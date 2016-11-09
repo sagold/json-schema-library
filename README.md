@@ -42,23 +42,9 @@ extended by any missing items or properties.
 
 ```js
 const baseData = getTemplate(
-    {type: 'object', properties: { target: {'string'}}}
-); // returns { target: "" }
-```
-
-
-### guessOneOfSchema(schema, data, rootSchema = schema)
-
-returns the best matching schema.oneOf schema matching the given data. The method allows additional or missing values.
-
-```js
-const baseData = guessOneOfSchema(
-    {type: 'object', oneOf: [
-        {type: "object", properties: { target: "string", other: "boolean"}},
-        {type: "object", properties: { target: "number", other: "boolean"}}
-    ]},
-    { target: 14 }
-); // returns {type: "object", properties: { target: "number", other: "boolean"}}
+    { type: 'object', properties: { target: {'string'}} },
+    { other: true }
+); // returns { other: true, target: "" }
 ```
 
 
