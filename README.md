@@ -24,6 +24,15 @@ within the logic (advance VS retrieve from root -> support both)
 const targetSchema = getSchema(rootSchema, '#/path/to/target', rootData);
 ```
 
+Currently may also return an error:
+
+```js
+if (targetSchema instanceOf Error) {
+    throw targetSchema;
+}
+```
+
+
 
 ### SchemaService(schema)
 
@@ -42,9 +51,9 @@ extended by any missing items or properties.
 
 ```js
 const baseData = getTemplate(
-    { type: 'object', properties: { target: {'string'}} },
+    { type: "object", properties: { target: { type: "string", default: "v" } } },
     { other: true }
-); // returns { other: true, target: "" }
+); // returns { other: true, target: "v" }
 ```
 
 
@@ -53,9 +62,8 @@ const baseData = getTemplate(
 returns a json schema which is valid against data.
 
 ```js
-const baseSchema = getTemplate(
-    { target: "" }
-); // {type: "object", properties: { target: "string"}},
+const baseSchema = getTemplate({ target: "" });
+// returns {type: "object", properties: { target: "string"}},
 ```
 
 
@@ -64,8 +72,10 @@ const baseSchema = getTemplate(
 returns the schema if it validates the data, else returns false if the data is invalid
 
 ```js
-const baseSchema = isValid("", { type: "number" }); // returns false
+const baseSchema = isValid("", { type: "number" });
+// returns false
 ```
+
 
 ### step(key, schema, data, rootSchema = schema)
 

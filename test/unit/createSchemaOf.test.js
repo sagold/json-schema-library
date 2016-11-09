@@ -25,4 +25,10 @@ describe("createSchemaOf", () => {
         expect(res.items[0].type).to.eq("string");
         expect(res.items[1].type).to.eq("boolean");
     });
+
+    it("should add single item as item-object", () => {
+        const res = createSchemaOf(["string"]);
+        expect(res.items).to.be.an.object;
+        expect(res.items).to.deep.eq({ type: "string" });
+    });
 });
