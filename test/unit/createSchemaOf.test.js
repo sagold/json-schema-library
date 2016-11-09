@@ -28,7 +28,7 @@ describe("createSchemaOf", () => {
 
     it("should add single item as item-object", () => {
         const res = createSchemaOf(["string"]);
-        expect(res.items).to.be.an.object;
+        expect(res.items).to.be.an("object");
         expect(res.items).to.deep.eq({ type: "string" });
     });
 });
