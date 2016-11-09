@@ -202,32 +202,6 @@ describe("getTemplate", () => {
                 expect(res.length).to.deep.equal(1);
                 expect(res).to.deep.equal(["target"]);
             });
-
-            it.skip("should return create template for data matching correct oneOf schema", () => {
-                const res = getTemplate({ type: "array", minItems: 1,
-                    items: {
-                        oneOf: [
-                            {
-                                type: "object",
-                                properties: {
-                                    first: { type: "string" },
-                                    second: { type: "string" }
-                                }
-                            },
-                            {
-                                type: "object",
-                                properties: {
-                                    second: { type: "string", "default": "target" },
-                                    third: { type: "string" }
-                                }
-                            }
-                        ]
-                    }
-                }, { third: "input" });
-
-                expect(res.length).to.deep.equal(1);
-                expect(res).to.deep.equal({ second: "target", third: "input" });
-            });
         });
     });
 });
