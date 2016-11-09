@@ -1,6 +1,5 @@
 # json-schema-library
 
-`npm i json-schema-library`
 
 > This package offers tools and utilities to work with json-schema, create and validate data. Unfortunately, most
 > packages, editors or validators do not care to expose basic json-schema functionality. This repository
@@ -8,7 +7,12 @@
 > will hopefully expand over time.
 
 Instead of small memory footprint or high performance, this package focuses on exposing utilities for browser and node
-environments. This package is tested on node v6.9.1.
+environments. Furthermore, current validation and retrieval functions perform a lazy check, which is required for form
+evaluation in i.e. json editors.
+
+`npm i json-schema-library`.
+
+This package is tested on node v6.9.1.
 
 
 ## Overview
