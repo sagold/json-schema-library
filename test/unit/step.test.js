@@ -2,7 +2,7 @@ const expect = require("chai").expect;
 const step = require("../../lib/step");
 
 
-describe("jsonschema.step", () => {
+describe("step", () => {
 
     describe("object", () => {
 
