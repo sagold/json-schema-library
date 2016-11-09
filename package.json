@@ -1,0 +1,30 @@
+{
+  "name": "json-schema-library",
+  "version": "0.0.1",
+  "description": "Javascript tools to work with json-schema, data generation and validation",
+  "main": "index.js",
+  "scripts": {
+    "test-unit": "mocha --recursive 'test/unit/**/*.test.js' -R spec; exit 0",
+    "tdd": "watch 'npm run test-unit' lib/ app/ test/; exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sagold/json-schema-library.git"
+  },
+  "author": "Sascha Goldhofer <noreply@saschagoldhofer.de> (https://github.com/sagold/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sagold/json-schema-library/issues"
+  },
+  "homepage": "https://github.com/sagold/json-schema-library",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "eslint": "^2.7.0",
+    "mocha": "^3.1.2",
+    "watch": "^1.0.1"
+  },
+  "dependencies": {
+    "ajv": "^4.8.2",
+    "json-library": "^1.0.3"
+  }
+}
