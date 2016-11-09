@@ -3,8 +3,8 @@
 `npm i json-schema-library`
 
 > This package offers tools and utilities to work with json-schema, create and validate data. Unfortunately, most
-> packages, editors or validators do not care to expose basic json-schema functionality. This repository tries to
-> lessen the pain to start building tools around json-schema. The tools currently support only a basic json-schema, but
+> packages, editors or validators do not care to expose basic json-schema functionality. This repository
+> lessens the pain building tools around json-schema. The tools currently support only a basic json-schema, but
 > will hopefully expand over time.
 
 Instead of small memory footprint or high performance, this package focuses on exposing utilities for browser and node
@@ -78,9 +78,7 @@ const baseSchema = getTemplate(
 returns the schema if it validates the data, else returns false if the data is invalid
 
 ```js
-const baseSchema = isValid("", 
-    { type: "number" }
-); // returns false
+const baseSchema = isValid("", { type: "number" }); // returns false
 ```
 
 ### step(key, schema, data, rootSchema = schema)
