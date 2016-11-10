@@ -2,7 +2,7 @@
   "name": "json-schema-library",
   "version": "0.0.1",
   "description": "Javascript tools to work with json-schema, data generation and validation",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test-unit": "mocha --recursive 'test/unit/**/*.test.js' -R spec; exit 0",
     "tdd": "watch 'npm run test-unit' lib/ app/ test/; exit 0"
