@@ -1,6 +1,6 @@
 {
   "name": "json-schema-library",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Javascript tools to work with json-schema, data generation and validation",
   "main": "lib/index.js",
   "scripts": {
