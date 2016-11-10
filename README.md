@@ -93,5 +93,24 @@ const baseSchema = step(
 ); // returns {type: "string"}
 ```
 
+### each(data, schema, callback)
+
+calls the callback on each item (object, array and value), passing the current schema and its data
+
+```js
+const schema = {
+    type: "array",
+    items: [
+        { type: "number" },
+        { type: "string" }
+    ]
+};
+
+each([5, "nine"], schema, (schema, value, pointer) => {
+    // 1. schema = { type: "array", items: [...] }, data = [5, "nine"], pointer = #
+    // 2. schema = { type: "number" }, data = 5, pointer = #/0
+    // 3. schema = { type: "string" }, data = "nine", pointer = #/1
+});
+```
 
 
