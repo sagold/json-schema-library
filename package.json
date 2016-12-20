@@ -4,8 +4,9 @@
   "description": "Javascript tools to work with json-schema, data generation and validation",
   "main": "lib/index.js",
   "scripts": {
+    "test": "npm run test-unit",
     "test-unit": "mocha --recursive 'test/unit/**/*.test.js' -R spec; exit 0",
-    "tdd": "watch 'npm run test-unit' lib/ app/ test/; exit 0"
+    "tdd": "watch 'npm run test-unit' lib/ test/; exit 0"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,6 @@
   },
   "dependencies": {
     "ajv": "^4.8.2",
-    "json-library": "^1.0.3"
+    "gson-pointer": "^1.0.4"
   }
 }
