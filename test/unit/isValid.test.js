@@ -97,6 +97,20 @@ describe("isValid", () => {
             const valid = isValid([1], { type: "array", maxItems: 1, minItems: 1 });
             expect(valid).to.be.an("object");
         });
+
+        it("should test items", () => {
+            const valid = isValid([1], { type: "array", items: {
+                type: "string"
+            } });
+
+            expect(valid).to.be.false;
+        });
+
+        it("should return schema if array is valid", () => {
+            const valid = isValid([1], { type: "array", items: { type: "number" } });
+            expect(valid).to.be.an("object");
+            expect(valid.type).to.eq("array");
+        });
     });
 
     describe("object", () => {
@@ -124,6 +138,23 @@ describe("isValid", () => {
         it("should be valid if item count is in range", () => {
             const valid = isValid({ a: 1 }, { type: "object", maxProperties: 1, minProperties: 1 });
             expect(valid).to.be.an("object");
+        });
+
+        it("should test properties", () => {
+            const valid = isValid({ a: 1 }, { type: "object", maxProperties: 1, minProperties: 1, properties: {
+                a: { type: "string" }
+            } });
+
+            expect(valid).to.be.false;
+        });
+
+        it("should return schema if object is valid", () => {
+            const valid = isValid({ a: 1 }, { type: "object", maxProperties: 1, minProperties: 1, properties: {
+                a: { type: "number" }
+            } });
+
+            expect(valid).to.be.an("object");
+            expect(valid.type).to.eq("object");
         });
     });
 
