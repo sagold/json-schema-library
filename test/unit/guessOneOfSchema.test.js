@@ -1,7 +1,7 @@
 /* eslint quote-props: 0 */
 const expect = require("chai").expect;
 const guessOneOfSchema = require("../../lib/guessOneOfSchema");
-
+const step = require("../../lib/step");
 
 describe("guessOneOfSchema", () => {
 
@@ -12,7 +12,7 @@ describe("guessOneOfSchema", () => {
                 { type: "number" },
                 { type: "object" }
             ]
-        }, 4);
+        }, 4, step);
 
         expect(res).to.deep.eq({ type: "number" });
     });
@@ -23,7 +23,7 @@ describe("guessOneOfSchema", () => {
                 { type: "string", pattern: "obelix" },
                 { type: "string", pattern: "asterix" }
             ]
-        }, "anasterixcame");
+        }, "anasterixcame", step);
 
         expect(res).to.deep.eq({ type: "string", pattern: "asterix" });
     });
@@ -37,7 +37,7 @@ describe("guessOneOfSchema", () => {
                     { type: "object", properties: { description: { type: "string" } } },
                     { type: "object", properties: { content: { type: "string" } } }
                 ]
-            }, { description: "..." });
+            }, { description: "..." }, step);
 
             expect(res).to.deep.eq({ type: "object", properties: { description: { type: "string" } } });
         });
@@ -48,7 +48,7 @@ describe("guessOneOfSchema", () => {
                     { type: "object", properties: { title: { type: "number" } } },
                     { type: "object", properties: { title: { type: "string" } } }
                 ]
-            }, { title: "asterix" });
+            }, { title: "asterix" }, step);
 
             expect(res).to.deep.eq({ type: "object", properties: { title: { type: "string" } } });
         });
@@ -63,7 +63,7 @@ describe("guessOneOfSchema", () => {
                         { type: "object", properties: { "a": t, "b": t, "c": t } },
                         { type: "object", properties: { "a": t, "d": t, "e": t } }
                     ]
-                }, { a: 0, b: 1 });
+                }, { a: 0, b: 1 }, step);
 
                 expect(res).to.deep.eq({ type: "object", properties: { "a": t, "b": t, "c": t } });
             });
@@ -76,7 +76,7 @@ describe("guessOneOfSchema", () => {
                         { type: "object", properties: { "a": { type: "boolean" }, "b": t, "d": t } },
                         { type: "object", properties: { "a": { type: "number" }, "b": t, "e": t } }
                     ]
-                }, { a: true, b: 1 });
+                }, { a: true, b: 1 }, step);
 
                 expect(res).to.deep.eq({ type: "object", properties: { "a": { type: "boolean" }, "b": t, "d": t } });
             });
@@ -118,7 +118,7 @@ describe("guessOneOfSchema", () => {
                 }, {
                     type: "teaser",
                     redirectUrl: "http://gfx.sueddeutsche.de/test/pay/article.html"
-                });
+                }, step);
 
                 expect(res).to.deep.eq({
                     type: "object",
