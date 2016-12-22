@@ -21,7 +21,7 @@ atlassian-ide-plugin.xml
 *.sublime-project
 *.sublime-workspace
 
-config
+/config
 doc-build/
 /build/
 /dist/
