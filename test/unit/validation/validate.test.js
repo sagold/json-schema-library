@@ -4,14 +4,18 @@ const validate = require("../../../lib/validation/type").validate;
 
 describe("validate", () => {
 
-    describe.only("string", () => {
+    describe("string", () => {
 
-        it("should return minLengthError if string is too short", () => {
+        it("should return MinLengthError if string is too short", () => {
             const errors = validate({ type: "string", minLength: 2 }, "a");
             expect(errors).to.have.length(1);
-            expect(errors[0].name).to.eq("minLengthError");
+            expect(errors[0].name).to.eq("MinLengthError");
+        });
 
-            throw errors[0];
+        it("should return MaxLengthError if string is too short", () => {
+            const errors = validate({ type: "string", maxLength: 2 }, "abc");
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("MaxLengthError");
         });
     });
 });
