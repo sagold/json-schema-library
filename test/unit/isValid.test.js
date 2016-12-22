@@ -55,21 +55,6 @@ describe("isValid", () => {
             const valid = isValid("4", { type: "number" }, step);
             expect(valid).to.be.false;
         });
-
-        it("should be invalid if number is too small", () => {
-            const valid = isValid(1, { type: "number", minimum: 2 }, step);
-            expect(valid).to.be.false;
-        });
-
-        it("should be invalid if number is too large", () => {
-            const valid = isValid(3, { type: "number", maximum: 2 }, step);
-            expect(valid).to.be.false;
-        });
-
-        it("should be valid if number is in range", () => {
-            const valid = isValid(2, { type: "number", maximum: 2, minimum: 2 }, step);
-            expect(valid).to.be.an("object");
-        });
     });
 
     describe("array", () => {
@@ -82,21 +67,6 @@ describe("isValid", () => {
         it("should be invalid if type is not an array", () => {
             const valid = isValid({}, { type: "array" }, step);
             expect(valid).to.be.false;
-        });
-
-        it("should be invalid for too few items", () => {
-            const valid = isValid([], { type: "array", minItems: 1 }, step);
-            expect(valid).to.be.false;
-        });
-
-        it("should be invalid for too many items", () => {
-            const valid = isValid([1, 2], { type: "array", maxItems: 1 }, step);
-            expect(valid).to.be.false;
-        });
-
-        it("should be valid if item count is in range", () => {
-            const valid = isValid([1], { type: "array", maxItems: 1, minItems: 1 }, step);
-            expect(valid).to.be.an("object");
         });
 
         it("should test items", () => {
