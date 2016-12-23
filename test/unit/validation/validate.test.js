@@ -60,8 +60,19 @@ describe("validate", () => {
             expect(errors[0].name).to.eq("MaxLengthError");
         });
 
-        it("should return no error if string is within range", () => {
+        it("should be valid if string is within range", () => {
             const errors = validate({ type: "string", minLength: 2, maxLength: 2 }, "ab");
+            expect(errors).to.have.length(0);
+        });
+
+        it("should return EnumError if value is not within enum list", () => {
+            const errors = validate({ type: "string", "enum": ["a", "c"] }, "b");
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("EnumError");
+        });
+
+        it("should be vali if value is within enum list", () => {
+            const errors = validate({ type: "string", "enum": ["a", "b", "c"] }, "b");
             expect(errors).to.have.length(0);
         });
     });
