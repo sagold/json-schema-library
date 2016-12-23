@@ -44,6 +44,13 @@ describe("validate", () => {
             const errors = validate({ type: "array", minItems: 2, maxItems: 2 }, [1, 2], step);
             expect(errors).to.have.length(0);
         });
+
+        it("should return error for invalid index", () => {
+            const errors = validate({ type: "array", items: [{ type: "string" }] }, [1], step);
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("TypeError");
+
+        });
     });
 
     describe("string", () => {
