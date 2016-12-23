@@ -19,7 +19,7 @@ describe("validate", () => {
             expect(errors[0].name).to.eq("MaxPropertiesError");
         });
 
-        it("should return no error if prperty count is within range", () => {
+        it("should return no error if property count is within range", () => {
             const errors = validate({ type: "object", maxProperties: 1 }, { a: 1, b: 2 }, step);
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("MaxPropertiesError");
@@ -91,6 +91,17 @@ describe("validate", () => {
 
         it("should return no error if number is within range", () => {
             const errors = validate({ type: "number", minimum: 1, maximum: 1 }, 1);
+            expect(errors).to.have.length(0);
+        });
+
+        it("should return EnumError if value is not within enum list", () => {
+            const errors = validate({ type: "number", "enum": [21, 27, 42] }, 13);
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("EnumError");
+        });
+
+        it("should be vali if value is within enum list", () => {
+            const errors = validate({ type: "number", "enum": [21, 27, 42] }, 27);
             expect(errors).to.have.length(0);
         });
     });
