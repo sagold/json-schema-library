@@ -49,7 +49,21 @@ describe("validate", () => {
             const errors = validate({ type: "array", items: [{ type: "string" }] }, [1], step);
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("TypeError");
+        });
 
+        it("should be valid for matching indices", () => {
+            const errors = validate({ type: "array", items: [{ type: "string" }, { type: "number" }] }, ["1", 2], step);
+            expect(errors).to.have.length(0);
+        });
+
+        it.only("should return error for additional items", () => {
+            const errors = validate({ type: "array",
+                items: [{ type: "string" }, { type: "number" }],
+                additionalItems: false
+            }, ["1", 2, "a"], step);
+
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("AdditionalItemsError");
         });
     });
 
