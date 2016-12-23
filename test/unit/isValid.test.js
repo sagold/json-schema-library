@@ -27,21 +27,6 @@ describe("isValid", () => {
             const valid = isValid(4, { type: "string" }, step);
             expect(valid).to.be.false;
         });
-
-        it("should be invalid if string is too short", () => {
-            const valid = isValid("4", { type: "string", minLength: 2 }, step);
-            expect(valid).to.be.false;
-        });
-
-        it("should be invalid if string is too long", () => {
-            const valid = isValid("443", { type: "string", maxLength: 2 }, step);
-            expect(valid).to.be.false;
-        });
-
-        it("should be valid if string length is in range", () => {
-            const valid = isValid("44", { type: "string", maxLength: 2, minLength: 2 }, step);
-            expect(valid).to.be.an("object");
-        });
     });
 
     describe("number", () => {
@@ -94,21 +79,6 @@ describe("isValid", () => {
         it("should be invalid if type is not an object", () => {
             const valid = isValid([], { type: "object" }, step);
             expect(valid).to.be.false;
-        });
-
-        it("should be invalid for too few properties", () => {
-            const valid = isValid({}, { type: "object", minProperties: 1 }, step);
-            expect(valid).to.be.false;
-        });
-
-        it("should be invalid for too many properties", () => {
-            const valid = isValid({ a: 1, b: 2 }, { type: "object", maxProperties: 1 }, step);
-            expect(valid).to.be.false;
-        });
-
-        it("should be valid if item count is in range", () => {
-            const valid = isValid({ a: 1 }, { type: "object", maxProperties: 1, minProperties: 1 }, step);
-            expect(valid).to.be.an("object");
         });
 
         it("should test properties", () => {
