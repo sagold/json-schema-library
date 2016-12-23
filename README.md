@@ -19,6 +19,7 @@ This package is tested on node v6.9.1.
 
 refer to the [unit-tests](./test/unit/) for up to date examples of each function.
 
+
 ### getSchema(schema, pointer, data)
 
 return the json 'schema' matching 'data' at 'pointer'. Should be modified to use a step/next-function, which is already
@@ -70,10 +71,19 @@ const baseSchema = getTemplate({ target: "" });
 // returns {type: "object", properties: { target: "string"}},
 ```
 
+### validate(data, schema, step)
 
-### isValid(data, schema)
+returns a list of validation errors
 
-returns the schema if it validates the data, else returns false if the data is invalid
+```js
+const baseSchema = validate("", { type: "number" });
+// returns false
+```
+
+
+### isValid(data, schema, step)
+
+returns true if the given schema validates the data 
 
 ```js
 const baseSchema = isValid("", { type: "number" });
@@ -92,6 +102,7 @@ const baseSchema = step(
     { target: "value" }
 ); // returns {type: "string"}
 ```
+
 
 ### each(data, schema, callback)
 
