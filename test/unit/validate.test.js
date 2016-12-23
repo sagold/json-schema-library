@@ -100,8 +100,24 @@ describe("validate", () => {
             expect(errors[0].name).to.eq("EnumError");
         });
 
-        it("should be vali if value is within enum list", () => {
+        it("should be valid if value is within enum list", () => {
             const errors = validate({ type: "number", "enum": [21, 27, 42] }, 27);
+            expect(errors).to.have.length(0);
+        });
+
+        it("should return error if value is not multiple of 1.5", () => {
+            const errors = validate({ type: "number", multipleOf: 1.5 }, 4);
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("MultipleOfError");
+        });
+
+        it("should be valid if value if a multiple of 1.5", () => {
+            const errors = validate({ type: "number", multipleOf: 1.5 }, 4.5);
+            expect(errors).to.have.length(0);
+        });
+
+        it("should be valid if 'multipleOf' is not a number", () => {
+            const errors = validate({ type: "number", multipleOf: "non-number" }, 4.5);
             expect(errors).to.have.length(0);
         });
     });
