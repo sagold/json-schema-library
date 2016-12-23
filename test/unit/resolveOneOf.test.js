@@ -1,12 +1,12 @@
 /* eslint quote-props: 0 */
 const expect = require("chai").expect;
-const guessOneOfSchema = require("../../lib/guessOneOfSchema");
+const resolveOneOf = require("../../lib/resolveOneOf");
 const step = require("../../lib/step");
 
-describe("guessOneOfSchema", () => {
+describe("resolveOneOf", () => {
 
     it("should return schema with matching type", () => {
-        const res = guessOneOfSchema({
+        const res = resolveOneOf({
             oneOf: [
                 { type: "string" },
                 { type: "number" },
@@ -18,7 +18,7 @@ describe("guessOneOfSchema", () => {
     });
 
     it("should return schema with matching pattern", () => {
-        const res = guessOneOfSchema({
+        const res = resolveOneOf({
             oneOf: [
                 { type: "string", pattern: "obelix" },
                 { type: "string", pattern: "asterix" }
@@ -31,7 +31,7 @@ describe("guessOneOfSchema", () => {
     describe("object", () => {
 
         it("should return schema with matching properties", () => {
-            const res = guessOneOfSchema({
+            const res = resolveOneOf({
                 oneOf: [
                     { type: "object", properties: { title: { type: "string" } } },
                     { type: "object", properties: { description: { type: "string" } } },
@@ -43,7 +43,7 @@ describe("guessOneOfSchema", () => {
         });
 
         it("should return schema with matching types", () => {
-            const res = guessOneOfSchema({
+            const res = resolveOneOf({
                 oneOf: [
                     { type: "object", properties: { title: { type: "number" } } },
                     { type: "object", properties: { title: { type: "string" } } }
@@ -57,7 +57,7 @@ describe("guessOneOfSchema", () => {
 
             it("should return schema with least missing properties", () => {
                 const t = { type: "number" };
-                const res = guessOneOfSchema({
+                const res = resolveOneOf({
                     oneOf: [
                         { type: "object", properties: { "a": t, "c": t, "d": t } },
                         { type: "object", properties: { "a": t, "b": t, "c": t } },
@@ -70,7 +70,7 @@ describe("guessOneOfSchema", () => {
 
             it("should only count properties that match the schema", () => {
                 const t = { type: "number" };
-                const res = guessOneOfSchema({
+                const res = resolveOneOf({
                     oneOf: [
                         { type: "object", properties: { "a": { type: "string" }, "b": t, "c": t } },
                         { type: "object", properties: { "a": { type: "boolean" }, "b": t, "d": t } },
@@ -82,7 +82,7 @@ describe("guessOneOfSchema", () => {
             });
 
             it("should find correct pay type", () => {
-                const res = guessOneOfSchema({
+                const res = resolveOneOf({
                     type: "object",
                     oneOf: [
                         { type: "object", properties: {
