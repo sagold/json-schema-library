@@ -20,6 +20,10 @@ describe("getTypeOf", () => {
         expect(getTypeOf(/^/)).to.eq("regexp");
     });
 
+    it("should return 'regexp' for 'new RegExp()'", () => {
+        expect(getTypeOf(new RegExp())).to.eq("regexp");
+    });
+
     it("should return 'object' for {}", () => {
         expect(getTypeOf({})).to.eq("object");
     });
