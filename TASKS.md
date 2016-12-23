@@ -5,6 +5,7 @@
 **Milestone** custom validator (form-validation, oneOfProperty, use current schema)
 
 - [ ] -- Features -- items: [] schema (order/defined indices)
+- [ ] -- Features -- oneOf -> oneOfProperty ( + Documentation)
 - [ ] -- Features -- additionalItems: Boolean | Schema
 - [ ] -- Features -- not
 - [ ] -- Features -- allOf
