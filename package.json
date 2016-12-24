@@ -7,7 +7,7 @@
     "test": "npm run test-unit",
     "test-unit": "mocha --recursive 'test/unit/**/*.test.js' -R spec; exit 0",
     "tdd": "watch 'npm run test-unit' lib/ test/; exit 0",
-    "coverage": "nyc npm run test"
+    "coverage": "nyc npm run test --reporter=lcov"
   },
   "repository": {
     "type": "git",
