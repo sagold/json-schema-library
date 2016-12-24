@@ -99,7 +99,6 @@ describe("validate", () => {
                 additionalItems: { type: "object" }
             }, ["1", 2, {}], step);
 
-            console.log(errors);
             expect(errors).to.have.length(0);
         });
     });
