@@ -6,7 +6,8 @@
   "scripts": {
     "test": "npm run test-unit",
     "test-unit": "mocha --recursive 'test/unit/**/*.test.js' -R spec; exit 0",
-    "tdd": "watch 'npm run test-unit' lib/ test/; exit 0"
+    "tdd": "watch 'npm run test-unit' lib/ test/; exit 0",
+    "coverage": "nyc npm run test"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
     "chai": "^3.5.0",
     "eslint": "^2.7.0",
     "mocha": "^3.1.2",
+    "nyc": "^10.0.0",
     "watch": "^1.0.1"
   },
   "dependencies": {
