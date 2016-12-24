@@ -24,14 +24,19 @@ describe("validate", () => {
             expect(errors).to.have.length(0);
         });
 
-        it("should be valid for missing type", () => {
-            const errors = validate({ type: "object", maxProperties: 1, minProperties: 1 }, { a: 1 }, step);
+        it("should still be valid for missing type", () => {
+            const errors = validate({ maxProperties: 1, minProperties: 1 }, { a: 1 }, step);
             expect(errors).to.have.length(0);
         });
 
-        it("should be valid for missing type", () => {
-            const errors = validate({ type: "object", maxProperties: 1, minProperties: 1 }, { a: 1 }, step);
-            expect(errors).to.have.length(0);
+        it("should be invalid if 'not' keyword does match", () => {
+            const errors = validate(
+                { type: "object", not: { type: "object", properties: { a: { type: "number" } } } },
+                { a: 1 },
+                step
+            );
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("NotError");
         });
     });
 
@@ -54,7 +59,7 @@ describe("validate", () => {
             expect(errors).to.have.length(0);
         });
 
-        it("should be valid for missing type", () => {
+        it("should still be valid for missing type", () => {
             const errors = validate({ minItems: 2, maxItems: 2 }, [1, 2], step);
             expect(errors).to.have.length(0);
         });
@@ -150,7 +155,7 @@ describe("validate", () => {
             expect(errors).to.have.length(0);
         });
 
-        it("should be valid for missing type", () => {
+        it("should still be valid for missing type", () => {
             const errors = validate({ minLength: 2, maxLength: 2 }, "ab", step);
             expect(errors).to.have.length(0);
         });
@@ -190,7 +195,7 @@ describe("validate", () => {
             expect(errors).to.have.length(0);
         });
 
-        it("should be valid for missing type", () => {
+        it("should still be valid for missing type", () => {
             const errors = validate({ minimum: 1, maximum: 1 }, 1, step);
             expect(errors).to.have.length(0);
         });
