@@ -19,10 +19,14 @@ describe("validate", () => {
             expect(errors[0].name).to.eq("MaxPropertiesError");
         });
 
-        it("should return no error if property count is within range", () => {
-            const errors = validate({ type: "object", maxProperties: 1 }, { a: 1, b: 2 }, step);
-            expect(errors).to.have.length(1);
-            expect(errors[0].name).to.eq("MaxPropertiesError");
+        it("should be valid if property count is within range", () => {
+            const errors = validate({ type: "object", maxProperties: 1, minProperties: 1 }, { a: 1 }, step);
+            expect(errors).to.have.length(0);
+        });
+
+        it("should be valid for missing type", () => {
+            const errors = validate({ type: "object", maxProperties: 1, minProperties: 1 }, { a: 1 }, step);
+            expect(errors).to.have.length(0);
         });
     });
 
@@ -40,8 +44,13 @@ describe("validate", () => {
             expect(errors[0].name).to.eq("MaxItemsError");
         });
 
-        it("should return no error if item count is within range", () => {
+        it("should be valid if item count is within range", () => {
             const errors = validate({ type: "array", minItems: 2, maxItems: 2 }, [1, 2], step);
+            expect(errors).to.have.length(0);
+        });
+
+        it("should be valid for missing type", () => {
+            const errors = validate({ minItems: 2, maxItems: 2 }, [1, 2], step);
             expect(errors).to.have.length(0);
         });
 
@@ -80,7 +89,6 @@ describe("validate", () => {
                 items: [{ type: "string" }, { type: "number" }]
             }, ["1", 2, "a"], step);
 
-            errors[0] && console.log(errors[0]);
             expect(errors).to.have.length(0);
         });
 
@@ -91,6 +99,7 @@ describe("validate", () => {
             }, ["1", 2, "a"], step);
 
             expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("TypeError");
         });
 
         it("should be valid for matching additionalItems schema", () => {
@@ -122,15 +131,26 @@ describe("validate", () => {
             expect(errors).to.have.length(0);
         });
 
+        it("should be valid for missing type", () => {
+            const errors = validate({ minLength: 2, maxLength: 2 }, "ab");
+            expect(errors).to.have.length(0);
+        });
+
         it("should return EnumError if value is not within enum list", () => {
             const errors = validate({ type: "string", "enum": ["a", "c"] }, "b");
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("EnumError");
         });
 
-        it("should be vali if value is within enum list", () => {
+        it("should be valid if value is within enum list", () => {
             const errors = validate({ type: "string", "enum": ["a", "b", "c"] }, "b");
             expect(errors).to.have.length(0);
+        });
+
+        it("should be invalid if 'not' keyword does match", () => {
+            const errors = validate({ type: "string", not: { type: "string", pattern: "^b$" } }, "b");
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("NotError");
         });
     });
 
@@ -146,8 +166,13 @@ describe("validate", () => {
             expect(errors[0].name).to.eq("MaximumError");
         });
 
-        it("should return no error if number is within range", () => {
+        it("should be valid if number is within range", () => {
             const errors = validate({ type: "number", minimum: 1, maximum: 1 }, 1);
+            expect(errors).to.have.length(0);
+        });
+
+        it("should be valid for missing type", () => {
+            const errors = validate({ minimum: 1, maximum: 1 }, 1);
             expect(errors).to.have.length(0);
         });
 
