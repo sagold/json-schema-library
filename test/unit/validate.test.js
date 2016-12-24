@@ -56,7 +56,7 @@ describe("validate", () => {
             expect(errors).to.have.length(0);
         });
 
-        it.only("should return error for additional items", () => {
+        it("should return error for prohibited additional items", () => {
             const errors = validate({ type: "array",
                 items: [{ type: "string" }, { type: "number" }],
                 additionalItems: false
@@ -64,6 +64,43 @@ describe("validate", () => {
 
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("AdditionalItemsError");
+        });
+
+        it("should be valid if additionalItems is true", () => {
+            const errors = validate({ type: "array",
+                items: [{ type: "string" }, { type: "number" }],
+                additionalItems: true
+            }, ["1", 2, "a"], step);
+
+            expect(errors).to.have.length(0);
+        });
+
+        it("should also be valid if additionalItems is undefined", () => {
+            const errors = validate({ type: "array",
+                items: [{ type: "string" }, { type: "number" }]
+            }, ["1", 2, "a"], step);
+
+            errors[0] && console.log(errors[0]);
+            expect(errors).to.have.length(0);
+        });
+
+        it("should return error for mismatching additionalItems schema", () => {
+            const errors = validate({ type: "array",
+                items: [{ type: "string" }, { type: "number" }],
+                additionalItems: { type: "object" }
+            }, ["1", 2, "a"], step);
+
+            expect(errors).to.have.length(1);
+        });
+
+        it("should be valid for matching additionalItems schema", () => {
+            const errors = validate({ type: "array",
+                items: [{ type: "string" }, { type: "number" }],
+                additionalItems: { type: "object" }
+            }, ["1", 2, {}], step);
+
+            console.log(errors);
+            expect(errors).to.have.length(0);
         });
     });
 
