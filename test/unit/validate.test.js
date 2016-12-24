@@ -28,6 +28,11 @@ describe("validate", () => {
             const errors = validate({ type: "object", maxProperties: 1, minProperties: 1 }, { a: 1 }, step);
             expect(errors).to.have.length(0);
         });
+
+        it("should be valid for missing type", () => {
+            const errors = validate({ type: "object", maxProperties: 1, minProperties: 1 }, { a: 1 }, step);
+            expect(errors).to.have.length(0);
+        });
     });
 
     describe("array", () => {
@@ -110,45 +115,59 @@ describe("validate", () => {
 
             expect(errors).to.have.length(0);
         });
+
+        it("should be invalid if 'not' keyword does match", () => {
+            const errors = validate(
+                { type: "array",
+                    items: [{ type: "string" }, { type: "number" }],
+                    additionalItems: { type: "object" },
+                    not: { items: {} }
+                },
+                ["1", 2, {}],
+                step
+            );
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("NotError");
+        });
     });
 
     describe("string", () => {
 
         it("should return MinLengthError if string is too short", () => {
-            const errors = validate({ type: "string", minLength: 2 }, "a");
+            const errors = validate({ type: "string", minLength: 2 }, "a", step);
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("MinLengthError");
         });
 
         it("should return MaxLengthError if string is too long", () => {
-            const errors = validate({ type: "string", maxLength: 2 }, "abc");
+            const errors = validate({ type: "string", maxLength: 2 }, "abc", step);
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("MaxLengthError");
         });
 
         it("should be valid if string is within range", () => {
-            const errors = validate({ type: "string", minLength: 2, maxLength: 2 }, "ab");
+            const errors = validate({ type: "string", minLength: 2, maxLength: 2 }, "ab", step);
             expect(errors).to.have.length(0);
         });
 
         it("should be valid for missing type", () => {
-            const errors = validate({ minLength: 2, maxLength: 2 }, "ab");
+            const errors = validate({ minLength: 2, maxLength: 2 }, "ab", step);
             expect(errors).to.have.length(0);
         });
 
         it("should return EnumError if value is not within enum list", () => {
-            const errors = validate({ type: "string", "enum": ["a", "c"] }, "b");
+            const errors = validate({ type: "string", "enum": ["a", "c"] }, "b", step);
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("EnumError");
         });
 
         it("should be valid if value is within enum list", () => {
-            const errors = validate({ type: "string", "enum": ["a", "b", "c"] }, "b");
+            const errors = validate({ type: "string", "enum": ["a", "b", "c"] }, "b", step);
             expect(errors).to.have.length(0);
         });
 
         it("should be invalid if 'not' keyword does match", () => {
-            const errors = validate({ type: "string", not: { type: "string", pattern: "^b$" } }, "b");
+            const errors = validate({ type: "string", not: { type: "string", pattern: "^b$" } }, "b", step);
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("NotError");
         });
@@ -157,50 +176,58 @@ describe("validate", () => {
     describe("number", () => {
 
         it("should return MinimumError if number is too small", () => {
-            const errors = validate({ type: "number", minimum: 2 }, 1);
+            const errors = validate({ type: "number", minimum: 2 }, 1, step);
             expect(errors[0].name).to.eq("MinimumError");
         });
 
         it("should return MaximumError if number is too large", () => {
-            const errors = validate({ type: "number", maximum: 1 }, 2);
+            const errors = validate({ type: "number", maximum: 1 }, 2, step);
             expect(errors[0].name).to.eq("MaximumError");
         });
 
         it("should be valid if number is within range", () => {
-            const errors = validate({ type: "number", minimum: 1, maximum: 1 }, 1);
+            const errors = validate({ type: "number", minimum: 1, maximum: 1 }, 1, step);
             expect(errors).to.have.length(0);
         });
 
         it("should be valid for missing type", () => {
-            const errors = validate({ minimum: 1, maximum: 1 }, 1);
+            const errors = validate({ minimum: 1, maximum: 1 }, 1, step);
             expect(errors).to.have.length(0);
         });
 
         it("should return EnumError if value is not within enum list", () => {
-            const errors = validate({ type: "number", "enum": [21, 27, 42] }, 13);
+            const errors = validate({ type: "number", "enum": [21, 27, 42] }, 13, step);
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("EnumError");
         });
 
         it("should be valid if value is within enum list", () => {
-            const errors = validate({ type: "number", "enum": [21, 27, 42] }, 27);
+            const errors = validate({ type: "number", "enum": [21, 27, 42] }, 27, step);
             expect(errors).to.have.length(0);
         });
 
         it("should return error if value is not multiple of 1.5", () => {
-            const errors = validate({ type: "number", multipleOf: 1.5 }, 4);
+            const errors = validate({ type: "number", multipleOf: 1.5 }, 4, step);
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("MultipleOfError");
         });
 
         it("should be valid if value if a multiple of 1.5", () => {
-            const errors = validate({ type: "number", multipleOf: 1.5 }, 4.5);
+            const errors = validate({ type: "number", multipleOf: 1.5 }, 4.5, step);
             expect(errors).to.have.length(0);
         });
 
         it("should be valid if 'multipleOf' is not a number", () => {
-            const errors = validate({ type: "number", multipleOf: "non-number" }, 4.5);
+            const errors = validate({ type: "number", multipleOf: "non-number" }, 4.5, step);
             expect(errors).to.have.length(0);
+        });
+
+        it("should be invalid if 'not' keyword does match", () => {
+            const errors = validate(
+                { type: "number", multipleOf: "non-number", not: { type: "number", minimum: 4 } }, 4.5, step
+            );
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("NotError");
         });
     });
 });
