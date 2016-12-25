@@ -1,4 +1,4 @@
-/* eslint quote-props: 0 */
+/* eslint quote-props: 0 max-len: 0 */
 const expect = require("chai").expect;
 const resolveOneOf = require("../../lib/resolveOneOf");
 const step = require("../../lib/step");
@@ -42,7 +42,7 @@ describe("resolveOneOf", () => {
             expect(res).to.deep.eq({ type: "object", properties: { description: { type: "string" } } });
         });
 
-        it("should return schema with matching types", () => {
+        it("should return schema matching nested properties", () => {
             const res = resolveOneOf({
                 oneOf: [
                     { type: "object", properties: { title: { type: "number" } } },
@@ -52,6 +52,68 @@ describe("resolveOneOf", () => {
 
             expect(res).to.deep.eq({ type: "object", properties: { title: { type: "string" } } });
         });
+
+
+        describe("oneOfProperty", () => {
+
+            it("should return schema matching oneOfProperty", () => {
+                const res = resolveOneOf({
+                    oneOfProperty: "id",
+                    oneOf: [
+                        { type: "object", properties: { id: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
+                        { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } },
+                        { type: "object", properties: { id: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
+                    ]
+                }, { id: "2", title: 123 }, step);
+
+                expect(res).to.deep.eq(
+                    { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } }
+                );
+            });
+
+            it("should return schema matching oneOfProperty even it is invalid", () => {
+                const res = resolveOneOf({
+                    oneOfProperty: "id",
+                    oneOf: [
+                        { type: "object", properties: { id: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
+                        { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } },
+                        { type: "object", properties: { id: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
+                    ]
+                }, { id: "2", title: "not a number" }, step);
+
+                expect(res).to.deep.eq(
+                    { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } }
+                );
+            });
+
+            it("should return an error if value at oneOfProperty is undefined", () => {
+                const res = resolveOneOf({
+                    oneOfProperty: "id",
+                    oneOf: [
+                        { type: "object", properties: { id: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
+                        { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } },
+                        { type: "object", properties: { id: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
+                    ]
+                }, { title: "not a number" }, step);
+
+                expect(res).to.be.instanceof(Error);
+                expect(res.name).to.eq("MissingOneOfPropertyError");
+            });
+
+            it("should return an error if no oneOfProperty could be matched", () => {
+                const res = resolveOneOf({
+                    oneOfProperty: "id",
+                    oneOf: [
+                        { type: "object", properties: { id: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
+                        { type: "object", properties: { id: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
+                    ]
+                }, { id: "2", title: "not a number" }, step);
+
+                expect(res).to.be.instanceof(Error);
+                expect(res.name).to.eq("OneOfPropertyError");
+            });
+        });
+
 
         describe("fuzzy match missing values", () => {
 
