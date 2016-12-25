@@ -1,12 +1,19 @@
 # Tasks
 
+**Milestone** add remaining draft04 features
+- [ ] -- Features -- patternProperties
+
+
 ## 16/12/xx
+
+- [ ] Testing (validate real json files)
 
 **Milestone** customizable default and form (json-editor) validation
 - [ ] -- Breaking -- Add sort of 'core' to customize validation, stepper, errors etc and reduce requried arguments
 
-**Milestone** custom validator (form-validation, oneOfProperty, validate currently existing schemas)
-- [ ] -- Features -- additionalItems: Boolean | Schema
+**Milestone** custom validator (form-validation, oneOfProperty)
+- [✓] -- Features -- additionalProperties: Boolean | Schema
+- [✓] -- Features -- additionalItems: Boolean | Schema
 - [✓] -- Features -- Add support for type "integer"
 - [✓] -- Features -- oneOf -> oneOfProperty ( + Documentation)
 - [✓] -- Breaking -- change isValid to return boolean

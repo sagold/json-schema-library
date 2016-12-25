@@ -38,6 +38,30 @@ describe("validate", () => {
             expect(errors).to.have.length(0);
         });
 
+        it("should return AdditionalPropertiesError for an additional property", () => {
+            const errors = validate({ type: "object", additionalProperties: false }, { a: 1 }, step);
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("NoAdditionalPropertiesError");
+        });
+
+        it("should be valid if 'additionProperties' is true", () => {
+            const errors = validate({ type: "object", additionalProperties: true }, { a: 1 }, step);
+            expect(errors).to.have.length(0);
+        });
+
+        it("should be valid if value matches 'additionProperties' schema", () => {
+            const errors = validate({ type: "object", additionalProperties: { type: "number" } }, { a: 1 }, step);
+            expect(errors).to.have.length(0);
+        });
+
+        it("should return AdditionalPropertiesError if value does not match 'additionProperties' schema", () => {
+            const errors = validate({ type: "object", additionalProperties: { type: "string" } }, { a: 1 }, step);
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("AdditionalPropertiesError");
+        });
+
+        // @todo patternProperties
+
         it("should still be valid for missing type", () => {
             const errors = validate({ maxProperties: 1, minProperties: 1 }, { a: 1 }, step);
             expect(errors).to.have.length(0);
