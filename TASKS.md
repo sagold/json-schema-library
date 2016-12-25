@@ -7,6 +7,7 @@
 - [ ] -- Features -- allOf
 - [ ] -- Features -- anyOf
 - [ ] -- Features -- oneOf: failing if multiple schemas match
+- [ ] -- Features -- required (array of properties). Currently everything property is required by default
 
 
 ## 16/12/xx
