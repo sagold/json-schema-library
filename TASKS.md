@@ -4,6 +4,8 @@
 
 **Milestone** add remaining draft04 features
 - [ ] -- Features -- patternProperties
+- [ ] -- Features -- uniqueItems
+- [ ] -- Features -- dependencies
 - [ ] -- Features -- allOf
 - [ ] -- Features -- anyOf
 - [ ] -- Features -- oneOf: failing if multiple schemas match
@@ -15,6 +17,7 @@
 - [ ] Testing (validate real json files)
 
 **Milestone** customizable default and form (json-editor) validation
+- [ ] -- Features -- Add core: Form, fix core: Draft04
 - [✓] -- Breaking -- Add sort of 'core' to customize validation, stepper, errors etc and reduce requried arguments
 
 **Milestone** custom validator (form-validation, oneOfProperty)
