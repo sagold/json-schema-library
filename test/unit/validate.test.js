@@ -221,11 +221,25 @@ describe("validate", () => {
 
         it("should return MinimumError if number is too small", () => {
             const errors = validate(core, { type: "number", minimum: 2 }, 1);
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("MinimumError");
+        });
+
+        it("should return MinimumError if number is equal and exclusiveMinimum is set", () => {
+            const errors = validate(core, { type: "number", minimum: 2, exclusiveMinimum: true }, 2);
+            expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("MinimumError");
         });
 
         it("should return MaximumError if number is too large", () => {
             const errors = validate(core, { type: "number", maximum: 1 }, 2);
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("MaximumError");
+        });
+
+        it("should return MaximumError if number same and exclusiveMaximum is set", () => {
+            const errors = validate(core, { type: "number", maximum: 2, exclusiveMaximum: true }, 2);
+            expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("MaximumError");
         });
 
