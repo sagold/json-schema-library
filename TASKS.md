@@ -1,15 +1,14 @@
 # Tasks
 
-## 16/12
+## 16/12/xx
+
+**Milestone** customizable default and form (json-editor) validation
+- [ ] -- Breaking -- Add sort of 'core' to customize validation, stepper, errors etc and reduce requried arguments
 
 **Milestone** custom validator (form-validation, oneOfProperty, validate currently existing schemas)
-**Milestone** customizable default and form (json-editor) validation
-
-- [ ] -- Breaking -- Add sort of 'core' to custim validation, stepper, errors etc and simplify function depenency inject
 - [ ] -- Features -- oneOf -> oneOfProperty ( + Documentation)
 - [ ] -- Features -- additionalItems: Boolean | Schema
-- [ ] -- Features -- allOf
-- [ ] -- Features -- anyOf
+- [ ] -- Features -- Add support for type "integer"
 - [✓] -- Breaking -- change isValid to return boolean
 - [✓] -- Breaking -- use `step` in isValid -- bad: circular dependencies with step -> guessOneOfSchema -> isValid --X-> step
 - [✓] -- Features -- items: [] schema (order/defined indices)

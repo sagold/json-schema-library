@@ -229,7 +229,7 @@ describe("validate", () => {
 
         it("should be invalid if 'not' keyword does match", () => {
             const errors = validate(
-                { type: "number", multipleOf: "non-number", not: { type: "number", minimum: 4 } }, 4.5, step
+                { type: "number", not: { type: "number", minimum: 4 } }, 4.5, step
             );
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("NotError");
