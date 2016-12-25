@@ -5,6 +5,20 @@ const step = require("../../lib/step");
 
 describe("validate", () => {
 
+    describe("integer", () => {
+
+        it("should suport type 'integer'", () => {
+            const errors = validate({ type: "integer" }, 1, step);
+            expect(errors).to.have.length(0);
+        });
+
+        it("should throw error if type 'integer' received a float", () => {
+            const errors = validate({ type: "integer" }, 1.1, step);
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("TypeError");
+        });
+    });
+
     describe("object", () => {
 
         it("should return MinPropertiesError for too few properties", () => {
