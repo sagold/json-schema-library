@@ -1,7 +1,7 @@
 {
   "name": "json-schema-library",
   "version": "0.3.0",
-  "description": "Javascript tools to work with json-schema, data generation and validation",
+  "description": "Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation",
   "main": "lib/index.js",
   "scripts": {
     "test": "npm run test-unit",

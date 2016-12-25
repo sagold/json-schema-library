@@ -4,6 +4,9 @@
 
 **Milestone** add remaining draft04 features
 - [ ] -- Features -- patternProperties
+- [ ] -- Features -- allOf
+- [ ] -- Features -- anyOf
+- [ ] -- Features -- oneOf: failing if multiple schemas match
 
 
 ## 16/12/xx
