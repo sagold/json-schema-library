@@ -1,13 +1,17 @@
 const expect = require("chai").expect;
 const getSchema = require("../../lib/getSchema");
-
+const Core = require("../../lib/cores/draft04");
 
 describe("getSchema", () => {
+
+    let core;
+    before(() => (core = new Core()));
 
     describe("value", () => {
 
         it("should return schema of any value", () => {
-            const schema = getSchema({ id: "target", type: "*" }, "#");
+            core.rootSchema = { id: "target", type: "*" };
+            const schema = getSchema(core, core.rootSchema, undefined, "#");
             expect(schema).to.deep.equal({ id: "target", type: "*" });
         });
     });
@@ -15,17 +19,18 @@ describe("getSchema", () => {
     describe("object", () => {
 
         it("should return schema of the given property", () => {
-            const schema = getSchema({
+            core.rootSchema = {
                 type: "object",
                 properties: {
                     title: { id: "title", type: "string" }
                 }
-            }, "#/title");
+            };
+            const schema = getSchema(core, core.rootSchema, undefined, "#/title");
             expect(schema).to.deep.equal({ id: "title", type: "string" });
         });
 
         it("should return schema for property within nested object", () => {
-            const schema = getSchema({
+            core.rootSchema = {
                 type: "object",
                 properties: {
                     image: {
@@ -35,12 +40,13 @@ describe("getSchema", () => {
                         }
                     }
                 }
-            }, "#/image/title");
+            };
+            const schema = getSchema(core, core.rootSchema, undefined, "#/image/title");
             expect(schema).to.deep.equal({ id: "title", type: "string" });
         });
 
         it("should resolve $ref as property", () => {
-            const schema = getSchema({
+            core.rootSchema = {
                 type: "object",
                 definitions: {
                     target: {
@@ -52,12 +58,13 @@ describe("getSchema", () => {
                         $ref: "#/definitions/target"
                     }
                 }
-            }, "#/image");
+            };
+            const schema = getSchema(core, core.rootSchema, undefined, "#/image");
             expect(schema).to.deep.equal({ id: "target" });
         });
 
         it("should return correct 'oneOf' object definition", () => {
-            const schema = getSchema({
+            core.rootSchema = {
                 type: "object",
                 oneOf: [
                     {
@@ -76,7 +83,8 @@ describe("getSchema", () => {
                         additionalProperties: false
                     }
                 ]
-            }, "#/second", { second: "string" });
+            };
+            const schema = getSchema(core, core.rootSchema, { second: "string" }, "#/second");
             expect(schema).to.deep.equal({ id: "target", type: "string" });
         });
     });
@@ -84,27 +92,29 @@ describe("getSchema", () => {
     describe("array", () => {
 
         it("should return item schema", () => {
-            const schema = getSchema({
+            core.rootSchema = {
                 type: "array",
                 items: { id: "title", type: "string" }
-            }, "#/0");
+            };
+            const schema = getSchema(core, core.rootSchema, undefined, "#/0");
             expect(schema).to.deep.equal({ id: "title", type: "string" });
         });
 
         it("should return item schema based on index", () => {
-            const schema = getSchema({
+            core.rootSchema = {
                 type: "array",
                 items: [
                     { type: "number" },
                     { id: "target", type: "string" },
                     { type: "number" }
                 ]
-            }, "#/1");
+            };
+            const schema = getSchema(core, core.rootSchema, undefined, "#/1");
             expect(schema).to.deep.equal({ id: "target", type: "string" });
         });
 
         it("should return schema for matching 'oneOf' item", () => {
-            const schema = getSchema({
+            core.rootSchema = {
                 type: "array",
                 items: {
                     oneOf: [
@@ -125,7 +135,8 @@ describe("getSchema", () => {
                         }
                     ]
                 }
-            }, "#/0/second", [{ second: "second" }]);
+            };
+            const schema = getSchema(core, core.rootSchema, [{ second: "second" }], "#/0/second");
             expect(schema).to.deep.equal({ type: "string", id: "target" });
         });
     });

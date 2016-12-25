@@ -1,5 +1,7 @@
 # Tasks
 
+- [ ] -- Refactor -- type validation as keyword (in validation/keywords)
+
 **Milestone** add remaining draft04 features
 - [ ] -- Features -- patternProperties
 
@@ -9,7 +11,7 @@
 - [ ] Testing (validate real json files)
 
 **Milestone** customizable default and form (json-editor) validation
-- [ ] -- Breaking -- Add sort of 'core' to customize validation, stepper, errors etc and reduce requried arguments
+- [✓] -- Breaking -- Add sort of 'core' to customize validation, stepper, errors etc and reduce requried arguments
 
 **Milestone** custom validator (form-validation, oneOfProperty)
 - [✓] -- Features -- additionalProperties: Boolean | Schema

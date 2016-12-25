@@ -1,29 +1,34 @@
 /* eslint quote-props: 0 max-len: 0 */
 const expect = require("chai").expect;
 const resolveOneOf = require("../../lib/resolveOneOf");
-const step = require("../../lib/step");
+const Core = require("../../lib/cores/draft04");
 
 describe("resolveOneOf", () => {
 
+    let core;
+    beforeEach(() => (core = new Core()));
+
     it("should return schema with matching type", () => {
-        const res = resolveOneOf({
+        core.rootSchema = {
             oneOf: [
                 { type: "string" },
                 { type: "number" },
                 { type: "object" }
             ]
-        }, 4, step);
+        };
+        const res = resolveOneOf(core, core.rootSchema, 4);
 
         expect(res).to.deep.eq({ type: "number" });
     });
 
     it("should return schema with matching pattern", () => {
-        const res = resolveOneOf({
+        core.rootSchema = {
             oneOf: [
                 { type: "string", pattern: "obelix" },
                 { type: "string", pattern: "asterix" }
             ]
-        }, "anasterixcame", step);
+        };
+        const res = resolveOneOf(core, core.rootSchema, "anasterixcame");
 
         expect(res).to.deep.eq({ type: "string", pattern: "asterix" });
     });
@@ -31,24 +36,26 @@ describe("resolveOneOf", () => {
     describe("object", () => {
 
         it("should return schema with matching properties", () => {
-            const res = resolveOneOf({
+            core.rootSchema = {
                 oneOf: [
                     { type: "object", properties: { title: { type: "string" } } },
                     { type: "object", properties: { description: { type: "string" } } },
                     { type: "object", properties: { content: { type: "string" } } }
                 ]
-            }, { description: "..." }, step);
+            };
+            const res = resolveOneOf(core, core.rootSchema, { description: "..." });
 
             expect(res).to.deep.eq({ type: "object", properties: { description: { type: "string" } } });
         });
 
         it("should return schema matching nested properties", () => {
-            const res = resolveOneOf({
+            core.rootSchema = {
                 oneOf: [
                     { type: "object", properties: { title: { type: "number" } } },
                     { type: "object", properties: { title: { type: "string" } } }
                 ]
-            }, { title: "asterix" }, step);
+            };
+            const res = resolveOneOf(core, core.rootSchema, { title: "asterix" });
 
             expect(res).to.deep.eq({ type: "object", properties: { title: { type: "string" } } });
         });
@@ -57,14 +64,15 @@ describe("resolveOneOf", () => {
         describe("oneOfProperty", () => {
 
             it("should return schema matching oneOfProperty", () => {
-                const res = resolveOneOf({
+                core.rootSchema = {
                     oneOfProperty: "id",
                     oneOf: [
                         { type: "object", properties: { id: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
                         { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } },
                         { type: "object", properties: { id: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
                     ]
-                }, { id: "2", title: 123 }, step);
+                };
+                const res = resolveOneOf(core, core.rootSchema, { id: "2", title: 123 });
 
                 expect(res).to.deep.eq(
                     { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } }
@@ -72,14 +80,15 @@ describe("resolveOneOf", () => {
             });
 
             it("should return schema matching oneOfProperty even it is invalid", () => {
-                const res = resolveOneOf({
+                core.rootSchema = {
                     oneOfProperty: "id",
                     oneOf: [
                         { type: "object", properties: { id: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
                         { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } },
                         { type: "object", properties: { id: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
                     ]
-                }, { id: "2", title: "not a number" }, step);
+                };
+                const res = resolveOneOf(core, core.rootSchema, { id: "2", title: "not a number" });
 
                 expect(res).to.deep.eq(
                     { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } }
@@ -87,27 +96,29 @@ describe("resolveOneOf", () => {
             });
 
             it("should return an error if value at oneOfProperty is undefined", () => {
-                const res = resolveOneOf({
+                core.rootSchema = {
                     oneOfProperty: "id",
                     oneOf: [
                         { type: "object", properties: { id: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
                         { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } },
                         { type: "object", properties: { id: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
                     ]
-                }, { title: "not a number" }, step);
+                };
+                const res = resolveOneOf(core, core.rootSchema, { title: "not a number" });
 
                 expect(res).to.be.instanceof(Error);
                 expect(res.name).to.eq("MissingOneOfPropertyError");
             });
 
             it("should return an error if no oneOfProperty could be matched", () => {
-                const res = resolveOneOf({
+                core.rootSchema = {
                     oneOfProperty: "id",
                     oneOf: [
                         { type: "object", properties: { id: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
                         { type: "object", properties: { id: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
                     ]
-                }, { id: "2", title: "not a number" }, step);
+                };
+                const res = resolveOneOf(core, core.rootSchema, { id: "2", title: "not a number" });
 
                 expect(res).to.be.instanceof(Error);
                 expect(res.name).to.eq("OneOfPropertyError");
@@ -119,32 +130,34 @@ describe("resolveOneOf", () => {
 
             it("should return schema with least missing properties", () => {
                 const t = { type: "number" };
-                const res = resolveOneOf({
+                core.rootSchema = {
                     oneOf: [
                         { type: "object", properties: { "a": t, "c": t, "d": t } },
                         { type: "object", properties: { "a": t, "b": t, "c": t } },
                         { type: "object", properties: { "a": t, "d": t, "e": t } }
                     ]
-                }, { a: 0, b: 1 }, step);
+                };
+                const res = resolveOneOf(core, core.rootSchema, { a: 0, b: 1 });
 
                 expect(res).to.deep.eq({ type: "object", properties: { "a": t, "b": t, "c": t } });
             });
 
             it("should only count properties that match the schema", () => {
                 const t = { type: "number" };
-                const res = resolveOneOf({
+                core.rootSchema = {
                     oneOf: [
                         { type: "object", properties: { "a": { type: "string" }, "b": t, "c": t } },
                         { type: "object", properties: { "a": { type: "boolean" }, "b": t, "d": t } },
                         { type: "object", properties: { "a": { type: "number" }, "b": t, "e": t } }
                     ]
-                }, { a: true, b: 1 }, step);
+                };
+                const res = resolveOneOf(core, core.rootSchema, { a: true, b: 1 });
 
                 expect(res).to.deep.eq({ type: "object", properties: { "a": { type: "boolean" }, "b": t, "d": t } });
             });
 
             it("should find correct pay type", () => {
-                const res = resolveOneOf({
+                core.rootSchema = {
                     type: "object",
                     oneOf: [
                         { type: "object", properties: {
@@ -177,10 +190,11 @@ describe("resolveOneOf", () => {
                             }
                         } }
                     ]
-                }, {
+                };
+                const res = resolveOneOf(core, core.rootSchema, {
                     type: "teaser",
                     redirectUrl: "http://gfx.sueddeutsche.de/test/pay/article.html"
-                }, step);
+                });
 
                 expect(res).to.deep.eq({
                     type: "object",

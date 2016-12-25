@@ -1,13 +1,19 @@
 const expect = require("chai").expect;
 const step = require("../../lib/step");
 
+const Core = require("../../lib/cores/draft04");
+
 
 describe("step", () => {
+
+    let core;
+    before(() => (core = new Core()));
+
 
     describe("object", () => {
 
         it("should return object property", () => {
-            const res = step("title", {
+            const res = step(core, "title", {
                 type: "object",
                 properties: {
                     title: { type: "string" }
@@ -18,7 +24,7 @@ describe("step", () => {
         });
 
         it("should return matching oneOf", () => {
-            const res = step("title", {
+            const res = step(core, "title", {
                 type: "object",
                 oneOf: [
                     { type: "object", properties: { title: { type: "string" } } },
@@ -33,7 +39,7 @@ describe("step", () => {
     describe("array", () => {
 
         it("should return item property", () => {
-            const res = step(0, {
+            const res = step(core, 0, {
                 type: "array",
                 items: {
                     title: { type: "string" }
@@ -44,7 +50,7 @@ describe("step", () => {
         });
 
         it("should return item at index", () => {
-            const res = step(1, {
+            const res = step(core, 1, {
                 type: "array",
                 items: [
                     { type: "string" },
@@ -57,7 +63,7 @@ describe("step", () => {
         });
 
         it("should return matching item in oneOf", () => {
-            const res = step(0, {
+            const res = step(core, 0, {
                 type: "array",
                 items: {
                     oneOf: [
