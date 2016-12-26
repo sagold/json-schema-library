@@ -85,7 +85,7 @@ returns a list of validation errors
 
 ```js
 const core = new require("json-schema-library").core.draft04(rootSchema),
-const baseSchema = validate(core, { type: "number" }, "");
+const baseSchema = core.validate({ type: "number" }, "");
 // returns false
 
 // alternatively use core.validate({ type: "number" }, "")
@@ -98,7 +98,7 @@ returns true if the given schema validates the data
 
 ```js
 const core = new require("json-schema-library").core.draft04(rootSchema),
-const baseSchema = isValid(core, { type: "number" }, "");
+const baseSchema = core.isValid({ type: "number" }, "");
 // returns false
 ```
 
@@ -109,8 +109,7 @@ returns the child schema found at the given key
 
 ```js
 const core = new require("json-schema-library").core.draft04(rootSchema),
-const baseSchema = step(
-    core,
+const baseSchema = core.step(
     { type: "object", properties: { target: {type: "string"}} },
     { target: "value" }
     "target", 
@@ -133,7 +132,7 @@ const rootSchema = {
     ]
 };
 const core = new require("json-schema-library").core.draft04(rootSchema),
-each(core, core.rootSchema, [5, "nine"], (schema, value, pointer) => {
+core.each(core.rootSchema, [5, "nine"], (schema, value, pointer) => {
     // 1. schema = { type: "array", items: [...] }, data = [5, "nine"], pointer = #
     // 2. schema = { type: "number" }, data = 5, pointer = #/0
     // 3. schema = { type: "string" }, data = "nine", pointer = #/1
