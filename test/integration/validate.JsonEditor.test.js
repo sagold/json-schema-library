@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const expect = require("chai").expect;
-const Core = require("../../lib/cores/Draft04");
+const Core = require("../../lib/cores/JsonEditor");
 
 
 describe("validate.JsonEditor", () => {
@@ -23,10 +23,10 @@ describe("validate.JsonEditor", () => {
 
     describe("resolveRef", () => {
 
-        it("should discard any properties where $ref is used", () => {
+        it("should merge any properties where $ref is used", () => {
             core.rootSchema = { definitions: { def: { type: "string" } } };
             const result = core.resolveRef({ $ref: "#/definitions/def", title: "a definition" });
-            expect(result).to.deep.equal({ type: "string" });
+            expect(result).to.deep.equal({ type: "string", title: "a definition" });
         });
     });
 
