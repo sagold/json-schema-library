@@ -1,5 +1,7 @@
 # Tasks
 
+## 17/01
+
 - [ ] -- Refactor -- type validation as keyword (in validation/keywords)
 
 **Milestone** add remaining draft04 features
@@ -12,13 +14,15 @@
 - [ ] -- Features -- required (array of properties). Currently everything property is required by default
 
 
-## 16/12/xx
+## 16/12
 
 - [ ] Testing (validate real json files)
+- [ ] Test + document core differences
 
 **Milestone** customizable default and form (json-editor) validation
-- [ ] -- Features -- Add core: Form, fix core: Draft04 - by using separate functions
 - [ ] Sanitize Errors 
+- [✓] -- Features -- Add core: Form, fix core: Draft04 - by using separate functions
+- [✓] Add getTemplate to core (resolveOneOf)
 - [✓] -- Breaking -- Add sort of 'core' to customize validation, stepper, errors etc and reduce requried arguments
 
 **Milestone** custom validator (form-validation, oneOfProperty)
