@@ -2,15 +2,10 @@
 
 **Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation**
 
-
 > This package offers tools and utilities to work with json-schema, create and validate data. Unfortunately, most
-> packages, editors or validators do not care to expose basic json-schema functionality. This repository
-> lessens the pain building tools around json-schema. The tools currently support only a basic json-schema, but
-> will hopefully expand over time.
-
-Instead of small memory footprint or high performance, this package focuses on exposing utilities for browser and node
-environments. Furthermore, current validation and retrieval functions perform a lazy check, which is required for form
-evaluation in i.e. json editors.
+> packages, editors or validators do not care to expose basic json-schema functionality. Instead of small memory
+> footprint or high performance, this package focuses on exposing utilities for browser and node environments and
+> lessens the pain to build custom tools around json-schema.
 
 `npm i json-schema-library`.
 
@@ -19,15 +14,40 @@ This package is tested on node v6.9.1.
 
 ## Overview
 
-Refer to the [unit-tests](./test/unit/) for up to date examples of each function. Most functions require a _core-helper_
-which holds all required functions are configs to perform its task. This _core-helper_ may be modified to extend, remove
-or modify any used functions or configuration lists.
+Either select an existing __validator__ (`core`) or create your own. Each __Core__ hold all functions that are required
+for the json-schema operations like validation. In order to overwrite a custom function you can either
 
-Cores can be found under cores in either _index.js_ or under _lib/cores/_ and are instantiated with
-`new Core(jsonSchema)`. The default-core i.e. implements json schema draft04. But you can also add a json-editor (form)
-specific core. Most functions require arguments in the following order _core, jsonSchema, jsonData, jsonPointer_.
+- modify the map-objects (i.e. [/lib/validation/keywords](./lib/validation/keywords))
+- overwrite functions or keys in the generated instance (`const instance = new Core()`)
+- Create a custom __Core__ following the examples in [/lib/cores](./lib/cores)
 
-### getSchema(schema, pointer, data)
+Additionally, helper functions and tools are separately exposed via CommonJS Modules. Most of them do require a
+core-object as parameter, but use only some of the functions defined in an core-instance.
+
+
+### Core
+
+The default interface of a validator can be found in [/lib/cores/CoreInterface](./lib/cores/CoreInterface). It exposes
+the following methods
+
+| method            | parameter                             | description
+| ----------------- | ------------------------------------- | -------------------------------------
+| constructor       | schema                                | pass the root schema in the constructor
+| get rootSchema    |                                       | or pass the root schema as property like
+| set rootSchema    | rootSchema                            | `instance.rootSchema = require("./json-schema.json")`
+| each              | schema, data, callback, pointer = "#" | Iterates over the data, passing value and its schema
+| step              | key, schema, data, pointer = "#"      | step into a json-schema by the given key (property or index)
+| validate          | schema, data, pointer = "#"           | return a list of errors found validating the data
+| isValid           | schema, data, pointer = "#"           | returns true if the data is validated by the json-schema
+| resolveOneOf      | schema, data, pointer = "#"           | returns the oneOf-schema for the passed data
+| resolveRef        | schema                                | resolves a $ref on a given schema-object
+| getSchema         | schema, data, pointer = "#"           | returns the json schema of the given data-json-pointer
+| getTemplate       | schema, data                          | returns a template object based of the given json-schema
+
+
+#### examples
+
+##### getSchema(core, schema, pointer, data)
 
 return the json 'schema' matching 'data' at 'pointer'. Should be modified to use a step/next-function, which is already
 within the logic (advance VS retrieve from root -> support both)
@@ -45,19 +65,7 @@ if (targetSchema instanceOf Error) {
 }
 ```
 
-
-
-### SchemaService(schema)
-
-binds the schema to getSchema.
-
-```js
-const schemaService = new SchemaService(rootSchema); // default core 'draft04'
-const targetSchema = schemaService.get('#/path/to/target', rootData);
-```
-
-
-### getTemplate(schema, data, rootSchema = schema)
+##### getTemplate(core, schema, data, rootSchema = schema)
 
 return data which is valid to the given json-schema. Additionally, a data object may be given, which will be
 extended by any missing items or properties.
@@ -69,17 +77,7 @@ const baseData = getTemplate(
 ); // returns { other: true, target: "v" }
 ```
 
-
-### createSchemaOf(data)
-
-returns a json schema which is valid against data.
-
-```js
-const baseSchema = getTemplate({ target: "" });
-// returns {type: "object", properties: { target: "string"}},
-```
-
-### validate(data, schema, step)
+##### validate(data, schema, step)
 
 returns a list of validation errors
 
@@ -91,8 +89,7 @@ const baseSchema = core.validate({ type: "number" }, "");
 // alternatively use core.validate({ type: "number" }, "")
 ```
 
-
-### isValid(data, schema, step)
+##### isValid(data, schema, step)
 
 returns true if the given schema validates the data 
 
@@ -102,8 +99,7 @@ const baseSchema = core.isValid({ type: "number" }, "");
 // returns false
 ```
 
-
-### step(key, schema, data, rootSchema = schema)
+##### step(key, schema, data, rootSchema = schema)
 
 returns the child schema found at the given key
 
@@ -118,8 +114,7 @@ const baseSchema = core.step(
 // alternatively use core.step({ type: "object", properties: { target: {type: "string"}} }, { target: "value" }, "target")
 ```
 
-
-### each(data, schema, callback)
+##### each(data, schema, callback)
 
 calls the callback on each item (object, array and value), passing the current schema and its data
 
@@ -139,4 +134,24 @@ core.each(core.rootSchema, [5, "nine"], (schema, value, pointer) => {
 });
 ```
 
+
+### Additional helpers
+
+#### SchemaService(schema)
+
+binds the schema to getSchema.
+
+```js
+const schemaService = new SchemaService(rootSchema); // default core 'draft04'
+const targetSchema = schemaService.get('#/path/to/target', rootData);
+```
+
+#### createSchemaOf(data)
+
+returns a json schema which is valid against data.
+
+```js
+const baseSchema = getTemplate({ target: "" });
+// returns {type: "object", properties: { target: "string"}},
+```
 
