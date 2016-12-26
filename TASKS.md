@@ -3,6 +3,7 @@
 ## 17/01
 
 - [ ] -- Refactor -- type validation as keyword (in validation/keywords)
+- [ ] -- Features -- Improve validation maps to add & hook (!) custom entries
 
 **Milestone** add remaining draft04 features
 - [ ] -- Features -- patternProperties
@@ -18,6 +19,7 @@
 
 - [ ] Testing (validate real json files)
 - [ ] Test + document core differences
+- [✓] Add async validation
 
 **Milestone** customizable default and form (json-editor) validation
 - [ ] Sanitize Errors 

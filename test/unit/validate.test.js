@@ -10,7 +10,7 @@ describe("validate", () => {
 
     describe("integer", () => {
 
-        it("should suport type 'integer'", () => {
+        it("should support type 'integer'", () => {
             const errors = validate(core, { type: "integer" }, 1);
             expect(errors).to.have.length(0);
         });
