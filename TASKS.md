@@ -22,7 +22,7 @@
 - [✓] Add async validation
 
 **Milestone** customizable default and form (json-editor) validation
-- [ ] Sanitize Errors 
+- [✓] Sanitize Errors 
 - [✓] -- Features -- Add core: Form, fix core: Draft04 - by using separate functions
 - [✓] Add getTemplate to core (resolveOneOf)
 - [✓] -- Breaking -- Add sort of 'core' to customize validation, stepper, errors etc and reduce requried arguments
