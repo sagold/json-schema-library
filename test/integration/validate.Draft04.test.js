@@ -4,7 +4,7 @@ const expect = require("chai").expect;
 const Core = require("../../lib/cores/Draft04");
 
 
-describe("validate.draft04", () => {
+describe("validate.Draft04", () => {
     let schema;
     let data;
     let core;
