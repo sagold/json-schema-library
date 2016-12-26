@@ -67,7 +67,9 @@ Returns data which is valid to the given json-schema. Additionally, a data objec
 extended by any missing items or properties.
 
 ```js
-const baseData = getTemplate(
+const Core = require("json-schema-library").cores.Draft04;
+const core = new Core();
+const baseData = core.getTemplate(
     { type: "object", properties: { target: { type: "string", default: "v" } } },
     { other: true }
 ); // returns { other: true, target: "v" }
@@ -77,18 +79,18 @@ const baseData = getTemplate(
 Validate data and get a list of validation errors
 
 ```js
-const core = new require("json-schema-library").core.draft04(rootSchema),
-const baseSchema = core.validate({ type: "number" }, "");
-// returns false
-
-// alternatively use core.validate({ type: "number" }, "")
+const Core = require("json-schema-library").cores.Draft04;
+const core = new Core(rootSchema);
+const errors = core.validate({ type: "number" }, "");
+// returns [TypeError]
 ```
 
 ##### isValid(core, data, schema, step)
 Return true if the given schema validates the data 
 
 ```js
-const core = new require("json-schema-library").core.draft04(rootSchema),
+const Core = require("json-schema-library").cores.Draft04;
+const core = new Core(rootSchema);
 const baseSchema = core.isValid({ type: "number" }, "");
 // returns false
 ```
@@ -97,32 +99,31 @@ const baseSchema = core.isValid({ type: "number" }, "");
 Get the child schema of a property or index
 
 ```js
-const core = new require("json-schema-library").core.draft04(rootSchema),
+const Core = require("json-schema-library").cores.Draft04;
+const core = new Core(rootSchema);
 const baseSchema = core.step(
     { type: "object", properties: { target: {type: "string"}} },
     { target: "value" }
     "target", 
 ); // returns {type: "string"}
-
-// alternatively use core.step({ type: "object", properties: { target: {type: "string"}} }, { target: "value" }, "target")
 ```
 
 ##### each(core, data, schema, callback)
 Iterate over each item (object, array and value), passing each value and its corresponding schema
 
 ```js
-const rootSchema = {
+const Core = require("json-schema-library").cores.Draft04;
+const core = new Core({
     type: "array",
     items: [
         { type: "number" },
         { type: "string" }
     ]
-};
-const core = new require("json-schema-library").core.draft04(rootSchema),
+});
 core.each(core.rootSchema, [5, "nine"], (schema, value, pointer) => {
-    // 1. schema = { type: "array", items: [...] }, data = [5, "nine"], pointer = #
-    // 2. schema = { type: "number" }, data = 5, pointer = #/0
-    // 3. schema = { type: "string" }, data = "nine", pointer = #/1
+// 1. schema = { type: "array", items: [...] }, data = [5, "nine"], pointer = #
+// 2. schema = { type: "number" }, data = 5, pointer = #/0
+// 3. schema = { type: "string" }, data = "nine", pointer = #/1
 });
 ```
 
