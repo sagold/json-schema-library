@@ -73,5 +73,43 @@ describe("validate.JsonEditor", () => {
             expect(result).to.be.instanceof(Error);
             expect(result.name).to.eq("MultipleOneOfError");
         });
+
+        describe("oneOfProperty", () => {
+
+            it("should return schema where 'oneOfProperty'-value matches schema", () => {
+                const result = core.resolveOneOf(
+                    {
+                        oneOfProperty: "id",
+                        oneOf: [
+                            { properties: { id: { pattern: "^1$" } } },
+                            { properties: { id: { pattern: "^2$" } } },
+                            { properties: { id: { pattern: "^3$" } } }
+                        ]
+                    },
+                    { id: "2" }
+                );
+                expect(result).to.deep.equal({ properties: { id: { pattern: "^2$" } } });
+            });
+        });
+
+        describe("fuzzyMatch", () => {
+
+            it("should return schema where most properties match", () => {
+                const result = core.resolveOneOf(
+                    {
+                        oneOf: [
+                            { properties: { id: { pattern: "^1$" }, a: { type: "object" } } },
+                            { properties: { id: { pattern: "^2$" }, a: { type: "string" }, b: { type: "number" } } },
+                            { properties: { id: { pattern: "^3$" }, a: { type: "number" } } }
+                        ]
+                    },
+                    { id: "4", a: 1, b: 2 }
+                );
+                expect(result).to.deep.equal(
+                    { properties: { id: { pattern: "^2$" }, a: { type: "string" }, b: { type: "number" } } }
+                );
+            });
+
+        });
     });
 });

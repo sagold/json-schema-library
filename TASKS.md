@@ -18,7 +18,7 @@
 ## 16/12
 
 - [ ] Testing (validate real json files)
-- [ ] Test + document core differences
+- [✓] Test + document core differences
 - [✓] Add async validation
 
 **Milestone** customizable default and form (json-editor) validation
