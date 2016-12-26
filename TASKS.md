@@ -17,7 +17,7 @@
 
 ## 16/12
 
-- [ ] Testing (validate real json files)
+- [✓] Testing (validate real json files)
 - [✓] Test + document core differences
 - [✓] Add async validation
 
