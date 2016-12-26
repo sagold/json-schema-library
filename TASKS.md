@@ -4,6 +4,7 @@
 
 - [ ] -- Refactor -- type validation as keyword (in validation/keywords)
 - [ ] -- Features -- Improve validation maps to add & hook (!) custom entries
+- [ ] -- Features -- Helper to find a json- and json-schema-pointer
 
 **Milestone** add remaining draft04 features
 - [ ] -- Features -- patternProperties

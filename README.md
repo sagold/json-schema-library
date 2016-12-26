@@ -32,9 +32,7 @@ the following methods
 
 | method            | parameter                         | description
 | ----------------- | --------------------------------- | -------------------------------------------------------------
-| constructor       | schema                            | pass the root schema in the constructor
-| get rootSchema    |                                   | or pass the root schema as property like
-| set rootSchema    | rootSchema                        | `instance.rootSchema = require("./json-schema.json")`
+| constructor       | schema                            | pass the root schema in the constructor or add it on rootSchema
 | each              | schema, data, callback, [pointer] | Iterates over the data, passing value and its schema
 | step              | key, schema, data, [pointer]      | step into a json-schema by the given key (property or index)
 | validate          | schema, data, [pointer]           | return a list of errors found validating the data
@@ -48,8 +46,7 @@ the following methods
 #### Examples
 
 ##### getSchema(core, schema, pointer, data)
-
-return the json 'schema' matching 'data' at 'pointer'. Should be modified to use a step/next-function, which is already
+Returns the json 'schema' matching 'data' at 'pointer'. Should be modified to use a step/next-function, which is already
 within the logic (advance VS retrieve from root -> support both)
 
 ```js
@@ -66,8 +63,7 @@ if (targetSchema instanceOf Error) {
 ```
 
 ##### getTemplate(core, schema, data, rootSchema = schema)
-
-return data which is valid to the given json-schema. Additionally, a data object may be given, which will be
+Returns data which is valid to the given json-schema. Additionally, a data object may be given, which will be
 extended by any missing items or properties.
 
 ```js
@@ -77,9 +73,8 @@ const baseData = getTemplate(
 ); // returns { other: true, target: "v" }
 ```
 
-##### validate(data, schema, step)
-
-returns a list of validation errors
+##### validate(core, data, schema, step)
+Validate data and get a list of validation errors
 
 ```js
 const core = new require("json-schema-library").core.draft04(rootSchema),
@@ -89,9 +84,8 @@ const baseSchema = core.validate({ type: "number" }, "");
 // alternatively use core.validate({ type: "number" }, "")
 ```
 
-##### isValid(data, schema, step)
-
-returns true if the given schema validates the data 
+##### isValid(core, data, schema, step)
+Return true if the given schema validates the data 
 
 ```js
 const core = new require("json-schema-library").core.draft04(rootSchema),
@@ -99,9 +93,8 @@ const baseSchema = core.isValid({ type: "number" }, "");
 // returns false
 ```
 
-##### step(key, schema, data, rootSchema = schema)
-
-returns the child schema found at the given key
+##### step(core, key, schema, data, rootSchema = schema)
+Get the child schema of a property or index
 
 ```js
 const core = new require("json-schema-library").core.draft04(rootSchema),
@@ -114,9 +107,8 @@ const baseSchema = core.step(
 // alternatively use core.step({ type: "object", properties: { target: {type: "string"}} }, { target: "value" }, "target")
 ```
 
-##### each(data, schema, callback)
-
-calls the callback on each item (object, array and value), passing the current schema and its data
+##### each(core, data, schema, callback)
+Iterate over each item (object, array and value), passing each value and its corresponding schema
 
 ```js
 const rootSchema = {
@@ -138,8 +130,7 @@ core.each(core.rootSchema, [5, "nine"], (schema, value, pointer) => {
 ### Additional helpers
 
 #### SchemaService(schema)
-
-binds the schema to getSchema.
+Retrieve the json-schema at the given json-pointer
 
 ```js
 const schemaService = new SchemaService(rootSchema); // default core 'draft04'
@@ -147,8 +138,7 @@ const targetSchema = schemaService.get('#/path/to/target', rootData);
 ```
 
 #### createSchemaOf(data)
-
-returns a json schema which is valid against data.
+Creates a json-schema for the given input-data.
 
 ```js
 const baseSchema = getTemplate({ target: "" });
