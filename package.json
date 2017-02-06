@@ -30,5 +30,8 @@
   "dependencies": {
     "ajv": "^4.8.2",
     "gson-pointer": "^1.0.4"
+  },
+  "publishConfig": {
+      "registry": "http://registry.npmjs.org"
   }
 }
