@@ -56,16 +56,19 @@ describe("iterateSchema", () => {
         const rootSchema = {
             type: "array",
             items: {
-                first: { type: "string" },
-                second: { type: "number" }
+                type: "object",
+                properties: {
+                    first: { type: "string" },
+                    second: { type: "number" }
+                }
             }
         };
 
         iterateSchema(rootSchema, (schema) => calls.push(schema));
 
-        expect(calls).to.have.length(3);
-        expect(calls[1]).to.eq(rootSchema.items.first);
-        expect(calls[2]).to.eq(rootSchema.items.second);
+        expect(calls).to.have.length(4);
+        expect(calls[2]).to.eq(rootSchema.items.properties.first);
+        expect(calls[3]).to.eq(rootSchema.items.properties.second);
     });
 
     it("should call on each oneOf-schema in items", () => {

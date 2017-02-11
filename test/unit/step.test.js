@@ -42,11 +42,11 @@ describe("step", () => {
             const res = step(core, 0, {
                 type: "array",
                 items: {
-                    title: { type: "string" }
+                    type: "string"
                 }
             });
 
-            expect(res).to.deep.eq({ title: { type: "string" } });
+            expect(res).to.deep.eq({ type: "string" });
         });
 
         it("should return item at index", () => {
