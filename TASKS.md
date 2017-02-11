@@ -2,9 +2,11 @@
 
 ## 17/01
 
+- [ ] profile performance
 - [ ] -- Refactor -- type validation as keyword (in validation/keywords)
 - [ ] -- Features -- Improve validation maps to add & hook (!) custom entries
 - [ ] -- Features -- Helper to find a json- and json-schema-pointer
+- [ ] -- Fix -- Return all errors in oneOf-validation
 
 **Milestone** add remaining draft04 features
 - [ ] -- Features -- patternProperties
