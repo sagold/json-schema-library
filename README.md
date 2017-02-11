@@ -14,7 +14,7 @@ This package is tested on node v6.9.1.
 
 ## Overview
 
-Either select an existing __validator__ (`core`) or create your own. Each __Core__ hold all functions that are required
+Either select an existing __validator__ (`core`) or create your own. Each __Core__ holds all functions that are required
 for the json-schema operations like validation. In order to overwrite a custom function you can either
 
 - modify the map-objects (i.e. [/lib/validation/keywords](./lib/validation/keywords))
@@ -57,7 +57,7 @@ const targetSchema = getSchema(core, rootSchema, '#/path/to/target', rootData);
 Currently may also return an error:
 
 ```js
-if (targetSchema instanceOf Error) {
+if (targetSchema.type === "error") {
     throw targetSchema;
 }
 ```
@@ -82,7 +82,7 @@ Validate data and get a list of validation errors
 const Core = require("json-schema-library").cores.Draft04;
 const core = new Core(rootSchema);
 const errors = core.validate({ type: "number" }, "");
-// returns [TypeError]
+// returns { type: "TypeError" }
 ```
 
 ##### isValid(core, data, schema, step)

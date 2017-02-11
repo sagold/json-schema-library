@@ -55,7 +55,7 @@ describe("validate.JsonEditor", () => {
                 },
                 []
             );
-            expect(result).to.be.instanceof(Error);
+            expect(result.type).to.eq("error");
             expect(result.name).to.eq("OneOfError");
         });
 
@@ -70,7 +70,7 @@ describe("validate.JsonEditor", () => {
                 },
                 4
             );
-            expect(result).to.be.instanceof(Error);
+            expect(result.type).to.eq("error");
             expect(result.name).to.eq("MultipleOneOfError");
         });
 

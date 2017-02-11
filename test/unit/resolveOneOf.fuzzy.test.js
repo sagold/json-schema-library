@@ -106,7 +106,7 @@ describe("resolveOneOf", () => {
                 };
                 const res = resolveOneOf(core, core.rootSchema, { title: "not a number" });
 
-                expect(res).to.be.instanceof(Error);
+                expect(res.type).to.eq("error");
                 expect(res.name).to.eq("MissingOneOfPropertyError");
             });
 
@@ -120,7 +120,7 @@ describe("resolveOneOf", () => {
                 };
                 const res = resolveOneOf(core, core.rootSchema, { id: "2", title: "not a number" });
 
-                expect(res).to.be.instanceof(Error);
+                expect(res.type).to.eq("error");
                 expect(res.name).to.eq("OneOfPropertyError");
             });
         });
