@@ -2,7 +2,7 @@ const expect = require("chai").expect;
 const addValidator = require("../../lib/addValidator");
 const Core = require("../../lib/cores/draft04");
 
-describe.only("addValidator", () => {
+describe("addValidator", () => {
 
     let core;
     beforeEach(() => (core = new Core()));
@@ -56,13 +56,26 @@ describe.only("addValidator", () => {
 
     describe("keyword", () => {
 
+        beforeEach(() => {
+            if (core.validateKeyword.capitalized) throw new Error("keyword 'capitalized' should not be set");
+        });
+
         it("should call custom keyword validator", () => {
             let called = false;
-            addValidator.keyword(core, "string", "capitalized", () => { called = true; });
+            addValidator.keyword(core, "string", "capitalized", () => (called = true));
 
             core.validate({ type: "string", capitalized: true }, "myString");
 
             expect(called).to.eq(true);
+        });
+
+        it("should not call valiator if keyword is not set", () => {
+            let called = false;
+            addValidator.keyword(core, "string", "capitalized", () => (called = true));
+
+            core.validate({ type: "string" }, "myString");
+
+            expect(called).to.eq(false);
         });
 
         it("should not call custom keyword validator for different datatype", () => {
@@ -82,7 +95,7 @@ describe.only("addValidator", () => {
             expect(result).to.have.length(0);
         });
 
-        it("should return error on failed format validation", () => {
+        it("should return error on failed keyword validation", () => {
             addValidator.keyword(core, "string", "capitalized", (core, schema, value) => ({
                 type: "error",
                 code: "keyword-error"
