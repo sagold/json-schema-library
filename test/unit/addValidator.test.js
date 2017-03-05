@@ -65,6 +65,15 @@ describe.only("addValidator", () => {
             expect(called).to.eq(true);
         });
 
+        it("should not call custom keyword validator for different datatype", () => {
+            let called = false;
+            addValidator.keyword(core, "string", "capitalized", () => { called = true; });
+
+            core.validate({ type: "number", capitalized: true }, 1234);
+
+            expect(called).to.eq(false);
+        });
+
         it("should return no error for successful validation", () => {
             addValidator.keyword(core, "string", "capitalized", (core, schema, value) => true);
 
