@@ -138,6 +138,13 @@ const schemaService = new SchemaService(rootSchema); // default core 'draft04'
 const targetSchema = schemaService.get('#/path/to/target', rootData);
 ```
 
+#### getChildSchemaSelection
+Returns a list of possible schemas for the given child-property or index
+
+```js
+const listOfAvailableOptions = getChildSchemaSelection(core, schema, "childKey");
+```
+
 #### createSchemaOf(data)
 Creates a json-schema for the given input-data.
 
