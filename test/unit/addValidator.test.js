@@ -7,6 +7,23 @@ describe("addValidator", () => {
     let core;
     beforeEach(() => (core = new Core()));
 
+    describe("error", () => {
+
+        it("should overwrite 'minLengthError'", () => {
+            addValidator.error(core, "minLengthError", (data) => ({
+                type: "error",
+                code: "custom-min-length-error",
+                message: "my custom error message",
+                data
+            }));
+
+            const result = core.validate({ type: "string", minLength: 4 }, "abc");
+
+            expect(result).to.have.length(1);
+            expect(result[0].code).to.eq("custom-min-length-error");
+        });
+    });
+
     describe("format", () => {
 
         it("should call custom format validator", () => {
