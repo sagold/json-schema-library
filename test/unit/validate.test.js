@@ -99,6 +99,19 @@ describe("validate", () => {
             expect(errors[0].name).to.eq("NoAdditionalPropertiesError");
             expect(errors[1].name).to.eq("NoAdditionalPropertiesError");
         });
+
+        it("shoud return errors for missing `required` properties", () => {
+            const errors = validate(core,
+                {
+                    type: "object", required: ["id", "a", "aa", "aaa"]
+                },
+                { id: "first", a: "correct", b: "ignored" }
+            );
+
+            expect(errors).to.have.length(2);
+            expect(errors[0].name).to.eq("RequiredPropertyError");
+            expect(errors[1].name).to.eq("RequiredPropertyError");
+        });
     });
 
     describe("array", () => {

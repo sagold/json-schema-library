@@ -1,9 +1,9 @@
 /* eslint quote-props: 0 max-len: 0 */
 const expect = require("chai").expect;
 const resolveOneOf = require("../../lib/resolveOneOf.fuzzy");
-const Core = require("../../lib/cores/draft04");
+const Core = require("../../lib/cores/JsonEditor");
 
-describe("resolveOneOf", () => {
+describe("resolveOneOf (fuzzy)", () => {
 
     let core;
     beforeEach(() => (core = new Core()));
