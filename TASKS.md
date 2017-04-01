@@ -5,9 +5,9 @@
 - [ ] profile performance
 - [ ] -- Refactor -- move type validation as keyword to validation/keywords
 - [~] -- Features -- Improve validation maps to add & hook (!) custom entries (WIP, Add tests)
-- [?] -- Refactor -- Use addValidation to setup base validation mappings?
+- [ ] -- Refactor -- Use addValidation to setup base validation mappings?
 - [ ] -- Features -- Helper to find a json- and json-schema-pointer
-- [ ] -- Fix -- Return all errors in oneOf-validation
+- [✓] -- Fix -- Return all errors in oneOf-validation
 - [✓] -- Refactor -- Keyword validators should only be called for defined keyword
 
 **Milestone** add remaining draft04 features
@@ -16,8 +16,9 @@
 - [ ] -- Features -- dependencies
 - [ ] -- Features -- allOf
 - [ ] -- Features -- anyOf
-- [ ] -- Features -- oneOf: failing if multiple schemas match
+- [ ] -- Features -- oneOf: fail for multiple matching oneof-schemas
 - [ ] -- Features -- required (array of properties). Currently every property is required by default
+- [ ] -- Features -- required
 
 
 ## 16/12

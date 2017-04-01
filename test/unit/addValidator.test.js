@@ -74,7 +74,9 @@ describe("addValidator", () => {
     describe("keyword", () => {
 
         beforeEach(() => {
-            if (core.validateKeyword.capitalized) throw new Error("keyword 'capitalized' should not be set");
+            if (core.validateKeyword.capitalized) {
+                throw new Error("keyword 'capitalized' should not be set");
+            }
         });
 
         it("should call custom keyword validator", () => {
