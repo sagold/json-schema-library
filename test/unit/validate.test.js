@@ -199,8 +199,8 @@ describe("validate", () => {
             const errors = validate(core, { type: "array", items: { type: "string" }, maxItems: 1 }, ["1", 2]);
 
             expect(errors).to.have.length(2);
-            expect(errors[0].name).to.eq("MaxItemsError");
-            expect(errors[1].name).to.eq("TypeError");
+            expect(errors[0].name).to.eq("TypeError");
+            expect(errors[1].name).to.eq("MaxItemsError");
         });
 
         describe("oneOf", () => {
