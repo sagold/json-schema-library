@@ -58,7 +58,7 @@ Currently may also return an error:
 
 ```js
 if (targetSchema.type === "error") {
-    throw targetSchema;
+    throw new Error(targetSchema.message);
 }
 ```
 
@@ -125,6 +125,28 @@ core.each(core.rootSchema, [5, "nine"], (schema, value, pointer) => {
 // 2. schema = { type: "number" }, data = 5, pointer = #/0
 // 3. schema = { type: "string" }, data = "nine", pointer = #/1
 });
+```
+
+
+### Add custom validators
+
+```js
+const addValidator = require("../../lib/addValidator");
+const Core = require("../../lib/cores/draft04");
+
+// add a custom format 'id'
+addValidator.format(core, "id", (core, schema, value, pointer) => {});
+
+// add custom keyword 'capitalized' for type 'string'
+addValidator.keyword(core, "string", "capitalized", (core, schema, value, pointer) => {});
+
+// add a custom error (may overwrite existing errors)
+addValidator.error(core, "minLengthError", (data) => ({
+    type: "error",
+    code: "custom-min-length-error",
+    message: "my custom error message",
+    data
+}));
 ```
 
 
