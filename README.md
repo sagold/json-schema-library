@@ -175,3 +175,10 @@ const baseSchema = getTemplate({ target: "" });
 // returns {type: "object", properties: { target: "string"}},
 ```
 
+
+## Custom extensions
+
+### pattern
+
+For error generation, an attribute `patternExample` may be set for a `pattern` validation. Instead of the regular
+expression, the example will be printed in the error message.
