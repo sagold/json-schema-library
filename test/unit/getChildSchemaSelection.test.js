@@ -9,35 +9,35 @@ describe("getChildSchemaSelection", () => {
     before(() => (core = new Core()));
 
     it("should return a single object-schema as list", () => {
-        const schema = { type: "object",
+        core.rootSchema = { type: "object",
             properties: {
                 a: { type: "string" },
                 b: { type: "number" }
             }
         };
 
-        const result = getChildSchemaSelection(core, schema, "b");
+        const result = getChildSchemaSelection(core, core.rootSchema, "b");
 
         expect(result).to.have.length(1);
-        expect(result[0]).to.eq(schema.properties.b);
+        expect(result[0]).to.eq(core.rootSchema.properties.b);
     });
 
     it("should return a single array-item as list", () => {
-        const schema = { type: "array",
+        core.rootSchema = { type: "array",
             items: [
                 { type: "string" },
                 { type: "number" }
             ]
         };
 
-        const result = getChildSchemaSelection(core, schema, 0);
+        const result = getChildSchemaSelection(core, core.rootSchema, 0);
 
         expect(result).to.have.length(1);
-        expect(result[0]).to.eq(schema.items[0]);
+        expect(result[0]).to.eq(core.rootSchema.items[0]);
     });
 
     it("sould return list of oneOf elements", () => {
-        const schema = { type: "array",
+        core.rootSchema = { type: "array",
             items: {
                 oneOf: [
                     { type: "string" },
@@ -46,9 +46,9 @@ describe("getChildSchemaSelection", () => {
             }
         };
 
-        const result = getChildSchemaSelection(core, schema, "b");
+        const result = getChildSchemaSelection(core, core.rootSchema, "b");
 
         expect(result).to.have.length(2);
-        expect(result).to.deep.eq(schema.items.oneOf);
+        expect(result).to.deep.eq(core.rootSchema.items.oneOf);
     });
 });
