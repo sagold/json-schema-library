@@ -17,6 +17,7 @@
 - [ ] -- Features -- allOf
 - [ ] -- Features -- anyOf
 - [✓] -- Features -- oneOf: fail for multiple matching oneof-schemas
+- [✓] -- Features -- oneOf: for non-arrays
 - [✓] -- Features -- required (array of properties). Currently every property is required by default
 
 
