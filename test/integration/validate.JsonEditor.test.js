@@ -68,8 +68,9 @@ describe("validate.JsonEditor", () => {
                         { type: "number", minimum: 3 }
                     ]
                 },
-                4
+                4, "#"
             );
+
             expect(result.type).to.eq("error");
             expect(result.name).to.eq("MultipleOneOfError");
         });
