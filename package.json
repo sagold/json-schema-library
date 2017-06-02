@@ -29,9 +29,10 @@
   },
   "dependencies": {
     "ajv": "^4.8.2",
-    "gson-pointer": "^1.0.4"
+    "gson-pointer": "^1.0.4",
+    "valid-url": "^1.0.9"
   },
   "publishConfig": {
-      "registry": "http://registry.npmjs.org"
+    "registry": "http://registry.npmjs.org"
   }
 }
