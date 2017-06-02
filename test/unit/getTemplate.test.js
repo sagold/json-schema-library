@@ -1,3 +1,4 @@
+/* eslint quote-props: 0 */
 const expect = require("chai").expect;
 const getTemplate = require("../../lib/getTemplate");
 const Core = require("../../lib/cores/JsonEditor");
@@ -90,7 +91,7 @@ describe("getTemplate", () => {
             it("should return template of first oneOf schema", () => {
                 core.rootSchema = { type: "object",
                     oneOf: [
-                        { type: "object", properties: { title: { type: "string", "default": "jane" } } },
+                        { type: "object", properties: { title: { type: "string", default: "jane" } } },
                         { type: "object", properties: { value: { type: "number" } } }
                     ]
                 };
@@ -98,9 +99,24 @@ describe("getTemplate", () => {
 
                 expect(res).to.deep.equal({ title: "jane" });
             });
+
+            it("should return template of for matching oneOf schema", () => {
+                core.rootSchema = { type: "object",
+                    oneOf: [
+                        { type: "object", properties: {
+                            value: { type: "string", default: "jane" } }
+                        },
+                        { type: "object", properties: {
+                            value: { type: "number" }, test: { type: "string", default: "test" } }
+                        }
+                    ]
+                };
+                const res = getTemplate(core, core.rootSchema, { value: 111 });
+
+                expect(res).to.deep.equal({ value: 111, test: "test" });
+            });
         });
     });
-
 
     describe("array", () => {
         describe(".items:Object", () => {
@@ -221,6 +237,21 @@ describe("getTemplate", () => {
                 expect(res.length).to.deep.equal(1);
                 expect(res).to.deep.equal(["target"]);
             });
+        });
+    });
+
+    describe("oneOf", () => {
+
+        it("should return first schema for mixed types", () => {
+            core.rootSchema = {
+                oneOf: [
+                    { type: "string", "default": "jane" },
+                    { type: "number" }
+                ]
+            };
+            const res = getTemplate(core, core.rootSchema);
+
+            expect(res).to.deep.equal("jane");
         });
     });
 });
