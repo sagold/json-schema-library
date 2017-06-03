@@ -46,12 +46,14 @@ the following methods
 #### Examples
 
 ##### getSchema(core, schema, pointer, data)
-Returns the json 'schema' matching 'data' at 'pointer'. Should be modified to use a step/next-function, which is already
-within the logic (advance VS retrieve from root -> support both)
+> Get the json-schema describing the `data` found at `pointer`.
+
+Note: Should be modified to use a step/next-function, which is already within the logic
+(advance VS retrieve from root -> support both)
 
 ```js
 const core = new require("json-schema-library").core.draft04(rootSchema),
-const targetSchema = getSchema(core, rootSchema, '#/path/to/target', rootData);
+const targetSchema = core.getSchema(rootSchema, '#/path/to/target', rootData);
 ```
 
 Currently may also return an error:
@@ -61,6 +63,14 @@ if (targetSchema.type === "error") {
     throw new Error(targetSchema.message);
 }
 ```
+
+Or using `getSchema` directly
+
+```js
+const core = new require("json-schema-library").core.draft04(rootSchema),
+const targetSchema = getSchema(core, rootSchema, '#/path/to/target', rootData);
+```
+
 
 ##### getTemplate(core, schema, data, rootSchema = schema)
 Returns data which is valid to the given json-schema. Additionally, a data object may be given, which will be
@@ -86,7 +96,7 @@ const errors = core.validate({ type: "number" }, "");
 ```
 
 ##### isValid(core, data, schema, step)
-Return true if the given schema validates the data 
+Return true if the given schema validates the data (basically `core.validate({ type: "number" }, "").length === 0`)
 
 ```js
 const Core = require("json-schema-library").cores.Draft04;
@@ -182,3 +192,25 @@ const baseSchema = getTemplate({ target: "" });
 
 For error generation, an attribute `patternExample` may be set for a `pattern` validation. Instead of the regular
 expression, the example will be printed in the error message.
+
+### oneOf-flag
+
+In `resolveOneOf.fuzzy.js` For an explicit oneOf resolution the schema may be extended by a `oneOfProperty`-property.
+This will always associate an entry with a matching value (instead of schema validation).
+
+Example
+
+```js
+const schema = {
+    oneOfProperty: "id",
+    oneOf: [
+        { type: "object", properties: { id: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
+        { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } },
+        { type: "object", properties: { id: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
+    ]
+}
+
+const result = resolveOneOf(core, schema, { id: "2", title: "not a number" })
+// will always return (even if invalid)
+// { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } }
+```
