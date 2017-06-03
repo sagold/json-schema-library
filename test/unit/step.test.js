@@ -25,7 +25,6 @@ describe("step", () => {
 
         it("should return matching oneOf", () => {
             const res = step(core, "title", {
-                type: "object",
                 oneOf: [
                     { type: "object", properties: { title: { type: "string" } } },
                     { type: "object", properties: { title: { type: "number" } } }
@@ -34,6 +33,30 @@ describe("step", () => {
 
             expect(res).to.deep.eq({ type: "number" });
         });
+    });
+
+    describe("oneof", () => {
+
+        it("should return matching schema", () => {
+            const res = step(core, "title", {
+                type: "object",
+                properties: {
+                    title: {
+                        oneOf: [
+                            { type: "string", title: "Zeichenkette" },
+                            { type: "number", title: "Zahl" }
+                        ]
+                    }
+                }
+            }, { title: 111 });
+
+            // @special case: where a schema is selected and the original schema maintained.
+            // Remove the original and its flag
+            delete res.oneOfSchema;
+            delete res.variableSchema;
+            expect(res).to.deep.eq({ type: "number", title: "Zahl" });
+        });
+
     });
 
     describe("array", () => {

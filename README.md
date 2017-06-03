@@ -32,7 +32,7 @@ the following methods
 
 | method            | parameter                         | description
 | ----------------- | --------------------------------- | -------------------------------------------------------------
-| constructor       | schema                            | pass the root schema in the constructor or add it on rootSchema
+| constructor       | schema                            | pass the root-schema in the constructor
 | each              | schema, data, callback, [pointer] | Iterates over the data, passing value and its schema
 | step              | key, schema, data, [pointer]      | step into a json-schema by the given key (property or index)
 | validate          | schema, data, [pointer]           | return a list of errors found validating the data
@@ -41,26 +41,37 @@ the following methods
 | resolveRef        | schema                            | resolves a $ref on a given schema-object
 | getSchema         | schema, data, [pointer]           | returns the json schema of the given data-json-pointer
 | getTemplate       | schema, data                      | returns a template object based of the given json-schema
+| setSchema         | schema                            | set or change the root-schema
 
 
 #### Examples
 
 ##### getSchema(core, schema, pointer, data)
-Returns the json 'schema' matching 'data' at 'pointer'. Should be modified to use a step/next-function, which is already
-within the logic (advance VS retrieve from root -> support both)
+> Get the json-schema describing the `data` found at `pointer`.
+
+Note: Should be modified to use a step/next-function, which is already within the logic
+(advance VS retrieve from root -> support both)
 
 ```js
 const core = new require("json-schema-library").core.draft04(rootSchema),
-const targetSchema = getSchema(core, rootSchema, '#/path/to/target', rootData);
+const targetSchema = core.getSchema(rootSchema, '#/path/to/target', rootData);
 ```
 
 Currently may also return an error:
 
 ```js
 if (targetSchema.type === "error") {
-    throw targetSchema;
+    throw new Error(targetSchema.message);
 }
 ```
+
+Or using `getSchema` directly
+
+```js
+const core = new require("json-schema-library").core.draft04(rootSchema),
+const targetSchema = getSchema(core, rootSchema, '#/path/to/target', rootData);
+```
+
 
 ##### getTemplate(core, schema, data, rootSchema = schema)
 Returns data which is valid to the given json-schema. Additionally, a data object may be given, which will be
@@ -86,7 +97,7 @@ const errors = core.validate({ type: "number" }, "");
 ```
 
 ##### isValid(core, data, schema, step)
-Return true if the given schema validates the data 
+Return true if the given schema validates the data (basically `core.validate({ type: "number" }, "").length === 0`)
 
 ```js
 const Core = require("json-schema-library").cores.Draft04;
@@ -128,6 +139,28 @@ core.each(core.rootSchema, [5, "nine"], (schema, value, pointer) => {
 ```
 
 
+### Add custom validators
+
+```js
+const addValidator = require("../../lib/addValidator");
+const Core = require("../../lib/cores/draft04");
+
+// add a custom format 'id'
+addValidator.format(core, "id", (core, schema, value, pointer) => {});
+
+// add custom keyword 'capitalized' for type 'string'
+addValidator.keyword(core, "string", "capitalized", (core, schema, value, pointer) => {});
+
+// add a custom error (may overwrite existing errors)
+addValidator.error(core, "minLengthError", (data) => ({
+    type: "error",
+    code: "custom-min-length-error",
+    message: "my custom error message",
+    data
+}));
+```
+
+
 ### Additional helpers
 
 #### SchemaService(schema)
@@ -153,3 +186,32 @@ const baseSchema = getTemplate({ target: "" });
 // returns {type: "object", properties: { target: "string"}},
 ```
 
+
+## Custom extensions
+
+### pattern
+
+For error generation, an attribute `patternExample` may be set for a `pattern` validation. Instead of the regular
+expression, the example will be printed in the error message.
+
+### oneOf-flag
+
+In `resolveOneOf.fuzzy.js` For an explicit oneOf resolution the schema may be extended by a `oneOfProperty`-property.
+This will always associate an entry with a matching value (instead of schema validation).
+
+Example
+
+```js
+const schema = {
+    oneOfProperty: "id",
+    oneOf: [
+        { type: "object", properties: { id: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
+        { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } },
+        { type: "object", properties: { id: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
+    ]
+}
+
+const result = resolveOneOf(core, schema, { id: "2", title: "not a number" })
+// will always return (even if invalid)
+// { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } }
+```

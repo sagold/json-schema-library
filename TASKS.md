@@ -3,19 +3,22 @@
 ## 17/01
 
 - [ ] profile performance
-- [ ] -- Refactor -- type validation as keyword (in validation/keywords)
-- [ ] -- Features -- Improve validation maps to add & hook (!) custom entries
+- [ ] -- Refactor -- move type validation as keyword to validation/keywords
+- [~] -- Features -- Improve validation maps to add & hook (!) custom entries (WIP, Add tests)
+- [ ] -- Refactor -- Use addValidation to setup base validation mappings?
 - [ ] -- Features -- Helper to find a json- and json-schema-pointer
-- [ ] -- Fix -- Return all errors in oneOf-validation
+- [✓] -- Fix -- Return all errors in oneOf-validation
+- [✓] -- Refactor -- Keyword validators should only be called for defined keyword
 
 **Milestone** add remaining draft04 features
 - [ ] -- Features -- patternProperties
 - [ ] -- Features -- uniqueItems
-- [ ] -- Features -- dependencies
+- [ ] -- Features -- dependencies (implications: remove default-required properties in Core.JsonEditor): https://spacetelescope.github.io/understanding-json-schema/reference/object.html#index-4
 - [ ] -- Features -- allOf
 - [ ] -- Features -- anyOf
-- [ ] -- Features -- oneOf: failing if multiple schemas match
-- [ ] -- Features -- required (array of properties). Currently everything property is required by default
+- [✓] -- Features -- oneOf: fail for multiple matching oneof-schemas
+- [✓] -- Features -- oneOf: for non-arrays
+- [✓] -- Features -- required (array of properties). Currently every property is required by default
 
 
 ## 16/12

@@ -47,17 +47,24 @@ describe("validate", () => {
             expect(errors[0].name).to.eq("NoAdditionalPropertiesError");
         });
 
-        it("should be valid if 'additionProperties' is true", () => {
+        it("should return all AdditionalPropertiesErrors", () => {
+            const errors = validate(core, { type: "object", additionalProperties: false }, { a: 1, b: 2 });
+            expect(errors).to.have.length(2);
+            expect(errors[0].name).to.eq("NoAdditionalPropertiesError");
+            expect(errors[1].name).to.eq("NoAdditionalPropertiesError");
+        });
+
+        it("should be valid if 'additionalProperties' is true", () => {
             const errors = validate(core, { type: "object", additionalProperties: true }, { a: 1 });
             expect(errors).to.have.length(0);
         });
 
-        it("should be valid if value matches 'additionProperties' schema", () => {
+        it("should be valid if value matches 'additionalProperties' schema", () => {
             const errors = validate(core, { type: "object", additionalProperties: { type: "number" } }, { a: 1 });
             expect(errors).to.have.length(0);
         });
 
-        it("should return AdditionalPropertiesError if value does not match 'additionProperties' schema", () => {
+        it("should return AdditionalPropertiesError if value does not match 'additionalProperties' schema", () => {
             const errors = validate(core, { type: "object", additionalProperties: { type: "string" } }, { a: 1 });
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("AdditionalPropertiesError");
@@ -77,6 +84,33 @@ describe("validate", () => {
             );
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("NotError");
+        });
+
+        it("should return all errors", () => {
+            const errors = validate(core,
+                {
+                    type: "object", additionalProperties: false,
+                    properties: { a: { type: "string" }, id: { type: "string", pattern: /^first$/ } }
+                },
+                { id: "first", a: "correct", b: "notallowed", c: false }
+            );
+
+            expect(errors).to.have.length(2);
+            expect(errors[0].name).to.eq("NoAdditionalPropertiesError");
+            expect(errors[1].name).to.eq("NoAdditionalPropertiesError");
+        });
+
+        it("shoud return errors for missing `required` properties", () => {
+            const errors = validate(core,
+                {
+                    type: "object", required: ["id", "a", "aa", "aaa"]
+                },
+                { id: "first", a: "correct", b: "ignored" }
+            );
+
+            expect(errors).to.have.length(2);
+            expect(errors[0].name).to.eq("RequiredPropertyError");
+            expect(errors[1].name).to.eq("RequiredPropertyError");
         });
     });
 
@@ -172,6 +206,45 @@ describe("validate", () => {
             );
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("NotError");
+        });
+
+        it("should return all errors", () => {
+            const errors = validate(core, { type: "array", items: { type: "string" }, maxItems: 1 }, ["1", 2]);
+
+            expect(errors).to.have.length(2);
+            expect(errors[0].name).to.eq("TypeError");
+            expect(errors[1].name).to.eq("MaxItemsError");
+        });
+
+        describe("oneOf", () => {
+
+            it("should return no error for valid oneOf items", () => {
+                const errors = validate(core,
+                    {
+                        type: "array", items: { oneOf: [
+                            { type: "number" },
+                            { type: "object", properties: { a: { type: "string" } }, additionalProperties: false }
+                        ] }
+                    },
+                    [100, { a: "string" }]
+                );
+
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return OneOfError if no item does match", () => {
+                const errors = validate(core,
+                    {
+                        type: "array", items: { oneOf: [
+                            { type: "number" },
+                            { type: "object", properties: { a: { type: "string" } }, additionalProperties: false }
+                        ] }
+                    },
+                    [100, { a: "correct", b: "not correct" }]
+                );
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("OneOfError");
+            });
         });
     });
 
