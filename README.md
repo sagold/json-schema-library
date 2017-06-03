@@ -32,7 +32,7 @@ the following methods
 
 | method            | parameter                         | description
 | ----------------- | --------------------------------- | -------------------------------------------------------------
-| constructor       | schema                            | pass the root schema in the constructor or add it on rootSchema
+| constructor       | schema                            | pass the root-schema in the constructor
 | each              | schema, data, callback, [pointer] | Iterates over the data, passing value and its schema
 | step              | key, schema, data, [pointer]      | step into a json-schema by the given key (property or index)
 | validate          | schema, data, [pointer]           | return a list of errors found validating the data
@@ -41,6 +41,7 @@ the following methods
 | resolveRef        | schema                            | resolves a $ref on a given schema-object
 | getSchema         | schema, data, [pointer]           | returns the json schema of the given data-json-pointer
 | getTemplate       | schema, data                      | returns a template object based of the given json-schema
+| setSchema         | schema                            | set or change the root-schema
 
 
 #### Examples
