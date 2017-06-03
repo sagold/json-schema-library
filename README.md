@@ -13,7 +13,8 @@ This package is tested on node v6.9.1.
 
 
 1. [Overview](#overview)
-1. [Core](#core)
+    1. [Core](#core)
+    1. [Add Custom Validators](#add-custom-validators)
 1. [Custom Extensions](#custom-extensions)
 
 
