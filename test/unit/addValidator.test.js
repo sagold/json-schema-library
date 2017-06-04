@@ -88,7 +88,7 @@ describe("addValidator", () => {
             expect(called).to.eq(true);
         });
 
-        it("should not call valiator if keyword is not set", () => {
+        it("should not call validator if keyword is not set", () => {
             let called = false;
             addValidator.keyword(core, "string", "capitalized", () => (called = true));
 

@@ -111,6 +111,20 @@ const baseSchema = core.isValid({ type: "number" }, "");
 // returns false
 ```
 
+##### validate(core, data, schema, step)
+> Asynchronous validation helper
+
+Optional support for onError helper, which is invoked for each error (after being resolved)
+
+```js
+const Core = require("json-schema-library").cores.Draft04;
+const validateAsync = require("json-schema-library").validateAsync;
+const core = new Core(rootSchema);
+// signature: Core, Schema, Data, [Pointer], [onErrorCallback] : Promise
+validateAsync(core, { type: "number" }, "", "#", function onError(err) {})
+    .then((allErrors) => {})
+```
+
 ##### step(core, key, schema, data, rootSchema = schema)
 > Get the json-schema of a child-property
 
