@@ -8,6 +8,7 @@
 - [ ] -- Refactor -- Use addValidation to setup base validation mappings?
 - [ ] -- Features -- Helper to find a json- and json-schema-pointer
 - [✓] -- Fix -- Return all errors in oneOf-validation
+- [✓] -- Feature -- Error progress notification for async validation
 - [✓] -- Refactor -- Keyword validators should only be called for defined keyword
 
 **Milestone** add remaining draft04 features

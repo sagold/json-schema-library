@@ -237,6 +237,42 @@ describe("getTemplate", () => {
                 expect(res.length).to.deep.equal(1);
                 expect(res).to.deep.equal(["target"]);
             });
+
+            it("should merge with input data", () => {
+                core.rootSchema = {
+                    type: "array",
+                    minItems: 1,
+                    items: {
+                        oneOf: [
+                            {
+                                type: "object",
+                                properties: {
+                                    notitle: { type: "string", default: "nottitle" }
+                                }
+                            },
+                            {
+                                type: "object",
+                                properties: {
+                                    title: {
+                                        type: "string",
+                                        default: "Standardtitel"
+                                    },
+                                    subtitle: {
+                                        type: "string",
+                                        default: "do not replace with"
+                                    }
+                                }
+                            },
+                            { type: "number", "default": 9 }
+                        ]
+                    }
+                };
+
+                const res = getTemplate(core, core.rootSchema, [{ subtitle: "Subtitel" }]);
+
+                expect(res.length).to.deep.equal(1);
+                expect(res).to.deep.equal([{ title: "Standardtitel", subtitle: "Subtitel" }]);
+            });
         });
     });
 
