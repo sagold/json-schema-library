@@ -9,6 +9,11 @@ describe("step", () => {
     let core;
     before(() => (core = new Core()));
 
+    it("should return an error for unknown types", () => {
+        const res = step(core, 0, { type: "unknown" }, {});
+        expect(res).to.be.an("error");
+    });
+
 
     describe("object", () => {
 
@@ -61,6 +66,11 @@ describe("step", () => {
 
     describe("array", () => {
 
+        it("should return an error for invalid array schema", () => {
+            const res = step(core, 0, { type: "array" }, []);
+            expect(res).to.be.an("error");
+        });
+
         it("should return item property", () => {
             const res = step(core, 0, {
                 type: "array",
@@ -97,6 +107,15 @@ describe("step", () => {
             }, [{ title: 2 }]);
 
             expect(res).to.deep.eq({ type: "object", properties: { title: { type: "number" } } });
+        });
+
+        it("should return a generated schema with additionalItems", () => {
+            const res = step(core, 1, {
+                type: "array",
+                additionalItems: true
+            }, ["3", 2]);
+
+            expect(res.type).to.eq("number");
         });
     });
 });
