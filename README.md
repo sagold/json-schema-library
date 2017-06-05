@@ -59,14 +59,14 @@ Core {
     typeKeywords: {} 
     // keyword validation functions, e.g. validateKeyword.enum(), validateKeyword.items(), ...
     validateKeyword: {}
-    // type validation for array, object, number, etc. Basically runs over typeKeywords and executes validation
-    // functions from `validateKeyword`
+    // type validation for array, object, number, etc. Basically runs over typeKeywords and executes
+    // validation functions from `validateKeyword`
     validateType: {}
-    // format validation functions. will be executed if a) typeKeywords includes 'format' and a validation function is
-    // set in validateFormat
+    // format validation functions. will be executed if a) typeKeywords includes 'format' and a
+    // validation function is set in validateFormat
     validateFormat: {}
-    // list of error-creator functions. They receive an object with the data of the error and must return an object
-    // like { type: 'error', message: "" }
+    // list of error-creator functions. They receive an object with the data of the error and must
+    // return an object like { type: 'error', message: "" }
     errors: {}
 }
 ```
