@@ -11,6 +11,7 @@ describe("getTemplate", () => {
     before(() => (core = new Core()));
 
     describe("object", () => {
+
         describe(".properties", () => {
 
             it("should return defined properties of object", () => {
@@ -63,6 +64,7 @@ describe("getTemplate", () => {
             });
         });
 
+
         describe("$ref", () => {
 
             it("should resolve $ref in object schema", () => {
@@ -85,6 +87,7 @@ describe("getTemplate", () => {
                 expect(res).to.deep.equal({ first: "asterix" });
             });
         });
+
 
         describe(".oneOf", () => {
 
@@ -117,6 +120,7 @@ describe("getTemplate", () => {
             });
         });
     });
+
 
     describe("array", () => {
         describe(".items:Object", () => {
