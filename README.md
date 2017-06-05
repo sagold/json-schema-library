@@ -50,6 +50,28 @@ the following methods
 | setSchema         | schema                                | set or change the root-schema
 
 
+Each core holds some mapping objects, that may be modified
+
+```js
+Core {
+    // keyword validations for each type, e.g. "array": ["enum", "items", "minItems", "maxItems", ...]
+    // for each item in the given list, the validation function in `validationKeyword` will be called
+    typeKeywords: {} 
+    // keyword validation functions, e.g. validateKeyword.enum(), validateKeyword.items(), ...
+    validateKeyword: {}
+    // type validation for array, object, number, etc. Basically runs over typeKeywords and executes validation
+    // functions from `validateKeyword`
+    validateType: {}
+    // format validation functions. will be executed if a) typeKeywords includes 'format' and a validation function is
+    // set in validateFormat
+    validateFormat: {}
+    // list of error-creator functions. They receive an object with the data of the error and must return an object
+    // like { type: 'error', message: "" }
+    errors: {}
+}
+```
+
+
 #### Examples
 
 ##### getSchema(core, schema, pointer, data)
