@@ -2,6 +2,7 @@
 
 ## 17/01
 
+- [ ] iterate schema: resolve $ref and definitions
 - [ ] profile performance
 - [ ] -- Refactor -- move type validation as keyword to validation/keywords
 - [~] -- Features -- Improve validation maps to add & hook (!) custom entries (WIP, Add tests)
