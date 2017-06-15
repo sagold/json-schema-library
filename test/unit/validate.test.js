@@ -83,6 +83,19 @@ describe("validate", () => {
         });
 
 
+        describe("not", () => {
+
+            it("should be invalid if 'not' keyword does match", () => {
+                const errors = validate(core,
+                    { type: "object", not: { type: "object", properties: { a: { type: "number" } } } },
+                    { a: 1 }
+                );
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("NotError");
+            });
+        });
+
+
         describe("additionalProperties", () => {
 
             it("should return AdditionalPropertiesError for an additional property", () => {
@@ -98,33 +111,157 @@ describe("validate", () => {
                 expect(errors[1].name).to.eq("NoAdditionalPropertiesError");
             });
 
-            it("should be valid if 'additionalProperties' is true", () => {
+            it("should be valid if 'additionalProperties' is 'true'", () => {
                 const errors = validate(core, { type: "object", additionalProperties: true }, { a: 1 });
                 expect(errors).to.have.length(0);
             });
 
             it("should be valid if value matches 'additionalProperties' schema", () => {
-                const errors = validate(core, { type: "object", additionalProperties: { type: "number" } }, { a: 1 });
+                const errors = validate(core, {
+                    type: "object",
+                    properties: { b: { type: "string" } },
+                    additionalProperties: { type: "number" } },
+                    { a: 1 }
+                );
                 expect(errors).to.have.length(0);
             });
 
-            it("should return AdditionalPropertiesError if value does not match 'additionalProperties' schema", () => {
-                const errors = validate(core, { type: "object", additionalProperties: { type: "string" } }, { a: 1 });
+            it("should only validate existing definition in 'properties'", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: { b: { type: "string" } },
+                    additionalProperties: { type: "number" }
+                }, { b: "i am valid" });
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return error if value does not match 'additionalProperties' schema", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: { b: { type: "string" } },
+                    additionalProperties: { type: "string" } },
+                    { a: 1 }
+                );
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("AdditionalPropertiesError");
             });
         });
 
 
-        describe("not", () => {
+        describe("patternProperties", () => {
 
-            it("should be invalid if 'not' keyword does match", () => {
-                const errors = validate(core,
-                    { type: "object", not: { type: "object", properties: { a: { type: "number" } } } },
-                    { a: 1 }
+            it("should return an error for matching pattern and failed validation", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    patternProperties: {
+                        test: { type: "number" }
+                    }
+                },
+                    { test: "invalid type" }
                 );
                 expect(errors).to.have.length(1);
-                expect(errors[0].name).to.eq("NotError");
+                expect(errors[0].name).to.eq("TypeError");
+            });
+
+            it("should validate a correct matching pattern", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    patternProperties: {
+                        test: { type: "number" }
+                    }
+                },
+                    { test: 10 }
+                );
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return an error for matching regex pattern and failed validation", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    patternProperties: {
+                        "^.est?": { type: "number" }
+                    }
+                },
+                    { test: "invalid type" }
+                );
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("TypeError");
+            });
+
+            it("should ignore items defined in properties", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: {
+                        test: { type: "string" }
+                    },
+                    patternProperties: {
+                        "^.est?": { type: "number" }
+                    }
+                },
+                    { test: "valid type" }
+                );
+
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return 'PatternPropertiesError' if additional properties are not allowed", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: {
+                        test: { type: "string" }
+                    },
+                    patternProperties: {
+                        "^.est?$": { type: "number" }
+                    },
+                    additionalProperties: false
+                },
+                    { tester: "invalid property" }
+                );
+
+                console.log(errors[0]);
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("PatternPropertiesError");
+            });
+
+            it("should return no error if additional properties are not allowed but valid in patterns", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    patternProperties: {
+                        "^.est?$": { type: "number" }
+                    },
+                    additionalProperties: false
+                },
+                    { tes: 10 }
+                );
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return no error if additional properties validate value", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    patternProperties: {
+                        "^.est?$": { type: "number" }
+                    },
+                    additionalProperties: { type: "string" }
+                },
+                    { anAddedProp: "valid" }
+                );
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return an AdditionalPropertiesError if additional properties do not validate", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    patternProperties: {
+                        "^.est?$": { type: "number" }
+                    },
+                    additionalProperties: { type: "string" }
+                },
+                    { anAddedProp: 100 }
+                );
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("AdditionalPropertiesError");
             });
         });
     });
