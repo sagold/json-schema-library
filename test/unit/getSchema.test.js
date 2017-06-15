@@ -99,6 +99,17 @@ describe("getSchema", () => {
             const schema = getSchema(core, core.rootSchema, undefined, "#/def");
             expect(schema).to.deep.equal({ type: "number" });
         });
+
+        it("should return an error if schema could not be resolved", () => {
+            core.rootSchema = {
+                type: "object",
+                properties: { coffee: { type: "string" } },
+                patternProperties: { "^tee$": { type: "string" } },
+                additionalProperties: false
+            };
+            const schema = getSchema(core, core.rootSchema, undefined, "#/beer");
+            expect(schema.name).to.equal("UnknownPropertyError");
+        });
     });
 
     describe("array", () => {
