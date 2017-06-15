@@ -116,28 +116,6 @@ describe("validate", () => {
 
     describe("array", () => {
 
-        it("should return MinItemsError for too few items", () => {
-            const errors = validate(core, { type: "array", minItems: 2 }, [1]);
-            expect(errors).to.have.length(1);
-            expect(errors[0].name).to.eq("MinItemsError");
-        });
-
-        it("should return MaxItemsError for too many items", () => {
-            const errors = validate(core, { type: "array", maxItems: 1 }, [1, 2]);
-            expect(errors).to.have.length(1);
-            expect(errors[0].name).to.eq("MaxItemsError");
-        });
-
-        it("should be valid if item count is within range", () => {
-            const errors = validate(core, { type: "array", minItems: 2, maxItems: 2 }, [1, 2]);
-            expect(errors).to.have.length(0);
-        });
-
-        it("should still be valid for missing type", () => {
-            const errors = validate(core, { minItems: 2, maxItems: 2 }, [1, 2]);
-            expect(errors).to.have.length(0);
-        });
-
         it("should return error for invalid index", () => {
             const errors = validate(core, { type: "array", items: [{ type: "string" }] }, [1]);
             expect(errors).to.have.length(1);
@@ -149,65 +127,6 @@ describe("validate", () => {
             expect(errors).to.have.length(0);
         });
 
-        it("should return error for prohibited additional items", () => {
-            const errors = validate(core, { type: "array",
-                items: [{ type: "string" }, { type: "number" }],
-                additionalItems: false
-            }, ["1", 2, "a"]);
-
-            expect(errors).to.have.length(1);
-            expect(errors[0].name).to.eq("AdditionalItemsError");
-        });
-
-        it("should be valid if 'additionalItems' is true", () => {
-            const errors = validate(core, { type: "array",
-                items: [{ type: "string" }, { type: "number" }],
-                additionalItems: true
-            }, ["1", 2, "a"]);
-
-            expect(errors).to.have.length(0);
-        });
-
-        it("should also be valid if 'additionalItems' is undefined", () => {
-            const errors = validate(core, { type: "array",
-                items: [{ type: "string" }, { type: "number" }]
-            }, ["1", 2, "a"]);
-
-            expect(errors).to.have.length(0);
-        });
-
-        it("should return error for mismatching 'additionalItems' schema", () => {
-            const errors = validate(core, { type: "array",
-                items: [{ type: "string" }, { type: "number" }],
-                additionalItems: { type: "object" }
-            }, ["1", 2, "a"]);
-
-            expect(errors).to.have.length(1);
-            expect(errors[0].name).to.eq("TypeError");
-        });
-
-        it("should be valid for matching 'additionalItems' schema", () => {
-            const errors = validate(core, { type: "array",
-                items: [{ type: "string" }, { type: "number" }],
-                additionalItems: { type: "object" }
-            }, ["1", 2, {}]);
-
-            expect(errors).to.have.length(0);
-        });
-
-        it("should be invalid if 'not' keyword does match", () => {
-            const errors = validate(core,
-                { type: "array",
-                    items: [{ type: "string" }, { type: "number" }],
-                    additionalItems: { type: "object" },
-                    not: { items: {} }
-                },
-                ["1", 2, {}]
-            );
-            expect(errors).to.have.length(1);
-            expect(errors[0].name).to.eq("NotError");
-        });
-
         it("should return all errors", () => {
             const errors = validate(core, { type: "array", items: { type: "string" }, maxItems: 1 }, ["1", 2]);
 
@@ -215,6 +134,127 @@ describe("validate", () => {
             expect(errors[0].name).to.eq("TypeError");
             expect(errors[1].name).to.eq("MaxItemsError");
         });
+
+
+        describe("min/maxItems", () => {
+
+            it("should return MinItemsError for too few items", () => {
+                const errors = validate(core, { type: "array", minItems: 2 }, [1]);
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MinItemsError");
+            });
+
+            it("should return MaxItemsError for too many items", () => {
+                const errors = validate(core, { type: "array", maxItems: 1 }, [1, 2]);
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MaxItemsError");
+            });
+
+            it("should be valid if item count is within range", () => {
+                const errors = validate(core, { type: "array", minItems: 2, maxItems: 2 }, [1, 2]);
+                expect(errors).to.have.length(0);
+            });
+
+            it("should still be valid for missing type", () => {
+                const errors = validate(core, { minItems: 2, maxItems: 2 }, [1, 2]);
+                expect(errors).to.have.length(0);
+            });
+        });
+
+        describe("additionalItems", () => {
+
+            it("should return error for prohibited additional items", () => {
+                const errors = validate(core, { type: "array",
+                    items: [{ type: "string" }, { type: "number" }],
+                    additionalItems: false
+                }, ["1", 2, "a"]);
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("AdditionalItemsError");
+            });
+
+            it("should be valid if 'additionalItems' is true", () => {
+                const errors = validate(core, { type: "array",
+                    items: [{ type: "string" }, { type: "number" }],
+                    additionalItems: true
+                }, ["1", 2, "a"]);
+
+                expect(errors).to.have.length(0);
+            });
+
+            it("should also be valid if 'additionalItems' is undefined", () => {
+                const errors = validate(core, { type: "array",
+                    items: [{ type: "string" }, { type: "number" }]
+                }, ["1", 2, "a"]);
+
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return error for mismatching 'additionalItems' schema", () => {
+                const errors = validate(core, { type: "array",
+                    items: [{ type: "string" }, { type: "number" }],
+                    additionalItems: { type: "object" }
+                }, ["1", 2, "a"]);
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("TypeError");
+            });
+
+            it("should be valid for matching 'additionalItems' schema", () => {
+                const errors = validate(core, { type: "array",
+                    items: [{ type: "string" }, { type: "number" }],
+                    additionalItems: { type: "object" }
+                }, ["1", 2, {}]);
+
+                expect(errors).to.have.length(0);
+            });
+        });
+
+
+        describe("not", () => {
+
+            it("should be invalid if 'not' keyword does match", () => {
+                const errors = validate(core,
+                    { type: "array",
+                        items: [{ type: "string" }, { type: "number" }],
+                        additionalItems: { type: "object" },
+                        not: { items: {} }
+                    },
+                    ["1", 2, {}]
+                );
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("NotError");
+            });
+        });
+
+
+        describe("uniqueItems", () => {
+
+            it("should not validate for duplicated values", () => {
+                const errors = validate(core, { type: "array", uniqueItems: true }, [1, 2, 3, 4, 3]);
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("UniqueItemsError");
+            });
+
+            it("should not validate for duplicated objects", () => {
+                const errors = validate(core, { type: "array", uniqueItems: true },
+                    [{ id: "first" }, { id: "second" }, { id: "first" }]
+                );
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("UniqueItemsError");
+            });
+
+            it("should validate for mismatching objects with equal properties", () => {
+                const errors = validate(core, { type: "array", uniqueItems: true },
+                    [{ id: "first", val: 1 }, { id: "first", val: 2 }, { id: "first", val: 3 }]
+                );
+
+                expect(errors).to.have.length(0);
+            });
+        });
+
 
         describe("oneOf", () => {
 

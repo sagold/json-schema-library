@@ -1,6 +1,6 @@
 # Tasks
 
-## 17/01
+## 2017
 
 - [ ] iterate schema: resolve $ref and definitions
 - [ ] profile performance
@@ -14,10 +14,10 @@
 
 **Milestone** add remaining draft04 features
 - [ ] -- Features -- patternProperties
-- [ ] -- Features -- uniqueItems
 - [ ] -- Features -- dependencies (implications: remove default-required properties in Core.JsonEditor): https://spacetelescope.github.io/understanding-json-schema/reference/object.html#index-4
 - [ ] -- Features -- allOf
 - [ ] -- Features -- anyOf
+- [✓] -- Features -- uniqueItems
 - [✓] -- Features -- oneOf: fail for multiple matching oneof-schemas
 - [✓] -- Features -- oneOf: for non-arrays
 - [✓] -- Features -- required (array of properties). Currently every property is required by default
