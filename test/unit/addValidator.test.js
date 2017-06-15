@@ -9,6 +9,10 @@ describe("addValidator", () => {
 
     describe("error", () => {
 
+        it("should throw an error for a missing creator function", () => {
+            expect(() => addValidator.error(core, "123")).to.throw();
+        });
+
         it("should overwrite 'minLengthError'", () => {
             addValidator.error(core, "minLengthError", (data) => ({
                 type: "error",
@@ -25,6 +29,15 @@ describe("addValidator", () => {
     });
 
     describe("format", () => {
+
+        it("should throw an error for a missing validation function", () => {
+            expect(() => addValidator.format(core, "123")).to.throw();
+        });
+
+        it("should throw an error if the type is already specified", () => {
+            addValidator.format(core, "123", Function.prototype);
+            expect(() => addValidator.format(core, "123", Function.prototype)).to.throw();
+        });
 
         it("should call custom format validator", () => {
             let called = false;
@@ -79,6 +92,19 @@ describe("addValidator", () => {
             }
         });
 
+        it("should throw an error for a missing validation function", () => {
+            expect(() => addValidator.keyword(core, "object", "123")).to.throw("Validation function expected");
+        });
+
+        it("should throw an error for unknown datatypes", () => {
+            expect(() => addValidator.keyword(core, "error", "123", Function.prototype)).to.throw("Unknown datatype");
+        });
+
+        it("should allow to overwrite existing keyword validation", () => {
+            expect(() => addValidator.keyword(core, "object", "enum", Function.prototype)).not.to.throw();
+            expect(core.validateKeyword.enum).to.eq(Function.prototype);
+        });
+
         it("should call custom keyword validator", () => {
             let called = false;
             addValidator.keyword(core, "string", "capitalized", () => (called = true));
@@ -88,7 +114,7 @@ describe("addValidator", () => {
             expect(called).to.eq(true);
         });
 
-        it("should not call valiator if keyword is not set", () => {
+        it("should not call validator if keyword is not set", () => {
             let called = false;
             addValidator.keyword(core, "string", "capitalized", () => (called = true));
 

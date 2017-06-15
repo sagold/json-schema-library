@@ -87,6 +87,18 @@ describe("getSchema", () => {
             const schema = getSchema(core, core.rootSchema, { second: "string" }, "#/second");
             expect(schema).to.deep.equal({ id: "target", type: "string" });
         });
+
+        it("should return schema of matching patternProperty", () => {
+            core.rootSchema = {
+                type: "object",
+                patternProperties: {
+                    "^abc$": { type: "string" },
+                    "^def$": { type: "number" }
+                }
+            };
+            const schema = getSchema(core, core.rootSchema, undefined, "#/def");
+            expect(schema).to.deep.equal({ type: "number" });
+        });
     });
 
     describe("array", () => {

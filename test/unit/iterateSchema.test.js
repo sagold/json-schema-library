@@ -71,6 +71,22 @@ describe("iterateSchema", () => {
         expect(calls[3]).to.eq(rootSchema.items.properties.second);
     });
 
+    it("should call on each oneOf-schema", () => {
+        const calls = [];
+        const rootSchema = {
+            oneOf: [
+                { type: "string" },
+                { type: "number" }
+            ]
+        };
+
+        iterateSchema(rootSchema, (schema) => calls.push(schema));
+
+        expect(calls).to.have.length(3);
+        expect(calls[1]).to.eq(rootSchema.oneOf[0]);
+        expect(calls[2]).to.eq(rootSchema.oneOf[1]);
+    });
+
     it("should call on each oneOf-schema in items", () => {
         const calls = [];
         const rootSchema = {
@@ -88,5 +104,21 @@ describe("iterateSchema", () => {
         expect(calls).to.have.length(3);
         expect(calls[1]).to.eq(rootSchema.items.oneOf[0]);
         expect(calls[2]).to.eq(rootSchema.items.oneOf[1]);
+    });
+
+    it("should call on defintitions", () => {
+        const calls = [];
+        const rootSchema = {
+            definitions: {
+                image: {
+                    type: "string", format: "url"
+                }
+            }
+        };
+
+        iterateSchema(rootSchema, (schema) => calls.push(schema));
+
+        expect(calls).to.have.length(2);
+        expect(calls[1]).to.eq(rootSchema.definitions.image);
     });
 });

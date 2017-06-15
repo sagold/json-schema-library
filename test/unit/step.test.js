@@ -9,6 +9,11 @@ describe("step", () => {
     let core;
     before(() => (core = new Core()));
 
+    it("should return an error for unknown types", () => {
+        const res = step(core, 0, { type: "unknown" }, {});
+        expect(res).to.be.an("error");
+    });
+
 
     describe("object", () => {
 
@@ -32,6 +37,31 @@ describe("step", () => {
             }, { title: 4 });
 
             expect(res).to.deep.eq({ type: "number" });
+        });
+
+        it("should return matching patternProperty", () => {
+            const res = step(core, "second", {
+                type: "object",
+                patternProperties: {
+                    "^first$": { type: "number", id: "first" },
+                    "^second$": { type: "string", id: "second" }
+                }
+            });
+
+            expect(res).to.deep.eq({ type: "string", id: "second" });
+        });
+
+        it("should return additionalProperties schema for not matching patternProperty", () => {
+            const res = step(core, "third", {
+                type: "object",
+                patternProperties: {
+                    "^first$": { type: "number", id: "first" },
+                    "^second$": { type: "string", id: "second" }
+                },
+                additionalProperties: { type: "object" }
+            });
+
+            expect(res).to.deep.eq({ type: "object" });
         });
     });
 
@@ -60,6 +90,11 @@ describe("step", () => {
     });
 
     describe("array", () => {
+
+        it("should return an error for invalid array schema", () => {
+            const res = step(core, 0, { type: "array" }, []);
+            expect(res).to.be.an("error");
+        });
 
         it("should return item property", () => {
             const res = step(core, 0, {
@@ -97,6 +132,15 @@ describe("step", () => {
             }, [{ title: 2 }]);
 
             expect(res).to.deep.eq({ type: "object", properties: { title: { type: "number" } } });
+        });
+
+        it("should return a generated schema with additionalItems", () => {
+            const res = step(core, 1, {
+                type: "array",
+                additionalItems: true
+            }, ["3", 2]);
+
+            expect(res.type).to.eq("number");
         });
     });
 });
