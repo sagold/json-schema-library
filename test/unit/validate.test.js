@@ -22,68 +22,12 @@ describe("validate", () => {
         });
     });
 
+
     describe("object", () => {
-
-        it("should return MinPropertiesError for too few properties", () => {
-            const errors = validate(core, { type: "object", minProperties: 2 }, { a: 1 });
-            expect(errors).to.have.length(1);
-            expect(errors[0].name).to.eq("MinPropertiesError");
-        });
-
-        it("should return MaxPropertiesError for too many properties", () => {
-            const errors = validate(core, { type: "object", maxProperties: 1 }, { a: 1, b: 2 });
-            expect(errors).to.have.length(1);
-            expect(errors[0].name).to.eq("MaxPropertiesError");
-        });
-
-        it("should be valid if property count is within range", () => {
-            const errors = validate(core, { type: "object", maxProperties: 1, minProperties: 1 }, { a: 1 });
-            expect(errors).to.have.length(0);
-        });
-
-        it("should return AdditionalPropertiesError for an additional property", () => {
-            const errors = validate(core, { type: "object", additionalProperties: false }, { a: 1 });
-            expect(errors).to.have.length(1);
-            expect(errors[0].name).to.eq("NoAdditionalPropertiesError");
-        });
-
-        it("should return all AdditionalPropertiesErrors", () => {
-            const errors = validate(core, { type: "object", additionalProperties: false }, { a: 1, b: 2 });
-            expect(errors).to.have.length(2);
-            expect(errors[0].name).to.eq("NoAdditionalPropertiesError");
-            expect(errors[1].name).to.eq("NoAdditionalPropertiesError");
-        });
-
-        it("should be valid if 'additionalProperties' is true", () => {
-            const errors = validate(core, { type: "object", additionalProperties: true }, { a: 1 });
-            expect(errors).to.have.length(0);
-        });
-
-        it("should be valid if value matches 'additionalProperties' schema", () => {
-            const errors = validate(core, { type: "object", additionalProperties: { type: "number" } }, { a: 1 });
-            expect(errors).to.have.length(0);
-        });
-
-        it("should return AdditionalPropertiesError if value does not match 'additionalProperties' schema", () => {
-            const errors = validate(core, { type: "object", additionalProperties: { type: "string" } }, { a: 1 });
-            expect(errors).to.have.length(1);
-            expect(errors[0].name).to.eq("AdditionalPropertiesError");
-        });
-
-        // @todo patternProperties
 
         it("should still be valid for missing type", () => {
             const errors = validate(core, { maxProperties: 1, minProperties: 1 }, { a: 1 });
             expect(errors).to.have.length(0);
-        });
-
-        it("should be invalid if 'not' keyword does match", () => {
-            const errors = validate(core,
-                { type: "object", not: { type: "object", properties: { a: { type: "number" } } } },
-                { a: 1 }
-            );
-            expect(errors).to.have.length(1);
-            expect(errors[0].name).to.eq("NotError");
         });
 
         it("should return all errors", () => {
@@ -100,19 +44,91 @@ describe("validate", () => {
             expect(errors[1].name).to.eq("NoAdditionalPropertiesError");
         });
 
-        it("shoud return errors for missing `required` properties", () => {
-            const errors = validate(core,
-                {
-                    type: "object", required: ["id", "a", "aa", "aaa"]
-                },
-                { id: "first", a: "correct", b: "ignored" }
-            );
 
-            expect(errors).to.have.length(2);
-            expect(errors[0].name).to.eq("RequiredPropertyError");
-            expect(errors[1].name).to.eq("RequiredPropertyError");
+        describe("required", () => {
+
+            it("shoud return errors for missing `required` properties", () => {
+                const errors = validate(core,
+                    {
+                        type: "object", required: ["id", "a", "aa", "aaa"]
+                    },
+                    { id: "first", a: "correct", b: "ignored" }
+                );
+
+                expect(errors).to.have.length(2);
+                expect(errors[0].name).to.eq("RequiredPropertyError");
+                expect(errors[1].name).to.eq("RequiredPropertyError");
+            });
+        });
+
+
+        describe("min/maxProperties", () => {
+
+            it("should return MinPropertiesError for too few properties", () => {
+                const errors = validate(core, { type: "object", minProperties: 2 }, { a: 1 });
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MinPropertiesError");
+            });
+
+            it("should return MaxPropertiesError for too many properties", () => {
+                const errors = validate(core, { type: "object", maxProperties: 1 }, { a: 1, b: 2 });
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MaxPropertiesError");
+            });
+
+            it("should be valid if property count is within range", () => {
+                const errors = validate(core, { type: "object", maxProperties: 1, minProperties: 1 }, { a: 1 });
+                expect(errors).to.have.length(0);
+            });
+        });
+
+
+        describe("additionalProperties", () => {
+
+            it("should return AdditionalPropertiesError for an additional property", () => {
+                const errors = validate(core, { type: "object", additionalProperties: false }, { a: 1 });
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("NoAdditionalPropertiesError");
+            });
+
+            it("should return all AdditionalPropertiesErrors", () => {
+                const errors = validate(core, { type: "object", additionalProperties: false }, { a: 1, b: 2 });
+                expect(errors).to.have.length(2);
+                expect(errors[0].name).to.eq("NoAdditionalPropertiesError");
+                expect(errors[1].name).to.eq("NoAdditionalPropertiesError");
+            });
+
+            it("should be valid if 'additionalProperties' is true", () => {
+                const errors = validate(core, { type: "object", additionalProperties: true }, { a: 1 });
+                expect(errors).to.have.length(0);
+            });
+
+            it("should be valid if value matches 'additionalProperties' schema", () => {
+                const errors = validate(core, { type: "object", additionalProperties: { type: "number" } }, { a: 1 });
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return AdditionalPropertiesError if value does not match 'additionalProperties' schema", () => {
+                const errors = validate(core, { type: "object", additionalProperties: { type: "string" } }, { a: 1 });
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("AdditionalPropertiesError");
+            });
+        });
+
+
+        describe("not", () => {
+
+            it("should be invalid if 'not' keyword does match", () => {
+                const errors = validate(core,
+                    { type: "object", not: { type: "object", properties: { a: { type: "number" } } } },
+                    { a: 1 }
+                );
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("NotError");
+            });
         });
     });
+
 
     describe("array", () => {
 
