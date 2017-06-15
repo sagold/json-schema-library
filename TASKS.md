@@ -11,7 +11,7 @@
 - [✓] -- Fix -- Return all errors in oneOf-validation
 - [✓] -- Feature -- Error progress notification for async validation
 - [✓] -- Refactor -- Keyword validators should only be called for defined keyword
-- [ ] -- Feature -- getSchema of patternProperties
+- [✓] -- Feature -- getSchema of patternProperties
 
 **Milestone** add remaining draft04 features
 - [ ] -- Features -- dependencies (implications: remove default-required properties in Core.JsonEditor): https://spacetelescope.github.io/understanding-json-schema/reference/object.html#index-4

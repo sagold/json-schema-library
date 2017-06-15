@@ -38,6 +38,31 @@ describe("step", () => {
 
             expect(res).to.deep.eq({ type: "number" });
         });
+
+        it("should return matching patternProperty", () => {
+            const res = step(core, "second", {
+                type: "object",
+                patternProperties: {
+                    "^first$": { type: "number", id: "first" },
+                    "^second$": { type: "string", id: "second" }
+                }
+            });
+
+            expect(res).to.deep.eq({ type: "string", id: "second" });
+        });
+
+        it("should return additionalProperties schema for not matching patternProperty", () => {
+            const res = step(core, "third", {
+                type: "object",
+                patternProperties: {
+                    "^first$": { type: "number", id: "first" },
+                    "^second$": { type: "string", id: "second" }
+                },
+                additionalProperties: { type: "object" }
+            });
+
+            expect(res).to.deep.eq({ type: "object" });
+        });
     });
 
     describe("oneof", () => {
