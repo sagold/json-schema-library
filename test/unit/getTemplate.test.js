@@ -10,6 +10,20 @@ describe("getTemplate", () => {
     let core;
     before(() => (core = new Core()));
 
+    it("should set an empty string if no default value is given", () => {
+        core.rootSchema = { type: "string" };
+        const res = getTemplate(core, core.rootSchema);
+
+        expect(res).to.deep.equal("");
+    });
+
+    it("should set the first enum option for a missing default", () => {
+        core.rootSchema = { type: "string", enum: ["first", "second"] };
+        const res = getTemplate(core, core.rootSchema);
+
+        expect(res).to.deep.equal("first");
+    });
+
     describe("object", () => {
 
         describe(".properties", () => {
@@ -63,7 +77,6 @@ describe("getTemplate", () => {
                 expect(res).to.deep.equal({ first: "john", second: 8 });
             });
         });
-
 
         describe("$ref", () => {
 
