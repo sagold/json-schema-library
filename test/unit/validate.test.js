@@ -246,7 +246,6 @@ describe("validate", () => {
                     { tester: "invalid property" }
                 );
 
-                console.log(errors[0]);
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("PatternPropertiesError");
             });
