@@ -145,6 +145,34 @@ describe("validate", () => {
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("AdditionalPropertiesError");
             });
+
+            it("should be valid if value matches 'additionalProperties' oneOf schema", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: { b: { type: "string" } },
+                    additionalProperties: {
+                        oneOf: [
+                            { type: "number" }
+                        ]
+                    } },
+                    { a: 1 }
+                );
+                expect(errors).to.have.length(0);
+            });
+
+            it("should be invalid if value does not match 'additionalProperties' in oneOf schema", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: { b: { type: "string" } },
+                    additionalProperties: {
+                        oneOf: [
+                            { type: "string" }
+                        ]
+                    } },
+                    { a: 1 }
+                );
+                expect(errors).to.have.length(1);
+            });
         });
 
 
