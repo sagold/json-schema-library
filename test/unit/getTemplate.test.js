@@ -24,6 +24,29 @@ describe("getTemplate", () => {
         expect(res).to.deep.equal("first");
     });
 
+    describe("boolean", () => {
+        it("should set default value for boolean", () => {
+            core.rootSchema = { type: "boolean", default: false };
+            const res = getTemplate(core, core.rootSchema);
+
+            expect(res).to.equal(false);
+        });
+
+        it("should not override given boolean if it is 'false'", () => {
+            core.rootSchema = { type: "boolean", default: true };
+            const res = getTemplate(core, core.rootSchema, false);
+
+            expect(res).to.equal(false);
+        });
+
+        it("should not override given boolean if it is 'true'", () => {
+            core.rootSchema = { type: "boolean", default: false };
+            const res = getTemplate(core, core.rootSchema, true);
+
+            expect(res).to.equal(true);
+        });
+    });
+
     describe("object", () => {
 
         describe(".properties", () => {
@@ -38,6 +61,18 @@ describe("getTemplate", () => {
                 const res = getTemplate(core, core.rootSchema);
 
                 expect(res).to.deep.equal({ first: "", second: 0 });
+            });
+
+            it("should not fail on falsy input data", () => {
+                core.rootSchema = { type: "object",
+                    properties: {
+                        first: { type: "boolean", default: true },
+                        second: { type: "boolean", default: false },
+                    }
+                };
+                const res = getTemplate(core, core.rootSchema, { first: false, second: true });
+
+                expect(res).to.deep.equal({ first: false, second: true });
             });
 
             it("should return default object if defined", () => {
@@ -224,17 +259,62 @@ describe("getTemplate", () => {
                 expect(res).to.deep.equal(["", false]);
             });
 
-            it("should not replace input data", () => {
+            it("should replace input data", () => {
                 core.rootSchema = { type: "array",
                     minItems: 2,
                     items: [
-                        { type: "string" },
+                        { type: "object" },
                         { type: "boolean", "default": true }
                     ]
                 };
                 const res = getTemplate(core, core.rootSchema, [43]);
 
-                expect(res).to.deep.equal([43, true]);
+                expect(res).to.deep.equal([{}, true]);
+            });
+
+            it("should convert input data for strings", () => {
+                core.rootSchema = { type: "array", minItems: 1,
+                    items: [{ type: "string" }]
+                };
+                const res = getTemplate(core, core.rootSchema, [43]);
+
+                expect(res).to.deep.equal(["43"]);
+            });
+
+            it("should convert input data for numbers", () => {
+                core.rootSchema = { type: "array", minItems: 1,
+                    items: [{ type: "number" }]
+                };
+                const res = getTemplate(core, core.rootSchema, ["43"]);
+
+                expect(res).to.deep.equal([43]);
+            });
+
+            it("should return default value for invalid number", () => {
+                core.rootSchema = { type: "array", minItems: 1,
+                    items: [{ type: "number" }]
+                };
+                const res = getTemplate(core, core.rootSchema, ["asd"]);
+
+                expect(res).to.deep.equal([0]);
+            });
+
+            it("should convert input data for booleans", () => {
+                core.rootSchema = { type: "array", minItems: 1,
+                    items: [{ type: "boolean" }]
+                };
+                const res = getTemplate(core, core.rootSchema, ["false"]);
+
+                expect(res).to.deep.equal([false]);
+            });
+
+            it("should return default value for invalid boolean", () => {
+                core.rootSchema = { type: "array", minItems: 1,
+                    items: [{ type: "boolean" }]
+                };
+                const res = getTemplate(core, core.rootSchema, ["43"]);
+
+                expect(res).to.deep.equal([false]);
             });
         });
 
