@@ -4,10 +4,10 @@
   "description": "Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test-unit; npm run test-integration",
-    "test-integration": "mocha --recursive 'test/integration/**/*.test.js' -R spec; exit 0",
-    "test-unit": "mocha --recursive 'test/unit/**/*.test.js' -R spec; exit 0",
-    "tdd": "watch 'npm run test-unit' lib/ test/; exit 0",
+    "test": "npm run test-unit && npm run test-integration",
+    "test-integration": "mocha --recursive -R spec test/integration/**/*.test.js",
+    "test-unit": "mocha --recursive -R spec test/unit/**/*.test.js",
+    "tdd": "watch \"npm run test-unit\" lib/ test/",
     "coverage": "nyc npm run test --reporter=lcov"
   },
   "repository": {
