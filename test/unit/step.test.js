@@ -1,7 +1,7 @@
 const expect = require("chai").expect;
 const step = require("../../lib/step");
 
-const Core = require("../../lib/cores/draft04");
+const Core = require("../../lib/cores/Draft04");
 
 
 describe("step", () => {

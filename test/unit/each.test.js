@@ -1,6 +1,6 @@
 const expect = require("chai").expect;
 const each = require("../../lib/each");
-const Core = require("../../lib/cores/draft04");
+const Core = require("../../lib/cores/Draft04");
 
 describe("each", () => {
 

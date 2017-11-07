@@ -1,6 +1,6 @@
 const expect = require("chai").expect;
 const validate = require("../../lib/validate");
-const Core = require("../../lib/cores/draft04");
+const Core = require("../../lib/cores/Draft04");
 
 
 describe("validate", () => {

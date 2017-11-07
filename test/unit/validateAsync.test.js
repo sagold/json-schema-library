@@ -1,6 +1,6 @@
 const expect = require("chai").expect;
 const validateAsync = require("../../lib/validateAsync");
-const Core = require("../../lib/cores/draft04");
+const Core = require("../../lib/cores/Draft04");
 const addValidator = require("../../lib/addValidator");
 
 
