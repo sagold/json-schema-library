@@ -1,7 +1,7 @@
 /* eslint quote-props: 0, no-unused-expressions: 0 */
 const expect = require("chai").expect;
 const isValid = require("../../lib/isValid");
-const Core = require("../../lib/cores/draft04");
+const Core = require("../../lib/cores/Draft04");
 
 
 describe("isValid", () => {

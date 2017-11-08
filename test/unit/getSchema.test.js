@@ -1,6 +1,6 @@
 const expect = require("chai").expect;
 const getSchema = require("../../lib/getSchema");
-const Core = require("../../lib/cores/draft04");
+const Core = require("../../lib/cores/Draft04");
 
 describe("getSchema", () => {
 
