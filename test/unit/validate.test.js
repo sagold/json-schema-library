@@ -581,4 +581,14 @@ describe("validate", () => {
             expect(errors[0].name).to.eq("NotError");
         });
     });
+
+    describe("arrays of types", () => {
+
+        it("should work", () => {
+            let errors = validate(core, { type: ["object", "null"] }, {});
+            expect(errors).to.have.length(0);
+            errors = validate(core, { type: ["object", "null"] }, null);
+            expect(errors).to.have.length(0);
+        });
+    });
 });
