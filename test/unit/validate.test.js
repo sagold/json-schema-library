@@ -584,11 +584,17 @@ describe("validate", () => {
 
     describe("arrays of types", () => {
 
-        it("should work", () => {
+        it("should not return an error for a valid type", () => {
             let errors = validate(core, { type: ["object", "null"] }, {});
             expect(errors).to.have.length(0);
             errors = validate(core, { type: ["object", "null"] }, null);
             expect(errors).to.have.length(0);
+        });
+
+        it("should return a TypeErrpr if passed type is not within array", () => {
+            let errors = validate(core, { type: ["object", "null"] }, []);
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("TypeError");
         });
     });
 });

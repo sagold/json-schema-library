@@ -17,7 +17,7 @@
 **Milestone** add remaining draft04 features
 - [ ] -- Features -- allOf
 - [ ] -- Features -- anyOf
-- [ ] -- Features -- type-array
+- [✓] -- Features -- type-array
 - [✓] -- Features -- patternProperties
 - [✓] -- Features -- uniqueItems
 - [✓] -- Features -- oneOf: fail for multiple matching oneof-schemas
