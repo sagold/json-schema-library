@@ -1,28 +1,36 @@
 # Tasks
 
+
 ## 2017
 
 - [ ] -- Features -- dependencies (implications: remove default-required properties in Core.JsonEditor): https://spacetelescope.github.io/understanding-json-schema/reference/object.html#index-4
 - [ ] iterate schema: resolve $ref and definitions
 - [ ] profile performance
 - [ ] -- Refactor -- move type validation as keyword to validation/keywords
-- [~] -- Features -- Improve validation maps to add & hook (!) custom entries (WIP, Add tests)
 - [ ] -- Refactor -- Use addValidation to setup base validation mappings?
 - [ ] -- Features -- Helper to find a json- and json-schema-pointer
+- [~] -- Features -- Improve validation maps to add & hook (!) custom entries (WIP, Add tests)
 - [✓] -- Fix -- Return all errors in oneOf-validation
 - [✓] -- Feature -- Error progress notification for async validation
 - [✓] -- Refactor -- Keyword validators should only be called for defined keyword
 - [✓] -- Feature -- getSchema of patternProperties
 
 **Milestone** add remaining draft04 features
-- [ ] -- Features -- allOf
-- [ ] -- Features -- anyOf
+- [ ] -- allOf
+- [ ] -- AnyOf
+- [ ] -- definitions
+- [ ] -- dependencies
+- [ ] -- remote references
 - [✓] -- Features -- type-array
 - [✓] -- Features -- patternProperties
 - [✓] -- Features -- uniqueItems
 - [✓] -- Features -- oneOf: fail for multiple matching oneof-schemas
 - [✓] -- Features -- oneOf: for non-arrays
 - [✓] -- Features -- required (array of properties). Currently every property is required by default
+
+### unsupported optional draft04 features
+- [ ] -- bignum (optional)
+- [ ] -- specific format validations (optional)
 
 
 ## 16/12
