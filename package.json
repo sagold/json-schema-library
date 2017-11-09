@@ -23,6 +23,7 @@
   "homepage": "https://github.com/sagold/json-schema-library",
   "devDependencies": {
     "chai": "^3.5.0",
+    "chalk": "^2.3.0",
     "eslint": "^2.7.0",
     "json-schema-test-suite": "0.0.10",
     "mocha": "^3.1.2",

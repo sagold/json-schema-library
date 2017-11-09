@@ -2,34 +2,34 @@
 const TestSuite = require("json-schema-test-suite");
 const Draft04 = require("../../lib/cores/Draft04");
 const expect = require("chai").expect;
+const chalk = require("chalk");
 
 // filter test files
 function filter(file, parent, optional) {
+    // console.log("FILTER", file, parent, optional);
     if (file.includes("anyOf")) {
-        console.log("AnyOf not yet supported");
+        console.log(chalk.red(`- ${optional ? "optional " : ""}anyOf not yet supported`));
         return false;
     } else if (file.includes("allOf")) {
-        console.log("allOf not yet supported");
+        console.log(chalk.red(`- ${optional ? "optional " : ""}allOf not yet supported`));
         return false;
     } else if (file.includes("definitions")) {
-        console.log("definitions not yet supported");
+        console.log(chalk.red(`- ${optional ? "optional " : ""}definitions not yet supported`));
         return false;
     } else if (file.includes("format")) {
-        console.log("specific format validations not yet supported");
+        console.log(chalk.grey(`- ${optional ? "optional " : ""}specific format validations not supported`));
         return false;
     } else if (file.includes("dependencies")) {
-        console.log("dependencies not yet supported");
+        console.log(chalk.red(`- ${optional ? "optional " : ""}dependencies not yet supported`));
         return false;
     } else if (file.includes("refRemote")) {
-        console.log("remote references not yet supported");
+        console.log(chalk.red(`- ${optional ? "optional " : ""}remote references not yet supported`));
         return false;
     } else if (file.includes("bignum")) {
-        console.log("bignum not yet supported");
+        console.log(chalk.grey(`- ${optional ? "optional " : ""}bignum not supported`));
         return false;
     }
 
-
-    // console.log("FILTER", file, parent, optional);
     return true;
 }
 
@@ -56,9 +56,8 @@ tests.forEach((testCase) => {
                 schema.tests.forEach((test) => {
 
                     it(`${test.description} (${testCase.file})`, () => {
-                        expect(test.result.valid).to.eq(test.valid,
-                            `${test.description}\nschema: ${JSON.stringify(schema.schema)}\ndata: ${JSON.stringify(test.data)}`
-                        );
+                        // eslint-disable-next-line max-len
+                        expect(test.result.valid).to.eq(test.valid, `${test.description}\nschema: ${JSON.stringify(schema.schema)}\ndata: ${JSON.stringify(test.data)}`);
                     });
                 });
             });
