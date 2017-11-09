@@ -23,6 +23,9 @@ function filter(file, parent, optional) {
     } else if (file.includes("refRemote")) {
         console.log("remote references not yet supported");
         return false;
+    } else if (file.includes("bignum")) {
+        console.log("bignum not yet supported");
+        return false;
     }
 
 
