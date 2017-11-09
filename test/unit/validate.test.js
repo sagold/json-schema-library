@@ -582,7 +582,7 @@ describe("validate", () => {
         });
     });
 
-    describe.only("arrays of types", () => {
+    describe("arrays of types", () => {
 
         it("should not return an error for a valid type", () => {
             let errors = validate(core, { type: ["object", "null"] }, {});
@@ -592,13 +592,13 @@ describe("validate", () => {
         });
 
         it("should return a TypeError if passed type is not within array", () => {
-            let errors = validate(core, { type: ["object", "null"] }, []);
+            const errors = validate(core, { type: ["object", "null"] }, []);
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("TypeError");
         });
 
         it("should support 'integer' as a valid type within array", () => {
-            let errors = validate(core, { type: ["integer", "null"] }, 1);
+            const errors = validate(core, { type: ["integer", "null"] }, 1);
             expect(errors).to.have.length(0);
         });
     });
