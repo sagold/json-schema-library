@@ -20,6 +20,20 @@ describe("validate", () => {
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("TypeError");
         });
+
+        describe("oneOf", () => {
+
+            it("should validate on a matching oneOf definition", () => {
+                const errors = validate(core, { oneOf: [{ type: "integer" }, { type: "string" }] }, 3);
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return an error for mulltiple matching oneOf schemas", () => {
+                const errors = validate(core, { oneOf: [{ type: "integer" }, { minimum: 2 }] }, 3);
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MultipleOneOfError");
+            });
+        });
     });
 
 
@@ -172,6 +186,22 @@ describe("validate", () => {
                     { a: 1 }
                 );
                 expect(errors).to.have.length(1);
+            });
+
+            it("should be invalid if value does match multiple 'additionalProperties' in oneOf schema", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: { b: { type: "string" } },
+                    additionalProperties: {
+                        oneOf: [
+                            { type: "string" },
+                            { type: "string" }
+                        ]
+                    } },
+                    { a: "a string" }
+                );
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("AdditionalPropertiesError");
             });
         });
 
@@ -465,6 +495,20 @@ describe("validate", () => {
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("OneOfError");
             });
+
+            it("should return MultipleOneOfError if multiple oneOf definitions match the given value", () => {
+                const errors = validate(core,
+                    {
+                        type: "array", items: { oneOf: [
+                            { type: "integer" },
+                            { minimum: 2 }
+                        ] }
+                    },
+                    [3]
+                );
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MultipleOneOfError");
+            });
         });
     });
 
@@ -603,33 +647,36 @@ describe("validate", () => {
         });
     });
 
-    describe("heterogeneous enum", () => {
+    describe("heterogeneous types", () => {
 
-        it("should validate a matching value within enum", () => {
-            const errors = validate(core, { "enum": [1, "second", []] }, "second");
-            expect(errors).to.have.length(0);
-        });
+        describe("enum", () => {
 
-        it("should validate a matching array within enum", () => {
-            const errors = validate(core, { "enum": [1, "second", []] }, []);
-            expect(errors).to.have.length(0);
-        });
+            it("should validate a matching value within enum", () => {
+                const errors = validate(core, { "enum": [1, "second", []] }, "second");
+                expect(errors).to.have.length(0);
+            });
 
-        it("should validate a matching object within enum", () => {
-            const errors = validate(core, { "enum": [1, "second", { id: "third" }] }, { id: "third" });
-            expect(errors).to.have.length(0);
-        });
+            it("should validate a matching array within enum", () => {
+                const errors = validate(core, { "enum": [1, "second", []] }, []);
+                expect(errors).to.have.length(0);
+            });
 
-        it("should return error for non-matching object", () => {
-            const errors = validate(core, { "enum": [1, "second", { id: "third" }] }, { id: "first" });
-            expect(errors).to.have.length(1);
-            expect(errors[0].name).to.eq("EnumError");
-        });
+            it("should validate a matching object within enum", () => {
+                const errors = validate(core, { "enum": [1, "second", { id: "third" }] }, { id: "third" });
+                expect(errors).to.have.length(0);
+            });
 
-        it("should return error for invalid null", () => {
-            const errors = validate(core, { "enum": [1, "second", { id: "third" }] }, null);
-            expect(errors).to.have.length(1);
-            expect(errors[0].name).to.eq("EnumError");
+            it("should return error for non-matching object", () => {
+                const errors = validate(core, { "enum": [1, "second", { id: "third" }] }, { id: "first" });
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("EnumError");
+            });
+
+            it("should return error for invalid null", () => {
+                const errors = validate(core, { "enum": [1, "second", { id: "third" }] }, null);
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("EnumError");
+            });
         });
     });
 });

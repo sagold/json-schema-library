@@ -9,6 +9,7 @@
 - [ ] -- Refactor -- move type validation as keyword to validation/keywords
 - [ ] -- Refactor -- Use addValidation to setup base validation mappings?
 - [ ] -- Features -- Helper to find a json- and json-schema-pointer
+- [ ] -- Refactor -- consider unifying keyword.oneOf and step.oneof (Object, Array)
 - [~] -- Features -- Improve validation maps to add & hook (!) custom entries (WIP, Add tests)
 - [✓] -- Fix -- Return all errors in oneOf-validation
 - [✓] -- Feature -- Error progress notification for async validation
