@@ -28,6 +28,9 @@ function filter(file, parent, optional) {
     } else if (file.includes("bignum")) {
         console.log(chalk.grey(`- ${optional ? "optional " : ""}bignum not supported`));
         return false;
+    } else if (file.includes("zeroTerminatedFloats")) {
+        console.log(chalk.grey("- zeroTerminatedFloats can not be satisfied with javascript"));
+        return false;
     }
 
     return true;
