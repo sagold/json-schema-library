@@ -602,4 +602,30 @@ describe("validate", () => {
             expect(errors).to.have.length(0);
         });
     });
+
+    describe("heterogeneous enum", () => {
+
+        // {"enum":[6,"foo",[],true,{"foo":12}]}
+        it("should validate a matching value within enum", () => {
+            const errors = validate(core, { "enum": [1, "second", []] }, "second");
+            expect(errors).to.have.length(0);
+        });
+
+        it("should validate a matching array within enum", () => {
+            const errors = validate(core, { "enum": [1, "second", []] }, []);
+            expect(errors).to.have.length(0);
+        });
+
+        it("should validate a matching object within enum", () => {
+            const errors = validate(core, { "enum": [1, "second", { id: "third" }] }, { id: "third" });
+            expect(errors).to.have.length(0);
+        });
+
+        it("should return value for non-matching object", () => {
+            const errors = validate(core, { "enum": [1, "second", { id: "third" }] }, { id: "first" });
+            expect(errors).to.have.length(1);
+            expect(errors[0].name).to.eq("EnumError");
+        });
+
+    });
 });
