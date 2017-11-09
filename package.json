@@ -7,6 +7,7 @@
     "test": "npm run test-unit && npm run test-integration",
     "test-integration": "mocha --recursive -R spec test/integration/**/*.test.js",
     "test-unit": "mocha --recursive -R spec test/unit/**/*.test.js",
+    "test-spec": "mocha --recursive -R spec test/spec/**/*.test.js",
     "tdd": "watch \"npm run test-unit\" lib/ test/",
     "coverage": "nyc npm run test --reporter=lcov"
   },
@@ -23,6 +24,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "eslint": "^2.7.0",
+    "json-schema-test-suite": "0.0.10",
     "mocha": "^3.1.2",
     "nyc": "^10.0.0",
     "watch": "^1.0.1"
