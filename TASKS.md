@@ -17,9 +17,9 @@
 - [✓] -- Feature -- getSchema of patternProperties
 
 **Milestone** add remaining draft04 features
-- [ ] -- definitions
-- [ ] -- dependencies
 - [ ] -- remote references
+- [✓] -- definitions
+- [✓] -- dependencies
 - [✓] -- Features -- allOf
 - [✓] -- Features -- anyOf
 - [✓] -- Features -- type-array

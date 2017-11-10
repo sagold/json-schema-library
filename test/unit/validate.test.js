@@ -371,6 +371,7 @@ describe("validate", () => {
                 },
                     { anAddedProp: "valid" }
                 );
+
                 expect(errors).to.have.length(0);
             });
 
@@ -387,6 +388,112 @@ describe("validate", () => {
 
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("AdditionalPropertiesError");
+            });
+        });
+
+        describe.only("dependencies", () => {
+
+            it("should ignore any dependencies if the property is no set", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: {
+                        title: { type: "string" },
+                        url: { type: "string" },
+                        target: { type: "string" }
+                    },
+                    dependencies: {
+                        url: ["target"]
+                    }
+                },
+                    { title: "Check this out" }
+                );
+
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return a 'MissingDependencyError' if the dependent property is missing", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: {
+                        title: { type: "string" },
+                        url: { type: "string" },
+                        target: { type: "string" }
+                    },
+                    dependencies: {
+                        url: ["target"]
+                    }
+                },
+                    { title: "Check this out", url: "http://example.com" }
+                );
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MissingDependencyError");
+            });
+
+            it("should return a 'MissingDependencyError' if the dependent counterpart is missing", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: {
+                        title: { type: "string" },
+                        url: { type: "string" },
+                        target: { type: "string" }
+                    },
+                    dependencies: {
+                        url: ["target"],
+                        target: ["url"]
+                    }
+                },
+                    { title: "Check this out", target: "_blank" }
+                );
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MissingDependencyError");
+            });
+
+            it("should be valid for a matching schema dependency", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: {
+                        title: { type: "string" },
+                        url: { type: "string" },
+                        target: { type: "string" }
+                    },
+                    dependencies: {
+                        url: {
+                            properties: {
+                                target: { type: "string" }
+                            }
+                        }
+                    }
+                },
+                    { title: "Check this out", url: "http://example.com", target: "_blank" }
+                );
+
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return validation error for a non-matching schema dependency", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: {
+                        title: { type: "string" },
+                        url: { type: "string" },
+                        target: { type: "string" }
+                    },
+                    dependencies: {
+                        url: {
+                            required: ["target"],
+                            properties: {
+                                target: { type: "string" }
+                            }
+                        }
+                    }
+                },
+                    { title: "Check this out", url: "http://example.com" }
+                );
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("RequiredPropertyError");
             });
         });
     });

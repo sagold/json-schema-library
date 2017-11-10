@@ -17,9 +17,6 @@ function filter(file, parent, optional) {
     if (file.includes("format")) {
         console.log(chalk.grey(`- ${optional ? "optional " : ""}specific format validations not supported`));
         return false;
-    } else if (file.includes("dependencies")) {
-        console.log(chalk.red(`- ${optional ? "optional " : ""}dependencies not yet supported`));
-        return false;
     } else if (file.includes("refRemote")) {
         console.log(chalk.red(`- ${optional ? "optional " : ""}remote references not yet supported`));
         return false;
