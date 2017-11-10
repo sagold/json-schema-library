@@ -223,6 +223,23 @@ describe("validate", () => {
                 expect(errors).to.have.length(1);
             });
 
+            it("should be ignore properties that are matched by patternProperties", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: { b: { type: "string" } },
+                    patternProperties: {
+                        "^.$": { type: "number" }
+                    },
+                    additionalProperties: {
+                        oneOf: [
+                            { type: "string" }
+                        ]
+                    } },
+                    { a: 1 }
+                );
+                expect(errors).to.have.length(0);
+            });
+
             it("should be invalid if value does match multiple 'additionalProperties' in oneOf schema", () => {
                 const errors = validate(core, {
                     type: "object",
@@ -281,7 +298,7 @@ describe("validate", () => {
                 expect(errors[0].name).to.eq("TypeError");
             });
 
-            it("should ignore items defined in properties", () => {
+            it("should invalidate defined property", () => {
                 const errors = validate(core, {
                     type: "object",
                     properties: {
@@ -291,10 +308,11 @@ describe("validate", () => {
                         "^.est?": { type: "number" }
                     }
                 },
-                    { test: "valid type" }
+                    { test: "invalid type" }
                 );
 
-                expect(errors).to.have.length(0);
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("TypeError");
             });
 
             it("should return 'PatternPropertiesError' if additional properties are not allowed", () => {
