@@ -52,4 +52,15 @@ describe("resolveRef (strict)", () => {
         expect(result).to.have.property("type");
         expect(result.type).to.eq("integer");
     });
+
+    it("should resolve draft04 json", () => {
+        const schema = {
+            $ref: "http://json-schema.org/draft-04/schema#"
+        };
+
+        const result = resolveRef(schema, schema);
+
+        expect(result).to.have.property("$schema");
+        expect(result.$schema).to.eq("http://json-schema.org/draft-04/schema#");
+    });
 });
