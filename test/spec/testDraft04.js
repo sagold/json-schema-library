@@ -1,59 +1,46 @@
-const TestSuite = require("json-schema-test-suite");
+/* eslint max-len: 0 */
 const expect = require("chai").expect;
-const chalk = require("chalk");
+const glob = require("glob");
+const path = require("path");
+const flattenArray = require("../../lib/utils/flattenArray");
+const addSchema = require("../../lib/addSchema");
 
 // setup remote files
-const remotes = require("../../remotes");
-remotes["http://localhost:1234/integer.json"] = require("json-schema-test-suite/remotes/integer.json");
-remotes["http://localhost:1234/subSchemas.json"] = require("json-schema-test-suite/remotes/subSchemas.json");
+addSchema("http://localhost:1234/integer.json", require("json-schema-test-suite/remotes/integer.json"));
+addSchema("http://localhost:1234/subSchemas.json", require("json-schema-test-suite/remotes/subSchemas.json"));
+addSchema("http://localhost:1234/name.json", require("json-schema-test-suite/remotes/name.json"));
 
 // ignore theese tests
 const skipTest = [
-    "changed scope ref invalid" // not going to be supported (combination of id, folder, refs)
+    "changed scope ref invalid", // not going to be supported (combination of id, folder, refs)
+    "a float is not an integer even without fractional part" // will always fail within javascript
 ];
 
-// filter test files
-function filter(file, parent, optional) {
-    if (file.includes("bignum")) {
-        console.log(chalk.grey(`- ${optional ? "optional " : ""}bignum not supported`));
-        return false;
-    } else if (file.includes("zeroTerminatedFloats")) {
-        console.log(chalk.grey("- zeroTerminatedFloats can not be satisfied with javascript"));
-        return false;
-    }
-
-    return true;
+const globPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "tests", "draft4", "**", "*.json");
+let draft04TestCases = glob.sync(globPattern);
+if (draft04TestCases.length === 0) {
+    throw new Error(`Failed retrieving tests from ${globPattern}`);
 }
+
+// load TestCases
+draft04TestCases = flattenArray(draft04TestCases.map(require));
 
 
 function runTests(Core) {
-    // generate tests
-    const tests = TestSuite.testSync(validatorFactory, filter, "draft4");
+    draft04TestCases.forEach((testCase) => {
+        const description = testCase.description;
+        const schema = testCase.schema;
 
-    // wrap validator to fit test-suite
-    function validatorFactory(schema) {
-        const core = new Core(schema);
-        return {
-            validate: (data) => {
-                const errors = core.validate(schema, data);
-                return errors.length === 0 ? { valid: true } : { valid: false, errors };
-            }
-        };
-    }
+        describe(`[${description}]`, () => {
+            testCase.tests.forEach((testData) => {
+                const test = skipTest.includes(testData.description) ? it.skip : it;
 
-    function runTest(testCase, schema, test) {
-        const testFunction = skipTest.includes(test.description) ? it.skip : it;
-        testFunction(`${test.description} (${testCase.file})`, () => {
-            // eslint-disable-next-line max-len
-            expect(test.result.valid).to.eq(test.valid, `${test.description}\nschema: ${JSON.stringify(schema.schema)}\ndata: ${JSON.stringify(test.data)}`);
-        });
-    }
-
-    // run assertions
-    tests.forEach((testCase) => {
-        testCase.schemas.forEach((schema) => {
-            describe(`[${testCase.name}] ${schema.description}`, () => {
-                schema.tests.forEach((test) => runTest(testCase, schema, test));
+                test(testData.description, () => {
+                    const testSchema = JSON.parse(JSON.stringify(schema));
+                    const validator = new Core(testSchema);
+                    const isValid = validator.isValid(testSchema, testData.data);
+                    expect(isValid).to.eq(testData.valid);
+                });
             });
         });
     });
