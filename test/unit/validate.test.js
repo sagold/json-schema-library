@@ -315,6 +315,21 @@ describe("validate", () => {
                 expect(errors[0].name).to.eq("PatternPropertiesError");
             });
 
+            it("should return an error if one of the matching patterns does not validate", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    patternProperties: {
+                        "^.est?$": { type: "number" },
+                        "^.est$": { type: "string" }
+                    },
+                    additionalProperties: false
+                },
+                    { test: 10 }
+                );
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("TypeError");
+            });
+
             it("should return no error if additional properties are not allowed but valid in patterns", () => {
                 const errors = validate(core, {
                     type: "object",
