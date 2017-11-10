@@ -18,6 +18,7 @@
 
 **Milestone** add remaining draft04 features
 - [ ] -- remote references
+- [✓] -- default format validations
 - [✓] -- definitions
 - [✓] -- dependencies
 - [✓] -- Features -- allOf
@@ -31,7 +32,6 @@
 
 ### unsupported optional draft04 features
 - [ ] -- bignum (optional)
-- [ ] -- specific format validations (optional)
 
 
 ## 16/12

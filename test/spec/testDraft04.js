@@ -14,10 +14,7 @@ const skipTest = [
 
 // filter test files
 function filter(file, parent, optional) {
-    if (file.includes("format")) {
-        console.log(chalk.grey(`- ${optional ? "optional " : ""}specific format validations not supported`));
-        return false;
-    } else if (file.includes("bignum")) {
+    if (file.includes("bignum")) {
         console.log(chalk.grey(`- ${optional ? "optional " : ""}bignum not supported`));
         return false;
     } else if (file.includes("zeroTerminatedFloats")) {
