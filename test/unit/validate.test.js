@@ -678,5 +678,24 @@ describe("validate", () => {
                 expect(errors[0].name).to.eq("EnumError");
             });
         });
+
+        describe("$ref", () => {
+
+            it("should correctly validate data through nested $ref", () => {
+                const schema = {
+                    $ref: "#/definitions/c",
+                    definitions: {
+                        a: { type: "integer" },
+                        b: { $ref: "#/definitions/a" },
+                        c: { $ref: "#/definitions/b" }
+                    }
+                };
+                core.rootSchema = schema;
+                const errors = validate(core, schema, "a");
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("TypeError");
+            });
+        });
     });
 });
