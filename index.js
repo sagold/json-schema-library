@@ -7,6 +7,7 @@ module.exports = {
         Draft04: require("./lib/cores/Draft04"), // core implementing draft04 specs
         JsonEditor: require("./lib/cores/JsonEditor") // adjusted core of draft04 to better support the json-editor
     },
+    addSchema: require("./lib/addSchema"),
     createCustomError: require("./lib/utils/createCustomError"),
     addValidator: require("./lib/addValidator"), // add validation for keyword, format, datatype and customize errors
     createSchemaOf: require("./lib/createSchemaOf"), // creates a simple schema based on the given data
