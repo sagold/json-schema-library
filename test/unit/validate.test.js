@@ -391,7 +391,7 @@ describe("validate", () => {
             });
         });
 
-        describe.only("dependencies", () => {
+        describe("dependencies", () => {
 
             it("should ignore any dependencies if the property is no set", () => {
                 const errors = validate(core, {
@@ -879,6 +879,18 @@ describe("validate", () => {
 
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("MinimumError");
+            });
+
+            it("should correctly resolve local remote url", () => {
+                const remotes = require("../../remotes");
+                remotes["http://localhost:1234/integer.json"] = require("json-schema-test-suite/remotes/integer.json");
+
+                const schema = { $ref: "http://localhost:1234/integer.json", _id: "input" };
+                core.rootSchema = schema;
+                const errors = validate(core, schema, "not an integer");
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("TypeError");
             });
         });
     });
