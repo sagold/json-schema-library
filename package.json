@@ -31,7 +31,7 @@
     "watch": "^1.0.1"
   },
   "dependencies": {
-    "gson-pointer": "^1.0.4",
+    "gson-pointer": "^2.2.0",
     "valid-url": "^1.0.9"
   },
   "publishConfig": {
