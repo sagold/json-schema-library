@@ -4,13 +4,16 @@
   "description": "Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test-unit && npm run test-integration",
+    "test": "npm run test-unit && npm run test-spec && npm run test-integration",
     "test-integration": "mocha --recursive -R spec test/integration/**/*.test.js",
     "test-unit": "mocha --recursive -R spec test/unit/**/*.test.js",
     "test-spec": "mocha --recursive -R spec test/spec/**/*.test.js",
     "tdd": "watch \"npm run test-unit\" lib/ test/",
     "coverage": "nyc npm run test --reporter=lcov"
   },
+  "pre-push": [
+    "test"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/sagold/json-schema-library.git"
@@ -28,6 +31,7 @@
     "json-schema-test-suite": "0.0.10",
     "mocha": "^3.1.2",
     "nyc": "^10.0.0",
+    "pre-push": "^0.1.1",
     "watch": "^1.0.1"
   },
   "dependencies": {
