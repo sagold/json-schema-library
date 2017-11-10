@@ -28,10 +28,31 @@ describe("validate", () => {
                 expect(errors).to.have.length(0);
             });
 
-            it("should return an error for mulltiple matching oneOf schemas", () => {
+            it("should return an error for multiple matching oneOf schemas", () => {
                 const errors = validate(core, { oneOf: [{ type: "integer" }, { minimum: 2 }] }, 3);
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("MultipleOneOfError");
+            });
+        });
+
+        describe("allOf", () => {
+
+            it("should validate if all allOf-schemas are valid", () => {
+                const errors = validate(core, { allOf: [{ type: "integer" }, { minimum: 2 }] }, 3);
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return error if not all schemas match", () => {
+                const errors = validate(core, { allOf: [{ type: "integer" }, { minimum: 4 }] }, 3);
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MinimumError");
+            });
+
+            it("should return all errors for each non-matching schemas", () => {
+                const errors = validate(core, { allOf: [{ type: "integer" }, { minimum: 4 }, { maximum: 2 }] }, 3);
+                expect(errors).to.have.length(2);
+                expect(errors[0].name).to.eq("MinimumError");
+                expect(errors[1].name).to.eq("MaximumError");
             });
         });
     });
