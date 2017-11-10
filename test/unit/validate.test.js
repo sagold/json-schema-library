@@ -20,6 +20,55 @@ describe("validate", () => {
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("TypeError");
         });
+
+        describe("oneOf", () => {
+
+            it("should validate on a matching oneOf definition", () => {
+                const errors = validate(core, { oneOf: [{ type: "integer" }, { type: "string" }] }, 3);
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return an error for multiple matching oneOf schemas", () => {
+                const errors = validate(core, { oneOf: [{ type: "integer" }, { minimum: 2 }] }, 3);
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MultipleOneOfError");
+            });
+        });
+
+        describe("allOf", () => {
+
+            it("should validate if all allOf-schemas are valid", () => {
+                const errors = validate(core, { allOf: [{ type: "integer" }, { minimum: 2 }] }, 3);
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return error if not all schemas match", () => {
+                const errors = validate(core, { allOf: [{ type: "integer" }, { minimum: 4 }] }, 3);
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MinimumError");
+            });
+
+            it("should return all errors for each non-matching schemas", () => {
+                const errors = validate(core, { allOf: [{ type: "integer" }, { minimum: 4 }, { maximum: 2 }] }, 3);
+                expect(errors).to.have.length(2);
+                expect(errors[0].name).to.eq("MinimumError");
+                expect(errors[1].name).to.eq("MaximumError");
+            });
+        });
+
+        describe("anyOf", () => {
+
+            it("should validate if one schemas in anyOf validates", () => {
+                const errors = validate(core, { anyOf: [{ minimum: 4 }, { maximum: 4 }] }, 3);
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return error if not all schemas match", () => {
+                const errors = validate(core, { anyOf: [{ minimum: 4 }, { maximum: 2 }] }, 3);
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("AnyOfError");
+            });
+        });
     });
 
 
@@ -173,6 +222,39 @@ describe("validate", () => {
                 );
                 expect(errors).to.have.length(1);
             });
+
+            it("should be ignore properties that are matched by patternProperties", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: { b: { type: "string" } },
+                    patternProperties: {
+                        "^.$": { type: "number" }
+                    },
+                    additionalProperties: {
+                        oneOf: [
+                            { type: "string" }
+                        ]
+                    } },
+                    { a: 1 }
+                );
+                expect(errors).to.have.length(0);
+            });
+
+            it("should be invalid if value does match multiple 'additionalProperties' in oneOf schema", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: { b: { type: "string" } },
+                    additionalProperties: {
+                        oneOf: [
+                            { type: "string" },
+                            { type: "string" }
+                        ]
+                    } },
+                    { a: "a string" }
+                );
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("AdditionalPropertiesError");
+            });
         });
 
 
@@ -216,7 +298,7 @@ describe("validate", () => {
                 expect(errors[0].name).to.eq("TypeError");
             });
 
-            it("should ignore items defined in properties", () => {
+            it("should invalidate defined property", () => {
                 const errors = validate(core, {
                     type: "object",
                     properties: {
@@ -226,10 +308,11 @@ describe("validate", () => {
                         "^.est?": { type: "number" }
                     }
                 },
-                    { test: "valid type" }
+                    { test: "invalid type" }
                 );
 
-                expect(errors).to.have.length(0);
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("TypeError");
             });
 
             it("should return 'PatternPropertiesError' if additional properties are not allowed", () => {
@@ -248,6 +331,21 @@ describe("validate", () => {
 
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("PatternPropertiesError");
+            });
+
+            it("should return an error if one of the matching patterns does not validate", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    patternProperties: {
+                        "^.est?$": { type: "number" },
+                        "^.est$": { type: "string" }
+                    },
+                    additionalProperties: false
+                },
+                    { test: 10 }
+                );
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("TypeError");
             });
 
             it("should return no error if additional properties are not allowed but valid in patterns", () => {
@@ -273,6 +371,7 @@ describe("validate", () => {
                 },
                     { anAddedProp: "valid" }
                 );
+
                 expect(errors).to.have.length(0);
             });
 
@@ -289,6 +388,112 @@ describe("validate", () => {
 
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("AdditionalPropertiesError");
+            });
+        });
+
+        describe("dependencies", () => {
+
+            it("should ignore any dependencies if the property is no set", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: {
+                        title: { type: "string" },
+                        url: { type: "string" },
+                        target: { type: "string" }
+                    },
+                    dependencies: {
+                        url: ["target"]
+                    }
+                },
+                    { title: "Check this out" }
+                );
+
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return a 'MissingDependencyError' if the dependent property is missing", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: {
+                        title: { type: "string" },
+                        url: { type: "string" },
+                        target: { type: "string" }
+                    },
+                    dependencies: {
+                        url: ["target"]
+                    }
+                },
+                    { title: "Check this out", url: "http://example.com" }
+                );
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MissingDependencyError");
+            });
+
+            it("should return a 'MissingDependencyError' if the dependent counterpart is missing", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: {
+                        title: { type: "string" },
+                        url: { type: "string" },
+                        target: { type: "string" }
+                    },
+                    dependencies: {
+                        url: ["target"],
+                        target: ["url"]
+                    }
+                },
+                    { title: "Check this out", target: "_blank" }
+                );
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MissingDependencyError");
+            });
+
+            it("should be valid for a matching schema dependency", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: {
+                        title: { type: "string" },
+                        url: { type: "string" },
+                        target: { type: "string" }
+                    },
+                    dependencies: {
+                        url: {
+                            properties: {
+                                target: { type: "string" }
+                            }
+                        }
+                    }
+                },
+                    { title: "Check this out", url: "http://example.com", target: "_blank" }
+                );
+
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return validation error for a non-matching schema dependency", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    properties: {
+                        title: { type: "string" },
+                        url: { type: "string" },
+                        target: { type: "string" }
+                    },
+                    dependencies: {
+                        url: {
+                            required: ["target"],
+                            properties: {
+                                target: { type: "string" }
+                            }
+                        }
+                    }
+                },
+                    { title: "Check this out", url: "http://example.com" }
+                );
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("RequiredPropertyError");
             });
         });
     });
@@ -465,6 +670,20 @@ describe("validate", () => {
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("OneOfError");
             });
+
+            it("should return MultipleOneOfError if multiple oneOf definitions match the given value", () => {
+                const errors = validate(core,
+                    {
+                        type: "array", items: { oneOf: [
+                            { type: "integer" },
+                            { minimum: 2 }
+                        ] }
+                    },
+                    [3]
+                );
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MultipleOneOfError");
+            });
         });
     });
 
@@ -591,10 +810,88 @@ describe("validate", () => {
             expect(errors).to.have.length(0);
         });
 
-        it("should return a TypeErrpr if passed type is not within array", () => {
-            let errors = validate(core, { type: ["object", "null"] }, []);
+        it("should return a TypeError if passed type is not within array", () => {
+            const errors = validate(core, { type: ["object", "null"] }, []);
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("TypeError");
+        });
+
+        it("should support 'integer' as a valid type within array", () => {
+            const errors = validate(core, { type: ["integer", "null"] }, 1);
+            expect(errors).to.have.length(0);
+        });
+    });
+
+    describe("heterogeneous types", () => {
+
+        describe("enum", () => {
+
+            it("should validate a matching value within enum", () => {
+                const errors = validate(core, { "enum": [1, "second", []] }, "second");
+                expect(errors).to.have.length(0);
+            });
+
+            it("should validate a matching array within enum", () => {
+                const errors = validate(core, { "enum": [1, "second", []] }, []);
+                expect(errors).to.have.length(0);
+            });
+
+            it("should validate a matching object within enum", () => {
+                const errors = validate(core, { "enum": [1, "second", { id: "third" }] }, { id: "third" });
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return error for non-matching object", () => {
+                const errors = validate(core, { "enum": [1, "second", { id: "third" }] }, { id: "first" });
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("EnumError");
+            });
+
+            it("should return error for invalid null", () => {
+                const errors = validate(core, { "enum": [1, "second", { id: "third" }] }, null);
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("EnumError");
+            });
+        });
+
+        describe("$ref", () => {
+
+            it("should correctly validate data through nested $ref", () => {
+                const schema = {
+                    $ref: "#/definitions/c",
+                    definitions: {
+                        a: { type: "integer" },
+                        b: { $ref: "#/definitions/a" },
+                        c: { $ref: "#/definitions/b" }
+                    }
+                };
+                core.rootSchema = schema;
+                const errors = validate(core, schema, "a");
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("TypeError");
+            });
+
+            it("should correctly validate combination of remote, allOf, and allOf-$ref", () => {
+                const schema = { $ref: "http://json-schema.org/draft-04/schema#", _id: "input" };
+                core.rootSchema = schema;
+                const errors = validate(core, schema, { minLength: -1 });
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MinimumError");
+            });
+
+            it("should correctly resolve local remote url", () => {
+                const remotes = require("../../remotes");
+                remotes["http://localhost:1234/integer.json"] = require("json-schema-test-suite/remotes/integer.json");
+
+                const schema = { $ref: "http://localhost:1234/integer.json", _id: "input" };
+                core.rootSchema = schema;
+                const errors = validate(core, schema, "not an integer");
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("TypeError");
+            });
         });
     });
 });
