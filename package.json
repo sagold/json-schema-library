@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "gson-pointer": "^2.2.0",
+    "punycode": "^2.1.0",
     "valid-url": "^1.0.9"
   },
   "publishConfig": {
