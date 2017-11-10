@@ -7,10 +7,7 @@ const chalk = require("chalk");
 // filter test files
 function filter(file, parent, optional) {
     // console.log("FILTER", file, parent, optional);
-    if (file.includes("anyOf")) {
-        console.log(chalk.red(`- ${optional ? "optional " : ""}anyOf not yet supported`));
-        return false;
-    } else if (file.includes("definitions")) {
+    if (file.includes("definitions")) {
         console.log(chalk.red(`- ${optional ? "optional " : ""}definitions not yet supported`));
         return false;
     } else if (file.includes("format")) {

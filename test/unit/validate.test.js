@@ -55,6 +55,20 @@ describe("validate", () => {
                 expect(errors[1].name).to.eq("MaximumError");
             });
         });
+
+        describe("anyOf", () => {
+
+            it("should validate if one schemas in anyOf validates", () => {
+                const errors = validate(core, { anyOf: [{ minimum: 4 }, { maximum: 4 }] }, 3);
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return error if not all schemas match", () => {
+                const errors = validate(core, { anyOf: [{ minimum: 4 }, { maximum: 2 }] }, 3);
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("AnyOfError");
+            });
+        });
     });
 
 
