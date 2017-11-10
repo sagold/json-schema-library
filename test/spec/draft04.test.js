@@ -4,13 +4,17 @@ const Draft04 = require("../../lib/cores/Draft04");
 const expect = require("chai").expect;
 const chalk = require("chalk");
 
+
+// setup remote files
+const remotes = require("../../remotes");
+remotes["http://localhost:1234/integer.json"] = require("json-schema-test-suite/remotes/integer.json");
+remotes["http://localhost:1234/subSchemas.json"] = require("json-schema-test-suite/remotes/subSchemas.json");
+
+
 // filter test files
 function filter(file, parent, optional) {
     // console.log("FILTER", file, parent, optional);
-    if (file.includes("definitions")) {
-        console.log(chalk.red(`- ${optional ? "optional " : ""}definitions not yet supported`));
-        return false;
-    } else if (file.includes("format")) {
+    if (file.includes("format")) {
         console.log(chalk.grey(`- ${optional ? "optional " : ""}specific format validations not supported`));
         return false;
     } else if (file.includes("dependencies")) {
