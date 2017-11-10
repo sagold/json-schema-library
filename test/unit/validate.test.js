@@ -717,6 +717,15 @@ describe("validate", () => {
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("TypeError");
             });
+
+            it("should correctly validate combination of remote, allOf, and allOf-$ref", () => {
+                const schema = { $ref: "http://json-schema.org/draft-04/schema#", _id: "input" };
+                core.rootSchema = schema;
+                const errors = validate(core, schema, { minLength: -1 });
+
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("MinimumError");
+            });
         });
     });
 });
