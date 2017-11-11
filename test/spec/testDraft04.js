@@ -11,18 +11,6 @@ addSchema("http://localhost:1234/integer.json", require("json-schema-test-suite/
 addSchema("http://localhost:1234/subSchemas.json", require("json-schema-test-suite/remotes/subSchemas.json"));
 addSchema("http://localhost:1234/name.json", require("json-schema-test-suite/remotes/name.json"));
 
-// ignore theese tests
-const skipTest = [
-    "changed scope ref invalid", // not going to be supported (combination of id, folder (folder!!!), refs)
-    "a float is not an integer even without fractional part", // will always fail within javascript
-    // TestCases: not required but complex logic
-    "base URI change",
-    "base URI change - change folder in subschema",
-    "root ref in remote ref",
-    "Recursive references between schemas",
-    "base URI change - change folder" // weird stuff, totally inpractical
-];
-
 const globPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "tests", "draft4", "**", "*.json");
 let draft04TestCases = glob.sync(globPattern);
 if (draft04TestCases.length === 0) {
@@ -33,7 +21,7 @@ if (draft04TestCases.length === 0) {
 draft04TestCases = flattenArray(draft04TestCases.map(require));
 
 
-function runTests(Core) {
+function runTests(Core, skipTest = []) {
     draft04TestCases.forEach((testCase) => {
         const description = testCase.description;
         const schema = testCase.schema;
