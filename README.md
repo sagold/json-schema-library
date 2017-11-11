@@ -133,7 +133,7 @@ const baseSchema = core.isValid({ type: "number" }, "");
 // returns false
 ```
 
-##### validate(core, data, schema, step)
+##### validateAsync(core, data, schema, step)
 > Asynchronous validation helper
 
 Optional support for onError helper, which is invoked for each error (after being resolved)
