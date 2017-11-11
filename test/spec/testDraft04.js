@@ -15,7 +15,6 @@ addSchema("http://localhost:1234/name.json", require("json-schema-test-suite/rem
 const skipTest = [
     "changed scope ref invalid", // not going to be supported (combination of id, folder (folder!!!), refs)
     "a float is not an integer even without fractional part", // will always fail within javascript
-    "ref valid, maxItems ignored",
     // TestCases: not required but complex logic
     "base URI change",
     "base URI change - change folder in subschema",
