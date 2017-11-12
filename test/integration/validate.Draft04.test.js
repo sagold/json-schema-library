@@ -26,6 +26,9 @@ describe("validate.Draft04", () => {
         it("should discard any properties where $ref is used", () => {
             core.rootSchema = { definitions: { def: { type: "string" } } };
             const result = core.resolveRef({ $ref: "#/definitions/def", title: "a definition" });
+            // remove internatls (remoteRef precompilation)
+            delete result.__compiled;
+            delete result.id;
             expect(result).to.deep.equal({ type: "string" });
         });
     });

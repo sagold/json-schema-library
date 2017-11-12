@@ -26,7 +26,7 @@ describe("validate.JsonEditor", () => {
         it("should merge any properties where $ref is used", () => {
             core.rootSchema = { definitions: { def: { type: "string" } } };
             const result = core.resolveRef({ $ref: "#/definitions/def", title: "a definition" });
-            expect(result).to.deep.equal({ type: "string", title: "a definition" });
+            expect(result).to.deep.include({ type: "string", title: "a definition" });
         });
     });
 
