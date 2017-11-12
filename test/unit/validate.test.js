@@ -56,7 +56,7 @@ describe("validate", () => {
             });
         });
 
-        describe.only("anyOf", () => {
+        describe("anyOf", () => {
 
             it("should validate if one schemas in anyOf validates", () => {
                 const errors = validate(core, { anyOf: [{ minimum: 4 }, { maximum: 4 }] }, 3);
