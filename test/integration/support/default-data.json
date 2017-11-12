@@ -13,7 +13,7 @@
         "title": "Vergiftete Versprechen",
         "caption": "Why is this required?",
         "subtitle": "<p>Marinduque leidet unter dem giftigen Erbe des schwersten Industrieunglücks in der Geschichte der Philippinen. Seit zwanzig Jahren kämpft die kleine Insel gegen einen der größten Bergbaukonzerne der Welt.</p>",
-        "author": "Von Jan Denhik Pinsel, Moleei Schose und Kim Ball",
+        "author": "",
         "yAlign": "bottom",
         "displayMode": "parallax",
         "image": {
@@ -27,7 +27,7 @@
             }
         },
         "video": {
-            "url": "http://gfx.sueddeutsche.de/wissen/2015-11-27_Marshallinseln/assets/chapter01/loop-lagune.mp4",
+            "url": "http://example.com/wissen/2015-11-27_Marshallinseln/assets/chapter01/loop-lagune.mp4",
             "quality": 70,
             "type": "video",
             "loop": true
@@ -43,7 +43,7 @@
     {
         "partial": "app/src/modules/video/video",
         "video": {
-            "url": "http://gfx.sueddeutsche.de/assets/videos/831efdfa02e706d5b124b49fcea0d755172db876c6e7fdd4f79d70893fcf644cc9b17857eb6fd163265257a4ca2db073c6c07fa235399a2f5e716c7479b5da78.mp4",
+            "url": "http://example.com/assets/videos/831efdfa02e706d5b124b49fcea0d755172db876c6e7fdd4f79d70893fcf644cc9b17857eb6fd163265257a4ca2db073c6c07fa235399a2f5e716c7479b5da78.mp4",
             "previewImage": {
                 "url": "data/assets/video_dergipfel.png",
                 "quality": 70
@@ -64,7 +64,7 @@
     {
             "partial": "app/src/modules/video/video",
             "video": {
-                "url": "http://gfx.sueddeutsche.de/assets/videos/3fe4cf92b10879203675eebe582d2a0ec5e38dcd369149b63074f1b1ba54bdef7c866897ad9fa59102f775e555bcfc5af998a827dcde3a4708a1821e4553184f.mp4",
+                "url": "http://example.com/assets/videos/3fe4cf92b10879203675eebe582d2a0ec5e38dcd369149b63074f1b1ba54bdef7c866897ad9fa59102f775e555bcfc5af998a827dcde3a4708a1821e4553184f.mp4",
                 "previewImage": {
                     "url": "data/assets/video_dergipfel.png",
                     "quality": 70
@@ -138,7 +138,7 @@
     }, {
         "partial": "app/src/modules/popin/popin",
         "popin": {
-            "content": "<p>&quot;Noch immer sterben Menschen an Hunger oder frieren zu Tode&quot;, sagt die UNHCR-Sprecherin - weil das Regime in Syrien und in geringerem Umfang auch Rebellen humanitäre Hilfe blockierten. Aber auch in den wichtigsten Aufnahmeländern, der Türkei, <a href=\"http://www.sueddeutsche.de/thema/Libanon\" target=\"_blank\">Libanon</a> und Jordanien, <u>habe die Unterfinanzierung schlimme Folgen.</u></p>",
+            "content": "<p>&quot;Noch immer sterben Menschen an Hunger oder frieren zu Tode&quot;, sagt die UNHCR-Sprecherin - weil das Regime in Syrien und in geringerem Umfang auch Rebellen humanitäre Hilfe blockierten. Aber auch in den wichtigsten Aufnahmeländern, der Türkei, <a href=\"http://example.com/thema/Libanon\" target=\"_blank\">Libanon</a> und Jordanien, <u>habe die Unterfinanzierung schlimme Folgen.</u></p>",
             "image": {
                 "desktop": {
                     "url": "data/assets/erbgang04.jpg",
@@ -162,7 +162,7 @@
     }, {
         "partial": "app/src/modules/embed/embed",
         "embed": {
-            "url": "http://gfx.sueddeutsche.de/apps/5820c8ccf38f33fb247b5c4c/CURRENT/map-elector/",
+            "url": "http://example.com/apps/5820c8ccf38f33fb247b5c4c/CURRENT/map-elector/",
             "config": "{horizontalPadding: false}",
             "channel": "www"
         }
@@ -440,7 +440,7 @@
     }, {
         "partial": "app/src/modules/video/video",
         "video": {
-            "url": "http://gfx-stage.sueddeutsche.de/test/g7/asset/video/g7-intro.mp4",
+            "url": "http://example.com/test/g7/asset/video/g7-intro.mp4",
             "quality": 70,
             "previewImage": {
                 "url": "data/assets/video_dergipfel.png",
@@ -503,12 +503,12 @@
     "seo": {
         "title": "Das ist ein Seitentitel",
         "teaser": "Das ist ein Teaser",
-        "keywords": "Süddeutsche Zeitung, Longread",
+        "keywords": "Longread",
         "schemaOrg": {
             "title": "Schema.org title",
             "description": "Schema.org description",
             "image": { "url": "data/assets/coconut.jpg", "quality": 70 },
-            "logo": "szig-style/lib/assets/sz-small-black.png"
+            "logo": "small-black.png"
         }
     },
     "socialMedia": {
