@@ -9,25 +9,15 @@
 
 `npm i json-schema-library`.
 
-This package is tested on node v6.9.1 and in latest Browsers.
+
+- This package is tested on node v6.9.1 and in latest Browsers.
+- This library currently supports all draft4 features
 
 
-1. [Draft4](#draft4)
 1. [Overview](#overview)
     1. [Core](#core)
     1. [Add Custom Validators](#add-custom-validators)
 1. [Custom Extensions](#custom-extensions)
-
-
-## Draft4
-
-This library currently supports all draft4 features, **excluding:**
-
-- _$ref_ remote resolution
-- scope changes via _id_
-
-Theese feature would totally change the api for the worse and may not be required in most cases. An decision to
-add supporting theese features is currently _pending_.
 
 
 ## Overview

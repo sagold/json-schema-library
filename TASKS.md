@@ -3,9 +3,6 @@
 
 ## 2017
 
-- [ ] -- Decision to support remote references
-
-- [ ] -- Features -- dependencies (implications: remove default-required properties in Core.JsonEditor): https://spacetelescope.github.io/understanding-json-schema/reference/object.html#index-4
 - [ ] iterate schema: resolve $ref and definitions
 - [ ] profile performance
 - [ ] -- Refactor -- move type validation as keyword to validation/keywords
@@ -19,6 +16,7 @@
 - [✓] -- Feature -- getSchema of patternProperties
 
 **Milestone** add remaining draft04 features
+- [✓] -- remote references
 - [✓] -- default format validations
 - [✓] -- definitions
 - [✓] -- dependencies
@@ -32,7 +30,7 @@
 - [✓] -- Features -- required (array of properties). Currently every property is required by default
 
 ### unsupported optional draft04 features
-- [ ] -- bignum (optional)
+- [x] -- bignum (optional)
 
 
 ## 16/12
