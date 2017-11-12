@@ -200,4 +200,22 @@ describe("iterateSchema", () => {
         expect(calls).to.have.length(2);
         expect(calls[1]).to.eq(rootSchema.dependencies.target);
     });
+
+    it("should iterate over nested definitions", () => {
+        const calls = [];
+        const rootSchema = {
+            definitions: {
+                anotherScope: {
+                    definitions: {
+                        bar: { type: "array" }
+                    }
+                }
+            }
+        };
+
+        iterateSchema(rootSchema, (schema) => calls.push(schema));
+
+        expect(calls).to.have.length(3);
+        expect(calls[1]).to.eq(rootSchema.definitions.anotherScope.definitions.target);
+    });
 });

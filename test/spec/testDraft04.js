@@ -10,6 +10,7 @@ const addSchema = require("../../lib/addSchema");
 addSchema("http://localhost:1234/integer.json", require("json-schema-test-suite/remotes/integer.json"));
 addSchema("http://localhost:1234/subSchemas.json", require("json-schema-test-suite/remotes/subSchemas.json"));
 addSchema("http://localhost:1234/name.json", require("json-schema-test-suite/remotes/name.json"));
+addSchema("http://localhost:1234/folder/folderInteger.json", require("json-schema-test-suite/remotes/folder/folderInteger.json"));
 
 const globPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "tests", "draft4", "**", "*.json");
 let draft04TestCases = glob.sync(globPattern);

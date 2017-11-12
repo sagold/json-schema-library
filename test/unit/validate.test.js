@@ -56,7 +56,7 @@ describe("validate", () => {
             });
         });
 
-        describe("anyOf", () => {
+        describe.only("anyOf", () => {
 
             it("should validate if one schemas in anyOf validates", () => {
                 const errors = validate(core, { anyOf: [{ minimum: 4 }, { maximum: 4 }] }, 3);
@@ -67,6 +67,26 @@ describe("validate", () => {
                 const errors = validate(core, { anyOf: [{ minimum: 4 }, { maximum: 2 }] }, 3);
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("AnyOfError");
+            });
+
+            it("should validate null", () => {
+                const errors = validate(core, { anyOf: [{ type: "null" }] }, null);
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return error if invalid null", () => {
+                const errors = validate(core, { anyOf: [{ type: "null" }] }, 3);
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("AnyOfError");
+            });
+
+            it("should resolve references", () => {
+                core.rootSchema = {
+                    definitions: { integer: { type: "integer" } }
+                };
+
+                const errors = validate(core, { anyOf: [{ type: "null" }, { $ref: "#/definitions/integer" }] }, 3);
+                expect(errors).to.have.length(0);
             });
         });
     });
