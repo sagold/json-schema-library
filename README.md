@@ -9,7 +9,7 @@
 
 `npm i json-schema-library`.
 
-This package is tested on node v6.9.1.
+This package is tested on node v6.9.1 and in latest Browsers.
 
 
 1. [Draft4](#draft4)
