@@ -216,6 +216,8 @@ describe("iterateSchema", () => {
         iterateSchema(rootSchema, (schema) => calls.push(schema));
 
         expect(calls).to.have.length(3);
-        expect(calls[1]).to.eq(rootSchema.definitions.anotherScope.definitions.target);
+        expect(calls[0]).to.eq(rootSchema);
+        expect(calls[1]).to.eq(rootSchema.definitions.anotherScope);
+        expect(calls[2]).to.eq(rootSchema.definitions.anotherScope.definitions.bar);
     });
 });
