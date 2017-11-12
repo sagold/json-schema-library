@@ -165,6 +165,34 @@ describe("validate", () => {
         });
 
 
+        describe("oneOf", () => {
+
+            it("should validate matching oneOf", () => {
+                const errors = validate(core, {
+                    oneOf: [
+                        { type: "object", properties: { value: { type: "string" } } },
+                        { type: "object", properties: { value: { type: "integer" } } }
+                    ] },
+                    { value: "a string" }
+                );
+                expect(errors).to.have.length(0);
+            });
+
+            it("should return error for non-matching oneOf", () => {
+                const errors = validate(core, {
+                    type: "object",
+                    oneOf: [
+                        { type: "object", properties: { value: { type: "string" } } },
+                        { type: "object", properties: { value: { type: "integer" } } }
+                    ] },
+                    { value: [] }
+                );
+                expect(errors).to.have.length(1);
+                expect(errors[0].name).to.eq("OneOfError");
+            });
+        });
+
+
         describe("additionalProperties", () => {
 
             it("should return AdditionalPropertiesError for an additional property", () => {
