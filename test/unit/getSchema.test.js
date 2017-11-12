@@ -10,9 +10,9 @@ describe("getSchema", () => {
     describe("value", () => {
 
         it("should return schema of any value", () => {
-            core.rootSchema = { id: "target", type: "*" };
+            core.rootSchema = { name: "target", type: "*" };
             const schema = getSchema(core, core.rootSchema, undefined, "#");
-            expect(schema).to.deep.equal({ id: "target", type: "*" });
+            expect(schema).to.deep.include({ name: "target", type: "*" });
         });
     });
 
@@ -22,11 +22,11 @@ describe("getSchema", () => {
             core.rootSchema = {
                 type: "object",
                 properties: {
-                    title: { id: "title", type: "string" }
+                    title: { name: "title", type: "string" }
                 }
             };
             const schema = getSchema(core, core.rootSchema, undefined, "#/title");
-            expect(schema).to.deep.equal({ id: "title", type: "string" });
+            expect(schema).to.deep.include({ name: "title", type: "string" });
         });
 
         it("should return schema for property within nested object", () => {
@@ -36,13 +36,13 @@ describe("getSchema", () => {
                     image: {
                         type: "object",
                         properties: {
-                            title: { id: "title", type: "string" }
+                            title: { name: "title", type: "string" }
                         }
                     }
                 }
             };
             const schema = getSchema(core, core.rootSchema, undefined, "#/image/title");
-            expect(schema).to.deep.equal({ id: "title", type: "string" });
+            expect(schema).to.deep.include({ name: "title", type: "string" });
         });
 
         it("should resolve $ref as property", () => {
@@ -50,7 +50,7 @@ describe("getSchema", () => {
                 type: "object",
                 definitions: {
                     target: {
-                        id: "target"
+                        name: "target"
                     }
                 },
                 properties: {
@@ -60,7 +60,7 @@ describe("getSchema", () => {
                 }
             };
             const schema = getSchema(core, core.rootSchema, undefined, "#/image");
-            expect(schema).to.deep.equal({ id: "target" });
+            expect(schema).to.deep.include({ name: "target" });
         });
 
         it("should return correct 'oneOf' object definition", () => {
@@ -74,7 +74,7 @@ describe("getSchema", () => {
                     },
                     {
                         type: "object",
-                        properties: { second: { type: "string", id: "target" } },
+                        properties: { second: { type: "string", name: "target" } },
                         additionalProperties: false
                     },
                     {
@@ -85,7 +85,7 @@ describe("getSchema", () => {
                 ]
             };
             const schema = getSchema(core, core.rootSchema, { second: "string" }, "#/second");
-            expect(schema).to.deep.equal({ id: "target", type: "string" });
+            expect(schema).to.deep.include({ name: "target", type: "string" });
         });
 
         it("should return schema of matching patternProperty", () => {
@@ -97,7 +97,7 @@ describe("getSchema", () => {
                 }
             };
             const schema = getSchema(core, core.rootSchema, undefined, "#/def");
-            expect(schema).to.deep.equal({ type: "number" });
+            expect(schema).to.deep.include({ type: "number" });
         });
 
         it("should return an error if schema could not be resolved", () => {
@@ -117,10 +117,10 @@ describe("getSchema", () => {
         it("should return item schema", () => {
             core.rootSchema = {
                 type: "array",
-                items: { id: "title", type: "string" }
+                items: { name: "title", type: "string" }
             };
             const schema = getSchema(core, core.rootSchema, undefined, "#/0");
-            expect(schema).to.deep.equal({ id: "title", type: "string" });
+            expect(schema).to.deep.include({ name: "title", type: "string" });
         });
 
         it("should return item schema based on index", () => {
@@ -128,12 +128,12 @@ describe("getSchema", () => {
                 type: "array",
                 items: [
                     { type: "number" },
-                    { id: "target", type: "string" },
+                    { name: "target", type: "string" },
                     { type: "number" }
                 ]
             };
             const schema = getSchema(core, core.rootSchema, undefined, "#/1");
-            expect(schema).to.deep.equal({ id: "target", type: "string" });
+            expect(schema).to.deep.include({ name: "target", type: "string" });
         });
 
         it("should return schema for matching 'oneOf' item", () => {
@@ -148,7 +148,7 @@ describe("getSchema", () => {
                         },
                         {
                             type: "object",
-                            properties: { second: { type: "string", id: "target" } },
+                            properties: { second: { type: "string", name: "target" } },
                             additionalProperties: false
                         },
                         {
@@ -160,7 +160,7 @@ describe("getSchema", () => {
                 }
             };
             const schema = getSchema(core, core.rootSchema, [{ second: "second" }], "#/0/second");
-            expect(schema).to.deep.equal({ type: "string", id: "target" });
+            expect(schema).to.deep.include({ type: "string", name: "target" });
         });
     });
 });
