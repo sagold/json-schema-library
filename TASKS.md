@@ -7,7 +7,7 @@
 
 ### possibly
 
-- [ ] profile performance
+- [ ] improve performance
 - [ ] iterate schema: resolve $ref and definitions
 
 
