@@ -1,14 +1,22 @@
 # Tasks
 
 
+## 2018
+
+- [ ] draft06 support
+
+### possibly
+
+- [ ] profile performance
+- [ ] iterate schema: resolve $ref and definitions
+
+
 ## 2017
 
-- [ ] iterate schema: resolve $ref and definitions
-- [ ] profile performance
+- [ ] -- Change -- addSchema to be setup per instance
 - [ ] -- Refactor -- move type validation as keyword to validation/keywords
 - [ ] -- Refactor -- Use addValidation to setup base validation mappings?
 - [ ] -- Features -- Helper to find a json- and json-schema-pointer
-- [ ] -- Refactor -- consider unifying keyword.oneOf and step.oneof (Object, Array)
 - [~] -- Features -- Improve validation maps to add & hook (!) custom entries (WIP, Add tests)
 - [✓] -- Fix -- Return all errors in oneOf-validation
 - [✓] -- Feature -- Error progress notification for async validation
@@ -28,9 +36,6 @@
 - [✓] -- Features -- oneOf: fail for multiple matching oneof-schemas
 - [✓] -- Features -- oneOf: for non-arrays
 - [✓] -- Features -- required (array of properties). Currently every property is required by default
-
-### unsupported optional draft04 features
-- [x] -- bignum (optional)
 
 
 ## 16/12
