@@ -11,7 +11,7 @@
 
 
 - This package is tested on node v6.9.1 and in latest Browsers.
-- This library currently supports all draft4 features
+- This library currently supports all draft4 features (@see [benchmark](https://github.com/sagold/json-schema-benchmark))
 
 
 1. [Overview](#overview)
