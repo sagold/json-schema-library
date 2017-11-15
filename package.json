@@ -37,7 +37,7 @@
     "webpack": "^3.8.1"
   },
   "dependencies": {
-    "gson-pointer": "^2.2.0",
+    "gson-pointer": "^3.0.0",
     "punycode": "^2.1.0",
     "valid-url": "^1.0.9"
   },
