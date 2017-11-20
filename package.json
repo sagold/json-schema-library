@@ -1,6 +1,6 @@
 {
   "name": "json-schema-library",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation",
   "main": "index.js",
   "scripts": {
@@ -39,7 +39,7 @@
     "webpack-bundle-size-analyzer": "^2.7.0"
   },
   "dependencies": {
-    "gson-pointer": "^3.1.0",
+    "gson-pointer": "^3.2.1",
     "valid-url": "^1.0.9"
   },
   "publishConfig": {
