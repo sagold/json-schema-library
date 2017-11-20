@@ -11,7 +11,7 @@
 
 
 - This package is tested on node v6.9.1 and in latest Browsers.
-- This library currently supports all draft4 features
+- This library currently supports all draft4 features (@see [benchmark](https://github.com/sagold/json-schema-benchmark))
 
 
 1. [Overview](#overview)
@@ -80,7 +80,8 @@ Core {
 > Get the json-schema describing the `data` found at `pointer`.
 
 ```js
-const core = new require("json-schema-library").core.draft04(rootSchema),
+const Core = require("json-schema-library").cores.Draft04;
+const core = new Core(rootSchema);
 const targetSchema = core.getSchema(rootSchema, '#/path/to/target', rootData);
 ```
 
@@ -95,7 +96,8 @@ if (targetSchema.type === "error") {
 Or using `getSchema` directly
 
 ```js
-const core = new require("json-schema-library").core.draft04(rootSchema),
+const Core = require("json-schema-library").cores.Draft04;
+const core = new Core(rootSchema);
 const targetSchema = getSchema(core, rootSchema, '#/path/to/target', rootData);
 ```
 
@@ -142,7 +144,6 @@ Optional support for onError helper, which is invoked for each error (after bein
 
 ```js
 const Core = require("json-schema-library").cores.Draft04;
-const validateAsync = require("json-schema-library").validateAsync;
 const core = new Core(rootSchema);
 // signature: Core, Schema, Data, [Pointer], [onErrorCallback] : Promise
 validateAsync(core, { type: "number" }, "", "#", function onError(err) {})
