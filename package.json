@@ -9,7 +9,8 @@
     "test-unit": "mocha --recursive -R spec test/unit/**/*.test.js",
     "test-spec": "mocha --recursive -R spec test/spec/**/*.test.js",
     "tdd": "watch \"npm run test-unit\" lib/ test/",
-    "coverage": "nyc npm run test --reporter=lcov"
+    "coverage": "nyc npm run test --reporter=lcov",
+    "analyze": "NODE_ENV=production webpack --json | webpack-bundle-size-analyzer"
   },
   "pre-push": [
     "test"
@@ -34,11 +35,11 @@
     "nyc": "^10.0.0",
     "pre-push": "^0.1.1",
     "watch": "^1.0.1",
-    "webpack": "^3.8.1"
+    "webpack": "^3.8.1",
+    "webpack-bundle-size-analyzer": "^2.7.0"
   },
   "dependencies": {
     "gson-pointer": "^3.1.0",
-    "punycode": "^2.1.0",
     "valid-url": "^1.0.9"
   },
   "publishConfig": {
