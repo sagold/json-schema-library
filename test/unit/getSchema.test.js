@@ -2,10 +2,12 @@ const expect = require("chai").expect;
 const getSchema = require("../../lib/getSchema");
 const Core = require("../../lib/cores/Draft04");
 
+
 describe("getSchema", () => {
 
     let core;
     before(() => (core = new Core()));
+
 
     describe("value", () => {
 
@@ -15,6 +17,7 @@ describe("getSchema", () => {
             expect(schema).to.deep.include({ name: "target", type: "*" });
         });
     });
+
 
     describe("object", () => {
 
@@ -111,6 +114,7 @@ describe("getSchema", () => {
             expect(schema.name).to.equal("UnknownPropertyError");
         });
     });
+
 
     describe("array", () => {
 

@@ -25,3 +25,4 @@ atlassian-ide-plugin.xml
 /config
 /coverage
 /build
+/dist

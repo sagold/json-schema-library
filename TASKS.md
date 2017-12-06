@@ -4,19 +4,19 @@
 ## 2018
 
 - [ ] draft06 support
+- [ ] -- Improve -- _oneOf-Error messages_ (specific errors where possible, instead of one-of-error)
 
 ### possibly
 
 - [ ] improve performance
 - [ ] iterate schema: resolve $ref and definitions
-
+- [ ] -- Features -- Helper to find a json- and json-schema-pointer
 
 ## 2017
 
-- [ ] -- Change -- addSchema to be setup per instance
+- [ ] -- Change -- addSchema to be set up per instance
 - [ ] -- Refactor -- move type validation as keyword to validation/keywords
 - [ ] -- Refactor -- Use addValidation to setup base validation mappings?
-- [ ] -- Features -- Helper to find a json- and json-schema-pointer
 - [~] -- Features -- Improve validation maps to add & hook (!) custom entries (WIP, Add tests)
 - [✓] -- Fix -- Return all errors in oneOf-validation
 - [✓] -- Feature -- Error progress notification for async validation
