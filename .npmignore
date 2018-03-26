@@ -21,8 +21,7 @@ atlassian-ide-plugin.xml
 *.sublime-project
 *.sublime-workspace
 
-/config/
-doc-build/
 /build/
-/dist/
-/channels/
+/docs/
+/test/
+/coverage/
