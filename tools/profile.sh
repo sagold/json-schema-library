@@ -13,7 +13,7 @@ fi
 node --prof "$FILE".js
 
 # create profile
-PROFILE=profiles/profile-"$FILE"-`date '+%Y-%m-%d %H:%M:%S'`.txt
+PROFILE=profiles/$(git rev-parse --abbrev-ref HEAD)-"$FILE"-`date '+%Y-%m-%d %H:%M:%S'`.txt
 for f in isolate-*
 do
     node --prof-process $f > "$PROFILE"
