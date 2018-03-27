@@ -9,7 +9,6 @@
 Thumbs.db
 
 node_modules/
-bower_components/
 npm-debug.log
 
 .cache/
@@ -24,4 +23,5 @@ atlassian-ide-plugin.xml
 /build/
 /docs/
 /test/
+/tools/
 /coverage/

@@ -26,3 +26,4 @@ atlassian-ide-plugin.xml
 /coverage
 /build
 /dist
+/tools/profiles
