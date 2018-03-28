@@ -1,4 +1,4 @@
-<h1 align="center"><img src="./docs/json-schema-library.png" width="228" alt="json-schema-library"></h1>
+<h1 align="center"><img src="./docs/json-schema-library.png" width="256" alt="json-schema-library"></h1>
 
 **Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation**
 
