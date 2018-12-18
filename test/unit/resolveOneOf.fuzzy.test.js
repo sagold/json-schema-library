@@ -231,6 +231,26 @@ describe("resolveOneOf (fuzzy)", () => {
     });
 
     describe("array", () => {
-        // @TODO: ADD TESTS
+        // @TODO: ADD FURHTER TESTS
+
+        it("should return oneOfError for invalid data", () => {
+            // bug found
+            core.rootSchema = {
+                oneOf: [
+                    {
+                        type: "object",
+                        required: ["title"],
+                        properties: {
+                            title: {
+                                type: "string"
+                            }
+                        }
+                    }
+                ]
+            };
+            const res = resolveOneOf(core, core.rootSchema, { content: "content" });
+            expect(res.type).to.eq("error");
+            expect(res.name).to.eq("OneOfError");
+        });
     });
 });
