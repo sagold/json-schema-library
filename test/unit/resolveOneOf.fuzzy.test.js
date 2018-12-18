@@ -33,6 +33,22 @@ describe("resolveOneOf (fuzzy)", () => {
         expect(res).to.deep.eq({ type: "string", pattern: "asterix" });
     });
 
+    it("should resolve $ref before schema", () => {
+        core.rootSchema = {
+            definitions: {
+                "a": { type: "string", pattern: "obelix" },
+                "b": { type: "string", pattern: "asterix" }
+            },
+            oneOf: [
+                { $ref: "#/definitions/a" },
+                { $ref: "#/definitions/b" }
+            ]
+        };
+        const res = resolveOneOf(core, core.rootSchema, "anasterixcame");
+
+        expect(res).to.deep.eq({ type: "string", pattern: "asterix" });
+    });
+
     describe("object", () => {
 
         it("should return schema with matching properties", () => {
