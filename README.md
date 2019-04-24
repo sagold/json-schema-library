@@ -25,7 +25,7 @@
 Either select an existing __validator__ (`core`) or create your own. Each __Core__ holds all functions that are required
 for the json-schema operations like validation. In order to overwrite a custom function you can either
 
-- modify the map-objects (i.e. [/lib/validation/keywords](./lib/validation/keywords))
+- modify the map-objects (i.e. [/lib/validation/keywords.js](./lib/validation/keyword.js))
 - overwrite functions or keys in the generated instance (`const instance = new Core()`)
 - Create a custom __Core__ following the examples in [/lib/cores](./lib/cores)
 
