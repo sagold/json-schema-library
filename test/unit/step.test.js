@@ -39,6 +39,17 @@ describe("step", () => {
             expect(res).to.deep.eq({ type: "number" });
         });
 
+        it("should return matching oneOf, for objects missing properties", () => {
+            const res = step(core, "title", {
+                oneOf: [
+                    { type: "object", additionalProperties: { type: "string" } },
+                    { type: "object", additionalProperties: { type: "number" } }
+                ]
+            }, { title: 4, test: 2 });
+
+            expect(res).to.deep.eq({ type: "number" });
+        });
+
         it("should return matching patternProperty", () => {
             const res = step(core, "second", {
                 type: "object",
