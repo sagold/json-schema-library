@@ -1,13 +1,14 @@
 # Tasks
 
-
-- [ ] remotes and scopes per schema-instance (using precompile or core)
-- [ ] fix insane $ref resolution 'node' can be in 'root/node' or 'root/folder/node' (?)
-- [ ] remove duplication from resolveRef.strict and resolveRef.withOverwrite
-
 - [ ] Improve -- _oneOf-Error messages_ (specific errors where possible, instead of one-of-error)
 - [ ] Refactor -- move type validation as keyword to validation/keywords
 - [ ] Refactor -- Use addValidation to setup base validation mappings?
+
+## !!! failsafe ref-resolution and simpler ref-retrieval
+- [ ] -- Change -- remotes per instance, removing side effects
+- [ ] remotes and scopes per schema-instance (using precompile or core)
+- [ ] fix insane $ref resolution 'node' can be in 'root/node' or 'root/folder/node' (?)
+- [ ] remove duplication from resolveRef.strict and resolveRef.withOverwrite
 
 
 ### possibly
@@ -30,8 +31,8 @@
 **Milestone** consistent feature support
 
 - [ ] remove hard coded schema interpretation
-- [ ] -- Refactor -- sophisticated schema compilation
 - [ ] -- Change -- remotes per instance, removing side effects
+- [ ] rootSchema always compiled
 - [ ] Add missing 'step' support for allOf and anyOf type definitions
 - [✓] Complete schema support in iterateSchema
 
