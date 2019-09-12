@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run test-unit && npm run test-spec && npm run test-integration",
-    "test-integration": "mocha --recursive -R spec test/integration/**/*.test.js",
-    "test-unit": "mocha --recursive -R spec test/unit/**/*.test.js",
-    "test-spec": "mocha --recursive -R spec test/spec/**/*.test.js",
+    "test-integration": "mocha --recursive -R spec 'test/integration/**/*.test.js'",
+    "test-unit": "mocha --recursive -R spec 'test/unit/**/*.test.js'",
+    "test-spec": "mocha --recursive -R spec 'test/spec/**/*.test.js'",
     "tdd": "watch \"npm run test-unit\" lib/ test/",
     "coverage": "nyc npm run test --reporter=lcov",
     "analyze": "NODE_ENV=production webpack --json | webpack-bundle-size-analyzer"

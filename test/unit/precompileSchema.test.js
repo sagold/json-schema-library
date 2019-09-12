@@ -189,7 +189,7 @@ describe("precompileSchema", () => {
     it("should update nested items definition, not requiring a type definition", () => {
         const result = precompileSchema(core, {
             id: "http://localhost:1234/",
-            type: "object",
+            type: "array",
             items: {
                 id: "folder/",
                 items: { $ref: "folderInteger.json" }
@@ -250,7 +250,9 @@ describe("precompileSchema", () => {
                 id: "http://my-schema/test.json",
                 type: "object",
                 properties: {
-                    list: {}
+                    list: {
+                        type: "array"
+                    }
                 },
                 definitions: {
                     baz: { id: "folder/" }

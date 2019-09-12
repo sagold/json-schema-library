@@ -4,7 +4,7 @@
         "node": true
     },
     "parserOptions": {
-        "ecmaVersion": 6,
+        "ecmaVersion": 8,
         "sourceType": "module"
     },
     "rules": {
@@ -124,7 +124,7 @@
         "consistent-this": [1, "self"],
         "eol-last": [2, "unix"],
         "func-names": 0,
-        "func-style": [2, "declaration"],
+        "func-style": [2, "declaration", { "allowArrowFunctions": true }],
         "id-length": [1, { "min": 1, "max": 40 }],
         "key-spacing": [1, {"beforeColon": false, "afterColon": true }],
         "keyword-spacing": 1,
@@ -188,12 +188,12 @@
         "indent": [2, 4, {"SwitchCase": 1 }],
         "quotes": [2, "double", "avoid-escape"],
         "arrow-body-style": [2, "as-needed"],
-        "arrow-parens": [2, "always"],
+        "arrow-parens": [2, "as-needed"],
         "arrow-spacing": [2, { "before": true, "after": true } ],
         "constructor-super": 2,
         "generator-star-spacing": [2, { "before": false, "after": true }],
         "no-class-assign": 2,
-        "no-confusing-arrow": 2,
+        "no-confusing-arrow": [2, { "allowParens": true }],
         "no-const-assign": 2,
         "no-dupe-class-members": 2,
         "no-duplicate-imports": 2,
