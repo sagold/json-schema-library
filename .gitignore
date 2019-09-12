@@ -27,3 +27,4 @@ atlassian-ide-plugin.xml
 /build
 /dist
 /tools/profiles
+/yarn.lock

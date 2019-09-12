@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "gson-pointer": "^3.2.1",
+    "gson-query": "^2.0.0",
     "valid-url": "^1.0.9"
   },
   "publishConfig": {
