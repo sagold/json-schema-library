@@ -73,6 +73,25 @@ describe("step", () => {
             expect(res).to.deep.eq({ type: "number", minimum: 2 });
         });
 
+        it("should resolve references from anyOf schema", () => {
+            core.setSchema({
+                definitions: {
+                    string: { type: "object", additionalProperties: { type: "string" } },
+                    number: { type: "object", additionalProperties: { type: "number" } },
+                    min: { type: "object", additionalProperties: { minimum: 2 } }
+                },
+                anyOf: [
+                    { $ref: "#/definitions/string" },
+                    { $ref: "#/definitions/number" },
+                    { $ref: "#/definitions/min" }
+                ]
+            });
+
+            const res = step(core, "title", core.rootSchema, { title: 4, test: 2 });
+
+            expect(res).to.deep.eq({ type: "number", minimum: 2 });
+        });
+
         it("should return matching allOf schema", () => {
             const res = step(core, "title", {
                 allOf: [
@@ -80,6 +99,23 @@ describe("step", () => {
                     { additionalProperties: { type: "number" } }
                 ]
             }, { title: 4, test: 2 });
+
+            expect(res).to.deep.eq({ type: "number" });
+        });
+
+        it("should resolve references in allOf schema", () => {
+            core.setSchema({
+                definitions: {
+                    object: { type: "object" },
+                    additionalNumber: { additionalProperties: { type: "number" } }
+                },
+                allOf: [
+                    { $ref: "#/definitions/object" },
+                    { $ref: "#/definitions/additionalNumber" }
+                ]
+            });
+
+            const res = step(core, "title", core.rootSchema, { title: 4, test: 2 });
 
             expect(res).to.deep.eq({ type: "number" });
         });
