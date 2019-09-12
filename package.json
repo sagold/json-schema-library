@@ -39,6 +39,7 @@
     "webpack-bundle-size-analyzer": "^2.7.0"
   },
   "dependencies": {
+    "deepmerge": "^4.0.0",
     "gson-pointer": "^3.2.1",
     "gson-query": "^2.0.0",
     "valid-url": "^1.0.9"

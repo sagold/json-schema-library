@@ -27,13 +27,13 @@
 
 - iterateSchema renamed to eachTypeDef
 
-
 **Milestone** consistent feature support
 
-- [ ] Refactor replace inline schema interpretation with typeDef-helpers
-- [✓] Complete schema support in iterateSchema
+- [ ] remove hard coded schema interpretation
 - [ ] -- Refactor -- sophisticated schema compilation
 - [ ] -- Change -- remotes per instance, removing side effects
+- [ ] Add missing 'step' support for allOf and anyOf type definitions
+- [✓] Complete schema support in iterateSchema
 
 
 ## 2017
