@@ -14,6 +14,7 @@ addSchema("http://localhost:1234/folder/folderInteger.json", require("json-schem
 
 // fetch TestCases
 const globPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "tests", "draft4", "**", "*.json");
+// const globPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "tests", "draft4", "ref.json");
 let draft04TestCases = glob.sync(globPattern);
 if (draft04TestCases.length === 0) {
     throw new Error(`Failed retrieving tests from ${globPattern}`);

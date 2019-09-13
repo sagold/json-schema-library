@@ -1,22 +1,44 @@
 # Tasks
 
+- [ ] Improve -- _oneOf-Error messages_ (specific errors where possible, instead of one-of-error)
+- [ ] Refactor -- move type validation as keyword to validation/keywords
+- [ ] Refactor -- Use addValidation to setup base validation mappings?
 
-## 2018
+## !!! failsafe ref-resolution and simpler ref-retrieval
+- [ ] -- Change -- remotes per instance, removing side effects
+- [ ] remotes and scopes per schema-instance (using precompile or core)
+- [ ] fix insane $ref resolution 'node' can be in 'root/node' or 'root/folder/node' (?)
+- [ ] remove duplication from resolveRef.strict and resolveRef.withOverwrite
 
-- [ ] draft06 support
-- [ ] -- Improve -- _oneOf-Error messages_ (specific errors where possible, instead of one-of-error)
 
 ### possibly
 
+- [ ] latest draft support
 - [ ] improve performance
 - [ ] iterate schema: resolve $ref and definitions
 - [ ] -- Features -- Helper to find a json- and json-schema-pointer
 
+
+## 2019
+
+- [✓] -- Fix -- latest benchmark tests
+- [✓] -- Fix -- iterate schema (using typeDefs)
+
+**Breaking Changes**
+
+- iterateSchema renamed to eachTypeDef
+
+**Milestone** consistent feature support
+
+- [ ] remove hard coded schema interpretation
+- [ ] -- Change -- remotes per instance, removing side effects
+- [ ] rootSchema always compiled
+- [ ] Add missing 'step' support for allOf and anyOf type definitions
+- [✓] Complete schema support in iterateSchema
+
+
 ## 2017
 
-- [ ] -- Change -- addSchema to be set up per instance
-- [ ] -- Refactor -- move type validation as keyword to validation/keywords
-- [ ] -- Refactor -- Use addValidation to setup base validation mappings?
 - [~] -- Features -- Improve validation maps to add & hook (!) custom entries (WIP, Add tests)
 - [✓] -- Fix -- Return all errors in oneOf-validation
 - [✓] -- Feature -- Error progress notification for async validation

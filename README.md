@@ -230,11 +230,11 @@ const baseSchema = getTemplate({ target: "" });
 // returns {type: "object", properties: { target: "string"}},
 ```
 
-#### iterateSchema
-Calls the callback function for each schema definition
+#### eachTypeDef
+Iterate the schema, invoking the callback function for each type (schema) definition
 
 ```js
-const baseSchema = iterateSchema(schema, (schema, pointer) => {});
+const baseSchema = eachTypeDef(schema, (schema, pointer) => {});
 ```
 
 
