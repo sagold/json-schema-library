@@ -27,7 +27,7 @@ draft04TestCases = flattenArray(draft04TestCases.map(require));
 
 
 function runTests(Core, skipTest = []) {
-    draft04TestCases.forEach((testCase) => {
+    draft04TestCases.forEach(testCase => {
         const schema = testCase.schema;
         if (skipTest.includes(testCase.description)) {
             console.log(chalk.red(`Unsupported '${testCase.description}'`));
@@ -35,7 +35,7 @@ function runTests(Core, skipTest = []) {
         }
 
         describe(testCase.description, () => {
-            testCase.tests.forEach((testData) => {
+            testCase.tests.forEach(testData => {
                 const test = skipTest.includes(testData.description) ? it.skip : it;
 
                 test(testData.description, () => {
