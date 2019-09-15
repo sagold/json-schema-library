@@ -5,6 +5,7 @@ const path = require("path");
 const chalk = require("chalk");
 const flattenArray = require("../../lib/utils/flattenArray");
 const addSchema = require("../../lib/addSchema");
+const compile = require("../../lib/compile");
 
 // setup remote files
 addSchema("http://localhost:1234/integer.json", require("json-schema-test-suite/remotes/integer.json"));
@@ -15,6 +16,7 @@ addSchema("http://localhost:1234/folder/folderInteger.json", require("json-schem
 // fetch TestCases
 const globPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "tests", "draft4", "**", "*.json");
 // const globPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "tests", "draft4", "ref.json");
+// const globPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "tests", "draft4", "refRemote.json");
 let draft04TestCases = glob.sync(globPattern);
 if (draft04TestCases.length === 0) {
     throw new Error(`Failed retrieving tests from ${globPattern}`);
@@ -37,7 +39,7 @@ function runTests(Core, skipTest = []) {
                 const test = skipTest.includes(testData.description) ? it.skip : it;
 
                 test(testData.description, () => {
-                    const testSchema = JSON.parse(JSON.stringify(schema));
+                    const testSchema = compile(schema);
                     const validator = new Core(testSchema);
                     const isValid = validator.isValid(testSchema, testData.data);
                     expect(isValid).to.eq(testData.valid);

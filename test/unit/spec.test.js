@@ -1,6 +1,8 @@
 const { expect } = require("chai");
 const JsonEditor = require("../../lib/cores/JsonEditor");
 const Draft04 = require("../../lib/cores/Draft04");
+const compile = require("../../lib/compile");
+const remotes = require("../../remotes");
 
 
 describe("benchmark spec tests", () => {
@@ -32,6 +34,7 @@ describe("benchmark spec tests", () => {
 
     // this fails in benchmark...
     it("should invalidate wrong schema for remote schema", () => {
+        // remotes["http://json-schema.org/draft-04/schema"] = compile(require("../../remotes/draft04.json"));
         const schema = { $ref: "http://json-schema.org/draft-04/schema#" };
         const core = new Draft04(schema);
 
@@ -55,5 +58,71 @@ describe("benchmark spec tests", () => {
         });
 
         expect(isValid).to.eq(true, "data should be valid");
+    });
+
+    it("should correctly validate recursive references between schemas", () => {
+        const schema = {
+            id: "http://localhost:1234/tree",
+            description: "tree of nodes",
+            type: "object",
+            properties: {
+                meta: { type: "string" },
+                nodes: {
+                    type: "array",
+                    items: { $ref: "node" }
+                }
+            },
+            required: ["meta", "nodes"],
+            definitions: {
+                node: {
+                    id: "http://localhost:1234/node",
+                    description: "node",
+                    type: "object",
+                    properties: {
+                        value: { type: "number" },
+                        subtree: { $ref: "tree" }
+                    },
+                    required: ["value"]
+                }
+            }
+        };
+        const core = new Draft04(schema);
+
+        const errors = core.validate(schema, {
+            meta: "root",
+            nodes: [
+                {
+                    value: 1,
+                    subtree: {
+                        meta: "child",
+                        nodes: [
+                            { value: "string is invalid" },
+                            { value: 1.2 }
+                        ]
+                    }
+                }
+            ]
+        });
+
+        expect(errors.length).to.eq(1);
+    });
+
+    it("should resolve base URI change base URI change ref valid", () => {
+        remotes["http://localhost:1234/folder/folderInteger.json"] = compile(
+            require("json-schema-test-suite/remotes/folder/folderInteger.json")
+        );
+        const schema = compile({
+            id: "http://localhost:1234/",
+            items: {
+                id: "folder/",
+                items: { $ref: "folderInteger.json" }
+            }
+        });
+        const validData = [[1]];
+        const core = new Draft04(schema);
+
+        const errors = core.validate(schema, validData);
+        // console.log(JSON.stringify(errors, null, 2));
+        expect(errors.length).to.eq(0);
     });
 });
