@@ -3,7 +3,9 @@ const compile = require("../../lib/compile");
 const remotes = require("../../remotes");
 
 
-describe.only("compile", () => {
+describe("compile", () => {
+    afterEach(() => remotes.reset());
+
     describe("behaviour", () => {
 
         it("should return a copy", () => {
@@ -21,16 +23,15 @@ describe.only("compile", () => {
         });
 
         it("should not change iterable properties", () => {
-            const result = compile(require("../../remotes/draft04.json"));
+            const originalSchema = JSON.parse(JSON.stringify(require("../../remotes/draft04.json")));
+            const result = compile(originalSchema);
 
-            expect(result).to.deep.eq(require("../../remotes/draft04.json"));
+            expect(result).to.deep.eq(originalSchema);
         });
     });
 
 
     describe("getRef", () => {
-
-        // default behaviour
 
         it("should always return json-pointer target", () => {
             const schema = compile({
@@ -66,7 +67,7 @@ describe.only("compile", () => {
             // optimized version, requiring a $ref target within schema
             const schema = compile({
                 type: "object", properties: {
-                    ref: { $ref: "#/any/target" }
+                    ref: { $ref: "#/any/ref" }
                 },
                 definitions: {
                     target: { id: "#target", type: "any" }
@@ -79,7 +80,6 @@ describe.only("compile", () => {
         });
 
         it("should return schema for absolute assembled scope ids", () => {
-            // optimized version, requiring a $ref target within schema
             const schema = compile({
                 id: "http://localhost.com/#",
                 type: "object", properties: {
@@ -101,6 +101,71 @@ describe.only("compile", () => {
             const result = schema.getRef("http://localhost.com/folder#target");
 
             expect(result).to.deep.eq({ id: "#target", type: "array" });
+        });
+
+        it("should resolve json-pointer with root-url", () => {
+            // optimized version, requiring a $ref target within schema
+            const schema = compile({
+                id: "http://localhost.com/#",
+                type: "object", properties: {
+                    ref: { $ref: "any" }
+                },
+                definitions: {
+                    target: {
+                        type: "number"
+                    }
+                }
+            });
+
+            const result = schema.getRef("http://localhost.com/#/definitions/target");
+
+            expect(result).to.deep.eq({ type: "number" });
+        });
+    });
+
+    describe("compile ref", () => {
+
+        it("should compile ref to absolute scope", () => {
+            const schema = compile({
+                id: "http://localhost:1234/tree",
+                type: "object",
+                properties: {
+                    nodes: {
+                        type: "array",
+                        items: { $ref: "node" }
+                    }
+                }
+            });
+
+            expect(schema.properties.nodes.items.__ref).to.eq("http://localhost:1234/node");
+        });
+
+        it("should compile ref to absolute scope", () => {
+            const schema = compile({
+                definitions: {
+                    node: {
+                        id: "http://localhost:1234/node",
+                        type: "object",
+                        properties: {
+                            subtree: { $ref: "tree" }
+                        }
+                    }
+                }
+            });
+
+            expect(schema.definitions.node.properties.subtree.__ref).to.eq("http://localhost:1234/tree");
+        });
+
+        it("should resolve absolute url with subfolder", () => {
+            const schema = compile({
+                id: "http://localhost:1234/",
+                items: {
+                    id: "folder/",
+                    items: { $ref: "folderInteger.json" }
+                }
+            });
+
+            expect(schema.items.items.__ref).to.eq("http://localhost:1234/folder/folderInteger.json");
         });
     });
 
@@ -124,9 +189,225 @@ describe.only("compile", () => {
 
             expect(result).to.deep.eq({ type: "integer" });
         });
+
+        it("should resolve pointer within remote", () => {
+            remotes["http://remotehost.com/schema"] = compile({ definitions: { target: { type: "integer" } } });
+            const schema = compile({ $ref: "http://remotehost.com/schema#" });
+
+            const result = schema.getRef("http://remotehost.com/schema#/definitions/target");
+
+            expect(result).to.deep.eq({ type: "integer" });
+        });
+
+        it("should resolve id within remote", () => {
+            remotes["http://remotehost.com/schema"] = compile({
+                definitions: { target: { id: "#r", type: "integer" } }
+            });
+            const schema = compile({ $ref: "http://remotehost.com/schema#" });
+
+            const result = schema.getRef("http://remotehost.com/schema#r");
+
+            expect(result).to.deep.eq({ id: "#r", type: "integer" });
+        });
     });
 
 
-    describe("spec ref.json", () => {});
-    describe("spec remoteRef.json", () => {});
+    describe("spec ref.json", () => {
+
+        it("should return root", () => {
+            const schema = compile({ properties: { foo: { $ref: "#" } } });
+            const result = schema.getRef("#");
+            expect(result).to.deep.eq({ properties: { foo: { $ref: "#" } } });
+        });
+
+        it("should return relative pointer", () => {
+            const schema = compile({ properties: { foo: { type: "integer" }, bar: { $ref: "#/properties/foo" } } });
+            const result = schema.getRef("#/properties/foo");
+            expect(result).to.deep.equal({ type: "integer" });
+        });
+
+        it("should work on escaped pointer", () => {
+            const schema = compile({
+                "tilda~field": { type: "integer" },
+                "slash/field": { type: "integer" },
+                "percent%field": { type: "integer" }
+            });
+
+            expect(schema.getRef("#/tilda~0field")).to.deep.equal({ type: "integer" });
+            expect(schema.getRef("#/slash~1field")).to.deep.equal({ type: "integer" });
+            expect(schema.getRef("#/percent%25field")).to.deep.equal({ type: "integer" });
+        });
+
+        it("should resolve nested $ref", () => {
+            const schema = compile({
+                definitions: {
+                    a: { type: "integer" },
+                    b: { $ref: "#/definitions/a" },
+                    c: { $ref: "#/definitions/b" }
+                },
+                $ref: "#/definitions/c"
+            });
+
+            const result = schema.getRef("#/definitions/c");
+            expect(result).to.deep.equal({ type: "integer" });
+        });
+
+        it("should resolve to absolute scope", () => {
+            // @todo this will only work for single occurence of 'node' or 'tree'.
+
+            // this will require
+            // - a compiled subschema and thus an optional input like schema.getRef(subSchema),
+            //     where the scope is available on a hidden property
+            // - or the ref could be modified (for internal use only)
+            // - or an optional scope param
+            const schema = compile({
+                id: "http://localhost:1234/tree",
+                type: "object",
+                properties: {
+                    nodes: {
+                        type: "array",
+                        items: { $ref: "node" }
+                    }
+                },
+                definitions: {
+                    node: {
+                        id: "http://localhost:1234/node",
+                        type: "object",
+                        properties: {
+                            value: { type: "number" },
+                            subtree: { $ref: "tree" }
+                        }
+                    }
+                }
+            });
+
+            const result = schema.getRef("node");
+            expect(result).to.deep.equal({
+                id: "http://localhost:1234/node",
+                type: "object",
+                properties: {
+                    value: { type: "number" },
+                    subtree: { $ref: "tree" }
+                }
+            });
+        });
+
+        it("should resolve pointer containing quotes", () => {
+            const schema = compile({ definitions: { "foo\"bar": { type: "number" } } });
+
+            const result = schema.getRef("#/definitions/foo%22bar");
+            expect(result).to.deep.equal({ type: "number" });
+        });
+
+        it("should resolve location independent identifier", () => {
+            const schema = compile({ definitions: { A: { id: "#foo", type: "integer" } } });
+
+            const result = schema.getRef("#foo");
+            expect(result).to.deep.equal({ id: "#foo", type: "integer" });
+        });
+
+        it("should resolve location independent identifier with base uri change in subschema", () => {
+            const schema = compile({
+                id: "http://localhost:1234/root",
+                definitions: {
+                    A: {
+                        id: "nested.json",
+                        definitions: {
+                            B: { id: "#foo", type: "integer" }
+                        }
+                    }
+                }
+            });
+
+            const result = schema.getRef("http://localhost:1234/nested.json#foo");
+            expect(result).to.deep.eq({ id: "#foo", type: "integer" });
+        });
+    });
+
+
+    describe("spec remoteRef.json", () => {
+
+        it("should resolve remote ref", () => {
+            remotes["http://localhost:1234/integer.json"] = compile({ type: "integer" });
+            const schema = compile({ $ref: "http://localhost:1234/integer.json" });
+
+            const result = schema.getRef("http://localhost:1234/integer.json");
+            expect(result).to.deep.eq({ type: "integer" });
+        });
+
+        it("should resolve remote ref with fragment", () => {
+            remotes["http://localhost:1234/subSchemas.json"] = compile({ integer: { type: "integer" } });
+            const schema = compile({ $ref: "http://localhost:1234/subSchemas.json#/integer" });
+
+            const result = schema.getRef("http://localhost:1234/subSchemas.json#/integer");
+            expect(result).to.deep.eq({ type: "integer" });
+        });
+
+        it("should resolve ref with remote ref", () => {
+            remotes["http://localhost:1234/subSchemas.json"] = compile({
+                integer: { type: "integer" },
+                refToInteger: { $ref: "#/integer" }
+            });
+            const schema = compile({ $ref: "http://localhost:1234/subSchemas.json#/refToInteger" });
+
+            const result = schema.getRef("http://localhost:1234/subSchemas.json#/refToInteger");
+            expect(result).to.deep.eq({ type: "integer" });
+        });
+
+        it("should join scope and resolve to remote", () => {
+            remotes["http://localhost:1234/folder/folderInteger.json"] = compile({ type: "integer" });
+            const schema = compile({
+                id: "http://localhost:1234/",
+                items: {
+                    id: "folder/",
+                    items: { $ref: "folderInteger.json" }
+                }
+            });
+
+            const result = schema.getRef(schema.items.items);
+            expect(result).to.deep.eq({ type: "integer" });
+        });
+
+        it("should correctly replace base uri for remote scope updates", () => {
+            remotes["http://localhost:1234/folder/folderInteger.json"] = compile({ type: "integer" });
+            const schema = compile({
+                id: "http://localhost:1234/scope_change_defs1.json",
+                type: "object",
+                properties: {
+                    list: { $ref: "#/definitions/baz" }
+                },
+                definitions: {
+                    baz: {
+                        id: "folder/",
+                        type: "array",
+                        items: { $ref: "folderInteger.json" }
+                    }
+                }
+            });
+
+            const result = schema.getRef(schema.definitions.baz.items);
+            expect(result).to.deep.eq({ type: "integer" });
+        });
+
+        it("should resolve joined remote with root ref", () => {
+            remotes["http://localhost:1234/name.json"] = compile({
+                definitions: {
+                    orNull: {
+                        anyOf: [{ type: "null" }, { $ref: "#" }]
+                    }
+                },
+                type: "string"
+            });
+            const schema = compile({
+                id: "http://localhost:1234/object",
+                type: "object",
+                properties: {
+                    name: { $ref: "name.json#/definitions/orNull" }
+                }
+            });
+
+            const result = schema.getRef(schema.properties.name);
+            expect(result).to.deep.eq({ anyOf: [{ type: "null" }, { $ref: "#" }] });
+        });
+    });
 });
