@@ -39,9 +39,8 @@ function runTests(Core, skipTest = []) {
                 const test = skipTest.includes(testData.description) ? it.skip : it;
 
                 test(testData.description, () => {
-                    const testSchema = compile(schema);
-                    const validator = new Core(testSchema);
-                    const isValid = validator.isValid(testSchema, testData.data);
+                    const validator = new Core(schema);
+                    const isValid = validator.isValid(testData.data);
                     expect(isValid).to.eq(testData.valid);
                 });
             });

@@ -9,7 +9,7 @@ describe("benchmark spec tests", () => {
 
     // this is wanted fuzzy behaviour and collision on validation...
     it.skip("should correctly validate complex oneOf type", () => {
-        const schema = {
+        const core = new JsonEditor({
             oneOf: [
                 {
                     properties: {
@@ -24,10 +24,8 @@ describe("benchmark spec tests", () => {
                     required: ["foo"]
                 }
             ]
-        };
-        const core = new JsonEditor(schema);
-
-        const errors = core.validate(schema, { foo: "baz", bar: 2 });
+        });
+        const errors = core.validate({ foo: "baz", bar: 2 });
         console.log("errors", JSON.stringify(errors));
         expect(errors.length).to.eq(1, "both oneOf valid (complex)");
     });
@@ -35,10 +33,9 @@ describe("benchmark spec tests", () => {
     // this fails in benchmark...
     it("should invalidate wrong schema for remote schema", () => {
         // remotes["http://json-schema.org/draft-04/schema"] = compile(require("../../remotes/draft04.json"));
-        const schema = { $ref: "http://json-schema.org/draft-04/schema#" };
-        const core = new Draft04(schema);
+        const core = new Draft04({ $ref: "http://json-schema.org/draft-04/schema#" });
 
-        const isValid = core.isValid(schema, {
+        const isValid = core.isValid({
             definitions: {
                 foo: { type: 1 }
             }
@@ -48,10 +45,9 @@ describe("benchmark spec tests", () => {
     });
 
     it("should correctly validate remote schema", () => {
-        const schema = { $ref: "http://json-schema.org/draft-04/schema#" };
-        const core = new Draft04(schema);
+        const core = new Draft04({ $ref: "http://json-schema.org/draft-04/schema#" });
 
-        const isValid = core.isValid(schema, {
+        const isValid = core.isValid({
             definitions: {
                 foo: { type: "integer" }
             }
@@ -88,7 +84,7 @@ describe("benchmark spec tests", () => {
         };
         const core = new Draft04(schema);
 
-        const errors = core.validate(schema, {
+        const errors = core.validate({
             meta: "root",
             nodes: [
                 {
@@ -111,17 +107,15 @@ describe("benchmark spec tests", () => {
         remotes["http://localhost:1234/folder/folderInteger.json"] = compile(
             require("json-schema-test-suite/remotes/folder/folderInteger.json")
         );
-        const schema = compile({
+        const core = new Draft04({
             id: "http://localhost:1234/",
             items: {
                 id: "folder/",
                 items: { $ref: "folderInteger.json" }
             }
         });
-        const validData = [[1]];
-        const core = new Draft04(schema);
 
-        const errors = core.validate(schema, validData);
+        const errors = core.validate([[1]]);
         // console.log(JSON.stringify(errors, null, 2));
         expect(errors.length).to.eq(0);
     });

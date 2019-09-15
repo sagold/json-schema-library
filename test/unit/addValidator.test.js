@@ -14,14 +14,14 @@ describe("addValidator", () => {
         });
 
         it("should overwrite 'minLengthError'", () => {
-            addValidator.error(core, "minLengthError", (data) => ({
+            addValidator.error(core, "minLengthError", data => ({
                 type: "error",
                 code: "custom-min-length-error",
                 message: "my custom error message",
                 data
             }));
 
-            const result = core.validate({ type: "string", minLength: 4 }, "abc");
+            const result = core.validate("abc", { type: "string", minLength: 4 });
 
             expect(result).to.have.length(1);
             expect(result[0].code).to.eq("custom-min-length-error");
@@ -46,7 +46,7 @@ describe("addValidator", () => {
                 called = true;
             });
 
-            core.validate({ type: "string", format: "id" }, "123-123");
+            core.validate("123-123", { type: "string", format: "id" });
 
             expect(called).to.eq(true);
         });
@@ -58,7 +58,7 @@ describe("addValidator", () => {
                 called = true;
             });
 
-            core.validate({ type: "string", format: "string" }, "123-123");
+            core.validate("123-123", { type: "string", format: "string" });
 
             expect(called).to.eq(false);
         });
@@ -69,7 +69,7 @@ describe("addValidator", () => {
                 code: "format-id-error"
             }));
 
-            const result = core.validate({ type: "string", format: "id" }, "123-123");
+            const result = core.validate("123-123", { type: "string", format: "id" });
 
             expect(result).to.have.length(1);
             expect(result[0].code).to.eq("format-id-error");
@@ -78,7 +78,7 @@ describe("addValidator", () => {
         it("should return no error for successful validation", () => {
             addValidator.format(core, "id", () => true);
 
-            const result = core.validate({ type: "string", format: "id" }, "123-123");
+            const result = core.validate("123-123", { type: "string", format: "id" });
 
             expect(result).to.have.length(0);
         });
@@ -109,7 +109,7 @@ describe("addValidator", () => {
             let called = false;
             addValidator.keyword(core, "string", "capitalized", () => (called = true));
 
-            core.validate({ type: "string", capitalized: true }, "myString");
+            core.validate("myString", { type: "string", capitalized: true });
 
             expect(called).to.eq(true);
         });
@@ -118,7 +118,7 @@ describe("addValidator", () => {
             let called = false;
             addValidator.keyword(core, "string", "capitalized", () => (called = true));
 
-            core.validate({ type: "string" }, "myString");
+            core.validate("myString", { type: "string" });
 
             expect(called).to.eq(false);
         });
@@ -127,7 +127,7 @@ describe("addValidator", () => {
             let called = false;
             addValidator.keyword(core, "string", "capitalized", () => { called = true; });
 
-            core.validate({ type: "number", capitalized: true }, 1234);
+            core.validate(1234, { type: "number", capitalized: true });
 
             expect(called).to.eq(false);
         });
@@ -135,7 +135,7 @@ describe("addValidator", () => {
         it("should return no error for successful validation", () => {
             addValidator.keyword(core, "string", "capitalized", (core, schema, value) => true);
 
-            const result = core.validate({ type: "string", capitalized: true }, "myString");
+            const result = core.validate("myString", { type: "string", capitalized: true });
 
             expect(result).to.have.length(0);
         });
@@ -146,7 +146,7 @@ describe("addValidator", () => {
                 code: "keyword-error"
             }));
 
-            const result = core.validate({ type: "string", capitalized: true }, "myString");
+            const result = core.validate("myString", { type: "string", capitalized: true });
 
             expect(result).to.have.length(1);
             expect(result[0].code).to.eq("keyword-error");

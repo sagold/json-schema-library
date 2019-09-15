@@ -43,8 +43,8 @@ the following methods
 | constructor       | schema : instance                     | pass the root-schema in the constructor
 | each              | schema, data, callback, [pointer]     | Iterates over the data, passing value and its schema
 | step              | key, schema, data, [pointer] : Schema | step into a json-schema by the given key (property or index)
-| validate          | schema, data, [pointer] : Array       | Get a list of validation errors
-| isValid           | schema, data, [pointer] : Boolean     | Check if the given schema validates the data
+| validate          | data, [schema], [pointer] : Array       | Get a list of validation errors
+| isValid           | data, [schema], [pointer] : Boolean     | Check if the given schema validates the data
 | resolveOneOf      | schema, data, [pointer] : Schema      | returns the oneOf-schema for the passed data
 | resolveRef        | schema : Schema                       | resolves a $ref on a given schema-object
 | getSchema         | schema, data, [pointer] : Schema      | Get the json-schema describing the `data` found at `pointer`
@@ -121,19 +121,21 @@ const baseData = core.getTemplate(
 ```js
 const Core = require("json-schema-library").cores.Draft04;
 const core = new Core(rootSchema);
-const errors = core.validate({ type: "number" }, "");
+const errors = core.validate({ validationOf: "rootSchema" });
+// validation errors running data for 'rootSchema'
+const customSchemaErrors = core.validate("", { type: "number" });
 // returns { type: "TypeError" }
 ```
 
 ##### isValid(core, data, schema, step)
 > Check if the given schema validates the data
 
-basically `core.validate({ type: "number" }, "").length === 0`
+basically `core.validate("", { type: "number" }).length === 0`
 
 ```js
 const Core = require("json-schema-library").cores.Draft04;
 const core = new Core(rootSchema);
-const baseSchema = core.isValid({ type: "number" }, "");
+const baseSchema = core.isValid("", { type: "number" });
 // returns false
 ```
 
@@ -146,7 +148,7 @@ Optional support for onError helper, which is invoked for each error (after bein
 const Core = require("json-schema-library").cores.Draft04;
 const core = new Core(rootSchema);
 // signature: Core, Schema, Data, [Pointer], [onErrorCallback] : Promise
-validateAsync(core, { type: "number" }, "", "#", function onError(err) {})
+validateAsync(core, "", { type: "number" }, "#", function onError(err) {})
     .then((allErrors) => {})
 ```
 
