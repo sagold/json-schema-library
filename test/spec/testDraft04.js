@@ -15,6 +15,7 @@ addSchema("http://localhost:1234/folder/folderInteger.json", require("json-schem
 // fetch TestCases
 const globPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "tests", "draft4", "**", "*.json");
 // const globPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "tests", "draft4", "ref.json");
+// const globPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "tests", "draft4", "refRemote.json");
 let draft04TestCases = glob.sync(globPattern);
 if (draft04TestCases.length === 0) {
     throw new Error(`Failed retrieving tests from ${globPattern}`);
@@ -25,7 +26,7 @@ draft04TestCases = flattenArray(draft04TestCases.map(require));
 
 
 function runTests(Core, skipTest = []) {
-    draft04TestCases.forEach((testCase) => {
+    draft04TestCases.forEach(testCase => {
         const schema = testCase.schema;
         if (skipTest.includes(testCase.description)) {
             console.log(chalk.red(`Unsupported '${testCase.description}'`));
@@ -33,13 +34,12 @@ function runTests(Core, skipTest = []) {
         }
 
         describe(testCase.description, () => {
-            testCase.tests.forEach((testData) => {
+            testCase.tests.forEach(testData => {
                 const test = skipTest.includes(testData.description) ? it.skip : it;
 
                 test(testData.description, () => {
-                    const testSchema = JSON.parse(JSON.stringify(schema));
-                    const validator = new Core(testSchema);
-                    const isValid = validator.isValid(testSchema, testData.data);
+                    const validator = new Core(schema);
+                    const isValid = validator.isValid(testData.data);
                     expect(isValid).to.eq(testData.valid);
                 });
             });

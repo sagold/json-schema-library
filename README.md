@@ -43,11 +43,11 @@ the following methods
 | constructor       | schema : instance                     | pass the root-schema in the constructor
 | each              | schema, data, callback, [pointer]     | Iterates over the data, passing value and its schema
 | step              | key, schema, data, [pointer] : Schema | step into a json-schema by the given key (property or index)
-| validate          | schema, data, [pointer] : Array       | Get a list of validation errors
-| isValid           | schema, data, [pointer] : Boolean     | Check if the given schema validates the data
+| validate          | data, [schema], [pointer] : Array     | Get a list of validation errors
+| isValid           | data, [schema], [pointer] : Boolean   | Check if the given schema validates the data
 | resolveOneOf      | schema, data, [pointer] : Schema      | returns the oneOf-schema for the passed data
 | resolveRef        | schema : Schema                       | resolves a $ref on a given schema-object
-| getSchema         | schema, data, [pointer] : Schema      | Get the json-schema describing the `data` found at `pointer`
+| getSchema         | pointer, [data], [schema] : Schema    | Get the json-schema describing the `data` found at `pointer`
 | getTemplate       | schema, data : Mixed                  | returns a template object based of the given json-schema
 | setSchema         | schema                                | set or change the root-schema
 
@@ -76,13 +76,15 @@ Core {
 
 #### Examples
 
-##### getSchema(core, schema, pointer, data)
+##### getSchema(core, pointer, [data], [schema])
 > Get the json-schema describing the `data` found at `pointer`.
+> The default json-schema-definitions can be resolved without any data as input: `core.getSchema('#/article/title')`. 
+> For any dynamic values (like `oneOf`, `definitions`) the data has to be passed in addition.
 
 ```js
 const Core = require("json-schema-library").cores.Draft04;
 const core = new Core(rootSchema);
-const targetSchema = core.getSchema(rootSchema, '#/path/to/target', rootData);
+const targetSchema = core.getSchema('#/path/to/target', rootData);
 ```
 
 Currently may also return an error:
@@ -98,7 +100,7 @@ Or using `getSchema` directly
 ```js
 const Core = require("json-schema-library").cores.Draft04;
 const core = new Core(rootSchema);
-const targetSchema = getSchema(core, rootSchema, '#/path/to/target', rootData);
+const targetSchema = getSchema(core, '#/path/to/target', rootData);
 ```
 
 
@@ -121,23 +123,25 @@ const baseData = core.getTemplate(
 ```js
 const Core = require("json-schema-library").cores.Draft04;
 const core = new Core(rootSchema);
-const errors = core.validate({ type: "number" }, "");
+const errors = core.validate({ validationOf: "rootSchema" });
+// validation errors running data for 'rootSchema'
+const customSchemaErrors = core.validate("", { type: "number" });
 // returns { type: "TypeError" }
 ```
 
 ##### isValid(core, data, schema, step)
 > Check if the given schema validates the data
 
-basically `core.validate({ type: "number" }, "").length === 0`
+basically `core.validate("", { type: "number" }).length === 0`
 
 ```js
 const Core = require("json-schema-library").cores.Draft04;
 const core = new Core(rootSchema);
-const baseSchema = core.isValid({ type: "number" }, "");
+const baseSchema = core.isValid("", { type: "number" });
 // returns false
 ```
 
-##### validateAsync(core, data, schema, step)
+##### validateAsync(core, data, options)
 > Asynchronous validation helper
 
 Optional support for onError helper, which is invoked for each error (after being resolved)
@@ -145,9 +149,9 @@ Optional support for onError helper, which is invoked for each error (after bein
 ```js
 const Core = require("json-schema-library").cores.Draft04;
 const core = new Core(rootSchema);
-// signature: Core, Schema, Data, [Pointer], [onErrorCallback] : Promise
-validateAsync(core, { type: "number" }, "", "#", function onError(err) {})
-    .then((allErrors) => {})
+// signature: Core, data, { onError: [onErrorCallback], schema: JSONSchema, pointer: [Pointer]} : Promise
+validateAsync(core, "", { onError: (err) => {}, schema: { type: "number" } })
+    .then(allErrors => {});
 ```
 
 ##### step(core, key, schema, data, rootSchema = schema)
@@ -230,11 +234,11 @@ const baseSchema = getTemplate({ target: "" });
 // returns {type: "object", properties: { target: "string"}},
 ```
 
-#### eachTypeDef
+#### eachSchema
 Iterate the schema, invoking the callback function for each type (schema) definition
 
 ```js
-const baseSchema = eachTypeDef(schema, (schema, pointer) => {});
+const baseSchema = eachSchema(schema, (schema, pointer) => {});
 ```
 
 

@@ -7,15 +7,15 @@ module.exports = {
         Draft04: require("./lib/cores/Draft04"), // core implementing draft04 specs
         JsonEditor: require("./lib/cores/JsonEditor") // adjusted core of draft04 to better support the json-editor
     },
-    addSchema: require("./lib/addSchema"),
+    addSchema: require("./lib/addSchema"), // add a schema to be references via $ref
     addValidator: require("./lib/addValidator"), // add validation for keyword, format, datatype and customize errors
     createCustomError: require("./lib/utils/createCustomError"),
     createSchemaOf: require("./lib/createSchemaOf"), // creates a simple schema based on the given data
     each: require("./lib/each"), // iterate over data, receiving each data-entry with its schema
-    eachTypeDef: require("./lib/eachTypeDef"), // iterates over a json-schemas type definitions
+    eachSchema: require("./lib/eachSchema"), // iterates over a json-schemas type definitions
     getChildSchemaSelection: require("./lib/getChildSchemaSelection"), // get available child schemas
-    getSchema: require("./lib/getSchema"), // get schema of data
-    getTemplate: require("./lib/getTemplate"), // create data based which validates the given schema
+    getSchema: require("./lib/getSchema"), // get schema of datapointer
+    getTemplate: require("./lib/getTemplate"), // create data which is valid to the given schema
     getTypeOf: require("./lib/getTypeOf"), // returns the javascript datatype
     isValid: require("./lib/isValid"), // returns a boolean if the schema is valid
     SchemaService: require("./lib/SchemaService"),

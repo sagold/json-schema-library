@@ -10,12 +10,12 @@ describe("isValid", () => {
     before(() => (core = new Core()));
 
     it("should return true if value is valid", () => {
-        const valid = isValid(core, { type: "number" }, 4);
+        const valid = isValid(core, 4, { type: "number" });
         expect(valid).to.be.true;
     });
 
     it("should return false if value is invalid", () => {
-        const valid = isValid(core, { type: "string" }, 4);
+        const valid = isValid(core, 4, { type: "string" });
         expect(valid).to.be.false;
     });
 
@@ -23,6 +23,10 @@ describe("isValid", () => {
     // @fixme this is correct here, not when running tests through spec...
     it("should not validate multiple oneOf validations", () => {
         const valid = isValid(core,
+            {
+                foo: "baz",
+                bar: 2
+            },
             {
                 oneOf: [
                     {
@@ -34,10 +38,6 @@ describe("isValid", () => {
                         required: ["foo"]
                     }
                 ]
-            },
-            {
-                foo: "baz",
-                bar: 2
             }
         );
 

@@ -10,17 +10,19 @@ describe("validateAsync", () => {
     before(() => (core = new Core()));
 
     it("should return a promise", () => {
-        const promise = validateAsync(core, { type: "number" }, 4);
+        const promise = validateAsync(core, 4, { schema: { type: "number" } });
         expect(promise).to.be.instanceof(Promise);
     });
 
-    it("should resolve successfull with an empty error", () => validateAsync(core, { type: "number" }, 4)
+    it("should resolve successfull with an empty error", () =>
+        validateAsync(core, 4, { schema: { type: "number" } })
         .then((errors) => {
             expect(errors).to.have.length(0);
         }
     ));
 
-    it("should resolve with errors for a failed validation", () => validateAsync(core, { type: "number" }, "4")
+    it("should resolve with errors for a failed validation", () =>
+        validateAsync(core, "4", { schema: { type: "number" }})
         .then((errors) => {
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("TypeError");
@@ -42,19 +44,21 @@ describe("validateAsync", () => {
 
         it("should call onProgress immediately with error", () => {
             const errors = [];
-            return validateAsync(
-                    core, {
-                        type: "object",
-                        properties: {
-                            async: { type: "string", asyncError: true },
-                            anotherError: { type: "string" }
-                        }
-                    }, {
+            return validateAsync(core,
+                    {
                         async: "test async progres",
                         anotherError: 44
                     },
-                    "#",
-                    (err) => errors.push(err)
+                    {
+                        schema: {
+                            type: "object",
+                            properties: {
+                                async: { type: "string", asyncError: true },
+                                anotherError: { type: "string" }
+                            }
+                        },
+                        onError: (err) => errors.push(err)
+                    }
                 )
                 .then(() => {
                     expect(errors).to.have.length(2);

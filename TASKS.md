@@ -7,15 +7,14 @@
 ## !!! failsafe ref-resolution and simpler ref-retrieval
 - [ ] -- Change -- remotes per instance, removing side effects
 - [ ] remotes and scopes per schema-instance (using precompile or core)
-- [ ] fix insane $ref resolution 'node' can be in 'root/node' or 'root/folder/node' (?)
-- [ ] remove duplication from resolveRef.strict and resolveRef.withOverwrite
+- [✓] fix insane $ref resolution 'node' can be in 'root/node' or 'root/folder/node' (?)
+- [✓] remove duplication from resolveRef.strict and resolveRef.withOverwrite
 
 
 ### possibly
 
 - [ ] latest draft support
 - [ ] improve performance
-- [ ] iterate schema: resolve $ref and definitions
 - [ ] -- Features -- Helper to find a json- and json-schema-pointer
 
 
@@ -26,14 +25,18 @@
 
 **Breaking Changes**
 
-- iterateSchema renamed to eachTypeDef
+- `iterateSchema` renamed to `eachSchema`
+- `validate` and `isValid` changed signature from (schema, data, [pointer]) to (data, [schema], [pointer])
+- `validateAsync` changed signature from (schema, data, [pointer], [onError]) to (data, [{ schema, pointer, onError }])
+- `getSchema` changed signature from (schema, data, [pointer]) to (pointer, [data], [schema])
+- `precompileSchema` renamed to `compileSchema`
 
 **Milestone** consistent feature support
 
 - [ ] remove hard coded schema interpretation
 - [ ] -- Change -- remotes per instance, removing side effects
-- [ ] rootSchema always compiled
-- [ ] Add missing 'step' support for allOf and anyOf type definitions
+- [✓] rootSchema always compiled
+- [✓] Add missing 'step' support for allOf and anyOf type definitions
 - [✓] Complete schema support in iterateSchema
 
 

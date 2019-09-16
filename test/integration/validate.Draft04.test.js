@@ -16,7 +16,7 @@ describe("validate.Draft04", () => {
     });
 
     it("should validate test-data by default", () => {
-        const errors = core.validate(schema, data);
+        const errors = core.validate(data);
 
         expect(errors).to.have.length(0);
     });
