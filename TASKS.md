@@ -25,7 +25,7 @@
 
 **Breaking Changes**
 
-- `iterateSchema` renamed to `eachTypeDef`
+- `iterateSchema` renamed to `eachSchema`
 - `validate` and `isValid` changed signature from (schema, data, [pointer]) to (data, [schema], [pointer])
 - `precompileSchema` renamed to `compileSchema`
 

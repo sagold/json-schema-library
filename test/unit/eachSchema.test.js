@@ -1,9 +1,9 @@
 /* eslint quote-props: 0, no-unused-expressions: 0 */
 const expect = require("chai").expect;
-const eachTypeDef = require("../../lib/eachTypeDef");
+const eachSchema = require("../../lib/eachSchema");
 
 
-describe("eachTypeDef", () => {
+describe("eachSchema", () => {
 
     it("should execute callback on root-schema", () => {
         let firstCall;
@@ -12,7 +12,7 @@ describe("eachTypeDef", () => {
             properties: {}
         };
 
-        eachTypeDef(rootSchema, schema => (firstCall = firstCall || schema));
+        eachSchema(rootSchema, schema => (firstCall = firstCall || schema));
 
         expect(firstCall).to.eq(rootSchema);
     });
@@ -28,7 +28,7 @@ describe("eachTypeDef", () => {
             }
         };
 
-        eachTypeDef(rootSchema, (schema, pointer) => calls.push(pointer));
+        eachSchema(rootSchema, (schema, pointer) => calls.push(pointer));
 
         expect(calls).to.have.length(2);
         expect(calls[1]).to.eq("/properties/title");
@@ -45,7 +45,7 @@ describe("eachTypeDef", () => {
             }
         };
 
-        eachTypeDef(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
+        eachSchema(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
 
         expect(calls.length).to.eq(3);
         expect(calls[1].schema).to.eq(rootSchema.properties.first);
@@ -65,7 +65,7 @@ describe("eachTypeDef", () => {
             ]
         };
 
-        eachTypeDef(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
+        eachSchema(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
 
         expect(calls.length).to.eq(3);
         expect(calls[1].schema).to.eq(rootSchema.items[0]);
@@ -88,7 +88,7 @@ describe("eachTypeDef", () => {
             }
         };
 
-        eachTypeDef(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
+        eachSchema(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
 
         expect(calls.length).to.eq(4);
         expect(calls[2].schema).to.eq(rootSchema.items.properties.first);
@@ -107,7 +107,7 @@ describe("eachTypeDef", () => {
             ]
         };
 
-        eachTypeDef(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
+        eachSchema(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
 
         expect(calls.length).to.eq(3);
         expect(calls[1].schema).to.eq(rootSchema.oneOf[0]);
@@ -129,7 +129,7 @@ describe("eachTypeDef", () => {
             }
         };
 
-        eachTypeDef(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
+        eachSchema(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
 
         expect(calls.length).to.eq(4);
         expect(calls[1].schema).to.eq(rootSchema.items);
@@ -150,7 +150,7 @@ describe("eachTypeDef", () => {
             ]
         };
 
-        eachTypeDef(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
+        eachSchema(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
 
         expect(calls.length).to.eq(3);
         expect(calls[1].schema).to.eq(rootSchema.anyOf[0]);
@@ -169,7 +169,7 @@ describe("eachTypeDef", () => {
             ]
         };
 
-        eachTypeDef(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, schema => calls.push(schema));
 
         expect(calls.length).to.eq(3);
         expect(calls[1]).to.eq(rootSchema.allOf[0]);
@@ -187,7 +187,7 @@ describe("eachTypeDef", () => {
             }
         };
 
-        eachTypeDef(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, schema => calls.push(schema));
 
         expect(calls.length).to.eq(2);
         expect(calls[1]).to.eq(rootSchema.definitions.image);
@@ -206,7 +206,7 @@ describe("eachTypeDef", () => {
             }
         };
 
-        eachTypeDef(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, schema => calls.push(schema));
 
         expect(calls.length).to.eq(3);
         expect(calls[1]).to.eq(rootSchema.additionalProperties);
@@ -221,7 +221,7 @@ describe("eachTypeDef", () => {
             }
         };
 
-        eachTypeDef(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, schema => calls.push(schema));
 
         expect(calls.length).to.eq(1);
     });
@@ -239,7 +239,7 @@ describe("eachTypeDef", () => {
             }
         };
 
-        eachTypeDef(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, schema => calls.push(schema));
 
         expect(calls.length).to.eq(2);
         expect(calls[1]).to.eq(rootSchema.dependencies.target);
@@ -254,7 +254,7 @@ describe("eachTypeDef", () => {
             }
         };
 
-        eachTypeDef(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, schema => calls.push(schema));
 
         expect(calls.length).to.eq(2);
         expect(calls[0]).to.eq(rootSchema);
@@ -275,7 +275,7 @@ describe("eachTypeDef", () => {
             }
         };
 
-        eachTypeDef(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, schema => calls.push(schema));
 
         expect(calls).to.have.length(4);
         expect(calls[0]).to.eq(rootSchema);
