@@ -1,18 +1,12 @@
 # Tasks
 
 - [ ] Improve -- _oneOf-Error messages_ (specific errors where possible, instead of one-of-error)
-- [ ] Refactor -- move type validation as keyword to validation/keywords
-- [ ] Refactor -- Use addValidation to setup base validation mappings?
-
-## !!! failsafe ref-resolution and simpler ref-retrieval
-- [ ] -- Change -- remotes per instance, removing side effects
-- [ ] remotes and scopes per schema-instance (using precompile or core)
-- [✓] fix insane $ref resolution 'node' can be in 'root/node' or 'root/folder/node' (?)
-- [✓] remove duplication from resolveRef.strict and resolveRef.withOverwrite
 
 
 ### possibly
 
+- [ ] Refactor -- move type validation as keyword to validation/keywords
+- [ ] Refactor -- Use addValidation to setup base validation mappings?
 - [ ] latest draft support
 - [ ] improve performance
 - [ ] -- Features -- Helper to find a json- and json-schema-pointer
@@ -22,6 +16,10 @@
 
 - [✓] -- Fix -- latest benchmark tests
 - [✓] -- Fix -- iterate schema (using typeDefs)
+- [✓] -- Fix -- scopes per schema-instance
+- [✓] -- Fix -- insane $ref resolution 'node' can be in 'root/node' or 'root/folder/node'
+- [✓] -- Refactor -- remove duplication from resolveRef.strict and resolveRef.withOverwrite
+- [✓] -- Change -- improve function apis (param order, rootSchema per default)
 
 **Breaking Changes**
 
@@ -34,9 +32,10 @@
 **Milestone** consistent feature support
 
 - [ ] remove hard coded schema interpretation
-- [ ] -- Change -- remotes per instance, removing side effects
+- [✓] no modifications on remote-object
 - [✓] rootSchema always compiled
 - [✓] Add missing 'step' support for allOf and anyOf type definitions
+- [ ] Add missing 'getTemplate' support for allOf and anyOf type definitions
 - [✓] Complete schema support in iterateSchema
 
 
