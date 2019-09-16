@@ -252,46 +252,6 @@ describe("compile", () => {
             expect(result).to.deep.equal({ type: "integer" });
         });
 
-        it("should resolve to absolute scope", () => {
-            // @todo this will only work for single occurence of 'node' or 'tree'.
-
-            // this will require
-            // - a compiled subschema and thus an optional input like schema.getRef(subSchema),
-            //     where the scope is available on a hidden property
-            // - or the ref could be modified (for internal use only)
-            // - or an optional scope param
-            const schema = compile({
-                id: "http://localhost:1234/tree",
-                type: "object",
-                properties: {
-                    nodes: {
-                        type: "array",
-                        items: { $ref: "node" }
-                    }
-                },
-                definitions: {
-                    node: {
-                        id: "http://localhost:1234/node",
-                        type: "object",
-                        properties: {
-                            value: { type: "number" },
-                            subtree: { $ref: "tree" }
-                        }
-                    }
-                }
-            });
-
-            const result = schema.getRef("node");
-            expect(result).to.deep.equal({
-                id: "http://localhost:1234/node",
-                type: "object",
-                properties: {
-                    value: { type: "number" },
-                    subtree: { $ref: "tree" }
-                }
-            });
-        });
-
         it("should resolve pointer containing quotes", () => {
             const schema = compile({ definitions: { "foo\"bar": { type: "number" } } });
 
