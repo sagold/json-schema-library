@@ -11,37 +11,37 @@ describe("getTemplate", () => {
     before(() => (core = new Core()));
 
     it("should set an empty string if no default value is given", () => {
-        core.rootSchema = { type: "string" };
-        const res = getTemplate(core, core.rootSchema);
+        core.setSchema({ type: "string" });
+        const res = getTemplate(core);
 
         expect(res).to.deep.equal("");
     });
 
     it("should set the first enum option for a missing default", () => {
-        core.rootSchema = { type: "string", enum: ["first", "second"] };
-        const res = getTemplate(core, core.rootSchema);
+        core.setSchema({ type: "string", enum: ["first", "second"] });
+        const res = getTemplate(core);
 
         expect(res).to.deep.equal("first");
     });
 
     describe("boolean", () => {
         it("should set default value for boolean", () => {
-            core.rootSchema = { type: "boolean", default: false };
-            const res = getTemplate(core, core.rootSchema);
+            core.setSchema({ type: "boolean", default: false });
+            const res = getTemplate(core);
 
             expect(res).to.equal(false);
         });
 
         it("should not override given boolean if it is 'false'", () => {
-            core.rootSchema = { type: "boolean", default: true };
-            const res = getTemplate(core, core.rootSchema, false);
+            core.setSchema({ type: "boolean", default: true });
+            const res = getTemplate(core, false);
 
             expect(res).to.equal(false);
         });
 
         it("should not override given boolean if it is 'true'", () => {
-            core.rootSchema = { type: "boolean", default: false };
-            const res = getTemplate(core, core.rootSchema, true);
+            core.setSchema({ type: "boolean", default: false });
+            const res = getTemplate(core, true);
 
             expect(res).to.equal(true);
         });
@@ -52,62 +52,62 @@ describe("getTemplate", () => {
         describe(".properties", () => {
 
             it("should return defined properties of object", () => {
-                core.rootSchema = { type: "object",
+                core.setSchema({ type: "object",
                     properties: {
                         first: { type: "string" },
                         second: { type: "number" }
                     }
-                };
-                const res = getTemplate(core, core.rootSchema);
+                });
+                const res = getTemplate(core);
 
                 expect(res).to.deep.equal({ first: "", second: 0 });
             });
 
             it("should not fail on falsy input data", () => {
-                core.rootSchema = { type: "object",
+                core.setSchema({ type: "object",
                     properties: {
                         first: { type: "boolean", default: true },
                         second: { type: "boolean", default: false },
                     }
-                };
-                const res = getTemplate(core, core.rootSchema, { first: false, second: true });
+                });
+                const res = getTemplate(core, { first: false, second: true });
 
                 expect(res).to.deep.equal({ first: false, second: true });
             });
 
             it("should return default object if defined", () => {
-                core.rootSchema = { type: "object",
+                core.setSchema({ type: "object",
                     properties: { first: { type: "string" }, second: { type: "number" } },
                     "default": { first: "john", second: 4 }
-                };
-                const res = getTemplate(core, core.rootSchema);
+                });
+                const res = getTemplate(core);
 
                 expect(res).to.deep.equal({ first: "john", second: 4 });
             });
 
             it("should not override given default values", () => {
-                core.rootSchema = { type: "object",
+                core.setSchema({ type: "object",
                     properties: {
                         first: { type: "string", "default": "jane" },
                         second: { type: "number" }
                     },
                     "default": { first: "john", second: 4 }
-                };
-                const res = getTemplate(core, core.rootSchema);
+                });
+                const res = getTemplate(core);
 
                 expect(res).to.deep.equal({ first: "john", second: 4 });
             });
 
             it("should extend given template data by default values", () => {
-                core.rootSchema = { type: "object",
+                core.setSchema({ type: "object",
                     properties: {
                         first: { type: "string", "default": "jane" },
                         second: { type: "number" }
                     },
                     "default": { first: "john", second: 4 }
 
-                };
-                const res = getTemplate(core, core.rootSchema, { second: 8 });
+                });
+                const res = getTemplate(core, { second: 8 });
 
                 expect(res).to.deep.equal({ first: "john", second: 8 });
             });
@@ -116,17 +116,17 @@ describe("getTemplate", () => {
         describe("$ref", () => {
 
             it("should resolve $ref in object schema", () => {
-                core.rootSchema = { type: "object",
+                core.setSchema({ type: "object",
                     properties: { first: { $ref: "#/definition/first" } },
                     definition: { first: { type: "string", default: "john" } }
-                };
-                const res = getTemplate(core, core.rootSchema);
+                });
+                const res = getTemplate(core);
 
                 expect(res).to.deep.equal({ first: "john" });
             });
 
             // it("should prefer default over default in $ref", () => {
-            //     core.rootSchema = { type: "object",
+            //     core.setSchema({ type: "object",
             //         properties: { first: { $ref: "#/definition/first", default: "asterix" } },
             //         definition: { first: { type: "string", default: "john" } }
             //     };
@@ -140,19 +140,19 @@ describe("getTemplate", () => {
         describe(".oneOf", () => {
 
             it("should return template of first oneOf schema", () => {
-                core.rootSchema = { type: "object",
+                core.setSchema({ type: "object",
                     oneOf: [
                         { type: "object", properties: { title: { type: "string", default: "jane" } } },
                         { type: "object", properties: { value: { type: "number" } } }
                     ]
-                };
-                const res = getTemplate(core, core.rootSchema);
+                });
+                const res = getTemplate(core);
 
                 expect(res).to.deep.equal({ title: "jane" });
             });
 
             it("should return template of for matching oneOf schema", () => {
-                core.rootSchema = { type: "object",
+                core.setSchema({ type: "object",
                     oneOf: [
                         { type: "object", properties: {
                             value: { type: "string", default: "jane" } }
@@ -161,8 +161,8 @@ describe("getTemplate", () => {
                             value: { type: "number" }, test: { type: "string", default: "test" } }
                         }
                     ]
-                };
-                const res = getTemplate(core, core.rootSchema, { value: 111 });
+                });
+                const res = getTemplate(core, { value: 111 });
 
                 expect(res).to.deep.equal({ value: 111, test: "test" });
             });
@@ -174,67 +174,67 @@ describe("getTemplate", () => {
         describe(".items:Object", () => {
 
             it("should return empty array if minItems = 0", () => {
-                core.rootSchema = { type: "array",
+                core.setSchema({ type: "array",
                     items: {
                         type: "boolean"
                     }
-                };
-                const res = getTemplate(core, core.rootSchema);
+                });
+                const res = getTemplate(core);
 
                 expect(res).to.deep.equal([]);
             });
 
             it("should return array with minItems", () => {
-                core.rootSchema = { type: "array",
+                core.setSchema({ type: "array",
                     minItems: 3,
                     items: {
                         type: "boolean"
                     }
-                };
-                const res = getTemplate(core, core.rootSchema);
+                });
+                const res = getTemplate(core);
 
                 expect(res.length).to.deep.equal(3);
                 expect(res).to.deep.equal([false, false, false]);
             });
 
             it("should return default array", () => {
-                core.rootSchema = { type: "array",
+                core.setSchema({ type: "array",
                     minItems: 1,
                     "default": [true],
                     items: {
                         type: "boolean"
                     }
-                };
-                const res = getTemplate(core, core.rootSchema);
+                });
+                const res = getTemplate(core);
 
                 expect(res.length).to.deep.equal(1);
                 expect(res).to.deep.equal([true]);
             });
 
             it("should not override given default values", () => {
-                core.rootSchema = { type: "array",
+                core.setSchema({ type: "array",
                     minItems: 2,
                     "default": ["abba", "doors"],
                     items: {
                         type: "string",
                         "default": "elvis"
                     }
-                };
-                const res = getTemplate(core, core.rootSchema);
+                });
+                const res = getTemplate(core);
 
                 expect(res.length).to.deep.equal(2);
                 expect(res).to.deep.equal(["abba", "doors"]);
             });
 
             it("should extend given template data by default values", () => {
-                core.rootSchema = { type: "array",
+                core.setSchema({ type: "array",
                     minItems: 2,
                     "default": ["abba", "doors"],
                     items: {
                         type: "string"
                     }
-                };
-                const res = getTemplate(core, core.rootSchema, ["elvis"]);
+                });
+                const res = getTemplate(core, ["elvis"]);
 
                 expect(res.length).to.deep.equal(2);
                 expect(res).to.deep.equal(["elvis", "doors"]);
@@ -247,72 +247,72 @@ describe("getTemplate", () => {
             // - It’s ok to not provide all of the items:
             // https://spacetelescope.github.io/understanding-json-schema/reference/array.html#tuple-validation
             it("should return items in given order", () => {
-                core.rootSchema = { type: "array",
+                core.setSchema({ type: "array",
                     minItems: 2,
                     items: [
                         { type: "string" },
                         { type: "boolean" }
                     ]
-                };
-                const res = getTemplate(core, core.rootSchema);
+                });
+                const res = getTemplate(core);
 
                 expect(res).to.deep.equal(["", false]);
             });
 
             it("should replace input data", () => {
-                core.rootSchema = { type: "array",
+                core.setSchema({ type: "array",
                     minItems: 2,
                     items: [
                         { type: "object" },
                         { type: "boolean", "default": true }
                     ]
-                };
-                const res = getTemplate(core, core.rootSchema, [43]);
+                });
+                const res = getTemplate(core, [43]);
 
                 expect(res).to.deep.equal([{}, true]);
             });
 
             it("should convert input data for strings", () => {
-                core.rootSchema = { type: "array", minItems: 1,
+                core.setSchema({ type: "array", minItems: 1,
                     items: [{ type: "string" }]
-                };
-                const res = getTemplate(core, core.rootSchema, [43]);
+                });
+                const res = getTemplate(core, [43]);
 
                 expect(res).to.deep.equal(["43"]);
             });
 
             it("should convert input data for numbers", () => {
-                core.rootSchema = { type: "array", minItems: 1,
+                core.setSchema({ type: "array", minItems: 1,
                     items: [{ type: "number" }]
-                };
-                const res = getTemplate(core, core.rootSchema, ["43"]);
+                });
+                const res = getTemplate(core, ["43"]);
 
                 expect(res).to.deep.equal([43]);
             });
 
             it("should return default value for invalid number", () => {
-                core.rootSchema = { type: "array", minItems: 1,
+                core.setSchema({ type: "array", minItems: 1,
                     items: [{ type: "number" }]
-                };
-                const res = getTemplate(core, core.rootSchema, ["asd"]);
+                });
+                const res = getTemplate(core, ["asd"]);
 
                 expect(res).to.deep.equal([0]);
             });
 
             it("should convert input data for booleans", () => {
-                core.rootSchema = { type: "array", minItems: 1,
+                core.setSchema({ type: "array", minItems: 1,
                     items: [{ type: "boolean" }]
-                };
-                const res = getTemplate(core, core.rootSchema, ["false"]);
+                });
+                const res = getTemplate(core, ["false"]);
 
                 expect(res).to.deep.equal([false]);
             });
 
             it("should return default value for invalid boolean", () => {
-                core.rootSchema = { type: "array", minItems: 1,
+                core.setSchema({ type: "array", minItems: 1,
                     items: [{ type: "boolean" }]
-                };
-                const res = getTemplate(core, core.rootSchema, ["43"]);
+                });
+                const res = getTemplate(core, ["43"]);
 
                 expect(res).to.deep.equal([false]);
             });
@@ -321,22 +321,22 @@ describe("getTemplate", () => {
         describe(".items.oneOf", () => {
 
             it("should return template of first oneOf schema", () => {
-                core.rootSchema = { type: "array", minItems: 1,
+                core.setSchema({ type: "array", minItems: 1,
                     items: {
                         oneOf: [
                             { type: "string", "default": "target" },
                             { type: "number", "default": 9 }
                         ]
                     }
-                };
-                const res = getTemplate(core, core.rootSchema);
+                });
+                const res = getTemplate(core);
 
                 expect(res.length).to.deep.equal(1);
                 expect(res).to.deep.equal(["target"]);
             });
 
             it("should merge with input data", () => {
-                core.rootSchema = {
+                core.setSchema({
                     type: "array",
                     minItems: 1,
                     items: {
@@ -363,9 +363,9 @@ describe("getTemplate", () => {
                             { type: "number", "default": 9 }
                         ]
                     }
-                };
+                });
 
-                const res = getTemplate(core, core.rootSchema, [{ subtitle: "Subtitel" }]);
+                const res = getTemplate(core, [{ subtitle: "Subtitel" }]);
 
                 expect(res.length).to.deep.equal(1);
                 expect(res).to.deep.equal([{ title: "Standardtitel", subtitle: "Subtitel" }]);
@@ -376,13 +376,13 @@ describe("getTemplate", () => {
     describe("oneOf", () => {
 
         it("should return first schema for mixed types", () => {
-            core.rootSchema = {
+            core.setSchema({
                 oneOf: [
                     { type: "string", "default": "jane" },
                     { type: "number" }
                 ]
-            };
-            const res = getTemplate(core, core.rootSchema);
+            });
+            const res = getTemplate(core);
 
             expect(res).to.deep.equal("jane");
         });

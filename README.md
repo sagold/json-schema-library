@@ -48,7 +48,7 @@ the following methods
 | resolveOneOf      | schema, data, [pointer] : Schema      | returns the oneOf-schema for the passed data
 | resolveRef        | schema : Schema                       | resolves a $ref on a given schema-object
 | getSchema         | pointer, [data], [schema] : Schema    | Get the json-schema describing the `data` found at `pointer`
-| getTemplate       | schema, data : Mixed                  | returns a template object based of the given json-schema
+| getTemplate       | data, [schema] : Mixed                | returns a template object based of the given json-schema
 | setSchema         | schema                                | set or change the root-schema
 
 
@@ -104,7 +104,7 @@ const targetSchema = getSchema(core, '#/path/to/target', rootData);
 ```
 
 
-##### getTemplate(core, schema, data, rootSchema = schema)
+##### getTemplate(core, data, schema)
 > Generate data which is valid to the given json-schema. Additionally, a data object may be given, which will be
 extended by any missing items or properties.
 
@@ -112,8 +112,8 @@ extended by any missing items or properties.
 const Core = require("json-schema-library").cores.Draft04;
 const core = new Core();
 const baseData = core.getTemplate(
+    { other: true },
     { type: "object", properties: { target: { type: "string", default: "v" } } },
-    { other: true }
 ); // returns { other: true, target: "v" }
 ```
 
