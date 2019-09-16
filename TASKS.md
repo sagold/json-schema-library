@@ -27,6 +27,7 @@
 
 - `iterateSchema` renamed to `eachSchema`
 - `validate` and `isValid` changed signature from (schema, data, [pointer]) to (data, [schema], [pointer])
+- `getSchema` changed signature from (schema, data, [pointer]) to (pointer, [data], [schema])
 - `precompileSchema` renamed to `compileSchema`
 
 **Milestone** consistent feature support

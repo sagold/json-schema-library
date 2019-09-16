@@ -43,11 +43,11 @@ the following methods
 | constructor       | schema : instance                     | pass the root-schema in the constructor
 | each              | schema, data, callback, [pointer]     | Iterates over the data, passing value and its schema
 | step              | key, schema, data, [pointer] : Schema | step into a json-schema by the given key (property or index)
-| validate          | data, [schema], [pointer] : Array       | Get a list of validation errors
-| isValid           | data, [schema], [pointer] : Boolean     | Check if the given schema validates the data
+| validate          | data, [schema], [pointer] : Array     | Get a list of validation errors
+| isValid           | data, [schema], [pointer] : Boolean   | Check if the given schema validates the data
 | resolveOneOf      | schema, data, [pointer] : Schema      | returns the oneOf-schema for the passed data
 | resolveRef        | schema : Schema                       | resolves a $ref on a given schema-object
-| getSchema         | schema, data, [pointer] : Schema      | Get the json-schema describing the `data` found at `pointer`
+| getSchema         | pointer, [data], [schema] : Schema    | Get the json-schema describing the `data` found at `pointer`
 | getTemplate       | schema, data : Mixed                  | returns a template object based of the given json-schema
 | setSchema         | schema                                | set or change the root-schema
 
@@ -76,13 +76,15 @@ Core {
 
 #### Examples
 
-##### getSchema(core, schema, pointer, data)
+##### getSchema(core, pointer, [data], [schema])
 > Get the json-schema describing the `data` found at `pointer`.
+> The default json-schema-definitions can be resolved without any data as input: `core.getSchema('#/article/title')`. 
+> For any dynamic values (like `oneOf`, `definitions`) the data has to be passed in addition.
 
 ```js
 const Core = require("json-schema-library").cores.Draft04;
 const core = new Core(rootSchema);
-const targetSchema = core.getSchema(rootSchema, '#/path/to/target', rootData);
+const targetSchema = core.getSchema('#/path/to/target', rootData);
 ```
 
 Currently may also return an error:
@@ -98,7 +100,7 @@ Or using `getSchema` directly
 ```js
 const Core = require("json-schema-library").cores.Draft04;
 const core = new Core(rootSchema);
-const targetSchema = getSchema(core, rootSchema, '#/path/to/target', rootData);
+const targetSchema = getSchema(core, '#/path/to/target', rootData);
 ```
 
 
