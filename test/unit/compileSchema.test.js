@@ -4,6 +4,7 @@ const remotes = require("../../remotes");
 
 
 describe("compile", () => {
+    const FORCE_COMPILATION = true;
     afterEach(() => remotes.reset());
 
     describe("behaviour", () => {
@@ -200,9 +201,12 @@ describe("compile", () => {
         });
 
         it("should resolve id within remote", () => {
-            remotes["http://remotehost.com/schema"] = compile({
-                definitions: { target: { id: "#r", type: "integer" } }
-            });
+            remotes["http://remotehost.com/schema"] = compile(
+                {
+                    definitions: { target: { id: "#r", type: "integer" } }
+                },
+                FORCE_COMPILATION
+            );
             const schema = compile({ $ref: "http://remotehost.com/schema#" });
 
             const result = schema.getRef("http://remotehost.com/schema#r");
@@ -260,24 +264,30 @@ describe("compile", () => {
         });
 
         it("should resolve location independent identifier", () => {
-            const schema = compile({ definitions: { A: { id: "#foo", type: "integer" } } });
+            const schema = compile(
+                { definitions: { A: { id: "#foo", type: "integer" } } },
+                FORCE_COMPILATION
+            );
 
             const result = schema.getRef("#foo");
             expect(result).to.deep.equal({ id: "#foo", type: "integer" });
         });
 
         it("should resolve location independent identifier with base uri change in subschema", () => {
-            const schema = compile({
-                id: "http://localhost:1234/root",
-                definitions: {
-                    A: {
-                        id: "nested.json",
-                        definitions: {
-                            B: { id: "#foo", type: "integer" }
+            const schema = compile(
+                {
+                    id: "http://localhost:1234/root",
+                    definitions: {
+                        A: {
+                            id: "nested.json",
+                            definitions: {
+                                B: { id: "#foo", type: "integer" }
+                            }
                         }
                     }
-                }
-            });
+                },
+                FORCE_COMPILATION
+            );
 
             const result = schema.getRef("http://localhost:1234/nested.json#foo");
             expect(result).to.deep.eq({ id: "#foo", type: "integer" });
