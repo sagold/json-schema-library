@@ -230,7 +230,7 @@ const listOfAvailableOptions = getChildSchemaSelection(core, schema, "childKey")
 Creates a json-schema for the given input-data.
 
 ```js
-const baseSchema = getTemplate({ target: "" });
+const baseSchema = createSchemaOf({ target: "" });
 // returns {type: "object", properties: { target: "string"}},
 ```
 

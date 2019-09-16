@@ -2,6 +2,8 @@
 const expect = require("chai").expect;
 const resolveOneOf = require("../../lib/resolveOneOf.fuzzy");
 const Core = require("../../lib/cores/JsonEditor");
+const { DECLARATOR_ONEOF } = require("../../lib/config/settings");
+
 
 describe("resolveOneOf (fuzzy)", () => {
 
@@ -81,7 +83,7 @@ describe("resolveOneOf (fuzzy)", () => {
 
             it("should return schema matching oneOfProperty", () => {
                 core.rootSchema = {
-                    oneOfProperty: "name",
+                    [DECLARATOR_ONEOF]: "name",
                     oneOf: [
                         { type: "object", properties: { name: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
                         { type: "object", properties: { name: { type: "string", pattern: "^2$" }, title: { type: "number" } } },
@@ -97,7 +99,7 @@ describe("resolveOneOf (fuzzy)", () => {
 
             it("should return schema matching oneOfProperty even it is invalid", () => {
                 core.rootSchema = {
-                    oneOfProperty: "name",
+                    [DECLARATOR_ONEOF]: "name",
                     oneOf: [
                         { type: "object", properties: { name: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
                         { type: "object", properties: { name: { type: "string", pattern: "^2$" }, title: { type: "number" } } },
@@ -113,7 +115,7 @@ describe("resolveOneOf (fuzzy)", () => {
 
             it("should return an error if value at oneOfProperty is undefined", () => {
                 core.rootSchema = {
-                    oneOfProperty: "name",
+                    [DECLARATOR_ONEOF]: "name",
                     oneOf: [
                         { type: "object", properties: { name: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
                         { type: "object", properties: { name: { type: "string", pattern: "^2$" }, title: { type: "number" } } },
@@ -128,7 +130,7 @@ describe("resolveOneOf (fuzzy)", () => {
 
             it("should return an error if no oneOfProperty could be matched", () => {
                 core.rootSchema = {
-                    oneOfProperty: "name",
+                    [DECLARATOR_ONEOF]: "name",
                     oneOf: [
                         { type: "object", properties: { name: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
                         { type: "object", properties: { name: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
