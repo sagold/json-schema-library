@@ -14,8 +14,8 @@ module.exports = {
     each: require("./lib/each"), // iterate over data, receiving each data-entry with its schema
     eachSchema: require("./lib/eachSchema"), // iterates over a json-schemas type definitions
     getChildSchemaSelection: require("./lib/getChildSchemaSelection"), // get available child schemas
-    getSchema: require("./lib/getSchema"), // get schema of data
-    getTemplate: require("./lib/getTemplate"), // create data based which validates the given schema
+    getSchema: require("./lib/getSchema"), // get schema of datapointer
+    getTemplate: require("./lib/getTemplate"), // create data which is valid to the given schema
     getTypeOf: require("./lib/getTypeOf"), // returns the javascript datatype
     isValid: require("./lib/isValid"), // returns a boolean if the schema is valid
     SchemaService: require("./lib/SchemaService"),

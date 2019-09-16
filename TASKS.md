@@ -27,6 +27,7 @@
 
 - `iterateSchema` renamed to `eachSchema`
 - `validate` and `isValid` changed signature from (schema, data, [pointer]) to (data, [schema], [pointer])
+- `validateAsync` changed signature from (schema, data, [pointer], [onError]) to (data, [{ schema, pointer, onError }])
 - `getSchema` changed signature from (schema, data, [pointer]) to (pointer, [data], [schema])
 - `precompileSchema` renamed to `compileSchema`
 

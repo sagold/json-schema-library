@@ -141,7 +141,7 @@ const baseSchema = core.isValid("", { type: "number" });
 // returns false
 ```
 
-##### validateAsync(core, data, schema, step)
+##### validateAsync(core, data, options)
 > Asynchronous validation helper
 
 Optional support for onError helper, which is invoked for each error (after being resolved)
@@ -149,9 +149,9 @@ Optional support for onError helper, which is invoked for each error (after bein
 ```js
 const Core = require("json-schema-library").cores.Draft04;
 const core = new Core(rootSchema);
-// signature: Core, Schema, Data, [Pointer], [onErrorCallback] : Promise
-validateAsync(core, "", { type: "number" }, "#", function onError(err) {})
-    .then((allErrors) => {})
+// signature: Core, data, { onError: [onErrorCallback], schema: JSONSchema, pointer: [Pointer]} : Promise
+validateAsync(core, "", { onError: (err) => {}, schema: { type: "number" } })
+    .then(allErrors => {});
 ```
 
 ##### step(core, key, schema, data, rootSchema = schema)
