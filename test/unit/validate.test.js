@@ -81,10 +81,9 @@ describe("validate", () => {
             });
 
             it("should resolve references", () => {
-                core.rootSchema = {
+                core.setSchema({
                     definitions: { integer: { type: "integer" } }
-                };
-
+                });
                 const errors = validate(core, 3, { anyOf: [{ type: "null" }, { $ref: "#/definitions/integer" }] });
                 expect(errors).to.have.length(0);
             });
@@ -924,14 +923,14 @@ describe("validate", () => {
         describe("$ref", () => {
 
             it("should correctly validate data through nested $ref", () => {
-                core.rootSchema = {
+                core.setSchema({
                     $ref: "#/definitions/c",
                     definitions: {
                         a: { type: "integer" },
                         b: { $ref: "#/definitions/a" },
                         c: { $ref: "#/definitions/b" }
                     }
-                };
+                });
                 const errors = validate(core, "a");
 
                 expect(errors).to.have.length(1);
@@ -939,8 +938,7 @@ describe("validate", () => {
             });
 
             it("should correctly validate combination of remote, allOf, and allOf-$ref", () => {
-                const schema = { $ref: "http://json-schema.org/draft-04/schema#", _id: "input" };
-                core.rootSchema = schema;
+                core.setSchema({ $ref: "http://json-schema.org/draft-04/schema#", _id: "input" });
                 const errors = validate(core, { minLength: -1 });
 
                 expect(errors).to.have.length(1);
@@ -951,7 +949,7 @@ describe("validate", () => {
                 const remotes = require("../../remotes");
                 remotes["http://localhost:1234/integer.json"] = require("json-schema-test-suite/remotes/integer.json");
 
-                core.rootSchema = { $ref: "http://localhost:1234/integer.json", _id: "input" };
+                core.setSchema({ $ref: "http://localhost:1234/integer.json", _id: "input" });
                 const errors = validate(core, "not an integer");
 
                 expect(errors).to.have.length(1);

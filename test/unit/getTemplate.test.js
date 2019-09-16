@@ -113,6 +113,7 @@ describe("getTemplate", () => {
             });
         });
 
+
         describe("$ref", () => {
 
             it("should resolve $ref in object schema", () => {
@@ -124,16 +125,6 @@ describe("getTemplate", () => {
 
                 expect(res).to.deep.equal({ first: "john" });
             });
-
-            // it("should prefer default over default in $ref", () => {
-            //     core.setSchema({ type: "object",
-            //         properties: { first: { $ref: "#/definition/first", default: "asterix" } },
-            //         definition: { first: { type: "string", default: "john" } }
-            //     };
-            //     const res = getTemplate(core, core.rootSchema);
-
-            //     expect(res).to.deep.equal({ first: "asterix" });
-            // });
         });
 
 
