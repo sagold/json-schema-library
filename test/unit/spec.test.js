@@ -8,27 +8,27 @@ const remotes = require("../../remotes");
 describe("benchmark spec tests", () => {
 
     // this is wanted fuzzy behaviour and collision on validation...
-    it.skip("should correctly validate complex oneOf type", () => {
-        const core = new JsonEditor({
-            oneOf: [
-                {
-                    properties: {
-                        bar: { type: "integer" }
-                    },
-                    required: ["bar"]
-                },
-                {
-                    properties: {
-                        foo: { type: "string" }
-                    },
-                    required: ["foo"]
-                }
-            ]
-        });
-        const errors = core.validate({ foo: "baz", bar: 2 });
-        console.log("errors", JSON.stringify(errors));
-        expect(errors.length).to.eq(1, "both oneOf valid (complex)");
-    });
+    // it.skip("should correctly validate complex oneOf type", () => {
+    //     const core = new JsonEditor({
+    //         oneOf: [
+    //             {
+    //                 properties: {
+    //                     bar: { type: "integer" }
+    //                 },
+    //                 required: ["bar"]
+    //             },
+    //             {
+    //                 properties: {
+    //                     foo: { type: "string" }
+    //                 },
+    //                 required: ["foo"]
+    //             }
+    //         ]
+    //     });
+    //     const errors = core.validate({ foo: "baz", bar: 2 });
+    //     console.log("errors", JSON.stringify(errors));
+    //     expect(errors.length).to.eq(1, "both oneOf valid (complex)");
+    // });
 
     // this fails in benchmark...
     it("should invalidate wrong schema for remote schema", () => {

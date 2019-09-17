@@ -7,10 +7,10 @@
 > footprint or high performance, this package focuses on exposing utilities for browser and node environments and
 > lessens the pain to build custom tools around json-schema.
 
-`npm i json-schema-library`.
+`npm i json-schema-library -S` or `yarn add json-schema-library -S`
 
 
-- This package is tested on node v6.9.1 and in latest Browsers.
+- This package is tested on node v10.16 and in latest Browsers.
 - This library currently supports all draft4 features (@see [benchmark](https://github.com/ebdrup/json-schema-benchmark))
 
 
@@ -41,15 +41,15 @@ the following methods
 | method            | signature                             | description
 | ----------------- | ------------------------------------- | -------------------------------------------------------------
 | constructor       | schema : instance                     | pass the root-schema in the constructor
-| each              | schema, data, callback, [pointer]     | Iterates over the data, passing value and its schema
-| step              | key, schema, data, [pointer] : Schema | step into a json-schema by the given key (property or index)
-| validate          | data, [schema], [pointer] : Array     | Get a list of validation errors
-| isValid           | data, [schema], [pointer] : Boolean   | Check if the given schema validates the data
-| resolveOneOf      | schema, data, [pointer] : Schema      | returns the oneOf-schema for the passed data
-| resolveRef        | schema : Schema                       | resolves a $ref on a given schema-object
+| each              | data, callback, [schema], [pointer]   | Iterates over the data, passing value and its schema
 | getSchema         | pointer, [data], [schema] : Schema    | Get the json-schema describing the `data` found at `pointer`
 | getTemplate       | data, [schema] : Mixed                | returns a template object based of the given json-schema
-| setSchema         | schema                                | set or change the root-schema
+| isValid           | data, [schema], [pointer] : Boolean   | Check if the given schema validates the data
+| resolveOneOf      | data, [schema], [pointer] : Schema    | returns the oneOf-schema for the passed data
+| resolveRef        | schema : Schema                       | resolves a $ref on a given schema-object
+| setSchema         | schema                                | set a new (root) schema
+| step              | key, schema, data, [pointer] : Schema | step into a json-schema by the given key (property or index)
+| validate          | data, [schema], [pointer] : Array     | Get a list of validation errors
 
 
 Each core holds some mapping objects, that may be modified
@@ -104,7 +104,7 @@ const targetSchema = getSchema(core, '#/path/to/target', rootData);
 ```
 
 
-##### getTemplate(core, data, schema)
+##### getTemplate(core, data, [schema])
 > Generate data which is valid to the given json-schema. Additionally, a data object may be given, which will be
 extended by any missing items or properties.
 
@@ -117,7 +117,7 @@ const baseData = core.getTemplate(
 ); // returns { other: true, target: "v" }
 ```
 
-##### validate(core, data, schema, step)
+##### validate(core, data, [schema])
 > Get a list of validation errors
 
 ```js
@@ -129,7 +129,7 @@ const customSchemaErrors = core.validate("", { type: "number" });
 // returns { type: "TypeError" }
 ```
 
-##### isValid(core, data, schema, step)
+##### isValid(core, data, [schema])
 > Check if the given schema validates the data
 
 basically `core.validate("", { type: "number" }).length === 0`
@@ -141,7 +141,7 @@ const baseSchema = core.isValid("", { type: "number" });
 // returns false
 ```
 
-##### validateAsync(core, data, options)
+##### validateAsync(core, data, [options])
 > Asynchronous validation helper
 
 Optional support for onError helper, which is invoked for each error (after being resolved)
@@ -154,20 +154,20 @@ validateAsync(core, "", { onError: (err) => {}, schema: { type: "number" } })
     .then(allErrors => {});
 ```
 
-##### step(core, key, schema, data, rootSchema = schema)
+##### step(core, key, schema, data)
 > Get the json-schema of a child-property
 
 ```js
 const Core = require("json-schema-library").cores.Draft04;
 const core = new Core(rootSchema);
-const baseSchema = core.step(
-    { type: "object", properties: { target: {type: "string"}} },
+const baseSchema = core.step(   
+    "target"
+    { type: "object", properties: { target: { type: "string" } } },
     { target: "value" }
-    "target", 
 ); // returns {type: "string"}
 ```
 
-##### each(core, data, schema, callback)
+##### each(core, data, callback, [schema])
 > Iterates over each data-item (object, array and value); passing the value and its corresponding schema
 
 ```js
@@ -179,7 +179,7 @@ const core = new Core({
         { type: "string" }
     ]
 });
-core.each(core.rootSchema, [5, "nine"], (schema, value, pointer) => {
+core.each([5, "nine"], (schema, value, pointer) => {
 // 1. schema = { type: "array", items: [...] }, data = [5, "nine"], pointer = #
 // 2. schema = { type: "number" }, data = 5, pointer = #/0
 // 3. schema = { type: "string" }, data = "nine", pointer = #/1
@@ -211,19 +211,11 @@ addValidator.error(core, "minLengthError", (data) => ({
 
 ### Additional helpers
 
-#### SchemaService(schema)
-Retrieve the json-schema at the given json-pointer
-
-```js
-const schemaService = new SchemaService(rootSchema); // default core 'draft04'
-const targetSchema = schemaService.get('#/path/to/target', rootData);
-```
-
-#### getChildSchemaSelection
+#### getChildSchemaSelection(core, key, schema)
 Returns a list of possible schemas for the given child-property or index
 
 ```js
-const listOfAvailableOptions = getChildSchemaSelection(core, schema, "childKey");
+const listOfAvailableOptions = getChildSchemaSelection(core, "childKey", schema);
 ```
 
 #### createSchemaOf(data)
@@ -234,7 +226,7 @@ const baseSchema = createSchemaOf({ target: "" });
 // returns {type: "object", properties: { target: "string"}},
 ```
 
-#### eachSchema
+#### eachSchema(schema, callback)
 Iterate the schema, invoking the callback function for each type (schema) definition
 
 ```js
@@ -266,7 +258,7 @@ const schema = {
     ]
 }
 
-const result = resolveOneOf(core, schema, { id: "2", title: "not a number" })
+const result = resolveOneOf(core, { id: "2", title: "not a number" }, schema);
 // will always return (even if invalid)
 // { type: "object", properties: { id: { type: "string", pattern: "^2$" }, title: { type: "number" } } }
 ```

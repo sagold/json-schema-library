@@ -5,16 +5,18 @@ const Core = require("../../lib/cores/Draft04");
 describe("each", () => {
 
     let core;
-    before(() => (core = new Core()));
+    before(() => {
+        core = new Core();
+        each.core = core;
+    });
 
 
     it("should call callback with schema, value and pointer", () => {
         const calls = [];
-        each(
-            core,
-            { type: "number" },
+        core.each(
             5,
-            (...args) => calls.push(args)
+            (...args) => calls.push(args),
+            { type: "number" }
         );
 
         expect(calls).to.have.length(1);
@@ -25,11 +27,10 @@ describe("each", () => {
 
     it("should callback for array and all array items", () => {
         const calls = [];
-        each(
-            core,
-            { type: "array", items: { type: "number" } },
+        core.each(
             [5, 9],
-            (...args) => calls.push(args)
+            (...args) => calls.push(args),
+            { type: "array", items: { type: "number" } }
         );
 
         expect(calls).to.have.length(3);
@@ -42,11 +43,10 @@ describe("each", () => {
 
     it("should callback for array and pick correct schema forEach item", () => {
         const calls = [];
-        each(
-            core,
-            { type: "array", items: [{ type: "number" }, { type: "string" }] },
+        core.each(
             [5, "nine"],
-            (...args) => calls.push(args)
+            (...args) => calls.push(args),
+            { type: "array", items: [{ type: "number" }, { type: "string" }] }
         );
 
         expect(calls).to.have.length(3);
@@ -59,11 +59,10 @@ describe("each", () => {
 
     it("should callback for object and all properties", () => {
         const calls = [];
-        each(
-            core,
-            { type: "object", properties: { a: { type: "number" }, b : { type: "number" } } },
+        core.each(
             { a: 5, b: 9 },
-            (...args) => calls.push(args)
+            (...args) => calls.push(args),
+            { type: "object", properties: { a: { type: "number" }, b : { type: "number" } } }
         );
 
         expect(calls).to.have.length(3);

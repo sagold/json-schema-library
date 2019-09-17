@@ -1,10 +1,10 @@
 # Tasks
 
-- [ ] Improve -- _oneOf-Error messages_ (specific errors where possible, instead of one-of-error)
-
 
 ### possibly
 
+- [ ] Resolve $ref local json-pointer without requiring compiled schema
+- [ ] Improve -- _oneOf-Error messages_ (specific errors where possible, instead of one-of-error)
 - [ ] Refactor -- move type validation as keyword to validation/keywords
 - [ ] Refactor -- Use addValidation to setup base validation mappings?
 - [ ] latest draft support
@@ -28,6 +28,8 @@
 - `validateAsync` changed signature from (schema, data, [pointer], [onError]) to (data, [{ schema, pointer, onError }])
 - `getTemplate` changed signature from (schema, data) to (data, [schema])
 - `getSchema` changed signature from (schema, data, [pointer]) to (pointer, [data], [schema])
+- `each` changed signature from (schema, data, [pointer]) to (data, [schema], [pointer])
+- `resolveOneOf` changed signature from (schema, data, [pointer]) to (data, [schema], [pointer])
 - `precompileSchema` renamed to `compileSchema`
 
 **Milestone** consistent feature support

@@ -9,46 +9,46 @@ describe("getChildSchemaSelection", () => {
     before(() => (core = new Core()));
 
     it("should return a single object-schema as list", () => {
-        core.rootSchema = { type: "object",
+        const result = getChildSchemaSelection(core, "b", {
+            type: "object",
             properties: {
                 a: { type: "string" },
                 b: { type: "number" }
             }
-        };
-
-        const result = getChildSchemaSelection(core, core.rootSchema, "b");
+        });
 
         expect(result).to.have.length(1);
-        expect(result[0]).to.eq(core.rootSchema.properties.b);
+        expect(result).to.deep.eq([{ type: "number" }]);
     });
 
     it("should return a single array-item as list", () => {
-        core.rootSchema = { type: "array",
+        const result = getChildSchemaSelection(core, 0, {
+            type: "array",
             items: [
                 { type: "string" },
                 { type: "number" }
             ]
-        };
-
-        const result = getChildSchemaSelection(core, core.rootSchema, 0);
+        });
 
         expect(result).to.have.length(1);
-        expect(result[0]).to.eq(core.rootSchema.items[0]);
+        expect(result).to.deep.eq([{ type: "string" }]);
     });
 
     it("sould return list of oneOf elements", () => {
-        core.rootSchema = { type: "array",
+        const result = getChildSchemaSelection(core, "b", {
+            type: "array",
             items: {
                 oneOf: [
                     { type: "string" },
                     { type: "number" }
                 ]
             }
-        };
-
-        const result = getChildSchemaSelection(core, core.rootSchema, "b");
+        });
 
         expect(result).to.have.length(2);
-        expect(result).to.deep.eq(core.rootSchema.items.oneOf);
+        expect(result).to.deep.deep.eq([
+            { type: "string" },
+            { type: "number" }
+        ]);
     });
 });

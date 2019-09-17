@@ -37,26 +37,26 @@ describe("validate.Draft04", () => {
 
         it("should return a matching schema", () => {
             const result = core.resolveOneOf(
+                5,
                 {
                     oneOf: [
                         { type: "string" },
                         { type: "number" }
                     ]
-                },
-                5
+                }
             );
             expect(result).to.deep.equal({ type: "number" });
         });
 
         it("should return an error if a matching schema could not be found", () => {
             const result = core.resolveOneOf(
+                [],
                 {
                     oneOf: [
                         { type: "string" },
                         { type: "number" }
                     ]
-                },
-                []
+                }
             );
             expect(result.type).to.eq("error");
             expect(result.name).to.eq("OneOfError");
@@ -64,14 +64,14 @@ describe("validate.Draft04", () => {
 
         it("should return an error if multiple schemas match the data", () => {
             const result = core.resolveOneOf(
+                4,
                 {
                     oneOf: [
                         { type: "string" },
                         { type: "number", minimum: 2 },
                         { type: "number", minimum: 3 }
                     ]
-                },
-                4
+                }
             );
             expect(result.type).to.eq("error");
             expect(result.name).to.eq("MultipleOneOfError");

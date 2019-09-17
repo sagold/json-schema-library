@@ -11,32 +11,30 @@ describe("resolveOneOf (fuzzy)", () => {
     beforeEach(() => (core = new Core()));
 
     it("should return schema with matching type", () => {
-        core.rootSchema = {
+        const res = resolveOneOf(core, 4, {
             oneOf: [
                 { type: "string" },
                 { type: "number" },
                 { type: "object" }
             ]
-        };
-        const res = resolveOneOf(core, core.rootSchema, 4);
+        });
 
         expect(res).to.deep.eq({ type: "number" });
     });
 
     it("should return schema with matching pattern", () => {
-        core.rootSchema = {
+        const res = resolveOneOf(core, "anasterixcame", {
             oneOf: [
                 { type: "string", pattern: "obelix" },
                 { type: "string", pattern: "asterix" }
             ]
-        };
-        const res = resolveOneOf(core, core.rootSchema, "anasterixcame");
+        });
 
         expect(res).to.deep.eq({ type: "string", pattern: "asterix" });
     });
 
     it("should resolve $ref before schema", () => {
-        core.rootSchema = {
+        core.setSchema({
             definitions: {
                 "a": { type: "string", pattern: "obelix" },
                 "b": { type: "string", pattern: "asterix" }
@@ -45,8 +43,8 @@ describe("resolveOneOf (fuzzy)", () => {
                 { $ref: "#/definitions/a" },
                 { $ref: "#/definitions/b" }
             ]
-        };
-        const res = resolveOneOf(core, core.rootSchema, "anasterixcame");
+        });
+        const res = resolveOneOf(core, "anasterixcame");
 
         expect(res).to.deep.eq({ type: "string", pattern: "asterix" });
     });
@@ -54,26 +52,24 @@ describe("resolveOneOf (fuzzy)", () => {
     describe("object", () => {
 
         it("should return schema with matching properties", () => {
-            core.rootSchema = {
+            const res = resolveOneOf(core, { description: "..." }, {
                 oneOf: [
                     { type: "object", properties: { title: { type: "string" } } },
                     { type: "object", properties: { description: { type: "string" } } },
                     { type: "object", properties: { content: { type: "string" } } }
                 ]
-            };
-            const res = resolveOneOf(core, core.rootSchema, { description: "..." });
+            });
 
             expect(res).to.deep.eq({ type: "object", properties: { description: { type: "string" } } });
         });
 
         it("should return schema matching nested properties", () => {
-            core.rootSchema = {
+            const res = resolveOneOf(core, { title: "asterix" }, {
                 oneOf: [
                     { type: "object", properties: { title: { type: "number" } } },
                     { type: "object", properties: { title: { type: "string" } } }
                 ]
-            };
-            const res = resolveOneOf(core, core.rootSchema, { title: "asterix" });
+            });
 
             expect(res).to.deep.eq({ type: "object", properties: { title: { type: "string" } } });
         });
@@ -82,61 +78,65 @@ describe("resolveOneOf (fuzzy)", () => {
         describe("oneOfProperty", () => {
 
             it("should return schema matching oneOfProperty", () => {
-                core.rootSchema = {
+                const res = resolveOneOf(core, { name: "2", title: 123 }, {
                     [DECLARATOR_ONEOF]: "name",
                     oneOf: [
                         { type: "object", properties: { name: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
                         { type: "object", properties: { name: { type: "string", pattern: "^2$" }, title: { type: "number" } } },
                         { type: "object", properties: { name: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
                     ]
-                };
-                const res = resolveOneOf(core, core.rootSchema, { name: "2", title: 123 });
+                });
 
-                expect(res).to.deep.eq(
-                    { type: "object", properties: { name: { type: "string", pattern: "^2$" }, title: { type: "number" } } }
-                );
+                expect(res).to.deep.eq({
+                    type: "object",
+                    properties: {
+                        name: { type: "string", pattern: "^2$" },
+                        title: { type: "number" }
+                    }
+                });
             });
 
             it("should return schema matching oneOfProperty even it is invalid", () => {
-                core.rootSchema = {
+                const res = resolveOneOf(core, { name: "2", title: "not a number" }, {
                     [DECLARATOR_ONEOF]: "name",
                     oneOf: [
                         { type: "object", properties: { name: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
                         { type: "object", properties: { name: { type: "string", pattern: "^2$" }, title: { type: "number" } } },
                         { type: "object", properties: { name: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
                     ]
-                };
-                const res = resolveOneOf(core, core.rootSchema, { name: "2", title: "not a number" });
+                });
 
-                expect(res).to.deep.eq(
-                    { type: "object", properties: { name: { type: "string", pattern: "^2$" }, title: { type: "number" } } }
-                );
+                expect(res).to.deep.eq({
+                    type: "object",
+                    properties: {
+                        name: { type: "string", pattern: "^2$" },
+                        title: { type: "number" }
+                    }
+                });
             });
 
             it("should return an error if value at oneOfProperty is undefined", () => {
-                core.rootSchema = {
+                const res = resolveOneOf(core, { title: "not a number" }, {
                     [DECLARATOR_ONEOF]: "name",
                     oneOf: [
                         { type: "object", properties: { name: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
                         { type: "object", properties: { name: { type: "string", pattern: "^2$" }, title: { type: "number" } } },
                         { type: "object", properties: { name: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
                     ]
-                };
-                const res = resolveOneOf(core, core.rootSchema, { title: "not a number" });
+                });
 
                 expect(res.type).to.eq("error");
                 expect(res.name).to.eq("MissingOneOfPropertyError");
             });
 
             it("should return an error if no oneOfProperty could be matched", () => {
-                core.rootSchema = {
+                const res = resolveOneOf(core, { name: "2", title: "not a number" }, {
                     [DECLARATOR_ONEOF]: "name",
                     oneOf: [
                         { type: "object", properties: { name: { type: "string", pattern: "^1$" }, title: { type: "number" } } },
                         { type: "object", properties: { name: { type: "string", pattern: "^3$" }, title: { type: "number" } } }
                     ]
-                };
-                const res = resolveOneOf(core, core.rootSchema, { name: "2", title: "not a number" });
+                });
 
                 expect(res.type).to.eq("error");
                 expect(res.name).to.eq("OneOfPropertyError");
@@ -148,34 +148,32 @@ describe("resolveOneOf (fuzzy)", () => {
 
             it("should return schema with least missing properties", () => {
                 const t = { type: "number" };
-                core.rootSchema = {
+                const res = resolveOneOf(core, { a: 0, b: 1 }, {
                     oneOf: [
                         { type: "object", properties: { "a": t, "c": t, "d": t } },
                         { type: "object", properties: { "a": t, "b": t, "c": t } },
                         { type: "object", properties: { "a": t, "d": t, "e": t } }
                     ]
-                };
-                const res = resolveOneOf(core, core.rootSchema, { a: 0, b: 1 });
+                });
 
                 expect(res).to.deep.eq({ type: "object", properties: { "a": t, "b": t, "c": t } });
             });
 
             it("should only count properties that match the schema", () => {
                 const t = { type: "number" };
-                core.rootSchema = {
+                const res = resolveOneOf(core, { a: true, b: 1 }, {
                     oneOf: [
                         { type: "object", properties: { "a": { type: "string" }, "b": t, "c": t } },
                         { type: "object", properties: { "a": { type: "boolean" }, "b": t, "d": t } },
                         { type: "object", properties: { "a": { type: "number" }, "b": t, "e": t } }
                     ]
-                };
-                const res = resolveOneOf(core, core.rootSchema, { a: true, b: 1 });
+                });
 
                 expect(res).to.deep.eq({ type: "object", properties: { "a": { type: "boolean" }, "b": t, "d": t } });
             });
 
             it("should find correct pay type", () => {
-                core.rootSchema = {
+                core.setSchema({
                     type: "object",
                     oneOf: [
                         { type: "object", properties: {
@@ -208,8 +206,8 @@ describe("resolveOneOf (fuzzy)", () => {
                             }
                         } }
                     ]
-                };
-                const res = resolveOneOf(core, core.rootSchema, {
+                });
+                const res = resolveOneOf(core, {
                     type: "teaser",
                     redirectUrl: "http://gfx.sueddeutsche.de/test/pay/article.html"
                 });
@@ -237,7 +235,7 @@ describe("resolveOneOf (fuzzy)", () => {
 
         it("should return oneOfError for invalid data", () => {
             // bug found
-            core.rootSchema = {
+            const res = resolveOneOf(core, { content: "content" }, {
                 oneOf: [
                     {
                         type: "object",
@@ -249,8 +247,8 @@ describe("resolveOneOf (fuzzy)", () => {
                         }
                     }
                 ]
-            };
-            const res = resolveOneOf(core, core.rootSchema, { content: "content" });
+            });
+
             expect(res.type).to.eq("error");
             expect(res.name).to.eq("OneOfError");
         });
