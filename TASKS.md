@@ -1,15 +1,17 @@
 # Tasks
 
+- [ ] remove hard coded schema interpretation
+- [ ] Improve -- _oneOf-Error messages_ (specific errors where possible, instead of one-of-error)
+
 
 ### possibly
 
 - [ ] Resolve $ref local json-pointer without requiring compiled schema
-- [ ] Improve -- _oneOf-Error messages_ (specific errors where possible, instead of one-of-error)
 - [ ] Refactor -- move type validation as keyword to validation/keywords
 - [ ] Refactor -- Use addValidation to setup base validation mappings?
 - [ ] latest draft support
 - [ ] improve performance
-- [ ] -- Features -- Helper to find a json- and json-schema-pointer
+- [ ] -- Feature -- Helper to find a json- and json-schema-pointer
 
 
 ## 2019
@@ -34,11 +36,10 @@
 
 **Milestone** consistent feature support
 
-- [ ] remove hard coded schema interpretation
 - [✓] no modifications on remote-object
 - [✓] rootSchema always compiled
 - [✓] Add missing 'step' support for allOf and anyOf type definitions
-- [ ] Add missing 'getTemplate' support for allOf and anyOf type definitions
+- [✓] Add missing 'getTemplate' support for allOf and anyOf object and array definitions
 - [✓] Complete schema support in iterateSchema
 
 

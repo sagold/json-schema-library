@@ -24,6 +24,7 @@ describe("getTemplate", () => {
         expect(res).to.deep.equal("first");
     });
 
+
     describe("boolean", () => {
         it("should set default value for boolean", () => {
             core.setSchema({ type: "boolean", default: false });
@@ -47,9 +48,9 @@ describe("getTemplate", () => {
         });
     });
 
-    describe("object", () => {
 
-        describe(".properties", () => {
+    describe("object", () => {
+        describe("properties", () => {
 
             it("should return defined properties of object", () => {
                 core.setSchema({ type: "object",
@@ -67,7 +68,7 @@ describe("getTemplate", () => {
                 core.setSchema({ type: "object",
                     properties: {
                         first: { type: "boolean", default: true },
-                        second: { type: "boolean", default: false },
+                        second: { type: "boolean", default: false }
                     }
                 });
                 const res = getTemplate(core, { first: false, second: true });
@@ -128,7 +129,7 @@ describe("getTemplate", () => {
         });
 
 
-        describe(".oneOf", () => {
+        describe("oneOf", () => {
 
             it("should return template of first oneOf schema", () => {
                 core.setSchema({ type: "object",
@@ -158,11 +159,60 @@ describe("getTemplate", () => {
                 expect(res).to.deep.equal({ value: 111, test: "test" });
             });
         });
+
+
+        describe("allOf", () => {
+
+            it("should create template for merged allOf schema", () => {
+                core.setSchema({ type: "object",
+                    allOf: [
+                        {
+                            properties: {
+                                name: { type: "string", default: "jane" }
+                            }
+                        },
+                        {
+                            properties: {
+                                stage: { type: "string", default: "test" }
+                            }
+                        }
+                    ]
+                });
+                const res = getTemplate(core, { name: "john" });
+
+                expect(res).to.deep.equal({ name: "john", stage: "test" });
+            });
+        });
+
+
+        describe("anyOf", () => {
+
+            it("should create template for first anyOf schema", () => {
+                core.setSchema({ type: "object",
+                    anyOf: [
+                        {
+                            properties: {
+                                name: { type: "string", default: "jane" },
+                                stage: { type: "string", default: "develop" }
+                            }
+                        },
+                        {
+                            properties: {
+                                stage: { type: "number", default: 0 }
+                            }
+                        }
+                    ]
+                });
+                const res = getTemplate(core, { name: "john" });
+
+                expect(res).to.deep.equal({ name: "john", stage: "develop" });
+            });
+        });
     });
 
 
     describe("array", () => {
-        describe(".items:Object", () => {
+        describe("items:Object", () => {
 
             it("should return empty array if minItems = 0", () => {
                 core.setSchema({ type: "array",
@@ -232,7 +282,8 @@ describe("getTemplate", () => {
             });
         });
 
-        describe(".items:Array", () => {
+
+        describe("items:Array", () => {
             // - Tuple validation is useful when the array is a collection of items where each has a different schema
             // and the ordinal index of each item is meaningful.
             // - It’s ok to not provide all of the items:
@@ -309,7 +360,8 @@ describe("getTemplate", () => {
             });
         });
 
-        describe(".items.oneOf", () => {
+
+        describe("items.oneOf", () => {
 
             it("should return template of first oneOf schema", () => {
                 core.setSchema({ type: "array", minItems: 1,
@@ -362,7 +414,72 @@ describe("getTemplate", () => {
                 expect(res).to.deep.equal([{ title: "Standardtitel", subtitle: "Subtitel" }]);
             });
         });
+
+
+        describe("items.allOf", () => {
+
+            it("should create template for merged allOf schema", () => {
+                core.setSchema({
+                    type: "array",
+                    minItems: 2,
+                    items: {
+                        type: "object",
+                        allOf: [
+                            {
+                                properties: {
+                                    title: { type: "string", default: "title" }
+                                }
+                            },
+                            {
+                                properties: {
+                                    caption: { type: "string", default: "caption" }
+                                }
+                            }
+                        ]
+                    }
+                });
+
+                const res = getTemplate(core, [{ "title": "given-title" }]);
+                expect(res).to.deep.equal([
+                    { "title": "given-title", "caption": "caption" },
+                    { "title": "title", "caption": "caption" }
+                ]);
+            });
+        });
+
+
+        describe("items.anyOf", () => {
+
+            it("should create template for first anyOf schema", () => {
+                core.setSchema({
+                    type: "array",
+                    minItems: 2,
+                    items: {
+                        type: "object",
+                        anyOf: [
+                            {
+                                properties: {
+                                    title: { type: "string", default: "title" }
+                                }
+                            },
+                            {
+                                properties: {
+                                    caption: { type: "string", default: "caption" }
+                                }
+                            }
+                        ]
+                    }
+                });
+
+                const res = getTemplate(core, [{ "title": "given-title" }]);
+                expect(res).to.deep.equal([
+                    { "title": "given-title" },
+                    { "title": "title" }
+                ]);
+            });
+        });
     });
+
 
     describe("oneOf", () => {
 

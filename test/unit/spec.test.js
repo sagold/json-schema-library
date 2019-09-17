@@ -30,20 +30,6 @@ describe("benchmark spec tests", () => {
     //     expect(errors.length).to.eq(1, "both oneOf valid (complex)");
     // });
 
-    // this fails in benchmark...
-    it("should invalidate wrong schema for remote schema", () => {
-        // remotes["http://json-schema.org/draft-04/schema"] = compile(require("../../remotes/draft04.json"));
-        const core = new Draft04({ $ref: "http://json-schema.org/draft-04/schema#" });
-
-        const isValid = core.isValid({
-            definitions: {
-                foo: { type: 1 }
-            }
-        });
-
-        expect(isValid).to.eq(false, "data should not be valid");
-    });
-
     it("should correctly validate remote schema", () => {
         const core = new Draft04({ $ref: "http://json-schema.org/draft-04/schema#" });
 
@@ -54,6 +40,19 @@ describe("benchmark spec tests", () => {
         });
 
         expect(isValid).to.eq(true, "data should be valid");
+    });
+
+    it("should correctly validate remote schema with invalid data", () => {
+        // remotes["http://json-schema.org/draft-04/schema"] = compile(require("../../remotes/draft04.json"));
+        const core = new Draft04({ $ref: "http://json-schema.org/draft-04/schema#" });
+
+        const isValid = core.isValid({
+            definitions: {
+                foo: { type: 1 }
+            }
+        });
+
+        expect(isValid).to.eq(false, "data should not be valid");
     });
 
     it("should correctly validate recursive references between schemas", () => {
@@ -103,7 +102,7 @@ describe("benchmark spec tests", () => {
         expect(errors.length).to.eq(1);
     });
 
-    it("should resolve base URI change base URI change ref valid", () => {
+    it("should resolve: base URI change base URI change ref valid", () => {
         remotes["http://localhost:1234/folder/folderInteger.json"] = compile(
             require("json-schema-test-suite/remotes/folder/folderInteger.json")
         );
@@ -116,7 +115,6 @@ describe("benchmark spec tests", () => {
         });
 
         const errors = core.validate([[1]]);
-        // console.log(JSON.stringify(errors, null, 2));
         expect(errors.length).to.eq(0);
     });
 });
