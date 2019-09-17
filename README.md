@@ -14,10 +14,18 @@
 - This library currently supports all draft4 features (@see [benchmark](https://github.com/ebdrup/json-schema-benchmark))
 
 
+1. [Breaking Changes](#breaking-changes)
 1. [Overview](#overview)
     1. [Core](#core)
     1. [Add Custom Validators](#add-custom-validators)
 1. [Custom Extensions](#custom-extensions)
+
+
+## Breaking Changes
+
+1. with version `v4.0.0` the api has changed in order to use the defined (root) schema in core as default where 
+    possible. This means, most methods have a a changed signature, where `data` is passed before an optional `schema` argument. Check the [Core Overview](#core) for the current signature
+2. additionally `iterateSchema` has been renamed to `eachSchema` for consistency
 
 
 ## Overview
