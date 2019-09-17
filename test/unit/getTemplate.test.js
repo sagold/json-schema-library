@@ -24,6 +24,35 @@ describe("getTemplate", () => {
         expect(res).to.deep.equal("first");
     });
 
+    it("should not modify input schema", () => {
+        const schema = {
+            type: "object",
+            properties: {
+                title: { type: "string", default: "title" },
+                list: {
+                    type: "array",
+                    items: {
+                        allOf: [
+                            { type: "object" },
+                            { properties: { index: { type: "number", default: 4 } } }
+                        ]
+                    }
+                },
+                author: {
+                    anyOf: [{ type: "string", default: "jane" }, { type: "string", default: "john" }]
+                },
+                source: {
+                    type: "string",
+                    enum: ["dpa", "getty"]
+                }
+            }
+        };
+        const originalSchema = JSON.stringify(schema);
+        core.setSchema(schema);
+        getTemplate(core, {}, schema);
+        expect(JSON.stringify(schema)).to.deep.equal(originalSchema);
+    });
+
 
     describe("boolean", () => {
         it("should set default value for boolean", () => {
@@ -125,6 +154,40 @@ describe("getTemplate", () => {
                 const res = getTemplate(core);
 
                 expect(res).to.deep.equal({ first: "john" });
+            });
+
+            it("should follow $ref only once", () => {
+                core.setSchema({
+                    type: "object",
+                    properties: {
+                        value: { type: "string", default: "node" },
+                        nodes: {
+                            type: "array",
+                            minItems: 1,
+                            items: {
+                                $ref: "#"
+                            }
+                        }
+                    }
+                });
+                const res = core.getTemplate({});
+
+                expect(res).to.deep.equal({
+                    value: "node",
+                    nodes: [
+                        {
+                            value: "node",
+                            nodes: []
+                        }
+                    ]
+                });
+            });
+
+            // should not follow $ref to infinity
+            it("should create template of draft04", () => {
+                core.setSchema(require("../../remotes/draft04.json"));
+                const res = core.getTemplate({});
+                expect(Object.prototype.toString.call(res)).to.eq("[object Object]");
             });
         });
 

@@ -16,12 +16,15 @@
 
 ## 2019
 
+### version 4.0
+
 - [✓] -- Fix -- latest benchmark tests
 - [✓] -- Fix -- iterate schema (using typeDefs)
 - [✓] -- Fix -- scopes per schema-instance
 - [✓] -- Fix -- insane $ref resolution 'node' can be in 'root/node' or 'root/folder/node'
 - [✓] -- Refactor -- remove duplication from resolveRef.strict and resolveRef.withOverwrite
 - [✓] -- Change -- improve function apis (param order, rootSchema per default)
+- [✓] -- Fix -- `getTemplate` to resolve $ref to infinity
 
 **Breaking Changes**
 
