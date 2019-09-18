@@ -9,6 +9,7 @@ module.exports = {
     },
     addSchema: require("./lib/addSchema"), // add a schema to be references via $ref
     addValidator: require("./lib/addValidator"), // add validation for keyword, format, datatype and customize errors
+    compileSchema: require("./lib/compileSchema"),
     createCustomError: require("./lib/utils/createCustomError"),
     createSchemaOf: require("./lib/createSchemaOf"), // creates a simple schema based on the given data
     each: require("./lib/each"), // iterate over data, receiving each data-entry with its schema
