@@ -13,6 +13,7 @@ npm-debug.log
 
 .cache/
 .sass-cache/
+.nyc_output
 
 .idea/
 /.project
