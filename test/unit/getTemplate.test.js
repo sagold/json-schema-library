@@ -145,6 +145,11 @@ describe("getTemplate", () => {
 
 
         describe("$ref", () => {
+            const settings = require("../../lib/config/settings");
+            const initialValue = settings.GET_TEMPLATE_RECURSION_LIMIT;
+            before(() => (settings.GET_TEMPLATE_RECURSION_LIMIT = 1));
+            after(() => (settings.GET_TEMPLATE_RECURSION_LIMIT = initialValue));
+
 
             it("should resolve $ref in object schema", () => {
                 core.setSchema({ type: "object",
@@ -156,7 +161,9 @@ describe("getTemplate", () => {
                 expect(res).to.deep.equal({ first: "john" });
             });
 
-            it("should follow $ref only once", () => {
+
+            it("should follow $ref once", () => {
+
                 core.setSchema({
                     type: "object",
                     properties: {
@@ -182,6 +189,7 @@ describe("getTemplate", () => {
                     ]
                 });
             });
+
 
             // should not follow $ref to infinity
             it("should create template of draft04", () => {
