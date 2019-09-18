@@ -1,6 +1,6 @@
 {
   "name": "json-schema-library",
-  "version": "3.3.5",
+  "version": "4.0.0",
   "description": "Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation",
   "main": "index.js",
   "scripts": {
