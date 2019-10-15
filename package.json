@@ -21,7 +21,7 @@
     "url": "https://github.com/sagold/json-schema-library.git"
   },
   "author": "Sascha Goldhofer <noreply@saschagoldhofer.de> (https://github.com/sagold/)",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/sagold/json-schema-library/issues"
   },
