@@ -190,6 +190,57 @@ describe("getTemplate", () => {
                 });
             });
 
+            // iteration depth is 1, input-depth is 2 => still add template to depth 2
+            it.only("should respect depth of input data in $ref-resolution", () => {
+                core.setSchema({
+                    type: "object",
+                    properties: {
+                        value: { type: "string", default: "node" },
+                        nodes: {
+                            type: "array",
+                            minItems: 1,
+                            items: {
+                                $ref: "#"
+                            }
+                        }
+                    }
+                });
+
+                const res = core.getTemplate({
+                    nodes: [
+                        {
+                            value: "input-node"
+                        },
+                        {
+                            nodes: [
+                                {
+                                    value: "inner-node"
+                                }
+                            ]
+                        }
+                    ]
+                });
+
+                expect(res).to.deep.equal({
+                    value: "node",
+                    nodes: [
+                        {
+                            value: "input-node",
+                            nodes: []
+                        },
+                        {
+                            value: "node",
+                            nodes: [
+                                {
+                                    value: "inner-node",
+                                    nodes: []
+                                }
+                            ]
+                        }
+                    ]
+                });
+            });
+
 
             // should not follow $ref to infinity
             it("should create template of draft04", () => {
