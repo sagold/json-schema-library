@@ -248,9 +248,10 @@ describe("getTemplate", () => {
 
 
             // should not follow $ref to infinity
-            it.skip("should create template of draft04", () => {
+            it("should create template of draft04", () => {
                 core.setSchema(require("../../remotes/draft04.json"));
                 const res = core.getTemplate({});
+                // console.log("RESULT\n", JSON.stringify(res, null, 2));
                 expect(Object.prototype.toString.call(res)).to.eq("[object Object]");
             });
         });
