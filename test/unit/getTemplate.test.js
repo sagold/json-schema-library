@@ -191,7 +191,7 @@ describe("getTemplate", () => {
             });
 
             // iteration depth is 1, input-depth is 2 => still add template to depth 2
-            it.only("should respect depth of input data in $ref-resolution", () => {
+            it("should respect depth of input data in $ref-resolution", () => {
                 core.setSchema({
                     type: "object",
                     properties: {
@@ -214,7 +214,7 @@ describe("getTemplate", () => {
                         {
                             nodes: [
                                 {
-                                    value: "inner-node"
+                                    nodes: []
                                 }
                             ]
                         }
@@ -232,7 +232,7 @@ describe("getTemplate", () => {
                             value: "node",
                             nodes: [
                                 {
-                                    value: "inner-node",
+                                    value: "node",
                                     nodes: []
                                 }
                             ]
@@ -243,7 +243,7 @@ describe("getTemplate", () => {
 
 
             // should not follow $ref to infinity
-            it("should create template of draft04", () => {
+            it.skip("should create template of draft04", () => {
                 core.setSchema(require("../../remotes/draft04.json"));
                 const res = core.getTemplate({});
                 expect(Object.prototype.toString.call(res)).to.eq("[object Object]");
