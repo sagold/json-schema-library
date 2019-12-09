@@ -233,7 +233,12 @@ describe("getTemplate", () => {
                             nodes: [
                                 {
                                     value: "node",
-                                    nodes: []
+                                    nodes: [
+                                        {
+                                            value: "node",
+                                            nodes: []
+                                        }
+                                    ]
                                 }
                             ]
                         }
