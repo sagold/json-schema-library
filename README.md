@@ -7,7 +7,7 @@
 > footprint or high performance, this package focuses on exposing utilities for browser and node environments and
 > lessens the pain to build custom tools around json-schema.
 
-`npm i json-schema-library -S` or `yarn add json-schema-library -S`
+`npm i json-schema-library -S` or `yarn add json-schema-library`
 
 
 - This package is tested on node v10.16 and in latest Browsers.
