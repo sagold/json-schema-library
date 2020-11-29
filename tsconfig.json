@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "declaration": false,
+        "outDir": "./dist/",
+        "module": "es2015",
+        "target": "es2015",
+        "allowJs": true,
+        "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true,
+        "downlevelIteration": true,
+        "moduleResolution": "node",
+        "noImplicitAny": false,
+        "types": [],
+        "lib": [
+            "DOM",
+            "ES2018"
+        ]
+    },
+    "include": [
+        "index.ts",
+        "lib/**/*"
+    ]
+}
