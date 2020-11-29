@@ -161,12 +161,12 @@ describe("compile", () => {
             const schema = compile({
                 id: "http://localhost:1234/",
                 items: {
-                    id: "folder/",
+                    id: "baseUriChange/",
                     items: { $ref: "folderInteger.json" }
                 }
             });
 
-            expect(schema.items.items.__ref).to.eq("http://localhost:1234/folder/folderInteger.json");
+            expect(schema.items.items.__ref).to.eq("http://localhost:1234/baseUriChange/folderInteger.json");
         });
     });
 
@@ -325,11 +325,11 @@ describe("compile", () => {
         });
 
         it("should join scope and resolve to remote", () => {
-            remotes["http://localhost:1234/folder/folderInteger.json"] = compile({ type: "integer" });
+            remotes["http://localhost:1234/baseUriChange/folderInteger.json"] = compile({ type: "integer" });
             const schema = compile({
                 id: "http://localhost:1234/",
                 items: {
-                    id: "folder/",
+                    id: "baseUriChange/",
                     items: { $ref: "folderInteger.json" }
                 }
             });
@@ -339,7 +339,7 @@ describe("compile", () => {
         });
 
         it("should correctly replace base uri for remote scope updates", () => {
-            remotes["http://localhost:1234/folder/folderInteger.json"] = compile({ type: "integer" });
+            remotes["http://localhost:1234/baseUriChange/folderInteger.json"] = compile({ type: "integer" });
             const schema = compile({
                 id: "http://localhost:1234/scope_change_defs1.json",
                 type: "object",
@@ -348,7 +348,7 @@ describe("compile", () => {
                 },
                 definitions: {
                     baz: {
-                        id: "folder/",
+                        id: "baseUriChange/",
                         type: "array",
                         items: { $ref: "folderInteger.json" }
                     }
