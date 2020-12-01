@@ -13,9 +13,6 @@
     "analyze": "NODE_ENV=production webpack --json | webpack-bundle-size-analyzer",
     "lint": "eslint lib"
   },
-  "pre-push": [
-    "test"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/sagold/json-schema-library.git"
