@@ -1,6 +1,9 @@
+import strings from "./lib/config/strings";
+
+
 module.exports = {
     config: {
-        strings: require("./lib/config/strings")
+        strings
     },
     cores: {
         Interface: require("./lib/cores/CoreInterface"),
