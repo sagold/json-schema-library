@@ -1,7 +1,7 @@
-const expect = require("chai").expect;
-const validateAsync = require("../../lib/validateAsync");
-const Core = require("../../lib/cores/Draft04");
-const addValidator = require("../../lib/addValidator");
+import { expect } from "chai";
+import validateAsync from "../../lib/validateAsync";
+import Core from "../../lib/cores/Draft04";
+import addValidator from "../../lib/addValidator";
 
 
 describe("validateAsync", () => {
@@ -34,10 +34,16 @@ describe("validateAsync", () => {
 
         before(() => {
             // adds an async validation helper to { type: 'string', asyncError: true }
-            addValidator.keyword(core, "string", "asyncError", (c, schema) => { // eslint-disable-line arrow-body-style
-                return schema.asyncError ? new Promise((resolve) =>
+            // @ts-ignore
+            addValidator.keyword(core, "string", "asyncError", (c, schema) => {
+                return schema.asyncError ? new Promise(resolve =>
                     // eslint-disable-next-line max-nested-callbacks
-                    setTimeout(() => resolve({ type: "error", name: "AsyncError" }), 25)
+                    resolve({
+                        type: "error",
+                        name: "AsyncError",
+                        code: "test-async-error",
+                        message: "custom test error"
+                    })
                 ) : Promise.resolve();
             });
         });

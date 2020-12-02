@@ -1,12 +1,14 @@
-const expect = require("chai").expect;
-const each = require("../../lib/each");
-const Core = require("../../lib/cores/Draft04");
+import { expect } from "chai";
+import each from "../../lib/each";
+import Core from "../../lib/cores/Draft04";
+
 
 describe("each", () => {
 
     let core;
     before(() => {
         core = new Core();
+        // @ts-ignore
         each.core = core;
     });
 

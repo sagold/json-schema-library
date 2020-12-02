@@ -1,5 +1,5 @@
-const expect = require("chai").expect;
-const getTypeOf = require("../../lib/getTypeOf");
+import { expect } from "chai";
+import getTypeOf from "../../lib/getTypeOf";
 
 
 describe("getTypeOf", () => {
@@ -21,7 +21,7 @@ describe("getTypeOf", () => {
     });
 
     it("should return 'regexp' for 'new RegExp()'", () => {
-        expect(getTypeOf(new RegExp())).to.eq("regexp");
+        expect(getTypeOf(new RegExp(""))).to.eq("regexp");
     });
 
     it("should return 'object' for {}", () => {
@@ -37,6 +37,7 @@ describe("getTypeOf", () => {
     });
 
     it("should return 'undefined' for undefined", () => {
+        // @ts-ignore
         expect(getTypeOf()).to.eq("undefined");
     });
 });

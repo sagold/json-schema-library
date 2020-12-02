@@ -1,8 +1,9 @@
 /* eslint max-statements-per-line: ["error", { "max": 2 }] */
-const eachSchema = require("../eachSchema");
-const remotes = require("../../remotes");
-const joinScope = require("./joinScope");
-const getRef = require("./getRef");
+import eachSchema from "../eachSchema";
+import remotes from "../../remotes";
+import joinScope from "./joinScope";
+import getRef from "./getRef";
+import { JSONSchema } from "../types";
 
 const COMPILED = "__compiled";
 const COMPILED_REF = "__ref";
@@ -11,7 +12,7 @@ const GET_ROOT = "getRoot";
 const suffixes = /(#|\/)+$/g;
 
 
-function compile(rootSchema, force = false) {
+export default function compile(rootSchema: JSONSchema, force = false): JSONSchema {
     if (rootSchema[COMPILED] !== undefined) { return rootSchema; } // eslint-disable-line
     const context = { ids: {}, remotes: Object.assign({}, remotes) };
     const rootSchemaAsString = JSON.stringify(rootSchema);
@@ -53,6 +54,3 @@ function compile(rootSchema, force = false) {
     // console.log(JSON.stringify(context.ids, null, 2));
     return rootSchema;
 }
-
-
-module.exports = compile;

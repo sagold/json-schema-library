@@ -3,12 +3,17 @@ import resolveRef from "../resolveRef.withOverwrite";
 import compileSchema from "../compileSchema";
 import resolveAnyOf from "../resolveAnyOf";
 import resolveAllOf from "../resolveAllOf";
-import { JSONSchema, JSONPointer } from "../types";
+import { JSONSchema, JSONPointer, JSONError } from "../types";
 
 
 /* eslint no-unused-vars: 0 no-empty-function: 0 */
 export default class CoreInterface {
     __rootSchema: JSONSchema;
+    errors;
+    typeKeywords;
+    validateFormat;
+    validateKeyword;
+    validateType;
 
     constructor(schema?: JSONSchema) {
         this.setSchema(schema);
@@ -29,11 +34,11 @@ export default class CoreInterface {
         throw new Error("function 'each' is not implemented");
     }
 
-    validate(data: any, schema: JSONSchema = this.rootSchema, pointer: JSONPointer = "#") {
+    validate(data: any, schema: JSONSchema = this.rootSchema, pointer: JSONPointer = "#"): Array<JSONError> {
         throw new Error("function 'validate' is not implemented");
     }
 
-    isValid(data: any, schema: JSONSchema = this.rootSchema, pointer: JSONPointer = "#") {
+    isValid(data: any, schema: JSONSchema = this.rootSchema, pointer: JSONPointer = "#"): boolean {
         throw new Error("function 'isValid' is not implemented");
     }
 
@@ -65,7 +70,7 @@ export default class CoreInterface {
         this.rootSchema = schema;
     }
 
-    step(key: string, schema: JSONSchema, data: any, pointer: JSONPointer = "#") {
+    step(key: string, schema: JSONSchema, data: any, pointer: JSONPointer = "#"): JSONSchema {
         throw new Error("function 'step' is not implemented");
     }
 }

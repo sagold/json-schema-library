@@ -1,8 +1,8 @@
 /* eslint quote-props: 0 max-len: 0 */
-const expect = require("chai").expect;
-const resolveOneOf = require("../../lib/resolveOneOf.fuzzy");
-const Core = require("../../lib/cores/JsonEditor");
-const { DECLARATOR_ONEOF } = require("../../lib/config/settings");
+import { expect } from "chai";
+import resolveOneOf from "../../lib/resolveOneOf.fuzzy";
+import Core from "../../lib/cores/JsonEditor";
+import { DECLARATOR_ONEOF } from "../../lib/config/settings";
 
 
 describe("resolveOneOf (fuzzy)", () => {

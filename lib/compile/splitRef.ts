@@ -2,7 +2,7 @@ const suffixes = /(#|\/)+$/g;
 const emptyValues = ["", null, "#"];
 
 
-module.exports = function splitRef($ref) {
+export default function splitRef($ref) {
     if (emptyValues.includes($ref)) {
         return [];
     }

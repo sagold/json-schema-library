@@ -1,6 +1,7 @@
 const toString = Object.prototype.toString;
 
-module.exports = function getTypeOf(value) {
+
+export default function getTypeOf(value: any) {
     // eslint-disable-next-line newline-per-chained-call
     return toString.call(value).match(/\s([^\]]+)\]/).pop().toLowerCase();
-};
+}

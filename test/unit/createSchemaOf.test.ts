@@ -1,5 +1,5 @@
-const expect = require("chai").expect;
-const createSchemaOf = require("../../lib/createSchemaOf");
+import { expect } from "chai";
+import createSchemaOf from "../../lib/createSchemaOf";
 
 
 describe("createSchemaOf", () => {

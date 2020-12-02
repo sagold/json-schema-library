@@ -1,25 +1,30 @@
+import Core from "./cores/CoreInterface";
+import { JSONValidator } from "./types";
+
+
 /**
  * @throws Error
  * Adds a custom error. May override existing errors
  *
- * @param {Core} core
- * @param {String} errorId          - id of error @see /lib/validation/errors
- * @param {Function} errorCreator   - function returning an error-object @see /lib/utils/createCustomError
+ * @param core
+ * @param errorId - id of error @see /lib/validation/errors
+ * @param {Function} errorCreator - function returning an error-object @see /lib/utils/createCustomError
  */
-function addError(core, errorId, errorCreator) {
+function addError(core: Core, errorId: string, errorCreator) {
     if (typeof errorCreator !== "function") {
         throw new Error(`Error callback 'errorCreator' must be of type function. Received ${typeof errorCreator}`);
     }
     core.errors[errorId] = errorCreator;
 }
 
+
 /**
  * Adds a custom format validator. Existing format may not be overriden (may still be modified manually)
- * @param {Core} core
- * @param {String} formatType           - format type (i.e. `format: "html"`)
- * @param {Function} validationFunction - called with (core, schema, value, pointer)
+ * @param core
+ * @param formatType - format type (i.e. `format: "html"`)
+ * @param validationFunction - called with (core, schema, value, pointer)
  */
-function addFormat(core, formatType, validationFunction) {
+function addFormat(core: Core, formatType: string, validationFunction: JSONValidator) {
     if (typeof validationFunction !== "function") {
         throw new Error(`Validation function expected. Received ${typeof validationFunction}`);
     }
@@ -30,15 +35,16 @@ function addFormat(core, formatType, validationFunction) {
     throw new Error(`A format '${formatType}' is already registered to validation`);
 }
 
+
 /**
  * Adds a custom keyword validation to a specific type. May not override existing keywords.
  *
- * @param {Core} core
- * @param {String} datatype             - valid datatype like "object", "array", "string", etc
- * @param {String} keyword              - The keyword to add, i.e. `minWidth: ...`
- * @param {Function} validationFunction - called with (core, schema, value, pointer)
+ * @param core
+ * @param datatype - valid datatype like "object", "array", "string", etc
+ * @param keyword - The keyword to add, i.e. `minWidth: ...`
+ * @param validationFunction - called with (core, schema, value, pointer)
  */
-function addKeyword(core, datatype, keyword, validationFunction) {
+function addKeyword(core: Core, datatype: string, keyword: string, validationFunction: JSONValidator) {
     if (typeof validationFunction !== "function") {
         throw new Error(`Validation function expected. Received ${typeof validationFunction}`);
     }
@@ -52,7 +58,7 @@ function addKeyword(core, datatype, keyword, validationFunction) {
 }
 
 
-module.exports = {
+export default {
     error: addError,
     format: addFormat,
     keyword: addKeyword

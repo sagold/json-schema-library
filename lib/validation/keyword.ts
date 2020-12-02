@@ -1,8 +1,8 @@
-const getTypeOf = require("../getTypeOf");
-const ucs2decode = require("../utils/punycode.ucs2decode");
-const settings = require("../config/settings");
+import getTypeOf from "../getTypeOf";
+import isSame from "../utils/deepCompare";
+import settings from "../config/settings";
+import ucs2decode from "../utils/punycode.ucs2decode";
 const FPP = settings.floatingPointPrecision;
-const isSame = require("../utils/deepCompare");
 
 
 // list of validation keywords: http://json-schema.org/latest/json-schema-validation.html#rfc.section.5
@@ -165,7 +165,7 @@ const KeywordValidation = {
     },
     items: (core, schema, value, pointer) => {
         const errors = [];
-        for (var i = 0; i < value.length; i += 1) {
+        for (let i = 0; i < value.length; i += 1) {
             const itemData = value[i];
             // @todo reevaluate: incomplete schema is created here
             const itemSchema = core.step(i, schema, value, pointer);
@@ -351,7 +351,7 @@ const KeywordValidation = {
     properties: (core, schema, value, pointer) => {
         const errors = [];
         const keys = Object.keys(schema.properties || {});
-        for (var i = 0; i < keys.length; i += 1) {
+        for (let i = 0; i < keys.length; i += 1) {
             const key = keys[i];
             if (value[key] !== undefined) {
                 const itemSchema = core.step(key, schema, value, pointer);
@@ -365,7 +365,7 @@ const KeywordValidation = {
     propertiesRequired: (core, schema, value, pointer) => {
         const errors = [];
         const keys = Object.keys(schema.properties || {});
-        for (var i = 0; i < keys.length; i += 1) {
+        for (let i = 0; i < keys.length; i += 1) {
             const key = keys[i];
             if (value[key] === undefined) {
                 errors.push(core.errors.requiredPropertyError({ key, pointer }));
@@ -426,5 +426,5 @@ const KeywordValidation = {
 };
 
 
-module.exports = KeywordValidation;
+export default KeywordValidation;
 

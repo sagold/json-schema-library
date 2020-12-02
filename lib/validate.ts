@@ -1,6 +1,8 @@
-const getTypeOf = require("./getTypeOf");
-const filter = require("./utils/filter");
-const flattenArray = require("./utils/flattenArray");
+import getTypeOf from "./getTypeOf";
+import filter from "./utils/filter";
+import flattenArray from "./utils/flattenArray";
+import { JSONSchema, JSONPointer, JSONError } from "./types";
+import Core from "./cores/CoreInterface";
 
 
 function getJsonSchemaType(value, expectedType) {
@@ -19,15 +21,15 @@ function getJsonSchemaType(value, expectedType) {
 /**
  * Validate data by a json schema
  *
- * @param  {CoreInterface} core - validator
- * @param  {Mixed} value        - value to validate
- * @param  {Schema} [schema]     - json schema, defaults to rootSchema
- * @param  {String} [pointer]   - json pointer pointing to value (used for error-messages only)
- * @return {Array} list of errors or empty
+ * @param core - validator
+ * @param value - value to validate
+ * @param [schema] - json schema, defaults to rootSchema
+ * @param [pointer] - json pointer pointing to value (used for error-messages only)
+ * @return list of errors or empty
  */
-module.exports = function validate(core, value, schema = core.rootSchema, pointer = "#") {
+export default function validate(core: Core, value: any, schema: JSONSchema = core.rootSchema, pointer: JSONPointer = "#"): Array<JSONError> {
     if (schema.type === "error") {
-        return [schema];
+        return [schema as JSONError];
     }
 
     schema = core.resolveRef(schema);
@@ -46,4 +48,4 @@ module.exports = function validate(core, value, schema = core.rootSchema, pointe
     const errors = flattenArray(core.validateType[receivedType](core, schema, value, pointer));
     // also promises may be passed along (validateAsync)
     return errors.filter(filter.errorOrPromise);
-};
+}

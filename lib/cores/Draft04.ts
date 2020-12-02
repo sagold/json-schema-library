@@ -11,6 +11,7 @@ import { JSONSchema, JSONPointer } from "../types";
 
 import remotes from "../../remotes";
 import draft04 from "../../remotes/draft04.json";
+// @ts-ignore
 remotes["http://json-schema.org/draft-04/schema"] = compileSchema(draft04);
 
 import TYPE_KEYWORD_MAPPING from "../validation/typeKeywordMapping";

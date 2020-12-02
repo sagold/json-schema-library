@@ -5,7 +5,7 @@ const isDomain = /^[^:]+:\/\/[^/]+\//;
 const trailingFragments = /\/[^/]*$/;
 const idAndPointer = /#.*$/;
 
-module.exports = function joinScope(previous, id) {
+export default function joinScope(previous, id) {
     if (previous == null && id == null) { return "#"; }
     if (id == null) { return previous.replace(trailingHash, ""); }
     if (previous == null) { return id.replace(trailingHash, ""); }

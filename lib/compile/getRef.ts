@@ -1,17 +1,18 @@
-const { get } = require("gson-pointer");
-const splitRef = require("./splitRef");
-const suffixes = /(#|\/)+$/g;
-const getTypeOf = require("../getTypeOf");
-// const emptyValues = ["", null, "#"];
+import { get } from "gson-pointer";
+import splitRef from "./splitRef";
+import getTypeOf from "../getTypeOf";
+import { JSONSchema } from "../types";
 
+
+const suffixes = /(#|\/)+$/g;
+// const emptyValues = ["", null, "#"];
 const isObject = val => (getTypeOf(val) === "object");
 
 
 // 1. combined is known
 // 2. base or pointer is known
 // 3. base + pointer is known
-
-module.exports = function getRef(context, rootSchema, $ref) {
+export default function getRef(context, rootSchema: JSONSchema, $ref) {
     if (isObject($ref)) {
         $ref = $ref.__ref || $ref.$ref;
     }
@@ -81,4 +82,4 @@ module.exports = function getRef(context, rootSchema, $ref) {
         return getRef(context, rootSchema, schema.$ref);
     }
     return schema;
-};
+}

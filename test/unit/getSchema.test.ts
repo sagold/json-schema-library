@@ -1,6 +1,6 @@
-const expect = require("chai").expect;
-const getSchema = require("../../lib/getSchema");
-const Core = require("../../lib/cores/Draft04");
+import { expect } from "chai";
+import getSchema  from "../../lib/getSchema"
+import Core  from "../../lib/cores/Draft04"
 
 
 describe("getSchema", () => {

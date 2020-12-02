@@ -1,9 +1,11 @@
-const copy = require("./utils/copy");
-const merge = require("./utils/merge");
-const errors = require("./validation/errors");
+import copy from "./utils/copy";
+import merge from "./utils/merge";
+import errors from "./validation/errors";
+import { JSONSchema, JSONPointer, JSONError } from "./types";
+import Core from "./cores/CoreInterface";
 
 
-module.exports = function resolveAnyOf(core, data, schema = core.rootSchema, pointer = "#") {
+export default function resolveAnyOf(core: Core, data: any, schema: JSONSchema = core.rootSchema, pointer: JSONPointer = "#"): JSONSchema|JSONError {
     let found = false;
     let mergedSchema = copy(schema);
     for (let i = 0; i < schema.anyOf.length; i += 1) {
@@ -20,4 +22,4 @@ module.exports = function resolveAnyOf(core, data, schema = core.rootSchema, poi
 
     delete mergedSchema.anyOf;
     return mergedSchema;
-};
+}

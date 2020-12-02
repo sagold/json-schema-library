@@ -1,6 +1,10 @@
-const expect = require("chai").expect;
-const addValidator = require("../../lib/addValidator");
-const Core = require("../../lib/cores/Draft04");
+import { expect } from "chai";
+import addValidator from "../../lib/addValidator";
+import Core from "../../lib/cores/Draft04";
+
+
+const nullFunc = () => {}; // eslint-disable-line
+
 
 describe("addValidator", () => {
 
@@ -10,6 +14,7 @@ describe("addValidator", () => {
     describe("error", () => {
 
         it("should throw an error for a missing creator function", () => {
+            // @ts-ignore
             expect(() => addValidator.error(core, "123")).to.throw();
         });
 
@@ -31,17 +36,17 @@ describe("addValidator", () => {
     describe("format", () => {
 
         it("should throw an error for a missing validation function", () => {
+            // @ts-ignore
             expect(() => addValidator.format(core, "123")).to.throw();
         });
 
         it("should throw an error if the type is already specified", () => {
-            addValidator.format(core, "123", Function.prototype);
-            expect(() => addValidator.format(core, "123", Function.prototype)).to.throw();
+            addValidator.format(core, "123", nullFunc);
+            expect(() => addValidator.format(core, "123", nullFunc)).to.throw();
         });
 
         it("should call custom format validator", () => {
             let called = false;
-
             addValidator.format(core, "id", () => {
                 called = true;
             });
@@ -53,7 +58,6 @@ describe("addValidator", () => {
 
         it("should not call custom validator for a different format", () => {
             let called = false;
-
             addValidator.format(core, "id", () => {
                 called = true;
             });
@@ -65,8 +69,10 @@ describe("addValidator", () => {
 
         it("should return error on failed format validation", () => {
             addValidator.format(core, "id", () => ({
+                name: "test",
                 type: "error",
-                code: "format-id-error"
+                code: "format-id-error",
+                message: "custom test error"
             }));
 
             const result = core.validate("123-123", { type: "string", format: "id" });
@@ -76,7 +82,7 @@ describe("addValidator", () => {
         });
 
         it("should return no error for successful validation", () => {
-            addValidator.format(core, "id", () => true);
+            addValidator.format(core, "id", () => undefined);
 
             const result = core.validate("123-123", { type: "string", format: "id" });
 
@@ -93,21 +99,22 @@ describe("addValidator", () => {
         });
 
         it("should throw an error for a missing validation function", () => {
+            // @ts-ignore
             expect(() => addValidator.keyword(core, "object", "123")).to.throw("Validation function expected");
         });
 
         it("should throw an error for unknown datatypes", () => {
-            expect(() => addValidator.keyword(core, "error", "123", Function.prototype)).to.throw("Unknown datatype");
+            expect(() => addValidator.keyword(core, "error", "123", nullFunc)).to.throw("Unknown datatype");
         });
 
         it("should allow to overwrite existing keyword validation", () => {
-            expect(() => addValidator.keyword(core, "object", "enum", Function.prototype)).not.to.throw();
-            expect(core.validateKeyword.enum).to.eq(Function.prototype);
+            expect(() => addValidator.keyword(core, "object", "enum", nullFunc)).not.to.throw();
+            expect(core.validateKeyword.enum).to.eq(nullFunc);
         });
 
         it("should call custom keyword validator", () => {
             let called = false;
-            addValidator.keyword(core, "string", "capitalized", () => (called = true));
+            addValidator.keyword(core, "string", "capitalized", () => { called = true; return undefined; });
 
             core.validate("myString", { type: "string", capitalized: true });
 
@@ -116,7 +123,7 @@ describe("addValidator", () => {
 
         it("should not call validator if keyword is not set", () => {
             let called = false;
-            addValidator.keyword(core, "string", "capitalized", () => (called = true));
+            addValidator.keyword(core, "string", "capitalized", () => { called = true; return undefined; });
 
             core.validate("myString", { type: "string" });
 
@@ -125,7 +132,7 @@ describe("addValidator", () => {
 
         it("should not call custom keyword validator for different datatype", () => {
             let called = false;
-            addValidator.keyword(core, "string", "capitalized", () => { called = true; });
+            addValidator.keyword(core, "string", "capitalized", () => { called = true; return undefined; });
 
             core.validate(1234, { type: "number", capitalized: true });
 
@@ -133,7 +140,7 @@ describe("addValidator", () => {
         });
 
         it("should return no error for successful validation", () => {
-            addValidator.keyword(core, "string", "capitalized", (core, schema, value) => true);
+            addValidator.keyword(core, "string", "capitalized", (core, schema, value) => undefined);
 
             const result = core.validate("myString", { type: "string", capitalized: true });
 
@@ -142,8 +149,10 @@ describe("addValidator", () => {
 
         it("should return error on failed keyword validation", () => {
             addValidator.keyword(core, "string", "capitalized", (core, schema, value) => ({
+                name: "test",
                 type: "error",
-                code: "keyword-error"
+                code: "keyword-error",
+                message: "custom test error"
             }));
 
             const result = core.validate("myString", { type: "string", capitalized: true });

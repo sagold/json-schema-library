@@ -1,17 +1,19 @@
-const filter = require("./utils/filter");
-const flattenArray = require("./utils/flattenArray");
+import filter from "./utils/filter";
+import flattenArray from "./utils/flattenArray";
+import Core from "./cores/CoreInterface";
+import { JSONSchema, JSONError, JSONPointer } from "./types";
 
 
 /**
  * Selects and returns a oneOf schema for the given data
  *
- * @param  {CoreInterface} core - validator
- * @param  {Mixed} data
- * @param  {Object} schema      - current json schema containing property oneOf
- * @param  {String} pointer     - json pointer to data
- * @return {Object|Error} oneOf schema or an error
+ * @param core - validator
+ * @param data
+ * @param schema - current json schema containing property oneOf
+ * @param pointer - json pointer to data
+ * @return oneOf schema or an error
  */
-module.exports = function resolveOneOf(core, data, schema = core.rootSchema, pointer = "#") {
+export default function resolveOneOf(core: Core, data: any, schema: JSONSchema = core.rootSchema, pointer: JSONPointer = "#"): JSONSchema|JSONError {
     const matches = [];
     const errors = [];
     for (let i = 0; i < schema.oneOf.length; i += 1) {
@@ -35,4 +37,4 @@ module.exports = function resolveOneOf(core, data, schema = core.rootSchema, poi
     }
 
     return core.errors.oneOfError({ value: JSON.stringify(data), pointer, oneOf: schema.oneOf, errors });
-};
+}

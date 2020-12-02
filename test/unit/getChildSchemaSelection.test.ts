@@ -1,6 +1,6 @@
-const expect = require("chai").expect;
-const Core = require("../../lib/cores/JsonEditor");
-const getChildSchemaSelection = require("../../lib/getChildSchemaSelection");
+import { expect } from "chai";
+import Core from "../../lib/cores/JsonEditor";
+import getChildSchemaSelection from "../../lib/getChildSchemaSelection";
 
 
 describe("getChildSchemaSelection", () => {
@@ -46,7 +46,7 @@ describe("getChildSchemaSelection", () => {
         });
 
         expect(result).to.have.length(2);
-        expect(result).to.deep.deep.eq([
+        expect(result).to.deep.eq([
             { type: "string" },
             { type: "number" }
         ]);
@@ -71,7 +71,7 @@ describe("getChildSchemaSelection", () => {
         const result = getChildSchemaSelection(core, "b", core.getSchema());
 
         expect(result).to.have.length(2);
-        expect(result).to.deep.deep.eq([
+        expect(result).to.deep.eq([
             { type: "string" },
             { type: "number" }
         ]);

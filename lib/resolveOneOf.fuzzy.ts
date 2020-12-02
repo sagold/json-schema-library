@@ -1,26 +1,28 @@
-const filter = require("./utils/filter");
-const flattenArray = require("./utils/flattenArray");
-const getTypeOf = require("./getTypeOf");
-const { DECLARATOR_ONEOF } = require("./config/settings");
+import filter from "./utils/filter";
+import flattenArray from "./utils/flattenArray";
+import getTypeOf from "./getTypeOf";
+import { DECLARATOR_ONEOF } from "./config/settings";
+import { JSONSchema, JSONPointer } from "./types";
+import Core from "./cores/CoreInterface";
 
 
 /**
  * Returns a ranking for the data and given schema
  *
- * @param  {CoreInterface} core
- * @param  {Object} one     - json schema type: object
- * @param  {Object} data
- * @param  {String} pointer
- * @return {Number} ranking value (higher is better)
+ * @param core
+ * @param - json schema type: object
+ * @param data
+ * @param [pointer]
+ * @return ranking value (higher is better)
  */
-function fuzzyObjectValue(core, one, data, pointer) {
+function fuzzyObjectValue(core: Core, one: JSONSchema, data: { [p: string]: any }, pointer?: JSONPointer) {
     if (data == null || one.properties == null) {
         return -1;
     }
 
     let value = 0;
     const keys = Object.keys(one.properties);
-    for (var i = 0; i < keys.length; i += 1) {
+    for (let i = 0; i < keys.length; i += 1) {
         const key = keys[i];
         if (data[key] != null && core.isValid(data[key], one.properties[key], pointer)) {
             value += 1;
@@ -33,13 +35,13 @@ function fuzzyObjectValue(core, one, data, pointer) {
 /**
  * Selects and returns a oneOf schema for the given data
  *
- * @param  {CoreInterface} core
- * @param  {Mixed} data
- * @param  {Object} schema      - current json schema containing property oneOf
- * @param  {String} pointer     - json pointer to data
- * @return {Object|Error} oneOf schema or an error
+ * @param core
+ * @param data
+ * @param [schema] - current json schema containing property oneOf
+ * @param [pointer] - json pointer to data
+ * @return oneOf schema or an error
  */
-module.exports = function resolveOneOf(core, data, schema = core.rootSchema, pointer = "#") {
+export default function resolveOneOf(core: Core, data: any, schema: JSONSchema = core.rootSchema, pointer: JSONPointer = "#") {
     // !keyword: oneOfProperty
     // an additional <DECLARATOR_ONEOF> (default `oneOfProperty`) on the schema will exactly determine the
     // oneOf value (if set in data)
@@ -118,4 +120,4 @@ module.exports = function resolveOneOf(core, data, schema = core.rootSchema, poi
     }
 
     return core.errors.oneOfError({ value: JSON.stringify(data), pointer, oneOf: schema.oneOf });
-};
+}

@@ -1,13 +1,14 @@
-const getTypeOf = require("./getTypeOf");
+import getTypeOf from "./getTypeOf";
+import { JSONSchema } from "./types";
 
 
 /**
  * Create a simple json schema for the given input data
- * @param  {Mixed} data     - data to get json schema for
- * @return {Object} schema
+ * @param  data - data to get json schema for
+ * @return schema
  */
-function createSchemaOf(data) {
-    const schema = {
+export default function createSchemaOf(data: any): JSONSchema {
+    const schema: JSONSchema = {
         type: getTypeOf(data)
     };
 
@@ -25,7 +26,3 @@ function createSchemaOf(data) {
 
     return schema;
 }
-
-
-module.exports = createSchemaOf;
-

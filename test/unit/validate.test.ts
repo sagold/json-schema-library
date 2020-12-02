@@ -1,6 +1,6 @@
-const expect = require("chai").expect;
-const validate = require("../../lib/validate");
-const Core = require("../../lib/cores/Draft04");
+import { expect } from "chai";
+import validate from "../../lib/validate";
+import Core from "../../lib/cores/Draft04";
 
 
 describe("validate", () => {
