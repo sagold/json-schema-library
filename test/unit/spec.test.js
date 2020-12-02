@@ -104,7 +104,8 @@ describe("benchmark spec tests", () => {
 
     it("should resolve: base URI change base URI change ref valid", () => {
         remotes["http://localhost:1234/baseUriChange/folderInteger.json"] = compile(
-            require("json-schema-test-suite/remotes/baseUriChange/folderInteger.json")
+            //require("json-schema-test-suite/remotes/baseUriChange/folderInteger.json")
+            require("json-schema-test-suite/remotes/folder/folderInteger.json")
         );
         const core = new Draft04({
             id: "http://localhost:1234/",
