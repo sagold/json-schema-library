@@ -1,7 +1,6 @@
-const expect = require("chai").expect;
-const step = require("../../lib/step");
-
-const Core = require("../../lib/cores/Draft04");
+import { expect } from "chai";
+import step from "../../lib/step";
+import Core from "../../lib/cores/Draft04";
 
 
 describe("step", () => {
@@ -13,7 +12,6 @@ describe("step", () => {
         const res = step(core, 0, { type: "unknown" }, {});
         expect(res).to.be.an("error");
     });
-
 
     describe("object", () => {
 

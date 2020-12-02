@@ -9,7 +9,7 @@
     "dist:es6": "tsc --outDir distmodule --target ES2019",
     "test": "mocha --recursive -R dot 'test/**/*.test.js'",
     "test:integration": "mocha --recursive -R spec 'test/integration/**/*.test.js'",
-    "test:unit": "mocha --recursive -R spec 'test/unit/**/*.test.js'",
+    "test:unit": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/unit/**/*.test.ts'",
     "test:spec": "mocha --recursive -R spec 'test/spec/**/*.test.js'",
     "tdd": "watch \"npm run test:unit\" lib/ test/",
     "coverage": "nyc npm run test --reporter=lcov",

@@ -1,4 +1,3 @@
-
 /**
  * Returns a list of possible child-schemas for the given property key. In case of a oneOf selection, multiple schemas
  * could be added at the given property (e.g. item-index), thus an array of options is returned. In all other cases
@@ -9,7 +8,7 @@
  * @param  {Object} [schema]    - parent schema of following property
  * @return {Object}
  */
-module.exports = function getChildSchemaSelection(core, property, schema = core.rootSchema) {
+export default function getChildSchemaSelection(core, property, schema = core.rootSchema) {
     const result = core.step(property, schema, {}, "#");
 
     if (result.type === "error") {
@@ -20,4 +19,4 @@ module.exports = function getChildSchemaSelection(core, property, schema = core.
     }
 
     return [result];
-};
+}

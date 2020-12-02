@@ -1,18 +1,20 @@
-const getTypeOf = require("./getTypeOf");
-const createSchemaOf = require("./createSchemaOf");
-const errors = require("./validation/errors");
-const merge = require("./utils/merge");
+import getTypeOf from "./getTypeOf";
+import createSchemaOf from "./createSchemaOf";
+import errors from "./validation/errors";
+import merge from "./utils/merge";
+import { JSONSchema, JSONPointer, JSONError } from "./types";
+import Core from "./cores/CoreInterface";
 
 
 const stepType = {
 
-    array: (core, key, schema, data, pointer) => {
+    array: (core: Core, key: string|number, schema: JSONSchema, data: any, pointer: JSONPointer): JSONSchema|JSONError => {
         const itemsType = getTypeOf(schema.items);
 
         if (itemsType === "object") {
             // oneOf
             if (Array.isArray(schema.items.oneOf)) {
-                return core.resolveOneOf(data[key], schema.items, pointer) || false;
+                return core.resolveOneOf(data[key], schema.items, pointer);
             }
 
             // anyOf
@@ -56,10 +58,10 @@ const stepType = {
             return createSchemaOf(data[key]);
         }
 
-        return new Error(`Invalid array schema for ${key} at ${pointer}`);
+        return new Error(`Invalid array schema for ${key} at ${pointer}`) as JSONError;
     },
 
-    object: (core, key, schema, data, pointer) => {
+    object: (core: Core, key: string|number, schema: JSONSchema, data: any, pointer: JSONPointer): JSONSchema|JSONError => {
 
         if (Array.isArray(schema.oneOf)) {
             // update current schema
@@ -147,20 +149,18 @@ const stepType = {
  *  This helper determines the location of the property within the schema (additional properties, oneOf, ...) and
  *  returns the correct schema.
  *
- * @param  {CoreInterface} core     - validator
- * @param  {String|Number} key      - property-name or array-index
- * @param  {Object} schema          - json schema of current data
- * @param  {Object|Array} data      - parent of key
- * @param  {String} pointer
- * @return {Object|Error} Schema or Error if failed resolving key
+ * @param  core     - validator
+ * @param  key      - property-name or array-index
+ * @param  schema          - json schema of current data
+ * @param  data      - parent of key
+ * @param  [pointer]
+ * @return Schema or Error if failed resolving key
  */
-function step(core, key, schema, data, pointer = "#") {
+export default function step(core: Core, key: string|number, schema: JSONSchema, data?: any, pointer: JSONPointer = "#"):
+JSONSchema|JSONError {
     const expectedType = schema.type || getTypeOf(data);
     if (stepType[expectedType]) {
         return stepType[expectedType](core, key, schema, data, pointer);
     }
-    return new Error(`Unsupported schema type ${schema.type} for key ${key}`);
+    return new Error(`Unsupported schema type ${schema.type} for key ${key}`) as JSONError;
 }
-
-
-module.exports = step;
