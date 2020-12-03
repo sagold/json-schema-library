@@ -17,12 +17,6 @@ import ERRORS from "../validation/errors";
 
 export default class JsonEditorCore extends CoreInterface {
 
-    typeKeywords;
-    validateKeyword;
-    validateType;
-    validateFormat;
-    errors;
-
     constructor(schema?: JSONSchema) {
         super(schema);
         this.typeKeywords = JSON.parse(JSON.stringify(TYPE_KEYWORD_MAPPING));

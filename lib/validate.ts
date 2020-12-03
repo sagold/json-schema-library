@@ -1,5 +1,5 @@
 import getTypeOf from "./getTypeOf";
-import filter from "./utils/filter";
+import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
 import { JSONSchema, JSONPointer, JSONError } from "./types";
 import Core from "./cores/CoreInterface";
@@ -47,5 +47,5 @@ export default function validate(core: Core, value: any, schema: JSONSchema = co
 
     const errors = flattenArray(core.validateType[receivedType](core, schema, value, pointer));
     // also promises may be passed along (validateAsync)
-    return errors.filter(filter.errorOrPromise);
+    return errors.filter(errorOrPromise);
 }

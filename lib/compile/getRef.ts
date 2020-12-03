@@ -5,7 +5,6 @@ import { JSONSchema } from "../types";
 
 
 const suffixes = /(#|\/)+$/g;
-// const emptyValues = ["", null, "#"];
 const isObject = val => (getTypeOf(val) === "object");
 
 

@@ -1,4 +1,4 @@
-import filter from "./utils/filter";
+import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
 import Core from "./cores/CoreInterface";
 import { JSONSchema, JSONError, JSONPointer } from "./types";
@@ -20,7 +20,7 @@ export default function resolveOneOf(core: Core, data: any, schema: JSONSchema =
         const one = core.resolveRef(schema.oneOf[i]);
 
         let result = flattenArray(core.validate(data, one, pointer));
-        result = result.filter(filter.errorOrPromise);
+        result = result.filter(errorOrPromise);
 
         if (result.length > 0) {
             errors.push(...result);

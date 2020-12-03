@@ -1,4 +1,10 @@
 import __ from "./__";
+import { JSONError } from "../types";
+
+
+export interface CreateError {
+    (data?: { [p : string]: any }): JSONError
+}
 
 
 function dashCase(str: string): string {
@@ -6,33 +12,24 @@ function dashCase(str: string): string {
 }
 
 
+export function createError(name: string, data?: { [p : string]: any }): JSONError {
+    return {
+        type: "error",
+        name,
+        code: dashCase(name),
+        message: __(name, data),
+        data
+    };
+}
+
+
 /**
  * Creates a custom Error-Constructor which instances may be identified by `customError instanceof Error`. Its messages
- * are defined by strings-object __@see config/strings.js__sa
- * @param name    - id of error (camelcased)
- * @return Error-Contructor
+ * are defined by strings-object __@see config/strings.ts
+ *
+ * @param name - id of error (camelcased)
+ * @return error constructor function
  */
-export default function createCustomError(name: string) {
-    return function (data) {
-        return {
-            type: "error",
-            name,
-            code: dashCase(name),
-            message: __(name, data),
-            data
-        };
-    };
-
-    // function CustomError(data) {
-    //     const message = __(name, data);
-    //     const error = Error.call(this, message);
-    //     this.name = name;
-    //     this.code = dashCase(name);
-    //     this.stack = error.stack;
-    //     this.message = message;
-    //     this.data = data;
-    // }
-    // CustomError.prototype = Object.create(Error.prototype);
-    // CustomError.prototype.name = name;
-    // return CustomError;
+export default function createCustomError(name: string): CreateError {
+    return createError.bind(null, name);
 }

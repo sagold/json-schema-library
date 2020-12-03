@@ -9,7 +9,7 @@ import render from "./render";
  * @param fallback - fallback template
  * @return resulting string
  */
-export default function __(keyword: string, data: any, fallback: string = keyword) {
+export default function __(keyword: string, data: any, fallback: string = keyword): string {
     const template = strings[keyword] || fallback;
     return render(template, data);
 }

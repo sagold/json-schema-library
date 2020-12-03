@@ -1,4 +1,4 @@
-import filter from "./utils/filter";
+import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
 import getTypeOf from "./getTypeOf";
 import settings from "./config/settings";
@@ -70,7 +70,7 @@ export default function resolveOneOf(core: Core, data: any, schema: JSONSchema =
             }
 
             let result = flattenArray(core.validate(oneOfValue, oneOfPropertySchema, pointer));
-            result = result.filter(filter.errorOrPromise);
+            result = result.filter(errorOrPromise);
 
             if (result.length > 0) {
                 errors.push(...result);

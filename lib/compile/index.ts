@@ -19,11 +19,7 @@ export default function compile(rootSchema: JSONSchema, force = false): JSONSche
     rootSchema = JSON.parse(rootSchemaAsString);
     Object.defineProperty(rootSchema, COMPILED, { enumerable: false, value: true });
     Object.defineProperty(rootSchema, GET_REF, { enumerable: false, value: getRef.bind(null, context, rootSchema) });
-    // Object.defineProperty(rootSchema, "debug", { enumerable: false, value: schema => {
-    //     console.log(JSON.stringify(context.ids, null, 2));
-    //     console.log("remotes", Object.keys(remotes));
-    //     console.log(JSON.stringify(rootSchema, null, 2));
-    // } });
+
     if (force === false && rootSchemaAsString.includes("$ref") === false) {
         // bail early, when no $refs are defined
         return rootSchema;

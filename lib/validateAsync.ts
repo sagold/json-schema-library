@@ -1,4 +1,4 @@
-import filter from "./utils/filter";
+import { isError, errorsOnly } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
 import { JSONSchema, JSONPointer, JSONError } from "./types";
 import Core from "./cores/CoreInterface";
@@ -11,7 +11,7 @@ function createErrorNotification(onError: OnError) {
             error.forEach(notifyError);
             return error;
         }
-        if (filter.isError(error)) {
+        if (isError(error)) {
             onError(error);
         }
         return error;
@@ -51,7 +51,7 @@ export default function validateAsync(core: Core, value: any, options?: Options)
         for (let i = 0; i < errors.length; i += 1) {
             if (errors[i] instanceof Promise) {
                 errors[i].then(notifyError);
-            } else if (filter.isError(errors[i])) {
+            } else if (isError(errors[i])) {
                 onError(errors[i]);
             }
         }
@@ -60,7 +60,7 @@ export default function validateAsync(core: Core, value: any, options?: Options)
     return Promise
         .all(errors)
         .then(flattenArray)
-        .then(resolvedErrors => resolvedErrors.filter(filter.errorsOnly))
+        .then(resolvedErrors => resolvedErrors.filter(errorsOnly))
         .catch(e => {
             console.log("Failed resolving promises", e.message);
             console.log(e.stack);

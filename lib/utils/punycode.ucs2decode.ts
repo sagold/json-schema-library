@@ -12,10 +12,10 @@
  * @see <https://mathiasbynens.be/notes/javascript-encoding>
  * @memberOf punycode.ucs2
  * @name decode
- * @param {String} string The Unicode input string (UCS-2).
- * @returns {Array} The new array of code points.
+ * @param string The Unicode input string (UCS-2).
+ * @returns The new array of code points.
  */
-export default function ucs2decode(string) {
+export default function ucs2decode(string: string): Array<string> {
     const output = [];
     let counter = 0;
     const length = string.length;

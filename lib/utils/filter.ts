@@ -1,18 +1,15 @@
-function isPromise(obj) {
+export function isPromise(obj) {
     return obj instanceof Promise;
 }
 
-function isError(obj) {
+export function isError(obj) {
     return obj && obj.type === "error";
 }
 
-export default {
-    isError,
-    isPromise,
-    errorOrPromise(error) {
-        return isError(error) || isPromise(error);
-    },
-    errorsOnly(error) {
-        return isError(error);
-    }
-};
+export function errorOrPromise(error) {
+    return isError(error) || isPromise(error);
+}
+
+export function errorsOnly(error) {
+    return isError(error);
+}
