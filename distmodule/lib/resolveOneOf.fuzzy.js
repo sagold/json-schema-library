@@ -2,12 +2,7 @@ import filter from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
 import getTypeOf from "./getTypeOf";
 import settings from "./config/settings";
-import { JSONSchema, JSONPointer, JSONError } from "./types";
-import Core from "./cores/CoreInterface";
-
-
 const { DECLARATOR_ONEOF } = settings;
-
 /**
  * Returns a ranking for the data and given schema
  *
@@ -17,11 +12,10 @@ const { DECLARATOR_ONEOF } = settings;
  * @param [pointer]
  * @return ranking value (higher is better)
  */
-function fuzzyObjectValue(core: Core, one: JSONSchema, data: { [p: string]: any }, pointer?: JSONPointer) {
+function fuzzyObjectValue(core, one, data, pointer) {
     if (data == null || one.properties == null) {
         return -1;
     }
-
     let value = 0;
     const keys = Object.keys(one.properties);
     for (let i = 0; i < keys.length; i += 1) {
@@ -30,10 +24,8 @@ function fuzzyObjectValue(core: Core, one: JSONSchema, data: { [p: string]: any 
             value += 1;
         }
     }
-
     return value;
 }
-
 /**
  * Selects and returns a oneOf schema for the given data
  *
@@ -43,45 +35,37 @@ function fuzzyObjectValue(core: Core, one: JSONSchema, data: { [p: string]: any 
  * @param [pointer] - json pointer to data
  * @return oneOf schema or an error
  */
-export default function resolveOneOf(core: Core, data: any, schema: JSONSchema = core.rootSchema, pointer: JSONPointer = "#"): JSONSchema|JSONError {
+export default function resolveOneOf(core, data, schema = core.rootSchema, pointer = "#") {
     // !keyword: oneOfProperty
     // an additional <DECLARATOR_ONEOF> (default `oneOfProperty`) on the schema will exactly determine the
     // oneOf value (if set in data)
-
     // @fixme
     // abort if no data is given an DECLARATOR_ONEOF is set (used by getChildSchemaSelection)
     // this case (data != null) should not be necessary
     if (data != null && schema[DECLARATOR_ONEOF]) {
-
         const errors = [];
         const oneOfProperty = schema[DECLARATOR_ONEOF];
         const oneOfValue = data[schema[DECLARATOR_ONEOF]];
-
         if (oneOfValue === undefined) {
             return core.errors.missingOneOfPropertyError({ property: oneOfProperty, pointer });
         }
-
         for (let i = 0; i < schema.oneOf.length; i += 1) {
             const one = core.resolveRef(schema.oneOf[i]);
             const oneOfPropertySchema = core.step(oneOfProperty, one, data, pointer);
-
             if (oneOfPropertySchema && oneOfPropertySchema.type === "error") {
                 return oneOfPropertySchema;
             }
-
             let result = flattenArray(core.validate(oneOfValue, oneOfPropertySchema, pointer));
             result = result.filter(filter.errorOrPromise);
-
             if (result.length > 0) {
                 errors.push(...result);
-            } else {
+            }
+            else {
                 return one; // return resolved schema
             }
         }
-
         return core.errors.oneOfPropertyError({ property: oneOfProperty, value: oneOfValue, pointer, errors });
     }
-
     // keyword: oneOf
     const matches = [];
     for (let i = 0; i < schema.oneOf.length; i += 1) {
@@ -90,36 +74,28 @@ export default function resolveOneOf(core: Core, data: any, schema: JSONSchema =
             matches.push(one);
         }
     }
-
     if (matches.length === 1) {
         return matches[0];
     }
-
     // fuzzy match oneOf
     if (getTypeOf(data) === "object") {
         let schemaOfItem;
         let fuzzyGreatest = 0;
-
         for (let i = 0; i < schema.oneOf.length; i += 1) {
             const one = core.resolveRef(schema.oneOf[i]);
             const fuzzyValue = fuzzyObjectValue(core, one, data);
-
             if (fuzzyGreatest < fuzzyValue) {
                 fuzzyGreatest = fuzzyValue;
                 schemaOfItem = schema.oneOf[i];
             }
         }
-
         if (schemaOfItem === undefined) {
             return core.errors.oneOfError({ value: JSON.stringify(data), pointer, oneOf: schema.oneOf });
         }
-
         return schemaOfItem;
     }
-
     if (matches.length > 1) {
         return core.errors.multipleOneOfError({ matches, data, pointer });
     }
-
     return core.errors.oneOfError({ value: JSON.stringify(data), pointer, oneOf: schema.oneOf });
 }

@@ -14,7 +14,7 @@ const config = {
         path: path.resolve(__dirname, PRODUCTION ? "dist" : "dev"),
         filename: 'jsonSchemaLibrary.js',
         libraryTarget: 'umd',
-        library: 'JSLib',
+        library: 'jlib',
         umdNamedDefine: true,
         globalObject: `(typeof self !== 'undefined' ? self : this)`
     },
