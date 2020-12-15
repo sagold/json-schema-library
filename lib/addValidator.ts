@@ -8,11 +8,11 @@ import { JSONValidator } from "./types";
  *
  * @param core
  * @param errorId - id of error @see /lib/validation/errors
- * @param {Function} errorCreator - function returning an error-object @see /lib/utils/createCustomError
+ * @param errorCreator - function returning an error-object @see /lib/utils/createCustomError
  */
 function addError(core: Core, errorId: string, errorCreator) {
     if (typeof errorCreator !== "function") {
-        throw new Error(`Error callback 'errorCreator' must be of type function. Received ${typeof errorCreator}`);
+        throw new Error(`Error callback 'errorCreator' must be of type function. Received '${typeof errorCreator}'`);
     }
     core.errors[errorId] = errorCreator;
 }
