@@ -1,5 +1,5 @@
 import gp from "gson-pointer";
-import gq from "gson-query";
+import { get } from "gson-query";
 import getTypeId from "./getTypeId";
 import types from "./types";
 import { JSONSchema, JSONPointer } from "../types";
@@ -25,7 +25,7 @@ export default function getTypeDefs(schema: JSONSchema): Array<{ pointer: JSONPo
     }
 
     type.definitions.forEach(query => {
-        gq.get(schema, query, (value, key, parent, pointer) => {
+        get(schema, query, (value, key, parent, pointer) => {
             if (isObject(value) && getTypeId(value)) {
                 defs.push({ pointer: gp.join(gp.split(pointer), false), def: value });
             }
