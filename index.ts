@@ -19,16 +19,13 @@ import step from "./lib/step";
 import validate from "./lib/validate";
 import validateAsync from "./lib/validateAsync";
 
+const config = { strings };
 
-export default {
-    config: {
-        strings
-    },
-    cores: {
-        Interface,
-        Draft04, // core implementing draft04 specs
-        JsonEditor // adjusted core of draft04 to better support the json-editor
-    },
+export {
+    config,
+    Interface,
+    Draft04, // core implementing draft04 specs
+    JsonEditor, // adjusted core of draft04 to better support the json-editor
     addSchema, // add a schema to be references via $ref
     addValidator, // add validation for keyword, format, datatype and customize errors
     compileSchema,
