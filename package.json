@@ -55,8 +55,8 @@
   },
   "dependencies": {
     "deepmerge": "^4.2.2",
-    "gson-pointer": "^4.1.0",
-    "gson-query": "^2.0.0",
+    "gson-pointer": "^4.1.1",
+    "gson-query": "^4.4.1",
     "valid-url": "^1.0.9"
   },
   "publishConfig": {
