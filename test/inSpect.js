@@ -2,7 +2,7 @@ const expect = require("chai").expect;
 const Core = require("../lib/cores/Draft04");
 const addSchema = require("../lib/addSchema");
 
-addSchema("http://localhost:1234/name.json", require("json-schema-test-suite/remotes/name.json"));
+// addSchema("http://localhost:1234/name.json", require("json-schema-test-suite/remotes/name.json"));
 
 const TestCase = {
     description: "root ref in remote ref",

@@ -23,9 +23,10 @@
 
 ## Breaking Changes
 
-1. with version `v4.0.0` the api has changed in order to use the defined (root) schema in core as default where 
+1. with version `v5.0.0` the apie has changed to es6 modules, where there is no default epxport, only named exports. Additionally all code has been rewritten to typescript. If directly accessing files, switch to `dist/module/*.js`-files for plain js-modules.
+2. with version `v4.0.0` the api has changed in order to use the defined (root) schema in core as default where 
     possible. This means, most methods have a a changed signature, where `data` is passed before an optional `schema` argument. Check the [Core Overview](#core) for the current signature
-2. additionally `iterateSchema` has been renamed to `eachSchema` for consistency
+3. additionally `iterateSchema` has been renamed to `eachSchema` for consistency
 
 
 ## Overview
@@ -90,7 +91,7 @@ Core {
 > For any dynamic values (like `oneOf`, `definitions`) the data has to be passed in addition.
 
 ```js
-const Core = require("json-schema-library").cores.Draft04;
+import { Draft04 as Core } from "json-schema-library";
 const core = new Core(rootSchema);
 const targetSchema = core.getSchema('#/path/to/target', rootData);
 ```
@@ -106,7 +107,7 @@ if (targetSchema.type === "error") {
 Or using `getSchema` directly
 
 ```js
-const Core = require("json-schema-library").cores.Draft04;
+import { Draft04 as Core } from "json-schema-library";
 const core = new Core(rootSchema);
 const targetSchema = getSchema(core, '#/path/to/target', rootData);
 ```
@@ -117,7 +118,7 @@ const targetSchema = getSchema(core, '#/path/to/target', rootData);
 extended by any missing items or properties.
 
 ```js
-const Core = require("json-schema-library").cores.Draft04;
+import { Draft04 as Core } from "json-schema-library";
 const core = new Core();
 const baseData = core.getTemplate(
     { other: true },
@@ -129,7 +130,7 @@ const baseData = core.getTemplate(
 > Get a list of validation errors
 
 ```js
-const Core = require("json-schema-library").cores.Draft04;
+import { Draft04 as Core } from "json-schema-library";
 const core = new Core(rootSchema);
 const errors = core.validate({ validationOf: "rootSchema" });
 // validation errors running data for 'rootSchema'
@@ -143,7 +144,7 @@ const customSchemaErrors = core.validate("", { type: "number" });
 basically `core.validate("", { type: "number" }).length === 0`
 
 ```js
-const Core = require("json-schema-library").cores.Draft04;
+import { Draft04 as Core } from "json-schema-library";
 const core = new Core(rootSchema);
 const baseSchema = core.isValid("", { type: "number" });
 // returns false
@@ -155,7 +156,7 @@ const baseSchema = core.isValid("", { type: "number" });
 Optional support for onError helper, which is invoked for each error (after being resolved)
 
 ```js
-const Core = require("json-schema-library").cores.Draft04;
+import { Draft04 as Core } from "json-schema-library";
 const core = new Core(rootSchema);
 // signature: Core, data, { onError: [onErrorCallback], schema: JSONSchema, pointer: [Pointer]} : Promise
 validateAsync(core, "", { onError: (err) => {}, schema: { type: "number" } })
@@ -166,7 +167,7 @@ validateAsync(core, "", { onError: (err) => {}, schema: { type: "number" } })
 > Get the json-schema of a child-property
 
 ```js
-const Core = require("json-schema-library").cores.Draft04;
+import { Draft04 as Core } from "json-schema-library";
 const core = new Core(rootSchema);
 const baseSchema = core.step(   
     "target"
@@ -179,7 +180,7 @@ const baseSchema = core.step(
 > Iterates over each data-item (object, array and value); passing the value and its corresponding schema
 
 ```js
-const Core = require("json-schema-library").cores.Draft04;
+import { Draft04 as Core } from "json-schema-library";
 const core = new Core({
     type: "array",
     items: [
@@ -198,8 +199,7 @@ core.each([5, "nine"], (schema, value, pointer) => {
 ### Add custom validators
 
 ```js
-const addValidator = require("../../lib/addValidator");
-const Core = require("../../lib/cores/draft04");
+import { addValidator } from "json-schema-library";
 
 // add a custom format 'id'
 addValidator.format(core, "id", (core, schema, value, pointer) => {});
@@ -223,6 +223,7 @@ addValidator.error(core, "minLengthError", (data) => ({
 Returns a list of possible schemas for the given child-property or index
 
 ```js
+import { getChildSchemaSelection } from "json-schema-library";
 const listOfAvailableOptions = getChildSchemaSelection(core, "childKey", schema);
 ```
 
@@ -230,6 +231,7 @@ const listOfAvailableOptions = getChildSchemaSelection(core, "childKey", schema)
 Creates a json-schema for the given input-data.
 
 ```js
+import { createSchemaOf } from "json-schema-library";
 const baseSchema = createSchemaOf({ target: "" });
 // returns {type: "object", properties: { target: "string"}},
 ```
@@ -238,6 +240,7 @@ const baseSchema = createSchemaOf({ target: "" });
 Iterate the schema, invoking the callback function for each type (schema) definition
 
 ```js
+import { eachSchema } from "json-schema-library";
 const baseSchema = eachSchema(schema, (schema, pointer) => {});
 ```
 
