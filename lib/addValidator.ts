@@ -7,7 +7,7 @@ import { JSONValidator } from "./types";
  * Adds a custom error. May override existing errors
  *
  * @param core
- * @param errorId - id of error @see /lib/validation/errors
+ * @param errorId id of error @see /lib/validation/errors
  * @param errorCreator - function returning an error-object @see /lib/utils/createCustomError
  */
 function addError(core: Core, errorId: string, errorCreator) {

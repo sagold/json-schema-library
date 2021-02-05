@@ -43,3 +43,5 @@ export {
     validate, // validates data by a schema
     validateAsync // async validation of data by a schema
 };
+
+export type { JSONSchema, JSONPointer, JSONError, JSONValidator } from "./lib/types";
