@@ -25,7 +25,7 @@ export default function getTypeDefs(schema: JSONSchema): Array<{ pointer: JSONPo
     }
 
     type.definitions.forEach(query => {
-        gq.run(schema, query, (value, key, parent, pointer) => {
+        gq.get(schema, query, (value, key, parent, pointer) => {
             if (isObject(value) && getTypeId(value)) {
                 defs.push({ pointer: gp.join(gp.split(pointer), false), def: value });
             }

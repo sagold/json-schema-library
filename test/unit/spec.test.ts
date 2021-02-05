@@ -3,8 +3,8 @@ import Draft04 from "../../lib/cores/Draft04";
 import compile from "../../lib/compile";
 import remotes from "../../remotes";
 
-// import SCHEMA_FOLDER_INTEGER from "json-schema-test-suite/remotes/baseUriChange/folderInteger.json";
-import SCHEMA_FOLDER_INTEGER from "json-schema-test-suite/remotes/folder/folderInteger.json";
+import SCHEMA_FOLDER_INTEGER from "json-schema-test-suite/remotes/baseUriChange/folderInteger.json";
+// import SCHEMA_FOLDER_INTEGER from "json-schema-test-suite/remotes/folder/folderInteger.json";
 
 
 describe("benchmark spec tests", () => {
