@@ -1,6 +1,6 @@
 {
   "name": "json-schema-library",
-  "version": "5.1.1",
+  "version": "5.2.0",
   "description": "Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation",
   "module": "dist/module/index.js",
   "types": "dist/index.d.ts",
@@ -56,7 +56,7 @@
   "dependencies": {
     "deepmerge": "^4.2.2",
     "gson-pointer": "^4.1.1",
-    "gson-query": "^5.0.1",
+    "gson-query": "^5.1.0",
     "valid-url": "^1.0.9"
   },
   "publishConfig": {
