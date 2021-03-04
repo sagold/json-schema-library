@@ -18,6 +18,7 @@ import SchemaService from "./lib/SchemaService";
 import step from "./lib/step";
 import validate from "./lib/validate";
 import validateAsync from "./lib/validateAsync";
+import settings from "./lib/config/settings";
 
 const config = { strings };
 
@@ -38,6 +39,7 @@ export {
     getTemplate, // create data which is valid to the given schema
     getTypeOf, // returns the javascript datatype
     isValid, // returns a boolean if the schema is valid
+    settings,
     SchemaService,
     step, // steps into a json-schema, returning the matching child-schema
     validate, // validates data by a schema
