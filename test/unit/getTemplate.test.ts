@@ -623,4 +623,38 @@ describe("getTemplate", () => {
             expect(res).to.deep.equal("jane");
         });
     });
+
+    describe("templateOptions", () => {
+
+        it("should not add optional properties", () => {
+            const schema = {
+                type: "object",
+                required: ["list", "author"],
+                properties: {
+                    title: { type: "string", default: "title" },
+                    list: {
+                        type: "array",
+                        items: {
+                            allOf: [
+                                { type: "object" },
+                                { properties: { index: { type: "number", default: 4 } } }
+                            ]
+                        }
+                    },
+                    author: {
+                        anyOf: [{ type: "string", default: "jane" }, { type: "string", default: "john" }]
+                    },
+                    source: {
+                        type: "string",
+                        enum: ["dpa", "getty"]
+                    }
+                }
+            };
+            core.setSchema(schema);
+
+            const template = getTemplate(core, {}, schema, { addOptionalProps: false });
+
+            expect({ list: [], author: "jane" }).to.deep.equal(template);
+        });
+    });
 });
