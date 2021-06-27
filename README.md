@@ -23,9 +23,9 @@
 
 ## Breaking Changes
 
-1. with version `v5.0.0` the apie has changed to es6 modules, where there is no default epxport, only named exports. Additionally all code has been rewritten to typescript. If directly accessing files, switch to `dist/module/*.js`-files for plain js-modules.
+1. with version `v5.0.0` the api has changed to es6 modules, where there is no default epxport, only named exports. Additionally all code has been rewritten to typescript. When directly accessing files, switch to `dist/module/*.js`-files for plain js-modules.
 2. with version `v4.0.0` the api has changed in order to use the defined (root) schema in core as default where 
-    possible. This means, most methods have a a changed signature, where `data` is passed before an optional `schema` argument. Check the [Core Overview](#core) for the current signature
+    possible. This means, most methods have a changed signature, where `data` is passed before an optional `schema` argument. Check the [Core Overview](#core) for the current signature
 3. additionally `iterateSchema` has been renamed to `eachSchema` for consistency
 
 
@@ -87,7 +87,7 @@ Core {
 
 ##### getSchema(core, pointer, [data], [schema])
 > Get the json-schema describing the `data` found at `pointer`.
-> The default json-schema-definitions can be resolved without any data as input: `core.getSchema('#/article/title')`. 
+> The default json-schema definitions can be resolved without any data as input: `core.getSchema('#/article/title')`. 
 > For any dynamic values (like `oneOf`, `definitions`) the data has to be passed in addition.
 
 ```js
