@@ -16,7 +16,8 @@
     "tdd": "watch \"npm run test:unit\" lib/ test/",
     "coverage": "nyc npm run test --reporter=lcov",
     "analyze": "NODE_ENV=production webpack --json | webpack-bundle-size-analyzer",
-    "lint": "eslint lib"
+    "lint": "eslint lib",
+    "prepublishOnly": "yarn dist"
   },
   "repository": {
     "type": "git",
