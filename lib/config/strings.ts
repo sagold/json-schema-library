@@ -17,6 +17,7 @@ export default {
     FormatIPV6LeadingZeroError: "IPv6 addresses starting with zero are invalid, since they are interpreted as octals",
     FormatRegExError: "Value `{{value}}` at `{{pointer}}` is not a valid regular expression",
     InvalidDataError: "No value may be specified in `{{pointer}}`",
+    InvalidPropertyNameError: "Invalid property name `{{property}}` at `{{pointer}}`",
     MaximumError: "Value in `{{pointer}}` is `{{length}}`, but should be `{{maximum}}` at maximum",
     MaxItemsError: "Too many items in `{{pointer}}`, should be `{{maximum}}` at most, but got `{{length}}`",
     MaxLengthError: "Value `{{pointer}}` should have a maximum length of `{{maxLength}}`, but got `{{length}}`.",

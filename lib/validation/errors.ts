@@ -21,6 +21,7 @@ const errors: { [p: string]: CreateError } = {
     invalidSchemaError: createCustomError("InvalidSchemaError"),
     invalidDataError: createCustomError("InvalidDataError"),
     invalidTypeError: createCustomError("InvalidTypeError"),
+    invalidPropertyNameError: createCustomError("InvalidPropertyNameError"),
     maximumError: createCustomError("MaximumError"),
     maxItemsError: createCustomError("MaxItemsError"),
     maxLengthError: createCustomError("MaxLengthError"),

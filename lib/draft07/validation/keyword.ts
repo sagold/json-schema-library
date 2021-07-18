@@ -1,5 +1,6 @@
 import Keywords from "../../validation/keyword";
 import getTypeOf from "../../getTypeOf";
+import gp from "gson-pointer";
 
 const KeywordValidation = {
     ...Keywords,
@@ -84,6 +85,47 @@ const KeywordValidation = {
                 errors.push(core.errors.patternPropertiesError({
                     key, pointer, patterns: Object.keys(pp).join(",")
                 }));
+            }
+        });
+
+        return errors;
+    },
+    // @draft >= 6
+    propertyNames: (core, schema, value, pointer) => {
+        // bool schema
+        if (schema.propertyNames === false) {
+            // empty objects are valid
+            if (Object.keys(value).length === 0) {
+                return undefined;
+            }
+            return core.errors.invalidPropertyNameError({
+                property: Object.keys(value),
+                pointer,
+                value
+            });
+        }
+
+        if (schema.propertyNames === true) {
+            return undefined;
+        }
+
+        if (getTypeOf(schema.propertyNames) !== "object") {
+            // ignore invalid schema
+            return undefined;
+        }
+
+        const errors = [];
+        const properties = Object.keys(value);
+        const propertySchema = { ...schema.propertyNames, type: "string" };
+        properties.forEach(prop => {
+            const validationResult = core.validate(prop, propertySchema, `${pointer}/${prop}`);
+            if (validationResult.length > 0) {
+                errors.push(core.errors.invalidPropertyNameError({
+                    property: prop,
+                    pointer,
+                    validationError: validationResult[0],
+                    value: value[prop]
+                }))
             }
         });
 

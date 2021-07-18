@@ -17,14 +17,14 @@ if (draft07TestCases.length === 0) {
     throw new Error(`Failed retrieving tests from ${globPattern}`);
 }
 
-draft07TestCases = draft07TestCases.filter(filepath => filepath.includes("/items.json"));
+draft07TestCases = draft07TestCases.filter(filepath => filepath.includes("/propertyNames.json"));
 
 /*
   ✓ 'tests/draft7/additionalItems.json',
   ✓ 'tests/draft7/additionalProperties.json',
   ✓ 'tests/draft7/allOf.json',
   ✓ 'tests/draft7/anyOf.json',
-  ✖ ✖ 'tests/draft7/boolean_schema.json',
+  ✓ 'tests/draft7/boolean_schema.json',
   ✖ 'tests/draft7/const.json',
   ✖ 'tests/draft7/contains.json',
   ✓ 'tests/draft7/default.json',
@@ -37,7 +37,7 @@ draft07TestCases = draft07TestCases.filter(filepath => filepath.includes("/items
   ✖ 'tests/draft7/id.json',
   ✖ 'tests/draft7/if-then-else.json',
   ✓ 'tests/draft7/infinite-loop-detection.json',
-  ✖ 'tests/draft7/items.json',
+  ✓ 'tests/draft7/items.json',
   ✓ 'tests/draft7/maximum.json',
   ✓ 'tests/draft7/maxItems.json',
   ✓ 'tests/draft7/maxLength.json',
@@ -47,8 +47,8 @@ draft07TestCases = draft07TestCases.filter(filepath => filepath.includes("/items
   ✓ 'tests/draft7/minLength.json',
   ✓ 'tests/draft7/minProperties.json',
   ✓ 'tests/draft7/multipleOf.json',
-  ✖ 'tests/draft7/not.json',
-  ✖ 'tests/draft7/oneOf.json',
+  ✓ 'tests/draft7/not.json',
+  ✓ 'tests/draft7/oneOf.json',
   'tests/draft7/optional/bignum.json',
   'tests/draft7/optional/content.json',
   'tests/draft7/optional/ecmascript-regex.json',
@@ -75,7 +75,7 @@ draft07TestCases = draft07TestCases.filter(filepath => filepath.includes("/items
   ✓ 'tests/draft7/pattern.json',
   ✓ 'tests/draft7/patternProperties.json' - adjusted boolean schema: false
   ✓ 'tests/draft7/properties.json',
-  ✖ 'tests/draft7/propertyNames.json',
+  ✓ 'tests/draft7/propertyNames.json',
   ✖ ✖ 'tests/draft7/ref.json',
   ✖ 'tests/draft7/refRemote.json',
   ✓ 'tests/draft7/required.json',

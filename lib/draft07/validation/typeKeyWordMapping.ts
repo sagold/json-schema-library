@@ -7,7 +7,7 @@ export default {
     boolean: ["enum", "not"],
     object: [
         "additionalProperties", "dependencies", "enum", "format", "minProperties", "maxProperties",
-        "patternProperties", "properties", "required", "not", "oneOf", "allOf", "anyOf"
+        "patternProperties", "properties", "propertyNames", "required", "not", "oneOf", "allOf", "anyOf"
     ],
     string: ["enum", "format", "maxLength", "minLength", "pattern", "not", "oneOf", "allOf", "anyOf"],
     number: ["enum", "exclusiveMaximum", "exclusiveMinimum", "format", "maximum", "minimum", "multipleOf", "not", "oneOf", "allOf", "anyOf"],
