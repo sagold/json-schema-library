@@ -4,7 +4,11 @@ import settings from "../config/settings";
 import ucs2decode from "../utils/punycode.ucs2decode";
 import { JSONValidator } from "../types";
 const FPP = settings.floatingPointPrecision;
+import { JSONError } from "../types";
 
+function isError(o): o is JSONError {
+    return o?.type === "error";
+}
 
 // list of validation keywords: http://json-schema.org/latest/json-schema-validation.html#rfc.section.5
 const KeywordValidation: Record<string, JSONValidator> = {
@@ -306,7 +310,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
         }
 
         schema = core.resolveOneOf(value, schema, pointer);
-        if (schema && schema.type === "error") {
+        if (isError(schema)) {
             return schema;
         }
 

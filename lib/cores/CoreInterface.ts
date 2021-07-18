@@ -70,7 +70,7 @@ export default class CoreInterface {
         this.rootSchema = schema;
     }
 
-    step(key: string, schema: JSONSchema, data: any, pointer: JSONPointer = "#"): JSONSchema {
+    step(key: string|number, schema: JSONSchema, data: any, pointer: JSONPointer = "#"): JSONSchema {
         throw new Error("function 'step' is not implemented");
     }
 }
