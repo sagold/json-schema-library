@@ -1,8 +1,8 @@
 import Keywords from "../../validation/keyword";
 import getTypeOf from "../../getTypeOf";
-import gp from "gson-pointer";
+import { JSONValidator } from "../../types";
 
-const KeywordValidation = {
+const KeywordValidation: Record<string, JSONValidator> = {
     ...Keywords,
     // @draft >= 6
     contains: (core, schema, value, pointer) => {

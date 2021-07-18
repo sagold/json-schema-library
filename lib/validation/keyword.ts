@@ -2,11 +2,12 @@ import getTypeOf from "../getTypeOf";
 import isSame from "../utils/deepCompare";
 import settings from "../config/settings";
 import ucs2decode from "../utils/punycode.ucs2decode";
+import { JSONValidator } from "../types";
 const FPP = settings.floatingPointPrecision;
 
 
 // list of validation keywords: http://json-schema.org/latest/json-schema-validation.html#rfc.section.5
-const KeywordValidation = {
+const KeywordValidation: Record<string, JSONValidator> = {
 
     additionalProperties: (core, schema, value, pointer) => {
         if (schema.additionalProperties === true || schema.additionalProperties == null) {
