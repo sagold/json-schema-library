@@ -33,6 +33,15 @@ const stepType = {
         }
 
         if (itemsType === "array") {
+            // @draft >= 7 bool schema, items:[true, false]
+            if (schema.items[key] === true) {
+                return createSchemaOf(data[key]);
+            }
+            // @draft >= 7 bool schema, items:[true, false]
+            if (schema.items[key] === false) {
+                return errors.invalidDataError({ key, value: data[key], pointer });
+            }
+
             if (schema.items[key]) {
                 return core.resolveRef(schema.items[key]);
             }

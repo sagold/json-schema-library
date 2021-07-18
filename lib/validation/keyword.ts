@@ -164,12 +164,19 @@ const KeywordValidation = {
         return undefined;
     },
     items: (core, schema, value, pointer) => {
+        // @draft >= 7 bool schema
+        if (schema.items === false) {
+            if (Array.isArray(value) && value.length === 0) {
+                return undefined;
+            }
+            return core.errors.invalidDataError({ pointer, value });
+        }
+
         const errors = [];
         for (let i = 0; i < value.length; i += 1) {
             const itemData = value[i];
             // @todo reevaluate: incomplete schema is created here
             const itemSchema = core.step(i, schema, value, pointer);
-
             if (itemSchema && itemSchema.type === "error") {
                 return [itemSchema];
             }
