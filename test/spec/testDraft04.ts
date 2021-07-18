@@ -5,20 +5,13 @@ import path from "path";
 import chalk from "chalk";
 import flattenArray from "../../lib/utils/flattenArray";
 import addSchema from "../../lib/addSchema";
+import { addRemotes } from "./utils/addRemotes";
 
 // setup remote files
-const remotesPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "remotes", "**", "*.json");
-const remotes = glob.sync(remotesPattern);
-remotes.forEach(filepath => {
-    const file = require(filepath); // eslint-disable-line
-    const remoteId = `http://localhost:1234/${filepath.split("/remotes/").pop()}`;
-    addSchema(remoteId, file);
-})
+addRemotes(addSchema);
 
 // fetch TestCases
 const globPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "tests", "draft4", "**", "*.json");
-// const globPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "tests", "draft4", "ref.json");
-// const globPattern = path.join(__dirname, "..", "..", "node_modules", "json-schema-test-suite", "tests", "draft4", "refRemote.json");
 let draft04TestCases = glob.sync(globPattern);
 if (draft04TestCases.length === 0) {
     throw new Error(`Failed retrieving tests from ${globPattern}`);
