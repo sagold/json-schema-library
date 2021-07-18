@@ -63,6 +63,10 @@ export default {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
+        if (value && value[0] === "0") {
+            // leading zeroes should be rejected, as they are treated as octals
+            return errors.formatIPV4LeadingZeroError({ value, pointer });
+        }
         if (value.length <= 15 && isValidIPV4.test(value)) {
             return undefined;
         }
@@ -72,6 +76,10 @@ export default {
     ipv6: (core, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
+        }
+        if (value && value[0] === "0") {
+            // leading zeroes should be rejected, as they are treated as octals
+            return errors.formatIPV6LeadingZeroError({ value, pointer });
         }
         if (value.length <= 45 && isValidIPV6.test(value)) {
             return undefined;
