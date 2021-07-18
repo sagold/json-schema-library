@@ -91,6 +91,10 @@ export default {
         if (typeof value === "string" && /\\Z$/.test(value) === false) {
             return undefined;
         }
+        // v7 tests, ignore non-regex values
+        if (typeof value === "object" || typeof value === "number" || Array.isArray(value)) {
+            return undefined;
+        }
         return errors.formatRegExError({ value, pointer });
     },
 
