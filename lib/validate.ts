@@ -44,7 +44,12 @@ export default function validate(core: Core, value: any, schema: JSONSchema = co
         return [schema as JSONError];
     }
 
+    // console.log("before resolve", schema);
+    const beforeschema = schema;
     schema = core.resolveRef(schema);
+    if (schema == null) {
+        console.log("failed resolving", beforeschema);
+    }
 
     // @draft >= 6 const
     if (schema.const !== undefined) {

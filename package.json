@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/sagold/json-schema-library",
   "devDependencies": {
+    "@json-schema-org/tests": "^2.0.0",
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.0.4",
     "@types/node": "^14.14.10",
@@ -44,8 +45,8 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-optimize-regex": "^1.2.0",
     "eslint-plugin-promise": "^4.2.1",
-    "glob": "^7.1.2",
     "json-schema-test-suite": "json-schema-org/JSON-Schema-Test-Suite.git#master",
+    "glob": "^7.1.2",
     "mocha": "^3.1.2",
     "nyc": "^10.0.0",
     "terser-webpack-plugin": "^5.0.3",
