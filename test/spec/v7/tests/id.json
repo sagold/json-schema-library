@@ -1,6 +1,7 @@
 {
     "name": "id",
     "file": "id.json",
+    "optional": false,
     "schemas": [
         {
             "description": "id inside an enum is not a real identifier",
