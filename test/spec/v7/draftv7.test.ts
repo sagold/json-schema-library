@@ -17,13 +17,13 @@ if (draft07TestCases.length === 0) {
     throw new Error(`Failed retrieving tests from ${globPattern}`);
 }
 
-draft07TestCases = draft07TestCases.filter(filepath => filepath.includes("/boolean_schema.json"));
+draft07TestCases = draft07TestCases.filter(filepath => filepath.includes("/items.json"));
 
 /*
   ✓ 'tests/draft7/additionalItems.json',
   ✓ 'tests/draft7/additionalProperties.json',
-  ✖ 'tests/draft7/allOf.json',
-  ✖ 'tests/draft7/anyOf.json',
+  ✓ 'tests/draft7/allOf.json',
+  ✓ 'tests/draft7/anyOf.json',
   ✖ ✖ 'tests/draft7/boolean_schema.json',
   ✖ 'tests/draft7/const.json',
   ✖ 'tests/draft7/contains.json',
@@ -33,7 +33,7 @@ draft07TestCases = draft07TestCases.filter(filepath => filepath.includes("/boole
   ✓ 'tests/draft7/enum.json',
   ✓ 'tests/draft7/exclusiveMaximum.json' - added & adjusted
   ✓ 'tests/draft7/exclusiveMinimum.json' - added & adjusted
-  ✖ 'tests/draft7/format.json',
+  ✓ 'tests/draft7/format.json',
   ✖ 'tests/draft7/id.json',
   ✖ 'tests/draft7/if-then-else.json',
   ✓ 'tests/draft7/infinite-loop-detection.json',

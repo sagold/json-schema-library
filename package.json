@@ -13,6 +13,7 @@
     "test:integration": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/integration/**/*.test.ts'",
     "test:unit": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/unit/**/*.test.ts'",
     "test:spec": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/spec/**/*.test.ts'",
+    "test:4": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/spec/*.test.ts'",
     "test:7": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/spec/v7/*.test.ts'",
     "tdd": "watch \"npm run test:unit\" lib/ test/",
     "coverage": "nyc npm run test --reporter=lcov",
