@@ -17,7 +17,7 @@ if (draft07TestCases.length === 0) {
     throw new Error(`Failed retrieving tests from ${globPattern}`);
 }
 
-draft07TestCases = draft07TestCases.filter(filepath => filepath.includes("/propertyNames.json"));
+draft07TestCases = draft07TestCases.filter(filepath => filepath.includes("const.json"));
 
 /*
   ✓ 'tests/draft7/additionalItems.json',
@@ -25,7 +25,7 @@ draft07TestCases = draft07TestCases.filter(filepath => filepath.includes("/prope
   ✓ 'tests/draft7/allOf.json',
   ✓ 'tests/draft7/anyOf.json',
   ✓ 'tests/draft7/boolean_schema.json',
-  ✖ 'tests/draft7/const.json',
+  ✓ 'tests/draft7/const.json',
   ✖ 'tests/draft7/contains.json',
   ✓ 'tests/draft7/default.json',
   ✖ 'tests/draft7/definitions.json',
@@ -53,14 +53,14 @@ draft07TestCases = draft07TestCases.filter(filepath => filepath.includes("/prope
   'tests/draft7/optional/content.json',
   'tests/draft7/optional/ecmascript-regex.json',
   'tests/draft7/optional/float-overflow.json',
-  'tests/draft7/optional/format/date-time.json',
+  ✓ 'tests/draft7/optional/format/date-time.json',
   'tests/draft7/optional/format/date.json',
-  'tests/draft7/optional/format/email.json',
-  'tests/draft7/optional/format/hostname.json',
+  ✖ 'tests/draft7/optional/format/email.json',
+  ✖ 'tests/draft7/optional/format/hostname.json',
   'tests/draft7/optional/format/idn-email.json',
   'tests/draft7/optional/format/idn-hostname.json',
-  'tests/draft7/optional/format/ipv4.json',
-  'tests/draft7/optional/format/ipv6.json',
+  ✓ 'tests/draft7/optional/format/ipv4.json',
+  ✓ 'tests/draft7/optional/format/ipv6.json',
   'tests/draft7/optional/format/iri-reference.json',
   'tests/draft7/optional/format/iri.json',
   'tests/draft7/optional/format/json-pointer.json',
@@ -69,13 +69,13 @@ draft07TestCases = draft07TestCases.filter(filepath => filepath.includes("/prope
   'tests/draft7/optional/format/time.json',
   'tests/draft7/optional/format/uri-reference.json',
   'tests/draft7/optional/format/uri-template.json',
-  'tests/draft7/optional/format/uri.json',
+  ✓ 'tests/draft7/optional/format/uri.json',
   'tests/draft7/optional/non-bmp-regex.json',
-  'tests/draft7/optional/unicode.json',
+  ✖ 'tests/draft7/optional/unicode.json',
   ✓ 'tests/draft7/pattern.json',
   ✓ 'tests/draft7/patternProperties.json' - adjusted boolean schema: false
   ✓ 'tests/draft7/properties.json',
-  ✓ 'tests/draft7/propertyNames.json',
+  ✓ 'tests/draft7/propertyNames.json' - add
   ✖ ✖ 'tests/draft7/ref.json',
   ✖ 'tests/draft7/refRemote.json',
   ✓ 'tests/draft7/required.json',

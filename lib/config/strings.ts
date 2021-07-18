@@ -5,6 +5,7 @@ export default {
     AdditionalPropertiesError: "Additional property `{{property}}` on `{{pointer}}` does not match schema `{{schema}}`",
     AnyOfError: "Value `{{value}}` at `{{pointer}}` does not match any schema of `{{anyOf}}`",
     AllOfError: "Value `{{value}}` at `{{pointer}}` does not match schema of `{{allOf}}`",
+    ConstError: "Expected value at `{{pointer}}` to be `{{expected}}`, but value given is `{{value}}`",
     EnumError: "Expected given value `{{value}}` in `{{pointer}}` to be one of `{{values}}`",
     FormatDateTimeError: "Value `{{value}}` at `{{pointer}}` is not a valid date-time",
     FormatEmailError: "Value `{{value}}` at `{{pointer}}` is not a valid email",

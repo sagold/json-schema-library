@@ -3,6 +3,7 @@ import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
 import { JSONSchema, JSONPointer, JSONError } from "./types";
 import Core from "./cores/CoreInterface";
+import equal from "fast-deep-equal";
 
 
 function getJsonSchemaType(value, expectedType) {
@@ -44,6 +45,14 @@ export default function validate(core: Core, value: any, schema: JSONSchema = co
     }
 
     schema = core.resolveRef(schema);
+
+    // @draft >= 6 const
+    if (schema.const !== undefined) {
+        if (equal(schema.const, value)) {
+            return [];
+        }
+        return [core.errors.constError({ value, expected: schema.const, pointer })];
+    }
 
     const receivedType = getJsonSchemaType(value, schema.type);
     const expectedType = schema.type || receivedType;

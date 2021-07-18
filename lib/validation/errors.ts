@@ -7,6 +7,7 @@ const errors: { [p: string]: CreateError } = {
     additionalPropertiesError: createCustomError("AdditionalPropertiesError"),
     anyOfError: createCustomError("AnyOfError"),
     allOfError: createCustomError("AllOfError"),
+    constError: createCustomError("ConstError"),
     enumError: createCustomError("EnumError"),
     formatUrlError: createCustomError("FormatUrlError"),
     formatUriError: createCustomError("FormatUriError"),
