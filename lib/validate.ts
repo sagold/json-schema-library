@@ -28,6 +28,17 @@ function getJsonSchemaType(value, expectedType) {
  * @return list of errors or empty
  */
 export default function validate(core: Core, value: any, schema: JSONSchema = core.rootSchema, pointer: JSONPointer = "#"): Array<JSONError> {
+    // @todo this is a high level v7 schema validation
+    // @ts-ignore
+    if (schema === true) {
+        return [];
+    }
+    // @todo this is a high level v7 schema validation
+    // @ts-ignore
+    if (schema === false) {
+        return [core.errors.invalidDataError({ value, pointer })];
+    }
+
     if (schema.type === "error") {
         return [schema as JSONError];
     }

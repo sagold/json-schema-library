@@ -6,7 +6,7 @@ import resolveRef from "../resolveRef.strict";
 import getTemplate from "../getTemplate";
 import getSchema from "../getSchema";
 import each from "../each";
-import compileSchema from "../compileSchema";
+import compileSchema from "../draft07/compile";
 import { JSONSchema, JSONPointer } from "../types";
 
 import remotes from "../../remotes";
@@ -16,12 +16,12 @@ remotes["http://json-schema.org/draft-04/schema"] = compileSchema(draft04);
 
 import TYPE_KEYWORD_MAPPING from "../draft07/validation/typeKeywordMapping";
 import KEYWORDS from "../draft07/validation/keyword";
-import TYPES from "../validation/type";
+import TYPES from "../draft07/validation/type";
 import FORMATS from "../validation/format";
 import ERRORS from "../validation/errors";
 
 
-export default class Draft04Core extends CoreInterface {
+export default class Draft07Core extends CoreInterface {
 
     constructor(schema?: JSONSchema) {
         super(schema);
@@ -30,6 +30,17 @@ export default class Draft04Core extends CoreInterface {
         this.validateType = Object.assign({}, TYPES);
         this.validateFormat = Object.assign({}, FORMATS);
         this.errors = Object.assign({}, ERRORS);
+    }
+
+    get rootSchema() {
+        return this.__rootSchema;
+    }
+
+    set rootSchema(rootSchema: JSONSchema) {
+        if (rootSchema == null) {
+            return;
+        }
+        this.__rootSchema = compileSchema(rootSchema);
     }
 
     each(data: any, callback, schema: JSONSchema = this.rootSchema, pointer: JSONPointer = "#") {

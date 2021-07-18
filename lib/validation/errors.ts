@@ -19,6 +19,7 @@ const errors: { [p: string]: CreateError } = {
     formatIPV6LeadingZeroError: createCustomError("FormatIPV6LeadingZeroError"),
     formatRegExError: createCustomError("FormatRegExError"),
     invalidSchemaError: createCustomError("InvalidSchemaError"),
+    invalidDataError: createCustomError("InvalidDataError"),
     invalidTypeError: createCustomError("InvalidTypeError"),
     maximumError: createCustomError("MaximumError"),
     maxItemsError: createCustomError("MaxItemsError"),

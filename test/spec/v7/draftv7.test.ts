@@ -4,7 +4,7 @@ import chalk from "chalk";
 import path from "path";
 import glob from "glob";
 import Draft07 from "../../../lib/cores/Draft07";
-import addSchema from "../../../lib/addSchema";
+import addSchema from "../../../lib/draft07/addSchema";
 import { addRemotes } from "../utils/addRemotes";
 import flattenArray from "../../../lib/utils/flattenArray";
 
