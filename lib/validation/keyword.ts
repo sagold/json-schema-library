@@ -122,6 +122,15 @@ const KeywordValidation = {
                     return;
                 }
 
+                // @draft >= 6 boolean schema
+                if (schema.dependencies[property] === true) {
+                    return;
+                }
+                if (schema.dependencies[property] === false) {
+                    errors.push(core.errors.missingDependencyError({ pointer }));
+                    return;
+                }
+
                 let dependencyErrors;
                 const type = getTypeOf(schema.dependencies[property]);
                 if (type === "array") {
@@ -130,7 +139,6 @@ const KeywordValidation = {
                         .map(missingProperty => core.errors.missingDependencyError({ missingProperty, pointer }));
                 } else if (type === "object") {
                     dependencyErrors = core.validate(value, schema.dependencies[property]);
-
                 } else {
                     throw new Error(`Invalid dependency definition for ${pointer}/${property}. Must be list or schema`);
                 }
