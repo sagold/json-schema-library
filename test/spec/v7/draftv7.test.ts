@@ -6,11 +6,15 @@ import addSchema from "../../../lib/draft07/addSchema";
 import { addRemotes } from "../utils/addRemotes";
 import TestSuite from "@json-schema-org/tests";
 import draft07 from "../../../remotes/draft07.json";
+import testId from "./tests/id.json";
 
 addRemotes(addSchema);
 addSchema("http://json-schema.org/draft-07/schema", draft07);
 
-const testCases = TestSuite.draft7().filter(testcase => testcase.name.includes("dependencies"));
+const testCases = TestSuite.draft7().filter(testcase => testcase.name.includes("refRemote"));
+
+// https://json-schema.org/understanding-json-schema/structuring.html#id
+// const testCases = [testId]
 
 /*
   ✓ additionalItems,
@@ -22,12 +26,12 @@ const testCases = TestSuite.draft7().filter(testcase => testcase.name.includes("
   ✓ contains,
   ✓ default,
   ✓ definitions - requires compiled draft-07 schema
-  ✖ dependencies - added boolean
+  ✓ dependencies - added boolean
   ✓ enum,
   ✓ exclusiveMaximum' - added & adjusted
   ✓ exclusiveMinimum' - added & adjusted
   ✓ format,
-  ✖ id,
+  ✓ id - renamed schema.id to schema.$id
   ✖ if-then-else,
   ✓ infinite-loop-detection,
   ✓ items,
@@ -77,9 +81,8 @@ const testCases = TestSuite.draft7().filter(testcase => testcase.name.includes("
   ✖ unknownKeyword'
  */
 
-
 function runTestCase(Core, tc, skipTest = []) {
-    describe(`${tc.name}${tc.optional ? "(optional)" : ""}`, () => {
+    describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.schemas.forEach(testCase => {
             const schema = testCase.schema;
             if (skipTest.includes(testCase.description)) {

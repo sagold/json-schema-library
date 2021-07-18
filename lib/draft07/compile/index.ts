@@ -32,14 +32,14 @@ export default function compile(rootSchema: JSONSchema, force = false): JSONSche
     const scopes = {};
     const getRoot = () => rootSchema;
     eachSchema(rootSchema, (schema, pointer) => {
-        if (schema.id) { context.ids[schema.id.replace(suffixes, "")] = pointer; }
+        if (schema.$id) { context.ids[schema.$id.replace(suffixes, "")] = pointer; }
 
         // build up scopes and add them to $ref-resolution map
         pointer = `#${pointer}`.replace(/##+/, "#");
         const previousPointer = pointer.replace(/\/[^/]+$/, "");
         const parentPointer = pointer.replace(/\/[^/]+\/[^/]+$/, "");
         const previousScope = scopes[previousPointer] || scopes[parentPointer];
-        const scope = joinScope(previousScope, schema.id);
+        const scope = joinScope(previousScope, schema.$id);
         scopes[pointer] = scope;
         if (context.ids[scope] == null) { context.ids[scope] = pointer; }
 
