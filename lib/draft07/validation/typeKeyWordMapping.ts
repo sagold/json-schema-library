@@ -3,7 +3,7 @@
  *  - overview https://epoberezkin.github.io/ajv/keywords.html
  */
 export default {
-    array: ["enum", "items", "minItems", "maxItems", "uniqueItems", "not"],
+    array: ["enum", "contains", "items", "minItems", "maxItems", "uniqueItems", "not"],
     boolean: ["enum", "not"],
     object: [
         "additionalProperties", "dependencies", "enum", "format", "minProperties", "maxProperties",

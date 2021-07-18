@@ -4,6 +4,31 @@ import gp from "gson-pointer";
 
 const KeywordValidation = {
     ...Keywords,
+    // @draft >= 6
+    contains: (core, schema, value, pointer) => {
+        if (schema.contains === false) {
+            return core.errors.containsArrayError({ pointer, value });
+        }
+
+        if (schema.contains === true) {
+            if (Array.isArray(value) && value.length === 0) {
+                return core.errors.containsAnyError({ pointer });
+            }
+            return undefined;
+        }
+
+        if (getTypeOf(schema.contains) !== "object") {
+            // ignore invalid schema
+            return undefined;
+        }
+
+        for (let i = 0; i < value.length; i += 1) {
+            if (core.isValid(value[i], schema.contains)) {
+                return undefined;
+            }
+        }
+        return core.errors.containsError({ pointer, schema: JSON.stringify(schema.contains) });
+    },
     exclusiveMaximum: (core, schema, value, pointer) => {
         if (isNaN(schema.exclusiveMaximum)) {
             return undefined;
