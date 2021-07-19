@@ -7,14 +7,18 @@ import { addRemotes } from "../utils/addRemotes";
 import TestSuite from "@json-schema-org/tests";
 import draft07 from "../../../remotes/draft07.json";
 import testId from "./tests/id.json";
+import testUnknownKeyword from "./tests/unknownKeyword.json";
+import testRefRemote from "./tests/refRemote";
 
 addRemotes(addSchema);
 addSchema("http://json-schema.org/draft-07/schema", draft07);
 
-const testCases = TestSuite.draft7().filter(testcase => testcase.name.includes("refRemote"));
+// const testCases = TestSuite.draft7()
+//     .filter(testcase => testcase.name === "refRemote")
+    // .filter(testcase => !testcase.optional);
 
 // https://json-schema.org/understanding-json-schema/structuring.html#id
-// const testCases = [testId]
+const testCases = [testRefRemote];
 
 /*
   ✓ additionalItems,
@@ -32,7 +36,7 @@ const testCases = TestSuite.draft7().filter(testcase => testcase.name.includes("
   ✓ exclusiveMinimum' - added & adjusted
   ✓ format,
   ✓ id - renamed schema.id to schema.$id
-  ✖ if-then-else,
+  ✖ if-then-else - added
   ✓ infinite-loop-detection,
   ✓ items,
   ✓ maximum,
@@ -73,7 +77,7 @@ const testCases = TestSuite.draft7().filter(testcase => testcase.name.includes("
   ✓ patternProperties' - adjusted boolean schema: false
   ✓ properties,
   ✓ propertyNames' - add
-  ✖ ✖ ref,
+  ✓ ref,
   ✖ refRemote,
   ✓ required,
   ✓ type,

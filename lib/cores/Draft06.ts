@@ -10,10 +10,10 @@ import compileSchema from "../draft07/compile";
 import { JSONSchema, JSONPointer } from "../types";
 
 import remotes from "../../remotes";
-import draft07 from "../../remotes/draft07.json";
+import draft06 from "../../remotes/draft06.json";
 
 // @ts-ignore
-remotes["http://json-schema.org/draft-07/schema"] = compileSchema(draft07);
+remotes["http://json-schema.org/draft-06/schema"] = compileSchema(draft06);
 
 import TYPE_KEYWORD_MAPPING from "../draft07/validation/typeKeywordMapping";
 import KEYWORDS from "../draft07/validation/keyword";
@@ -22,7 +22,7 @@ import FORMATS from "../validation/format";
 import ERRORS from "../validation/errors";
 
 
-export default class Draft07Core extends CoreInterface {
+export default class Draft06Core extends CoreInterface {
 
     constructor(schema?: JSONSchema) {
         super(schema);
