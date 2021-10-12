@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import compile from "../../lib/compile";
 import remotes from "../../remotes";
+import Draft07 from "../../lib/cores/Draft07";
 import copy from "../../lib/utils/copy";
 import Draft04 from "../../remotes/draft04.json";
 
@@ -298,7 +299,7 @@ describe("compile", () => {
     });
 
 
-    describe("spec remoteRef.json", () => {
+    describe("draft04 spec remoteRef.json", () => {
 
         it("should resolve remote ref", () => {
             remotes["http://localhost:1234/integer.json"] = compile({ type: "integer" });
@@ -381,6 +382,47 @@ describe("compile", () => {
 
             const result = schema.getRef(schema.properties.name);
             expect(result).to.deep.eq({ anyOf: [{ type: "null" }, { $ref: "#" }] });
+        });
+    });
+
+    describe.only("draft07 - refRemote base URI change - base URI change ref invalid", () => {
+        /*
+            here we test if the root-pointer resolution of a remote definition is
+            resolved within the remote schema - currently, it is not
+            - references are resolved dynamically
+            - so we return a schema, where the included reference is resolved later
+            - which might resolve in wrong schema
+         */
+        let validator: Draft07;
+        beforeEach(() => {
+            remotes["http://localhost:1234/name.json"] = compile({
+                definitions: {
+                    orNull: {
+                        anyOf: [{ type: "null" }, { $ref: "#" }]
+                    }
+                },
+                type: "string"
+            });
+            const schema = compile({
+                id: "http://localhost:1234/object",
+                type: "object",
+                properties: {
+                    name: { $ref: "name.json#/definitions/orNull" }
+                }
+            });
+            validator = new Draft07(schema);
+        });
+
+        it("should validate 'string'", () => {
+            expect(validator.validate({ name: "foo" })).to.deep.eq([]);
+        });
+
+        it("should validate 'null'", () => {
+            expect(validator.validate({ name: null })).to.deep.eq([], "null is valid");
+        });
+
+        it("should not validate 'object'", () => {
+            expect(validator.isValid({ name: { name: null } })).to.eq(false);
         });
     });
 });
