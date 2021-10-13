@@ -18,7 +18,6 @@
 /coverage
 /dist
 /tools/profiles
-/yarn.lock
 atlassian-ide-plugin.xml
 bower_components/
 node_modules/
