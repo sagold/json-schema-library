@@ -47,7 +47,22 @@ const KeywordValidation: Record<string, JSONValidator> = {
         }
         return undefined;
     },
+    if: (core, schema, value, pointer) => {
+        if (schema.if == null) {
+            return undefined;
+        }
 
+        const ifErrors = core.validate(value, schema.if, pointer);
+        // console.log("if Errors", value, ifErrors);
+
+        if (ifErrors.length === 0 && schema.then) {
+            return core.validate(value, schema.then, pointer);
+        }
+
+        if (ifErrors.length !== 0 && schema.else) {
+            return core.validate(value, schema.else, pointer);
+        }
+    },
     maximum: (core, schema, value, pointer) => {
         if (isNaN(schema.maximum)) {
             return undefined;
