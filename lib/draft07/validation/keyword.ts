@@ -33,7 +33,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
         if (isNaN(schema.exclusiveMaximum)) {
             return undefined;
         }
-        if (schema.exclusiveMaximum && schema.exclusiveMaximum <= value) {
+        if (schema.exclusiveMaximum <= value) {
             return core.errors.maximumError({ maximum: schema.exclusiveMaximum, length: value, pointer });
         }
         return undefined;
@@ -47,6 +47,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
         }
         return undefined;
     },
+
     maximum: (core, schema, value, pointer) => {
         if (isNaN(schema.maximum)) {
             return undefined;
