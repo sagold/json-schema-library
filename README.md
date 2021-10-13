@@ -23,8 +23,8 @@
 
 ## Breaking Changes
 
-1. with version `v6.0.0` supported json schema draft are exported directly as `Draft04`, `Draft06`, `Draft07`, e.g. `import Draft07 from "json-schema-library`
-1. with version `v5.0.0` the api has changed to es6 modules, where there is no default epxport, only named exports. Additionally all code has been rewritten to typescript. When directly accessing files, switch to `dist/module/*.js`-files for plain js-modules.
+1. with version `v6.0.0` supported json schema drafts are exported directly as `Draft04`, `Draft06`, `Draft07`, e.g. `import Draft07 from "json-schema-library`
+1. with version `v5.0.0` the api has changed to es6 modules, where there is no default export, only named exports. Additionally all code has been rewritten to typescript. When directly accessing files, switch to `dist/module/*.js`-files for plain js-modules.
 1. with version `v4.0.0` the api has changed in order to use the defined (root) schema in core as default where 
     possible. This means, most methods have a changed signature, where `data` is passed before an optional `schema` argument. Check the [Core Overview](#core) for the current signature
 1. additionally `iterateSchema` has been renamed to `eachSchema` for consistency
