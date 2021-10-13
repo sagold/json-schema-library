@@ -2,7 +2,7 @@
 import { expect } from "chai";
 import chalk from "chalk";
 import Draft07 from "../../../lib/cores/Draft07";
-import addSchema from "../../../lib/draft07/addSchema";
+import addSchema from "../../../lib/draft06/addSchema";
 import { addRemotes } from "../utils/addRemotes";
 import TestSuite from "@json-schema-org/tests";
 import draft07 from "../../../remotes/draft07.json";

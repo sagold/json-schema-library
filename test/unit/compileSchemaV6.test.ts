@@ -1,11 +1,11 @@
 import { expect } from "chai";
-import compile from "../../lib/draft07/compile";
+import compile from "../../lib/draft06/compile";
 import remotes from "../../remotes";
-import Draft07 from "../../lib/cores/Draft07";
+import Draft06 from "../../lib/cores/Draft06";
 
 
-describe("compile7", () => {
-    let validator: Draft07;
+describe("compileV06", () => {
+    let validator: Draft06;
 
     describe("01 - refRemote base URI change - base URI change ref invalid", () => {
         /*
@@ -31,7 +31,7 @@ describe("compile7", () => {
                     name: { $ref: "name.json#/definitions/orNull" }
                 }
             });
-            validator = new Draft07(schema);
+            validator = new Draft06(schema);
         });
 
         it("should validate 'string'", () => {
@@ -60,7 +60,7 @@ describe("compile7", () => {
                     "items": {"$ref": "folderInteger.json"}
                 }
             });
-            validator = new Draft07(schema);
+            validator = new Draft06(schema);
         });
 
         it("should not validate 'string'", () => {

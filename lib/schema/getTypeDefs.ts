@@ -26,8 +26,9 @@ export default function getTypeDefs(schema: JSONSchema): Array<{ pointer: JSONPo
         // maybe this will require a more sophisticated approach
         type = {};
         for (let i = 0, l = id.length; i < l; i += 1) {
-            Object.assign(type, id[i]);
+            Object.assign(type, types[id[i]]);
         }
+
     } else {
         type = types[id];
     }

@@ -6,7 +6,7 @@ import resolveRef from "../resolveRef.strict";
 import getTemplate from "../getTemplate";
 import getSchema from "../getSchema";
 import each from "../each";
-import compileSchema from "../draft07/compile";
+import compileSchema from "../draft06/compile";
 import { JSONSchema, JSONPointer } from "../types";
 
 import remotes from "../../remotes";
@@ -15,9 +15,9 @@ import draft07 from "../../remotes/draft07.json";
 // @ts-ignore
 remotes["http://json-schema.org/draft-07/schema"] = compileSchema(draft07);
 
-import TYPE_KEYWORD_MAPPING from "../draft07/validation/typeKeywordMapping";
-import KEYWORDS from "../draft07/validation/keyword";
-import TYPES from "../draft07/validation/type";
+import TYPE_KEYWORD_MAPPING from "../draft06/validation/typeKeywordMapping";
+import KEYWORDS from "../draft06/validation/keyword";
+import TYPES from "../draft06/validation/type";
 import FORMATS from "../validation/format";
 import ERRORS from "../validation/errors";
 
