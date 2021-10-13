@@ -1,9 +1,9 @@
 /* eslint max-statements-per-line: ["error", { "max": 2 }] */
-import eachSchema from "../eachSchema";
-import remotes from "../../remotes";
-import joinScope from "./joinScope";
-import getRef from "./getRef";
-import { JSONSchema } from "../types";
+import eachSchema from "../../eachSchema";
+import remotes from "../../../remotes";
+import joinScope from "../../compile/joinScope";
+import getRef from "../../compile/getRef";
+import { JSONSchema } from "../../types";
 
 const COMPILED = "__compiled";
 const COMPILED_REF = "__ref";
@@ -11,7 +11,10 @@ const GET_REF = "getRef";
 const GET_ROOT = "getRoot";
 const suffixes = /(#|\/)+$/g;
 
+
 /**
+ * @draft starting with _draft 06_ keyword `id` has been renamed to `$id`
+ *
  * compiles the input root schema for $ref resolution and returns it again
  * @attention this modifies input schema but maintains object-structure
  *
@@ -23,6 +26,10 @@ const suffixes = /(#|\/)+$/g;
  * @return compiled json-schema
  */
 export default function compile(rootSchema: JSONSchema, force = false): JSONSchema {
+    // @ts-ignore
+    if (rootSchema === true || rootSchema === false) {
+        return rootSchema;
+    }
     if (rootSchema[COMPILED] !== undefined) { return rootSchema; } // eslint-disable-line
     const context = { ids: {}, remotes: Object.assign({}, remotes) };
     const rootSchemaAsString = JSON.stringify(rootSchema);
@@ -38,14 +45,14 @@ export default function compile(rootSchema: JSONSchema, force = false): JSONSche
     const scopes = {};
     const getRoot = () => rootSchema;
     eachSchema(rootSchema, (schema, pointer) => {
-        if (schema.id) { context.ids[schema.id.replace(suffixes, "")] = pointer; }
+        if (schema.$id) { context.ids[schema.$id.replace(suffixes, "")] = pointer; }
 
         // build up scopes and add them to $ref-resolution map
         pointer = `#${pointer}`.replace(/##+/, "#");
         const previousPointer = pointer.replace(/\/[^/]+$/, "");
         const parentPointer = pointer.replace(/\/[^/]+\/[^/]+$/, "");
         const previousScope = scopes[previousPointer] || scopes[parentPointer];
-        const scope = joinScope(previousScope, schema.id);
+        const scope = joinScope(previousScope, schema.$id);
         scopes[pointer] = scope;
         if (context.ids[scope] == null) { context.ids[scope] = pointer; }
 
@@ -57,6 +64,5 @@ export default function compile(rootSchema: JSONSchema, force = false): JSONSche
         }
     });
 
-    // console.log(JSON.stringify(context.ids, null, 2));
     return rootSchema;
 }

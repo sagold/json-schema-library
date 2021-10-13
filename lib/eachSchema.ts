@@ -30,11 +30,11 @@ function nextTypeDefs(schema: JSONSchema, pointer: JSONPointer) {
 function eachDefinition(walk: Walker, schema: JSONSchema, pointer: JSONPointer) {
     Object.keys(schema.definitions)
         .forEach(defId => {
-            if (!isObject(schema.definitions[defId])) {
-                console.log(`Invalid schema in ${pointer}/definitions/${defId}`);
+            if (schema.definitions[defId] === false || isObject(schema.definitions[defId])) {
+                walk.nextTypeDefs(schema.definitions[defId], gp.join(pointer, "definitions", defId, false));
                 return;
             }
-            walk.nextTypeDefs(schema.definitions[defId], gp.join(pointer, "definitions", defId, false));
+            console.log(`Invalid schema in ${pointer}/definitions/${defId}`);
         });
 }
 

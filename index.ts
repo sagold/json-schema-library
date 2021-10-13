@@ -1,6 +1,8 @@
 import strings from "./lib/config/strings";
 import Interface from "./lib/cores/CoreInterface";
 import Draft04 from "./lib/cores/Draft04";
+import Draft06 from "./lib/cores/Draft06";
+import Draft07 from "./lib/cores/Draft07";
 import JsonEditor from "./lib/cores/JsonEditor";
 import addSchema from "./lib/addSchema";
 import addValidator from "./lib/addValidator";
@@ -26,6 +28,8 @@ export {
     config,
     Interface,
     Draft04, // core implementing draft04 specs
+    Draft06, // core implementing draft06 specs
+    Draft07, // core implementing draft07 specs
     JsonEditor, // adjusted core of draft04 to better support the json-editor
     addSchema, // add a schema to be references via $ref
     addValidator, // add validation for keyword, format, datatype and customize errors

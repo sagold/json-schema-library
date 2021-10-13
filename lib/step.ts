@@ -33,6 +33,15 @@ const stepType = {
         }
 
         if (itemsType === "array") {
+            // @draft >= 7 bool schema, items:[true, false]
+            if (schema.items[key] === true) {
+                return createSchemaOf(data[key]);
+            }
+            // @draft >= 7 bool schema, items:[true, false]
+            if (schema.items[key] === false) {
+                return errors.invalidDataError({ key, value: data[key], pointer });
+            }
+
             if (schema.items[key]) {
                 return core.resolveRef(schema.items[key]);
             }
@@ -158,6 +167,16 @@ const stepType = {
  */
 export default function step(core: Core, key: string|number, schema: JSONSchema, data?: any, pointer: JSONPointer = "#"):
 JSONSchema|JSONError {
+    // @draft >= 4 ?
+    if (Array.isArray(schema.type)) {
+        const dataType = getTypeOf(data);
+        if (schema.type.includes(dataType)) {
+            return stepType[dataType](core, key, schema, data, pointer);
+        }
+        return core.errors.typeError({ value: data, pointer, expected: schema.type, received: dataType });
+    }
+
+
     const expectedType = schema.type || getTypeOf(data);
     if (stepType[expectedType]) {
         return stepType[expectedType](core, key, schema, data, pointer);

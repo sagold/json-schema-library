@@ -12,7 +12,7 @@ const typeKeywords = Object.keys(types).filter(id => types[id].type === false);
  * @param schema
  * @return type id, if found
  */
-export default function getTypeId(schema: JSONSchema): string|undefined {
+export default function getTypeId(schema: JSONSchema): string|string[]|undefined {
     if (isObject(schema) === false) {
         return undefined;
     }
@@ -21,7 +21,7 @@ export default function getTypeId(schema: JSONSchema): string|undefined {
         return "enum";
     }
 
-    if (types[schema.type]) {
+    if (types[schema.type] || Array.isArray(schema.type)) {
         return schema.type;
     }
 

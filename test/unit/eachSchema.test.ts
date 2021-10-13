@@ -283,4 +283,27 @@ describe("eachSchema", () => {
         expect(calls[2]).to.eq(rootSchema.definitions.nested);
         expect(calls[3]).to.eq(rootSchema.definitions.nested.definitions.foo);
     });
+
+    it("should support array-types", () => {
+        // https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.7.6.1
+        const calls = [];
+        const rootSchema = {
+            type: "object",
+            properties: {
+                simple: {
+                    type: ["string", "number"]
+                },
+                primitive: {
+                    type: ["string", "null"]
+                }
+            }
+        };
+
+        eachSchema(rootSchema, schema => calls.push(schema));
+
+        expect(calls.length).to.eq(3);
+        expect(calls[0]).to.eq(rootSchema);
+        expect(calls[1]).to.eq(rootSchema.properties.simple);
+        expect(calls[2]).to.eq(rootSchema.properties.primitive);
+    });
 });

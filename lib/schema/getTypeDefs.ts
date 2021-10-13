@@ -19,7 +19,20 @@ export default function getTypeDefs(schema: JSONSchema): Array<{ pointer: JSONPo
     if (id == null) {
         return defs;
     }
-    const type = types[id];
+
+    let type;
+    if (Array.isArray(id)) {
+        // since types can also be declared as a set of types, merge the definitions
+        // maybe this will require a more sophisticated approach
+        type = {};
+        for (let i = 0, l = id.length; i < l; i += 1) {
+            Object.assign(type, types[id[i]]);
+        }
+
+    } else {
+        type = types[id];
+    }
+
     if (type.definitions == null) {
         return defs;
     }

@@ -2,6 +2,7 @@ import { expect } from "chai";
 import compile from "../../lib/compile";
 import remotes from "../../remotes";
 import copy from "../../lib/utils/copy";
+import Core from "../../lib/cores/Draft04";
 import Draft04 from "../../remotes/draft04.json";
 
 
@@ -298,7 +299,7 @@ describe("compile", () => {
     });
 
 
-    describe("spec remoteRef.json", () => {
+    describe("draft04 spec remoteRef.json", () => {
 
         it("should resolve remote ref", () => {
             remotes["http://localhost:1234/integer.json"] = compile({ type: "integer" });
@@ -381,6 +382,59 @@ describe("compile", () => {
 
             const result = schema.getRef(schema.properties.name);
             expect(result).to.deep.eq({ anyOf: [{ type: "null" }, { $ref: "#" }] });
+        });
+
+        describe("base URI change", () => {
+            let validator;
+            beforeEach(() => {
+                remotes["http://localhost:1234/baseUriChange/folderInteger.json"] = compile({ "type": "integer" });
+                const schema = compile({
+                    "id": "http://localhost:1234/",
+                    "items": {
+                        "id": "baseUriChange/",
+                        "items": {"$ref": "folderInteger.json"}
+                    }
+                });
+                validator = new Core(schema);
+            })
+
+            it("base URI change ref valid", () => {
+                expect(validator.isValid([[1]])).to.eq(true);
+            });
+
+            it("base URI change ref invalid", () => {
+                expect(validator.isValid([["a"]])).to.eq(false);
+            });
+        });
+
+        describe("base URI change - change folder", () => {
+            let validator;
+            beforeEach(() => {
+                remotes["http://localhost:1234/baseUriChangeFolder/folderInteger.json"] = compile({ "type": "integer" });
+                const schema = compile({
+                    "id": "http://localhost:1234/scope_change_defs1.json",
+                    "type" : "object",
+                    "properties": {
+                        "list": {"$ref": "#/definitions/baz"}
+                    },
+                    "definitions": {
+                        "baz": {
+                            "id": "baseUriChangeFolder/",
+                            "type": "array",
+                            "items": {"$ref": "folderInteger.json"}
+                        }
+                    }
+                });
+                validator = new Core(schema);
+            })
+
+            it("number is valid", () => {
+                expect(validator.isValid({"list": [1]})).to.eq(true);
+            });
+
+            it("string is invalid", () => {
+                expect(validator.isValid({"list": ["a"]})).to.eq(false);
+            });
         });
     });
 });

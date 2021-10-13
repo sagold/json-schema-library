@@ -2,11 +2,16 @@ import getTypeOf from "../getTypeOf";
 import isSame from "../utils/deepCompare";
 import settings from "../config/settings";
 import ucs2decode from "../utils/punycode.ucs2decode";
+import { JSONValidator } from "../types";
 const FPP = settings.floatingPointPrecision;
+import { JSONError } from "../types";
 
+function isError(o): o is JSONError {
+    return o?.type === "error";
+}
 
 // list of validation keywords: http://json-schema.org/latest/json-schema-validation.html#rfc.section.5
-const KeywordValidation = {
+const KeywordValidation: Record<string, JSONValidator> = {
 
     additionalProperties: (core, schema, value, pointer) => {
         if (schema.additionalProperties === true || schema.additionalProperties == null) {
@@ -122,6 +127,15 @@ const KeywordValidation = {
                     return;
                 }
 
+                // @draft >= 6 boolean schema
+                if (schema.dependencies[property] === true) {
+                    return;
+                }
+                if (schema.dependencies[property] === false) {
+                    errors.push(core.errors.missingDependencyError({ pointer }));
+                    return;
+                }
+
                 let dependencyErrors;
                 const type = getTypeOf(schema.dependencies[property]);
                 if (type === "array") {
@@ -130,7 +144,6 @@ const KeywordValidation = {
                         .map(missingProperty => core.errors.missingDependencyError({ missingProperty, pointer }));
                 } else if (type === "object") {
                     dependencyErrors = core.validate(value, schema.dependencies[property]);
-
                 } else {
                     throw new Error(`Invalid dependency definition for ${pointer}/${property}. Must be list or schema`);
                 }
@@ -164,12 +177,19 @@ const KeywordValidation = {
         return undefined;
     },
     items: (core, schema, value, pointer) => {
+        // @draft >= 7 bool schema
+        if (schema.items === false) {
+            if (Array.isArray(value) && value.length === 0) {
+                return undefined;
+            }
+            return core.errors.invalidDataError({ pointer, value });
+        }
+
         const errors = [];
         for (let i = 0; i < value.length; i += 1) {
             const itemData = value[i];
             // @todo reevaluate: incomplete schema is created here
             const itemSchema = core.step(i, schema, value, pointer);
-
             if (itemSchema && itemSchema.type === "error") {
                 return [itemSchema];
             }
@@ -275,6 +295,7 @@ const KeywordValidation = {
         if ((value * FPP) % (schema.multipleOf * FPP) / FPP !== 0) {
             return core.errors.multipleOfError({ multipleOf: schema.multipleOf, value, pointer });
         }
+        // also check https://stackoverflow.com/questions/1815367/catch-and-compute-overflow-during-multiplication-of-two-large-integers
         return undefined;
     },
     not: (core, schema, value, pointer) => {
@@ -290,7 +311,7 @@ const KeywordValidation = {
         }
 
         schema = core.resolveOneOf(value, schema, pointer);
-        if (schema && schema.type === "error") {
+        if (isError(schema)) {
             return schema;
         }
 

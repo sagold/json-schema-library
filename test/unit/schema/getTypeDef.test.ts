@@ -108,4 +108,18 @@ describe("getTypeDefs", () => {
             { pointer: "/items/1", def: { id: "second-item", type: "object" } }
         ]);
     });
+
+    it("should also return type definitions defined as array", () => {
+        const defs = getTypeDefs({
+            type: "object",
+            properties: {
+                title: { type: ["string", "number"] }
+            },
+            additionalProperties: false
+        });
+
+        expect(defs).to.deep.eq([
+            { pointer: "/properties/title", def: { type: ["string", "number"] } }
+        ]);
+    });
 });
