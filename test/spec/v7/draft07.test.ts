@@ -14,8 +14,11 @@ addRemotes(addSchema);
 addSchema("http://json-schema.org/draft-07/schema", draft07);
 
 const testCases = TestSuite.draft7()
-    // .filter(testcase => testcase.name === "if-then-else")
-    .filter(testcase => !testcase.optional);
+    // .filter(testcase => testcase.name === "date")
+    // .filter(testcase => testcase.optional)
+    .filter(testcase =>
+        testcase.optional ? !["ecmascript-regex", "content", "iri", "iri-reference", "idn", "idn-reference", "idn-hostname", "idn-email"].includes(testcase.name) : true
+    );
 
 // https://json-schema.org/understanding-json-schema/structuring.html#id
 // const testCases = [testRefRemote];
@@ -55,21 +58,21 @@ const testCases = TestSuite.draft7()
   optional/ecmascript-regex,
   optional/float-overflow,
   ✓ optional/format/date-time,
-  optional/format/date,
-  ✖ optional/format/email,
-  ✖ optional/format/hostname,
+  ✓ optional/format/date,
+  ✓  optional/format/email,
+  ✓  optional/format/hostname,
   optional/format/idn-email,
   optional/format/idn-hostname,
   ✓ optional/format/ipv4,
   ✓ optional/format/ipv6,
   optional/format/iri-reference,
   optional/format/iri,
-  optional/format/json-pointer,
-  optional/format/regex,
-  optional/format/relative-json-pointer,
-  optional/format/time,
-  optional/format/uri-reference,
-  optional/format/uri-template,
+  ✓ optional/format/json-pointer,
+  ✓ optional/format/regex,
+  ✓ optional/format/relative-json-pointer,
+  ✓ optional/format/time,
+  ✓ optional/format/uri-reference,
+  ✓ optional/format/uri-template,
   ✓ optional/format/uri,
   optional/non-bmp-regex,
   ✖ optional/unicode,
@@ -78,11 +81,10 @@ const testCases = TestSuite.draft7()
   ✓ properties,
   ✓ propertyNames' - add
   ✓ ref,
-  ✖ refRemote,
+  ✓ refRemote,
   ✓ required,
   ✓ type,
-  ✓ uniqueItems,
-  ✖ unknownKeyword'
+  ✓ uniqueItems
  */
 
 function runTestCase(Core, tc, skipTest = []) {
