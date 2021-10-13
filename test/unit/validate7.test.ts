@@ -4,7 +4,7 @@ import Core from "../../lib/cores/Draft07";
 // import remotes from "../../remotes";
 
 
-describe.only("validate draf07", () => {
+describe("validate draft07", () => {
 
     let core;
     before(() => (core = new Core()));

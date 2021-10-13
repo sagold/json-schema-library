@@ -10,8 +10,16 @@ import draft04 from "../../../remotes/draft04.json";
 addRemotes(addSchema);
 addSchema("http://json-schema.org/draft-04/schema", draft04);
 
+/*
+ref relative refs with absolute uris and defs invalid on inner field:
+RangeError: Maximum call stack size exceeded
+ */
+
+const supportedTestCases = t => t.optional ? !["non-bmp-regex", "zeroTerminatedFloats", "float-overflow"].includes(t.name) : true;
 const testCases = TestSuite.draft4()
-    .filter(testcase => !testcase.optional);
+    // .filter(testcase => testcase.name === "float-overflow");
+    .filter(supportedTestCases);
+
 
 function runTestCase(Core, tc, skipTest = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {

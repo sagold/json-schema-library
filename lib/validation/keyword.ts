@@ -295,6 +295,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
         if ((value * FPP) % (schema.multipleOf * FPP) / FPP !== 0) {
             return core.errors.multipleOfError({ multipleOf: schema.multipleOf, value, pointer });
         }
+        // also check https://stackoverflow.com/questions/1815367/catch-and-compute-overflow-during-multiplication-of-two-large-integers
         return undefined;
     },
     not: (core, schema, value, pointer) => {

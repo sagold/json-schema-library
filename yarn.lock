@@ -1839,13 +1839,9 @@ json-parse-better-errors@^1.0.2:
   resolved "https://registry.npmjs.org/json-parse-better-errors/-/json-parse-better-errors-1.0.2.tgz#bb867cfb3450e69107c131d1c514bab3dc8bcaa9"
   integrity sha512-mrqyZKfX5EhL7hvqcV6WG1yYjnjeuYDzDhhcAAUrq8Po85NBQBJP+ZDUT75qZQ98IkUoBqdkExkukOU7Ts2wrw==
 
-"json-schema-test-suite@github:json-schema-org/JSON-Schema-Test-Suite#0a0f0cd":
+"json-schema-test-suite@github:json-schema-org/JSON-Schema-Test-Suite#0a0f0cd", json-schema-test-suite@json-schema-org/JSON-Schema-Test-Suite.git#bcf1dc81ae099ade2a9642c672c06ee1af1bb489:
   version "0.1.0"
-  resolved "https://codeload.github.com/json-schema-org/JSON-Schema-Test-Suite/tar.gz/0a0f0cd1b5cc7af1fc826bc0f58d7fc310b0500d"
-
-json-schema-test-suite@json-schema-org/JSON-Schema-Test-Suite.git#master:
-  version "0.1.0"
-  resolved "https://codeload.github.com/json-schema-org/JSON-Schema-Test-Suite/tar.gz/8b797cfe6d1c963028fe099d348e624056df8e6d"
+  resolved "https://codeload.github.com/json-schema-org/JSON-Schema-Test-Suite/tar.gz/bcf1dc81ae099ade2a9642c672c06ee1af1bb489"
 
 json-schema-traverse@^0.4.1:
   version "0.4.1"

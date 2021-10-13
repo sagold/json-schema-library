@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import compile from "../../lib/compile";
 import remotes from "../../remotes";
-import Draft07 from "../../lib/cores/Draft07";
 import copy from "../../lib/utils/copy";
+import Core from "../../lib/cores/Draft04";
 import Draft04 from "../../remotes/draft04.json";
 
 
@@ -383,46 +383,58 @@ describe("compile", () => {
             const result = schema.getRef(schema.properties.name);
             expect(result).to.deep.eq({ anyOf: [{ type: "null" }, { $ref: "#" }] });
         });
-    });
 
-    describe("draft07 - refRemote base URI change - base URI change ref invalid", () => {
-        /*
-            here we test if the root-pointer resolution of a remote definition is
-            resolved within the remote schema - currently, it is not
-            - references are resolved dynamically
-            - so we return a schema, where the included reference is resolved later
-            - which might resolve in wrong schema
-         */
-        let validator: Draft07;
-        beforeEach(() => {
-            remotes["http://localhost:1234/name.json"] = compile({
-                definitions: {
-                    orNull: {
-                        anyOf: [{ type: "null" }, { $ref: "#" }]
+        describe("base URI change", () => {
+            let validator;
+            beforeEach(() => {
+                remotes["http://localhost:1234/baseUriChange/folderInteger.json"] = compile({ "type": "integer" });
+                const schema = compile({
+                    "id": "http://localhost:1234/",
+                    "items": {
+                        "id": "baseUriChange/",
+                        "items": {"$ref": "folderInteger.json"}
                     }
-                },
-                type: "string"
+                });
+                validator = new Core(schema);
+            })
+
+            it("base URI change ref valid", () => {
+                expect(validator.isValid([[1]])).to.eq(true);
             });
-            const schema = compile({
-                id: "http://localhost:1234/object",
-                type: "object",
-                properties: {
-                    name: { $ref: "name.json#/definitions/orNull" }
-                }
+
+            it("base URI change ref invalid", () => {
+                expect(validator.isValid([["a"]])).to.eq(false);
             });
-            validator = new Draft07(schema);
         });
 
-        it("should validate 'string'", () => {
-            expect(validator.validate({ name: "foo" })).to.deep.eq([]);
-        });
+        describe("base URI change - change folder", () => {
+            let validator;
+            beforeEach(() => {
+                remotes["http://localhost:1234/baseUriChangeFolder/folderInteger.json"] = compile({ "type": "integer" });
+                const schema = compile({
+                    "id": "http://localhost:1234/scope_change_defs1.json",
+                    "type" : "object",
+                    "properties": {
+                        "list": {"$ref": "#/definitions/baz"}
+                    },
+                    "definitions": {
+                        "baz": {
+                            "id": "baseUriChangeFolder/",
+                            "type": "array",
+                            "items": {"$ref": "folderInteger.json"}
+                        }
+                    }
+                });
+                validator = new Core(schema);
+            })
 
-        it("should validate 'null'", () => {
-            expect(validator.validate({ name: null })).to.deep.eq([], "null is valid");
-        });
+            it("number is valid", () => {
+                expect(validator.isValid({"list": [1]})).to.eq(true);
+            });
 
-        it("should not validate 'object'", () => {
-            expect(validator.isValid({ name: { name: null } })).to.eq(false);
+            it("string is invalid", () => {
+                expect(validator.isValid({"list": ["a"]})).to.eq(false);
+            });
         });
     });
 });

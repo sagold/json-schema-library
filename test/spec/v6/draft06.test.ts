@@ -10,13 +10,11 @@ import draft06 from "../../../remotes/draft06.json";
 addRemotes(addSchema);
 addSchema("http://json-schema.org/draft-06/schema", draft06);
 
-const testCases = TestSuite.draft6()
-    .filter(testcase =>
-        testcase.optional ? !["ecmascript-regex"].includes(testcase.name) : true
-    );
+const supportedTestCases = t => t.optional ? !["ecmascript-regex", "float-overflow", "non-bmp-regex"].includes(t.name) : true;
 
-// https://json-schema.org/understanding-json-schema/structuring.html#id
-// const testCases = [testRefRemote];
+const testCases = TestSuite.draft6()
+    .filter(supportedTestCases);
+
 
 function runTestCase(Core, tc, skipTest = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
