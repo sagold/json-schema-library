@@ -385,7 +385,7 @@ describe("compile", () => {
         });
     });
 
-    describe.only("draft07 - refRemote base URI change - base URI change ref invalid", () => {
+    describe("draft07 - refRemote base URI change - base URI change ref invalid", () => {
         /*
             here we test if the root-pointer resolution of a remote definition is
             resolved within the remote schema - currently, it is not

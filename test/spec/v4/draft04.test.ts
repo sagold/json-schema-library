@@ -11,7 +11,6 @@ addRemotes(addSchema);
 addSchema("http://json-schema.org/draft-04/schema", draft04);
 
 const testCases = TestSuite.draft4()
-//     .filter(testcase => testcase.name === "refRemote")
     .filter(testcase => !testcase.optional);
 
 function runTestCase(Core, tc, skipTest = []) {
