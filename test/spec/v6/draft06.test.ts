@@ -11,7 +11,9 @@ addRemotes(addSchema);
 addSchema("http://json-schema.org/draft-06/schema", draft06);
 
 const testCases = TestSuite.draft6()
-    .filter(testcase => !testcase.optional);
+    .filter(testcase =>
+        testcase.optional ? !["ecmascript-regex"].includes(testcase.name) : true
+    );
 
 // https://json-schema.org/understanding-json-schema/structuring.html#id
 // const testCases = [testRefRemote];
