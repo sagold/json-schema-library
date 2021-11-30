@@ -4,14 +4,18 @@ import errors from "./validation/errors";
 import { JSONSchema, JSONPointer, JSONError } from "./types";
 import Core from "./cores/CoreInterface";
 
-
-export default function resolveAllOf(core: Core, data: any, schema: JSONSchema = core.rootSchema, pointer: JSONPointer = "#"): JSONSchema|JSONError {
+export default function resolveAllOf(
+    core: Core,
+    data: any,
+    schema: JSONSchema = core.rootSchema,
+    pointer: JSONPointer = "#"
+): JSONSchema | JSONError {
     let mergedSchema = copy(schema);
     for (let i = 0; i < schema.allOf.length; i += 1) {
         const allOfSchema = core.resolveRef(schema.allOf[i]);
-        if (core.isValid(data, allOfSchema, pointer) === false) {
-            return errors.allOfError({ value: data, pointer, allOf: JSON.stringify(schema.allOf) });
-        }
+        // if (core.isValid(data, allOfSchema, pointer) === false) {
+        //     return errors.allOfError({ value: data, pointer, allOf: JSON.stringify(schema.allOf) });
+        // }
         mergedSchema = merge(mergedSchema, allOfSchema);
     }
 
