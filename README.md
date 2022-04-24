@@ -11,7 +11,7 @@
 
 
 - This package is tested on node v10.16 and in latest Browsers.
-- This library currently supports all draft4 features (@see [benchmark](https://github.com/ebdrup/json-schema-benchmark))
+- This library currently supports draft4, draft6 and draft7 features (@see [benchmark](https://github.com/sagold/json-schema-benchmark))
 
 
 1. [Breaking Changes](#breaking-changes)
