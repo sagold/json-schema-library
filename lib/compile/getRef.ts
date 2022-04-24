@@ -5,7 +5,7 @@ import { JSONSchema } from "../types";
 
 
 const suffixes = /(#|\/)+$/g;
-const isObject = val => (getTypeOf(val) === "object");
+const isObject = (val: unknown): val is Record<string, any> => (getTypeOf(val) === "object");
 
 
 // 1. combined is known

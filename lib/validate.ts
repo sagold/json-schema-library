@@ -1,4 +1,4 @@
-import getTypeOf from "./getTypeOf";
+import getTypeOf, { JSType } from "./getTypeOf";
 import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
 import { JSONSchema, JSONPointer, JSONError } from "./types";
@@ -6,14 +6,13 @@ import Core from "./cores/CoreInterface";
 import equal from "fast-deep-equal";
 
 
-function getJsonSchemaType(value, expectedType) {
-    let jsType = getTypeOf(value);
-
+function getJsonSchemaType(value, expectedType): JSType|"integer" {
+    const jsType = getTypeOf(value);
     if (
         jsType === "number" && (expectedType === "integer" ||
         (Array.isArray(expectedType) && expectedType.includes("integer")))
     ) {
-        jsType = Number.isInteger(value) ? "integer" : "number";
+        return Number.isInteger(value) ? "integer" : "number";
     }
     return jsType;
 }

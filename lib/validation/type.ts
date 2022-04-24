@@ -1,3 +1,5 @@
+import { JSONTypeValidator } from "../types";
+
 /**
  * @todo: type is also a keyword, as is properties, items, etc
  *
@@ -5,7 +7,7 @@
  * or seven in case of ajv https://github.com/epoberezkin/ajv/blob/master/KEYWORDS.md#type
  * 1 null, 2 boolean, 3 object, 4 array, 5 number, 6 string (7 integer)
  */
-export default {
+const typeValidators: Record<string, JSONTypeValidator> = {
 
     array: (core, schema, value, pointer) =>
         core.typeKeywords.array
@@ -42,3 +44,5 @@ export default {
             .filter(key => schema && schema[key] != null)
             .map(key => core.validateKeyword[key](core, schema, value, pointer))
 };
+
+export default typeValidators;

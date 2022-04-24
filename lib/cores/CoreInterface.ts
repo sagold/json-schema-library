@@ -3,17 +3,24 @@ import resolveRef from "../resolveRef.withOverwrite";
 import compileSchema from "../compileSchema";
 import resolveAnyOf from "../resolveAnyOf";
 import resolveAllOf from "../resolveAllOf";
-import { JSONSchema, JSONPointer, JSONError } from "../types";
+import { JSONSchema, JSONPointer, JSONValidator, JSONTypeValidator, JSONError } from "../types";
+import { CreateError } from "../utils/createCustomError";
 
 
 /* eslint no-unused-vars: 0 no-empty-function: 0 */
 export default class CoreInterface {
+    /** entry point of schema */
     __rootSchema: JSONSchema;
-    errors;
-    typeKeywords;
-    validateFormat;
-    validateKeyword;
-    validateType;
+    /** error creators by id */
+    errors: Record<string, CreateError> = {};
+    /** map for valid keywords of a type  */
+    typeKeywords: Record<string, string[]> = {};
+    /** keyword validators  */
+    validateKeyword: Record<string, JSONValidator> = {};
+    /** type validators  */
+    validateType: Record<string, JSONTypeValidator> = {};
+    /** format validators  */
+    validateFormat: Record<string, JSONValidator> = {};
 
     constructor(schema?: JSONSchema) {
         this.setSchema(schema);

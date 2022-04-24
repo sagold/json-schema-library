@@ -5,21 +5,20 @@ import resolveOneOf from "../resolveOneOf.strict";
 import resolveRef from "../resolveRef.strict";
 import getTemplate from "../getTemplate";
 import getSchema from "../getSchema";
+import addSchema from "../addSchema";
 import each from "../each";
 import compileSchema from "../draft06/compile";
 import { JSONSchema, JSONPointer } from "../types";
-
-import remotes from "../../remotes";
 import draft07 from "../../remotes/draft07.json";
-
-// @ts-ignore
-remotes["http://json-schema.org/draft-07/schema"] = compileSchema(draft07);
 
 import TYPE_KEYWORD_MAPPING from "../draft06/validation/typeKeywordMapping";
 import KEYWORDS from "../draft06/validation/keyword";
 import TYPES from "../draft06/validation/type";
 import FORMATS from "../validation/format";
 import ERRORS from "../validation/errors";
+import addValidator from "../addValidator";
+
+addSchema("http://json-schema.org/draft-07/schema", draft07)
 
 
 export default class Draft07Core extends CoreInterface {
@@ -27,10 +26,10 @@ export default class Draft07Core extends CoreInterface {
     constructor(schema?: JSONSchema) {
         super(schema);
         this.typeKeywords = JSON.parse(JSON.stringify(TYPE_KEYWORD_MAPPING));
-        this.validateKeyword = Object.assign({}, KEYWORDS);
-        this.validateType = Object.assign({}, TYPES);
-        this.validateFormat = Object.assign({}, FORMATS);
-        this.errors = Object.assign({}, ERRORS);
+        Object.assign(this.validateKeyword, KEYWORDS);
+        Object.assign(this.validateType, TYPES);
+        Object.keys(FORMATS).forEach(id => addValidator.format(this, id, FORMATS[id]))
+        Object.keys(ERRORS).forEach(id => addValidator.error(this, id, ERRORS[id]))
     }
 
     get rootSchema() {

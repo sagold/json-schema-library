@@ -15,5 +15,9 @@ export type JSONError = {
 }
 
 export interface JSONValidator {
-    (core: Core, schema: JSONSchema, value: any, pointer: JSONPointer): void|undefined|JSONError|Array<JSONError>;
+    (core: Core, schema: JSONSchema, value: any, pointer: JSONPointer): void|undefined|JSONError|JSONError[];
+}
+
+export interface JSONTypeValidator {
+    (core: Core, schema: JSONSchema, value: any, pointer: JSONPointer): Array<void|undefined|JSONError|JSONError[]>;
 }

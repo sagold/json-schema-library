@@ -21,6 +21,7 @@ describe("addValidator", () => {
         it("should overwrite 'minLengthError'", () => {
             addValidator.error(core, "minLengthError", data => ({
                 type: "error",
+                name: "minLengthError",
                 code: "custom-min-length-error",
                 message: "my custom error message",
                 data

@@ -1,5 +1,6 @@
 import Core from "./cores/CoreInterface";
 import { JSONValidator } from "./types";
+import { CreateError } from "./utils/createCustomError";
 
 
 /**
@@ -10,7 +11,7 @@ import { JSONValidator } from "./types";
  * @param errorId id of error @see /lib/validation/errors
  * @param errorCreator - function returning an error-object @see /lib/utils/createCustomError
  */
-function addError(core: Core, errorId: string, errorCreator) {
+function addError(core: Core, errorId: string, errorCreator: CreateError) {
     if (typeof errorCreator !== "function") {
         throw new Error(`Error callback 'errorCreator' must be of type function. Received '${typeof errorCreator}'`);
     }
@@ -28,11 +29,10 @@ function addFormat(core: Core, formatType: string, validationFunction: JSONValid
     if (typeof validationFunction !== "function") {
         throw new Error(`Validation function expected. Received ${typeof validationFunction}`);
     }
-    if (core.validateFormat[formatType] == null) {
-        core.validateFormat[formatType] = validationFunction;
-        return;
+    if (core.validateFormat[formatType]) {
+        throw new Error(`A format '${formatType}' is already registered to validation`);
     }
-    throw new Error(`A format '${formatType}' is already registered to validation`);
+    core.validateFormat[formatType] = validationFunction;
 }
 
 
