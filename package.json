@@ -67,7 +67,9 @@
     "valid-url": "^1.0.9"
   },
   "resolutions": {
-    "json-schema-test-suite": "json-schema-org/JSON-Schema-Test-Suite.git#bcf1dc81ae099ade2a9642c672c06ee1af1bb489"
+    "json-schema-test-suite": "json-schema-org/JSON-Schema-Test-Suite.git#bcf1dc81ae099ade2a9642c672c06ee1af1bb489",
+    "lodash": "4.x",
+    "merge": "2.x"
   },
   "publishConfig": {
     "registry": "http://registry.npmjs.org"
