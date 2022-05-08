@@ -34,7 +34,6 @@
   },
   "homepage": "https://github.com/sagold/json-schema-library",
   "devDependencies": {
-    "@json-schema-org/tests": "^2.0.0",
     "@types/chai": "^4.2.14",
     "@types/mocha": "^9.1.1",
     "@types/node": "^14.14.10",
@@ -48,13 +47,13 @@
     "eslint-plugin-optimize-regex": "^1.2.0",
     "eslint-plugin-promise": "^6.0.0",
     "glob": "^8.0.1",
-    "json-schema-test-suite": "^0.0.10",
+    "json-schema-test-suite": "https://github.com/json-schema-org/JSON-Schema-Test-Suite.git",
     "mocha": "^9.2.2",
     "nyc": "^15.1.0",
     "terser-webpack-plugin": "^5.0.3",
     "ts-loader": "^9.2.8",
     "ts-node": "^10.7.0",
-    "typescript": "^4.6.3",
+    "typescript": "^4.6.4",
     "watch": "^1.0.1",
     "webpack": "^5.9.0",
     "webpack-cli": "^4.2.0"
@@ -67,7 +66,7 @@
     "valid-url": "^1.0.9"
   },
   "resolutions": {
-    "json-schema-test-suite": "json-schema-org/JSON-Schema-Test-Suite.git#bcf1dc81ae099ade2a9642c672c06ee1af1bb489",
+    "json-schema-test-suite": "https://github.com/json-schema-org/JSON-Schema-Test-Suite.git#060caae0dd58e34af0449baec1103606a0ef4977",
     "lodash": "4.x",
     "merge": "2.x"
   },

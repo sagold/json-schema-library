@@ -4,23 +4,20 @@ import chalk from "chalk";
 import Draft07 from "../../../lib/cores/Draft07";
 import addSchema from "../../../lib/draft06/addSchema";
 import { addRemotes } from "../utils/addRemotes";
-import TestSuite from "@json-schema-org/tests";
+import { getDraftTests, FeatureTest } from "../../getDraftTests"
 import draft07 from "../../../remotes/draft07.json";
 
 addRemotes(addSchema);
 addSchema("http://json-schema.org/draft-07/schema", draft07);
 
 const supportedTestCases = t => t.optional ? !["ecmascript-regex", "content", "iri", "iri-reference", "idn", "idn-reference", "idn-hostname", "idn-email", "float-overflow", "non-bmp-regex"].includes(t.name) : true;
-
-const testCases = TestSuite.draft7()
-    // .filter(testcase => testcase.name === "refRemote")
-    // .filter(testcase => testcase.optional)
+const draftFeatureTests = getDraftTests("7")
+    // .filter(testcase => testcase.name === "definitions")
     .filter(supportedTestCases);
 
-
-function runTestCase(Core, tc, skipTest = []) {
+function runTestCase(Core, tc: FeatureTest, skipTest = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
-        tc.schemas.forEach(testCase => {
+        tc.testCases.forEach(testCase => {
             const schema = testCase.schema;
             if (skipTest.includes(testCase.description)) {
                 console.log(chalk.red(`Unsupported '${testCase.description}'`));
@@ -44,7 +41,7 @@ function runTestCase(Core, tc, skipTest = []) {
 
 export default function runAllTestCases(Core, skipTest = []) {
     describe("draft07", () => {
-        testCases.forEach(testCase => runTestCase(Core, testCase, skipTest));
+        draftFeatureTests.forEach(testCase => runTestCase(Core, testCase, skipTest));
     });
 }
 
