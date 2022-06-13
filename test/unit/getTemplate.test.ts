@@ -3,7 +3,6 @@ import { expect } from "chai";
 import getTemplate from "../../lib/getTemplate";
 import Core from "../../lib/cores/Draft04";
 
-
 // @NOTE OneOf can be used to select required? https://github.com/epoberezkin/ajv/issues/134#issuecomment-190680773
 describe("getTemplate", () => {
 
