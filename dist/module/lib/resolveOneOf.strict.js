@@ -27,7 +27,16 @@ export default function resolveOneOf(core, data, schema = core.rootSchema, point
         return matches[0];
     }
     if (matches.length > 1) {
-        return core.errors.multipleOneOfError({ value: data, pointer, matches });
+        return core.errors.multipleOneOfError({
+            value: data,
+            pointer,
+            matches,
+        });
     }
-    return core.errors.oneOfError({ value: JSON.stringify(data), pointer, oneOf: schema.oneOf, errors });
+    return core.errors.oneOfError({
+        value: JSON.stringify(data),
+        pointer,
+        oneOf: schema.oneOf,
+        errors,
+    });
 }
