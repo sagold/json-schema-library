@@ -181,13 +181,13 @@ const stepType = {
         }
 
         if (schema.additionalProperties === true) {
-            return createSchemaOf(data);
+            return createSchemaOf(data[key]);
         }
 
         return errors.unknownPropertyError({
             property: key,
             value: data,
-            pointer,
+            pointer: `${pointer}/${key}`,
         });
     },
 };
