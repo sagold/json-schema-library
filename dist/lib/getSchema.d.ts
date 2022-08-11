@@ -13,4 +13,4 @@ import Core from "./cores/CoreInterface";
  * @param [schema] - the json schema to iterate. Defaults to core.rootSchema
  * @return json schema object of the json-pointer or an error
  */
-export default function getSchema(core: Core, pointer: JSONPointer, data?: any, schema?: JSONSchema): JSONSchema;
+export default function getSchema(core: Core, pointer: JSONPointer, data?: unknown, schema?: JSONSchema): JSONSchema;
