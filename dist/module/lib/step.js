@@ -32,7 +32,7 @@ const stepType = {
                 return errors.invalidDataError({
                     key,
                     value: data[key],
-                    pointer,
+                    pointer
                 });
             }
             if (schema.items[key]) {
@@ -42,11 +42,10 @@ const stepType = {
                 return errors.additionalItemsError({
                     key,
                     value: data[key],
-                    pointer,
+                    pointer
                 });
             }
-            if (schema.additionalItems === true ||
-                schema.additionalItems === undefined) {
+            if (schema.additionalItems === true || schema.additionalItems === undefined) {
                 return createSchemaOf(data[key]);
             }
             if (getTypeOf(schema.additionalItems) === "object") {
@@ -110,6 +109,21 @@ const stepType = {
                 return targetSchema;
             }
         }
+        // @draft <= 07
+        const { dependencies } = schema;
+        if (getTypeOf(dependencies) === "object") {
+            const dependentProperties = Object.keys(dependencies).filter((propertyName) => 
+            // data[propertyName] !== undefined &&
+            getTypeOf(dependencies[propertyName]) === "object");
+            for (let i = 0, l = dependentProperties.length; i < l; i += 1) {
+                const dependentProperty = dependentProperties[i];
+                const schema = step(core, key, dependencies[dependentProperty], data);
+                if (schema.type !== "error") {
+                    return schema;
+                }
+                console.log("error", schema);
+            }
+        }
         // find matching property key
         if (getTypeOf(schema.patternProperties) === "object") {
             let regex;
@@ -130,9 +144,10 @@ const stepType = {
         return errors.unknownPropertyError({
             property: key,
             value: data,
-            pointer: `${pointer}/${key}`,
+            // pointer: `${pointer}/${key}`,
+            pointer: `${pointer}`
         });
-    },
+    }
 };
 /**
  * Returns the json-schema of the given object property or array item.
@@ -159,7 +174,7 @@ export default function step(core, key, schema, data, pointer = "#") {
             value: data,
             pointer,
             expected: schema.type,
-            received: dataType,
+            received: dataType
         });
     }
     const expectedType = schema.type || getTypeOf(data);
