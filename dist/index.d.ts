@@ -43,3 +43,4 @@ resolveOneOf, resolveOneOfFuzzy, settings, SchemaService, step, // steps into a 
 validate, // validates data by a schema
 validateAsync };
 export type { JSONSchema, JSONPointer, JSONError, JSONValidator } from "./lib/types";
+export { isJSONError } from "./lib/types";

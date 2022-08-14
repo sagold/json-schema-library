@@ -2,6 +2,7 @@ import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
 import getTypeOf from "./getTypeOf";
 import settings from "./config/settings";
+import { isJSONError } from "./types";
 const { DECLARATOR_ONEOF } = settings;
 /**
  * Returns a ranking for the data and given schema
@@ -52,7 +53,7 @@ export default function resolveOneOf(core, data, schema = core.rootSchema, point
         for (let i = 0; i < schema.oneOf.length; i += 1) {
             const one = core.resolveRef(schema.oneOf[i]);
             const oneOfPropertySchema = core.step(oneOfProperty, one, data, pointer);
-            if (oneOfPropertySchema && oneOfPropertySchema.type === "error") {
+            if (isJSONError(oneOfPropertySchema)) {
                 return oneOfPropertySchema;
             }
             let result = flattenArray(core.validate(oneOfValue, oneOfPropertySchema, pointer));
@@ -64,7 +65,12 @@ export default function resolveOneOf(core, data, schema = core.rootSchema, point
                 return one; // return resolved schema
             }
         }
-        return core.errors.oneOfPropertyError({ property: oneOfProperty, value: oneOfValue, pointer, errors });
+        return core.errors.oneOfPropertyError({
+            property: oneOfProperty,
+            value: oneOfValue,
+            pointer,
+            errors
+        });
     }
     // keyword: oneOf
     const matches = [];
@@ -90,7 +96,11 @@ export default function resolveOneOf(core, data, schema = core.rootSchema, point
             }
         }
         if (schemaOfItem === undefined) {
-            return core.errors.oneOfError({ value: JSON.stringify(data), pointer, oneOf: schema.oneOf });
+            return core.errors.oneOfError({
+                value: JSON.stringify(data),
+                pointer,
+                oneOf: schema.oneOf
+            });
         }
         return schemaOfItem;
     }

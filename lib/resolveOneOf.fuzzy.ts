@@ -2,9 +2,8 @@ import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
 import getTypeOf from "./getTypeOf";
 import settings from "./config/settings";
-import { JSONSchema, JSONPointer, JSONError } from "./types";
+import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
 import Core from "./cores/CoreInterface";
-
 
 const { DECLARATOR_ONEOF } = settings;
 
@@ -17,7 +16,12 @@ const { DECLARATOR_ONEOF } = settings;
  * @param [pointer]
  * @return ranking value (higher is better)
  */
-function fuzzyObjectValue(core: Core, one: JSONSchema, data: { [p: string]: any }, pointer?: JSONPointer) {
+function fuzzyObjectValue(
+    core: Core,
+    one: JSONSchema,
+    data: { [p: string]: any },
+    pointer?: JSONPointer
+) {
     if (data == null || one.properties == null) {
         return -1;
     }
@@ -43,7 +47,12 @@ function fuzzyObjectValue(core: Core, one: JSONSchema, data: { [p: string]: any 
  * @param [pointer] - json pointer to data
  * @return oneOf schema or an error
  */
-export default function resolveOneOf(core: Core, data: any, schema: JSONSchema = core.rootSchema, pointer: JSONPointer = "#"): JSONSchema|JSONError {
+export default function resolveOneOf(
+    core: Core,
+    data: any,
+    schema: JSONSchema = core.rootSchema,
+    pointer: JSONPointer = "#"
+): JSONSchema | JSONError {
     // !keyword: oneOfProperty
     // an additional <DECLARATOR_ONEOF> (default `oneOfProperty`) on the schema will exactly determine the
     // oneOf value (if set in data)
@@ -52,7 +61,6 @@ export default function resolveOneOf(core: Core, data: any, schema: JSONSchema =
     // abort if no data is given an DECLARATOR_ONEOF is set (used by getChildSchemaSelection)
     // this case (data != null) should not be necessary
     if (data != null && schema[DECLARATOR_ONEOF]) {
-
         const errors = [];
         const oneOfProperty = schema[DECLARATOR_ONEOF];
         const oneOfValue = data[schema[DECLARATOR_ONEOF]];
@@ -65,7 +73,7 @@ export default function resolveOneOf(core: Core, data: any, schema: JSONSchema =
             const one = core.resolveRef(schema.oneOf[i]);
             const oneOfPropertySchema = core.step(oneOfProperty, one, data, pointer);
 
-            if (oneOfPropertySchema && oneOfPropertySchema.type === "error") {
+            if (isJSONError(oneOfPropertySchema)) {
                 return oneOfPropertySchema;
             }
 
@@ -79,7 +87,12 @@ export default function resolveOneOf(core: Core, data: any, schema: JSONSchema =
             }
         }
 
-        return core.errors.oneOfPropertyError({ property: oneOfProperty, value: oneOfValue, pointer, errors });
+        return core.errors.oneOfPropertyError({
+            property: oneOfProperty,
+            value: oneOfValue,
+            pointer,
+            errors
+        });
     }
 
     // keyword: oneOf
@@ -111,7 +124,11 @@ export default function resolveOneOf(core: Core, data: any, schema: JSONSchema =
         }
 
         if (schemaOfItem === undefined) {
-            return core.errors.oneOfError({ value: JSON.stringify(data), pointer, oneOf: schema.oneOf });
+            return core.errors.oneOfError({
+                value: JSON.stringify(data),
+                pointer,
+                oneOf: schema.oneOf
+            });
         }
 
         return schemaOfItem;

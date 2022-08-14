@@ -1,22 +1,21 @@
 import getTypeOf, { JSType } from "./getTypeOf";
 import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
-import { JSONSchema, JSONPointer, JSONError } from "./types";
+import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
 import Core from "./cores/CoreInterface";
 import equal from "fast-deep-equal";
 
-
-function getJsonSchemaType(value, expectedType): JSType|"integer" {
+function getJsonSchemaType(value, expectedType): JSType | "integer" {
     const jsType = getTypeOf(value);
     if (
-        jsType === "number" && (expectedType === "integer" ||
-        (Array.isArray(expectedType) && expectedType.includes("integer")))
+        jsType === "number" &&
+        (expectedType === "integer" ||
+            (Array.isArray(expectedType) && expectedType.includes("integer")))
     ) {
         return Number.isInteger(value) ? "integer" : "number";
     }
     return jsType;
 }
-
 
 /**
  * Validate data by a json schema
@@ -27,7 +26,12 @@ function getJsonSchemaType(value, expectedType): JSType|"integer" {
  * @param [pointer] - json pointer pointing to value (used for error-messages only)
  * @return list of errors or empty
  */
-export default function validate(core: Core, value: any, schema: JSONSchema = core.rootSchema, pointer: JSONPointer = "#"): Array<JSONError> {
+export default function validate(
+    core: Core,
+    value: any,
+    schema: JSONSchema = core.rootSchema,
+    pointer: JSONPointer = "#"
+): Array<JSONError> {
     schema = core.resolveRef(schema);
 
     // @todo this is a high level v7 schema validation
@@ -41,7 +45,7 @@ export default function validate(core: Core, value: any, schema: JSONSchema = co
         return [core.errors.invalidDataError({ value, pointer })];
     }
 
-    if (schema.type === "error") {
+    if (isJSONError(schema)) {
         return [schema as JSONError];
     }
 
@@ -56,8 +60,18 @@ export default function validate(core: Core, value: any, schema: JSONSchema = co
     const receivedType = getJsonSchemaType(value, schema.type);
     const expectedType = schema.type || receivedType;
 
-    if (receivedType !== expectedType && (!Array.isArray(expectedType) || !expectedType.includes(receivedType))) {
-        return [core.errors.typeError({ received: receivedType, expected: expectedType, value, pointer })];
+    if (
+        receivedType !== expectedType &&
+        (!Array.isArray(expectedType) || !expectedType.includes(receivedType))
+    ) {
+        return [
+            core.errors.typeError({
+                received: receivedType,
+                expected: expectedType,
+                value,
+                pointer
+            })
+        ];
     }
 
     if (core.validateType[receivedType] == null) {
