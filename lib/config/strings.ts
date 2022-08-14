@@ -51,4 +51,5 @@ export default {
     UnknownPropertyError: "Could not find a valid schema for property `{{pointer}}` within object",
     UniqueItemsError: "Expected unique items in {{pointer}}: duplicate value `{{value}}` found at {{itemPointer}} and {{duplicatePointer}}",
     ValueNotEmptyError: "A value for `{{property}}` is required at `{{pointer}}`"
-};
+} as Record<string, string>;
+
