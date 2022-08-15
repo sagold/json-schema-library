@@ -5,6 +5,10 @@ import ucs2decode from "../utils/punycode.ucs2decode";
 import { JSONValidator, isJSONError } from "../types";
 const FPP = settings.floatingPointPrecision;
 
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+const hasProperty = (value: Record<string, unknown>, property: string) =>
+    !(value[property] === undefined || !hasOwnProperty.call(value, property));
+
 // list of validation keywords: http://json-schema.org/latest/json-schema-validation.html#rfc.section.5
 const KeywordValidation: Record<string, JSONValidator> = {
     additionalProperties: (core, schema, value, pointer) => {
@@ -415,7 +419,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
         const keys = Object.keys(schema.properties || {});
         for (let i = 0; i < keys.length; i += 1) {
             const key = keys[i];
-            if (value[key] !== undefined) {
+            if (hasProperty(value, key)) {
                 const itemSchema = core.step(key, schema, value, pointer);
                 const keyErrors = core.validate(value[key], itemSchema, `${pointer}/${key}`);
                 errors.push(...keyErrors);
@@ -439,13 +443,13 @@ const KeywordValidation: Record<string, JSONValidator> = {
         }
         return errors;
     },
-    required: (core, schema, value, pointer) => {
+    required: (core, schema, value: Record<string, unknown>, pointer) => {
         if (Array.isArray(schema.required) === false) {
             return undefined;
         }
 
-        return schema.required.map((property) => {
-            if (value[property] === undefined) {
+        return schema.required.map((property: string) => {
+            if (!hasProperty(value, property)) {
                 return core.errors.requiredPropertyError({ key: property, pointer });
             }
             return undefined;

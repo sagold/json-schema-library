@@ -15,6 +15,9 @@ const supportedTestCases = (t) =>
         ? ![
               "format-ecmascript-regex",
               "content",
+              "ecmascript-regex",
+              "format-time",
+              "format-date-time",
               "format-iri",
               "format-iri-reference",
               "format-idn",
@@ -22,7 +25,7 @@ const supportedTestCases = (t) =>
               "format-idn-hostname",
               "format-idn-email",
               "float-overflow",
-              "non-bmp-regex",
+              "non-bmp-regex"
           ].includes(t.name)
         : true;
 const draftFeatureTests = getDraftTests("7")
@@ -40,9 +43,7 @@ function runTestCase(Core, tc: FeatureTest, skipTest = []) {
 
             describe(testCase.description, () => {
                 testCase.tests.forEach((testData) => {
-                    const test = skipTest.includes(testData.description)
-                        ? it.skip
-                        : it;
+                    const test = skipTest.includes(testData.description) ? it.skip : it;
 
                     test(testData.description, () => {
                         const validator = new Core(schema);
@@ -57,9 +58,7 @@ function runTestCase(Core, tc: FeatureTest, skipTest = []) {
 
 export default function runAllTestCases(Core, skipTest = []) {
     describe("draft07", () => {
-        draftFeatureTests.forEach((testCase) =>
-            runTestCase(Core, testCase, skipTest)
-        );
+        draftFeatureTests.forEach((testCase) => runTestCase(Core, testCase, skipTest));
     });
 }
 
