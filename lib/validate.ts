@@ -5,7 +5,7 @@ import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
 import Core from "./cores/CoreInterface";
 import equal from "fast-deep-equal";
 
-function getJsonSchemaType(value, expectedType): JSType | "integer" {
+function getJsonSchemaType(value: unknown, expectedType: string | string[]): JSType | "integer" {
     const jsType = getTypeOf(value);
     if (
         jsType === "number" &&
@@ -28,20 +28,17 @@ function getJsonSchemaType(value, expectedType): JSType | "integer" {
  */
 export default function validate(
     core: Core,
-    value: any,
+    value: unknown,
     schema: JSONSchema = core.rootSchema,
     pointer: JSONPointer = "#"
 ): Array<JSONError> {
     schema = core.resolveRef(schema);
 
-    // @todo this is a high level v7 schema validation
-    // @ts-ignore
-    if (schema === true) {
-        return [];
-    }
-    // @todo this is a high level v7 schema validation
-    // @ts-ignore
-    if (schema === false) {
+    // this is a high level v7 schema validation
+    if (getTypeOf(schema) === "boolean") {
+        if (schema) {
+            return [];
+        }
         return [core.errors.invalidDataError({ value, pointer })];
     }
 

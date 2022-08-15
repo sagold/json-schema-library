@@ -23,14 +23,11 @@ function getJsonSchemaType(value, expectedType) {
  */
 export default function validate(core, value, schema = core.rootSchema, pointer = "#") {
     schema = core.resolveRef(schema);
-    // @todo this is a high level v7 schema validation
-    // @ts-ignore
-    if (schema === true) {
-        return [];
-    }
-    // @todo this is a high level v7 schema validation
-    // @ts-ignore
-    if (schema === false) {
+    // this is a high level v7 schema validation
+    if (getTypeOf(schema) === "boolean") {
+        if (schema) {
+            return [];
+        }
         return [core.errors.invalidDataError({ value, pointer })];
     }
     if (isJSONError(schema)) {

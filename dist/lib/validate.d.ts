@@ -9,4 +9,4 @@ import Core from "./cores/CoreInterface";
  * @param [pointer] - json pointer pointing to value (used for error-messages only)
  * @return list of errors or empty
  */
-export default function validate(core: Core, value: any, schema?: JSONSchema, pointer?: JSONPointer): Array<JSONError>;
+export default function validate(core: Core, value: unknown, schema?: JSONSchema, pointer?: JSONPointer): Array<JSONError>;

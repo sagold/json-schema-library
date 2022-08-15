@@ -1,7 +1,6 @@
 import getTypeOf from "./getTypeOf";
 import { JSONSchema } from "./types";
 
-
 /**
  * Create a simple json schema for the given input data
  * @param  data - data to get json schema for
@@ -14,12 +13,11 @@ export default function createSchemaOf(data: any): JSONSchema {
 
     if (schema.type === "object") {
         schema.properties = {};
-        Object.keys(data).forEach(key => (schema.properties[key] = createSchemaOf(data[key])));
+        Object.keys(data).forEach((key) => (schema.properties[key] = createSchemaOf(data[key])));
     }
 
     if (schema.type === "array" && data.length === 1) {
         schema.items = createSchemaOf(data[0]);
-
     } else if (schema.type === "array") {
         schema.items = data.map(createSchemaOf);
     }

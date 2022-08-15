@@ -20,9 +20,7 @@ import TYPES from "../validation/type";
 import FORMATS from "../validation/format";
 import ERRORS from "../validation/errors";
 
-
 export default class Draft04Core extends CoreInterface {
-
     constructor(schema?: JSONSchema) {
         super(schema);
         this.typeKeywords = JSON.parse(JSON.stringify(TYPE_KEYWORD_MAPPING));
@@ -44,7 +42,7 @@ export default class Draft04Core extends CoreInterface {
         return this.validate(data, schema, pointer).length === 0;
     }
 
-    resolveOneOf(data: any, schema: JSONSchema, pointer: JSONPointer) {
+    resolveOneOf(data: any, schema: JSONSchema, pointer?: JSONPointer) {
         return resolveOneOf(this, data, schema, pointer);
     }
 
@@ -56,7 +54,7 @@ export default class Draft04Core extends CoreInterface {
         return getSchema(this, pointer, data, schema);
     }
 
-    getTemplate(data: any, schema: JSONSchema = this.rootSchema) {
+    getTemplate(data?: unknown, schema: JSONSchema = this.rootSchema) {
         return getTemplate(this, data, schema);
     }
 

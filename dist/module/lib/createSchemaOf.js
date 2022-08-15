@@ -10,7 +10,7 @@ export default function createSchemaOf(data) {
     };
     if (schema.type === "object") {
         schema.properties = {};
-        Object.keys(data).forEach(key => (schema.properties[key] = createSchemaOf(data[key])));
+        Object.keys(data).forEach((key) => (schema.properties[key] = createSchemaOf(data[key])));
     }
     if (schema.type === "array" && data.length === 1) {
         schema.items = createSchemaOf(data[0]);
