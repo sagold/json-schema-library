@@ -13,7 +13,7 @@ import { isJSONError, JSONError, JSONSchema } from "./types";
  */
 export default function getChildSchemaSelection(
     core: CoreInterface,
-    property: string,
+    property: string | number,
     schema: JSONSchema = core.rootSchema
 ): JSONSchema[] | JSONError {
     const result = core.step(property, schema, {}, "#");
