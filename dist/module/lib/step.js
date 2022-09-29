@@ -124,6 +124,23 @@ const stepType = {
                 }
             }
         }
+        // @draft >= 07
+        if (schema.if && (schema.then || schema.else)) {
+            // console.log("test if-then-else");
+            const isValid = core.isValid(data, schema.if);
+            if (isValid && schema.then) {
+                const resolvedThen = step(core, key, schema.then, data, pointer);
+                if (typeof resolvedThen.type === "string" && resolvedThen.type !== "error") {
+                    return resolvedThen;
+                }
+            }
+            if (!isValid && schema.else) {
+                const resolvedElse = step(core, key, schema.else, data, pointer);
+                if (typeof resolvedElse.type === "string" && resolvedElse.type !== "error") {
+                    return resolvedElse;
+                }
+            }
+        }
         // find matching property key
         if (getTypeOf(schema.patternProperties) === "object") {
             let regex;

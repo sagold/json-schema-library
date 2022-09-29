@@ -394,6 +394,27 @@ describe("getTemplate", () => {
                 expect(res).to.deep.equal({ test: "tested value", additionalValue: "additional" });
             });
 
+            it("should not change passed value of dependency", () => {
+                core.setSchema({
+                    type: "object",
+                    properties: {
+                        test: { type: "string", default: "tested value" }
+                    },
+                    dependencies: {
+                        test: {
+                            properties: {
+                                additionalValue: { type: "string", default: "additional" }
+                            }
+                        }
+                    }
+                });
+                const res = getTemplate(core, { additionalValue: "input value" });
+                expect(res).to.deep.equal({
+                    test: "tested value",
+                    additionalValue: "input value"
+                });
+            });
+
             it("should not create template for non matching dependency", () => {
                 core.setSchema({
                     type: "object",

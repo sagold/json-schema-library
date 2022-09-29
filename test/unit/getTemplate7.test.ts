@@ -27,4 +27,93 @@ describe("getTemplate - v7", () => {
 
         expect(res).to.deep.equal("static");
     });
+
+    describe("object", () => {
+        describe("if-then-else", () => {
+            it("should return template of then-schema for valid if-schema", () => {
+                core.setSchema({
+                    type: "object",
+                    // note that required is necessary for getTemplate behaviour
+                    required: ["test"],
+                    properties: {
+                        test: { type: "string", default: "with value" }
+                    },
+                    if: {
+                        properties: {
+                            test: { type: "string", minLength: 4 }
+                        }
+                    },
+                    then: {
+                        properties: {
+                            dynamic: { type: "string", default: "from then" }
+                        }
+                    }
+                });
+
+                const res = getTemplate(core);
+                expect(res).to.deep.equal({
+                    test: "with value",
+                    dynamic: "from then"
+                });
+            });
+
+            it("should not return template of then-schema for invalid if-schema", () => {
+                core.setSchema({
+                    type: "object",
+                    // note that required is necessary for getTemplate behaviour
+                    required: ["test"],
+                    properties: {
+                        test: { type: "string", default: "too short" }
+                    },
+                    if: {
+                        properties: {
+                            test: { type: "string", minLength: 40 }
+                        }
+                    },
+                    then: {
+                        properties: {
+                            dynamic: { type: "string", default: "from then" }
+                        }
+                    }
+                });
+
+                const res = getTemplate(core);
+                expect(res).to.deep.equal({
+                    test: "too short"
+                });
+            });
+
+            it("should return template of else-schema for invalid if-schema", () => {
+                core.setSchema({
+                    type: "object",
+                    // note that required is necessary for getTemplate behaviour
+                    required: ["test"],
+                    properties: {
+                        test: { type: "string", default: "with test" }
+                    },
+                    if: {
+                        properties: {
+                            test: { type: "string", minLength: 40 }
+                        }
+                    },
+                    then: {
+                        properties: {
+                            dynamic: { type: "string", default: "from then" }
+                        }
+                    },
+                    else: {
+                        properties: {
+                            dynamic: { type: "string", default: "from else" }
+                        }
+                    }
+                });
+
+                const res = getTemplate(core);
+                expect(res).to.deep.equal({
+                    test: "with test",
+                    dynamic: "from else"
+                });
+            });
+        });
+    });
 });

@@ -128,7 +128,6 @@ describe("getSchema", () => {
             //     const schema = getSchema(core, "#/additionalValue");
             //     expect(schema.type).to.equal("error");
             // });
-
             it("should return schema from dependencies when dependent property is present", () => {
                 core.setSchema({
                     type: "object",
@@ -145,6 +144,82 @@ describe("getSchema", () => {
                 });
                 const schema = getSchema(core, "/additionalValue", { test: "is defined" });
                 expect(schema).to.deep.include({ type: "string" });
+            });
+        });
+
+        describe("if-then-else", () => {
+            it("should return then-schema for matching if-schema", () => {
+                core.setSchema({
+                    type: "object",
+                    properties: {
+                        test: { type: "string" }
+                    },
+                    if: {
+                        properties: {
+                            test: { type: "string", minLength: 1 }
+                        }
+                    },
+                    then: {
+                        properties: {
+                            additionalValue: { description: "added", type: "string" }
+                        }
+                    }
+                });
+
+                const schema = getSchema(core, "/additionalValue", { test: "validates if" });
+                expect(schema).to.deep.include({ type: "string", description: "added" });
+            });
+            it("should return else-schema for non-matching if-schema", () => {
+                core.setSchema({
+                    type: "object",
+                    properties: {
+                        test: { type: "string" }
+                    },
+                    if: {
+                        properties: {
+                            test: { type: "string", minLength: 1 }
+                        }
+                    },
+                    then: {
+                        properties: {
+                            thenValue: { description: "then", type: "string" }
+                        }
+                    },
+                    else: {
+                        properties: {
+                            elseValue: { description: "else", type: "string" }
+                        }
+                    }
+                });
+
+                const schema = getSchema(core, "/elseValue", { test: "" });
+                expect(schema).to.deep.include({ type: "string", description: "else" });
+            });
+            it("should return correct schema for duplicate property", () => {
+                core.setSchema({
+                    type: "object",
+                    properties: {
+                        test: { type: "string" }
+                    },
+                    if: {
+                        properties: {
+                            test: { type: "string", minLength: 1 }
+                        }
+                    },
+                    then: {
+                        properties: {
+                            dynamicValue: { description: "then", type: "string" }
+                        }
+                    },
+                    else: {
+                        properties: {
+                            dynamicValue: { description: "else", type: "string" }
+                        }
+                    }
+                });
+
+                const schema = getSchema(core, "/dynamicValue", { test: "" });
+                expect(schema).to.deep.include({ type: "string", description: "else" });
             });
         });
     });

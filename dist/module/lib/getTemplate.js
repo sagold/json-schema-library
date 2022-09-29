@@ -191,6 +191,17 @@ const TYPE = {
             // merge any missing data (additionals) to resulting object
             Object.keys(data).forEach((key) => d[key] == null && (d[key] = data[key]));
         }
+        if (schema.if && (schema.then || schema.else)) {
+            const isValid = core.isValid(d, schema.if);
+            if (isValid && schema.then) {
+                const additionalData = core.getTemplate(d, { type: "object", ...schema.then });
+                Object.assign(d, additionalData);
+            }
+            else if (!isValid && schema.else) {
+                const additionalData = core.getTemplate(d, { type: "object", ...schema.else });
+                Object.assign(d, additionalData);
+            }
+        }
         // returns object, which is ordered by json-schema
         return d;
     },

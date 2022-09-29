@@ -32,4 +32,5 @@ import { EachCallback } from "./lib/each";
 import { EachSchemaCallback } from "./lib/eachSchema";
 import { ErrorData, CreateError } from "./lib/utils/createCustomError";
 import { JSONSchema, JSONPointer, JSONError, JSONValidator, JSONTypeValidator } from "./lib/types";
-export type { CreateError, DraftConfig, EachCallback, EachSchemaCallback, ErrorData, JSONError, JSONPointer, JSONSchema, JSONTypeValidator, JSONValidator };
+import { JSType } from "./lib/getTypeOf";
+export type { CreateError, DraftConfig, EachCallback, EachSchemaCallback, ErrorData, JSONError, JSONPointer, JSONSchema, JSONTypeValidator, JSONValidator, JSType };
