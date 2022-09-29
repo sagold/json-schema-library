@@ -126,6 +126,10 @@ function getTemplate(core, data, _schema: JSONSchema, pointer: JSONPointer, opts
     if (!isJSONSchema(schema)) { return undefined; }
     pointer = schema.pointer;
 
+    if (schema?.const) {
+        return schema.const;
+    }
+
     if (schema.oneOf) {
         // find correct schema for data
         const resolvedSchema = resolveOneOfFuzzy(core, data, schema);
@@ -256,6 +260,8 @@ const TYPE = {
 function getDefault(schema: JSONSchema, templateValue: any, initValue: any) {
     if (templateValue != null) {
         return templateValue;
+    } else if (schema.const) {
+        return schema.const;
     } else if (schema.default === undefined && Array.isArray(schema.enum)) {
         return schema.enum[0];
     } else if (schema.default === undefined) {
