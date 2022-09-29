@@ -50,4 +50,46 @@ describe("validate draft07", () => {
             });
         });
     });
+
+    describe("object", () => {
+        describe("dependencies", () => {
+            it("should validate if-then constructs", () => {
+                const errors = validate(
+                    core,
+                    {
+                        nested: {
+                            test: "with then",
+                            dynamic: ""
+                        }
+                    },
+                    {
+                        type: "object",
+                        properties: {
+                            nested: {
+                                type: "object",
+                                properties: {
+                                    test: {
+                                        type: "string"
+                                    }
+                                },
+                                dependencies: {
+                                    test: {
+                                        required: ["dynamic"],
+                                        properties: {
+                                            dynamic: {
+                                                type: "string",
+                                                minLength: 1
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                );
+                expect(errors).to.have.length(1, "should have returned an error");
+                expect(errors[0].data.pointer).to.equal("#/nested/dynamic");
+            });
+        });
+    });
 });

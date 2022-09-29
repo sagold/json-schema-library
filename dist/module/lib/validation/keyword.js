@@ -124,7 +124,7 @@ const KeywordValidation = {
                     .map((missingProperty) => core.errors.missingDependencyError({ missingProperty, pointer }));
             }
             else if (type === "object") {
-                dependencyErrors = core.validate(value, schema.dependencies[property]);
+                dependencyErrors = core.validate(value, schema.dependencies[property], pointer);
             }
             else {
                 throw new Error(`Invalid dependency definition for ${pointer}/${property}. Must be list or schema`);
