@@ -53,7 +53,7 @@ describe("validate draft07", () => {
 
     describe("object", () => {
         describe("dependencies", () => {
-            it("should validate if-then constructs", () => {
+            it("should return correct error for invalid dependency", () => {
                 const errors = validate(
                     core,
                     {
