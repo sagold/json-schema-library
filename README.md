@@ -739,7 +739,7 @@ import { Draft07, JSONValidator } from "json-schema-library";
 
 const jsonSchema = new Draft07(mySchema, {
   validateKeyword: {
-    customKeyword: <JSONValidator>myCustomKeywordValidator
+    customKeyword: myCustomKeywordValidator as JSONValidator
   },
   // in case for new keywords, or if keyword should be supported on other types
   // add keyword-name to typeKeywords
@@ -759,7 +759,7 @@ const myDraftConfiguration = {
   draft07Config,
   validateKeyword: {
     ...draft07Config.validateKeyword,
-    customKeyword: <JSONValidator>myCustomKeywordValidator
+    customKeyword: myCustomKeywordValidator as JSONValidator
   },
   // in case for new keywords, or if keyword should be supported on other types
   // add keyword-name to typeKeywords
@@ -782,7 +782,7 @@ import { Draft07, JSONValidator } from "json-schema-library";
 
 const jsonSchema = new Draft07(mySchema, {
   validateFormat: {
-    customFormat: <JSONValidator>myCustomFormatValidator
+    customFormat: myCustomFormatValidator as JSONValidator
   }
 });
 ```
