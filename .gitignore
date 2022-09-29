@@ -16,7 +16,7 @@
 /build
 /config
 /coverage
-/dist
+
 /tools/profiles
 atlassian-ide-plugin.xml
 bower_components/
