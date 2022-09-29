@@ -10,4 +10,4 @@ import { JSONError, JSONSchema } from "./types";
  * @param [schema]    - parent schema of following property
  * @return
  */
-export default function getChildSchemaSelection(core: CoreInterface, property: string, schema?: JSONSchema): JSONSchema[] | JSONError;
+export default function getChildSchemaSelection(core: CoreInterface, property: string | number, schema?: JSONSchema): JSONSchema[] | JSONError;
