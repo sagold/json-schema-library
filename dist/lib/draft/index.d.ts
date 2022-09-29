@@ -68,6 +68,7 @@ export declare class Draft {
      */
     addRemoteSchema(url: string, schema: JSONSchema): void;
     compileSchema(schema: JSONSchema): JSONSchema;
+    createSchemaOf(data: unknown): JSONSchema;
     /**
      * Iterates over data, retrieving its schema
      *
@@ -78,6 +79,7 @@ export declare class Draft {
      */
     each(data: any, callback: any, schema?: JSONSchema, pointer?: JSONPointer): void;
     eachSchema(callback: any, schema?: JSONSchema): void;
+    getChildSchemaSelection(property: string | number, schema?: JSONSchema): JSONError | JSONSchema[];
     /**
      * Returns the json-schema of a data-json-pointer.
      * Notes

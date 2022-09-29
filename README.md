@@ -1,4 +1,5 @@
-<h1 align="center"><img src="./docs/json-schema-library.png" width="256" alt="json-schema-library"></h1>
+<p align="center"><img src="./docs/json-schema-library.png" width="256" alt="json-schema-library"></p>
+
 
 **Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation**
 
@@ -7,13 +8,23 @@
 > footprint or high performance, this package focuses on exposing utilities for browser and node environments and
 > lessens the pain to build custom tools around json-schema.
 
-`npm i json-schema-library -S` or `yarn add json-schema-library`
 
--   This package is tested on node v10.16 and in latest Browsers.
--   This library currently supports draft4, draft6 and draft7 features (@see [benchmark](https://github.com/sagold/json-schema-benchmark))
+<p align="center">
+  <a href="#draft-methods">draft methods</a> | <a href="#draft-extensions">draft extensions</a> | <a href="#draft-customization">draft customization</a> | <a href="#breaking-changes">breaking changes</a>
+</p>
 
 
-_json-schema-library_ exposes a `Draft` for most json-schema drafts. Each `Draft` can be instantiated and offers a common set of actions working on the specified json-schema version. e.g.
+**install**
+
+`yarn add json-schema-library`
+
+-   This package is tested on node v16+ and in latest browsers
+-   This library currently supports draft4, draft6 and draft7 features [@see benchmark](https://github.com/sagold/json-schema-benchmark)
+
+
+**usage**
+
+`json-schema-library` exposes a `Draft` for most json-schema drafts. Each `Draft` can be instantiated and offers a common set of actions working on the specified json-schema version. e.g.
 
 ```ts
 import { Draft04, Draft06, Draft07, Draft, JSONError } from "json-schema-library";
@@ -23,11 +34,6 @@ import myData from "./myData.json";
 const jsonSchema: Draft = new Draft07(myJsonSchema);
 const errors: JSONError[] = jsonSchema.validate(myData);
 ```
-
--   [draft methods](#draft-methods)
--   [draft extensions](#draft-extensions)
--   [draft customization](#draft-customization)
--   [breaking changes](#breaking-changes)
 
 What follows is a description of the main draft methods.
 
@@ -67,7 +73,7 @@ const errors: JSONError[] = jsonSchema.validate("my-string", { type: "number" })
 
 <details><summary>About type JSONError</summary>
 
-In _json-schema-library_ all errors are in the format of a `JSONError`
+In `json-schema-library` all errors are in the format of a `JSONError`
 
 ```ts
 type JSONError = {
@@ -856,12 +862,12 @@ The above documentation reflects all those changes. Just reach out if you have t
 
 - replaced `Core` interface by new `Draft` interface
 - changed export of `Interface` to `Draft`
-- changed export of `Interface` to `Draft`
 - renamed `addSchema` to `addRemoteSchema`
 - changed api of `compileSchema` to have an additional schema-parameter for rootSchema reference
 - changed `compileSchema` and `addRemoteSchema` to work on instance state, instead of global state
 - `addRemoteSchema`, `compileSchema` now requires draft instance as first parameter
 - removed direct export of following functions: `addValidator`, `compileSchema`, `createSchemaOf`, `each`, `eachSchema`, `getChildSchemaSelection`, `getSchema`, `getTemplate`, `isValid`, `step`, `validate`. They are still accessible under the draftConfigs of each draft-version
+- changed draft version of `JsonEditor` to draft07
 
 </details>
 

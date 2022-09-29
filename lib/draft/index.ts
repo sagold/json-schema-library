@@ -96,6 +96,10 @@ export class Draft {
         return this.config.compileSchema(this, schema, this.rootSchema ?? schema);
     }
 
+    createSchemaOf(data: unknown) {
+        return this.config.createSchemaOf(data);
+    }
+
     /**
      * Iterates over data, retrieving its schema
      *
@@ -110,6 +114,10 @@ export class Draft {
 
     eachSchema(callback, schema = this.rootSchema) {
         return this.config.eachSchema(schema, callback);
+    }
+
+    getChildSchemaSelection(property: string | number, schema?: JSONSchema) {
+        return this.config.getChildSchemaSelection(this, property, schema);
     }
 
     /**

@@ -14,6 +14,7 @@
 - changed `compileSchema` and `addRemoteSchema` to work on instance state, instead of global state
 - `addRemoteSchema`, `compileSchema` now requires draft instance as first parameter
 - removed direct export of following functions: `addValidator`, `compileSchema`, `createSchemaOf`, `each`, `eachSchema`, `getChildSchemaSelection`, `getSchema`, `getTemplate`, `isValid`, `step`, `validate`. They are still accessible under the draftConfigs of each draft-version
+- changed draft version of `JsonEditor` to draft07
 
 **Milestone**
 

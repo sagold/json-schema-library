@@ -41,6 +41,9 @@ export class Draft {
         var _a;
         return this.config.compileSchema(this, schema, (_a = this.rootSchema) !== null && _a !== void 0 ? _a : schema);
     }
+    createSchemaOf(data) {
+        return this.config.createSchemaOf(data);
+    }
     /**
      * Iterates over data, retrieving its schema
      *
@@ -54,6 +57,9 @@ export class Draft {
     }
     eachSchema(callback, schema = this.rootSchema) {
         return this.config.eachSchema(schema, callback);
+    }
+    getChildSchemaSelection(property, schema) {
+        return this.config.getChildSchemaSelection(this, property, schema);
     }
     /**
      * Returns the json-schema of a data-json-pointer.

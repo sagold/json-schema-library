@@ -2,9 +2,9 @@ import merge from "../utils/merge";
 import resolveOneOf from "../resolveOneOf.fuzzy";
 import resolveRef from "../resolveRef.merge";
 import { Draft } from "../draft";
-import { draft04Config } from "../draft04";
+import { draft07Config } from "../draft07";
 const draftJsonEditorConfig = {
-    ...draft04Config,
+    ...draft07Config,
     resolveOneOf,
     resolveRef
 };
