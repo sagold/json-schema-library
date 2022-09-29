@@ -1,0 +1,188 @@
+Statistical profiling result from isolate-0x7fec88008000-29789-v8.log, (97 ticks, 2 unaccounted, 0 excluded).
+
+ [Shared libraries]:
+   ticks  total  nonlib   name
+     14   14.4%          /usr/lib/system/libsystem_pthread.dylib
+      6    6.2%          /usr/lib/system/libsystem_c.dylib
+      3    3.1%          /usr/lib/system/libsystem_platform.dylib
+      3    3.1%          /usr/lib/libc++.1.dylib
+      1    1.0%          /usr/lib/libobjc.A.dylib
+
+ [JavaScript]:
+   ticks  total  nonlib   name
+
+ [C++]:
+   ticks  total  nonlib   name
+     31   32.0%   44.3%  T node::native_module::NativeModuleEnv::CompileFunction(v8::FunctionCallbackInfo<v8::Value> const&)
+     23   23.7%   32.9%  t auto node::options_parser::OptionsParser<node::EnvironmentOptions>::Convert<node::DebugOptions>(node::options_parser::OptionsParser<node::DebugOptions>::Implication, node::options_parser::OptionsParser<node::DebugOptions>* (node::EnvironmentOptions::*)())
+     11   11.3%   15.7%  T __kernelrpc_mach_port_set_attributes
+      2    2.1%    2.9%  T _mig_strncpy_zerofill
+      1    1.0%    1.4%  T _task_info
+
+ [Summary]:
+   ticks  total  nonlib   name
+      0    0.0%    0.0%  JavaScript
+     68   70.1%   97.1%  C++
+      0    0.0%    0.0%  GC
+     27   27.8%          Shared libraries
+      2    2.1%          Unaccounted
+
+ [C++ entry points]:
+   ticks    cpp   total   name
+     63  100.0%   64.9%  TOTAL
+
+ [Bottom up (heavy) profile]:
+  Note: percentage shows a share of a particular caller in the total
+  amount of its parent calls.
+  Callers occupying less than 1.0% are not shown.
+
+   ticks parent  name
+     31   32.0%  T node::native_module::NativeModuleEnv::CompileFunction(v8::FunctionCallbackInfo<v8::Value> const&)
+     31  100.0%    t auto node::options_parser::OptionsParser<node::EnvironmentOptions>::Convert<node::DebugOptions>(node::options_parser::OptionsParser<node::DebugOptions>::Implication, node::options_parser::OptionsParser<node::DebugOptions>* (node::EnvironmentOptions::*)())
+     31  100.0%      LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+     31  100.0%        LazyCompile: ~nativeModuleRequire node:internal/bootstrap/loaders:332:29
+      6   19.4%          Function: ~<anonymous> node:internal/modules/esm/loader:1:1
+      6  100.0%            LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      4   12.9%          LazyCompile: ~initializeCJSLoader node:internal/bootstrap/pre_execution:477:29
+      4  100.0%            LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      4   12.9%          Function: ~<anonymous> node:internal/modules/esm/fetch_module:1:1
+      4  100.0%            LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      3    9.7%          Function: ~<anonymous> node:internal/modules/esm/get_source:1:1
+      3  100.0%            LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      2    6.5%          Function: ~<anonymous> node:internal/process/esm_loader:1:1
+      2  100.0%            LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      2    6.5%          Function: ~<anonymous> node:internal/modules/esm/get_format:1:1
+      2  100.0%            LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      1    3.2%          LazyCompile: ~setupInspectorHooks node:internal/bootstrap/pre_execution:288:29
+      1  100.0%            LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      1    3.2%          LazyCompile: ~initializeSourceMapsHandlers node:internal/bootstrap/pre_execution:516:38
+      1  100.0%            LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      1    3.2%          LazyCompile: ~initializeReport node:internal/bootstrap/pre_execution:238:26
+      1  100.0%            LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      1    3.2%          Function: ~<anonymous> node:net:1:1
+      1  100.0%            LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      1    3.2%          Function: ~<anonymous> node:internal/source_map/source_map_cache:1:1
+      1  100.0%            LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      1    3.2%          Function: ~<anonymous> node:internal/modules/esm/module_map:1:1
+      1  100.0%            LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      1    3.2%          Function: ~<anonymous> node:internal/modules/cjs/loader:1:1
+      1  100.0%            LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      1    3.2%          Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1    3.2%          Function: ~<anonymous> node:internal/fs/promises:1:1
+      1  100.0%            LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      1    3.2%          Function: ~<anonymous> node:internal/blocklist:1:1
+      1  100.0%            LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+
+     23   23.7%  t auto node::options_parser::OptionsParser<node::EnvironmentOptions>::Convert<node::DebugOptions>(node::options_parser::OptionsParser<node::DebugOptions>::Implication, node::options_parser::OptionsParser<node::DebugOptions>* (node::EnvironmentOptions::*)())
+     12   52.2%    t auto node::options_parser::OptionsParser<node::EnvironmentOptions>::Convert<node::DebugOptions>(node::options_parser::OptionsParser<node::DebugOptions>::Implication, node::options_parser::OptionsParser<node::DebugOptions>* (node::EnvironmentOptions::*)())
+      2   16.7%      LazyCompile: ~patchProcessObject node:internal/bootstrap/pre_execution:89:28
+      2  100.0%        LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      2  100.0%          Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1    8.3%      t auto node::options_parser::OptionsParser<node::EnvironmentOptions>::Convert<node::DebugOptions>(node::options_parser::OptionsParser<node::DebugOptions>::Implication, node::options_parser::OptionsParser<node::DebugOptions>* (node::EnvironmentOptions::*)())
+      1  100.0%        LazyCompile: ~formatError node:internal/util/inspect:1281:21
+      1  100.0%          LazyCompile: ~formatRaw node:internal/util/inspect:820:19
+      1  100.0%            LazyCompile: ~formatValue node:internal/util/inspect:745:21
+      1    8.3%      LazyCompile: ~setupWebCrypto node:internal/bootstrap/pre_execution:170:24
+      1  100.0%        LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      1  100.0%          Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1    8.3%      LazyCompile: ~nativeModuleRequire node:internal/bootstrap/loaders:332:29
+      1  100.0%        Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1    8.3%      LazyCompile: ~getOptionValue node:internal/options:39:24
+      1  100.0%        LazyCompile: ~setupFetch node:internal/bootstrap/pre_execution:153:20
+      1  100.0%          LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      1  100.0%            Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1    8.3%      LazyCompile: ~afterInspector node:internal/errors:753:17
+      1    8.3%      LazyCompile: ~SafeIterator node:internal/per_context/primordials:279:16
+      1  100.0%        LazyCompile: ~desc.value node:internal/per_context/primordials:334:32
+      1  100.0%          Function: ~<anonymous> node:internal/modules/cjs/loader:1:1
+      1  100.0%            LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      1    8.3%      LazyCompile: ~Module._load node:internal/modules/cjs/loader:757:24
+      1  100.0%        LazyCompile: ~executeUserEntryPoint node:internal/modules/run_main:70:31
+      1  100.0%          Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1    8.3%      Function: ~<anonymous> node:internal/util/iterable_weak_map:1:1
+      1  100.0%        LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      1  100.0%          LazyCompile: ~nativeModuleRequire node:internal/bootstrap/loaders:332:29
+      1  100.0%            Function: ~<anonymous> node:internal/source_map/source_map_cache:1:1
+      1    8.3%      Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1    8.3%      Function: ~<anonymous> node:internal/fs/promises:1:1
+      1  100.0%        LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      1  100.0%          LazyCompile: ~nativeModuleRequire node:internal/bootstrap/loaders:332:29
+      1  100.0%            Function: ~<anonymous> node:internal/modules/esm/get_source:1:1
+      1    4.3%    LazyCompile: ~internalBinding node:internal/bootstrap/loaders:164:45
+      1  100.0%      LazyCompile: ~initializeDeprecations node:internal/bootstrap/pre_execution:306:32
+      1  100.0%        LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      1  100.0%          Function: ~<anonymous> node:internal/main/run_main_module:1:1
+
+     14   14.4%  /usr/lib/system/libsystem_pthread.dylib
+      8   57.1%    t auto node::options_parser::OptionsParser<node::EnvironmentOptions>::Convert<node::DebugOptions>(node::options_parser::OptionsParser<node::DebugOptions>::Implication, node::options_parser::OptionsParser<node::DebugOptions>* (node::EnvironmentOptions::*)())
+      2   25.0%      LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      2  100.0%        Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      2   25.0%      LazyCompile: ~patchProcessObject node:internal/bootstrap/pre_execution:89:28
+      2  100.0%        LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      2  100.0%          Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1   12.5%      LazyCompile: ~setupWarningHandler node:internal/bootstrap/pre_execution:142:29
+      1  100.0%        LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      1  100.0%          Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1   12.5%      LazyCompile: ~<anonymous> node:internal/process/execution:137:10
+      1   12.5%      Function: ~<anonymous> node:internal/modules/cjs/helpers:1:1
+      1  100.0%        LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      1  100.0%          LazyCompile: ~nativeModuleRequire node:internal/bootstrap/loaders:332:29
+      1  100.0%            Function: ~<anonymous> node:internal/source_map/source_map_cache:1:1
+      1   12.5%      Function: ~<anonymous> node:internal/fs/rimraf:1:1
+      1  100.0%        LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      1  100.0%          LazyCompile: ~nativeModuleRequire node:internal/bootstrap/loaders:332:29
+      1  100.0%            Function: ~<anonymous> node:internal/fs/promises:1:1
+
+     11   11.3%  T __kernelrpc_mach_port_set_attributes
+      2   18.2%    t auto node::options_parser::OptionsParser<node::EnvironmentOptions>::Convert<node::DebugOptions>(node::options_parser::OptionsParser<node::DebugOptions>::Implication, node::options_parser::OptionsParser<node::DebugOptions>* (node::EnvironmentOptions::*)())
+      1   50.0%      LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      1  100.0%        Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1   50.0%      Function: ~<anonymous> node:internal/fs/promises:1:1
+      1  100.0%        LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      1  100.0%          LazyCompile: ~nativeModuleRequire node:internal/bootstrap/loaders:332:29
+      1  100.0%            Function: ~<anonymous> node:internal/modules/esm/get_source:1:1
+
+      6    6.2%  /usr/lib/system/libsystem_c.dylib
+      6  100.0%    t auto node::options_parser::OptionsParser<node::EnvironmentOptions>::Convert<node::DebugOptions>(node::options_parser::OptionsParser<node::DebugOptions>::Implication, node::options_parser::OptionsParser<node::DebugOptions>* (node::EnvironmentOptions::*)())
+      3   50.0%      LazyCompile: ~afterInspector node:internal/errors:753:17
+      1   16.7%      LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      1  100.0%        Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1   16.7%      Function: ~<anonymous> node:internal/fs/rimraf:1:1
+      1  100.0%        LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      1  100.0%          LazyCompile: ~nativeModuleRequire node:internal/bootstrap/loaders:332:29
+      1  100.0%            Function: ~<anonymous> node:internal/fs/promises:1:1
+      1   16.7%      Function: ~<anonymous> node:internal/fs/promises:1:1
+      1  100.0%        LazyCompile: ~compileForInternalLoader node:internal/bootstrap/loaders:299:27
+      1  100.0%          LazyCompile: ~nativeModuleRequire node:internal/bootstrap/loaders:332:29
+      1  100.0%            Function: ~<anonymous> node:internal/modules/esm/get_source:1:1
+
+      3    3.1%  /usr/lib/system/libsystem_platform.dylib
+      2   66.7%    t auto node::options_parser::OptionsParser<node::EnvironmentOptions>::Convert<node::DebugOptions>(node::options_parser::OptionsParser<node::DebugOptions>::Implication, node::options_parser::OptionsParser<node::DebugOptions>* (node::EnvironmentOptions::*)())
+      1   50.0%      LazyCompile: ~afterInspector node:internal/errors:753:17
+      1   50.0%      LazyCompile: ~<anonymous> node:path:1082:10
+      1  100.0%        LazyCompile: ~resolve node:path:1091:10
+      1  100.0%          LazyCompile: ~patchProcessObject node:internal/bootstrap/pre_execution:89:28
+      1  100.0%            LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+
+      3    3.1%  /usr/lib/libc++.1.dylib
+      1   33.3%    t auto node::options_parser::OptionsParser<node::EnvironmentOptions>::Convert<node::DebugOptions>(node::options_parser::OptionsParser<node::DebugOptions>::Implication, node::options_parser::OptionsParser<node::DebugOptions>* (node::EnvironmentOptions::*)())
+      1  100.0%      LazyCompile: ~formatValue node:internal/util/inspect:745:21
+      1  100.0%        LazyCompile: ~inspect node:internal/util/inspect:292:17
+      1  100.0%          LazyCompile: ~afterInspector node:internal/errors:753:17
+
+      2    2.1%  UNKNOWN
+      2  100.0%    t auto node::options_parser::OptionsParser<node::EnvironmentOptions>::Convert<node::DebugOptions>(node::options_parser::OptionsParser<node::DebugOptions>::Implication, node::options_parser::OptionsParser<node::DebugOptions>* (node::EnvironmentOptions::*)())
+      1   50.0%      LazyCompile: ~setupWarningHandler node:internal/bootstrap/pre_execution:142:29
+      1  100.0%        LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      1  100.0%          Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1   50.0%      LazyCompile: ~resolve node:path:1091:10
+      1  100.0%        LazyCompile: ~patchProcessObject node:internal/bootstrap/pre_execution:89:28
+      1  100.0%          LazyCompile: ~prepareMainThreadExecution node:internal/bootstrap/pre_execution:28:36
+      1  100.0%            Function: ~<anonymous> node:internal/main/run_main_module:1:1
+
+      2    2.1%  T _mig_strncpy_zerofill
+
+      1    1.0%  T _task_info
+
+      1    1.0%  /usr/lib/libobjc.A.dylib
+
