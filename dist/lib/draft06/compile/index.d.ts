@@ -1,3 +1,4 @@
+import { Draft } from "../../draft";
 import { JSONSchema } from "../../types";
 /**
  * @draft starting with _draft 06_ keyword `id` has been renamed to `$id`
@@ -12,4 +13,4 @@ import { JSONSchema } from "../../types";
  * @param [force] = false force compile json-schema
  * @return compiled json-schema
  */
-export default function compile(rootSchema: JSONSchema, force?: boolean): JSONSchema;
+export default function compileSchema(draft: Draft, schemaToCompile: JSONSchema, rootSchema?: JSONSchema, force?: boolean): JSONSchema;

@@ -1,6 +1,6 @@
 import __ from "./__";
-function dashCase(str) {
-    return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+function dashCase(text) {
+    return text.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 }
 export function createError(name, data) {
     return {
@@ -13,11 +13,11 @@ export function createError(name, data) {
 }
 /**
  * Creates a custom Error-Constructor which instances may be identified by `customError instanceof Error`. Its messages
- * are defined by strings-object __@see config/strings.ts
+ * are defined by strings-object @see config/strings.ts
  *
  * @param name - id of error (camelcased)
  * @return error constructor function
  */
-export default function createCustomError(name) {
+export function createCustomError(name) {
     return createError.bind(null, name);
 }

@@ -1,6 +1,6 @@
 import gp from "gson-pointer";
 import { JSONSchema, JSONPointer, isJSONError } from "./types";
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 
 const emptyObject = {};
 
@@ -35,7 +35,7 @@ function _get(
     data: unknown = emptyObject
 ): JSONSchema {
     if (frags.length === 0) {
-        return schema;
+        return core.resolveRef(schema);
     }
 
     const key = frags.shift(); // step key

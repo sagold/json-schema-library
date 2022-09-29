@@ -1,5 +1,5 @@
-import Core from "./cores/CoreInterface";
-import { JSONSchema, JSONError, JSONPointer } from "./types";
+import { JSONSchema, JSONPointer, JSONError } from "./types";
+import { Draft as Core } from "./draft";
 /**
  * Selects and returns a oneOf schema for the given data
  *

@@ -2,7 +2,7 @@ import gp from "gson-pointer";
 import { get } from "gson-query";
 import getTypeId from "./getTypeId";
 import types from "./types";
-const isObject = value => Object.prototype.toString.call(value) === "[object Object]";
+const isObject = (value) => Object.prototype.toString.call(value) === "[object Object]";
 /**
  * Returns a list of all (direct) type definitions from the given schema
  * @param schema
@@ -29,7 +29,7 @@ export default function getTypeDefs(schema) {
     if (type.definitions == null) {
         return defs;
     }
-    type.definitions.forEach(query => {
+    type.definitions.forEach((query) => {
         get(schema, query, (value, key, parent, pointer) => {
             if (isObject(value) && getTypeId(value)) {
                 defs.push({ pointer: gp.join(gp.split(pointer), false), def: value });

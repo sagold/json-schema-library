@@ -2,7 +2,7 @@ import copy from "./utils/copy";
 import merge from "./utils/merge";
 import errors from "./validation/errors";
 import { JSONSchema, JSONPointer, JSONError } from "./types";
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 
 export default function resolveAllOf(
     core: Core,

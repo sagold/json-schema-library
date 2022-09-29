@@ -1,25 +1,21 @@
 import { expect } from "chai";
 import addValidator from "../../lib/addValidator";
-import Core from "../../lib/cores/Draft04";
-
+import { Draft04 } from "../../lib/draft04";
 
 const nullFunc = () => {}; // eslint-disable-line
 
-
 describe("addValidator", () => {
-
     let core;
-    beforeEach(() => (core = new Core()));
+    beforeEach(() => (core = new Draft04()));
 
     describe("error", () => {
-
         it("should throw an error for a missing creator function", () => {
             // @ts-ignore
             expect(() => addValidator.error(core, "123")).to.throw();
         });
 
         it("should overwrite 'minLengthError'", () => {
-            addValidator.error(core, "minLengthError", data => ({
+            addValidator.error(core, "minLengthError", (data) => ({
                 type: "error",
                 name: "minLengthError",
                 code: "custom-min-length-error",
@@ -35,7 +31,6 @@ describe("addValidator", () => {
     });
 
     describe("format", () => {
-
         it("should throw an error for a missing validation function", () => {
             // @ts-ignore
             expect(() => addValidator.format(core, "123")).to.throw();
@@ -92,7 +87,6 @@ describe("addValidator", () => {
     });
 
     describe("keyword", () => {
-
         beforeEach(() => {
             if (core.validateKeyword.capitalized) {
                 throw new Error("keyword 'capitalized' should not be set");
@@ -101,11 +95,15 @@ describe("addValidator", () => {
 
         it("should throw an error for a missing validation function", () => {
             // @ts-ignore
-            expect(() => addValidator.keyword(core, "object", "123")).to.throw("Validation function expected");
+            expect(() => addValidator.keyword(core, "object", "123")).to.throw(
+                "Validation function expected"
+            );
         });
 
         it("should throw an error for unknown datatypes", () => {
-            expect(() => addValidator.keyword(core, "error", "123", nullFunc)).to.throw("Unknown datatype");
+            expect(() => addValidator.keyword(core, "error", "123", nullFunc)).to.throw(
+                "Unknown datatype"
+            );
         });
 
         it("should allow to overwrite existing keyword validation", () => {
@@ -115,7 +113,10 @@ describe("addValidator", () => {
 
         it("should call custom keyword validator", () => {
             let called = false;
-            addValidator.keyword(core, "string", "capitalized", () => { called = true; return undefined; });
+            addValidator.keyword(core, "string", "capitalized", () => {
+                called = true;
+                return undefined;
+            });
 
             core.validate("myString", { type: "string", capitalized: true });
 
@@ -124,7 +125,10 @@ describe("addValidator", () => {
 
         it("should not call validator if keyword is not set", () => {
             let called = false;
-            addValidator.keyword(core, "string", "capitalized", () => { called = true; return undefined; });
+            addValidator.keyword(core, "string", "capitalized", () => {
+                called = true;
+                return undefined;
+            });
 
             core.validate("myString", { type: "string" });
 
@@ -133,7 +137,10 @@ describe("addValidator", () => {
 
         it("should not call custom keyword validator for different datatype", () => {
             let called = false;
-            addValidator.keyword(core, "string", "capitalized", () => { called = true; return undefined; });
+            addValidator.keyword(core, "string", "capitalized", () => {
+                called = true;
+                return undefined;
+            });
 
             core.validate(1234, { type: "number", capitalized: true });
 

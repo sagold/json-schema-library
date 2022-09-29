@@ -1,7 +1,7 @@
 import { errorsOnly } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
 import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 
 function createErrorNotification(onError: OnError) {
     return function notifyError(error) {

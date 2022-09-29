@@ -4,16 +4,14 @@ import getTypeId from "./getTypeId";
 import types from "./types";
 import { JSONSchema, JSONPointer } from "../types";
 
-
-const isObject = value => Object.prototype.toString.call(value) === "[object Object]";
-
+const isObject = (value) => Object.prototype.toString.call(value) === "[object Object]";
 
 /**
  * Returns a list of all (direct) type definitions from the given schema
  * @param schema
  * @return list of type definition, given as { pointer, def }
  */
-export default function getTypeDefs(schema: JSONSchema): Array<{ pointer: JSONPointer, def: any }> {
+export default function getTypeDefs(schema: JSONSchema): Array<{ pointer: JSONPointer; def: any }> {
     const defs = [];
     const id = getTypeId(schema);
     if (id == null) {
@@ -28,7 +26,6 @@ export default function getTypeDefs(schema: JSONSchema): Array<{ pointer: JSONPo
         for (let i = 0, l = id.length; i < l; i += 1) {
             Object.assign(type, types[id[i]]);
         }
-
     } else {
         type = types[id];
     }
@@ -37,7 +34,7 @@ export default function getTypeDefs(schema: JSONSchema): Array<{ pointer: JSONPo
         return defs;
     }
 
-    type.definitions.forEach(query => {
+    type.definitions.forEach((query) => {
         get(schema, query, (value, key, parent, pointer) => {
             if (isObject(value) && getTypeId(value)) {
                 defs.push({ pointer: gp.join(gp.split(pointer), false), def: value });

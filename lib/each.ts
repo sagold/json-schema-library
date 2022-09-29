@@ -1,6 +1,8 @@
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 import getTypeOf from "./getTypeOf";
 import { JSONSchema, JSONPointer } from "./types";
+
+export type EachCallback = (schema: JSONSchema, data: unknown, pointer: JSONPointer) => void;
 
 /**
  * Iterates over data, retrieving its schema
@@ -14,7 +16,7 @@ import { JSONSchema, JSONPointer } from "./types";
 export default function each(
     core: Core,
     data: any,
-    callback,
+    callback: EachCallback,
     schema: JSONSchema = core.rootSchema,
     pointer: JSONPointer = "#"
 ) {

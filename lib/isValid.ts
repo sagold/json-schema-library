@@ -1,6 +1,5 @@
 import { JSONSchema, JSONPointer } from "./types";
-import Core from "./cores/CoreInterface";
-
+import { Draft as Core } from "./draft";
 
 /**
  * Test if the data is valid according to the given schema
@@ -11,6 +10,11 @@ import Core from "./cores/CoreInterface";
  * @param [pointer] - json pointer pointing to value
  * @return if schema does match given value
  */
-export default function isValid(core: Core, value: any, schema: JSONSchema = core.rootSchema, pointer: JSONPointer = "#"): boolean {
+export default function isValid(
+    core: Core,
+    value: any,
+    schema: JSONSchema = core.rootSchema,
+    pointer: JSONPointer = "#"
+): boolean {
     return core.validate(value, schema, pointer).length === 0;
 }

@@ -1,10 +1,8 @@
 import { expect } from "chai";
 import each from "../../lib/each";
-import Core from "../../lib/cores/Draft04";
-
+import { Draft04 as Core } from "../../lib/draft04";
 
 describe("each", () => {
-
     let core;
     before(() => {
         core = new Core();
@@ -12,14 +10,9 @@ describe("each", () => {
         each.core = core;
     });
 
-
     it("should call callback with schema, value and pointer", () => {
         const calls = [];
-        core.each(
-            5,
-            (...args) => calls.push(args),
-            { type: "number" }
-        );
+        core.each(5, (...args) => calls.push(args), { type: "number" });
 
         expect(calls).to.have.length(1);
         expect(calls[0][0]).to.deep.eq({ type: "number" });
@@ -29,11 +22,10 @@ describe("each", () => {
 
     it("should callback for array and all array items", () => {
         const calls = [];
-        core.each(
-            [5, 9],
-            (...args) => calls.push(args),
-            { type: "array", items: { type: "number" } }
-        );
+        core.each([5, 9], (...args) => calls.push(args), {
+            type: "array",
+            items: { type: "number" }
+        });
 
         expect(calls).to.have.length(3);
         expect(calls).to.deep.eq([
@@ -45,11 +37,10 @@ describe("each", () => {
 
     it("should callback for array and pick correct schema forEach item", () => {
         const calls = [];
-        core.each(
-            [5, "nine"],
-            (...args) => calls.push(args),
-            { type: "array", items: [{ type: "number" }, { type: "string" }] }
-        );
+        core.each([5, "nine"], (...args) => calls.push(args), {
+            type: "array",
+            items: [{ type: "number" }, { type: "string" }]
+        });
 
         expect(calls).to.have.length(3);
         expect(calls).to.deep.eq([
@@ -61,15 +52,18 @@ describe("each", () => {
 
     it("should callback for object and all properties", () => {
         const calls = [];
-        core.each(
-            { a: 5, b: 9 },
-            (...args) => calls.push(args),
-            { type: "object", properties: { a: { type: "number" }, b : { type: "number" } } }
-        );
+        core.each({ a: 5, b: 9 }, (...args) => calls.push(args), {
+            type: "object",
+            properties: { a: { type: "number" }, b: { type: "number" } }
+        });
 
         expect(calls).to.have.length(3);
         expect(calls).to.deep.eq([
-            [{ type: "object", properties: { a: { type: "number" }, b : { type: "number" } } }, { a: 5, b: 9 }, "#"],
+            [
+                { type: "object", properties: { a: { type: "number" }, b: { type: "number" } } },
+                { a: 5, b: 9 },
+                "#"
+            ],
             [{ type: "number" }, 5, "#/a"],
             [{ type: "number" }, 9, "#/b"]
         ]);

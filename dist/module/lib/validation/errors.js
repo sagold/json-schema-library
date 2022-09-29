@@ -1,5 +1,5 @@
 /* eslint no-invalid-this: 0 */
-import createCustomError from "../utils/createCustomError";
+import { createCustomError } from "../utils/createCustomError";
 const errors = {
     additionalItemsError: createCustomError("AdditionalItemsError"),
     additionalPropertiesError: createCustomError("AdditionalPropertiesError"),

@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import getSchema from "../../../lib/getSchema";
-import Core from "../../../lib/cores/Draft04";
+import { Draft04 as Core } from "../../../lib/draft04";
 import { JSONSchema, JSONPointer } from "../../../lib/types";
 import resolveOneOfFuzzy from "../../../lib/resolveOneOf.fuzzy";
 

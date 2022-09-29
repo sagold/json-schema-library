@@ -1,46 +1,35 @@
-import addSchema from "./lib/addSchema";
-import addValidator from "./lib/addValidator";
-import compileSchema from "./lib/compileSchema";
-import createCustomError from "./lib/utils/createCustomError";
-import createSchemaOf from "./lib/createSchemaOf";
-import Draft04 from "./lib/cores/Draft04";
-import Draft06 from "./lib/cores/Draft06";
-import Draft07 from "./lib/cores/Draft07";
-import each from "./lib/each";
-import eachSchema from "./lib/eachSchema";
-import getChildSchemaSelection from "./lib/getChildSchemaSelection";
-import getSchema from "./lib/getSchema";
-import getTemplate from "./lib/getTemplate";
+import { createError, createCustomError } from "./lib/utils/createCustomError";
 import getTypeOf from "./lib/getTypeOf";
-import Interface from "./lib/cores/CoreInterface";
-import isValid from "./lib/isValid";
-import JsonEditor from "./lib/cores/JsonEditor";
 import resolveOneOf from "./lib/resolveOneOf.strict";
 import resolveOneOfFuzzy from "./lib/resolveOneOf.fuzzy";
+import resolveRef from "./lib/resolveRef.strict";
+import resolveRefMerge from "./lib/resolveRef.merge";
 import SchemaService from "./lib/SchemaService";
 import settings from "./lib/config/settings";
-import step from "./lib/step";
-import validate from "./lib/validate";
 import validateAsync from "./lib/validateAsync";
+import render from "./lib/utils/render";
+import { Draft } from "./lib/draft";
+import { Draft04, draft04Config } from "./lib/draft04";
+import { Draft06, draft06Config } from "./lib/draft06";
+import { Draft07, draft07Config } from "./lib/draft07";
+import { JsonEditor, draftJsonEditorConfig } from "./lib/jsoneditor";
+import { isJSONError } from "./lib/types";
 declare const config: {
     strings: Record<string, string>;
 };
-export { config, Interface, Draft04, // core implementing draft04 specs
+export { config, Draft, Draft04, // core implementing draft04 specs
+draft04Config, // config implementing draft04 specs
 Draft06, // core implementing draft06 specs
+draft06Config, // config implementing draft06 specs
 Draft07, // core implementing draft07 specs
+draft07Config, // config implementing draft07 specs
 JsonEditor, // adjusted core of draft04 to better support the json-editor
-addSchema, // add a schema to be references via $ref
-addValidator, // add validation for keyword, format, datatype and customize errors
-compileSchema, createCustomError, createSchemaOf, // creates a simple schema based on the given data
-each, // iterate over data, receiving each data-entry with its schema
-eachSchema, // iterates over a json-schemas type definitions
-getChildSchemaSelection, // get available child schemas
-getSchema, // get schema of datapointer
-getTemplate, // create data which is valid to the given schema
-getTypeOf, // returns the javascript datatype
-isValid, // returns a boolean if the schema is valid
-resolveOneOf, resolveOneOfFuzzy, settings, SchemaService, step, // steps into a json-schema, returning the matching child-schema
-validate, // validates data by a schema
-validateAsync };
-export type { JSONSchema, JSONPointer, JSONError, JSONValidator } from "./lib/types";
-export { isJSONError } from "./lib/types";
+draftJsonEditorConfig, // adjusted config of draft04 to better support the json-editor
+createError, createCustomError, getTypeOf, // returns the javascript datatype
+isJSONError, render, resolveRef, resolveRefMerge, resolveOneOf, resolveOneOfFuzzy, settings, SchemaService, validateAsync };
+import { DraftConfig } from "./lib/draft";
+import { EachCallback } from "./lib/each";
+import { EachSchemaCallback } from "./lib/eachSchema";
+import { ErrorData, CreateError } from "./lib/utils/createCustomError";
+import { JSONSchema, JSONPointer, JSONError, JSONValidator, JSONTypeValidator } from "./lib/types";
+export type { CreateError, DraftConfig, EachCallback, EachSchemaCallback, ErrorData, JSONError, JSONPointer, JSONSchema, JSONTypeValidator, JSONValidator };

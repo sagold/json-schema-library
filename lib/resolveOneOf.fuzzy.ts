@@ -3,7 +3,7 @@ import flattenArray from "./utils/flattenArray";
 import getTypeOf from "./getTypeOf";
 import settings from "./config/settings";
 import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 
 const { DECLARATOR_ONEOF } = settings;
 

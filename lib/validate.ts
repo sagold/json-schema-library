@@ -2,7 +2,7 @@ import getTypeOf, { JSType } from "./getTypeOf";
 import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
 import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 import equal from "fast-deep-equal";
 
 function getJsonSchemaType(value: unknown, expectedType: string | string[]): JSType | "integer" {

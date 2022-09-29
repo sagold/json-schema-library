@@ -1,7 +1,6 @@
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 import { JSONValidator } from "./types";
 import { CreateError } from "./utils/createCustomError";
-
 
 /**
  * @throws Error
@@ -13,11 +12,12 @@ import { CreateError } from "./utils/createCustomError";
  */
 function addError(core: Core, errorId: string, errorCreator: CreateError) {
     if (typeof errorCreator !== "function") {
-        throw new Error(`Error callback 'errorCreator' must be of type function. Received '${typeof errorCreator}'`);
+        throw new Error(
+            `Error callback 'errorCreator' must be of type function. Received '${typeof errorCreator}'`
+        );
     }
     core.errors[errorId] = errorCreator;
 }
-
 
 /**
  * Adds a custom format validator. Existing format may not be overriden (may still be modified manually)
@@ -35,7 +35,6 @@ function addFormat(core: Core, formatType: string, validationFunction: JSONValid
     core.validateFormat[formatType] = validationFunction;
 }
 
-
 /**
  * Adds a custom keyword validation to a specific type. May not override existing keywords.
  *
@@ -44,7 +43,12 @@ function addFormat(core: Core, formatType: string, validationFunction: JSONValid
  * @param keyword - The keyword to add, i.e. `minWidth: ...`
  * @param validationFunction - called with (core, schema, value, pointer)
  */
-function addKeyword(core: Core, datatype: string, keyword: string, validationFunction: JSONValidator) {
+function addKeyword(
+    core: Core,
+    datatype: string,
+    keyword: string,
+    validationFunction: JSONValidator
+) {
     if (typeof validationFunction !== "function") {
         throw new Error(`Validation function expected. Received ${typeof validationFunction}`);
     }
@@ -56,7 +60,6 @@ function addKeyword(core: Core, datatype: string, keyword: string, validationFun
     }
     core.validateKeyword[keyword] = validationFunction;
 }
-
 
 export default {
     error: addError,

@@ -1,9 +1,8 @@
 import getSchema from "./getSchema";
-import Core from "./cores/JsonEditor";
+import { JsonEditor as Core } from "./jsoneditor";
 import gp from "gson-pointer";
 import copy from "./utils/copy";
 import { JSONSchema, JSONPointer } from "./types";
-
 
 export default class SchemaService {
     core: Core;
@@ -30,16 +29,19 @@ export default class SchemaService {
     }
 
     get(pointer: JSONPointer, data: any): JSONSchema {
-        if (data) { // possibly separate entry point
+        if (data) {
+            // possibly separate entry point
             const schema = getSchema(this.core, pointer, data, this.schema);
             return copy(schema);
         }
 
-        if (pointer === "#") { // root
+        if (pointer === "#") {
+            // root
             return this.schema;
         }
 
-        if (this.cache[pointer]) { // return cached result
+        if (this.cache[pointer]) {
+            // return cached result
             return this.cache[pointer];
         }
 
@@ -55,7 +57,12 @@ export default class SchemaService {
 
         // step from parent to child
         const key = gp.split(pointer).pop();
-        let schema = getSchema(this.core, key, gp.get(this.data, parentPointer), this.cache[parentPointer]);
+        let schema = getSchema(
+            this.core,
+            key,
+            gp.get(this.data, parentPointer),
+            this.cache[parentPointer]
+        );
         schema = copy(schema);
         if (schema.variableSchema !== true) {
             this.cache[pointer] = schema;

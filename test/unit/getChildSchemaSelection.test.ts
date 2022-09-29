@@ -1,10 +1,8 @@
 import { expect } from "chai";
-import Core from "../../lib/cores/JsonEditor";
+import { JsonEditor as Core } from "../../lib/jsoneditor";
 import getChildSchemaSelection from "../../lib/getChildSchemaSelection";
 
-
 describe("getChildSchemaSelection", () => {
-
     let core;
     before(() => (core = new Core()));
 
@@ -24,10 +22,7 @@ describe("getChildSchemaSelection", () => {
     it("should return a single array-item as list", () => {
         const result = getChildSchemaSelection(core, 0, {
             type: "array",
-            items: [
-                { type: "string" },
-                { type: "number" }
-            ]
+            items: [{ type: "string" }, { type: "number" }]
         });
 
         expect(result).to.have.length(1);
@@ -38,18 +33,12 @@ describe("getChildSchemaSelection", () => {
         const result = getChildSchemaSelection(core, "b", {
             type: "array",
             items: {
-                oneOf: [
-                    { type: "string" },
-                    { type: "number" }
-                ]
+                oneOf: [{ type: "string" }, { type: "number" }]
             }
         });
 
         expect(result).to.have.length(2);
-        expect(result).to.deep.eq([
-            { type: "string" },
-            { type: "number" }
-        ]);
+        expect(result).to.deep.eq([{ type: "string" }, { type: "number" }]);
     });
 
     it("should resolve items from oneOf elements", () => {
@@ -57,10 +46,7 @@ describe("getChildSchemaSelection", () => {
         core.setSchema({
             type: "array",
             items: {
-                oneOf: [
-                    { $ref: "#/definitions/string" },
-                    { $ref: "#/definitions/number" }
-                ]
+                oneOf: [{ $ref: "#/definitions/string" }, { $ref: "#/definitions/number" }]
             },
             definitions: {
                 number: { type: "number" },
@@ -71,9 +57,6 @@ describe("getChildSchemaSelection", () => {
         const result = getChildSchemaSelection(core, "b", core.getSchema());
 
         expect(result).to.have.length(2);
-        expect(result).to.deep.eq([
-            { type: "string" },
-            { type: "number" }
-        ]);
+        expect(result).to.deep.eq([{ type: "string" }, { type: "number" }]);
     });
 });

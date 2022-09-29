@@ -1,6 +1,7 @@
 /* eslint max-statements-per-line: ["error", { "max": 2 }] */
+import { Draft } from "../../draft";
 import eachSchema from "../../eachSchema";
-import remotes from "../../../remotes";
+// import remotes from "../../../remotes";
 import joinScope from "../../compile/joinScope";
 import getRef from "../../compile/getRef";
 import { JSONSchema } from "../../types";
@@ -10,7 +11,6 @@ const COMPILED_REF = "__ref";
 const GET_REF = "getRef";
 const GET_ROOT = "getRoot";
 const suffixes = /(#|\/)+$/g;
-
 
 /**
  * @draft starting with _draft 06_ keyword `id` has been renamed to `$id`
@@ -25,27 +25,53 @@ const suffixes = /(#|\/)+$/g;
  * @param [force] = false force compile json-schema
  * @return compiled json-schema
  */
-export default function compile(rootSchema: JSONSchema, force = false): JSONSchema {
+export default function compileSchema(
+    draft: Draft,
+    schemaToCompile: JSONSchema,
+    rootSchema = schemaToCompile,
+    force = false
+): JSONSchema {
     // @ts-ignore
-    if (rootSchema === true || rootSchema === false) {
-        return rootSchema;
+    if (schemaToCompile === true || schemaToCompile === false || schemaToCompile === undefined) {
+        return schemaToCompile;
     }
-    if (rootSchema[COMPILED] !== undefined) { return rootSchema; } // eslint-disable-line
-    const context = { ids: {}, remotes: Object.assign({}, remotes) };
-    const rootSchemaAsString = JSON.stringify(rootSchema);
-    rootSchema = JSON.parse(rootSchemaAsString);
-    Object.defineProperty(rootSchema, COMPILED, { enumerable: false, value: true });
-    Object.defineProperty(rootSchema, GET_REF, { enumerable: false, value: getRef.bind(null, context, rootSchema) });
+    if (schemaToCompile[COMPILED] !== undefined) {
+        return schemaToCompile;
+    } // eslint-disable-line
+    const context = { ids: {}, remotes: draft.remotes };
+    const rootSchemaAsString = JSON.stringify(schemaToCompile);
+    const compiledSchema = JSON.parse(rootSchemaAsString);
+    Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });
+    Object.defineProperty(compiledSchema, GET_REF, {
+        enumerable: false,
+        value: getRef.bind(null, context, compiledSchema)
+    });
 
+    // bail early, when no $refs are defined
     if (force === false && rootSchemaAsString.includes("$ref") === false) {
-        // bail early, when no $refs are defined
-        return rootSchema;
+        return compiledSchema;
+    }
+
+    // compile this schema under rootSchema, making definitions available to $ref-resolution
+    if (compiledSchema !== rootSchema) {
+        Object.defineProperty(compiledSchema, "$defs", {
+            enumerable: true,
+            value: Object.assign(
+                {},
+                rootSchema.definitions,
+                rootSchema.$defs,
+                compiledSchema.definitions,
+                compiledSchema.$defs
+            )
+        });
     }
 
     const scopes = {};
-    const getRoot = () => rootSchema;
-    eachSchema(rootSchema, (schema, pointer) => {
-        if (schema.$id) { context.ids[schema.$id.replace(suffixes, "")] = pointer; }
+    const getRoot = () => compiledSchema;
+    eachSchema(compiledSchema, (schema, pointer) => {
+        if (schema.$id) {
+            context.ids[schema.$id.replace(suffixes, "")] = pointer;
+        }
 
         // build up scopes and add them to $ref-resolution map
         pointer = `#${pointer}`.replace(/##+/, "#");
@@ -54,15 +80,20 @@ export default function compile(rootSchema: JSONSchema, force = false): JSONSche
         const previousScope = scopes[previousPointer] || scopes[parentPointer];
         const scope = joinScope(previousScope, schema.$id);
         scopes[pointer] = scope;
-        if (context.ids[scope] == null) { context.ids[scope] = pointer; }
+        if (context.ids[scope] == null) {
+            context.ids[scope] = pointer;
+        }
 
-        if (schema.$ref) {
-            Object.defineProperty(schema, COMPILED_REF, { enumerable: false, value: joinScope(scope, schema.$ref) });
+        if (schema.$ref && !schema[COMPILED_REF]) {
+            Object.defineProperty(schema, COMPILED_REF, {
+                enumerable: false,
+                value: joinScope(scope, schema.$ref)
+            });
             // @todo currently not used:
             Object.defineProperty(schema, GET_ROOT, { enumerable: false, value: getRoot });
             // console.log("compiled ref", scope, schema.$ref, "=>", joinScope(scope, schema.$ref));
         }
     });
 
-    return rootSchema;
+    return compiledSchema;
 }

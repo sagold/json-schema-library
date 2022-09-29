@@ -1,4 +1,4 @@
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 
 export type JSONSchema = { [p: string]: any };
 

@@ -2,7 +2,7 @@
 import { expect } from "chai";
 import chalk from "chalk";
 import Draft07 from "../../../lib/cores/Draft07";
-import addSchema from "../../../lib/draft07/addSchema";
+import addRemoteSchema from "../../../lib/draft07/addRemoteSchema";
 import { addRemotes } from "../utils/addRemotes";
 import TestSuite from "@json-schema-org/tests";
 import draft07 from "../../../remotes/draft2019-09.json";
@@ -10,15 +10,14 @@ import draft07 from "../../../remotes/draft2019-09.json";
 // import testUnknownKeyword from "./tests/unknownKeyword.json";
 // import testRefRemote from "./tests/refRemote";
 
-addRemotes(addSchema);
-addSchema("http://json-schema.org/draft-2019-09/schema", draft07);
+addRemotes(addRemoteSchema);
+addRemoteSchema("http://json-schema.org/draft-2019-09/schema", draft07);
 
-const testCases = TestSuite.draft2019()
-    .filter(testcase => testcase.name === "refRemote")
-    // .filter(testcase => !testcase.optional)
-    // .filter(testcase =>
-    //     testcase.optional ? !["ecmascript-regex", "content", "iri", "iri-reference", "idn", "idn-reference", "idn-hostname", "idn-email"].includes(testcase.name) : true
-    // );
+const testCases = TestSuite.draft2019().filter((testcase) => testcase.name === "refRemote");
+// .filter(testcase => !testcase.optional)
+// .filter(testcase =>
+//     testcase.optional ? !["ecmascript-regex", "content", "iri", "iri-reference", "idn", "idn-reference", "idn-hostname", "idn-email"].includes(testcase.name) : true
+// );
 
 console.log(Object.keys(TestSuite));
 
@@ -91,7 +90,7 @@ console.log(Object.keys(TestSuite));
 
 function runTestCase(Core, tc, skipTest = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
-        tc.schemas.forEach(testCase => {
+        tc.schemas.forEach((testCase) => {
             const schema = testCase.schema;
             if (skipTest.includes(testCase.description)) {
                 console.log(chalk.red(`Unsupported '${testCase.description}'`));
@@ -99,7 +98,7 @@ function runTestCase(Core, tc, skipTest = []) {
             }
 
             describe(testCase.description, () => {
-                testCase.tests.forEach(testData => {
+                testCase.tests.forEach((testData) => {
                     const test = skipTest.includes(testData.description) ? it.skip : it;
 
                     test(testData.description, () => {
@@ -115,7 +114,7 @@ function runTestCase(Core, tc, skipTest = []) {
 
 export default function runAllTestCases(Core, skipTest = []) {
     describe("draft2019-09", () => {
-        testCases.forEach(testCase => runTestCase(Core, testCase, skipTest));
+        testCases.forEach((testCase) => runTestCase(Core, testCase, skipTest));
     });
 }
 

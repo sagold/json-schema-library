@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import { expect } from "chai";
-import Core from "../../lib/cores/Draft04";
+import { Draft04 as Core } from "../../lib/draft04";
 import { JSONSchema } from "../../lib/types";
 
 describe("validate.Draft04", () => {

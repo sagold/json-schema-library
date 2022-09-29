@@ -3,7 +3,7 @@ import createSchemaOf from "./createSchemaOf";
 import errors from "./validation/errors";
 import merge from "./utils/merge";
 import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 
 const stepType = {
     array: (

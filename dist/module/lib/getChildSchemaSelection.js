@@ -4,7 +4,7 @@ import { isJSONError } from "./types";
  * could be added at the given property (e.g. item-index), thus an array of options is returned. In all other cases
  * a list with a single item will be returned
  *
- * @param core          - core to use
+ * @param core        - core to use
  * @param property    - parent schema of following property
  * @param [schema]    - parent schema of following property
  * @return

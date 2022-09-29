@@ -1,4 +1,4 @@
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 import { JSONValidator } from "./types";
 import { CreateError } from "./utils/createCustomError";
 /**

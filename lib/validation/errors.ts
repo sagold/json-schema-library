@@ -1,8 +1,7 @@
 /* eslint no-invalid-this: 0 */
-import createCustomError, { CreateError } from "../utils/createCustomError";
+import { createCustomError, CreateError } from "../utils/createCustomError";
 
-
-const errors: { [p: string]: CreateError } = {
+const errors: Record<string, CreateError> = {
     additionalItemsError: createCustomError("AdditionalItemsError"),
     additionalPropertiesError: createCustomError("AdditionalPropertiesError"),
     anyOfError: createCustomError("AnyOfError"),
@@ -56,6 +55,5 @@ const errors: { [p: string]: CreateError } = {
     unknownPropertyError: createCustomError("UnknownPropertyError"),
     valueNotEmptyError: createCustomError("ValueNotEmptyError")
 };
-
 
 export default errors;

@@ -20,7 +20,7 @@ export default function getSchema(core, pointer, data, schema = core.rootSchema)
 }
 function _get(core, schema, frags, pointer, data = emptyObject) {
     if (frags.length === 0) {
-        return schema;
+        return core.resolveRef(schema);
     }
     const key = frags.shift(); // step key
     schema = core.step(key, schema, data, pointer); // step schema

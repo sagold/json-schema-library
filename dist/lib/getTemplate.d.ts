@@ -1,5 +1,5 @@
 import { JSONSchema } from "./types";
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 interface TemplateOptions {
     /** Add all properties (required and optional) to the generated data */
     addOptionalProps: boolean;

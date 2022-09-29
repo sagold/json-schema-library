@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import getSchema from "../../lib/getSchema";
-import Core from "../../lib/cores/JsonEditor";
+import { JsonEditor as Core } from "../../lib/jsoneditor";
 
 describe("getSchema", () => {
     let core;

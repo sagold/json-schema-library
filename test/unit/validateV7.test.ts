@@ -1,16 +1,13 @@
 import { expect } from "chai";
 import validate from "../../lib/validate";
-import Core from "../../lib/cores/Draft07";
+import { Draft07 as Core } from "../../lib/draft07";
 // import remotes from "../../remotes";
 
-
 describe("validate draft07", () => {
-
     let core;
     before(() => (core = new Core()));
 
     describe("integer", () => {
-
         describe("exclusiveMaximum", () => {
             it("should fail if value is equal to 0", () => {
                 expect(validate(core, 0, { exclusiveMaximum: 0 })).to.have.length(1);
@@ -50,7 +47,7 @@ describe("validate draft07", () => {
                 expect(validate(core, -1, schema)).to.have.length(0, "valid when if test passes");
                 expect(validate(core, 4, schema)).to.have.length(0, "valid through else");
                 expect(validate(core, 3, schema)).to.have.length(1, "invalid through else");
-            })
+            });
         });
     });
 });

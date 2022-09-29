@@ -1,5 +1,8 @@
 import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
+import settings from "./config/settings";
+import { isJSONError } from "./types";
+const { DECLARATOR_ONEOF } = settings;
 /**
  * Selects and returns a oneOf schema for the given data
  *
@@ -10,6 +13,41 @@ import flattenArray from "./utils/flattenArray";
  * @return oneOf schema or an error
  */
 export default function resolveOneOf(core, data, schema = core.rootSchema, pointer = "#") {
+    // !keyword: oneOfProperty
+    // an additional <DECLARATOR_ONEOF> (default `oneOfProperty`) on the schema will exactly determine the
+    // oneOf value (if set in data)
+    // @fixme
+    // abort if no data is given an DECLARATOR_ONEOF is set (used by getChildSchemaSelection)
+    // this case (data != null) should not be necessary
+    if (data != null && schema[DECLARATOR_ONEOF]) {
+        const errors = [];
+        const oneOfProperty = schema[DECLARATOR_ONEOF];
+        const oneOfValue = data[schema[DECLARATOR_ONEOF]];
+        if (oneOfValue === undefined) {
+            return core.errors.missingOneOfPropertyError({ property: oneOfProperty, pointer });
+        }
+        for (let i = 0; i < schema.oneOf.length; i += 1) {
+            const one = core.resolveRef(schema.oneOf[i]);
+            const oneOfPropertySchema = core.step(oneOfProperty, one, data, pointer);
+            if (isJSONError(oneOfPropertySchema)) {
+                return oneOfPropertySchema;
+            }
+            let result = flattenArray(core.validate(oneOfValue, oneOfPropertySchema, pointer));
+            result = result.filter(errorOrPromise);
+            if (result.length > 0) {
+                errors.push(...result);
+            }
+            else {
+                return one; // return resolved schema
+            }
+        }
+        return core.errors.oneOfPropertyError({
+            property: oneOfProperty,
+            value: oneOfValue,
+            pointer,
+            errors
+        });
+    }
     const matches = [];
     const errors = [];
     for (let i = 0; i < schema.oneOf.length; i += 1) {
@@ -30,13 +68,13 @@ export default function resolveOneOf(core, data, schema = core.rootSchema, point
         return core.errors.multipleOneOfError({
             value: data,
             pointer,
-            matches,
+            matches
         });
     }
     return core.errors.oneOfError({
         value: JSON.stringify(data),
         pointer,
         oneOf: schema.oneOf,
-        errors,
+        errors
     });
 }

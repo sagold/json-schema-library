@@ -1,5 +1,5 @@
 import { JSONSchema, JSONPointer } from "./types";
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 /**
  * Test if the data is valid according to the given schema
  *

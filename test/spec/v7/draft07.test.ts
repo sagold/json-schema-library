@@ -1,14 +1,14 @@
 /* eslint max-len: 0 */
 import { expect } from "chai";
 import chalk from "chalk";
-import Draft07 from "../../../lib/cores/Draft07";
-import addSchema from "../../../lib/draft06/addSchema";
+import { Draft07 } from "../../../lib/draft07";
 import { addRemotes } from "../utils/addRemotes";
 import { getDraftTests, FeatureTest } from "../../getDraftTests";
-import draft07 from "../../../remotes/draft07.json";
+import draft07Meta from "../../../remotes/draft07.json";
 
-addRemotes(addSchema);
-addSchema("http://json-schema.org/draft-07/schema", draft07);
+const cache = new Draft07();
+cache.addRemoteSchema("http://json-schema.org/draft-07/schema", draft07Meta);
+addRemotes(cache);
 
 const supportedTestCases = (t) =>
     t.optional
@@ -32,7 +32,7 @@ const draftFeatureTests = getDraftTests("7")
     // .filter(testcase => testcase.name === "definitions")
     .filter(supportedTestCases);
 
-function runTestCase(Core, tc: FeatureTest, skipTest = []) {
+function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
             const schema = testCase.schema;
@@ -46,7 +46,8 @@ function runTestCase(Core, tc: FeatureTest, skipTest = []) {
                     const test = skipTest.includes(testData.description) ? it.skip : it;
 
                     test(testData.description, () => {
-                        const validator = new Core(schema);
+                        const validator = new Draft07(schema);
+                        Object.assign(validator.remotes, cache.remotes);
                         const isValid = validator.isValid(testData.data);
                         expect(isValid).to.eq(testData.valid);
                     });
@@ -56,10 +57,10 @@ function runTestCase(Core, tc: FeatureTest, skipTest = []) {
     });
 }
 
-export default function runAllTestCases(Core, skipTest = []) {
+export default function runAllTestCases(skipTest: string[] = []) {
     describe("draft07", () => {
-        draftFeatureTests.forEach((testCase) => runTestCase(Core, testCase, skipTest));
+        draftFeatureTests.forEach((testCase) => runTestCase(testCase, skipTest));
     });
 }
 
-runAllTestCases(Draft07);
+runAllTestCases();

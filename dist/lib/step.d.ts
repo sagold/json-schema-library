@@ -1,5 +1,5 @@
 import { JSONSchema, JSONPointer, JSONError } from "./types";
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 /**
  * Returns the json-schema of the given object property or array item.
  * e.g. it steps by one key into the data

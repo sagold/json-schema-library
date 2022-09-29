@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import step from "../../lib/step";
-import Core from "../../lib/cores/Draft04";
+import { Draft04 as Core } from "../../lib/draft04";
 
 describe("step", () => {
     let core;
@@ -16,8 +16,8 @@ describe("step", () => {
             const res = step(core, "title", {
                 type: "object",
                 properties: {
-                    title: { type: "string" },
-                },
+                    title: { type: "string" }
+                }
             });
 
             expect(res).to.deep.eq({ type: "string" });
@@ -31,13 +31,13 @@ describe("step", () => {
                     oneOf: [
                         {
                             type: "object",
-                            properties: { title: { type: "string" } },
+                            properties: { title: { type: "string" } }
                         },
                         {
                             type: "object",
-                            properties: { title: { type: "number" } },
-                        },
-                    ],
+                            properties: { title: { type: "number" } }
+                        }
+                    ]
                 },
                 { title: 4 }
             );
@@ -53,13 +53,13 @@ describe("step", () => {
                     oneOf: [
                         {
                             type: "object",
-                            additionalProperties: { type: "string" },
+                            additionalProperties: { type: "string" }
                         },
                         {
                             type: "object",
-                            additionalProperties: { type: "number" },
-                        },
-                    ],
+                            additionalProperties: { type: "number" }
+                        }
+                    ]
                 },
                 { title: 4, test: 2 }
             );
@@ -75,13 +75,13 @@ describe("step", () => {
                     anyOf: [
                         {
                             type: "object",
-                            additionalProperties: { type: "string" },
+                            additionalProperties: { type: "string" }
                         },
                         {
                             type: "object",
-                            additionalProperties: { type: "number" },
-                        },
-                    ],
+                            additionalProperties: { type: "number" }
+                        }
+                    ]
                 },
                 { title: 4, test: 2 }
             );
@@ -97,17 +97,17 @@ describe("step", () => {
                     anyOf: [
                         {
                             type: "object",
-                            additionalProperties: { type: "string" },
+                            additionalProperties: { type: "string" }
                         },
                         {
                             type: "object",
-                            additionalProperties: { type: "number" },
+                            additionalProperties: { type: "number" }
                         },
                         {
                             type: "object",
-                            additionalProperties: { minimum: 2 },
-                        },
-                    ],
+                            additionalProperties: { minimum: 2 }
+                        }
+                    ]
                 },
                 { title: 4, test: 2 }
             );
@@ -120,27 +120,27 @@ describe("step", () => {
                 definitions: {
                     string: {
                         type: "object",
-                        additionalProperties: { type: "string" },
+                        additionalProperties: { type: "string" }
                     },
                     number: {
                         type: "object",
-                        additionalProperties: { type: "number" },
+                        additionalProperties: { type: "number" }
                     },
                     min: {
                         type: "object",
-                        additionalProperties: { minimum: 2 },
-                    },
+                        additionalProperties: { minimum: 2 }
+                    }
                 },
                 anyOf: [
                     { $ref: "#/definitions/string" },
                     { $ref: "#/definitions/number" },
-                    { $ref: "#/definitions/min" },
-                ],
+                    { $ref: "#/definitions/min" }
+                ]
             });
 
             const res = step(core, "title", core.rootSchema, {
                 title: 4,
-                test: 2,
+                test: 2
             });
 
             expect(res).to.deep.eq({ type: "number", minimum: 2 });
@@ -151,10 +151,7 @@ describe("step", () => {
                 core,
                 "title",
                 {
-                    allOf: [
-                        { type: "object" },
-                        { additionalProperties: { type: "number" } },
-                    ],
+                    allOf: [{ type: "object" }, { additionalProperties: { type: "number" } }]
                 },
                 { title: 4, test: 2 }
             );
@@ -167,18 +164,18 @@ describe("step", () => {
                 definitions: {
                     object: { type: "object" },
                     additionalNumber: {
-                        additionalProperties: { type: "number" },
-                    },
+                        additionalProperties: { type: "number" }
+                    }
                 },
                 allOf: [
                     { $ref: "#/definitions/object" },
-                    { $ref: "#/definitions/additionalNumber" },
-                ],
+                    { $ref: "#/definitions/additionalNumber" }
+                ]
             });
 
             const res = step(core, "title", core.rootSchema, {
                 title: 4,
-                test: 2,
+                test: 2
             });
 
             expect(res).to.deep.eq({ type: "number" });
@@ -189,8 +186,8 @@ describe("step", () => {
                 type: "object",
                 patternProperties: {
                     "^first$": { type: "number", id: "first" },
-                    "^second$": { type: "string", id: "second" },
-                },
+                    "^second$": { type: "string", id: "second" }
+                }
             });
 
             expect(res).to.deep.eq({ type: "string", id: "second" });
@@ -201,9 +198,9 @@ describe("step", () => {
                 type: "object",
                 patternProperties: {
                     "^first$": { type: "number", id: "first" },
-                    "^second$": { type: "string", id: "second" },
+                    "^second$": { type: "string", id: "second" }
                 },
-                additionalProperties: { type: "object" },
+                additionalProperties: { type: "object" }
             });
 
             expect(res).to.deep.eq({ type: "object" });
@@ -221,10 +218,10 @@ describe("step", () => {
                         title: {
                             oneOf: [
                                 { type: "string", title: "Zeichenkette" },
-                                { type: "number", title: "Zahl" },
-                            ],
-                        },
-                    },
+                                { type: "number", title: "Zahl" }
+                            ]
+                        }
+                    }
                 },
                 { title: 111 }
             );
@@ -247,10 +244,10 @@ describe("step", () => {
                         title: {
                             oneOf: [
                                 { type: "string", title: "Zeichenkette" },
-                                { type: "number", title: "Zahl" },
-                            ],
-                        },
-                    },
+                                { type: "number", title: "Zahl" }
+                            ]
+                        }
+                    }
                 },
                 { title: 111 }
             );
@@ -269,8 +266,8 @@ describe("step", () => {
             const res = step(core, 0, {
                 type: "array",
                 items: {
-                    type: "string",
-                },
+                    type: "string"
+                }
             });
 
             expect(res).to.deep.eq({ type: "string" });
@@ -282,11 +279,7 @@ describe("step", () => {
                 1,
                 {
                     type: "array",
-                    items: [
-                        { type: "string" },
-                        { type: "number" },
-                        { type: "boolean" },
-                    ],
+                    items: [{ type: "string" }, { type: "number" }, { type: "boolean" }]
                 },
                 ["3", 2]
             );
@@ -304,21 +297,21 @@ describe("step", () => {
                         oneOf: [
                             {
                                 type: "object",
-                                properties: { title: { type: "string" } },
+                                properties: { title: { type: "string" } }
                             },
                             {
                                 type: "object",
-                                properties: { title: { type: "number" } },
-                            },
-                        ],
-                    },
+                                properties: { title: { type: "number" } }
+                            }
+                        ]
+                    }
                 },
                 [{ title: 2 }]
             );
 
             expect(res).to.deep.eq({
                 type: "object",
-                properties: { title: { type: "number" } },
+                properties: { title: { type: "number" } }
             });
         });
 
@@ -331,21 +324,21 @@ describe("step", () => {
                         anyOf: [
                             {
                                 type: "object",
-                                properties: { title: { type: "string" } },
+                                properties: { title: { type: "string" } }
                             },
                             {
                                 type: "object",
-                                properties: { title: { type: "number" } },
-                            },
-                        ],
-                    },
+                                properties: { title: { type: "number" } }
+                            }
+                        ]
+                    }
                 },
                 [{ title: "two" }, { title: 4 }]
             );
 
             expect(res).to.deep.eq({
                 type: "object",
-                properties: { title: { type: "number" } },
+                properties: { title: { type: "number" } }
             });
         });
 
@@ -358,25 +351,25 @@ describe("step", () => {
                         anyOf: [
                             {
                                 type: "object",
-                                properties: { title: { type: "string" } },
+                                properties: { title: { type: "string" } }
                             },
                             {
                                 type: "object",
-                                properties: { title: { type: "number" } },
+                                properties: { title: { type: "number" } }
                             },
                             {
                                 type: "object",
-                                properties: { title: { minimum: 2 } },
-                            },
-                        ],
-                    },
+                                properties: { title: { minimum: 2 } }
+                            }
+                        ]
+                    }
                 },
                 [{ title: "two" }, { title: 4 }]
             );
 
             expect(res).to.deep.eq({
                 type: "object",
-                properties: { title: { type: "number", minimum: 2 } },
+                properties: { title: { type: "number", minimum: 2 } }
             });
         });
 
@@ -389,21 +382,21 @@ describe("step", () => {
                         allOf: [
                             {
                                 type: "object",
-                                properties: { title: { type: "number" } },
+                                properties: { title: { type: "number" } }
                             },
                             {
                                 type: "object",
-                                properties: { title: { minimum: 3 } },
-                            },
-                        ],
-                    },
+                                properties: { title: { minimum: 3 } }
+                            }
+                        ]
+                    }
                 },
                 [{ title: "two" }, { title: 4 }]
             );
 
             expect(res).to.deep.eq({
                 type: "object",
-                properties: { title: { type: "number", minimum: 3 } },
+                properties: { title: { type: "number", minimum: 3 } }
             });
         });
 
@@ -413,7 +406,7 @@ describe("step", () => {
                 1,
                 {
                     type: "array",
-                    additionalItems: true,
+                    additionalItems: true
                 },
                 ["3", 2]
             );

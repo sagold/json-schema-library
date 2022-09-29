@@ -1,5 +1,5 @@
 import { JSONSchema, JSONPointer } from "./types";
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 /**
  * Returns the json-schema of a data-json-pointer.
  *

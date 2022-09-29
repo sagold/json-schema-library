@@ -1,10 +1,9 @@
 /* eslint quote-props: 0 */
 import { expect } from "chai";
 import getTemplate from "../../lib/getTemplate";
-import Core from "../../lib/cores/Draft07";
+import { Draft07 as Core } from "../../lib/draft07";
 
 describe("getTemplate - v7", () => {
-
     let core;
     before(() => (core = new Core()));
 

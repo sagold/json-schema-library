@@ -5,7 +5,7 @@ import merge from "./utils/merge";
 import copy from "./utils/copy";
 import settings from "./config/settings";
 import { JSONSchema, JSONPointer, isJSONError } from "./types";
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 
 interface TemplateOptions {
     /** Add all properties (required and optional) to the generated data */

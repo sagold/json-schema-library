@@ -1,5 +1,5 @@
 import { JSONSchema, JSONPointer, JSONError } from "./types";
-import Core from "./cores/CoreInterface";
+import { Draft as Core } from "./draft";
 /**
  * Validate data by a json schema
  *

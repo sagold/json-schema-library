@@ -1,4 +1,4 @@
-import Core from "./cores/JsonEditor";
+import { JsonEditor as Core } from "./jsoneditor";
 import { JSONSchema, JSONPointer } from "./types";
 export default class SchemaService {
     core: Core;

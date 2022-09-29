@@ -1,5 +1,5 @@
 import getSchema from "./getSchema";
-import Core from "./cores/JsonEditor";
+import { JsonEditor as Core } from "./jsoneditor";
 import gp from "gson-pointer";
 import copy from "./utils/copy";
 export default class SchemaService {
@@ -19,14 +19,17 @@ export default class SchemaService {
         this.cache = {};
     }
     get(pointer, data) {
-        if (data) { // possibly separate entry point
+        if (data) {
+            // possibly separate entry point
             const schema = getSchema(this.core, pointer, data, this.schema);
             return copy(schema);
         }
-        if (pointer === "#") { // root
+        if (pointer === "#") {
+            // root
             return this.schema;
         }
-        if (this.cache[pointer]) { // return cached result
+        if (this.cache[pointer]) {
+            // return cached result
             return this.cache[pointer];
         }
         const parentPointer = gp.join(pointer, "..");

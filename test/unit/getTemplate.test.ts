@@ -1,11 +1,11 @@
 /* eslint quote-props: 0 */
 import { expect } from "chai";
 import getTemplate from "../../lib/getTemplate";
-import Core from "../../lib/cores/Draft04";
+import { Draft04 as Core } from "../../lib/draft04";
 
 // @NOTE OneOf can be used to select required? https://github.com/epoberezkin/ajv/issues/134#issuecomment-190680773
 describe("getTemplate", () => {
-    let core;
+    let core: Core;
     before(() => (core = new Core()));
 
     it("should set an empty string if no default value is given", () => {

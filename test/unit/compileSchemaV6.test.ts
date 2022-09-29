@@ -1,8 +1,5 @@
 import { expect } from "chai";
-import compile from "../../lib/draft06/compile";
-import remotes from "../../remotes";
-import Draft06 from "../../lib/cores/Draft06";
-
+import { Draft06 } from "../../lib/draft06";
 
 describe("compileV06", () => {
     let validator: Draft06;
@@ -16,7 +13,14 @@ describe("compileV06", () => {
             - which might resolve in wrong schema
          */
         beforeEach(() => {
-            remotes["http://localhost:1234/name.json"] = compile({
+            validator = new Draft06({
+                $id: "http://localhost:1234/object",
+                type: "object",
+                properties: {
+                    name: { $ref: "name.json#/definitions/orNull" }
+                }
+            });
+            validator.addRemoteSchema("http://localhost:1234/name.json", {
                 definitions: {
                     orNull: {
                         anyOf: [{ type: "null" }, { $ref: "#" }]
@@ -24,14 +28,6 @@ describe("compileV06", () => {
                 },
                 type: "string"
             });
-            const schema = compile({
-                $id: "http://localhost:1234/object",
-                type: "object",
-                properties: {
-                    name: { $ref: "name.json#/definitions/orNull" }
-                }
-            });
-            validator = new Draft06(schema);
         });
 
         it("should validate 'string'", () => {
@@ -47,20 +43,18 @@ describe("compileV06", () => {
         });
     });
 
-
     describe("02 - refRemote base URI change - base URI change ref invalid", () => {
         beforeEach(() => {
-            remotes["http://localhost:1234/baseUriChange/folderInteger.json"] = compile({
-                "type": "integer"
-            });
-            const schema = compile({
-                "$id": "http://localhost:1234/",
-                "items": {
-                    "$id": "baseUriChange/",
-                    "items": {"$ref": "folderInteger.json"}
+            validator = new Draft06({
+                $id: "http://localhost:1234/",
+                items: {
+                    $id: "baseUriChange/",
+                    items: { $ref: "folderInteger.json" }
                 }
             });
-            validator = new Draft06(schema);
+            validator.addRemoteSchema("http://localhost:1234/baseUriChange/folderInteger.json", {
+                type: "integer"
+            });
         });
 
         it("should not validate 'string'", () => {
