@@ -194,11 +194,11 @@ const TYPE = {
         if (schema.if && (schema.then || schema.else)) {
             const isValid = core.isValid(d, schema.if);
             if (isValid && schema.then) {
-                const additionalData = core.getTemplate(d, { type: "object", ...schema.then });
+                const additionalData = core.getTemplate(d, { type: "object", ...schema.then }, opts);
                 Object.assign(d, additionalData);
             }
             else if (!isValid && schema.else) {
-                const additionalData = core.getTemplate(d, { type: "object", ...schema.else });
+                const additionalData = core.getTemplate(d, { type: "object", ...schema.else }, opts);
                 Object.assign(d, additionalData);
             }
         }

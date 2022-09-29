@@ -4,7 +4,7 @@ import resolveOneOf from "../resolveOneOf.strict";
 import resolveRef from "../resolveRef.strict";
 import resolveAllOf from "../resolveAllOf";
 import resolveAnyOf from "../resolveAnyOf";
-import getTemplate from "../getTemplate";
+import getTemplate, { TemplateOptions } from "../getTemplate";
 import getChildSchemaSelection from "../getChildSchemaSelection";
 import getSchema from "../getSchema";
 import { each, EachCallback } from "../each";
@@ -99,7 +99,7 @@ export declare class Draft {
      * @param [schema] - json schema, defaults to rootSchema
      * @return created template data
      */
-    getTemplate(data?: unknown, schema?: JSONSchema): any;
+    getTemplate(data?: unknown, schema?: JSONSchema, opts?: TemplateOptions): any;
     isValid(data: any, schema?: JSONSchema, pointer?: JSONPointer): boolean;
     resolveAnyOf(data: any, schema: JSONSchema, pointer?: JSONPointer): JSONSchema;
     resolveAllOf(data: any, schema: JSONSchema, pointer?: JSONPointer): JSONSchema;

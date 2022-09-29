@@ -7,10 +7,10 @@ import settings from "./config/settings";
 import { JSONSchema, JSONPointer, isJSONError } from "./types";
 import { Draft as Core } from "./draft";
 
-interface TemplateOptions {
+export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
     addOptionalProps: boolean;
-}
+};
 
 const defaultOptions: TemplateOptions = {
     addOptionalProps: true
@@ -269,10 +269,18 @@ const TYPE: Record<
         if (schema.if && (schema.then || schema.else)) {
             const isValid = core.isValid(d, schema.if);
             if (isValid && schema.then) {
-                const additionalData = core.getTemplate(d, { type: "object", ...schema.then });
+                const additionalData = core.getTemplate(
+                    d,
+                    { type: "object", ...schema.then },
+                    opts
+                );
                 Object.assign(d, additionalData);
             } else if (!isValid && schema.else) {
-                const additionalData = core.getTemplate(d, { type: "object", ...schema.else });
+                const additionalData = core.getTemplate(
+                    d,
+                    { type: "object", ...schema.else },
+                    opts
+                );
                 Object.assign(d, additionalData);
             }
         }

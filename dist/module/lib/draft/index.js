@@ -82,8 +82,8 @@ export class Draft {
      * @param [schema] - json schema, defaults to rootSchema
      * @return created template data
      */
-    getTemplate(data, schema) {
-        return this.config.getTemplate(this, data, schema);
+    getTemplate(data, schema, opts) {
+        return this.config.getTemplate(this, data, schema, opts);
     }
     isValid(data, schema, pointer) {
         return this.config.isValid(this, data, schema, pointer);
