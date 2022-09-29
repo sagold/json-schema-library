@@ -15,7 +15,7 @@ ref relative refs with absolute uris and defs invalid on inner field:
 RangeError: Maximum call stack size exceeded
  */
 
-const supportedTestCases = (t) =>
+const supportedTestCases = (t: FeatureTest) =>
     t.optional
         ? ![
               "ecmascript-regex",

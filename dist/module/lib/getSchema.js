@@ -27,6 +27,7 @@ function _get(core, schema, frags, pointer, data = emptyObject) {
     if (isJSONError(schema)) {
         return schema;
     }
+    // @ts-ignore
     data = data[key]; // step data
     return _get(core, schema, frags, `${pointer}/${key}`, data);
 }

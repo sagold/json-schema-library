@@ -4,7 +4,7 @@ import { Draft07 as Core } from "../../lib/draft07";
 // import remotes from "../../remotes";
 
 describe("validate draft07", () => {
-    let core;
+    let core: Core;
     before(() => (core = new Core()));
 
     describe("integer", () => {

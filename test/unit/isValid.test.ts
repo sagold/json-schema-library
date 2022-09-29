@@ -4,7 +4,7 @@ import isValid from "../../lib/isValid";
 import { Draft04 as Core } from "../../lib/draft04";
 
 describe("isValid", () => {
-    let core;
+    let core: Core;
     before(() => (core = new Core()));
 
     it("should return true if value is valid", () => {

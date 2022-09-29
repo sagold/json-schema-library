@@ -7,7 +7,7 @@ import settings from "../../lib/config/settings";
 const { DECLARATOR_ONEOF } = settings;
 
 describe("resolveOneOf (fuzzy)", () => {
-    let core;
+    let core: Core;
     beforeEach(() => (core = new Core()));
 
     it("should return schema with matching type", () => {

@@ -29,7 +29,11 @@ const KeywordValidation = {
             return undefined;
         }
         if (schema.exclusiveMaximum <= value) {
-            return core.errors.maximumError({ maximum: schema.exclusiveMaximum, length: value, pointer });
+            return core.errors.maximumError({
+                maximum: schema.exclusiveMaximum,
+                length: value,
+                pointer
+            });
         }
         return undefined;
     },
@@ -38,7 +42,11 @@ const KeywordValidation = {
             return undefined;
         }
         if (schema.exclusiveMinimum >= value) {
-            return core.errors.minimumError({ minimum: schema.exclusiveMinimum, length: value, pointer });
+            return core.errors.minimumError({
+                minimum: schema.exclusiveMinimum,
+                length: value,
+                pointer
+            });
         }
         return undefined;
     },
@@ -81,11 +89,11 @@ const KeywordValidation = {
         }
         const errors = [];
         const keys = Object.keys(value);
-        const patterns = Object.keys(pp).map(expr => ({
+        const patterns = Object.keys(pp).map((expr) => ({
             regex: new RegExp(expr),
             patternSchema: pp[expr]
         }));
-        keys.forEach(key => {
+        keys.forEach((key) => {
             let patternFound = false;
             for (let i = 0, l = patterns.length; i < l; i += 1) {
                 if (patterns[i].regex.test(key)) {
@@ -93,7 +101,9 @@ const KeywordValidation = {
                     // for a boolean schema `false`, always invalidate
                     if (patterns[i].patternSchema === false) {
                         errors.push(core.errors.patternPropertiesError({
-                            key, pointer, patterns: Object.keys(pp).join(",")
+                            key,
+                            pointer,
+                            patterns: Object.keys(pp).join(",")
                         }));
                         return;
                     }
@@ -109,7 +119,9 @@ const KeywordValidation = {
             if (patternFound === false && schema.additionalProperties === false) {
                 // this is an arrangement with additionalProperties
                 errors.push(core.errors.patternPropertiesError({
-                    key, pointer, patterns: Object.keys(pp).join(",")
+                    key,
+                    pointer,
+                    patterns: Object.keys(pp).join(",")
                 }));
             }
         });
@@ -139,7 +151,7 @@ const KeywordValidation = {
         const errors = [];
         const properties = Object.keys(value);
         const propertySchema = { ...schema.propertyNames, type: "string" };
-        properties.forEach(prop => {
+        properties.forEach((prop) => {
             const validationResult = core.validate(prop, propertySchema, `${pointer}/${prop}`);
             if (validationResult.length > 0) {
                 errors.push(core.errors.invalidPropertyNameError({

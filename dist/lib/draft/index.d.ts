@@ -7,9 +7,9 @@ import resolveAnyOf from "../resolveAnyOf";
 import getTemplate from "../getTemplate";
 import getChildSchemaSelection from "../getChildSchemaSelection";
 import getSchema from "../getSchema";
-import each from "../each";
+import { each, EachCallback } from "../each";
 import isValid from "../isValid";
-import eachSchema from "../eachSchema";
+import { eachSchema, EachSchemaCallback } from "../eachSchema";
 import createSchemaOf from "../createSchemaOf";
 import compileSchema from "../compileSchema";
 import { CreateError } from "../utils/createCustomError";
@@ -77,8 +77,8 @@ export declare class Draft {
      * @param [schema] - the schema matching the data. Defaults to rootSchema
      * @param [pointer] - pointer to current data. Default to rootPointer
      */
-    each(data: any, callback: any, schema?: JSONSchema, pointer?: JSONPointer): void;
-    eachSchema(callback: any, schema?: JSONSchema): void;
+    each(data: any, callback: EachCallback, schema?: JSONSchema, pointer?: JSONPointer): void;
+    eachSchema(callback: EachSchemaCallback, schema?: JSONSchema): void;
     getChildSchemaSelection(property: string | number, schema?: JSONSchema): JSONError | JSONSchema[];
     /**
      * Returns the json-schema of a data-json-pointer.

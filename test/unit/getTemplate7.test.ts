@@ -4,7 +4,7 @@ import getTemplate from "../../lib/getTemplate";
 import { Draft07 as Core } from "../../lib/draft07";
 
 describe("getTemplate - v7", () => {
-    let core;
+    let core: Core;
     before(() => (core = new Core()));
 
     it("should set default as value", () => {

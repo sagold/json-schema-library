@@ -9,7 +9,8 @@ type Walker = {
     callback: EachSchemaCallback;
 };
 
-const isObject = (value) => Object.prototype.toString.call(value) === "[object Object]";
+const isObject = (value: unknown): value is Record<string, unknown> =>
+    Object.prototype.toString.call(value) === "[object Object]";
 
 function nextTypeDefs(schema: JSONSchema, pointer: JSONPointer) {
     if (this.callback(schema, pointer) === true) {
@@ -38,7 +39,7 @@ function eachDefinition(
     });
 }
 
-export default function eachSchema(
+export function eachSchema(
     schema: JSONSchema,
     callback: EachSchemaCallback,
     pointer: JSONPointer = "#"

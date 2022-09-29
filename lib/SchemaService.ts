@@ -7,17 +7,17 @@ import { JSONSchema, JSONPointer } from "./types";
 export default class SchemaService {
     core: Core;
     schema: JSONSchema;
-    data: any;
-    cache: { [p: string]: JSONSchema };
+    data: unknown;
+    cache: Record<string, JSONSchema>;
 
-    constructor(schema: JSONSchema, data) {
+    constructor(schema: JSONSchema, data: unknown) {
         this.core = new Core(schema);
         this.schema = schema;
         this.data = data;
         this.cache = {};
     }
 
-    updateData(data: any) {
+    updateData(data: unknown) {
         this.data = data;
         this.cache = {};
     }
@@ -28,7 +28,7 @@ export default class SchemaService {
         this.cache = {};
     }
 
-    get(pointer: JSONPointer, data: any): JSONSchema {
+    get(pointer: JSONPointer, data: unknown): JSONSchema {
         if (data) {
             // possibly separate entry point
             const schema = getSchema(this.core, pointer, data, this.schema);

@@ -58,5 +58,6 @@ export default function validate(core, value, schema = core.rootSchema, pointer 
     }
     const errors = flattenArray(core.validateType[receivedType](core, schema, value, pointer));
     // also promises may be passed along (validateAsync)
+    // @ts-ignore
     return errors.filter(errorOrPromise);
 }

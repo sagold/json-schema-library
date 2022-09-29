@@ -1,7 +1,7 @@
 import addRemoteSchema from "../addRemoteSchema";
 import compileSchema from "../compileSchema";
-import each from "../each";
-import eachSchema from "../eachSchema";
+import { each } from "../each";
+import { eachSchema } from "../eachSchema";
 import ERRORS from "../validation/errors";
 import FORMATS from "../validation/format";
 import getSchema from "../getSchema";

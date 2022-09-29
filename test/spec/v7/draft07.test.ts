@@ -10,7 +10,7 @@ const cache = new Draft07();
 cache.addRemoteSchema("http://json-schema.org/draft-07/schema", draft07Meta);
 addRemotes(cache);
 
-const supportedTestCases = (t) =>
+const supportedTestCases = (t: FeatureTest) =>
     t.optional
         ? ![
               "format-ecmascript-regex",

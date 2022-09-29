@@ -8,7 +8,7 @@
         "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
         "moduleResolution": "node",
-        "noImplicitAny": false,
+        "noImplicitAny": true,
         "lib": ["DOM", "ES2018"]
     },
     "include": ["index.ts", "lib/**/*"]

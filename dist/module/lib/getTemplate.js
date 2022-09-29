@@ -197,8 +197,8 @@ const TYPE = {
     // build array type of items, ignores additionalItems
     array: (core, schema, data, pointer, opts) => {
         const template = schema.default === undefined ? [] : schema.default;
-        const d = data || [];
         schema.minItems = schema.minItems || 0;
+        const d = data || [];
         // items are undefined
         if (schema.items == null) {
             return d;
@@ -268,6 +268,6 @@ function getDefault(schema, templateValue, initValue) {
     return schema.default;
 }
 export default (core, data, schema = core.rootSchema, opts = defaultOptions) => {
-    cache = { mi: ".." };
+    cache = { mi: {} };
     return getTemplate(core, data, schema, "#", opts);
 };

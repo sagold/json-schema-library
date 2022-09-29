@@ -1,5 +1,5 @@
 /* eslint max-statements-per-line: ["error", { "max": 2 }] */
-import eachSchema from "../eachSchema";
+import { eachSchema } from "../eachSchema";
 import joinScope from "./joinScope";
 import getRef from "./getRef";
 const COMPILED = "__compiled";

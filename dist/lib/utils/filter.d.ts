@@ -1,3 +1,4 @@
-export declare function isPromise(obj: any): boolean;
-export declare function errorOrPromise(error: any): boolean;
-export declare function errorsOnly(error: any): boolean;
+import { JSONError } from "../types";
+export declare function isPromise(obj: unknown): obj is Promise<unknown>;
+export declare function errorOrPromise(error: unknown): error is JSONError | Promise<unknown>;
+export declare function errorsOnly(error: unknown): error is JSONError;

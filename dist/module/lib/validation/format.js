@@ -17,7 +17,7 @@ const isValidURIRef = /^(?:[a-z][a-z0-9+\-.]*:)?(?:\/?\/(?:(?:[a-z0-9\-._~!$&'()
 // uri-template: https://tools.ietf.org/html/rfc6570
 const isValidURITemplate = /^(?:(?:[^\x00-\x20"'<>%\\^`{|}]|%[0-9a-f]{2})|\{[+#./;?&=,!@|]?(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?(?:,(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?)*\})*$/i;
 // Default JSON-Schema formats: date-time, email, hostname, ipv4, ipv6, uri, uriref
-export default {
+const formatValidators = {
     date: (core, schema, value, pointer) => {
         if (typeof value !== "string") {
             return undefined;
@@ -33,7 +33,10 @@ export default {
         const day = +matches[3];
         // https://tools.ietf.org/html/rfc3339#appendix-C
         const isLeapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
-        if (month >= 1 && month <= 12 && day >= 1 && day <= (month == 2 && isLeapYear ? 29 : DAYS[month])) {
+        if (month >= 1 &&
+            month <= 12 &&
+            day >= 1 &&
+            day <= (month == 2 && isLeapYear ? 29 : DAYS[month])) {
             return undefined;
         }
         return errors.formatDateError({ value, pointer });
@@ -58,17 +61,17 @@ export default {
         if (value[0] === '"') {
             return errors.formatEmailError({ value, pointer });
         }
-        const [name, host, ...rest] = value.split('@');
+        const [name, host, ...rest] = value.split("@");
         if (!name || !host || rest.length !== 0 || name.length > 64 || host.length > 253) {
             return errors.formatEmailError({ value, pointer });
         }
-        if (name[0] === '.' || name.endsWith('.') || name.includes('..')) {
+        if (name[0] === "." || name.endsWith(".") || name.includes("..")) {
             return errors.formatEmailError({ value, pointer });
         }
         if (!/^[a-z0-9.-]+$/i.test(host) || !/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+$/i.test(name)) {
             return errors.formatEmailError({ value, pointer });
         }
-        if (!host.split('.').every(part => /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/i.test(part))) {
+        if (!host.split(".").every((part) => /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/i.test(part))) {
             return errors.formatEmailError({ value, pointer });
         }
         return undefined;
@@ -154,7 +157,9 @@ export default {
         const minute = +matches[2];
         const second = +matches[3];
         const timeZone = !!matches[5];
-        if (((hour <= 23 && minute <= 59 && second <= 59) || (hour == 23 && minute == 59 && second == 60)) && timeZone) {
+        if (((hour <= 23 && minute <= 59 && second <= 59) ||
+            (hour == 23 && minute == 59 && second == 60)) &&
+            timeZone) {
             return undefined;
         }
         return errors.formatTimeError({ value, pointer });
@@ -193,3 +198,4 @@ export default {
         return errors.formatUrlError({ value, pointer });
     }
 };
+export default formatValidators;

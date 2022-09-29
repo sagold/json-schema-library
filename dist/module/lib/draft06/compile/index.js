@@ -1,4 +1,4 @@
-import eachSchema from "../../eachSchema";
+import { eachSchema } from "../../eachSchema";
 // import remotes from "../../../remotes";
 import joinScope from "../../compile/joinScope";
 import getRef from "../../compile/getRef";

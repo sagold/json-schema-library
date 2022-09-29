@@ -1,9 +1,10 @@
 /* eslint max-statements-per-line: ["error", { "max": 2 }] */
-import eachSchema from "../eachSchema";
+import { eachSchema } from "../eachSchema";
 import { Draft } from "../draft";
 import joinScope from "./joinScope";
 import getRef from "./getRef";
 import { JSONSchema } from "../types";
+import { Context } from "./types";
 
 const COMPILED = "__compiled";
 const COMPILED_REF = "__ref";
@@ -34,7 +35,7 @@ export default function compileSchema(
         return schemaToCompile;
     }
 
-    const context = { ids: {}, remotes: draft.remotes };
+    const context: Context = { ids: {}, remotes: draft.remotes };
     const rootSchemaAsString = JSON.stringify(schemaToCompile);
     const compiledSchema: JSONSchema = JSON.parse(rootSchemaAsString);
 
@@ -63,7 +64,7 @@ export default function compileSchema(
         });
     }
 
-    const scopes = {};
+    const scopes: Record<string, string> = {};
     const getRoot = () => compiledSchema;
     eachSchema(compiledSchema, (schema, pointer) => {
         if (schema.id) {

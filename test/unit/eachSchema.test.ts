@@ -1,10 +1,10 @@
 /* eslint quote-props: 0, no-unused-expressions: 0 */
 import { expect } from "chai";
-import eachSchema from "../../lib/eachSchema";
+import { eachSchema } from "../../lib/eachSchema";
 
 describe("eachSchema", () => {
     it("should execute callback on root-schema", () => {
-        let firstCall;
+        let firstCall: unknown;
         const rootSchema = {
             type: "object",
             properties: {}
@@ -17,7 +17,7 @@ describe("eachSchema", () => {
 
     // maybe not. This would remove simple pointer config
     it.skip("should call on unspecified properties", () => {
-        const calls = [];
+        const calls: unknown[] = [];
         const rootSchema = {
             type: "object",
             properties: {
@@ -32,7 +32,7 @@ describe("eachSchema", () => {
     });
 
     it("should call on each property schema", () => {
-        const calls = [];
+        const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             type: "object",
             properties: {
@@ -51,7 +51,7 @@ describe("eachSchema", () => {
     });
 
     it("should call on each item schema", () => {
-        const calls = [];
+        const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             type: "array",
             items: [{ type: "string" }, { type: "number" }]
@@ -67,7 +67,7 @@ describe("eachSchema", () => {
     });
 
     it("should call on each item property", () => {
-        const calls = [];
+        const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             type: "array",
             items: {
@@ -89,7 +89,7 @@ describe("eachSchema", () => {
     });
 
     it("should call on each oneOf-schema", () => {
-        const calls = [];
+        const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             oneOf: [{ type: "string" }, { type: "number" }]
         };
@@ -104,7 +104,7 @@ describe("eachSchema", () => {
     });
 
     it("should call on each oneOf-schema in items", () => {
-        const calls = [];
+        const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             type: "array",
             items: {
@@ -124,7 +124,7 @@ describe("eachSchema", () => {
     });
 
     it("should call on each anyOf-schema", () => {
-        const calls = [];
+        const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             anyOf: [{ type: "string" }, { type: "number" }]
         };
@@ -139,7 +139,7 @@ describe("eachSchema", () => {
     });
 
     it("should call on each allOf-schema", () => {
-        const calls = [];
+        const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             allOf: [{ type: "string" }, { type: "number" }]
         };
@@ -152,7 +152,7 @@ describe("eachSchema", () => {
     });
 
     it("should call on definitions", () => {
-        const calls = [];
+        const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             definitions: {
                 image: {
@@ -169,7 +169,7 @@ describe("eachSchema", () => {
     });
 
     it("should call on additionalProperties", () => {
-        const calls = [];
+        const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             type: "object",
             additionalProperties: {
@@ -187,7 +187,7 @@ describe("eachSchema", () => {
     });
 
     it("should ignore depedency list", () => {
-        const calls = [];
+        const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             dependencies: {
                 url: ["title"]
@@ -200,7 +200,7 @@ describe("eachSchema", () => {
     });
 
     it("should call on each depedency schema", () => {
-        const calls = [];
+        const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             type: "object",
             dependencies: {
@@ -218,7 +218,7 @@ describe("eachSchema", () => {
     });
 
     it("should iterate definitions", () => {
-        const calls = [];
+        const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             definitions: {
                 bar: { type: "array" }
@@ -233,7 +233,7 @@ describe("eachSchema", () => {
     });
 
     it("should iterate over nested definitions", () => {
-        const calls = [];
+        const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             definitions: {
                 bar: { type: "array" },
@@ -256,7 +256,7 @@ describe("eachSchema", () => {
 
     it("should support array-types", () => {
         // https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.7.6.1
-        const calls = [];
+        const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             type: "object",
             properties: {

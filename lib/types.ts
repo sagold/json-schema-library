@@ -17,20 +17,21 @@ export type JSONError = {
  * ts type guard for json error
  * @returns true if passed type is a JSONError
  */
-export function isJSONError(error): error is JSONError {
+export function isJSONError(error: any): error is JSONError {
     return error?.type === "error";
 }
 
 export interface JSONValidator {
-    (core: Core, schema: JSONSchema, value: any, pointer: JSONPointer):
+    (core: Core, schema: JSONSchema, value: unknown, pointer: JSONPointer):
         | void
         | undefined
         | JSONError
-        | JSONError[];
+        | JSONError[]
+        | JSONError[][];
 }
 
 export interface JSONTypeValidator {
-    (core: Core, schema: JSONSchema, value: any, pointer: JSONPointer): Array<
-        void | undefined | JSONError | JSONError[]
+    (core: Core, schema: JSONSchema, value: unknown, pointer: JSONPointer): Array<
+        void | undefined | JSONError | JSONError[] | JSONError[][]
     >;
 }

@@ -8,7 +8,7 @@ import { Draft as Core } from "./draft";
 const stepType = {
     array: (
         core: Core,
-        key: string | number,
+        key: string,
         schema: JSONSchema,
         data: any,
         pointer: JSONPointer
@@ -90,7 +90,7 @@ const stepType = {
 
     object: (
         core: Core,
-        key: string | number,
+        key: string,
         schema: JSONSchema,
         data: any,
         pointer: JSONPointer
@@ -229,7 +229,8 @@ export default function step(
     if (Array.isArray(schema.type)) {
         const dataType = getTypeOf(data);
         if (schema.type.includes(dataType)) {
-            return stepType[dataType](core, key, schema, data, pointer);
+            // @ts-ignore
+            return stepType[dataType](core, `${key}`, schema, data, pointer);
         }
         return core.errors.typeError({
             value: data,
@@ -240,8 +241,10 @@ export default function step(
     }
 
     const expectedType = schema.type || getTypeOf(data);
-    if (stepType[expectedType]) {
-        return stepType[expectedType](core, key, schema, data, pointer);
+    // @ts-ignore
+    const stepFunction = stepType[expectedType];
+    if (stepFunction) {
+        return stepFunction(core, `${key}`, schema, data, pointer);
     }
     return new Error(`Unsupported schema type ${schema.type} for key ${key}`) as JSONError;
 }

@@ -4,7 +4,7 @@ import path from "path";
 import { Draft } from "../../../lib/draft";
 
 export interface AddSchema {
-    (remoteURI, file: Record<string, any>): void;
+    (remoteURI: string, file: Record<string, any>): void;
 }
 
 export function addRemotes(draft: Draft, baseURI = "http://localhost:1234") {
@@ -22,7 +22,7 @@ export function addRemotes(draft: Draft, baseURI = "http://localhost:1234") {
     );
     const remotes = glob.sync(remotesPattern);
     // console.log("remotes:");
-    remotes.forEach((filepath) => {
+    remotes.forEach((filepath: string) => {
         const file = require(filepath); // eslint-disable-line
         const remoteId = `${baseURI}/${filepath.split("/remotes/").pop()}`;
         // console.log(` - ${remoteId} ${filepath.includes("base") ? JSON.stringify(file) : ""}`);

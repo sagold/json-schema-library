@@ -8,7 +8,7 @@ import getTypeOf from "./getTypeOf";
  * @param [schema] - the schema matching the data. Defaults to rootSchema
  * @param [pointer] - pointer to current data. Default to rootPointer
  */
-export default function each(core, data, callback, schema = core.rootSchema, pointer = "#") {
+export function each(core, data, callback, schema = core.rootSchema, pointer = "#") {
     callback(schema, data, pointer);
     const dataType = getTypeOf(data);
     if (dataType === "object") {

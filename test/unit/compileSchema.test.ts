@@ -458,7 +458,7 @@ describe("compile", () => {
         });
 
         describe("base URI change", () => {
-            let validator;
+            let validator: Draft04;
             beforeEach(() => {
                 draft.remotes["http://localhost:1234/baseUriChange/folderInteger.json"] = compile(
                     draft,
@@ -486,7 +486,7 @@ describe("compile", () => {
         });
 
         describe("base URI change - change folder", () => {
-            let validator;
+            let validator: Draft04;
             beforeEach(() => {
                 draft.remotes["http://localhost:1234/baseUriChangeFolder/folderInteger.json"] =
                     compile(draft, {

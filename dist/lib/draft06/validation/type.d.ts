@@ -1,12 +1,4 @@
-declare const _default: {
-    array: (core: any, schema: any, value: any, pointer: any) => any;
-    object: (core: any, schema: any, value: any, pointer: any) => any;
-    string: (core: any, schema: any, value: any, pointer: any) => any;
-    integer: (core: any, schema: any, value: any, pointer: any) => any;
-    number: (core: any, schema: any, value: any, pointer: any) => any;
-    boolean: (core: any, schema: any, value: any, pointer: any) => any;
-    null: (core: any, schema: any, value: any, pointer: any) => any;
-};
+import { JSONTypeValidator } from "../../types";
 /**
  * @todo: type is also a keyword, as is properties, items, etc
  *
@@ -14,4 +6,5 @@ declare const _default: {
  * or seven in case of ajv https://github.com/epoberezkin/ajv/blob/master/KEYWORDS.md#type
  * 1 null, 2 boolean, 3 object, 4 array, 5 number, 6 string (7 integer)
  */
-export default _default;
+declare const validationType: Record<string, JSONTypeValidator>;
+export default validationType;

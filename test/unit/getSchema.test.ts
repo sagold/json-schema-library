@@ -3,7 +3,7 @@ import getSchema from "../../lib/getSchema";
 import { JsonEditor as Core } from "../../lib/jsoneditor";
 
 describe("getSchema", () => {
-    let core;
+    let core: Core;
     before(() => (core = new Core()));
 
     describe("value", () => {

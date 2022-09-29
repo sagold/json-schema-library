@@ -1,4 +1,4 @@
-export default {
+const Types = {
     $ref: {
         type: false
     },
@@ -13,14 +13,22 @@ export default {
     array: {
         type: true,
         // ignore additionalItems:TypeDef, when items:TypeDef
-        definitions: ["allOf/*", "anyOf/*", "oneOf/*", "not", "items", "items/*", "additionalItems"],
+        definitions: [
+            "allOf/*",
+            "anyOf/*",
+            "oneOf/*",
+            "not",
+            "items",
+            "items/*",
+            "additionalItems"
+        ],
         validationKeywords: ["minItems", "maxItems", "uniqueItems"],
         keywords: ["items", "additionalItems", "minItems", "maxItems", "uniqueItems"]
     },
-    "boolean": {
+    boolean: {
         type: true
     },
-    "enum": {
+    enum: {
         type: false
     },
     integer: {
@@ -37,7 +45,7 @@ export default {
         definitions: ["allOf/*", "anyOf/*", "oneOf/*", "not"],
         validationKeywords: ["minimum", "maximum", "multipleOf"]
     },
-    "null": {
+    null: {
         type: true
     },
     object: {
@@ -45,11 +53,26 @@ export default {
         // patternProperties also validate properties
         // dependencies:(string, TypeDef) extend current TypeDef
         // additional Properties validate only remaining properties (after properties & pattern)
-        definitions: ["allOf/*", "anyOf/*", "oneOf/*", "not",
-            "properties/*", "additionalProperties", "patternProperties/*", "dependencies/*"],
+        definitions: [
+            "allOf/*",
+            "anyOf/*",
+            "oneOf/*",
+            "not",
+            "properties/*",
+            "additionalProperties",
+            "patternProperties/*",
+            "dependencies/*"
+        ],
         validationKeywords: ["minProperties", "maxProperties", "required"],
-        keywords: ["properties", "additionalProperties", "patternProperties", "dependencies", "minProperties",
-            "maxProperties", "required"]
+        keywords: [
+            "properties",
+            "additionalProperties",
+            "patternProperties",
+            "dependencies",
+            "minProperties",
+            "maxProperties",
+            "required"
+        ]
     },
     oneOf: {
         type: false,
@@ -61,3 +84,4 @@ export default {
         validationKeywords: ["minLength", "maxLength", "pattern"]
     }
 };
+export default Types;

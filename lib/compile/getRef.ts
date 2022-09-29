@@ -2,16 +2,15 @@ import { get } from "gson-pointer";
 import splitRef from "./splitRef";
 import getTypeOf from "../getTypeOf";
 import { JSONSchema } from "../types";
-
+import { Context } from "./types";
 
 const suffixes = /(#|\/)+$/g;
-const isObject = (val: unknown): val is Record<string, any> => (getTypeOf(val) === "object");
-
+const isObject = (val: unknown): val is Record<string, any> => getTypeOf(val) === "object";
 
 // 1. combined is known
 // 2. base or pointer is known
 // 3. base + pointer is known
-export default function getRef(context, rootSchema: JSONSchema, $ref) {
+export default function getRef(context: Context, rootSchema: JSONSchema, $ref: string): JSONSchema {
     if (isObject($ref)) {
         $ref = $ref.__ref || $ref.$ref;
     }

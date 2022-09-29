@@ -10,7 +10,7 @@ const cache = new Draft06();
 cache.addRemoteSchema("http://json-schema.org/draft-06/schema", draft06Remote);
 addRemotes(cache);
 
-const supportedTestCases = (t) =>
+const supportedTestCases = (t: FeatureTest) =>
     t.optional
         ? !["ecmascript-regex", "format-date-time", "float-overflow", "non-bmp-regex"].includes(
               t.name

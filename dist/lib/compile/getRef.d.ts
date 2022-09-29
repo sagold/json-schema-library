@@ -1,2 +1,3 @@
 import { JSONSchema } from "../types";
-export default function getRef(context: any, rootSchema: JSONSchema, $ref: any): any;
+import { Context } from "./types";
+export default function getRef(context: Context, rootSchema: JSONSchema, $ref: string): JSONSchema;

@@ -5,7 +5,7 @@ import { JSONSchema, JSONPointer } from "../../../lib/types";
 import resolveOneOfFuzzy from "../../../lib/resolveOneOf.fuzzy";
 
 describe("issue#19 - getSchema from dependencies", () => {
-    let core;
+    let core: Core;
     beforeEach(
         () =>
             (core = new Core({

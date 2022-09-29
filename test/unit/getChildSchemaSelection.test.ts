@@ -3,7 +3,7 @@ import { JsonEditor as Core } from "../../lib/jsoneditor";
 import getChildSchemaSelection from "../../lib/getChildSchemaSelection";
 
 describe("getChildSchemaSelection", () => {
-    let core;
+    let core: Core;
     before(() => (core = new Core()));
 
     it("should return a single object-schema as list", () => {

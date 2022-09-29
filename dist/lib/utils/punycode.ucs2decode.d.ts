@@ -13,4 +13,4 @@
  * @param string The Unicode input string (UCS-2).
  * @returns The new array of code points.
  */
-export default function ucs2decode(string: string): Array<string>;
+export default function ucs2decode(string: string): string[];

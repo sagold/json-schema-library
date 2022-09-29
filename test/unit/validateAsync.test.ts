@@ -2,9 +2,10 @@ import { expect } from "chai";
 import validateAsync from "../../lib/validateAsync";
 import { Draft04 as Core } from "../../lib/draft04";
 import addValidator from "../../lib/addValidator";
+import { JSONError } from "../../lib/types";
 
 describe("validateAsync", () => {
-    let core;
+    let core: Core;
     before(() => (core = new Core()));
 
     it("should return a promise", () => {
@@ -43,7 +44,7 @@ describe("validateAsync", () => {
         });
 
         it("should call onProgress immediately with error", () => {
-            const errors = [];
+            const errors: JSONError[] = [];
             return validateAsync(
                 core,
                 {

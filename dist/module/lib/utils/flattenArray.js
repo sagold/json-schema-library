@@ -1,10 +1,11 @@
 export default function flattenArray(list, result = []) {
     for (let i = 0; i < list.length; i += 1) {
-        if (Array.isArray(list[i])) {
-            flattenArray(list[i], result);
+        const item = list[i];
+        if (Array.isArray(item)) {
+            flattenArray(item, result);
         }
         else {
-            result.push(list[i]);
+            result.push(item);
         }
     }
     return result;

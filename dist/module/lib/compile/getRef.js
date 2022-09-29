@@ -2,7 +2,7 @@ import { get } from "gson-pointer";
 import splitRef from "./splitRef";
 import getTypeOf from "../getTypeOf";
 const suffixes = /(#|\/)+$/g;
-const isObject = (val) => (getTypeOf(val) === "object");
+const isObject = (val) => getTypeOf(val) === "object";
 // 1. combined is known
 // 2. base or pointer is known
 // 3. base + pointer is known

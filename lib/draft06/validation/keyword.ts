@@ -1,11 +1,11 @@
 import Keywords from "../../validation/keyword";
 import getTypeOf from "../../getTypeOf";
-import { JSONValidator } from "../../types";
+import { JSONValidator, JSONError } from "../../types";
 
 const KeywordValidation: Record<string, JSONValidator> = {
     ...Keywords,
     // @draft >= 6
-    contains: (core, schema, value, pointer) => {
+    contains: (core, schema, value: unknown[], pointer) => {
         if (schema.contains === false) {
             return core.errors.containsArrayError({ pointer, value });
         }
@@ -34,7 +34,11 @@ const KeywordValidation: Record<string, JSONValidator> = {
             return undefined;
         }
         if (schema.exclusiveMaximum <= value) {
-            return core.errors.maximumError({ maximum: schema.exclusiveMaximum, length: value, pointer });
+            return core.errors.maximumError({
+                maximum: schema.exclusiveMaximum,
+                length: value,
+                pointer
+            });
         }
         return undefined;
     },
@@ -43,7 +47,11 @@ const KeywordValidation: Record<string, JSONValidator> = {
             return undefined;
         }
         if (schema.exclusiveMinimum >= value) {
-            return core.errors.minimumError({ minimum: schema.exclusiveMinimum, length: value, pointer });
+            return core.errors.minimumError({
+                minimum: schema.exclusiveMinimum,
+                length: value,
+                pointer
+            });
         }
         return undefined;
     },
@@ -81,21 +89,21 @@ const KeywordValidation: Record<string, JSONValidator> = {
         }
         return undefined;
     },
-    patternProperties: (core, schema, value, pointer) => {
+    patternProperties: (core, schema, value: Record<string, unknown>, pointer) => {
         const properties = schema.properties || {};
         const pp = schema.patternProperties;
         if (getTypeOf(pp) !== "object") {
             return undefined;
         }
 
-        const errors = [];
+        const errors: JSONError[] = [];
         const keys = Object.keys(value);
-        const patterns = Object.keys(pp).map(expr => ({
+        const patterns = Object.keys(pp).map((expr) => ({
             regex: new RegExp(expr),
             patternSchema: pp[expr]
         }));
 
-        keys.forEach(key => {
+        keys.forEach((key) => {
             let patternFound = false;
 
             for (let i = 0, l = patterns.length; i < l; i += 1) {
@@ -104,13 +112,21 @@ const KeywordValidation: Record<string, JSONValidator> = {
 
                     // for a boolean schema `false`, always invalidate
                     if (patterns[i].patternSchema === false) {
-                        errors.push(core.errors.patternPropertiesError({
-                            key, pointer, patterns: Object.keys(pp).join(",")
-                        }));
+                        errors.push(
+                            core.errors.patternPropertiesError({
+                                key,
+                                pointer,
+                                patterns: Object.keys(pp).join(",")
+                            })
+                        );
                         return;
                     }
 
-                    const valErrors = core.validate(value[key], patterns[i].patternSchema, `${pointer}/${key}`);
+                    const valErrors = core.validate(
+                        value[key],
+                        patterns[i].patternSchema,
+                        `${pointer}/${key}`
+                    );
                     if (valErrors && valErrors.length > 0) {
                         errors.push(...valErrors);
                     }
@@ -123,16 +139,20 @@ const KeywordValidation: Record<string, JSONValidator> = {
 
             if (patternFound === false && schema.additionalProperties === false) {
                 // this is an arrangement with additionalProperties
-                errors.push(core.errors.patternPropertiesError({
-                    key, pointer, patterns: Object.keys(pp).join(",")
-                }));
+                errors.push(
+                    core.errors.patternPropertiesError({
+                        key,
+                        pointer,
+                        patterns: Object.keys(pp).join(",")
+                    })
+                );
             }
         });
 
         return errors;
     },
     // @draft >= 6
-    propertyNames: (core, schema, value, pointer) => {
+    propertyNames: (core, schema, value: Record<string, unknown>, pointer) => {
         // bool schema
         if (schema.propertyNames === false) {
             // empty objects are valid
@@ -155,23 +175,25 @@ const KeywordValidation: Record<string, JSONValidator> = {
             return undefined;
         }
 
-        const errors = [];
+        const errors: JSONError[] = [];
         const properties = Object.keys(value);
         const propertySchema = { ...schema.propertyNames, type: "string" };
-        properties.forEach(prop => {
+        properties.forEach((prop) => {
             const validationResult = core.validate(prop, propertySchema, `${pointer}/${prop}`);
             if (validationResult.length > 0) {
-                errors.push(core.errors.invalidPropertyNameError({
-                    property: prop,
-                    pointer,
-                    validationError: validationResult[0],
-                    value: value[prop]
-                }))
+                errors.push(
+                    core.errors.invalidPropertyNameError({
+                        property: prop,
+                        pointer,
+                        validationError: validationResult[0],
+                        value: value[prop]
+                    })
+                );
             }
         });
 
         return errors;
     }
-}
+};
 
 export default KeywordValidation;

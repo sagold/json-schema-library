@@ -3,7 +3,7 @@ import step from "../../lib/step";
 import { Draft04 as Core } from "../../lib/draft04";
 
 describe("step", () => {
-    let core;
+    let core: Core;
     before(() => (core = new Core()));
 
     it("should return an error for unknown types", () => {

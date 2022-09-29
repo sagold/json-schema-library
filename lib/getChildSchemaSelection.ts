@@ -20,7 +20,7 @@ export default function getChildSchemaSelection(
 
     if (isJSONError(result)) {
         if (result.code === "one-of-error") {
-            return result.data.oneOf.map((item) => core.resolveRef(item));
+            return result.data.oneOf.map((item: JSONSchema) => core.resolveRef(item));
         }
         return result;
     }

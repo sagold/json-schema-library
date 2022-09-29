@@ -20,7 +20,7 @@ function eachDefinition(walk, schema, pointer, key = "definitions") {
         console.log(`Invalid schema in ${pointer}/${key}/${defId}`);
     });
 }
-export default function eachSchema(schema, callback, pointer = "#") {
+export function eachSchema(schema, callback, pointer = "#") {
     const walk = { callback, nextTypeDefs };
     walk.nextTypeDefs(schema, pointer);
     if (schema.definitions != null) {

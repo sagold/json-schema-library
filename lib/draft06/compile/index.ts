@@ -1,6 +1,6 @@
 /* eslint max-statements-per-line: ["error", { "max": 2 }] */
 import { Draft } from "../../draft";
-import eachSchema from "../../eachSchema";
+import { eachSchema } from "../../eachSchema";
 // import remotes from "../../../remotes";
 import joinScope from "../../compile/joinScope";
 import getRef from "../../compile/getRef";
@@ -11,6 +11,11 @@ const COMPILED_REF = "__ref";
 const GET_REF = "getRef";
 const GET_ROOT = "getRoot";
 const suffixes = /(#|\/)+$/g;
+
+type Context = {
+    ids: Record<string, unknown>;
+    remotes: Record<string, JSONSchema>;
+};
 
 /**
  * @draft starting with _draft 06_ keyword `id` has been renamed to `$id`
@@ -38,7 +43,7 @@ export default function compileSchema(
     if (schemaToCompile[COMPILED] !== undefined) {
         return schemaToCompile;
     } // eslint-disable-line
-    const context = { ids: {}, remotes: draft.remotes };
+    const context: Context = { ids: {}, remotes: draft.remotes };
     const rootSchemaAsString = JSON.stringify(schemaToCompile);
     const compiledSchema = JSON.parse(rootSchemaAsString);
     Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });
@@ -66,7 +71,7 @@ export default function compileSchema(
         });
     }
 
-    const scopes = {};
+    const scopes: Record<string, string> = {};
     const getRoot = () => compiledSchema;
     eachSchema(compiledSchema, (schema, pointer) => {
         if (schema.$id) {

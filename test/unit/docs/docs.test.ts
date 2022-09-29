@@ -121,7 +121,7 @@ describe("docs", () => {
             };
 
             const jsonSchema = new Draft07(mySchema);
-            const calls = [];
+            const calls: Record<string, unknown>[] = [];
             const myCallback = (schema: JSONSchema, value: unknown, pointer: JSONPointer) => {
                 calls.push({ schema, value, pointer });
             };
@@ -149,7 +149,7 @@ describe("docs", () => {
             };
 
             const jsonSchema = new Draft07(mySchema);
-            const calls = [];
+            const calls: Record<string, unknown>[] = [];
             const myCallback = (schema: JSONSchema) => {
                 calls.push(schema);
             };
@@ -201,8 +201,7 @@ describe("docs", () => {
             };
 
             const jsonSchema = new Draft07(mySchema);
-            let schemaOfItem: JSONSchema | JSONError;
-            schemaOfItem = jsonSchema.getSchema("/list/1", {
+            const schemaOfItem: JSONSchema | JSONError = jsonSchema.getSchema("/list/1", {
                 list: [{ description: "..." }, { name: "my-item" }]
             });
 

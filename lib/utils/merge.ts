@@ -1,4 +1,5 @@
 import deepmerge from "deepmerge";
+// @ts-ignore
 const overwriteMerge = (destinationArray, sourceArray) => sourceArray;
 
 /**

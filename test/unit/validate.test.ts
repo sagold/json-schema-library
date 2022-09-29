@@ -4,7 +4,7 @@ import { Draft04 as Core } from "../../lib/draft04";
 import draft04Meta from "../../remotes/draft04.json";
 
 describe("validate", () => {
-    let core;
+    let core: Core;
     before(() => (core = new Core()));
 
     describe("integer", () => {

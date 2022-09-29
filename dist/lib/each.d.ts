@@ -10,4 +10,4 @@ export declare type EachCallback = (schema: JSONSchema, data: unknown, pointer: 
  * @param [schema] - the schema matching the data. Defaults to rootSchema
  * @param [pointer] - pointer to current data. Default to rootPointer
  */
-export default function each(core: Core, data: any, callback: EachCallback, schema?: JSONSchema, pointer?: JSONPointer): void;
+export declare function each(core: Core, data: any, callback: EachCallback, schema?: JSONSchema, pointer?: JSONPointer): void;

@@ -52,7 +52,7 @@ const KeywordValidation = {
                         }));
                     }
                     else {
-                        errors.push(core.validate(value[property], result, pointer));
+                        errors.push(...core.validate(value[property], result, pointer));
                     }
                     // additionalProperties {}
                 }
@@ -84,7 +84,7 @@ const KeywordValidation = {
         }
         const errors = [];
         schema.allOf.forEach((subSchema) => {
-            errors.push(core.validate(value, subSchema, pointer));
+            errors.push(...core.validate(value, subSchema, pointer));
         });
         return errors;
     },

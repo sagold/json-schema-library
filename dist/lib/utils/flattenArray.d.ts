@@ -1,1 +1,1 @@
-export default function flattenArray<T = any>(list: Array<any>, result?: any[]): Array<T>;
+export default function flattenArray<T = unknown>(list: unknown[], result?: T[]): T[];

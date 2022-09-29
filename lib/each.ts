@@ -13,7 +13,7 @@ export type EachCallback = (schema: JSONSchema, data: unknown, pointer: JSONPoin
  * @param [schema] - the schema matching the data. Defaults to rootSchema
  * @param [pointer] - pointer to current data. Default to rootPointer
  */
-export default function each(
+export function each(
     core: Core,
     data: any,
     callback: EachCallback,
@@ -30,7 +30,7 @@ export default function each(
             core.each(next, callback, nextSchema, `${pointer}/${key}`);
         });
     } else if (dataType === "array") {
-        data.forEach((next, key) => {
+        data.forEach((next: unknown, key: number) => {
             const nextSchema = core.step(key, schema, data, pointer);
             core.each(next, callback, nextSchema, `${pointer}/${key}`);
         });

@@ -16,7 +16,7 @@ const defaultOptions: TemplateOptions = {
     addOptionalProps: true
 };
 
-let cache;
+let cache: Record<string, JSONSchema>;
 function shouldResolveRef(schema: JSONSchema, pointer: JSONPointer) {
     // ensure we refactored consistently
     if (pointer == null) {
@@ -77,7 +77,7 @@ function convertValue(type: string, value: any) {
 function createTemplateSchema(
     core: Core,
     schema: JSONSchema,
-    data,
+    data: unknown,
     pointer: JSONPointer
 ): JSONSchema | false {
     // invalid schema
@@ -123,7 +123,8 @@ function createTemplateSchema(
     return templateSchema;
 }
 
-const isJSONSchema = (template): template is JSONSchema => template && typeof template === "object";
+const isJSONSchema = (template: unknown): template is JSONSchema =>
+    template && typeof template === "object";
 
 /**
  * Create data object matching the given schema
@@ -193,21 +194,30 @@ function getTemplate(
     return templateData;
 }
 
-const TYPE = {
-    null: (core: Core, schema: JSONSchema, data: any) => getDefault(schema, data, null),
-    string: (core: Core, schema: JSONSchema, data: any) => getDefault(schema, data, ""),
-    number: (core: Core, schema: JSONSchema, data: any) => getDefault(schema, data, 0),
-    integer: (core: Core, schema: JSONSchema, data: any) => getDefault(schema, data, 0),
-    boolean: (core: Core, schema: JSONSchema, data: any) => getDefault(schema, data, false),
-    object: (
+const TYPE: Record<
+    string,
+    (
         core: Core,
         schema: JSONSchema,
-        data: any,
+        data: unknown,
+        pointer: JSONPointer,
+        opts: TemplateOptions
+    ) => unknown
+> = {
+    null: (core, schema, data) => getDefault(schema, data, null),
+    string: (core, schema, data) => getDefault(schema, data, ""),
+    number: (core, schema, data) => getDefault(schema, data, 0),
+    integer: (core, schema, data) => getDefault(schema, data, 0),
+    boolean: (core, schema, data) => getDefault(schema, data, false),
+    object: (
+        core,
+        schema,
+        data: Record<string, unknown> | undefined,
         pointer: JSONPointer,
         opts: TemplateOptions
     ) => {
         const template = schema.default === undefined ? {} : schema.default;
-        const d = {}; // do not assign data here, to keep ordering from json-schema
+        const d: Record<string, unknown> = {}; // do not assign data here, to keep ordering from json-schema
 
         if (schema.properties) {
             Object.keys(schema.properties).forEach((key) => {
@@ -260,10 +270,17 @@ const TYPE = {
         return d;
     },
     // build array type of items, ignores additionalItems
-    array: (core: Core, schema: JSONSchema, data, pointer: JSONPointer, opts: TemplateOptions) => {
+    array: (
+        core: Core,
+        schema: JSONSchema,
+        data: unknown[],
+        pointer: JSONPointer,
+        opts: TemplateOptions
+    ) => {
         const template = schema.default === undefined ? [] : schema.default;
-        const d = data || [];
         schema.minItems = schema.minItems || 0;
+
+        const d: unknown[] = data || [];
 
         // items are undefined
         if (schema.items == null) {
@@ -362,6 +379,6 @@ export default (
     schema: JSONSchema = core.rootSchema,
     opts: TemplateOptions = defaultOptions
 ) => {
-    cache = { mi: ".." };
+    cache = { mi: {} };
     return getTemplate(core, data, schema, "#", opts);
 };

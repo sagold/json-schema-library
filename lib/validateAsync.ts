@@ -4,7 +4,7 @@ import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
 import { Draft as Core } from "./draft";
 
 function createErrorNotification(onError: OnError) {
-    return function notifyError(error) {
+    return function notifyError(error: JSONError | JSONError[]) {
         if (Array.isArray(error)) {
             error = flattenArray(error);
             error.forEach(notifyError);

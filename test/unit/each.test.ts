@@ -1,9 +1,9 @@
 import { expect } from "chai";
-import each from "../../lib/each";
+import { each } from "../../lib/each";
 import { Draft04 as Core } from "../../lib/draft04";
 
 describe("each", () => {
-    let core;
+    let core: Core;
     before(() => {
         core = new Core();
         // @ts-ignore
@@ -11,8 +11,10 @@ describe("each", () => {
     });
 
     it("should call callback with schema, value and pointer", () => {
-        const calls = [];
-        core.each(5, (...args) => calls.push(args), { type: "number" });
+        const calls: [unknown, unknown, string][] = [];
+        core.each(5, (...args: [unknown, unknown, string]) => calls.push(args), {
+            type: "number"
+        });
 
         expect(calls).to.have.length(1);
         expect(calls[0][0]).to.deep.eq({ type: "number" });
@@ -21,8 +23,8 @@ describe("each", () => {
     });
 
     it("should callback for array and all array items", () => {
-        const calls = [];
-        core.each([5, 9], (...args) => calls.push(args), {
+        const calls: unknown[] = [];
+        core.each([5, 9], (...args: [unknown, unknown, string]) => calls.push(args), {
             type: "array",
             items: { type: "number" }
         });
@@ -36,8 +38,8 @@ describe("each", () => {
     });
 
     it("should callback for array and pick correct schema forEach item", () => {
-        const calls = [];
-        core.each([5, "nine"], (...args) => calls.push(args), {
+        const calls: unknown[] = [];
+        core.each([5, "nine"], (...args: [unknown, unknown, string]) => calls.push(args), {
             type: "array",
             items: [{ type: "number" }, { type: "string" }]
         });
@@ -51,8 +53,8 @@ describe("each", () => {
     });
 
     it("should callback for object and all properties", () => {
-        const calls = [];
-        core.each({ a: 5, b: 9 }, (...args) => calls.push(args), {
+        const calls: unknown[] = [];
+        core.each({ a: 5, b: 9 }, (...args: [unknown, unknown, string]) => calls.push(args), {
             type: "object",
             properties: { a: { type: "number" }, b: { type: "number" } }
         });
