@@ -2,9 +2,7 @@ import gp from "gson-pointer";
 import { JSONSchema, JSONPointer } from "./types";
 import Core from "./cores/CoreInterface";
 
-
 const emptyObject = {};
-
 
 /**
  * Returns the json-schema of a data-json-pointer.
@@ -19,13 +17,23 @@ const emptyObject = {};
  * @param [schema] - the json schema to iterate. Defaults to core.rootSchema
  * @return json schema object of the json-pointer or an error
  */
-export default function getSchema(core: Core, pointer: JSONPointer, data?: any, schema: JSONSchema = core.rootSchema): JSONSchema {
+export default function getSchema(
+    core: Core,
+    pointer: JSONPointer,
+    data?: unknown,
+    schema: JSONSchema = core.rootSchema
+): JSONSchema {
     const frags = gp.split(pointer);
     return _get(core, schema, frags, pointer, data);
 }
 
-
-function _get(core: Core, schema: JSONSchema, frags: Array<string>, pointer: JSONPointer, data: any = emptyObject): JSONSchema {
+function _get(
+    core: Core,
+    schema: JSONSchema,
+    frags: Array<string>,
+    pointer: JSONPointer,
+    data: unknown = emptyObject
+): JSONSchema {
     if (frags.length === 0) {
         return schema;
     }
