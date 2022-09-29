@@ -5,7 +5,7 @@ import merge from "./utils/merge";
 import copy from "./utils/copy";
 import settings from "./config/settings";
 const defaultOptions = {
-    addOptionalProps: true,
+    addOptionalProps: true
 };
 let cache;
 function shouldResolveRef(schema, pointer) {
@@ -17,9 +17,7 @@ function shouldResolveRef(schema, pointer) {
     if ($ref == null) {
         return true;
     }
-    const value = cache[pointer] == null || cache[pointer][$ref] == null
-        ? 0
-        : cache[pointer][$ref];
+    const value = cache[pointer] == null || cache[pointer][$ref] == null ? 0 : cache[pointer][$ref];
     return value < settings.GET_TEMPLATE_RECURSION_LIMIT;
 }
 function resolveRef(core, schema, pointer) {
@@ -79,8 +77,7 @@ function createTemplateSchema(core, schema, data, pointer) {
             const resolvedAnyOf = resolveRef(core, schema.anyOf[0], `${pointer}/anyOf/0`);
             templateSchema = merge(templateSchema, resolvedAnyOf);
             // add pointer return-value, if any
-            templateSchema.pointer =
-                schema.anyOf[0].$ref || templateSchema.pointer;
+            templateSchema.pointer = schema.anyOf[0].$ref || templateSchema.pointer;
         }
         delete templateSchema.anyOf;
     }
@@ -91,8 +88,7 @@ function createTemplateSchema(core, schema, data, pointer) {
             if (shouldResolveRef(schema.allOf[i], `${pointer}/allOf/${i}`)) {
                 templateSchema = merge(templateSchema, resolveRef(core, schema.allOf[i], `${pointer}/allOf/${i}`));
                 // add pointer return-value, if any
-                templateSchema.pointer =
-                    schema.allOf[i].$ref || templateSchema.pointer;
+                templateSchema.pointer = schema.allOf[i].$ref || templateSchema.pointer;
             }
         }
         delete templateSchema.allOf;
@@ -167,14 +163,26 @@ const TYPE = {
         const d = {}; // do not assign data here, to keep ordering from json-schema
         if (schema.properties) {
             Object.keys(schema.properties).forEach((key) => {
-                const value = data == null || data[key] == null
-                    ? template[key]
-                    : data[key];
-                const isRequired = Array.isArray(schema.required) &&
-                    schema.required.includes(key);
+                const value = data == null || data[key] == null ? template[key] : data[key];
+                const isRequired = Array.isArray(schema.required) && schema.required.includes(key);
                 // Omit adding a property if it is not required or optional props should be added
                 if (value != null || isRequired || opts.addOptionalProps) {
                     d[key] = getTemplate(core, value, schema.properties[key], `${pointer}/properties/${key}`, opts);
+                }
+            });
+        }
+        if (schema.dependencies) {
+            Object.keys(schema.dependencies).forEach((key) => {
+                const dependency = schema.dependencies[key];
+                if (getTypeOf(dependency) !== "object") {
+                    return;
+                }
+                if (d[key] === undefined) {
+                    return;
+                }
+                const result = getTemplate(core, data, { ...dependency, type: "object" }, `${pointer}/dependencies/${key}`, opts);
+                if (result && result.type !== "error") {
+                    Object.assign(d, result);
                 }
             });
         }
@@ -241,7 +249,7 @@ const TYPE = {
             return d;
         }
         return d;
-    },
+    }
 };
 function getDefault(schema, templateValue, initValue) {
     if (templateValue != null) {
