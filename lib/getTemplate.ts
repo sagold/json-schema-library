@@ -183,6 +183,10 @@ function getTemplate(
         }
     }
 
+    // @todo Array.isArray(schema.type)
+    // -> hasDefault? return
+    // if not -> pick first type
+
     if (!isJSONSchema(schema) || schema.type == null) {
         return undefined;
     }
