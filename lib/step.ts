@@ -5,10 +5,14 @@ import merge from "./utils/merge";
 import { JSONSchema, JSONPointer, JSONError } from "./types";
 import Core from "./cores/CoreInterface";
 
-
 const stepType = {
-
-    array: (core: Core, key: string|number, schema: JSONSchema, data: any, pointer: JSONPointer): JSONSchema|JSONError => {
+    array: (
+        core: Core,
+        key: string | number,
+        schema: JSONSchema,
+        data: any,
+        pointer: JSONPointer
+    ): JSONSchema | JSONError => {
         const itemsType = getTypeOf(schema.items);
 
         if (itemsType === "object") {
@@ -39,7 +43,11 @@ const stepType = {
             }
             // @draft >= 7 bool schema, items:[true, false]
             if (schema.items[key] === false) {
-                return errors.invalidDataError({ key, value: data[key], pointer });
+                return errors.invalidDataError({
+                    key,
+                    value: data[key],
+                    pointer,
+                });
             }
 
             if (schema.items[key]) {
@@ -47,10 +55,17 @@ const stepType = {
             }
 
             if (schema.additionalItems === false) {
-                return errors.additionalItemsError({ key, value: data[key], pointer });
+                return errors.additionalItemsError({
+                    key,
+                    value: data[key],
+                    pointer,
+                });
             }
 
-            if (schema.additionalItems === true || schema.additionalItems === undefined) {
+            if (
+                schema.additionalItems === true ||
+                schema.additionalItems === undefined
+            ) {
                 return createSchemaOf(data[key]);
             }
 
@@ -58,7 +73,13 @@ const stepType = {
                 return schema.additionalItems;
             }
 
-            throw new Error(`Invalid schema ${JSON.stringify(schema, null, 4)} for ${JSON.stringify(data, null, 4)}`);
+            throw new Error(
+                `Invalid schema ${JSON.stringify(
+                    schema,
+                    null,
+                    4
+                )} for ${JSON.stringify(data, null, 4)}`
+            );
         }
 
         if (schema.additionalItems !== false && data[key]) {
@@ -67,11 +88,18 @@ const stepType = {
             return createSchemaOf(data[key]);
         }
 
-        return new Error(`Invalid array schema for ${key} at ${pointer}`) as JSONError;
+        return new Error(
+            `Invalid array schema for ${key} at ${pointer}`
+        ) as JSONError;
     },
 
-    object: (core: Core, key: string|number, schema: JSONSchema, data: any, pointer: JSONPointer): JSONSchema|JSONError => {
-
+    object: (
+        core: Core,
+        key: string | number,
+        schema: JSONSchema,
+        data: any,
+        pointer: JSONPointer
+    ): JSONSchema | JSONError => {
         if (Array.isArray(schema.oneOf)) {
             // update current schema
             const oneOfSchema = core.resolveOneOf(data, schema, pointer);
@@ -113,9 +141,19 @@ const stepType = {
             if (targetSchema && Array.isArray(targetSchema.oneOf)) {
                 // @special case: this is a mix of a schema and optional definitions
                 // we resolve the schema here and add the original schema to `oneOfSchema`
-                let resolvedSchema = core.resolveOneOf(data[key], targetSchema, `${pointer}/${key}`);
+                let resolvedSchema = core.resolveOneOf(
+                    data[key],
+                    targetSchema,
+                    `${pointer}/${key}`
+                );
+
+                const oneOfIndex = targetSchema.oneOf.findIndex(
+                    (s) => s === resolvedSchema
+                );
+
                 resolvedSchema = JSON.parse(JSON.stringify(resolvedSchema));
                 resolvedSchema.variableSchema = true;
+                resolvedSchema.oneOfIndex = oneOfIndex;
                 resolvedSchema.oneOfSchema = targetSchema;
                 return resolvedSchema;
             }
@@ -146,10 +184,13 @@ const stepType = {
             return createSchemaOf(data);
         }
 
-        return errors.unknownPropertyError({ property: key, value: data, pointer });
-    }
+        return errors.unknownPropertyError({
+            property: key,
+            value: data,
+            pointer,
+        });
+    },
 };
-
 
 /**
  * Returns the json-schema of the given object property or array item.
@@ -165,21 +206,32 @@ const stepType = {
  * @param  [pointer]
  * @return Schema or Error if failed resolving key
  */
-export default function step(core: Core, key: string|number, schema: JSONSchema, data?: any, pointer: JSONPointer = "#"):
-JSONSchema|JSONError {
+export default function step(
+    core: Core,
+    key: string | number,
+    schema: JSONSchema,
+    data?: any,
+    pointer: JSONPointer = "#"
+): JSONSchema | JSONError {
     // @draft >= 4 ?
     if (Array.isArray(schema.type)) {
         const dataType = getTypeOf(data);
         if (schema.type.includes(dataType)) {
             return stepType[dataType](core, key, schema, data, pointer);
         }
-        return core.errors.typeError({ value: data, pointer, expected: schema.type, received: dataType });
+        return core.errors.typeError({
+            value: data,
+            pointer,
+            expected: schema.type,
+            received: dataType,
+        });
     }
-
 
     const expectedType = schema.type || getTypeOf(data);
     if (stepType[expectedType]) {
         return stepType[expectedType](core, key, schema, data, pointer);
     }
-    return new Error(`Unsupported schema type ${schema.type} for key ${key}`) as JSONError;
+    return new Error(
+        `Unsupported schema type ${schema.type} for key ${key}`
+    ) as JSONError;
 }

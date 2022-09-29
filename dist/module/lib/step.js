@@ -29,15 +29,24 @@ const stepType = {
             }
             // @draft >= 7 bool schema, items:[true, false]
             if (schema.items[key] === false) {
-                return errors.invalidDataError({ key, value: data[key], pointer });
+                return errors.invalidDataError({
+                    key,
+                    value: data[key],
+                    pointer,
+                });
             }
             if (schema.items[key]) {
                 return core.resolveRef(schema.items[key]);
             }
             if (schema.additionalItems === false) {
-                return errors.additionalItemsError({ key, value: data[key], pointer });
+                return errors.additionalItemsError({
+                    key,
+                    value: data[key],
+                    pointer,
+                });
             }
-            if (schema.additionalItems === true || schema.additionalItems === undefined) {
+            if (schema.additionalItems === true ||
+                schema.additionalItems === undefined) {
                 return createSchemaOf(data[key]);
             }
             if (getTypeOf(schema.additionalItems) === "object") {
@@ -89,8 +98,10 @@ const stepType = {
                 // @special case: this is a mix of a schema and optional definitions
                 // we resolve the schema here and add the original schema to `oneOfSchema`
                 let resolvedSchema = core.resolveOneOf(data[key], targetSchema, `${pointer}/${key}`);
+                const oneOfIndex = targetSchema.oneOf.findIndex((s) => s === resolvedSchema);
                 resolvedSchema = JSON.parse(JSON.stringify(resolvedSchema));
                 resolvedSchema.variableSchema = true;
+                resolvedSchema.oneOfIndex = oneOfIndex;
                 resolvedSchema.oneOfSchema = targetSchema;
                 return resolvedSchema;
             }
@@ -116,8 +127,12 @@ const stepType = {
         if (schema.additionalProperties === true) {
             return createSchemaOf(data);
         }
-        return errors.unknownPropertyError({ property: key, value: data, pointer });
-    }
+        return errors.unknownPropertyError({
+            property: key,
+            value: data,
+            pointer,
+        });
+    },
 };
 /**
  * Returns the json-schema of the given object property or array item.
@@ -140,7 +155,12 @@ export default function step(core, key, schema, data, pointer = "#") {
         if (schema.type.includes(dataType)) {
             return stepType[dataType](core, key, schema, data, pointer);
         }
-        return core.errors.typeError({ value: data, pointer, expected: schema.type, received: dataType });
+        return core.errors.typeError({
+            value: data,
+            pointer,
+            expected: schema.type,
+            received: dataType,
+        });
     }
     const expectedType = schema.type || getTypeOf(data);
     if (stepType[expectedType]) {
