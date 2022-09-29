@@ -1,16 +1,12 @@
 import { expect } from "chai";
-import getSchema  from "../../lib/getSchema"
-import Core  from "../../lib/cores/Draft04"
-
+import getSchema from "../../lib/getSchema";
+import Core from "../../lib/cores/JsonEditor";
 
 describe("getSchema", () => {
-
     let core;
     before(() => (core = new Core()));
 
-
     describe("value", () => {
-
         it("should return schema of any value", () => {
             core.setSchema({ name: "target", type: "*" });
             const schema = getSchema(core, "#");
@@ -18,9 +14,7 @@ describe("getSchema", () => {
         });
     });
 
-
     describe("object", () => {
-
         it("should return schema of the given property", () => {
             core.setSchema({
                 type: "object",
@@ -77,7 +71,9 @@ describe("getSchema", () => {
                     },
                     {
                         type: "object",
-                        properties: { second: { type: "string", name: "target" } },
+                        properties: {
+                            second: { type: "string", name: "target" }
+                        },
                         additionalProperties: false
                     },
                     {
@@ -113,11 +109,47 @@ describe("getSchema", () => {
             const schema = getSchema(core, "#/beer");
             expect(schema.name).to.equal("UnknownPropertyError");
         });
+
+        describe("dependencies", () => {
+            // it("should not return schema from dependencies when dependent property is missing", () => {
+            //     core.setSchema({
+            //         type: "object",
+            //         properties: {
+            //             test: { type: "string" }
+            //         },
+            //         dependencies: {
+            //             test: {
+            //                 properties: {
+            //                     additionalValue: { type: "string" }
+            //                 }
+            //             }
+            //         }
+            //     });
+            //     const schema = getSchema(core, "#/additionalValue");
+            //     expect(schema.type).to.equal("error");
+            // });
+
+            it("should return schema from dependencies when dependent property is present", () => {
+                core.setSchema({
+                    type: "object",
+                    properties: {
+                        test: { type: "string" }
+                    },
+                    dependencies: {
+                        test: {
+                            properties: {
+                                additionalValue: { type: "string" }
+                            }
+                        }
+                    }
+                });
+                const schema = getSchema(core, "/additionalValue", { test: "is defined" });
+                expect(schema).to.deep.include({ type: "string" });
+            });
+        });
     });
 
-
     describe("array", () => {
-
         it("should return item schema", () => {
             core.setSchema({
                 type: "array",
@@ -130,11 +162,7 @@ describe("getSchema", () => {
         it("should return item schema based on index", () => {
             core.setSchema({
                 type: "array",
-                items: [
-                    { type: "number" },
-                    { name: "target", type: "string" },
-                    { type: "number" }
-                ]
+                items: [{ type: "number" }, { name: "target", type: "string" }, { type: "number" }]
             });
             const schema = getSchema(core, "#/1");
             expect(schema).to.deep.include({ name: "target", type: "string" });
@@ -152,7 +180,9 @@ describe("getSchema", () => {
                         },
                         {
                             type: "object",
-                            properties: { second: { type: "string", name: "target" } },
+                            properties: {
+                                second: { type: "string", name: "target" }
+                            },
                             additionalProperties: false
                         },
                         {

@@ -2,9 +2,7 @@
 import { expect } from "chai";
 import eachSchema from "../../lib/eachSchema";
 
-
 describe("eachSchema", () => {
-
     it("should execute callback on root-schema", () => {
         let firstCall;
         const rootSchema = {
@@ -12,11 +10,10 @@ describe("eachSchema", () => {
             properties: {}
         };
 
-        eachSchema(rootSchema, schema => (firstCall = firstCall || schema));
+        eachSchema(rootSchema, (schema) => (firstCall = firstCall || schema));
 
         expect(firstCall).to.eq(rootSchema);
     });
-
 
     // maybe not. This would remove simple pointer config
     it.skip("should call on unspecified properties", () => {
@@ -33,7 +30,6 @@ describe("eachSchema", () => {
         expect(calls).to.have.length(2);
         expect(calls[1]).to.eq("/properties/title");
     });
-
 
     it("should call on each property schema", () => {
         const calls = [];
@@ -54,15 +50,11 @@ describe("eachSchema", () => {
         expect(calls[2].pointer).to.eq("/properties/second");
     });
 
-
     it("should call on each item schema", () => {
         const calls = [];
         const rootSchema = {
             type: "array",
-            items: [
-                { type: "string" },
-                { type: "number" }
-            ]
+            items: [{ type: "string" }, { type: "number" }]
         };
 
         eachSchema(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
@@ -73,7 +65,6 @@ describe("eachSchema", () => {
         expect(calls[2].schema).to.eq(rootSchema.items[1]);
         expect(calls[2].pointer).to.eq("/items/1");
     });
-
 
     it("should call on each item property", () => {
         const calls = [];
@@ -97,14 +88,10 @@ describe("eachSchema", () => {
         expect(calls[3].pointer).to.eq("/items/properties/second");
     });
 
-
     it("should call on each oneOf-schema", () => {
         const calls = [];
         const rootSchema = {
-            oneOf: [
-                { type: "string" },
-                { type: "number" }
-            ]
+            oneOf: [{ type: "string" }, { type: "number" }]
         };
 
         eachSchema(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
@@ -116,16 +103,12 @@ describe("eachSchema", () => {
         expect(calls[2].pointer).to.eq("/oneOf/1");
     });
 
-
     it("should call on each oneOf-schema in items", () => {
         const calls = [];
         const rootSchema = {
             type: "array",
             items: {
-                oneOf: [
-                    { type: "string" },
-                    { type: "number" }
-                ]
+                oneOf: [{ type: "string" }, { type: "number" }]
             }
         };
 
@@ -140,14 +123,10 @@ describe("eachSchema", () => {
         expect(calls[3].pointer).to.eq("/items/oneOf/1");
     });
 
-
     it("should call on each anyOf-schema", () => {
         const calls = [];
         const rootSchema = {
-            anyOf: [
-                { type: "string" },
-                { type: "number" }
-            ]
+            anyOf: [{ type: "string" }, { type: "number" }]
         };
 
         eachSchema(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
@@ -159,40 +138,35 @@ describe("eachSchema", () => {
         expect(calls[2].pointer).to.eq("/anyOf/1");
     });
 
-
     it("should call on each allOf-schema", () => {
         const calls = [];
         const rootSchema = {
-            allOf: [
-                { type: "string" },
-                { type: "number" }
-            ]
+            allOf: [{ type: "string" }, { type: "number" }]
         };
 
-        eachSchema(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, (schema) => calls.push(schema));
 
         expect(calls.length).to.eq(3);
         expect(calls[1]).to.eq(rootSchema.allOf[0]);
         expect(calls[2]).to.eq(rootSchema.allOf[1]);
     });
 
-
     it("should call on definitions", () => {
         const calls = [];
         const rootSchema = {
             definitions: {
                 image: {
-                    type: "string", format: "url"
+                    type: "string",
+                    format: "url"
                 }
             }
         };
 
-        eachSchema(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, (schema) => calls.push(schema));
 
         expect(calls.length).to.eq(2);
         expect(calls[1]).to.eq(rootSchema.definitions.image);
     });
-
 
     it("should call on additionalProperties", () => {
         const calls = [];
@@ -206,12 +180,11 @@ describe("eachSchema", () => {
             }
         };
 
-        eachSchema(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, (schema) => calls.push(schema));
 
         expect(calls.length).to.eq(3);
         expect(calls[1]).to.eq(rootSchema.additionalProperties);
     });
-
 
     it("should ignore depedency list", () => {
         const calls = [];
@@ -221,11 +194,10 @@ describe("eachSchema", () => {
             }
         };
 
-        eachSchema(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, (schema) => calls.push(schema));
 
         expect(calls.length).to.eq(1);
     });
-
 
     it("should call on each depedency schema", () => {
         const calls = [];
@@ -239,12 +211,11 @@ describe("eachSchema", () => {
             }
         };
 
-        eachSchema(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, (schema) => calls.push(schema));
 
         expect(calls.length).to.eq(2);
         expect(calls[1]).to.eq(rootSchema.dependencies.target);
     });
-
 
     it("should iterate definitions", () => {
         const calls = [];
@@ -254,13 +225,12 @@ describe("eachSchema", () => {
             }
         };
 
-        eachSchema(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, (schema) => calls.push(schema));
 
         expect(calls.length).to.eq(2);
         expect(calls[0]).to.eq(rootSchema);
         expect(calls[1]).to.eq(rootSchema.definitions.bar);
     });
-
 
     it("should iterate over nested definitions", () => {
         const calls = [];
@@ -275,7 +245,7 @@ describe("eachSchema", () => {
             }
         };
 
-        eachSchema(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, (schema) => calls.push(schema));
 
         expect(calls).to.have.length(4);
         expect(calls[0]).to.eq(rootSchema);
@@ -299,7 +269,7 @@ describe("eachSchema", () => {
             }
         };
 
-        eachSchema(rootSchema, schema => calls.push(schema));
+        eachSchema(rootSchema, (schema) => calls.push(schema));
 
         expect(calls.length).to.eq(3);
         expect(calls[0]).to.eq(rootSchema);

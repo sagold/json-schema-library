@@ -46,7 +46,7 @@ const stepType = {
                 return errors.invalidDataError({
                     key,
                     value: data[key],
-                    pointer,
+                    pointer
                 });
             }
 
@@ -58,14 +58,11 @@ const stepType = {
                 return errors.additionalItemsError({
                     key,
                     value: data[key],
-                    pointer,
+                    pointer
                 });
             }
 
-            if (
-                schema.additionalItems === true ||
-                schema.additionalItems === undefined
-            ) {
+            if (schema.additionalItems === true || schema.additionalItems === undefined) {
                 return createSchemaOf(data[key]);
             }
 
@@ -74,11 +71,11 @@ const stepType = {
             }
 
             throw new Error(
-                `Invalid schema ${JSON.stringify(
-                    schema,
+                `Invalid schema ${JSON.stringify(schema, null, 4)} for ${JSON.stringify(
+                    data,
                     null,
                     4
-                )} for ${JSON.stringify(data, null, 4)}`
+                )}`
             );
         }
 
@@ -88,9 +85,7 @@ const stepType = {
             return createSchemaOf(data[key]);
         }
 
-        return new Error(
-            `Invalid array schema for ${key} at ${pointer}`
-        ) as JSONError;
+        return new Error(`Invalid array schema for ${key} at ${pointer}`) as JSONError;
     },
 
     object: (
@@ -147,9 +142,7 @@ const stepType = {
                     `${pointer}/${key}`
                 );
 
-                const oneOfIndex = targetSchema.oneOf.findIndex(
-                    (s) => s === resolvedSchema
-                );
+                const oneOfIndex = targetSchema.oneOf.findIndex((s) => s === resolvedSchema);
 
                 resolvedSchema = JSON.parse(JSON.stringify(resolvedSchema));
                 resolvedSchema.variableSchema = true;
@@ -161,6 +154,25 @@ const stepType = {
             // resolved schema or error
             if (targetSchema) {
                 return targetSchema;
+            }
+        }
+
+        // @draft <= 07
+        const { dependencies } = schema;
+        if (getTypeOf(dependencies) === "object") {
+            const dependentProperties = Object.keys(dependencies).filter(
+                (propertyName) =>
+                    // data[propertyName] !== undefined &&
+                    getTypeOf(dependencies[propertyName]) === "object"
+            );
+
+            for (let i = 0, l = dependentProperties.length; i < l; i += 1) {
+                const dependentProperty = dependentProperties[i];
+                const schema = step(core, key, dependencies[dependentProperty], data);
+                if (schema.type !== "error") {
+                    return schema;
+                }
+                console.log("error", schema);
             }
         }
 
@@ -187,9 +199,10 @@ const stepType = {
         return errors.unknownPropertyError({
             property: key,
             value: data,
-            pointer: `${pointer}/${key}`,
+            // pointer: `${pointer}/${key}`,
+            pointer: `${pointer}`
         });
-    },
+    }
 };
 
 /**
@@ -223,7 +236,7 @@ export default function step(
             value: data,
             pointer,
             expected: schema.type,
-            received: dataType,
+            received: dataType
         });
     }
 
@@ -231,7 +244,5 @@ export default function step(
     if (stepType[expectedType]) {
         return stepType[expectedType](core, key, schema, data, pointer);
     }
-    return new Error(
-        `Unsupported schema type ${schema.type} for key ${key}`
-    ) as JSONError;
+    return new Error(`Unsupported schema type ${schema.type} for key ${key}`) as JSONError;
 }
