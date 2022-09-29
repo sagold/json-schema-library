@@ -17,14 +17,14 @@ export default class CoreInterface {
     get rootSchema(): JSONSchema;
     set rootSchema(rootSchema: JSONSchema);
     each(data: any, callback: any, schema?: JSONSchema, pointer?: JSONPointer): void;
-    validate(data: any, schema?: JSONSchema, pointer?: JSONPointer): Array<JSONError>;
+    validate(data: unknown, schema?: JSONSchema, pointer?: JSONPointer): Array<JSONError>;
     isValid(data: any, schema?: JSONSchema, pointer?: JSONPointer): boolean;
     resolveAnyOf(data: any, schema: JSONSchema, pointer?: JSONPointer): JSONSchema;
     resolveAllOf(data: any, schema: JSONSchema, pointer?: JSONPointer): JSONSchema;
     resolveRef(schema: JSONSchema): JSONSchema;
     resolveOneOf(data: any, schema: JSONSchema, pointer?: JSONPointer): JSONSchema;
     getSchema(pointer: JSONPointer, data: any, schema?: JSONSchema): void;
-    getTemplate(data: any, schema?: JSONSchema): void;
+    getTemplate(data?: unknown, schema?: JSONSchema): void;
     setSchema(schema: JSONSchema): void;
     /**
      * Returns the json-schema of the given object property or array item.

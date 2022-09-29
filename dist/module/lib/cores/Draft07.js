@@ -22,8 +22,8 @@ export default class Draft07Core extends CoreInterface {
         this.typeKeywords = JSON.parse(JSON.stringify(TYPE_KEYWORD_MAPPING));
         Object.assign(this.validateKeyword, KEYWORDS);
         Object.assign(this.validateType, TYPES);
-        Object.keys(FORMATS).forEach(id => addValidator.format(this, id, FORMATS[id]));
-        Object.keys(ERRORS).forEach(id => addValidator.error(this, id, ERRORS[id]));
+        Object.keys(FORMATS).forEach((id) => addValidator.format(this, id, FORMATS[id]));
+        Object.keys(ERRORS).forEach((id) => addValidator.error(this, id, ERRORS[id]));
     }
     get rootSchema() {
         return this.__rootSchema;

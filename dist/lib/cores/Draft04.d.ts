@@ -5,9 +5,9 @@ export default class Draft04Core extends CoreInterface {
     each(data: any, callback: any, schema?: JSONSchema, pointer?: JSONPointer): void;
     validate(data: any, schema?: JSONSchema, pointer?: JSONPointer): any;
     isValid(data: any, schema?: JSONSchema, pointer?: JSONPointer): any;
-    resolveOneOf(data: any, schema: JSONSchema, pointer: JSONPointer): JSONSchema | import("../types").JSONError;
+    resolveOneOf(data: any, schema: JSONSchema, pointer?: JSONPointer): JSONSchema | import("../types").JSONError;
     resolveRef(schema: JSONSchema): JSONSchema;
     getSchema(pointer: JSONPointer, data: any, schema?: JSONSchema): JSONSchema;
-    getTemplate(data: any, schema?: JSONSchema): any;
+    getTemplate(data?: unknown, schema?: JSONSchema): any;
     step(key: string, schema: JSONSchema, data: any, pointer?: JSONPointer): JSONSchema | import("../types").JSONError;
 }

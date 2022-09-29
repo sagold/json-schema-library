@@ -6,7 +6,6 @@ import resolveAllOf from "../resolveAllOf";
 import { JSONSchema, JSONPointer, JSONValidator, JSONTypeValidator, JSONError } from "../types";
 import { CreateError } from "../utils/createCustomError";
 
-
 /* eslint no-unused-vars: 0 no-empty-function: 0 */
 export default class CoreInterface {
     /** entry point of schema */
@@ -41,7 +40,11 @@ export default class CoreInterface {
         throw new Error("function 'each' is not implemented");
     }
 
-    validate(data: any, schema: JSONSchema = this.rootSchema, pointer: JSONPointer = "#"): Array<JSONError> {
+    validate(
+        data: unknown,
+        schema: JSONSchema = this.rootSchema,
+        pointer: JSONPointer = "#"
+    ): Array<JSONError> {
         throw new Error("function 'validate' is not implemented");
     }
 
@@ -69,7 +72,7 @@ export default class CoreInterface {
         throw new Error("function 'getSchema' is not implemented");
     }
 
-    getTemplate(data: any, schema: JSONSchema = this.rootSchema) {
+    getTemplate(data?: unknown, schema: JSONSchema = this.rootSchema) {
         throw new Error("function 'getTemplate' is not implemented");
     }
 
@@ -89,7 +92,12 @@ export default class CoreInterface {
      * @param [pointer] json pointer of parent object or array
      * @return schema or error if failed resolving key
      */
-    step(key: string|number, schema: JSONSchema, data: any, pointer: JSONPointer = "#"): JSONSchema {
+    step(
+        key: string | number,
+        schema: JSONSchema,
+        data: any,
+        pointer: JSONPointer = "#"
+    ): JSONSchema {
         throw new Error("function 'step' is not implemented");
     }
 }

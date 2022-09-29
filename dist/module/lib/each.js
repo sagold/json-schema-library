@@ -12,7 +12,7 @@ export default function each(core, data, callback, schema = core.rootSchema, poi
     callback(schema, data, pointer);
     const dataType = getTypeOf(data);
     if (dataType === "object") {
-        Object.keys(data).forEach(key => {
+        Object.keys(data).forEach((key) => {
             const nextSchema = core.step(key, schema, data, pointer); // not save
             const next = data[key]; // save
             core.each(next, callback, nextSchema, `${pointer}/${key}`);

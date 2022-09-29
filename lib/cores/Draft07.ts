@@ -18,18 +18,16 @@ import FORMATS from "../validation/format";
 import ERRORS from "../validation/errors";
 import addValidator from "../addValidator";
 
-addSchema("http://json-schema.org/draft-07/schema", draft07)
-
+addSchema("http://json-schema.org/draft-07/schema", draft07);
 
 export default class Draft07Core extends CoreInterface {
-
     constructor(schema?: JSONSchema) {
         super(schema);
         this.typeKeywords = JSON.parse(JSON.stringify(TYPE_KEYWORD_MAPPING));
         Object.assign(this.validateKeyword, KEYWORDS);
         Object.assign(this.validateType, TYPES);
-        Object.keys(FORMATS).forEach(id => addValidator.format(this, id, FORMATS[id]))
-        Object.keys(ERRORS).forEach(id => addValidator.error(this, id, ERRORS[id]))
+        Object.keys(FORMATS).forEach((id) => addValidator.format(this, id, FORMATS[id]));
+        Object.keys(ERRORS).forEach((id) => addValidator.error(this, id, ERRORS[id]));
     }
 
     get rootSchema() {
@@ -55,7 +53,7 @@ export default class Draft07Core extends CoreInterface {
         return this.validate(data, schema, pointer).length === 0;
     }
 
-    resolveOneOf(data: any, schema: JSONSchema, pointer: JSONPointer) {
+    resolveOneOf(data: any, schema: JSONSchema, pointer?: JSONPointer) {
         return resolveOneOf(this, data, schema, pointer);
     }
 
@@ -67,7 +65,7 @@ export default class Draft07Core extends CoreInterface {
         return getSchema(this, pointer, data, schema);
     }
 
-    getTemplate(data: any, schema: JSONSchema = this.rootSchema) {
+    getTemplate(data?: unknown, schema: JSONSchema = this.rootSchema) {
         return getTemplate(this, data, schema);
     }
 
