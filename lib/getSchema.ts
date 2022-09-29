@@ -1,5 +1,5 @@
 import gp from "gson-pointer";
-import { JSONSchema, JSONPointer } from "./types";
+import { JSONSchema, JSONPointer, isJSONError } from "./types";
 import Core from "./cores/CoreInterface";
 
 const emptyObject = {};
@@ -40,7 +40,7 @@ function _get(
 
     const key = frags.shift(); // step key
     schema = core.step(key, schema, data, pointer); // step schema
-    if (schema && schema.type === "error") {
+    if (isJSONError(schema)) {
         return schema;
     }
     data = data[key]; // step data

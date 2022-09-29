@@ -42,3 +42,4 @@ resolveOneOf, resolveOneOfFuzzy, settings, SchemaService, step, // steps into a 
 validate, // validates data by a schema
 validateAsync // async validation of data by a schema
  };
+export { isJSONError } from "./lib/types";

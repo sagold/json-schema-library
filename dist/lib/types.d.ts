@@ -13,6 +13,11 @@ export declare type JSONError = {
     };
     [p: string]: any;
 };
+/**
+ * ts type guard for json error
+ * @returns true if passed type is a JSONError
+ */
+export declare function isJSONError(error: any): error is JSONError;
 export interface JSONValidator {
     (core: Core, schema: JSONSchema, value: any, pointer: JSONPointer): void | undefined | JSONError | JSONError[];
 }

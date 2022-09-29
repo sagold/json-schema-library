@@ -2,7 +2,7 @@ import getTypeOf from "./getTypeOf";
 import createSchemaOf from "./createSchemaOf";
 import errors from "./validation/errors";
 import merge from "./utils/merge";
-import { JSONSchema, JSONPointer, JSONError } from "./types";
+import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
 import Core from "./cores/CoreInterface";
 
 const stepType = {
@@ -100,7 +100,7 @@ const stepType = {
             const oneOfSchema = core.resolveOneOf(data, schema, pointer);
             // resolveOneOf does currently not apply merge with base schema
             schema = merge(schema, oneOfSchema);
-            if (schema && schema.type === "error") {
+            if (isJSONError(schema)) {
                 return schema;
             }
         }
@@ -108,7 +108,7 @@ const stepType = {
         if (Array.isArray(schema.anyOf)) {
             // update current schema
             schema = core.resolveAnyOf(data, schema, pointer);
-            if (schema && schema.type === "error") {
+            if (isJSONError(schema)) {
                 return schema;
             }
         }
@@ -116,7 +116,7 @@ const stepType = {
         if (Array.isArray(schema.allOf)) {
             // update current schema
             schema = core.resolveAllOf(data, schema, pointer);
-            if (schema && schema.type === "error") {
+            if (isJSONError(schema)) {
                 return schema;
             }
         }
@@ -128,7 +128,7 @@ const stepType = {
             // @todo patternProperties also validate properties
 
             targetSchema = core.resolveRef(schema.properties[key]);
-            if (targetSchema && targetSchema.type === "error") {
+            if (isJSONError(targetSchema)) {
                 return targetSchema;
             }
 
@@ -169,10 +169,9 @@ const stepType = {
             for (let i = 0, l = dependentProperties.length; i < l; i += 1) {
                 const dependentProperty = dependentProperties[i];
                 const schema = step(core, key, dependencies[dependentProperty], data);
-                if (schema.type !== "error") {
+                if (!isJSONError(schema)) {
                     return schema;
                 }
-                console.log("error", schema);
             }
         }
 

@@ -55,3 +55,4 @@ export {
 };
 
 export type { JSONSchema, JSONPointer, JSONError, JSONValidator } from "./lib/types";
+export { isJSONError } from "./lib/types";

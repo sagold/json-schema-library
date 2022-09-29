@@ -2,28 +2,27 @@ import getTypeOf from "../getTypeOf";
 import isSame from "../utils/deepCompare";
 import settings from "../config/settings";
 import ucs2decode from "../utils/punycode.ucs2decode";
+import { isJSONError } from "../types";
 const FPP = settings.floatingPointPrecision;
-function isError(o) {
-    return (o === null || o === void 0 ? void 0 : o.type) === "error";
-}
 // list of validation keywords: http://json-schema.org/latest/json-schema-validation.html#rfc.section.5
 const KeywordValidation = {
     additionalProperties: (core, schema, value, pointer) => {
         if (schema.additionalProperties === true || schema.additionalProperties == null) {
             return undefined;
         }
-        if (getTypeOf(schema.patternProperties) === "object" && schema.additionalProperties === false) {
+        if (getTypeOf(schema.patternProperties) === "object" &&
+            schema.additionalProperties === false) {
             // this is an arrangement with patternProperties. patternProperties validate before additionalProperties:
             // https://spacetelescope.github.io/understanding-json-schema/reference/object.html#index-5
             return undefined;
         }
         const errors = [];
-        let receivedProperties = Object.keys(value).filter(prop => settings.propertyBlacklist.includes(prop) === false);
+        let receivedProperties = Object.keys(value).filter((prop) => settings.propertyBlacklist.includes(prop) === false);
         const expectedProperties = Object.keys(schema.properties || {});
         if (getTypeOf(schema.patternProperties) === "object") {
             // filter received properties by matching patternProperties
-            const patterns = Object.keys(schema.patternProperties).map(pattern => new RegExp(pattern));
-            receivedProperties = receivedProperties.filter(prop => {
+            const patterns = Object.keys(schema.patternProperties).map((pattern) => new RegExp(pattern));
+            receivedProperties = receivedProperties.filter((prop) => {
                 for (let i = 0; i < patterns.length; i += 1) {
                     if (patterns[i].test(prop)) {
                         return false; // remove
@@ -40,7 +39,7 @@ const KeywordValidation = {
                 // additionalProperties { oneOf: [] }
                 if (isObject && Array.isArray(schema.additionalProperties.oneOf)) {
                     const result = core.resolveOneOf(value[property], schema.additionalProperties, `${pointer}/${property}`);
-                    if (result.type === "error") {
+                    if (isJSONError(result)) {
                         errors.push(core.errors.additionalPropertiesError({
                             schema: schema.additionalProperties,
                             property: receivedProperties[i],
@@ -56,7 +55,8 @@ const KeywordValidation = {
                     // additionalProperties {}
                 }
                 else if (isObject) {
-                    if (core.validate(value[property], schema.additionalProperties, pointer).length !== 0) {
+                    if (core.validate(value[property], schema.additionalProperties, pointer)
+                        .length !== 0) {
                         errors.push(core.errors.additionalPropertiesError({
                             schema: schema.additionalProperties,
                             property: receivedProperties[i],
@@ -66,7 +66,11 @@ const KeywordValidation = {
                     }
                 }
                 else {
-                    errors.push(core.errors.noAdditionalPropertiesError({ property: receivedProperties[i], properties: expectedProperties, pointer }));
+                    errors.push(core.errors.noAdditionalPropertiesError({
+                        property: receivedProperties[i],
+                        properties: expectedProperties,
+                        pointer
+                    }));
                 }
             }
         }
@@ -77,7 +81,7 @@ const KeywordValidation = {
             return undefined;
         }
         const errors = [];
-        schema.allOf.forEach(subSchema => {
+        schema.allOf.forEach((subSchema) => {
             errors.push(core.validate(value, subSchema, pointer));
         });
         return errors;
@@ -98,8 +102,7 @@ const KeywordValidation = {
             return undefined;
         }
         const errors = [];
-        Object.keys(value)
-            .forEach(property => {
+        Object.keys(value).forEach((property) => {
             if (schema.dependencies[property] === undefined) {
                 return;
             }
@@ -115,8 +118,8 @@ const KeywordValidation = {
             const type = getTypeOf(schema.dependencies[property]);
             if (type === "array") {
                 dependencyErrors = schema.dependencies[property]
-                    .filter(dependency => value[dependency] === undefined)
-                    .map(missingProperty => core.errors.missingDependencyError({ missingProperty, pointer }));
+                    .filter((dependency) => value[dependency] === undefined)
+                    .map((missingProperty) => core.errors.missingDependencyError({ missingProperty, pointer }));
             }
             else if (type === "object") {
                 dependencyErrors = core.validate(value, schema.dependencies[property]);
@@ -128,7 +131,7 @@ const KeywordValidation = {
         });
         return errors.length > 0 ? errors : undefined;
     },
-    "enum": (core, schema, value, pointer) => {
+    enum: (core, schema, value, pointer) => {
         const type = getTypeOf(value);
         if (type === "object" || type === "array") {
             const valueStr = JSON.stringify(value);
@@ -164,7 +167,7 @@ const KeywordValidation = {
             const itemData = value[i];
             // @todo reevaluate: incomplete schema is created here
             const itemSchema = core.step(i, schema, value, pointer);
-            if (itemSchema && itemSchema.type === "error") {
+            if (isJSONError(itemSchema)) {
                 return [itemSchema];
             }
             const itemErrors = core.validate(itemData, itemSchema, `${pointer}/${i}`);
@@ -189,7 +192,11 @@ const KeywordValidation = {
             return undefined;
         }
         if (schema.maxItems < value.length) {
-            return core.errors.maxItemsError({ maximum: schema.maxItems, length: value.length, pointer });
+            return core.errors.maxItemsError({
+                maximum: schema.maxItems,
+                length: value.length,
+                pointer
+            });
         }
         return undefined;
     },
@@ -199,7 +206,11 @@ const KeywordValidation = {
         }
         const lengthOfString = ucs2decode(value).length;
         if (schema.maxLength < lengthOfString) {
-            return core.errors.maxLengthError({ maxLength: schema.maxLength, length: lengthOfString, pointer });
+            return core.errors.maxLengthError({
+                maxLength: schema.maxLength,
+                length: lengthOfString,
+                pointer
+            });
         }
         return undefined;
     },
@@ -220,7 +231,11 @@ const KeywordValidation = {
         }
         const lengthOfString = ucs2decode(value).length;
         if (schema.minLength > lengthOfString) {
-            return core.errors.minLengthError({ minLength: schema.minLength, length: lengthOfString, pointer });
+            return core.errors.minLengthError({
+                minLength: schema.minLength,
+                length: lengthOfString,
+                pointer
+            });
         }
         return undefined;
     },
@@ -241,7 +256,11 @@ const KeywordValidation = {
             return undefined;
         }
         if (schema.minItems > value.length) {
-            return core.errors.minItemsError({ minItems: schema.minItems, length: value.length, pointer });
+            return core.errors.minItemsError({
+                minItems: schema.minItems,
+                length: value.length,
+                pointer
+            });
         }
         return undefined;
     },
@@ -253,7 +272,8 @@ const KeywordValidation = {
         if (schema.minProperties > propertyCount) {
             return core.errors.minPropertiesError({
                 minProperties: schema.minProperties,
-                length: propertyCount, pointer
+                length: propertyCount,
+                pointer
             });
         }
         return undefined;
@@ -264,7 +284,7 @@ const KeywordValidation = {
         }
         // https://github.com/cfworker/cfworker/blob/master/packages/json-schema/src/validate.ts#L1061
         // https://github.com/ExodusMovement/schemasafe/blob/master/src/compile.js#L441
-        if ((value * FPP) % (schema.multipleOf * FPP) / FPP !== 0) {
+        if (((value * FPP) % (schema.multipleOf * FPP)) / FPP !== 0) {
             return core.errors.multipleOfError({ multipleOf: schema.multipleOf, value, pointer });
         }
         // also check https://stackoverflow.com/questions/1815367/catch-and-compute-overflow-during-multiplication-of-two-large-integers
@@ -282,7 +302,7 @@ const KeywordValidation = {
             return undefined;
         }
         schema = core.resolveOneOf(value, schema, pointer);
-        if (isError(schema)) {
+        if (isJSONError(schema)) {
             return schema;
         }
         return undefined;
@@ -293,7 +313,8 @@ const KeywordValidation = {
             return core.errors.patternError({
                 pattern: schema.pattern,
                 description: schema.patternExample || schema.pattern,
-                received: value, pointer
+                received: value,
+                pointer
             });
         }
         return undefined;
@@ -306,11 +327,11 @@ const KeywordValidation = {
         }
         const errors = [];
         const keys = Object.keys(value);
-        const patterns = Object.keys(pp).map(expr => ({
+        const patterns = Object.keys(pp).map((expr) => ({
             regex: new RegExp(expr),
             patternSchema: pp[expr]
         }));
-        keys.forEach(key => {
+        keys.forEach((key) => {
             let patternFound = false;
             for (let i = 0, l = patterns.length; i < l; i += 1) {
                 if (patterns[i].regex.test(key)) {
@@ -327,7 +348,9 @@ const KeywordValidation = {
             if (patternFound === false && schema.additionalProperties === false) {
                 // this is an arrangement with additionalProperties
                 errors.push(core.errors.patternPropertiesError({
-                    key, pointer, patterns: Object.keys(pp).join(",")
+                    key,
+                    pointer,
+                    patterns: Object.keys(pp).join(",")
                 }));
             }
         });
@@ -367,7 +390,7 @@ const KeywordValidation = {
         if (Array.isArray(schema.required) === false) {
             return undefined;
         }
-        return schema.required.map(property => {
+        return schema.required.map((property) => {
             if (value[property] === undefined) {
                 return core.errors.requiredPropertyError({ key: property, pointer });
             }
@@ -379,9 +402,12 @@ const KeywordValidation = {
         if (Array.isArray(schema.required) === false) {
             return undefined;
         }
-        return schema.required.map(property => {
+        return schema.required.map((property) => {
             if (value[property] == null || value[property] === "") {
-                return core.errors.valueNotEmptyError({ property, pointer: `${pointer}/${property}` });
+                return core.errors.valueNotEmptyError({
+                    property,
+                    pointer: `${pointer}/${property}`
+                });
             }
             return undefined;
         });

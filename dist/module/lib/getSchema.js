@@ -1,4 +1,5 @@
 import gp from "gson-pointer";
+import { isJSONError } from "./types";
 const emptyObject = {};
 /**
  * Returns the json-schema of a data-json-pointer.
@@ -23,7 +24,7 @@ function _get(core, schema, frags, pointer, data = emptyObject) {
     }
     const key = frags.shift(); // step key
     schema = core.step(key, schema, data, pointer); // step schema
-    if (schema && schema.type === "error") {
+    if (isJSONError(schema)) {
         return schema;
     }
     data = data[key]; // step data

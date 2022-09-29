@@ -4,7 +4,7 @@ import getTypeOf from "./getTypeOf";
 import merge from "./utils/merge";
 import copy from "./utils/copy";
 import settings from "./config/settings";
-import { JSONSchema, JSONPointer } from "./types";
+import { JSONSchema, JSONPointer, isJSONError } from "./types";
 import Core from "./cores/CoreInterface";
 
 interface TemplateOptions {
@@ -161,9 +161,9 @@ function getTemplate(
     if (schema.oneOf) {
         // find correct schema for data
         const resolvedSchema = resolveOneOfFuzzy(core, data, schema);
-        if (data == null && resolvedSchema.type === "error") {
+        if (data == null && isJSONError(resolvedSchema)) {
             schema = schema.oneOf[0];
-        } else if (resolvedSchema.type === "error") {
+        } else if (isJSONError(resolvedSchema.type)) {
             // @todo - check: do not return schema, but either input-data or undefined (clearing wrong data)
             return data;
         } else {
@@ -245,7 +245,7 @@ const TYPE = {
                     opts
                 );
 
-                if (result && result.type !== "error") {
+                if (result && !isJSONError(result)) {
                     Object.assign(d, result);
                 }
             });
