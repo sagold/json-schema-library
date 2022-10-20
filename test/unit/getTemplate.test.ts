@@ -726,6 +726,36 @@ describe("getTemplate", () => {
         });
     });
 
+    describe("list of types", () => {
+        it("should return first type of list for template", () => {
+            core.setSchema({
+                type: ["string", "object"]
+            });
+            const res = getTemplate(core);
+
+            expect(res).to.deep.equal("");
+        });
+
+        it("should return input data", () => {
+            core.setSchema({
+                type: ["string", "object"]
+            });
+            const res = getTemplate(core, "title");
+
+            expect(res).to.deep.equal("title");
+        });
+
+        it("should return type of default value if data is not given", () => {
+            core.setSchema({
+                type: ["string", "array", "object"],
+                default: []
+            });
+            const res = getTemplate(core);
+
+            expect(res).to.deep.equal([]);
+        });
+    });
+
     describe("templateOptions", () => {
         it("should not add optional properties", () => {
             const schema = {

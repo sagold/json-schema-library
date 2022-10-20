@@ -142,16 +142,35 @@ function getTemplate(core, data, _schema, pointer, opts) {
     if (!isJSONSchema(schema) || schema.type == null) {
         return undefined;
     }
+    const type = Array.isArray(schema.type)
+        ? selectType(schema.type, data, schema.default)
+        : schema.type;
     // reset invalid type
-    if (data != null && getTypeOf(data) !== schema.type) {
-        data = convertValue(schema.type, data);
+    if (data != null && getTypeOf(data) !== type) {
+        data = convertValue(type, data);
     }
-    if (TYPE[schema.type] == null) {
+    if (TYPE[type] == null) {
         // eslint-disable-line no-use-before-define
-        throw new Error(`Unsupported type '${schema.type} in ${JSON.stringify(schema)}'`);
+        throw new Error(`Unsupported type '${type} in ${JSON.stringify(schema)}'`);
     }
-    const templateData = TYPE[schema.type](core, schema, data, pointer, opts); // eslint-disable-line no-use-before-define
+    const templateData = TYPE[type](core, schema, data, pointer, opts); // eslint-disable-line no-use-before-define
     return templateData;
+}
+function selectType(types, data, defaultValue) {
+    if (data == undefined) {
+        if (defaultValue != null) {
+            const defaultType = getTypeOf(defaultValue);
+            if (types.includes(defaultType)) {
+                return defaultType;
+            }
+        }
+        return types[0];
+    }
+    const dataType = getTypeOf(data);
+    if (types.includes(dataType)) {
+        return dataType;
+    }
+    return types[0];
 }
 const TYPE = {
     null: (core, schema, data) => getDefault(schema, data, null),
