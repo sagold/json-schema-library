@@ -16,6 +16,7 @@
 /build
 /config
 /coverage
+/profiles
 
 /tools/profiles
 atlassian-ide-plugin.xml

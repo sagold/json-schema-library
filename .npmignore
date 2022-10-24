@@ -15,9 +15,10 @@
 /.project
 /build/
 /coverage/
+/profiles
 /docs/
 /test/
-/tools/
+/tools
 atlassian-ide-plugin.xml
 node_modules/
 npm-debug.log
