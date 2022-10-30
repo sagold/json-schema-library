@@ -275,6 +275,13 @@ const KeywordValidation: Record<string, JSONValidator> = {
         }
         const lengthOfString = ucs2decode(value).length;
         if (schema.minLength > lengthOfString) {
+            if (schema.minLength === 1) {
+                return core.errors.minLengthOneError({
+                    minLength: schema.minLength,
+                    length: lengthOfString,
+                    pointer
+                });
+            }
             return core.errors.minLengthError({
                 minLength: schema.minLength,
                 length: lengthOfString,
@@ -300,6 +307,13 @@ const KeywordValidation: Record<string, JSONValidator> = {
             return undefined;
         }
         if (schema.minItems > value.length) {
+            if (schema.minItems === 1) {
+                return core.errors.minItemsOneError({
+                    minItems: schema.minItems,
+                    length: value.length,
+                    pointer
+                });
+            }
             return core.errors.minItemsError({
                 minItems: schema.minItems,
                 length: value.length,
