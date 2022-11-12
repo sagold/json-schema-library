@@ -226,6 +226,7 @@ const TYPE = {
     },
     // build array type of items, ignores additionalItems
     array: (core, schema, data, pointer, opts) => {
+        var _a, _b, _c;
         const template = schema.default === undefined ? [] : schema.default;
         schema.minItems = schema.minItems || 0;
         const d = data || [];
@@ -235,7 +236,7 @@ const TYPE = {
         }
         // build defined set of items
         if (Array.isArray(schema.items)) {
-            for (let i = 0, l = Math.min(schema.minItems, schema.items.length); i < l; i += 1) {
+            for (let i = 0, l = Math.max((_a = schema.minItems) !== null && _a !== void 0 ? _a : 0, (_c = (_b = schema.items) === null || _b === void 0 ? void 0 : _b.length) !== null && _c !== void 0 ? _c : 0); i < l; i += 1) {
                 d[i] = getTemplate(core, d[i] == null ? template[i] : d[i], schema.items[i], `${pointer}/items/${i}`, opts);
             }
             return d;

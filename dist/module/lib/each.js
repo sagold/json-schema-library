@@ -9,6 +9,7 @@ import getTypeOf from "./getTypeOf";
  * @param [pointer] - pointer to current data. Default to rootPointer
  */
 export function each(core, data, callback, schema = core.rootSchema, pointer = "#") {
+    schema = core.resolveRef(schema);
     callback(schema, data, pointer);
     const dataType = getTypeOf(data);
     if (dataType === "object") {
