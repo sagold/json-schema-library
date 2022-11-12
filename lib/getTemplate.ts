@@ -329,7 +329,11 @@ const TYPE: Record<
 
         // build defined set of items
         if (Array.isArray(schema.items)) {
-            for (let i = 0, l = Math.min(schema.minItems, schema.items.length); i < l; i += 1) {
+            for (
+                let i = 0, l = Math.min(schema.minItems ?? 0, schema.items?.length ?? 0);
+                i < l;
+                i += 1
+            ) {
                 d[i] = getTemplate(
                     core,
                     d[i] == null ? template[i] : d[i],
