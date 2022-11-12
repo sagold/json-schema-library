@@ -70,4 +70,18 @@ describe("each", () => {
             [{ type: "number" }, 9, "#/b"]
         ]);
     });
+
+    it("should resolve root reference", () => {
+        const calls: any[] = [];
+        const draft = new Core({
+            $ref: "#/definitions/value",
+            definitions: {
+                value: { type: "object", properties: { title: { type: "string" } } }
+            }
+        });
+        draft.each({ title: "third" }, (schema) => calls.push(schema));
+        expect(calls).to.have.length(2);
+        expect(calls[0].type).to.equal("object");
+        expect(calls[1].type).to.equal("string");
+    });
 });

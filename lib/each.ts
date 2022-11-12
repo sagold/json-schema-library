@@ -20,6 +20,7 @@ export function each(
     schema: JSONSchema = core.rootSchema,
     pointer: JSONPointer = "#"
 ) {
+    schema = core.resolveRef(schema);
     callback(schema, data, pointer);
     const dataType = getTypeOf(data);
 
