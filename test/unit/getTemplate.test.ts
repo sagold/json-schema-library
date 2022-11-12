@@ -29,6 +29,18 @@ describe("getTemplate", () => {
         expect(res).to.deep.equal(null);
     });
 
+    it("should support null type properties", () => {
+        core.setSchema({
+            type: "object",
+            properties: {
+                nullType: { type: "null" }
+            }
+        });
+        const res = getTemplate(core);
+
+        expect(res).to.deep.equal({ nullType: null });
+    });
+
     it("should not modify input schema", () => {
         const schema = {
             type: "object",
@@ -266,18 +278,6 @@ describe("getTemplate", () => {
                 // console.log("RESULT\n", JSON.stringify(res, null, 2));
                 expect(Object.prototype.toString.call(res)).to.eq("[object Object]");
             });
-
-            it("should support null type properties", () => {
-                core.setSchema({
-                    type: "object",
-                    properties: {
-                        nullType: { type: "null" }
-                    }
-                });
-                const res = getTemplate(core);
-
-                expect(res).to.deep.equal({ nullType: null });
-            });
         });
 
         describe("oneOf", () => {
@@ -507,6 +507,38 @@ describe("getTemplate", () => {
 
                 expect(res.length).to.deep.equal(2);
                 expect(res).to.deep.equal(["elvis", "doors"]);
+            });
+
+            it("should extend all input objects by missing properties", () => {
+                core.setSchema({
+                    type: "array",
+                    default: ["abba", "doors"],
+                    items: {
+                        type: "object",
+                        properties: {
+                            first: { type: "string", default: "first" },
+                            second: { type: "string", default: "second" }
+                        }
+                    }
+                });
+                const res = core.getTemplate([
+                    {
+                        first: "user input"
+                    },
+                    {}
+                ]);
+
+                expect(res.length).to.deep.equal(2);
+                expect(res).to.deep.equal([
+                    {
+                        first: "user input",
+                        second: "second"
+                    },
+                    {
+                        first: "first",
+                        second: "second"
+                    }
+                ]);
             });
         });
 
