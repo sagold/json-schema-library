@@ -49,11 +49,9 @@ describe.only("issue#19 - getSchema from dependencies", () => {
                 },
                 jobs: {
                     type: "array",
-                    items: [
-                        {
-                            $ref: "#/definitions/job"
-                        }
-                    ]
+                    items: {
+                        $ref: "#/definitions/job"
+                    }
                 }
             }
         });
