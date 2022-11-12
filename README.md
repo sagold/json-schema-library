@@ -18,8 +18,10 @@
 
 `yarn add json-schema-library`
 
--   This package is tested on node v16+ and in latest browsers
--   This library currently supports draft4, draft6 and draft7 features [@see benchmark](https://github.com/sagold/json-schema-benchmark)
+[![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://npmjs.com/package/json-schema-library)
+[![Unit Tests](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library)
+
+This library currently supports draft4, draft6 and draft7 features [@see benchmark](https://github.com/sagold/json-schema-benchmark)
 
 
 **usage**
@@ -34,6 +36,7 @@ import myData from "./myData.json";
 const jsonSchema: Draft = new Draft07(myJsonSchema);
 const errors: JSONError[] = jsonSchema.validate(myData);
 ```
+
 
 What follows is a description of the main draft methods.
 

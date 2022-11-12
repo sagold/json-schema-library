@@ -12,6 +12,7 @@
 .idea/
 .nyc_output/
 .sass-cache/
+test-*.json
 /.project
 /build
 /config

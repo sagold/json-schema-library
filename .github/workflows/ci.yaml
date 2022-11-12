@@ -1,0 +1,45 @@
+name: CI
+
+on:
+    push:
+        branches: [feature/ci]
+    pull_request:
+        branches: [feature/ci]
+
+jobs:
+    ci:
+        name: install
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: "16"
+                  cache: "yarn"
+            - name: Install dependencies
+              run: yarn --frozen-lockfile
+            - name: unit tests
+              run: yarn test:unit:ci
+            - uses: dorny/test-reporter@v1.6.0
+              with:
+                  name: unit test results
+                  path: test-result-unit.json
+                  reporter: mocha-json
+            - name: Test spec v4
+              run: yarn test:spec:4:ci
+            - name: Test spec v6
+              run: yarn test:spec:6:ci
+            - name: Archive code coverage results
+              uses: actions/upload-artifact@v3
+              with:
+                  name: spec v6 test results
+                  path: test-result-spec6.json
+            - name: Test spec v7
+              run: yarn test:spec:7:ci
+            - uses: dorny/test-reporter@v1.6.0
+              with:
+                  fail-on-error: false
+                  name: spec test results # Name of the check run which will be created
+                  path: test-result-spec*.json # Path to test results
+                  reporter: mocha-json # Format of test results
+                  list-suites: "failed"

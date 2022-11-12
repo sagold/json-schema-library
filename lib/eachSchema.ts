@@ -35,7 +35,7 @@ function eachDefinition(
             walk.nextTypeDefs(defs[defId], gp.join(pointer, key, defId, false));
             return;
         }
-        console.log(`Invalid schema in ${pointer}/${key}/${defId}`);
+        // console.log(`Invalid schema in ${pointer}/${key}/${defId}`);
     });
 }
 

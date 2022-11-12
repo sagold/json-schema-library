@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { Draft07 } from "../../../lib/draft07";
 
-describe.only("issue#19 - getSchema from dependencies", () => {
+describe("issue#19 - getSchema from dependencies", () => {
     let draft: Draft07;
     beforeEach(() => {
         draft = new Draft07({
