@@ -192,6 +192,13 @@ const jsonSchema = new Draft07(myJsonSchema);
 const myData = jsonSchema.getTemplate({ name: "input-data" });
 ```
 
+**Note** If you are using references in your schema, `getTemplate` will only resolve the first _$ref_ in each path, ensuring no inifinte data structures are created. In case the limit of **1** _$ref_ resolution is to low, you can modify the value globally one by adjusting the json-schema-library settings:
+
+```ts
+import { settings } from "json-schema-library";
+settings..GET_TEMPLATE_RECURSION_LIMIT = 5;
+```
+
 <details><summary>Example</summary>
 
 ```ts
