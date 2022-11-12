@@ -188,6 +188,23 @@ describe("getTemplate", () => {
                 expect(res).to.deep.equal({ first: "john" });
             });
 
+            it("should resolve $ref in items-array", () => {
+                core.setSchema({
+                    type: "array",
+                    items: [{ $ref: "#/definition/first" }],
+                    definition: {
+                        first: {
+                            type: "object",
+                            properties: {
+                                first: { type: "string", default: "john" }
+                            }
+                        }
+                    }
+                });
+                const res = core.getTemplate([{}, {}]);
+                expect(res).to.deep.equal([{ first: "john" }, {}]);
+            });
+
             it("should follow $ref once", () => {
                 core.setSchema({
                     type: "object",

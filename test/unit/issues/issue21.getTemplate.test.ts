@@ -4,7 +4,7 @@ import { Draft07 } from "../../../lib/draft07";
 
 const INITIAL_RECURSION = settings.GET_TEMPLATE_RECURSION_LIMIT;
 
-describe.only("issue#19 - getSchema from dependencies", () => {
+describe("issue#19 - getSchema from dependencies", () => {
     let core: Draft07;
     beforeEach(() => {
         settings.GET_TEMPLATE_RECURSION_LIMIT = 2;
