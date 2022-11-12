@@ -7,7 +7,7 @@ const INITIAL_RECURSION = settings.GET_TEMPLATE_RECURSION_LIMIT;
 describe.only("issue#19 - getSchema from dependencies", () => {
     let core: Draft07;
     beforeEach(() => {
-        settings.GET_TEMPLATE_RECURSION_LIMIT = 5;
+        settings.GET_TEMPLATE_RECURSION_LIMIT = 2;
         core = new Draft07({
             $schema: "http://json-schema.org/draft/2019-09/schema",
             type: "object",
@@ -67,8 +67,6 @@ describe.only("issue#19 - getSchema from dependencies", () => {
         const data = core.getTemplate({
             jobs: [{ name: "job-1" }, { name: "job-2" }]
         });
-
-        console.log(JSON.stringify(data, null, 2));
 
         expect(data).to.deep.equal({
             jobs: [
