@@ -18,7 +18,7 @@
 
 `yarn add json-schema-library`
 
-[![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://npmjs.com/package/json-schema-library)
+[![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml)
 [![CI](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml)
 
 This library currently supports draft4, draft6 and draft7 features [@see benchmark](https://github.com/sagold/json-schema-benchmark)
