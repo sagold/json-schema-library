@@ -2,6 +2,7 @@
 import { eachSchema } from "../eachSchema";
 import joinScope from "./joinScope";
 import getRef from "./getRef";
+import { get } from "gson-pointer";
 const COMPILED = "__compiled";
 const COMPILED_REF = "__ref";
 const GET_REF = "getRef";
@@ -9,7 +10,8 @@ const GET_ROOT = "getRoot";
 const suffixes = /(#|\/)+$/g;
 /**
  * compiles the input root schema for `$ref` resolution and returns it again
- * @attention this modifies input schema but maintains object-structure
+ * @attention this modifies input schema but maintains data-structure and thus returns
+ * the same object with JSON.stringify
  *
  * for a compiled json-schema you can call getRef on any contained schema (location of type).
  * this resolves a $ref target to a valid schema (for a valid $ref)
@@ -18,7 +20,7 @@ const suffixes = /(#|\/)+$/g;
  * @param schemaToCompile - json-schema to compile
  * @param [rootSchema] - compiled root json-schema to use for definitions resolution
  * @param [force] = false - force compile json-schema
- * @return compiled copy of input json-schema
+ * @return compiled input json-schema
  */
 export default function compileSchema(draft, schemaToCompile, rootSchema = schemaToCompile, force = false) {
     if (!schemaToCompile || schemaToCompile[COMPILED] !== undefined) {
@@ -27,7 +29,9 @@ export default function compileSchema(draft, schemaToCompile, rootSchema = schem
     const context = { ids: {}, remotes: draft.remotes };
     const rootSchemaAsString = JSON.stringify(schemaToCompile);
     const compiledSchema = JSON.parse(rootSchemaAsString);
+    // flag this schema as compiled
     Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });
+    // add getRef-helper to this object
     Object.defineProperty(compiledSchema, GET_REF, {
         enumerable: false,
         value: getRef.bind(null, context, compiledSchema)
@@ -46,7 +50,15 @@ export default function compileSchema(draft, schemaToCompile, rootSchema = schem
     const scopes = {};
     const getRoot = () => compiledSchema;
     eachSchema(compiledSchema, (schema, pointer) => {
+        var _a;
         if (schema.id) {
+            // if this is a schema being merged on root object, we cannot override
+            // parents locations, but must reuse it
+            if (schema.id.startsWith("http") && /(allOf|anyOf|oneOf)\/\d+$/.test(pointer)) {
+                const parentPointer = pointer.replace(/\/(allOf|anyOf|oneOf)\/\d+$/, "");
+                const parentSchema = get(compiledSchema, parentPointer);
+                schema.id = (_a = parentSchema.id) !== null && _a !== void 0 ? _a : schema.id;
+            }
             context.ids[schema.id.replace(suffixes, "")] = pointer;
         }
         // build up scopes and add them to $ref-resolution map

@@ -2,6 +2,7 @@ import { eachSchema } from "../../eachSchema";
 // import remotes from "../../../remotes";
 import joinScope from "../../compile/joinScope";
 import getRef from "../../compile/getRef";
+import { get } from "gson-pointer";
 const COMPILED = "__compiled";
 const COMPILED_REF = "__ref";
 const GET_REF = "getRef";
@@ -50,7 +51,15 @@ export default function compileSchema(draft, schemaToCompile, rootSchema = schem
     const scopes = {};
     const getRoot = () => compiledSchema;
     eachSchema(compiledSchema, (schema, pointer) => {
+        var _a;
         if (schema.$id) {
+            // if this is a schema being merged on root object, we cannot override
+            // parents locations, but must reuse it
+            if (schema.$id.startsWith("http") && /(allOf|anyOf|oneOf)\/\d+$/.test(pointer)) {
+                const parentPointer = pointer.replace(/\/(allOf|anyOf|oneOf)\/\d+$/, "");
+                const parentSchema = get(compiledSchema, parentPointer);
+                schema.$id = (_a = parentSchema.$id) !== null && _a !== void 0 ? _a : schema.$id;
+            }
             context.ids[schema.$id.replace(suffixes, "")] = pointer;
         }
         // build up scopes and add them to $ref-resolution map
