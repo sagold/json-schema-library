@@ -31,6 +31,19 @@
         "type": "git",
         "url": "https://github.com/sagold/json-schema-library.git"
     },
+    "keywords": [
+        "JSON",
+        "schema",
+        "library",
+        "tools",
+        "utilities",
+        "validator",
+        "validation",
+        "jsonschema",
+        "json-schema",
+        "json-schema-validator",
+        "json-schema-validation"
+    ],
     "author": "Sascha Goldhofer <github@saschagoldhofer.de> (https://github.com/sagold/)",
     "license": "MIT",
     "bugs": {
