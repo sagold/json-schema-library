@@ -12,6 +12,22 @@ describe("getSchema", () => {
             const schema = getSchema(core, "#");
             expect(schema).to.deep.include({ name: "target", type: "*" });
         });
+
+        it("should resolve property through root $ref", () => {
+            core.setSchema({
+                $ref: "#/$defs/root",
+                $defs: {
+                    root: {
+                        type: "object",
+                        properties: {
+                            value: { type: "number", name: "target" }
+                        }
+                    }
+                }
+            });
+            const schema = getSchema(core, "#/value", { value: 123 });
+            expect(schema).to.deep.include({ name: "target", type: "number" });
+        });
     });
 
     describe("object", () => {

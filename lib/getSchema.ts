@@ -24,6 +24,7 @@ export default function getSchema(
     schema: JSONSchema = core.rootSchema
 ): JSONSchema {
     const frags = gp.split(pointer);
+    schema = core.resolveRef(schema);
     return _get(core, schema, frags, pointer, data);
 }
 
