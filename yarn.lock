@@ -1833,7 +1833,7 @@ json-parse-even-better-errors@^2.3.1:
 
 "json-schema-test-suite@https://github.com/json-schema-org/JSON-Schema-Test-Suite":
   version "0.1.0"
-  resolved "https://github.com/json-schema-org/JSON-Schema-Test-Suite#dfcea626f1bb442008dc7f5183a002c398f6601c"
+  resolved "https://github.com/json-schema-org/JSON-Schema-Test-Suite#97a3e215647a5316217080bae07898bb44d0ed3f"
 
 json-schema-traverse@^0.4.1:
   version "0.4.1"
