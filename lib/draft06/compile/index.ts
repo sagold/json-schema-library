@@ -5,6 +5,7 @@ import { eachSchema } from "../../eachSchema";
 import joinScope from "../../compile/joinScope";
 import getRef from "../../compile/getRef";
 import { JSONSchema } from "../../types";
+import { get } from "gson-pointer";
 
 const COMPILED = "__compiled";
 const COMPILED_REF = "__ref";
@@ -75,6 +76,13 @@ export default function compileSchema(
     const getRoot = () => compiledSchema;
     eachSchema(compiledSchema, (schema, pointer) => {
         if (schema.$id) {
+            // if this is a schema being merged on root object, we cannot override
+            // parents locations, but must reuse it
+            if (schema.$id.startsWith("http") && /(allOf|anyOf|oneOf)\/\d+$/.test(pointer)) {
+                const parentPointer = pointer.replace(/\/(allOf|anyOf|oneOf)\/\d+$/, "");
+                const parentSchema = get(compiledSchema, parentPointer);
+                schema.$id = parentSchema.$id ?? schema.$id;
+            }
             context.ids[schema.$id.replace(suffixes, "")] = pointer;
         }
 

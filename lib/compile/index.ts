@@ -5,6 +5,7 @@ import joinScope from "./joinScope";
 import getRef from "./getRef";
 import { JSONSchema } from "../types";
 import { Context } from "./types";
+import { get } from "gson-pointer";
 
 const COMPILED = "__compiled";
 const COMPILED_REF = "__ref";
@@ -14,7 +15,8 @@ const suffixes = /(#|\/)+$/g;
 
 /**
  * compiles the input root schema for `$ref` resolution and returns it again
- * @attention this modifies input schema but maintains object-structure
+ * @attention this modifies input schema but maintains data-structure and thus returns
+ * the same object with JSON.stringify
  *
  * for a compiled json-schema you can call getRef on any contained schema (location of type).
  * this resolves a $ref target to a valid schema (for a valid $ref)
@@ -23,7 +25,7 @@ const suffixes = /(#|\/)+$/g;
  * @param schemaToCompile - json-schema to compile
  * @param [rootSchema] - compiled root json-schema to use for definitions resolution
  * @param [force] = false - force compile json-schema
- * @return compiled copy of input json-schema
+ * @return compiled input json-schema
  */
 export default function compileSchema(
     draft: Draft,
@@ -39,7 +41,9 @@ export default function compileSchema(
     const rootSchemaAsString = JSON.stringify(schemaToCompile);
     const compiledSchema: JSONSchema = JSON.parse(rootSchemaAsString);
 
+    // flag this schema as compiled
     Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });
+    // add getRef-helper to this object
     Object.defineProperty(compiledSchema, GET_REF, {
         enumerable: false,
         value: getRef.bind(null, context, compiledSchema)
@@ -66,8 +70,16 @@ export default function compileSchema(
 
     const scopes: Record<string, string> = {};
     const getRoot = () => compiledSchema;
+
     eachSchema(compiledSchema, (schema, pointer) => {
         if (schema.id) {
+            // if this is a schema being merged on root object, we cannot override
+            // parents locations, but must reuse it
+            if (schema.id.startsWith("http") && /(allOf|anyOf|oneOf)\/\d+$/.test(pointer)) {
+                const parentPointer = pointer.replace(/\/(allOf|anyOf|oneOf)\/\d+$/, "");
+                const parentSchema = get(compiledSchema, parentPointer);
+                schema.id = parentSchema.id ?? schema.id;
+            }
             context.ids[schema.id.replace(suffixes, "")] = pointer;
         }
 

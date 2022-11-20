@@ -517,5 +517,43 @@ describe("compile", () => {
                 expect(validator.isValid({ list: ["a"] })).to.eq(false);
             });
         });
+
+        describe("$ref prevents a sibling id from changing the base uri", () => {
+            let validator: Draft04;
+            beforeEach(() => {
+                const schema = compile(draft, {
+                    id: "http://localhost:1234/sibling_id/base/",
+                    definitions: {
+                        foo: {
+                            id: "http://localhost:1234/sibling_id/foo.json",
+                            type: "string"
+                        },
+                        base_foo: {
+                            $comment:
+                                "this canonical uri is http://localhost:1234/sibling_id/base/foo.json",
+                            id: "foo.json",
+                            type: "number"
+                        }
+                    },
+                    allOf: [
+                        {
+                            $comment:
+                                "$ref resolves to http://localhost:1234/sibling_id/base/foo.json, not http://localhost:1234/sibling_id/foo.json",
+                            id: "http://localhost:1234/sibling_id/",
+                            $ref: "foo.json"
+                        }
+                    ]
+                });
+                validator = new Draft04(schema);
+            });
+
+            it("$ref resolves to /definitions/base_foo, data does not validate", () => {
+                expect(validator.isValid("a")).to.eq(false);
+            });
+
+            it("$ref resolves to /definitions/base_foo, data validates", () => {
+                expect(validator.isValid(1)).to.eq(true);
+            });
+        });
     });
 });
