@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { Draft07 } from "../../../lib/draft07";
 
-describe("issue#19 - getSchema from dependencies", () => {
+describe("issue#22 - eachSchema on root $ref", () => {
     let draft: Draft07;
     beforeEach(() => {
         draft = new Draft07({

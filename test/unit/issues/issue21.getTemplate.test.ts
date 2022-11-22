@@ -4,7 +4,7 @@ import { Draft07 } from "../../../lib/draft07";
 
 const INITIAL_RECURSION = settings.GET_TEMPLATE_RECURSION_LIMIT;
 
-describe("issue#19 - getSchema from dependencies", () => {
+describe("issue#21 - getTemplate containing refs", () => {
     let core: Draft07;
     beforeEach(() => {
         settings.GET_TEMPLATE_RECURSION_LIMIT = 2;
@@ -61,7 +61,7 @@ describe("issue#19 - getSchema from dependencies", () => {
         settings.GET_TEMPLATE_RECURSION_LIMIT = INITIAL_RECURSION;
     });
 
-    it("should return correct schema for existing data property 'customField'", () => {
+    it("should append property 'runner' on partial objects", () => {
         const data = core.getTemplate({
             jobs: [{ name: "job-1" }, { name: "job-2" }]
         });
