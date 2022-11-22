@@ -8,7 +8,7 @@ function getJsonSchemaType(value, expectedType) {
     if (jsType === "number" &&
         (expectedType === "integer" ||
             (Array.isArray(expectedType) && expectedType.includes("integer")))) {
-        return Number.isInteger(value) ? "integer" : "number";
+        return Number.isInteger(value) || isNaN(value) ? "integer" : "number";
     }
     return jsType;
 }
