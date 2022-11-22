@@ -19,6 +19,11 @@ describe("validate", () => {
             expect(errors[0].name).to.eq("TypeError");
         });
 
+        it("should validate NaN", () => {
+            const errors = validate(core, parseInt("a"), { type: "integer" });
+            expect(errors).to.have.length(0);
+        });
+
         describe("oneOf", () => {
             it("should validate on a matching oneOf definition", () => {
                 const errors = validate(core, 3, {
@@ -891,6 +896,11 @@ describe("validate", () => {
 
         it("should still be valid for missing type", () => {
             const errors = validate(core, 1, { minimum: 1, maximum: 1 });
+            expect(errors).to.have.length(0);
+        });
+
+        it("should validate NaN", () => {
+            const errors = validate(core, parseInt("a"), { type: "number" });
             expect(errors).to.have.length(0);
         });
 
