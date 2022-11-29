@@ -9,7 +9,7 @@ import { Draft as Core } from "./draft";
 
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
-    addOptionalProps: boolean;
+    addOptionalProps?: boolean;
     /** remove any data that does not match the given input schema */
     removeInvalidData?: boolean;
 };
@@ -160,11 +160,13 @@ function getTemplate(
     if (schema.oneOf) {
         // find correct schema for data
         const resolvedSchema = resolveOneOfFuzzy(core, data, schema);
-        if (data == null && isJSONError(resolvedSchema)) {
+        if (isJSONError(resolvedSchema)) {
+            if (data != null && opts.removeInvalidData !== true) {
+                return data;
+            }
+            // override
             schema = schema.oneOf[0];
-        } else if (isJSONError(resolvedSchema.type)) {
-            // @todo - check: do not return schema, but either input-data or undefined (clearing wrong data)
-            return data;
+            data = undefined;
         } else {
             schema = resolvedSchema;
         }
@@ -196,7 +198,7 @@ function getTemplate(
         return data;
     }
 
-    const templateData = TYPE[type](core, schema, data, pointer, opts); // eslint-disable-line no-use-before-define
+    const templateData = TYPE[type](core, schema, data, pointer, opts);
     return templateData;
 }
 

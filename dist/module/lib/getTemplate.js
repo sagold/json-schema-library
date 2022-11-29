@@ -122,12 +122,13 @@ function getTemplate(core, data, _schema, pointer, opts) {
     if (schema.oneOf) {
         // find correct schema for data
         const resolvedSchema = resolveOneOfFuzzy(core, data, schema);
-        if (data == null && isJSONError(resolvedSchema)) {
+        if (isJSONError(resolvedSchema)) {
+            if (data != null && opts.removeInvalidData !== true) {
+                return data;
+            }
+            // override
             schema = schema.oneOf[0];
-        }
-        else if (isJSONError(resolvedSchema.type)) {
-            // @todo - check: do not return schema, but either input-data or undefined (clearing wrong data)
-            return data;
+            data = undefined;
         }
         else {
             schema = resolvedSchema;
@@ -154,7 +155,7 @@ function getTemplate(core, data, _schema, pointer, opts) {
         }
         return data;
     }
-    const templateData = TYPE[type](core, schema, data, pointer, opts); // eslint-disable-line no-use-before-define
+    const templateData = TYPE[type](core, schema, data, pointer, opts);
     return templateData;
 }
 function selectType(types, data, defaultValue) {

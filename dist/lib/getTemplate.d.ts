@@ -2,7 +2,7 @@ import { JSONSchema } from "./types";
 import { Draft as Core } from "./draft";
 export declare type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
-    addOptionalProps: boolean;
+    addOptionalProps?: boolean;
     /** remove any data that does not match the given input schema */
     removeInvalidData?: boolean;
 };

@@ -1,12 +1,12 @@
 /* eslint quote-props: 0 */
 import { expect } from "chai";
 import getTemplate from "../../lib/getTemplate";
-import { Draft04 as Core } from "../../lib/draft04";
+import { Draft04 } from "../../lib/draft04";
 
 // @NOTE OneOf can be used to select required? https://github.com/epoberezkin/ajv/issues/134#issuecomment-190680773
 describe("getTemplate", () => {
-    let core: Core;
-    before(() => (core = new Core()));
+    let core: Draft04;
+    before(() => (core = new Draft04()));
 
     it("should set an empty string if no default value is given", () => {
         core.setSchema({ type: "string" });
@@ -319,7 +319,7 @@ describe("getTemplate", () => {
                 expect(res).to.deep.equal({ title: "jane" });
             });
 
-            it("should return template of for matching oneOf schema", () => {
+            it("should return template of matching oneOf schema", () => {
                 core.setSchema({
                     type: "object",
                     oneOf: [
@@ -341,6 +341,30 @@ describe("getTemplate", () => {
                 const res = getTemplate(core, { value: 111 });
 
                 expect(res).to.deep.equal({ value: 111, test: "test" });
+            });
+
+            it("should return input value if no oneOf-schema matches ", () => {
+                core.setSchema({
+                    type: "object",
+                    oneOf: [
+                        {
+                            type: "object",
+                            properties: {
+                                value: { type: "string", default: "jane" }
+                            }
+                        },
+                        {
+                            type: "object",
+                            properties: {
+                                value: { type: "number" },
+                                test: { type: "string", default: "test" }
+                            }
+                        }
+                    ]
+                });
+                const res = getTemplate(core, { value: ["keep-me"] });
+
+                expect(res).to.deep.equal({ value: ["keep-me"] });
             });
         });
 
@@ -806,6 +830,32 @@ describe("getTemplate", () => {
     });
 
     describe("templateOptions", () => {
+        it("should remove invalid oneOf schema if 'removeInvalidData=true'", () => {
+            core.setSchema({
+                type: "object",
+                oneOf: [
+                    {
+                        type: "object",
+                        properties: {
+                            value: { type: "string", default: "jane" }
+                        }
+                    },
+                    {
+                        type: "object",
+                        properties: {
+                            value: { type: "number" },
+                            test: { type: "string", default: "test" }
+                        }
+                    }
+                ]
+            });
+            const res = getTemplate(core, { value: ["keep-me"] }, core.getSchema(), {
+                removeInvalidData: true
+            });
+
+            expect(res).to.deep.equal({});
+        });
+
         it("should not add optional properties", () => {
             const schema = {
                 type: "object",
