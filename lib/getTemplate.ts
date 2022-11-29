@@ -10,19 +10,17 @@ import { Draft as Core } from "./draft";
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
     addOptionalProps: boolean;
+    /** remove any data that does not match the given input schema */
+    removeInvalidData?: boolean;
 };
 
 const defaultOptions: TemplateOptions = {
-    addOptionalProps: true
+    addOptionalProps: true,
+    removeInvalidData: false
 };
 
 let cache: Record<string, JSONSchema>;
 function shouldResolveRef(schema: JSONSchema, pointer: JSONPointer) {
-    // ensure we refactored consistently
-    if (pointer == null) {
-        throw new Error("Missing pointer");
-    }
-
     const { $ref } = schema;
     if ($ref == null) {
         return true;
@@ -174,7 +172,7 @@ function getTemplate(
 
     // @todo Array.isArray(schema.type)
     // -> hasDefault? return
-    // if not -> pick first type
+    // if not -> pick first types
 
     if (!isJSONSchema(schema) || schema.type == null) {
         return undefined;
@@ -190,8 +188,12 @@ function getTemplate(
     }
 
     if (TYPE[type] == null) {
-        // eslint-disable-line no-use-before-define
-        throw new Error(`Unsupported type '${type} in ${JSON.stringify(schema)}'`);
+        // in case we could not resolve the type
+        // (schema-type could not be resolved and returned an error)
+        if (opts.removeInvalidData) {
+            return undefined;
+        }
+        return data;
     }
 
     const templateData = TYPE[type](core, schema, data, pointer, opts); // eslint-disable-line no-use-before-define

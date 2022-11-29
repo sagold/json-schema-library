@@ -6,14 +6,11 @@ import copy from "./utils/copy";
 import settings from "./config/settings";
 import { isJSONError } from "./types";
 const defaultOptions = {
-    addOptionalProps: true
+    addOptionalProps: true,
+    removeInvalidData: false
 };
 let cache;
 function shouldResolveRef(schema, pointer) {
-    // ensure we refactored consistently
-    if (pointer == null) {
-        throw new Error("Missing pointer");
-    }
     const { $ref } = schema;
     if ($ref == null) {
         return true;
@@ -138,7 +135,7 @@ function getTemplate(core, data, _schema, pointer, opts) {
     }
     // @todo Array.isArray(schema.type)
     // -> hasDefault? return
-    // if not -> pick first type
+    // if not -> pick first types
     if (!isJSONSchema(schema) || schema.type == null) {
         return undefined;
     }
@@ -150,8 +147,12 @@ function getTemplate(core, data, _schema, pointer, opts) {
         data = convertValue(type, data);
     }
     if (TYPE[type] == null) {
-        // eslint-disable-line no-use-before-define
-        throw new Error(`Unsupported type '${type} in ${JSON.stringify(schema)}'`);
+        // in case we could not resolve the type
+        // (schema-type could not be resolved and returned an error)
+        if (opts.removeInvalidData) {
+            return undefined;
+        }
+        return data;
     }
     const templateData = TYPE[type](core, schema, data, pointer, opts); // eslint-disable-line no-use-before-define
     return templateData;
