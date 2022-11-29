@@ -264,13 +264,24 @@ const TYPE = {
         if (templateSchema.oneOf && d.length > 0) {
             const itemCount = Math.max(schema.minItems, d.length);
             for (let i = 0; i < itemCount; i += 1) {
-                const value = d[i] == null ? template[i] : d[i];
-                const one = resolveOneOfFuzzy(core, value, templateSchema);
-                if (one) {
-                    d[i] = getTemplate(core, value, one, `${pointer}/oneOf/${i}`, opts);
+                let value = d[i] == null ? template[i] : d[i];
+                let one = resolveOneOfFuzzy(core, value, templateSchema);
+                if (one == null || isJSONError(one)) {
+                    // schema could not be resolved or data is invalid
+                    if (value != null && opts.removeInvalidData !== true) {
+                        // keep invalid value
+                        d[i] = value;
+                    }
+                    else {
+                        // replace invalid value
+                        value = undefined;
+                        one = templateSchema.oneOf[0];
+                        d[i] = getTemplate(core, value, one, `${pointer}/oneOf/${i}`, opts);
+                    }
                 }
                 else {
-                    d[i] = value;
+                    // schema is valid
+                    d[i] = getTemplate(core, value, one, `${pointer}/oneOf/${i}`, opts);
                 }
             }
             return d;

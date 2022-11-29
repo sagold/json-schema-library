@@ -722,6 +722,37 @@ describe("getTemplate", () => {
                 expect(res.length).to.deep.equal(1);
                 expect(res).to.deep.equal([{ title: "Standardtitel", subtitle: "Subtitel" }]);
             });
+
+            it("should not remove invalid oneOf schema if 'removeInvalidData' is unset", () => {
+                core.setSchema({
+                    type: "object",
+                    properties: {
+                        filter: {
+                            $ref: "#/definitions/filter"
+                        }
+                    },
+                    definitions: {
+                        filter: {
+                            type: "array",
+                            items: {
+                                oneOf: [
+                                    {
+                                        type: "object",
+                                        properties: {
+                                            op: {
+                                                const: "in"
+                                            },
+                                            property: { type: "string", minLength: 1 }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                });
+                const res = getTemplate(core, { filter: [{ op: "möp" }] }, core.getSchema());
+                expect(res).to.deep.equal({ filter: [{ op: "möp" }] });
+            });
         });
 
         describe("items.allOf", () => {
