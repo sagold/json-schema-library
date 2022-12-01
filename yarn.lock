@@ -1556,10 +1556,15 @@ gson-conform@^1.0.3:
   resolved "https://registry.npmjs.org/gson-conform/-/gson-conform-1.0.3.tgz#6f982f98ea84199280bd48b6bfbcd0ae7447f1e2"
   integrity sha512-gaZQN/5ZbohkLBOs4JKHkg/IdOB9kuuEr5SVLAjHUs+Q+Nl746DRe18GgQy4oxxVXStO//Zga2wg4eWL9Mfshw==
 
-gson-pointer@4.1.1, gson-pointer@^4.1.1:
+gson-pointer@4.1.1:
   version "4.1.1"
   resolved "https://registry.npmjs.org/gson-pointer/-/gson-pointer-4.1.1.tgz#088d6aa38d52753530288d13b5a75b6a43170e9b"
   integrity sha512-rOS/zCLUI8BT0+/U+p5nzI0RfhIyRmzkpwzyCj8gcLoRl3rHuysk6ci1IQ955AQQZDSNN3mVec26Sx9wRZ0EjA==
+
+gson-pointer@^4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/gson-pointer/-/gson-pointer-4.1.2.tgz#6fba33bb1692c39a8b1c4e1b8ee8087334473d59"
+  integrity sha512-Y7LeSwsNWswhjixLkLFJQB8hgKzjU4U+3uS+gCZbDhn8OPC8FTMT/H+tG9IIiv2gFUhTylqVfyxqcTkZlriINw==
 
 gson-query@^5.1.0:
   version "5.1.0"
