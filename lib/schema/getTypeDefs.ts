@@ -1,5 +1,5 @@
 import gp from "@sagold/json-pointer";
-import { get } from "gson-query";
+import { get } from "@sagold/json-query";
 import getTypeId from "./getTypeId";
 import types from "./types";
 import { JSONSchema, JSONPointer } from "../types";

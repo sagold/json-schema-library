@@ -333,6 +333,14 @@
   resolved "https://registry.yarnpkg.com/@sagold/json-pointer/-/json-pointer-5.0.0.tgz#49a3f072cd95c89d82f67cc3d88b8bb86060c9e6"
   integrity sha512-+kIj/GyAlBfZPPcxXlpMdcDP/HyQBbmVCrQ9VZQ8wEqphIHCg0oLojBCLTqpICie/tIc7nwXh3joLVJ4PTD+NQ==
 
+"@sagold/json-query@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@sagold/json-query/-/json-query-6.0.0.tgz#a250a98d19cc20d8c06e8e9eeaf9d1de833f1ed4"
+  integrity sha512-fk9BimvNrzlhXiy+dvlwyA97W2N6GmPWCJo/2kwKEtU9oc93cVKamca9NcnjKx1hhjECjPfu30NQ8Tg2JGv/pA==
+  dependencies:
+    "@sagold/json-pointer" "^5.0.0"
+    ebnf "^1.9.0"
+
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/@tsconfig/node10/-/node10-1.0.9.tgz#df4907fc07a886922637b15e02d4cebc4c0021b2"
@@ -1556,25 +1564,6 @@ growl@1.10.5:
   version "1.10.5"
   resolved "https://registry.yarnpkg.com/growl/-/growl-1.10.5.tgz#f2735dc2283674fa67478b10181059355c369e5e"
   integrity sha512-qBr4OuELkhPenW6goKVXiv47US3clb3/IbuWF9KNKEijAy9oeHxU9IgzjvJhHkUzhaj7rOUD7+YGWqUjLp5oSA==
-
-gson-conform@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/gson-conform/-/gson-conform-1.0.3.tgz#6f982f98ea84199280bd48b6bfbcd0ae7447f1e2"
-  integrity sha512-gaZQN/5ZbohkLBOs4JKHkg/IdOB9kuuEr5SVLAjHUs+Q+Nl746DRe18GgQy4oxxVXStO//Zga2wg4eWL9Mfshw==
-
-gson-pointer@4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/gson-pointer/-/gson-pointer-4.1.1.tgz#088d6aa38d52753530288d13b5a75b6a43170e9b"
-  integrity sha512-rOS/zCLUI8BT0+/U+p5nzI0RfhIyRmzkpwzyCj8gcLoRl3rHuysk6ci1IQ955AQQZDSNN3mVec26Sx9wRZ0EjA==
-
-gson-query@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/gson-query/-/gson-query-5.1.0.tgz#8f34a062849f8c08be0c35eddaa2ad18a4326a49"
-  integrity sha512-xKb/90XfmLLKGgX8Y7LRF4yKnMR/ckV5WOQ/Ip0pRXuDh7jUhdY1UYjPvQnF7/UMbNsAo0168j2j0yt9+4QdaA==
-  dependencies:
-    ebnf "^1.9.0"
-    gson-conform "^1.0.3"
-    gson-pointer "4.1.1"
 
 has-flag@^3.0.0:
   version "3.0.0"
