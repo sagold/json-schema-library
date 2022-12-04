@@ -1,4 +1,4 @@
-import gp from "gson-pointer";
+import gp from "@sagold/json-pointer";
 import { get } from "gson-query";
 import getTypeId from "./getTypeId";
 import types from "./types";

@@ -1,4 +1,4 @@
-import gp from "gson-pointer";
+import gp from "@sagold/json-pointer";
 import { JSONSchema, JSONPointer, isJSONError } from "./types";
 import { Draft } from "./draft";
 

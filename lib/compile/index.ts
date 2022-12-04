@@ -5,7 +5,7 @@ import joinScope from "./joinScope";
 import getRef from "./getRef";
 import { JSONSchema } from "../types";
 import { Context } from "./types";
-import { get } from "gson-pointer";
+import { get } from "@sagold/json-pointer";
 
 const COMPILED = "__compiled";
 const COMPILED_REF = "__ref";

@@ -1,4 +1,4 @@
-import gp from "gson-pointer";
+import gp from "@sagold/json-pointer";
 import getTypeDefs from "./schema/getTypeDefs";
 import { JSONSchema, JSONPointer } from "./types";
 

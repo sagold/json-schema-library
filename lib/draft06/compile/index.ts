@@ -5,7 +5,7 @@ import { eachSchema } from "../../eachSchema";
 import joinScope from "../../compile/joinScope";
 import getRef from "../../compile/getRef";
 import { JSONSchema } from "../../types";
-import { get } from "gson-pointer";
+import { get } from "@sagold/json-pointer";
 
 const COMPILED = "__compiled";
 const COMPILED_REF = "__ref";
