@@ -1,6 +1,6 @@
 import getSchema from "./getSchema";
 import { JsonEditor as Core } from "./jsoneditor";
-import gp from "gson-pointer";
+import gp from "@sagold/json-pointer";
 import copy from "./utils/copy";
 export default class SchemaService {
     constructor(schema, data) {

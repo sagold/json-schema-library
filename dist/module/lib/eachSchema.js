@@ -1,4 +1,4 @@
-import gp from "gson-pointer";
+import gp from "@sagold/json-pointer";
 import getTypeDefs from "./schema/getTypeDefs";
 const isObject = (value) => Object.prototype.toString.call(value) === "[object Object]";
 function nextTypeDefs(schema, pointer) {

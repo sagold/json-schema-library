@@ -15,7 +15,7 @@ import compileSchema from "../compileSchema";
 import { CreateError } from "../utils/createCustomError";
 import addRemoteSchema from "../addRemoteSchema";
 import { JSONSchema, JSONPointer, JSONValidator, JSONTypeValidator, JSONError } from "../types";
-export declare type DraftConfig = {
+export type DraftConfig = {
     /** error creators by id */
     errors: Record<string, CreateError>;
     /** map for valid keywords of a type  */

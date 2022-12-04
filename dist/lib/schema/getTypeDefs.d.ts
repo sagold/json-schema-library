@@ -1,5 +1,5 @@
 import { JSONSchema, JSONPointer } from "../types";
-declare type TypeDef = {
+type TypeDef = {
     pointer: JSONPointer;
     def: unknown;
 };

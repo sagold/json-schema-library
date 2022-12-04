@@ -1,4 +1,4 @@
-import { get } from "gson-pointer";
+import { get } from "@sagold/json-pointer";
 import splitRef from "./splitRef";
 import getTypeOf from "../getTypeOf";
 const suffixes = /(#|\/)+$/g;

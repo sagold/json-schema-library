@@ -1,6 +1,6 @@
 import { Draft as Core } from "./draft";
 import { JSONSchema, JSONPointer } from "./types";
-export declare type EachCallback = (schema: JSONSchema, data: unknown, pointer: JSONPointer) => void;
+export type EachCallback = (schema: JSONSchema, data: unknown, pointer: JSONPointer) => void;
 /**
  * Iterates over data, retrieving its schema
  *

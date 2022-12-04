@@ -1,4 +1,4 @@
-import gp from "gson-pointer";
+import gp from "@sagold/json-pointer";
 import { isJSONError } from "./types";
 const emptyObject = {};
 /**

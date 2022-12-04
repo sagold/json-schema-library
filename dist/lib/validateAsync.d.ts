@@ -3,7 +3,7 @@ import { Draft as Core } from "./draft";
 export interface OnError {
     (error: JSONError): void;
 }
-export declare type Options = {
+export type Options = {
     schema?: JSONSchema;
     pointer?: JSONPointer;
     onError?: OnError;

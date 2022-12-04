@@ -1,4 +1,4 @@
-export declare type Type = {
+export type Type = {
     type: boolean;
     definitions?: string[];
     validationKeywords?: string[];

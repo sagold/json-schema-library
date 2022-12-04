@@ -1,9 +1,9 @@
 import { Draft as Core } from "./draft";
-export declare type JSONSchema = {
+export type JSONSchema = {
     [p: string]: any;
 };
-export declare type JSONPointer = string;
-export declare type JSONError = {
+export type JSONPointer = string;
+export type JSONError = {
     type: "error";
     name: string;
     code: string;
