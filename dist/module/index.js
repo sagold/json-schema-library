@@ -1,6 +1,7 @@
 import { createError, createCustomError } from "./lib/utils/createCustomError";
 import getTypeOf from "./lib/getTypeOf";
 import resolveOneOf from "./lib/resolveOneOf.strict";
+import resolveAllOf from "./lib/resolveAllOf";
 import resolveOneOfFuzzy from "./lib/resolveOneOf.fuzzy";
 import resolveRef from "./lib/resolveRef.strict";
 import resolveRefMerge from "./lib/resolveRef.merge";
@@ -25,5 +26,5 @@ draft07Config, // config implementing draft07 specs
 JsonEditor, // adjusted core of draft04 to better support the json-editor
 draftJsonEditorConfig, // adjusted config of draft04 to better support the json-editor
 createError, createCustomError, getTypeOf, // returns the javascript datatype
-isJSONError, render, resolveRef, resolveRefMerge, resolveOneOf, resolveOneOfFuzzy, settings, SchemaService, validateAsync // async validation of data by a schema
+isJSONError, render, resolveAllOf, resolveRef, resolveRefMerge, resolveOneOf, resolveOneOfFuzzy, settings, SchemaService, validateAsync // async validation of data by a schema
  };

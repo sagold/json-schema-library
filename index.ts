@@ -1,6 +1,7 @@
 import { createError, createCustomError } from "./lib/utils/createCustomError";
 import getTypeOf from "./lib/getTypeOf";
 import resolveOneOf from "./lib/resolveOneOf.strict";
+import resolveAllOf from "./lib/resolveAllOf";
 import resolveOneOfFuzzy from "./lib/resolveOneOf.fuzzy";
 import resolveRef from "./lib/resolveRef.strict";
 import resolveRefMerge from "./lib/resolveRef.merge";
@@ -34,6 +35,7 @@ export {
     getTypeOf, // returns the javascript datatype
     isJSONError,
     render,
+    resolveAllOf,
     resolveRef,
     resolveRefMerge,
     resolveOneOf,
