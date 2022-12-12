@@ -319,6 +319,27 @@ describe("getTemplate", () => {
                 expect(res).to.deep.equal({ title: "jane" });
             });
 
+            it("should extend empty object with first oneOf schema", () => {
+                core.setSchema({
+                    type: "object",
+                    oneOf: [
+                        {
+                            type: "object",
+                            properties: {
+                                title: { type: "string", default: "jane" }
+                            }
+                        },
+                        {
+                            type: "object",
+                            properties: { value: { type: "number" } }
+                        }
+                    ]
+                });
+                const res = getTemplate(core, {});
+
+                expect(res).to.deep.equal({ title: "jane" });
+            });
+
             it("should return template of matching oneOf schema", () => {
                 core.setSchema({
                     type: "object",

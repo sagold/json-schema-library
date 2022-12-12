@@ -6,6 +6,7 @@ import copy from "./utils/copy";
 import settings from "./config/settings";
 import { JSONSchema, JSONPointer, isJSONError } from "./types";
 import { Draft as Core } from "./draft";
+import { isEmpty } from "./utils/isEmpty";
 
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
@@ -157,18 +158,27 @@ function getTemplate(
         return schema.const;
     }
 
-    if (schema.oneOf) {
-        // find correct schema for data
-        const resolvedSchema = resolveOneOfFuzzy(core, data, schema);
-        if (isJSONError(resolvedSchema)) {
-            if (data != null && opts.removeInvalidData !== true) {
-                return data;
-            }
-            // override
-            schema = schema.oneOf[0];
-            data = undefined;
+    if (Array.isArray(schema.oneOf)) {
+        if (isEmpty(data)) {
+            const type =
+                schema.oneOf[0].type ||
+                schema.type ||
+                (schema.const && typeof schema.const) ||
+                getTypeOf(data);
+            schema = { ...schema.oneOf[0], type };
         } else {
-            schema = resolvedSchema;
+            // find correct schema for data
+            const resolvedSchema = resolveOneOfFuzzy(core, data, schema);
+            if (isJSONError(resolvedSchema)) {
+                if (data != null && opts.removeInvalidData !== true) {
+                    return data;
+                }
+                // override
+                schema = schema.oneOf[0];
+                data = undefined;
+            } else {
+                schema = resolvedSchema;
+            }
         }
     }
 

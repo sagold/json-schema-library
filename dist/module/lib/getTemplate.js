@@ -5,6 +5,7 @@ import merge from "./utils/merge";
 import copy from "./utils/copy";
 import settings from "./config/settings";
 import { isJSONError } from "./types";
+import { isEmpty } from "./utils/isEmpty";
 const defaultOptions = {
     addOptionalProps: true,
     removeInvalidData: false
@@ -119,19 +120,28 @@ function getTemplate(core, data, _schema, pointer, opts) {
     if (schema === null || schema === void 0 ? void 0 : schema.const) {
         return schema.const;
     }
-    if (schema.oneOf) {
-        // find correct schema for data
-        const resolvedSchema = resolveOneOfFuzzy(core, data, schema);
-        if (isJSONError(resolvedSchema)) {
-            if (data != null && opts.removeInvalidData !== true) {
-                return data;
-            }
-            // override
-            schema = schema.oneOf[0];
-            data = undefined;
+    if (Array.isArray(schema.oneOf)) {
+        if (isEmpty(data)) {
+            const type = schema.oneOf[0].type ||
+                schema.type ||
+                (schema.const && typeof schema.const) ||
+                getTypeOf(data);
+            schema = { ...schema.oneOf[0], type };
         }
         else {
-            schema = resolvedSchema;
+            // find correct schema for data
+            const resolvedSchema = resolveOneOfFuzzy(core, data, schema);
+            if (isJSONError(resolvedSchema)) {
+                if (data != null && opts.removeInvalidData !== true) {
+                    return data;
+                }
+                // override
+                schema = schema.oneOf[0];
+                data = undefined;
+            }
+            else {
+                schema = resolvedSchema;
+            }
         }
     }
     // @todo Array.isArray(schema.type)
