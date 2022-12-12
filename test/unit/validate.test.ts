@@ -216,7 +216,7 @@ describe("validate", () => {
                     { type: "object", additionalProperties: false }
                 );
                 expect(errors).to.have.length(1);
-                expect(errors[0].name).to.eq("NoAdditionalPropertiesError");
+                expect(errors[0].type).to.eq("error");
             });
 
             it("should return all AdditionalPropertiesErrors", () => {
@@ -276,7 +276,7 @@ describe("validate", () => {
                     }
                 );
                 expect(errors).to.have.length(1);
-                expect(errors[0].name).to.eq("AdditionalPropertiesError");
+                expect(errors[0].type).to.eq("error");
             });
 
             it("should be valid if value matches 'additionalProperties' oneOf schema", () => {
@@ -490,7 +490,7 @@ describe("validate", () => {
                 );
 
                 expect(errors).to.have.length(1);
-                expect(errors[0].name).to.eq("AdditionalPropertiesError");
+                expect(errors[0].type).to.eq("error");
             });
         });
 
