@@ -57,15 +57,7 @@ const KeywordValidation = {
                     // additionalProperties {}
                 }
                 else if (isObject) {
-                    if (core.validate(value[property], schema.additionalProperties, pointer)
-                        .length !== 0) {
-                        errors.push(core.errors.additionalPropertiesError({
-                            schema: schema.additionalProperties,
-                            property: receivedProperties[i],
-                            properties: expectedProperties,
-                            pointer
-                        }));
-                    }
+                    errors.push(...core.validate(value[property], schema.additionalProperties, `${pointer}/${property}`));
                 }
                 else {
                     errors.push(core.errors.noAdditionalPropertiesError({
