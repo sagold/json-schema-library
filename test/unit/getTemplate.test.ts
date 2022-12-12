@@ -415,63 +415,181 @@ describe("getTemplate", () => {
             });
         });
 
-        // <= draft07
+        // draft07 (backwards compatible)
         describe("dependencies", () => {
-            it("should create template for valid dependency", () => {
-                core.setSchema({
-                    type: "object",
-                    properties: {
-                        test: { type: "string", default: "tested value" }
-                    },
-                    dependencies: {
-                        test: {
+            describe("option: `additionalProps: false`", () => {
+                const TEMPLATE_OPTIONS = { addOptionalProps: false };
+                describe("dependency required", () => {
+                    it("should not add dependency if it is not required", () => {
+                        core.setSchema({
+                            type: "object",
                             properties: {
-                                additionalValue: { type: "string", default: "additional" }
+                                trigger: { type: "string" },
+                                dependency: { type: "string", default: "default" }
+                            },
+                            dependencies: {
+                                trigger: ["dependency"]
                             }
-                        }
-                    }
+                        });
+
+                        const res = getTemplate(core, {}, core.getSchema(), TEMPLATE_OPTIONS);
+                        expect(res).to.deep.equal({});
+                    });
+
+                    it("should add dependency if triggered as required", () => {
+                        core.setSchema({
+                            type: "object",
+                            properties: {
+                                trigger: { type: "string" },
+                                dependency: { type: "string", default: "default" }
+                            },
+                            dependencies: {
+                                trigger: ["dependency"]
+                            }
+                        });
+
+                        const res = getTemplate(
+                            core,
+                            { trigger: "yes" },
+                            core.getSchema(),
+                            TEMPLATE_OPTIONS
+                        );
+                        expect(res).to.deep.equal({ trigger: "yes", dependency: "default" });
+                    });
+
+                    it("should add dependency if initially triggered as required", () => {
+                        core.setSchema({
+                            type: "object",
+                            required: ["trigger"],
+                            properties: {
+                                trigger: { type: "string" },
+                                dependency: { type: "string", default: "default" }
+                            },
+                            dependencies: {
+                                trigger: ["dependency"]
+                            }
+                        });
+
+                        const res = getTemplate(core, {}, core.getSchema(), TEMPLATE_OPTIONS);
+                        expect(res).to.deep.equal({ trigger: "", dependency: "default" });
+                    });
                 });
-                const res = getTemplate(core);
-                expect(res).to.deep.equal({ test: "tested value", additionalValue: "additional" });
+                describe("dependency schema", () => {
+                    it("should not add dependency from schema if it is not required", () => {
+                        core.setSchema({
+                            type: "object",
+                            properties: {
+                                trigger: { type: "string" }
+                            },
+                            dependencies: {
+                                trigger: {
+                                    properties: {
+                                        dependency: { type: "string", default: "default" }
+                                    }
+                                }
+                            }
+                        });
+
+                        const res = getTemplate(core, {}, core.getSchema(), TEMPLATE_OPTIONS);
+                        expect(res).to.deep.equal({});
+                    });
+
+                    it("should add dependency from schema if triggered as required", () => {
+                        core.setSchema({
+                            type: "object",
+                            properties: {
+                                trigger: { type: "string" }
+                            },
+                            dependencies: {
+                                trigger: {
+                                    required: ["dependency"],
+                                    properties: {
+                                        dependency: { type: "string", default: "default" }
+                                    }
+                                }
+                            }
+                        });
+
+                        const res = getTemplate(
+                            core,
+                            { trigger: "yes" },
+                            core.getSchema(),
+                            TEMPLATE_OPTIONS
+                        );
+                        expect(res).to.deep.equal({ trigger: "yes", dependency: "default" });
+                    });
+                });
             });
 
-            it("should not change passed value of dependency", () => {
-                core.setSchema({
-                    type: "object",
-                    properties: {
-                        test: { type: "string", default: "tested value" }
-                    },
-                    dependencies: {
-                        test: {
-                            properties: {
-                                additionalValue: { type: "string", default: "additional" }
+            describe("option: `additionalProps: true`", () => {
+                it("should create template for valid dependency", () => {
+                    core.setSchema({
+                        type: "object",
+                        properties: {
+                            test: { type: "string", default: "tested value" }
+                        },
+                        dependencies: {
+                            test: {
+                                properties: {
+                                    additionalValue: { type: "string", default: "additional" }
+                                }
                             }
                         }
-                    }
+                    });
+                    const res = getTemplate(core, undefined, core.getSchema(), {
+                        addOptionalProps: true
+                    });
+                    expect(res).to.deep.equal({
+                        test: "tested value",
+                        additionalValue: "additional"
+                    });
                 });
-                const res = getTemplate(core, { additionalValue: "input value" });
-                expect(res).to.deep.equal({
-                    test: "tested value",
-                    additionalValue: "input value"
-                });
-            });
 
-            it("should not create template for non matching dependency", () => {
-                core.setSchema({
-                    type: "object",
-                    properties: {
-                        test: { type: "string", default: "tested value" }
-                    },
-                    dependencies: {
-                        unknown: {
-                            properties: {
-                                additionalValue: { type: "string", default: "additional" }
+                it("should not change passed value of dependency", () => {
+                    core.setSchema({
+                        type: "object",
+                        properties: {
+                            test: { type: "string", default: "tested value" }
+                        },
+                        dependencies: {
+                            test: {
+                                properties: {
+                                    additionalValue: { type: "string", default: "additional" }
+                                }
                             }
                         }
-                    }
+                    });
+                    const res = getTemplate(
+                        core,
+                        { additionalValue: "input value" },
+                        core.getSchema(),
+                        { addOptionalProps: true }
+                    );
+                    expect(res).to.deep.equal({
+                        test: "tested value",
+                        additionalValue: "input value"
+                    });
                 });
-                const res = getTemplate(core);
-                expect(res).to.deep.equal({ test: "tested value" });
+
+                it("should not create data for non matching dependency", () => {
+                    core.setSchema({
+                        type: "object",
+                        properties: {
+                            test: { type: "string", default: "tested value" }
+                        },
+                        dependencies: {
+                            unknown: {
+                                properties: {
+                                    additionalValue: { type: "string", default: "additional" }
+                                }
+                            }
+                        }
+                    });
+                    const res = getTemplate(core, undefined, core.getSchema(), {
+                        addOptionalProps: true
+                    });
+                    expect(res).to.deep.equal({ test: "tested value" });
+                });
             });
         });
     });

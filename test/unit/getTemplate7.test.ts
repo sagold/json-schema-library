@@ -44,6 +44,7 @@ describe("getTemplate - v7", () => {
                         }
                     },
                     then: {
+                        required: ["dynamic"],
                         properties: {
                             dynamic: { type: "string", default: "from then" }
                         }
@@ -55,6 +56,32 @@ describe("getTemplate - v7", () => {
                     test: "with value",
                     dynamic: "from then"
                 });
+            });
+
+            it("should not create data for then-schema if it is not required", () => {
+                core.setSchema({
+                    type: "object",
+                    // note that required is necessary for getTemplate behaviour
+                    required: ["test"],
+                    properties: {
+                        test: { type: "string", default: "with value" }
+                    },
+                    if: {
+                        properties: {
+                            test: { type: "string", minLength: 4 }
+                        }
+                    },
+                    then: {
+                        properties: {
+                            dynamic: { type: "string", default: "from then" }
+                        }
+                    }
+                });
+
+                const res = getTemplate(core, undefined, core.getSchema(), {
+                    addOptionalProps: false
+                });
+                expect(res).to.deep.equal({ test: "with value" });
             });
 
             it("should not return template of then-schema for invalid if-schema", () => {
