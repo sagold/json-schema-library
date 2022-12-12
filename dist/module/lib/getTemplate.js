@@ -181,12 +181,14 @@ const TYPE = {
     integer: (core, schema, data) => getDefault(schema, data, 0),
     boolean: (core, schema, data) => getDefault(schema, data, false),
     object: (core, schema, data, pointer, opts) => {
+        var _a;
         const template = schema.default === undefined ? {} : schema.default;
         const d = {}; // do not assign data here, to keep ordering from json-schema
+        const required = (_a = schema.required) !== null && _a !== void 0 ? _a : [];
         if (schema.properties) {
             Object.keys(schema.properties).forEach((key) => {
                 const value = data == null || data[key] == null ? template[key] : data[key];
-                const isRequired = Array.isArray(schema.required) && schema.required.includes(key);
+                const isRequired = required.includes(key);
                 // Omit adding a property if it is not required or optional props should be added
                 if (value != null || isRequired || opts.addOptionalProps) {
                     d[key] = getTemplate(core, value, schema.properties[key], `${pointer}/properties/${key}`, opts);
@@ -195,14 +197,27 @@ const TYPE = {
         }
         if (schema.dependencies) {
             Object.keys(schema.dependencies).forEach((key) => {
-                const dependency = schema.dependencies[key];
-                if (getTypeOf(dependency) !== "object") {
-                    return;
-                }
                 if (d[key] === undefined) {
                     return;
                 }
-                const result = getTemplate(core, data, { ...dependency, type: "object" }, `${pointer}/dependencies/${key}`, opts);
+                const dependency = schema.dependencies[key];
+                // dependencyRequired: { key: ['prop1', 'prop2'] }
+                if (Array.isArray(dependency)) {
+                    dependency.forEach((prop) => {
+                        d[prop] = getTemplate(core, d[prop], schema.properties[prop], `${pointer}/properties/${prop}`, opts);
+                    });
+                    return;
+                }
+                if (getTypeOf(dependency) !== "object") {
+                    return;
+                }
+                const result = getTemplate(core, data, {
+                    ...dependency,
+                    // required: Object.keys(dependency.properties || {}).concat(
+                    //     dependency.required ?? []
+                    // ),
+                    type: "object"
+                }, `${pointer}/dependencies/${key}`, opts);
                 if (result && !isJSONError(result)) {
                     Object.assign(d, result);
                 }

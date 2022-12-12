@@ -3,7 +3,7 @@ import { Draft as Core } from "./draft";
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
     addOptionalProps?: boolean;
-    /** remove any data that does not match the given input schema */
+    /** remove data that does not match input schema. Defaults to false */
     removeInvalidData?: boolean;
 };
 declare const _default: (core: Core, data?: any, schema?: JSONSchema, opts?: TemplateOptions) => any;
