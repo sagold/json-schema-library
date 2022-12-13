@@ -168,7 +168,13 @@ const stepType = {
 
             for (let i = 0, l = dependentProperties.length; i < l; i += 1) {
                 const dependentProperty = dependentProperties[i];
-                const schema = step(core, key, dependencies[dependentProperty], data);
+                const schema = step(
+                    core,
+                    key,
+                    dependencies[dependentProperty],
+                    data,
+                    `${pointer}/${dependentProperty}`
+                );
                 if (!isJSONError(schema)) {
                     return schema;
                 }
