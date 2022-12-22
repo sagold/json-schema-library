@@ -1,4 +1,4 @@
-<p align="center"><img src="./docs/json-schema-library.png" width="256" alt="json-schema-library"></p>
+<p style="text-align:center"><img src="./docs/json-schema-library.png" width="256" alt="json-schema-library"></p>
 
 
 **Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation**
@@ -9,7 +9,7 @@
 > lessens the pain to build custom tools around json-schema.
 
 
-<p align="center">
+<p style="text-align:center">
   <a href="#draft-methods">draft methods</a> | <a href="#draft-extensions">draft extensions</a> | <a href="#draft-customization">draft customization</a> | <a href="#breaking-changes">breaking changes</a>
 </p>
 
@@ -316,7 +316,7 @@ expect(calls).to.deep.equal([
 
 ### eachSchema
 
-`eachSchema` emits each sub schema definition to a callback. 
+`eachSchema` emits each sub schema definition to a callback.
 
 ```ts
 const jsonSchema = new Draft07(mySchema);
@@ -388,11 +388,11 @@ const mySchema = {
           {
             type: "object",
             required: ["name"],
-            properties: { 
-              name: { 
-                type: "string", 
-                title: "name of item" 
-              } 
+            properties: {
+              name: {
+                type: "string",
+                title: "name of item"
+              }
             }
           },
           {
@@ -475,7 +475,7 @@ expect(schemas).to.deep.equal([
 ])
 ```
 
-</details>  
+</details>
 
 
 
@@ -522,8 +522,8 @@ expect(res).to.deep.eq({ type: "number" });
 `addRemoteSchema` lets you add additional schemas that can be referenced by an url using `$ref`. Use this to combine multiple schemas without changing the actual schema.
 
 ```ts
-const jsonSchema = new Draft07({ 
-  $ref: "http://json-schema.org/draft-07/schema#definitions/nonNegativeInteger" 
+const jsonSchema = new Draft07({
+  $ref: "http://json-schema.org/draft-07/schema#definitions/nonNegativeInteger"
 });
 jsonSchema.addRemoteSchema("http://json-schema.org/draft-07/schema", draft07Schema);
 ```
@@ -613,9 +613,9 @@ const schema = {
 const resolvedSchema = jsonSchema.resolveOneOf({ id: "2", title: "not a number" }, schema);
 
 // will always return (even if invalid)
-expect(resolvedSchema).to.deep.eq({ 
-  type: "object", 
-  properties: { id: { const: "2" }, title: { type: "number" } } 
+expect(resolvedSchema).to.deep.eq({
+  type: "object",
+  properties: { id: { const: "2" }, title: { type: "number" } }
 });
 ```
 
@@ -636,7 +636,7 @@ new Draft07(mySchema, {});
 new Draft07(mySchema);
 ```
 
-all draft configurations for specific `Draft` classes take a partial configuration that lets you overwrite default behaviour, e.g. 
+all draft configurations for specific `Draft` classes take a partial configuration that lets you overwrite default behaviour, e.g.
 
 > replace the strict resolveOneOf behaviour to use fuzzy search instead:
 
@@ -700,7 +700,7 @@ expect(subHeaderSchema).to.eq({
 
 #### `resolveOneOf` fuzzy search
 
-The default json-schema behaviour for `oneOf` resolution is to validate all contained _oneOf_-schemas and return the one schema that validates against the given input data. If no item validates completely an error returned, containing all validation errors of all schemas. When you are interested in the actual error (instead of: data is valid or not), this is behaviour is not very helpful as the result is hard to read. 
+The default json-schema behaviour for `oneOf` resolution is to validate all contained _oneOf_-schemas and return the one schema that validates against the given input data. If no item validates completely an error returned, containing all validation errors of all schemas. When you are interested in the actual error (instead of: data is valid or not), this is behaviour is not very helpful as the result is hard to read.
 
 `json-schema-library` exposes a method `resolveOneOfFuzzy`, which will return a single schema in cases where no valid schema could be resolved. `resolveOneOfFuzzy` uses a simple scoring mechanism to return the best fitting schema for the given input data. Thus, `resolveOneOfFuzzy` may return schemas that do not validate a given input data.
 
@@ -712,7 +712,7 @@ const jsonSchema = new Draft07(mySchema, { resolveOneOf: resolveOneOfFuzzy });
 
 ### custom validators
 
-All json-schema validation is done using validator functions for _keywords_ and _formats_. 
+All json-schema validation is done using validator functions for _keywords_ and _formats_.
 
 **keyword validators** are called for each keyword defined on a json-schema, e.g. the following schema will run two keyword-validators, one for `items` and one of `minItems`, which are defined in `draft.validateKeyword.items` and `draft.validateKeyword.minItems`
 
@@ -818,10 +818,10 @@ Each error message in `config.strings` receives the `data`-property of an error.
 import { render } from "json-schema-library";
 
 render(
-  "Expected given value `{{value}}` in `{{pointer}}` to be one of `{{values}}`", 
+  "Expected given value `{{value}}` in `{{pointer}}` to be one of `{{values}}`",
   { pointer: "[A]", value: "[B]" }
 );
-// "Expected given value `[B]` in `[A]` to be one of ``" 
+// "Expected given value `[B]` in `[A]` to be one of ``"
 ```
 
 
