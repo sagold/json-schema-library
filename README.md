@@ -72,7 +72,7 @@ const jsonSchema = new Draft07(myJsonSchema);
 const errors: JSONError[] = jsonSchema.validate("my-string", { type: "number" });
 ```
 
-> to prevent some errors when using helper methods with an independent subschema, please use `compileSchema` if it is not retrieved from a draft-method directly (which was compiled by passing it to Draft). Specifically, if the schema contains a $ref you need to use `compileSchema`. More details in [compileSchema](#compileSchema).
+> To prevent some errors when using helper methods with an independent sub-schema, please use `compileSchema` if it is not retrieved from a draft-method directly (which was compiled by passing it to Draft). Specifically, if the schema contains a $ref you need to use `compileSchema`. More details in [compileSchema](#compileSchema).
 
 <details><summary>About type JSONError</summary>
 
@@ -88,7 +88,7 @@ type JSONError = {
 };
 ```
 
-in almost all cases, a _json-pointer_ is given on _error.data.pointer_, which points to the source within data where the error occured.
+In almost all cases, a _json-pointer_ is given on _error.data.pointer_, which points to the source within data where the error occured.
 
 For more details on how to work with errors, refer to section [custom errors](#custom-errors).
 
@@ -165,7 +165,7 @@ const isValid: boolean = jsonSchema.isValid(myData);
 
 ### validateAsync
 
-> this method is not yet exposed by a draft directly as the api of this is yet unsatisfactory. Nonetheless, this function is in production and can be used reliably
+> This method is not yet exposed by a draft directly as the API of this is yet unsatisfactory. Nonetheless, this function is in production and can be used reliably.
 
 Optional support for onError helper, which is invoked for each error (after being resolved)
 
@@ -519,7 +519,7 @@ expect(res).to.deep.eq({ type: "number" });
 
 ### addRemoteSchema
 
-`addRemoteSchema` lets you add additional schemas that can be referenced by an url using `$ref`. Use this to combine multiple schemas without changing the actual schema.
+`addRemoteSchema` lets you add additional schemas that can be referenced by an URL using `$ref`. Use this to combine multiple schemas without changing the actual schema.
 
 ```ts
 const jsonSchema = new Draft07({
@@ -742,7 +742,7 @@ console.log(draft07Config.typeKeywords.array);
 
 To add or overwrite a keyword validator you have to add a validator function on your draft config in `validateKeyword`.
 
-using specific Draft configuration, where draft configuration objects will be merged:
+Using specific Draft configuration, where draft configuration objects will be merged:
 
 ```ts
 import { Draft07, JSONValidator } from "json-schema-library";
@@ -864,7 +864,7 @@ const error: JSONError = createError("EnumError", { data: { pointer: "#/location
 
 ### v7.0.0
 
-with version `v7.0.0` library export and Draft api has changed heavily. The api is now more consistent across draft-versions and offers a simple and consistent configuration interface for existing and custom drafts. In addition, most standalone functions are no longer exposed separately, but under its current _draftConfigs_ and mainly on each draft-instance. This will help to reduce confusion, when consuming this api.
+With version `v7.0.0`, library export and Draft API has changed heavily. The API is now more consistent across draft-versions and offers a simple and consistent configuration interface for existing and custom drafts. In addition, most standalone functions are no longer exposed separately, but under its current _draftConfigs_ and mainly on each draft-instance. This will help to reduce confusion when consuming this API.
 
 The above documentation reflects all those changes. Just reach out if you have troubles migrating to the latest version.
 
@@ -873,7 +873,7 @@ The above documentation reflects all those changes. Just reach out if you have t
 - replaced `Core` interface by new `Draft` interface
 - changed export of `Interface` to `Draft`
 - renamed `addSchema` to `addRemoteSchema`
-- changed api of `compileSchema` to have an additional schema-parameter for rootSchema reference
+- changed API of `compileSchema` to have an additional schema-parameter for rootSchema reference
 - changed `compileSchema` and `addRemoteSchema` to work on instance state, instead of global state
 - `addRemoteSchema`, `compileSchema` now requires draft instance as first parameter
 - removed direct export of following functions: `addValidator`, `compileSchema`, `createSchemaOf`, `each`, `eachSchema`, `getChildSchemaSelection`, `getSchema`, `getTemplate`, `isValid`, `step`, `validate`. They are still accessible under the draftConfigs of each draft-version
@@ -884,14 +884,14 @@ The above documentation reflects all those changes. Just reach out if you have t
 
 ### v6.0.0
 
-with version `v6.0.0` supported json schema drafts are exported directly as `Draft04`, `Draft06`, `Draft07`, e.g. `import { Draft07 } from "json-schema-library"`
+With version `v6.0.0` supported json schema drafts are exported directly as `Draft04`, `Draft06`, `Draft07`. Example use: `import { Draft07 } from "json-schema-library"`.
 
 
 ### v5.0.0
 
-with version `v5.0.0` the api has changed to es6 modules, where there is no default export, only named exports. Additionally all code has been rewritten to typescript. When directly accessing files, switch to `dist/module/*.js`-files for plain js-modules.
+With version `v5.0.0` the API has changed to es6 modules, where there is no `default` export, only named exports. Additionally all code has been rewritten in TypeScript. When directly accessing files, switch to `dist/module/*.js`-files for plain js-modules.
 
 
 ### v4.0.0
 
-with version `v4.0.0` the api has changed in order to use the defined (root) schema in draft as default where possible. This means, most methods have a changed signature, where `data` is passed before an optional `schema` argument.
+With version `v4.0.0` the API has changed in order to use the defined (root) schema in draft as default where possible. This means most methods have a changed signature, where `data` is passed before an optional `schema` argument.
