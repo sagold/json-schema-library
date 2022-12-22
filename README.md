@@ -26,7 +26,7 @@ This library currently supports draft4, draft6 and draft7 features [@see benchma
 
 **usage**
 
-`json-schema-library` exposes a `Draft` for most json-schema drafts. Each `Draft` can be instantiated and offers a common set of actions working on the specified json-schema version. e.g.
+`json-schema-library` exposes a `Draft` for most json-schema drafts. Each `Draft` can be instantiated and offers a common set of actions working on the specified json-schema version. Example:
 
 ```ts
 import { Draft04, Draft06, Draft07, Draft, JSONError } from "json-schema-library";
@@ -58,14 +58,14 @@ What follows is a description of the main draft methods.
 
 ### validate
 
-`validate` is a complete _json-schema validator_ for your input data. Calling _validate_ will return a list of validation errors for the passed data
+`validate` is a complete _json-schema validator_ for your input data. Calling _validate_ will return a list of validation errors for the passed data.
 
 ```ts
 const jsonSchema = new Draft07(myJsonSchema);
 const errors: JSONError[] = jsonSchema.validate(myData);
 ```
 
-Additionally, you can validate a subschema and its data. Doing this, the intial schema will be used as rootSchema to e.g. resolve `$ref` from _definitions_
+Additionally, you can validate a sub-schema and its data. Doing this, the intial schema will be used as rootSchema (for example, to resolve `$ref` from _definitions_).
 
 ```ts
 const jsonSchema = new Draft07(myJsonSchema);
@@ -76,7 +76,7 @@ const errors: JSONError[] = jsonSchema.validate("my-string", { type: "number" })
 
 <details><summary>About type JSONError</summary>
 
-In `json-schema-library` all errors are in the format of a `JSONError`
+In `json-schema-library` all errors are in the format of a `JSONError`:
 
 ```ts
 type JSONError = {
@@ -155,7 +155,7 @@ expect(errors).to.deep.equal([
 
 ### isValid
 
-`isValid` will return a true if the given json-data is valid against the json-schema
+`isValid` will return `true` if the given json-data is valid against the json-schema.
 
 ```ts
 const jsonSchema = new Draft07(myJsonSchema);
@@ -167,7 +167,7 @@ const isValid: boolean = jsonSchema.isValid(myData);
 
 > This method is not yet exposed by a draft directly as the API of this is yet unsatisfactory. Nonetheless, this function is in production and can be used reliably.
 
-Optional support for onError helper, which is invoked for each error (after being resolved)
+Optional support for `onError` helper, which is invoked for each error (after being resolved):
 
 ```ts
 import { Draft07, JSONError, validateAsync } from "json-schema-library";
@@ -181,21 +181,21 @@ validateAsync(draft, "", { onError: (err: JSONError) => {}, schema: draft.getSch
 
 ### getTemplate
 
-`getTemplate` creates input data from a json-schema that is valid to the schema. Where possible the json-schema property `default` will be used to initially setup input data. In other cases, first enum values or initial values, etc are user to build up the json-data.
+`getTemplate` creates input data from a json-schema that is valid to the schema. Where possible, the json-schema `default` property will be used to initially setup input data. Otherwise, the first values encountered (enum values, initial values, etc.) are user to build up the json-data.
 
 ```ts
 const jsonSchema = new Draft07(myJsonSchema);
 const myData = jsonSchema.getTemplate();
 ```
 
-Additionally, you can pass input data. `getTemplate` will then complement any missing values from the schema, while keeping the initial values
+Additionally, you can pass input data. `getTemplate` will then complement any missing values from the schema, while keeping the initial values.
 
 ```ts
 const jsonSchema = new Draft07(myJsonSchema);
 const myData = jsonSchema.getTemplate({ name: "input-data" });
 ```
 
-**Note** If you are using references in your schema, `getTemplate` will only resolve the first _$ref_ in each path, ensuring no inifinte data structures are created. In case the limit of **1** _$ref_ resolution is to low, you can modify the value globally one by adjusting the json-schema-library settings:
+**Note:** If you are using references in your schema, `getTemplate` will only resolve the first _$ref_ in each path, ensuring no inifinte data structures are created. In case the limit of **1** _$ref_ resolution is too low, you can modify the value globally one by adjusting the json-schema-library settings:
 
 ```ts
 import { settings } from "json-schema-library";
@@ -316,7 +316,7 @@ expect(calls).to.deep.equal([
 
 ### eachSchema
 
-`eachSchema` emits each sub schema definition to a callback.
+`eachSchema` emits each sub-schema definition to a callback.
 
 ```ts
 const jsonSchema = new Draft07(mySchema);
@@ -365,7 +365,7 @@ expect(calls).to.deep.equal([
 
 ### getSchema
 
-`getSchema` retrieves the json-schema of a specific location in data. The location in data is given by a _json-pointer_. In many cases the schema can be retrieved without passing the actual data, but in situations where the schema is dynamic, e.g. in _oneOf_, _dependencies_, etc, the data is required or will return a _JSONError_ if the location could not be found.
+`getSchema` retrieves the json-schema of a specific location in data. The location in data is given by a _json-pointer_. In many cases the schema can be retrieved without passing the actual data, but in situations where the schema is dynamic (e.g., in _oneOf_, _dependencies_, etc.), the data is required or will return a _JSONError_ if the location cannot be found.
 
 ```ts
 const jsonSchema = new Draft07(mySchema);
@@ -433,16 +433,18 @@ expect(schemaOfItem).to.deep.equal({
 
 <details><summary>About JSONPointer</summary>
 
-**[JSON-Pointer](https://tools.ietf.org/html/rfc6901)** defines a string syntax for identifying a specific value within a JSON document and is [supported by JSON-Schema](https://json-schema.org/understanding-json-schema/structuring.html). Given a JSON document, it behaves similar to a [lodash path](https://lodash.com/docs/4.17.5#get) (`a[0].b.c`), which follows JS-syntax, but instead uses `/` separators, e.g. (`a/0/b/c`). In the end, you describe a path into the JSON data to a specific point.
+**[JSON-Pointer](https://tools.ietf.org/html/rfc6901)** defines a string syntax for identifying a specific value within a JSON document and is [supported by JSON-Schema](https://json-schema.org/understanding-json-schema/structuring.html). Given a JSON document, it behaves similar to a [lodash path](https://lodash.com/docs/4.17.5#get) (`a[0].b.c`), which follows JS-syntax, but instead uses `/` separators (e.g., `a/0/b/c`). In the end, you describe a path into the JSON data to a specific point.
 
 </details>
 
 
 ### getChildSchemaSelection
 
-`getChildSchemaSelection` returns a list of available sub schemas for the given property. In many cases, a single schema will be returned, but e.g. for _oneOf_-schemas a list of possible options is returned. This helper always returns a list of schemas.
+`getChildSchemaSelection` returns a list of available sub-schemas for the given property. In many cases, a single schema will be returned. For _oneOf_-schemas, a list of possible options is returned.
 
-**Note** This helper currenly supports a subset of json-schema for multiple results, mainly oneOf-definitions
+This helper always returns a list of schemas.
+
+**Note:** This helper currenly supports a subset of json-schema for multiple results, mainly _oneOf_-definitions
 
 ```ts
 const jsonSchema = new Draft07(mySchema);
@@ -563,7 +565,7 @@ const schema: JSONSchema = jsonSchema.createSchemaOf({ title: "initial value" })
 
 ### compileSchema
 
-`compileSchema` adds _$ref_ resolution support to a json-schema. Internally, each draft compiles a passed schema on its own, but when passing additional schemas to individual functions, `compileSchema` has to be called manually for json-schemas containing $ref-references.
+`compileSchema` adds _$ref_ resolution support to a json-schema. Internally, each draft compiles a passed schema on its own, but when passing additional schemas to individual functions, `compileSchema` has to be called manually for json-schemas containing _$ref_-references.
 
 ```ts
 const jsonSchema = new Draft07(mySchema);
@@ -571,7 +573,7 @@ const compiledSchema = jsonSchema.compileSchema({ $ref: "/$defs/table" });
 const tableSchema = compiledSchema.getRef();
 ```
 
-**Note** that `draft.compileSchema` compiles a schema under the current rootSchema. That is, definitions from root schema will be copied to the local schema, to enable $ref resolutions.
+**Note:** that `draft.compileSchema` compiles a schema under the current rootSchema. That is, definitions from root schema will be copied to the local schema, to enable _$ref_ resolutions.
 
 
 ## Draft extensions
@@ -587,9 +589,9 @@ expression, the example will be printed in the error message.
 
 ### oneOfProperty
 
-For `oneOf` resolution json-schema states that a data is valid, if it validate against exactly one of those sub schemas. In some scenarios this is unwanted behaviour as the actual `oneOf` schema is known and only validation errors of this exact sub schema should be returned.
+For `oneOf` resolution, json-schema states that data is valid if it validates against exactly one of those sub-schemas. In some scenarios this is unwanted behaviour, as the actual `oneOf` schema is known and only validation errors of this exact sub-schema should be returned.
 
-For an explicit `oneOf` resolution the json-schema may be extended by a property `oneOfProperty`. This will always associate an entry with a matching value (instead of schema validation) and return only this schema or validation errors, depending on the current task, e.g.
+For an explicit `oneOf` resolution, the json-schema may be extended by a property `oneOfProperty`. This will always associate an entry with a matching value (instead of schema validation) and return only this schema or validation errors, depending on the current task. For example:
 
 ```ts
 const schema = {
@@ -625,7 +627,7 @@ expect(resolvedSchema).to.deep.eq({
 [custom resolvers](#custom-resolvers) | [custom validators](#custom-validators) | [custom errors](#custom-errors)
 
 
-Each `Draft` in `json-schema-library` is build around a [DraftConfig](./lib/draft/index.ts#19). A `DraftConfig` holds all _functions_ and _configurations_ for each json-schema drafts. The `DraftConfig` is your main way to alter or extend behaviour for `json-schema-library`. You can either create your own _draftConfig_ or adjust any existing _draftConfig_. For the current drafts (4-7), each _draftConfig_ is exposed along with its actual _class_, e.g.
+Each `Draft` in `json-schema-library` is build around a [DraftConfig](./lib/draft/index.ts#19). A `DraftConfig` holds all _functions_ and _configurations_ for each json-schema drafts. The `DraftConfig` is your main way to alter or extend behaviour for `json-schema-library`. You can either create your own _draftConfig_ or adjust any existing _draftConfig_. For the current drafts (4-7), each _draftConfig_ is exposed along with its actual _class_. For example:
 
 ```ts
 import { Draft, Draft07, draft07Config } from 'json-schema-library';
@@ -636,9 +638,9 @@ new Draft07(mySchema, {});
 new Draft07(mySchema);
 ```
 
-all draft configurations for specific `Draft` classes take a partial configuration that lets you overwrite default behaviour, e.g.
+All draft configurations for specific `Draft` classes accept a partial configuration that lets you overwrite default behaviour:
 
-> replace the strict resolveOneOf behaviour to use fuzzy search instead:
+> replace the strict `resolveOneOf` behaviour to use fuzzy search instead:
 
 ```ts
 import { Draft07, draft07Config, resolveOneOfFuzzy } from 'json-schema-library';
@@ -650,12 +652,12 @@ new Draft({ ...draft07Config, resolveOneOf: resolveOneOfFuzzy }, mySchema);
 
 ### custom resolvers
 
-A _resolver_ is a simple method implementing a specific feature of json-schema to retrieve a sub schema. Implementing the signature of each resolver you can create and pass your own resolvers.
+A _resolver_ is a simple method implementing a specific feature of json-schema to retrieve a sub-schema. Implementing the signature of each resolver you can create and pass your own resolvers.
 
 
 #### `resolveRef` with merge
 
-The default json-schema behaviour for `$ref` resolution is to replace the schema where a `$ref` is defined. In some scenarios you what to add context specific information, like e.g. a specific _title_. For this, a modified `$ref`-resolver is exposed by `json-schema-library`
+The default json-schema behaviour for `$ref` resolution is to replace the schema where a `$ref` is defined. In some scenarios you what to add context-specific information (e.g., a specific _title_). For this, a modified `$ref`-resolver is exposed by `json-schema-library`:
 
 ```ts
 import { Draft07, draft07Config, resolveRefMerge } from 'json-schema-library';
@@ -664,7 +666,7 @@ const jsonSchema = new Draft07(mySchema, { resolveRef: resolveRefMerge });
 
 `resolveRefMerge` performs a shallow merge (first level of properties), adding the local schemas properties last.
 
-**Note** with this resolver, it is possible to overwrite json-schema behavioural properties. Treat with care.
+**Caution:** With this resolver, it is possible to overwrite json-schema behavioural properties. Treat with care.
 
 <details><summary>Example</summary>
 
@@ -700,7 +702,7 @@ expect(subHeaderSchema).to.eq({
 
 #### `resolveOneOf` fuzzy search
 
-The default json-schema behaviour for `oneOf` resolution is to validate all contained _oneOf_-schemas and return the one schema that validates against the given input data. If no item validates completely an error returned, containing all validation errors of all schemas. When you are interested in the actual error (instead of: data is valid or not), this is behaviour is not very helpful as the result is hard to read.
+The default json-schema behaviour for `oneOf` resolution is to validate all contained _oneOf_-schemas and return the one schema that validates against the given input data. If no item validates completely an error returned, containing all validation errors of all schemas. When you are interested in the actual error (rather than simply determining “Is the data is valid or not?”), this is behaviour is not very helpful as the result is hard to read.
 
 `json-schema-library` exposes a method `resolveOneOfFuzzy`, which will return a single schema in cases where no valid schema could be resolved. `resolveOneOfFuzzy` uses a simple scoring mechanism to return the best fitting schema for the given input data. Thus, `resolveOneOfFuzzy` may return schemas that do not validate a given input data.
 
@@ -714,13 +716,13 @@ const jsonSchema = new Draft07(mySchema, { resolveOneOf: resolveOneOfFuzzy });
 
 All json-schema validation is done using validator functions for _keywords_ and _formats_.
 
-**keyword validators** are called for each keyword defined on a json-schema, e.g. the following schema will run two keyword-validators, one for `items` and one of `minItems`, which are defined in `draft.validateKeyword.items` and `draft.validateKeyword.minItems`
+**keyword validators** are called for each keyword defined on a json-schema. For example, the following schema will run two keyword-validators (one for `items` and one of `minItems`) which are defined in `draft.validateKeyword.items` and `draft.validateKeyword.minItems`.
 
 ```ts
 { type: "object", items: {}, minItems: 1 }
 ```
 
-Since valid json-schema keywords vary by their `type` an additional mapping registers, which keyword should be tested per schema-type. This mapping is defined in `draft.typeKeywords`, e.g.
+Since valid json-schema keywords vary by their `type` an additional mapping registers, which keyword should be tested per schema-type. This mapping is defined in `draft.typeKeywords`:
 
 ```ts
 import { draft07Config } from "json-schema-library";
@@ -732,7 +734,7 @@ console.log(draft07Config.typeKeywords.array);
 
 > The keyword **format** is also registered in `draft.validateKeyword.format`, but each actual format validation is defined as follows:
 
-**format validators** are called on each ocurence of a property format on a json-schema, e.g. the following schema will run the _email_-validator given in `draft.validateFormat.email`
+**format validators** are called on each occurrence of a property format in a json-schema. In the next example, the schema will run the _email_-validator given in `draft.validateFormat.email`:
 
 ```ts
 { type: "string", format: "email" }
@@ -740,7 +742,7 @@ console.log(draft07Config.typeKeywords.array);
 
 #### add custom keyword validator
 
-To add or overwrite a keyword validator you have to add a validator function on your draft config in `validateKeyword`.
+To add or overwrite a keyword validator, you must add a validator function on your draft config in `validateKeyword`.
 
 Using specific Draft configuration, where draft configuration objects will be merged:
 
@@ -759,7 +761,7 @@ const jsonSchema = new Draft07(mySchema, {
 });
 ```
 
-manually extending draft configuration
+**Example:** Manually extending draft configuration:
 
 ```ts
 import { Draft, draft07Config, JSONValidator } from "json-schema-library";
@@ -785,7 +787,7 @@ const jsonSchema = new Draft(myDraftConfiguration, mySchema);
 
 #### add custom format validator
 
-To add or overwrite a format validator you have to add a validator function on your draft config in `validateFormat`.
+To add or overwrite a format validator you must add a validator function on your draft config in `validateFormat`.
 
 ```ts
 import { Draft07, JSONValidator } from "json-schema-library";
@@ -866,9 +868,9 @@ const error: JSONError = createError("EnumError", { data: { pointer: "#/location
 
 With version `v7.0.0`, library export and Draft API has changed heavily. The API is now more consistent across draft-versions and offers a simple and consistent configuration interface for existing and custom drafts. In addition, most standalone functions are no longer exposed separately, but under its current _draftConfigs_ and mainly on each draft-instance. This will help to reduce confusion when consuming this API.
 
-The above documentation reflects all those changes. Just reach out if you have troubles migrating to the latest version.
+The above documentation reflects all these changes. Just reach out if you have troubles migrating to the latest version.
 
-<details><summary>Details on breaking changes</summary>
+<details><summary>Details of breaking changes</summary>
 
 - replaced `Core` interface by new `Draft` interface
 - changed export of `Interface` to `Draft`
