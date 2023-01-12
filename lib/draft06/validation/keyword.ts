@@ -1,6 +1,7 @@
 import Keywords from "../../validation/keyword";
 import getTypeOf from "../../getTypeOf";
 import { JSONValidator, JSONError } from "../../types";
+import { validateIf } from "../../features/if";
 
 const KeywordValidation: Record<string, JSONValidator> = {
     ...Keywords,
@@ -55,22 +56,8 @@ const KeywordValidation: Record<string, JSONValidator> = {
         }
         return undefined;
     },
-    if: (core, schema, value, pointer) => {
-        if (schema.if == null) {
-            return undefined;
-        }
-
-        const ifErrors = core.validate(value, schema.if, pointer);
-        // console.log("if Errors", value, ifErrors);
-
-        if (ifErrors.length === 0 && schema.then) {
-            return core.validate(value, schema.then, pointer);
-        }
-
-        if (ifErrors.length !== 0 && schema.else) {
-            return core.validate(value, schema.else, pointer);
-        }
-    },
+    // @feature if-then-else
+    if: validateIf,
     maximum: (core, schema, value, pointer) => {
         if (isNaN(schema.maximum)) {
             return undefined;

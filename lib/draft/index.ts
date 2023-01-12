@@ -154,8 +154,8 @@ export class Draft {
         return this.config.resolveAnyOf(this, data, schema, pointer);
     }
 
-    resolveAllOf(data: any, schema: JSONSchema, pointer?: JSONPointer): JSONSchema {
-        return this.config.resolveAllOf(this, data, schema, pointer);
+    resolveAllOf(data: any, schema: JSONSchema): JSONSchema {
+        return this.config.resolveAllOf(this, data, schema);
     }
 
     resolveRef(schema: JSONSchema): JSONSchema {

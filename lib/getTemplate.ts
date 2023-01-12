@@ -7,6 +7,7 @@ import settings from "./config/settings";
 import { JSONSchema, JSONPointer, isJSONError } from "./types";
 import { Draft as Core } from "./draft";
 import { isEmpty } from "./utils/isEmpty";
+import { resolveIfSchema } from "./features/if";
 
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
@@ -324,23 +325,11 @@ const TYPE: Record<
             Object.keys(data).forEach((key) => d[key] == null && (d[key] = data[key]));
         }
 
-        if (schema.if && (schema.then || schema.else)) {
-            const isValid = core.isValid(d, schema.if);
-            if (isValid && schema.then) {
-                const additionalData = core.getTemplate(
-                    d,
-                    { type: "object", ...schema.then },
-                    opts
-                );
-                Object.assign(d, additionalData);
-            } else if (!isValid && schema.else) {
-                const additionalData = core.getTemplate(
-                    d,
-                    { type: "object", ...schema.else },
-                    opts
-                );
-                Object.assign(d, additionalData);
-            }
+        // @feature if-then-else
+        const ifSchema = resolveIfSchema(core, schema, d);
+        if (ifSchema) {
+            const additionalData = core.getTemplate(d, { type: "object", ...ifSchema }, opts);
+            Object.assign(d, additionalData);
         }
 
         // returns object, which is ordered by json-schema

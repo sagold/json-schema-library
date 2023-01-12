@@ -4,6 +4,7 @@ import errors from "./validation/errors";
 import merge from "./utils/merge";
 import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
 import { Draft as Core } from "./draft";
+import { stepIntoIf } from "./features/if";
 
 const stepType = {
     array: (
@@ -29,7 +30,7 @@ const stepType = {
 
             // allOf
             if (Array.isArray(schema.items.allOf)) {
-                return core.resolveAllOf(data[key], schema.items, pointer);
+                return core.resolveAllOf(data[key], schema.items);
             }
 
             // spec: ignore additionalItems, when items is schema-object
@@ -115,7 +116,7 @@ const stepType = {
 
         if (Array.isArray(schema.allOf)) {
             // update current schema
-            schema = core.resolveAllOf(data, schema, pointer);
+            schema = core.resolveAllOf(data, schema);
             if (isJSONError(schema)) {
                 return schema;
             }
@@ -181,22 +182,10 @@ const stepType = {
             }
         }
 
-        // @draft >= 07
-        if (schema.if && (schema.then || schema.else)) {
-            // console.log("test if-then-else");
-            const isValid = core.isValid(data, schema.if);
-            if (isValid && schema.then) {
-                const resolvedThen = step(core, key, schema.then, data, pointer);
-                if (typeof resolvedThen.type === "string" && resolvedThen.type !== "error") {
-                    return resolvedThen;
-                }
-            }
-            if (!isValid && schema.else) {
-                const resolvedElse = step(core, key, schema.else, data, pointer);
-                if (typeof resolvedElse.type === "string" && resolvedElse.type !== "error") {
-                    return resolvedElse;
-                }
-            }
+        // @feature if-then-else
+        const ifSchema = stepIntoIf(core, key, schema, data, pointer);
+        if (ifSchema) {
+            return ifSchema;
         }
 
         // find matching property key
