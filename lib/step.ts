@@ -5,6 +5,7 @@ import merge from "./utils/merge";
 import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
 import { Draft as Core } from "./draft";
 import { stepIntoIf } from "./features/if";
+import { stepIntoDependencies } from "./features/dependencies";
 
 const stepType = {
     array: (
@@ -158,28 +159,10 @@ const stepType = {
             }
         }
 
-        // @draft <= 07
-        const { dependencies } = schema;
-        if (getTypeOf(dependencies) === "object") {
-            const dependentProperties = Object.keys(dependencies).filter(
-                (propertyName) =>
-                    // data[propertyName] !== undefined &&
-                    getTypeOf(dependencies[propertyName]) === "object"
-            );
-
-            for (let i = 0, l = dependentProperties.length; i < l; i += 1) {
-                const dependentProperty = dependentProperties[i];
-                const schema = step(
-                    core,
-                    key,
-                    dependencies[dependentProperty],
-                    data,
-                    `${pointer}/${dependentProperty}`
-                );
-                if (!isJSONError(schema)) {
-                    return schema;
-                }
-            }
+        // @feature dependencies
+        const schemaInDependency = stepIntoDependencies(core, key, schema, data, pointer);
+        if (schemaInDependency) {
+            return schemaInDependency;
         }
 
         // @feature if-then-else

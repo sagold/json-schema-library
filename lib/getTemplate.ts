@@ -8,6 +8,8 @@ import { JSONSchema, JSONPointer, isJSONError } from "./types";
 import { Draft as Core } from "./draft";
 import { isEmpty } from "./utils/isEmpty";
 import { resolveIfSchema } from "./features/if";
+import { resolveDependencies } from "./features/dependencies";
+import { mergeSchema } from "./mergeSchema";
 
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
@@ -274,50 +276,20 @@ const TYPE: Record<
             });
         }
 
-        if (schema.dependencies) {
-            Object.keys(schema.dependencies).forEach((key) => {
-                if (d[key] === undefined) {
-                    return;
-                }
-
-                const dependency = schema.dependencies[key];
-
-                // dependencyRequired: { key: ['prop1', 'prop2'] }
-                if (Array.isArray(dependency)) {
-                    dependency.forEach((prop) => {
-                        d[prop] = getTemplate(
-                            core,
-                            d[prop],
-                            schema.properties[prop],
-                            `${pointer}/properties/${prop}`,
-                            opts
-                        );
-                    });
-                    return;
-                }
-
-                if (getTypeOf(dependency) !== "object") {
-                    return;
-                }
-
-                const result = getTemplate(
-                    core,
-                    data,
-                    {
-                        ...dependency,
-                        // required: Object.keys(dependency.properties || {}).concat(
-                        //     dependency.required ?? []
-                        // ),
-                        type: "object"
-                    },
-                    `${pointer}/dependencies/${key}`,
-                    opts
-                );
-
-                if (result && !isJSONError(result)) {
-                    Object.assign(d, result);
-                }
-            });
+        // @feature dependencies
+        // has to be done after resolving properties so dependency may trigger
+        let dependenciesSchema = resolveDependencies(core, schema, d);
+        if (dependenciesSchema) {
+            dependenciesSchema = mergeSchema(schema, dependenciesSchema);
+            delete dependenciesSchema.dependencies;
+            const dependencyData = getTemplate(
+                core,
+                data,
+                dependenciesSchema,
+                `${pointer}/dependencies`,
+                opts
+            );
+            Object.assign(d, dependencyData);
         }
 
         if (data) {
