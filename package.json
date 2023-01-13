@@ -6,9 +6,10 @@
     "types": "dist/index.d.ts",
     "main": "dist/jsonSchemaLibrary.js",
     "scripts": {
-        "dist": "rm -rf dist; yarn dist:es5 && yarn dist:es6",
+        "dist": "rm -rf dist; yarn dist:es5 && yarn dist:es6 && yarn dist:esm",
         "dist:es5": "NODE_ENV=production webpack",
         "dist:es6": "tsc --outDir dist/module --target ES2019",
+        "dist:esm": "esbuild --bundle --minify --sourcemap --outfile=dist/jsonSchemaLibrary.esm.min.js ./dist/module/index.js",
         "test": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/**/*.test.ts'",
         "test:integration": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/integration/**/*.test.ts'",
         "test:unit": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/unit/**/*.test.ts'",
@@ -62,6 +63,7 @@
         "@typescript-eslint/parser": "^5.20.0",
         "chai": "^4.2.0",
         "chalk": "^2.3.0",
+        "esbuild": "^0.16.17",
         "eslint": "^8.14.0",
         "eslint-plugin-array-func": "^3.1.7",
         "eslint-plugin-node": "^11.1.0",
@@ -80,10 +82,10 @@
         "webpack-cli": "^4.2.0"
     },
     "dependencies": {
-        "deepmerge": "^4.2.2",
-        "fast-deep-equal": "^3.1.3",
         "@sagold/json-pointer": "^5.0.0",
         "@sagold/json-query": "^6.0.0",
+        "deepmerge": "^4.2.2",
+        "fast-deep-equal": "^3.1.3",
         "valid-url": "^1.0.9"
     },
     "resolutions": {
