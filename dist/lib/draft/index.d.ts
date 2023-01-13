@@ -102,7 +102,7 @@ export declare class Draft {
     getTemplate(data?: unknown, schema?: JSONSchema, opts?: TemplateOptions): any;
     isValid(data: any, schema?: JSONSchema, pointer?: JSONPointer): boolean;
     resolveAnyOf(data: any, schema: JSONSchema, pointer?: JSONPointer): JSONSchema;
-    resolveAllOf(data: any, schema: JSONSchema, pointer?: JSONPointer): JSONSchema;
+    resolveAllOf(data: any, schema: JSONSchema): JSONSchema;
     resolveRef(schema: JSONSchema): JSONSchema;
     resolveOneOf(data: any, schema: JSONSchema, pointer?: JSONPointer): JSONSchema;
     setSchema(schema: JSONSchema): void;

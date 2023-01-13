@@ -3,6 +3,8 @@ import createSchemaOf from "./createSchemaOf";
 import errors from "./validation/errors";
 import merge from "./utils/merge";
 import { isJSONError } from "./types";
+import { stepIntoIf } from "./features/if";
+import { stepIntoDependencies } from "./features/dependencies";
 const stepType = {
     array: (core, key, schema, data, pointer) => {
         const itemsType = getTypeOf(schema.items);
@@ -18,7 +20,7 @@ const stepType = {
             }
             // allOf
             if (Array.isArray(schema.items.allOf)) {
-                return core.resolveAllOf(data[key], schema.items, pointer);
+                return core.resolveAllOf(data[key], schema.items);
             }
             // spec: ignore additionalItems, when items is schema-object
             return core.resolveRef(schema.items);
@@ -80,7 +82,7 @@ const stepType = {
         }
         if (Array.isArray(schema.allOf)) {
             // update current schema
-            schema = core.resolveAllOf(data, schema, pointer);
+            schema = core.resolveAllOf(data, schema);
             if (isJSONError(schema)) {
                 return schema;
             }
@@ -110,36 +112,15 @@ const stepType = {
                 return targetSchema;
             }
         }
-        // @draft <= 07
-        const { dependencies } = schema;
-        if (getTypeOf(dependencies) === "object") {
-            const dependentProperties = Object.keys(dependencies).filter((propertyName) => 
-            // data[propertyName] !== undefined &&
-            getTypeOf(dependencies[propertyName]) === "object");
-            for (let i = 0, l = dependentProperties.length; i < l; i += 1) {
-                const dependentProperty = dependentProperties[i];
-                const schema = step(core, key, dependencies[dependentProperty], data, `${pointer}/${dependentProperty}`);
-                if (!isJSONError(schema)) {
-                    return schema;
-                }
-            }
+        // @feature dependencies
+        const schemaInDependency = stepIntoDependencies(core, key, schema, data, pointer);
+        if (schemaInDependency) {
+            return schemaInDependency;
         }
-        // @draft >= 07
-        if (schema.if && (schema.then || schema.else)) {
-            // console.log("test if-then-else");
-            const isValid = core.isValid(data, schema.if);
-            if (isValid && schema.then) {
-                const resolvedThen = step(core, key, schema.then, data, pointer);
-                if (typeof resolvedThen.type === "string" && resolvedThen.type !== "error") {
-                    return resolvedThen;
-                }
-            }
-            if (!isValid && schema.else) {
-                const resolvedElse = step(core, key, schema.else, data, pointer);
-                if (typeof resolvedElse.type === "string" && resolvedElse.type !== "error") {
-                    return resolvedElse;
-                }
-            }
+        // @feature if-then-else
+        const ifSchema = stepIntoIf(core, key, schema, data, pointer);
+        if (ifSchema) {
+            return ifSchema;
         }
         // find matching property key
         if (getTypeOf(schema.patternProperties) === "object") {

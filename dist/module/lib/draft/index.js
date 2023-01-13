@@ -91,8 +91,8 @@ export class Draft {
     resolveAnyOf(data, schema, pointer) {
         return this.config.resolveAnyOf(this, data, schema, pointer);
     }
-    resolveAllOf(data, schema, pointer) {
-        return this.config.resolveAllOf(this, data, schema, pointer);
+    resolveAllOf(data, schema) {
+        return this.config.resolveAllOf(this, data, schema);
     }
     resolveRef(schema) {
         return this.config.resolveRef(schema, this.rootSchema);

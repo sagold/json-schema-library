@@ -2,6 +2,8 @@ import getTypeOf from "../getTypeOf";
 import isSame from "../utils/deepCompare";
 import settings from "../config/settings";
 import ucs2decode from "../utils/punycode.ucs2decode";
+import { validateDependencies } from "../features/dependencies";
+import { validateAllOf } from "../features/allOf";
 import { isJSONError } from "../types";
 const FPP = settings.floatingPointPrecision;
 const hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -70,16 +72,7 @@ const KeywordValidation = {
         }
         return errors;
     },
-    allOf: (core, schema, value, pointer) => {
-        if (Array.isArray(schema.allOf) === false) {
-            return undefined;
-        }
-        const errors = [];
-        schema.allOf.forEach((subSchema) => {
-            errors.push(...core.validate(value, subSchema, pointer));
-        });
-        return errors;
-    },
+    allOf: validateAllOf,
     anyOf: (core, schema, value, pointer) => {
         if (Array.isArray(schema.anyOf) === false) {
             return undefined;
@@ -91,40 +84,7 @@ const KeywordValidation = {
         }
         return core.errors.anyOfError({ anyOf: schema.anyOf, value, pointer });
     },
-    dependencies: (core, schema, value, pointer) => {
-        if (getTypeOf(schema.dependencies) !== "object") {
-            return undefined;
-        }
-        const errors = [];
-        Object.keys(value).forEach((property) => {
-            if (schema.dependencies[property] === undefined) {
-                return;
-            }
-            // @draft >= 6 boolean schema
-            if (schema.dependencies[property] === true) {
-                return;
-            }
-            if (schema.dependencies[property] === false) {
-                errors.push(core.errors.missingDependencyError({ pointer }));
-                return;
-            }
-            let dependencyErrors;
-            const type = getTypeOf(schema.dependencies[property]);
-            if (type === "array") {
-                dependencyErrors = schema.dependencies[property]
-                    .filter((dependency) => value[dependency] === undefined)
-                    .map((missingProperty) => core.errors.missingDependencyError({ missingProperty, pointer }));
-            }
-            else if (type === "object") {
-                dependencyErrors = core.validate(value, schema.dependencies[property], pointer);
-            }
-            else {
-                throw new Error(`Invalid dependency definition for ${pointer}/${property}. Must be list or schema`);
-            }
-            errors.push(...dependencyErrors);
-        });
-        return errors.length > 0 ? errors : undefined;
-    },
+    dependencies: validateDependencies,
     enum: (core, schema, value, pointer) => {
         const type = getTypeOf(value);
         if (type === "object" || type === "array") {

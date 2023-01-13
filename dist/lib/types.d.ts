@@ -1,4 +1,4 @@
-import { Draft as Core } from "./draft";
+import { Draft } from "./draft";
 export type JSONSchema = {
     [p: string]: any;
 };
@@ -19,8 +19,8 @@ export type JSONError = {
  */
 export declare function isJSONError(error: any): error is JSONError;
 export interface JSONValidator {
-    (core: Core, schema: JSONSchema, value: unknown, pointer: JSONPointer): void | undefined | JSONError | JSONError[] | JSONError[][];
+    (draft: Draft, schema: JSONSchema, value: unknown, pointer: JSONPointer): void | undefined | JSONError | JSONError[] | JSONError[][];
 }
 export interface JSONTypeValidator {
-    (core: Core, schema: JSONSchema, value: unknown, pointer: JSONPointer): Array<void | undefined | JSONError | JSONError[] | JSONError[][]>;
+    (draft: Draft, schema: JSONSchema, value: unknown, pointer: JSONPointer): Array<void | undefined | JSONError | JSONError[] | JSONError[][]>;
 }
