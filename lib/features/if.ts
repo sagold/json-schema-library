@@ -41,6 +41,9 @@ export function stepIntoIf(
 ): JSONSchema | undefined {
     if (schema.if && (schema.then || schema.else)) {
         const resolvedSchema = resolveIfSchema(draft, schema, data);
+        if (resolvedSchema == null) {
+            return;
+        }
         // @todo merge with schema before stepping? Note that validation must be separately
         const resolvedIfThenElseSchema = draft.step(key, resolvedSchema, data, pointer);
         if (

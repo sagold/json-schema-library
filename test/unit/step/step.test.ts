@@ -23,6 +23,37 @@ describe("step", () => {
             expect(res).to.deep.eq({ type: "string" });
         });
 
+        it("should return error for unknown property", () => {
+            const res = step(core, "wrongkey", {
+                type: "object",
+                properties: {
+                    title: { type: "string" }
+                }
+            });
+
+            expect(res.type).to.deep.eq("error");
+        });
+
+        it("should return error for unknown property", () => {
+            const res = step(core, "thenValue", {
+                type: "object",
+                properties: { test: { type: "string" } },
+                if: {
+                    properties: {
+                        test: { minLength: 10 }
+                    }
+                },
+                then: {
+                    required: ["thenValue"],
+                    properties: {
+                        thenValue: { description: "then", type: "string", default: "from then" }
+                    }
+                }
+            });
+
+            expect(res.type).to.deep.eq("error");
+        });
+
         it("should return matching oneOf", () => {
             const res = step(
                 core,
