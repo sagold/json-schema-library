@@ -10,7 +10,7 @@ export function resolveIfSchema(draft, schema, data) {
         return schema.else;
     }
     if (schema.if && (schema.then || schema.else)) {
-        const ifErrors = draft.validate(data, schema.if);
+        const ifErrors = draft.validate(data, draft.resolveRef(schema.if));
         if (ifErrors.length === 0 && schema.then) {
             return draft.resolveRef(schema.then);
         }

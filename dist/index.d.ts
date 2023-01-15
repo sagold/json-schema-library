@@ -8,6 +8,8 @@ import resolveRefMerge from "./lib/resolveRef.merge";
 import SchemaService from "./lib/SchemaService";
 import settings from "./lib/config/settings";
 import validateAsync from "./lib/validateAsync";
+import { reduceSchema, resolveDynamicSchema } from "./lib/reduceSchema";
+import { mergeSchema } from "./lib/mergeSchema";
 import render from "./lib/utils/render";
 import { Draft } from "./lib/draft";
 import { Draft04, draft04Config } from "./lib/draft04";
@@ -27,7 +29,10 @@ draft07Config, // config implementing draft07 specs
 JsonEditor, // adjusted core of draft04 to better support the json-editor
 draftJsonEditorConfig, // adjusted config of draft04 to better support the json-editor
 createError, createCustomError, getTypeOf, // returns the javascript datatype
-isJSONError, render, resolveAllOf, resolveRef, resolveRefMerge, resolveOneOf, resolveOneOfFuzzy, settings, SchemaService, validateAsync };
+isJSONError, mergeSchema, // NEW
+render, resolveAllOf, resolveRef, resolveRefMerge, resolveOneOf, resolveOneOfFuzzy, reduceSchema, // NEW
+resolveDynamicSchema, // NEW
+settings, SchemaService, validateAsync };
 import { DraftConfig } from "./lib/draft";
 import { EachCallback } from "./lib/each";
 import { EachSchemaCallback } from "./lib/eachSchema";

@@ -19,10 +19,11 @@ export function resolveDependencies(draft, schema, data) {
         return;
     }
     let updated = false;
-    let resolvedSchema = { type: "object", required: [] };
+    let resolvedSchema = { required: [] };
     Object.keys(dependencies).forEach((prop) => {
-        var _a;
-        if (data[prop] == null && !((_a = schema.required) === null || _a === void 0 ? void 0 : _a.includes(prop))) {
+        var _a, _b;
+        if (data[prop] == null &&
+            !(((_a = schema.required) === null || _a === void 0 ? void 0 : _a.includes(prop)) || ((_b = resolvedSchema.required) === null || _b === void 0 ? void 0 : _b.includes(prop)))) {
             return;
         }
         const dependency = dependencies[prop];
@@ -33,15 +34,14 @@ export function resolveDependencies(draft, schema, data) {
         }
         if (isObject(dependency)) {
             updated = true;
-            resolvedSchema = mergeSchema(resolvedSchema, dependency);
+            resolvedSchema = mergeSchema(resolvedSchema, draft.resolveRef(dependency));
             return;
         }
     });
     if (updated) {
         resolvedSchema.required = uniqueItems(resolvedSchema.required);
-        delete resolvedSchema.dependencies;
+        return resolvedSchema;
     }
-    return updated ? resolvedSchema : undefined;
 }
 /**
  * steps into dependencies

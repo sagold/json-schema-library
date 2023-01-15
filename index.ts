@@ -9,7 +9,7 @@ import SchemaService from "./lib/SchemaService";
 import settings from "./lib/config/settings";
 import strings from "./lib/config/strings";
 import validateAsync from "./lib/validateAsync";
-import { reduceSchema, resolveDynamicSchema } from "./lib/reduceSchema";
+import { reduceSchema, resolveDynamicSchema, isDynamicSchema } from "./lib/reduceSchema";
 import { mergeSchema } from "./lib/mergeSchema";
 import render from "./lib/utils/render";
 import { Draft } from "./lib/draft";
@@ -35,6 +35,7 @@ export {
     createError,
     createCustomError,
     getTypeOf, // returns the javascript datatype
+    isDynamicSchema, // NEW
     isJSONError,
     mergeSchema, // NEW
     render,

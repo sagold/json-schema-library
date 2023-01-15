@@ -13,9 +13,9 @@ export function resolveAllOfSchema(draft, schema, data) {
     }
     let resolvedSchema = {};
     allOf.forEach((subschema) => {
-        resolvedSchema = mergeSchema(resolvedSchema, subschema);
+        resolvedSchema = mergeSchema(resolvedSchema, draft.resolveRef(subschema));
     });
-    resolvedSchema.type = resolvedSchema.type || schema.type;
+    // resolvedSchema.type = resolvedSchema.type || schema.type;
     return resolvedSchema;
 }
 const validateAllOf = (core, schema, value, pointer) => {
