@@ -27,6 +27,7 @@ export type DraftConfig = {
     validateType: Record<string, JSONTypeValidator>;
     /** format validators  */
     validateFormat: Record<string, JSONValidator>;
+    templateDefaultOptions?: TemplateOptions;
 
     addRemoteSchema: typeof addRemoteSchema;
     compileSchema: typeof compileSchema;
@@ -142,7 +143,11 @@ export class Draft {
      * @param [schema] - json schema, defaults to rootSchema
      * @return created template data
      */
-    getTemplate(data?: unknown, schema?: JSONSchema, opts?: TemplateOptions) {
+    getTemplate(
+        data?: unknown,
+        schema?: JSONSchema,
+        opts: TemplateOptions = this.config.templateDefaultOptions
+    ) {
         return this.config.getTemplate(this, data, schema, opts);
     }
 
