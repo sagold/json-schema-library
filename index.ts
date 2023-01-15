@@ -9,6 +9,8 @@ import SchemaService from "./lib/SchemaService";
 import settings from "./lib/config/settings";
 import strings from "./lib/config/strings";
 import validateAsync from "./lib/validateAsync";
+import { reduceSchema, resolveDynamicSchema } from "./lib/reduceSchema";
+import { mergeSchema } from "./lib/mergeSchema";
 import render from "./lib/utils/render";
 import { Draft } from "./lib/draft";
 import { Draft04, draft04Config } from "./lib/draft04";
@@ -34,12 +36,15 @@ export {
     createCustomError,
     getTypeOf, // returns the javascript datatype
     isJSONError,
+    mergeSchema, // NEW
     render,
     resolveAllOf,
     resolveRef,
     resolveRefMerge,
     resolveOneOf,
     resolveOneOfFuzzy,
+    reduceSchema, // NEW
+    resolveDynamicSchema, // NEW
     settings,
     SchemaService,
     validateAsync // async validation of data by a schema

@@ -26,9 +26,12 @@ export function resolveDependencies(
         return;
     }
     let updated = false;
-    let resolvedSchema: JSONSchema = { type: "object", required: [] };
+    let resolvedSchema: JSONSchema = { required: [] };
     Object.keys(dependencies).forEach((prop) => {
-        if (data[prop] == null && !schema.required?.includes(prop)) {
+        if (
+            data[prop] == null &&
+            !(schema.required?.includes(prop) || resolvedSchema.required?.includes(prop))
+        ) {
             return;
         }
         const dependency = dependencies[prop];
@@ -39,17 +42,15 @@ export function resolveDependencies(
         }
         if (isObject(dependency)) {
             updated = true;
-            resolvedSchema = mergeSchema(resolvedSchema, dependency);
+            resolvedSchema = mergeSchema(resolvedSchema, draft.resolveRef(dependency));
             return;
         }
     });
 
     if (updated) {
         resolvedSchema.required = uniqueItems(resolvedSchema.required);
-        delete resolvedSchema.dependencies;
+        return resolvedSchema;
     }
-
-    return updated ? resolvedSchema : undefined;
 }
 
 /**
