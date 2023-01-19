@@ -180,6 +180,7 @@ function getTemplate(
                 schema = schema.oneOf[0];
                 data = undefined;
             } else {
+                resolvedSchema.type = resolvedSchema.type ?? schema.type;
                 schema = resolvedSchema;
             }
         }
