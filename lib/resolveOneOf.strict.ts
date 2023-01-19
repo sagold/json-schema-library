@@ -3,6 +3,7 @@ import flattenArray from "./utils/flattenArray";
 import settings from "./config/settings";
 import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
 import { Draft as Core } from "./draft";
+import { createOneOfSchemaResult } from "./schema/createOneOfSchemaResult";
 
 const { DECLARATOR_ONEOF } = settings;
 
@@ -51,7 +52,7 @@ export default function resolveOneOf(
             if (result.length > 0) {
                 errors.push(...result);
             } else {
-                return one; // return resolved schema
+                return createOneOfSchemaResult(schema, one, i); // return resolved schema
             }
         }
 
@@ -74,12 +75,12 @@ export default function resolveOneOf(
         if (result.length > 0) {
             errors.push(...result);
         } else {
-            matches.push(one);
+            matches.push({ index: i, schema: one });
         }
     }
 
     if (matches.length === 1) {
-        return matches[0];
+        return createOneOfSchemaResult(schema, matches[0].schema, matches[0].index); // return resolved schema
     }
     if (matches.length > 1) {
         return core.errors.multipleOneOfError({

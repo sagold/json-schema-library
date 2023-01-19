@@ -138,19 +138,11 @@ const stepType = {
             if (targetSchema && Array.isArray(targetSchema.oneOf)) {
                 // @special case: this is a mix of a schema and optional definitions
                 // we resolve the schema here and add the original schema to `oneOfSchema`
-                let resolvedSchema = core.resolveOneOf(
+                return core.resolveOneOf(
                     data[key],
                     targetSchema,
                     `${pointer}/${key}`
                 );
-
-                const oneOfIndex = targetSchema.oneOf.findIndex((s) => s === resolvedSchema);
-
-                resolvedSchema = JSON.parse(JSON.stringify(resolvedSchema));
-                resolvedSchema.variableSchema = true;
-                resolvedSchema.oneOfIndex = oneOfIndex;
-                resolvedSchema.oneOfSchema = targetSchema;
-                return resolvedSchema;
             }
 
             // resolved schema or error

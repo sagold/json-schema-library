@@ -1,368 +1,43 @@
-import { expect } from "chai";
+import { strict as assert } from "assert";
 import { Draft07 as Draft } from "../../lib/draft07";
-import { resolveDynamicSchema } from "../../lib/reduceSchema";
+import { reduceSchema } from "../../lib/reduceSchema";
 
-describe("resolveDynamicSchema", () => {
+describe("reduceSchema", () => {
     let draft: Draft;
     beforeEach(() => (draft = new Draft()));
 
-    describe("dependencies", () => {
-        it("should correctly merge dependencies", () => {
-            draft.setSchema({
-                $defs: {
-                    schema: {
-                        type: "object",
-                        required: ["one"],
-                        properties: {
-                            one: { type: "string" },
-                            two: { type: "string" }
-                        },
-                        dependencies: {
-                            one: ["two"],
-                            two: {
-                                $ref: "/$defs/two"
-                            }
-                        }
-                    },
-                    two: {
-                        required: ["three"],
-                        properties: {
-                            three: {
-                                type: "number"
-                            }
-                        }
-                    }
-                }
-            });
-            const schema = resolveDynamicSchema(draft, { $ref: "#/$defs/schema" }, { one: "" });
-            expect(schema).to.deep.equal({
-                required: ["two", "three"],
-                properties: {
-                    three: { type: "number" }
-                }
-            });
-        });
-        it("should return undefined if dynamic schema is not triggered", () => {
-            draft.setSchema({
-                $defs: {
-                    schema: {
-                        type: "object",
-                        required: [],
-                        properties: {
-                            one: { type: "string" },
-                            two: { type: "string" }
-                        },
-                        dependencies: {
-                            one: ["two"]
-                        }
-                    }
-                }
-            });
-            const schema = resolveDynamicSchema(draft, { $ref: "#/$defs/schema" }, {});
-            expect(schema).to.deep.equal(undefined);
-        });
-        it("should resolve nested dependencies schema", () => {
-            draft.setSchema({
-                $defs: {
-                    schema: {
-                        type: "object",
-                        required: ["one"],
-                        properties: {
-                            one: { type: "string" },
-                            two: { type: "string" }
-                        },
-                        dependencies: {
-                            one: ["two"],
-                            two: { $ref: "/$defs/two" }
-                        }
-                    },
-                    two: {
-                        required: ["three"],
-                        properties: {
-                            three: { type: "number" }
-                        },
-                        dependencies: {
-                            two: {
-                                properties: {
-                                    four: { type: "boolean" }
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            const schema = resolveDynamicSchema(draft, { $ref: "#/$defs/schema" }, { one: "" });
-            expect(schema).to.deep.equal({
-                required: ["two", "three"],
-                properties: {
-                    three: { type: "number" },
-                    four: { type: "boolean" }
-                }
-            });
-        });
-    });
-
-    describe("if-then-else", () => {
-        it("should select if-then-else schema", () => {
-            draft.setSchema({
-                $defs: {
-                    schema: {
-                        type: "object",
-                        required: ["one"],
-                        properties: {
-                            one: { type: "string" }
-                        },
-                        if: {
-                            minProperties: 1
-                        },
-                        then: {
-                            $ref: "/$defs/then"
-                        }
-                    },
-                    then: {
-                        required: ["two"],
-                        properties: {
-                            two: { type: "string" }
-                        }
-                    }
-                }
-            });
-            const schema = resolveDynamicSchema(draft, { $ref: "#/$defs/schema" }, { one: "" });
-            expect(schema).to.deep.equal({
-                required: ["two"],
-                properties: {
-                    two: { type: "string" }
-                }
-            });
-        });
-
-        it("should return undefined if dynamic schema is not triggered", () => {
-            draft.setSchema({
-                $defs: {
-                    schema: {
-                        type: "object",
-                        required: ["one"],
-                        properties: {
-                            one: { type: "string" }
-                        },
-                        if: {
-                            minProperties: 1
-                        },
-                        then: {
-                            required: ["two"],
-                            properties: {
-                                two: { type: "string" }
-                            }
-                        }
-                    }
-                }
-            });
-            const schema = resolveDynamicSchema(draft, { $ref: "#/$defs/schema" }, {});
-            expect(schema).to.deep.equal(undefined);
-        });
-
-        it("should resolve nested if-then-else schema", () => {
-            draft.setSchema({
-                $defs: {
-                    schema: {
-                        type: "object",
-                        required: ["one"],
-                        properties: {
-                            one: { type: "string" }
-                        },
-                        if: {
-                            minProperties: 1
-                        },
-                        then: {
-                            $ref: "/$defs/then"
-                        }
-                    },
-                    then: {
-                        if: {
-                            minProperties: 1
-                        },
-                        then: {
-                            required: ["two"],
-                            properties: {
-                                two: { type: "string" }
-                            }
-                        }
-                    }
-                }
-            });
-            const schema = resolveDynamicSchema(draft, { $ref: "#/$defs/schema" }, { one: "" });
-            expect(schema).to.deep.equal({
-                required: ["two"],
-                properties: {
-                    two: { type: "string" }
-                }
-            });
-        });
-    });
-
-    describe("allOf", () => {
-        it("should return merged allOf schema", () => {
-            draft.setSchema({
-                $defs: {
-                    schema: {
-                        type: "object",
-                        required: ["one"],
-                        properties: {
-                            one: { type: "string" }
-                        },
-                        allOf: [
-                            {
-                                $ref: "/$defs/one"
-                            },
-                            {
-                                $ref: "/$defs/two"
-                            }
-                        ]
-                    },
-                    one: {
-                        required: ["one"]
-                    },
-                    two: {
-                        required: ["two"],
-                        properties: {
-                            two: { type: "number" }
-                        }
-                    }
-                }
-            });
-            const schema = resolveDynamicSchema(draft, { $ref: "/$defs/schema" }, {});
-            expect(schema).to.deep.equal({
-                required: ["one", "two"],
-                properties: {
-                    two: { type: "number" }
-                }
-            });
-        });
-
-        it("should return undefined if allOf is empty", () => {
-            const schema = resolveDynamicSchema(
-                draft,
-                {
-                    type: "object",
-                    required: ["one"],
-                    properties: {
-                        one: { type: "string" }
-                    },
-                    allOf: []
-                },
-                {}
-            );
-            expect(schema).to.deep.equal(undefined);
-        });
-
-        it("should resolve nested allOf schema", () => {
-            draft.setSchema({
-                $defs: {
-                    schema: {
-                        type: "object",
-                        required: ["one"],
-                        properties: {
-                            one: { type: "string" }
-                        },
-                        allOf: [
-                            {
-                                $ref: "/$defs/one"
-                            },
-                            {
-                                $ref: "/$defs/two"
-                            }
-                        ]
-                    },
-                    one: {
-                        required: ["one"]
-                    },
-                    two: {
-                        required: ["two"],
-                        allOf: [
-                            {
-                                properties: {
-                                    two: { type: "number" }
-                                }
-                            }
-                        ]
-                    }
-                }
-            });
-            const schema = resolveDynamicSchema(draft, { $ref: "/$defs/schema" }, {});
-            expect(schema).to.deep.equal({
-                required: ["one", "two"],
-                properties: {
-                    two: { type: "number" }
-                }
-            });
-        });
-    });
-
     describe("oneOf", () => {
-        it("should select oneOf schema", () => {
-            const schema = resolveDynamicSchema(
+        it("should return oneOf source schema for resolved oneOf object", () => {
+            const staticSchema = reduceSchema(
                 draft,
                 {
                     type: "object",
+                    oneOfProperty: "type",
                     oneOf: [
                         {
+                            type: "object",
+                            required: ["type", "title"],
                             properties: {
-                                one: {
-                                    type: "number"
-                                }
+                                type: { type: "string", const: "paragraph" },
+                                title: { type: "string", title: "paragprah title" }
                             }
                         },
                         {
+                            type: "object",
+                            required: ["type", "title"],
                             properties: {
-                                two: {
-                                    type: "string"
-                                }
+                                type: { type: "string", const: "section" },
+                                title: { type: "string", title: "section title" }
                             }
                         }
                     ]
                 },
-                { one: "string" }
-            );
-            expect(schema).to.deep.equal({
-                properties: {
-                    two: {
-                        type: "string"
-                    }
-                }
-            });
-        });
-        it("should select correct oneOf schema from oneOfProperty", () => {
-            const schema = resolveDynamicSchema(
-                draft,
-                {
-                    type: "object",
-                    oneOfProperty: "id",
-                    oneOf: [
-                        {
-                            properties: {
-                                id: { const: "first" },
-                                one: { type: "number" }
-                            }
-                        },
-                        {
-                            properties: {
-                                id: { const: "second" },
-                                one: { type: "number" }
-                            }
-                        }
-                    ]
-                },
-                { id: "second" }
+                { type: "section", title: "" }
             );
 
-            expect(schema).to.deep.equal({
-                properties: {
-                    id: { const: "second" },
-                    one: { type: "number" }
-                }
-            });
+            assert.equal(typeof staticSchema.getOneOfOrigin, "function");
+            // @ts-ignore
+            assert.equal(staticSchema.getOneOfOrigin().index, 1);
         });
     });
-
-    describe("nested dynamic schema", () => {});
 });

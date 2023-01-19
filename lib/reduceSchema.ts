@@ -10,7 +10,23 @@ import { JsonData } from "@sagold/json-pointer";
 const toOmit = ["allOf", "oneOf", "dependencies", "if", "then", "else"];
 const dynamicProperties = ["allOf", "oneOf", "anyOf", "dependencies", "if"];
 
-export function isDynamicSchema(schema: JsonData) {
+function omit(object: Record<string, unknown>, ...keysToOmit: string[]) {
+    const result: Record<string, unknown> = {};
+    Object.keys(object).forEach((key) => {
+        if (!keysToOmit.includes(key)) {
+            result[key] = object[key];
+        }
+    });
+    if (object.getOneOfOrigin) {
+        Object.defineProperty(result, "getOneOfOrigin", {
+            enumerable: false,
+            value: object.getOneOfOrigin
+        });
+    }
+    return result;
+}
+
+export function isDynamicSchema(schema: JsonData): boolean {
     const givenProps = Object.keys(schema);
     return dynamicProperties.findIndex((prop) => givenProps.includes(prop)) !== -1;
 }
@@ -22,12 +38,6 @@ export function resolveDynamicSchema(draft: Draft, schema: JSONSchema, data: unk
     // @feature oneOf
     if (schema.oneOf) {
         const oneOfSchema = resolveOneOf(draft, data, schema);
-        if (oneOfSchema && oneOfSchema.type !== "error") {
-            resolvedSchema = mergeSchema(resolvedSchema ?? {}, oneOfSchema);
-        }
-    }
-    if (schema.items?.oneOf) {
-        const oneOfSchema = resolveOneOf(draft, data, schema.items);
         if (oneOfSchema && oneOfSchema.type !== "error") {
             resolvedSchema = mergeSchema(resolvedSchema ?? {}, oneOfSchema);
         }
@@ -60,14 +70,7 @@ export function resolveDynamicSchema(draft: Draft, schema: JSONSchema, data: unk
         resolvedSchema = mergeSchema(resolvedSchema, nestedSchema);
     }
 
-    const finalSchema: JSONSchema = {};
-    Object.keys(resolvedSchema).forEach((prop) => {
-        if (!toOmit.includes(prop)) {
-            finalSchema[prop] = resolvedSchema[prop];
-        }
-    });
-
-    return finalSchema;
+    return omit(resolvedSchema, ...toOmit);
 }
 
 /**
@@ -78,9 +81,10 @@ export function resolveDynamicSchema(draft: Draft, schema: JSONSchema, data: unk
  * @returns reduced json schema
  */
 export function reduceSchema(draft: Draft, schema: JSONSchema, data: unknown) {
-    const resolvedSchema = resolveDynamicSchema(draft, schema, data);
+    let resolvedSchema = resolveDynamicSchema(draft, schema, data);
     if (resolvedSchema) {
-        return mergeSchema(schema, resolvedSchema);
+        resolvedSchema = mergeSchema(schema, resolvedSchema);
+        return omit(resolvedSchema, ...toOmit);
     }
     return schema;
 }

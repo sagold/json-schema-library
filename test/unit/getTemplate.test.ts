@@ -387,6 +387,29 @@ describe("getTemplate", () => {
 
                 expect(res).to.deep.equal({ value: ["keep-me"] });
             });
+
+            it("should not require object type definition in oneOf schemas", () => {
+                core.setSchema({
+                    type: "object",
+                    oneOf: [
+                        {
+                            required: ["type"],
+                            properties: {
+                                type: { const: "header" }
+                            }
+                        },
+                        {
+                            required: ["type"],
+                            properties: {
+                                type: { const: "paragraph" }
+                            }
+                        }
+                    ]
+                });
+
+                const res = getTemplate(core, { type: "paragraph" });
+                expect(res).to.deep.equal({ type: "paragraph" });
+            });
         });
 
         describe("allOf", () => {
@@ -495,6 +518,7 @@ describe("getTemplate", () => {
                         expect(res).to.deep.equal({ trigger: "", dependency: "default" });
                     });
                 });
+
                 describe("dependency schema", () => {
                     it("should not add dependency from schema if it is not required", () => {
                         core.setSchema({

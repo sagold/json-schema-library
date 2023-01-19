@@ -1,5 +1,7 @@
 ## Changelog
 
+- [Breaking] remove `oneOfSchema` helper property in favor of `getOneOfOrigin()` non-enumerable function
+
 ### 7.0.0
 
 -   changed core interface to draft for simpler configuration using a configuration map

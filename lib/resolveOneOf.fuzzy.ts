@@ -4,6 +4,7 @@ import getTypeOf from "./getTypeOf";
 import settings from "./config/settings";
 import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
 import { Draft as Core } from "./draft";
+import { createOneOfSchemaResult } from "./schema/createOneOfSchemaResult";
 
 const { DECLARATOR_ONEOF } = settings;
 
@@ -83,7 +84,7 @@ export default function resolveOneOf(
             if (result.length > 0) {
                 errors.push(...result);
             } else {
-                return one; // return resolved schema
+                return createOneOfSchemaResult(schema, one, i);
             }
         }
 
@@ -100,17 +101,18 @@ export default function resolveOneOf(
     for (let i = 0; i < schema.oneOf.length; i += 1) {
         const one = core.resolveRef(schema.oneOf[i]);
         if (core.isValid(data, one, pointer)) {
-            matches.push(one);
+            matches.push({ schema: one, index: i });
         }
     }
 
     if (matches.length === 1) {
-        return matches[0];
+        return createOneOfSchemaResult(schema, matches[0].schema, matches[0].index);
     }
 
     // fuzzy match oneOf
     if (getTypeOf(data) === "object") {
         let schemaOfItem;
+        let schemaOfIndex = -1;
         let fuzzyGreatest = 0;
 
         for (let i = 0; i < schema.oneOf.length; i += 1) {
@@ -120,6 +122,7 @@ export default function resolveOneOf(
             if (fuzzyGreatest < fuzzyValue) {
                 fuzzyGreatest = fuzzyValue;
                 schemaOfItem = schema.oneOf[i];
+                schemaOfIndex = i;
             }
         }
 
@@ -131,7 +134,7 @@ export default function resolveOneOf(
             });
         }
 
-        return schemaOfItem;
+        return createOneOfSchemaResult(schema, schemaOfItem, schemaOfIndex);
     }
 
     if (matches.length > 1) {

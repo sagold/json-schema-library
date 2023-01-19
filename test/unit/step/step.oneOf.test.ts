@@ -50,6 +50,7 @@ describe("step.oneof", () => {
             { title: 111 }
         );
 
-        expect(res.oneOfIndex).to.eq(1);
+        expect(typeof res.getOneOfOrigin).to.eq("function");
+        expect(res.getOneOfOrigin().index).to.eq(1);
     });
 });
