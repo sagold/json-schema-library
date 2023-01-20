@@ -1,6 +1,8 @@
 ## Changelog
 
 - [Breaking] remove `oneOfSchema` helper property in favor of `getOneOfOrigin()` non-enumerable function
+- [Breaking] `getTemplate` will add only required properties per default. Use `addOptionalProps:true` to change this behaviour
+- [add] introduce `mergeSchema`, `reduceSchema` and `resolveDynamicSchema`
 
 ### 7.0.0
 

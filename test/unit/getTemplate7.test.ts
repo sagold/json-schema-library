@@ -124,11 +124,13 @@ describe("getTemplate - v7", () => {
                         }
                     },
                     then: {
+                        required: ["dynamic"],
                         properties: {
                             dynamic: { type: "string", default: "from then" }
                         }
                     },
                     else: {
+                        required: ["dynamic"],
                         properties: {
                             dynamic: { type: "string", default: "from else" }
                         }

@@ -32,6 +32,7 @@ describe("getTemplate", () => {
     it("should support null type properties", () => {
         core.setSchema({
             type: "object",
+            required: ["nullType"],
             properties: {
                 nullType: { type: "null" }
             }
@@ -105,6 +106,7 @@ describe("getTemplate", () => {
             it("should return defined properties of object", () => {
                 core.setSchema({
                     type: "object",
+                    required: ["first", "second"],
                     properties: {
                         first: { type: "string" },
                         second: { type: "number" }
@@ -180,6 +182,7 @@ describe("getTemplate", () => {
             it("should resolve $ref in object schema", () => {
                 core.setSchema({
                     type: "object",
+                    required: ["first"],
                     properties: { first: { $ref: "#/definition/first" } },
                     definition: { first: { type: "string", default: "john" } }
                 });
@@ -195,6 +198,7 @@ describe("getTemplate", () => {
                     definition: {
                         first: {
                             type: "object",
+                            required: ["first"],
                             properties: {
                                 first: { type: "string", default: "john" }
                             }
@@ -208,6 +212,7 @@ describe("getTemplate", () => {
             it("should follow $ref once", () => {
                 core.setSchema({
                     type: "object",
+                    required: ["value", "nodes"],
                     properties: {
                         value: { type: "string", default: "node" },
                         nodes: {
@@ -236,6 +241,7 @@ describe("getTemplate", () => {
             it("should respect depth of input data in $ref-resolution", () => {
                 core.setSchema({
                     type: "object",
+                    required: ["value", "nodes"],
                     properties: {
                         value: { type: "string", default: "node" },
                         nodes: {
@@ -304,12 +310,14 @@ describe("getTemplate", () => {
                     oneOf: [
                         {
                             type: "object",
+                            required: ["title"],
                             properties: {
                                 title: { type: "string", default: "jane" }
                             }
                         },
                         {
                             type: "object",
+                            required: ["value"],
                             properties: { value: { type: "number" } }
                         }
                     ]
@@ -325,12 +333,14 @@ describe("getTemplate", () => {
                     oneOf: [
                         {
                             type: "object",
+                            required: ["title"],
                             properties: {
                                 title: { type: "string", default: "jane" }
                             }
                         },
                         {
                             type: "object",
+                            required: ["value"],
                             properties: { value: { type: "number" } }
                         }
                     ]
@@ -346,12 +356,14 @@ describe("getTemplate", () => {
                     oneOf: [
                         {
                             type: "object",
+                            required: ["value"],
                             properties: {
                                 value: { type: "string", default: "jane" }
                             }
                         },
                         {
                             type: "object",
+                            required: ["value", "test"],
                             properties: {
                                 value: { type: "number" },
                                 test: { type: "string", default: "test" }
@@ -418,11 +430,13 @@ describe("getTemplate", () => {
                     type: "object",
                     allOf: [
                         {
+                            required: ["name"],
                             properties: {
                                 name: { type: "string", default: "jane" }
                             }
                         },
                         {
+                            required: ["stage"],
                             properties: {
                                 stage: { type: "string", default: "test" }
                             }
@@ -441,12 +455,14 @@ describe("getTemplate", () => {
                     type: "object",
                     anyOf: [
                         {
+                            required: ["name", "stage"],
                             properties: {
                                 name: { type: "string", default: "jane" },
                                 stage: { type: "string", default: "develop" }
                             }
                         },
                         {
+                            required: ["stage"],
                             properties: {
                                 stage: { type: "number", default: 0 }
                             }
@@ -719,6 +735,7 @@ describe("getTemplate", () => {
                     default: ["abba", "doors"],
                     items: {
                         type: "object",
+                        required: ["first", "second"],
                         properties: {
                             first: { type: "string", default: "first" },
                             second: { type: "string", default: "second" }
@@ -855,6 +872,7 @@ describe("getTemplate", () => {
                         oneOf: [
                             {
                                 type: "object",
+                                required: ["notitle"],
                                 properties: {
                                     notitle: {
                                         type: "string",
@@ -864,6 +882,7 @@ describe("getTemplate", () => {
                             },
                             {
                                 type: "object",
+                                required: ["title", "subtitle"],
                                 properties: {
                                     title: {
                                         type: "string",
@@ -927,11 +946,13 @@ describe("getTemplate", () => {
                         type: "object",
                         allOf: [
                             {
+                                required: ["title"],
                                 properties: {
                                     title: { type: "string", default: "title" }
                                 }
                             },
                             {
+                                required: ["caption"],
                                 properties: {
                                     caption: {
                                         type: "string",
@@ -960,11 +981,13 @@ describe("getTemplate", () => {
                         type: "object",
                         anyOf: [
                             {
+                                required: ["title"],
                                 properties: {
                                     title: { type: "string", default: "title" }
                                 }
                             },
                             {
+                                required: ["properties"],
                                 properties: {
                                     caption: {
                                         type: "string",

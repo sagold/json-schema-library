@@ -56,6 +56,7 @@ describe("docs", () => {
             // import { Draft07, JSONSchema } from "json-schema-library";
             const myJsonSchema: JSONSchema = {
                 type: "object",
+                required: ["name", "option", "list"],
                 properties: {
                     name: { type: "string" },
                     option: {
@@ -86,6 +87,7 @@ describe("docs", () => {
             // import { Draft07, JSONSchema } from "json-schema-library";
             const myJsonSchema: JSONSchema = {
                 type: "object",
+                required: ["name", "option", "list"],
                 properties: {
                     name: { type: "string" },
                     option: {

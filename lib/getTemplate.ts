@@ -8,6 +8,7 @@ import { JSONSchema, JSONPointer, isJSONError } from "./types";
 import { Draft as Core } from "./draft";
 import { isEmpty } from "./utils/isEmpty";
 import { resolveIfSchema } from "./features/if";
+import { resolveAllOfSchema } from "./features/allOf";
 import { resolveDependencies } from "./features/dependencies";
 import { mergeSchema } from "./mergeSchema";
 
@@ -19,7 +20,7 @@ export type TemplateOptions = {
 };
 
 const defaultOptions: TemplateOptions = {
-    addOptionalProps: true,
+    addOptionalProps: false,
     removeInvalidData: false
 };
 
@@ -107,18 +108,16 @@ function createTemplateSchema(
 
     // resolve allOf
     if (Array.isArray(schema.allOf)) {
-        for (let i = 0, l = schema.allOf.length; i < l; i += 1) {
-            // test if we may resolve
-            if (shouldResolveRef(schema.allOf[i], `${pointer}/allOf/${i}`)) {
-                templateSchema = merge(
-                    templateSchema,
-                    resolveRef(core, schema.allOf[i], `${pointer}/allOf/${i}`)
-                );
-                // add pointer return-value, if any
-                templateSchema.pointer = schema.allOf[i].$ref || templateSchema.pointer;
+        const mayResolve = schema.allOf
+            .map((allOf, index) => shouldResolveRef(allOf, `${pointer}/allOf/${index}`))
+            .reduceRight((next, before) => next && before, true);
+
+        if (mayResolve) {
+            const resolvedSchema = resolveAllOfSchema(core, schema, data);
+            if (resolvedSchema) {
+                templateSchema = mergeSchema(templateSchema, resolvedSchema);
             }
         }
-        delete templateSchema.allOf;
     }
 
     templateSchema.pointer = templateSchema.pointer || schema.$ref || pointer;
