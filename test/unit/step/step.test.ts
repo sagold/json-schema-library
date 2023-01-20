@@ -54,6 +54,47 @@ describe("step", () => {
             expect(res.type).to.deep.eq("error");
         });
 
+        it("should create schema for `additionalProperties=true`", () => {
+            const res = step(
+                core,
+                "any",
+                {
+                    type: "object",
+                    additionalProperties: true
+                },
+                { any: "i am valid" }
+            );
+
+            expect(res.type).to.deep.eq("string");
+        });
+
+        it("should treat `additionalProperties` as `true` per default", () => {
+            const res = step(
+                core,
+                "any",
+                {
+                    type: "object"
+                },
+                { any: "i am valid" }
+            );
+
+            expect(res.type).to.deep.eq("string");
+        });
+
+        it("should return an error if `additionalProperties=false` and property unknown", () => {
+            const res = step(
+                core,
+                "any",
+                {
+                    type: "object",
+                    additionalProperties: false
+                },
+                { any: "i am valid" }
+            );
+
+            expect(res.type).to.deep.eq("error");
+        });
+
         it("should return matching oneOf", () => {
             const res = step(
                 core,

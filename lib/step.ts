@@ -129,6 +129,17 @@ const stepType = {
         if (schema.properties && schema.properties[key] !== undefined) {
             // @todo patternProperties also validate properties
 
+            // boolean schema
+            if (schema.properties[key] === false) {
+                return errors.forbiddenPropertyError({
+                    property: key,
+                    value: data,
+                    pointer: `${pointer}`
+                });
+            } else if (schema.properties[key] === true) {
+                return createSchemaOf(data?.[key]);
+            }
+
             targetSchema = core.resolveRef(schema.properties[key]);
             if (isJSONError(targetSchema)) {
                 return targetSchema;
@@ -138,11 +149,7 @@ const stepType = {
             if (targetSchema && Array.isArray(targetSchema.oneOf)) {
                 // @special case: this is a mix of a schema and optional definitions
                 // we resolve the schema here and add the original schema to `oneOfSchema`
-                return core.resolveOneOf(
-                    data[key],
-                    targetSchema,
-                    `${pointer}/${key}`
-                );
+                return core.resolveOneOf(data[key], targetSchema, `${pointer}/${key}`);
             }
 
             // resolved schema or error
@@ -179,14 +186,16 @@ const stepType = {
             return schema.additionalProperties;
         }
 
-        if (schema.additionalProperties === true) {
+        if (
+            data &&
+            (schema.additionalProperties === undefined || schema.additionalProperties === true)
+        ) {
             return createSchemaOf(data[key]);
         }
 
         return errors.unknownPropertyError({
             property: key,
             value: data,
-            // pointer: `${pointer}/${key}`,
             pointer: `${pointer}`
         });
     }
@@ -213,6 +222,19 @@ export default function step(
     data?: any,
     pointer: JSONPointer = "#"
 ): JSONSchema | JSONError {
+    // // @ts-ignore
+    // if (schema === false) {
+    //     return errors.unknownPropertyError({
+    //         property: key,
+    //         value: data,
+    //         pointer: `${pointer}`
+    //     });
+    // }
+    // // @ts-ignore
+    // if (schema === true) {
+    //     return createSchemaOf(data?.[key]);
+    // }
+
     // @draft >= 4 ?
     if (Array.isArray(schema.type)) {
         const dataType = getTypeOf(data);

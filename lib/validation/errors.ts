@@ -11,6 +11,7 @@ const errors: Record<string, CreateError> = {
     containsArrayError: createCustomError("ContainsArrayError"),
     containsAnyError: createCustomError("ContainsAnyError"),
     enumError: createCustomError("EnumError"),
+    forbiddenPropertyError: createCustomError("ForbiddenPropertyError"),
     formatURLError: createCustomError("FormatURLError"),
     formatURIError: createCustomError("FormatURIError"),
     formatURIReferenceError: createCustomError("FormatURIReferenceError"),

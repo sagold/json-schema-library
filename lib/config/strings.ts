@@ -10,6 +10,7 @@ export default {
     ContainsArrayError: "The property at `{{pointer}}` must not be an array",
     ContainsError: "The array at `{{pointer}}` must contain an element that matches `{{schema}}`",
     EnumError: "Expected given value `{{value}}` in `{{pointer}}` to be one of `{{values}}`",
+    ForbiddenPropertyError: "Property name `{{property}}` at `{{pointer}}` is not allowed",
     FormatDateError: "Value `{{value}}` at `{{pointer}}` is not a valid date",
     FormatDateTimeError: "Value `{{value}}` at `{{pointer}}` is not a valid date-time",
     FormatEmailError: "Value `{{value}}` at `{{pointer}}` is not a valid email",
