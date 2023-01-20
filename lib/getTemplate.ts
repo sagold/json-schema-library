@@ -293,8 +293,25 @@ const TYPE: Record<
         }
 
         if (data) {
-            // merge any missing data (additionals) to resulting object
-            Object.keys(data).forEach((key) => d[key] == null && (d[key] = data[key]));
+            if (
+                opts.removeInvalidData === true &&
+                (schema.additionalProperties === false ||
+                    getTypeOf(schema.additionalProperties) === "object")
+            ) {
+                if (getTypeOf(schema.additionalProperties) === "object") {
+                    Object.keys(data).forEach((key) => {
+                        if (d[key] == null) {
+                            // merge valid missing data (additionals) to resulting object
+                            if (core.isValid(data[key], schema.additionalProperties)) {
+                                d[key] = data[key];
+                            }
+                        }
+                    });
+                }
+            } else {
+                // merge any missing data (additionals) to resulting object
+                Object.keys(data).forEach((key) => d[key] == null && (d[key] = data[key]));
+            }
         }
 
         // @feature if-then-else

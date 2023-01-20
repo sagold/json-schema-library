@@ -173,6 +173,107 @@ describe("getTemplate", () => {
             });
         });
 
+        describe("additionalProperties", () => {
+            it("should not remove additional properties `additionalProperties=undefined`", () => {
+                core.setSchema({
+                    type: "object",
+                    required: ["first", "second"],
+                    properties: {
+                        first: { type: "string" }
+                    }
+                });
+
+                const res = getTemplate(core, { first: "first", second: 42 });
+                expect(res).to.deep.equal({ first: "first", second: 42 });
+            });
+
+            it("should not remove additional properties `additionalProperties=true`", () => {
+                core.setSchema({
+                    type: "object",
+                    required: ["first", "second"],
+                    properties: {
+                        first: { type: "string" }
+                    },
+                    additionalProperties: true
+                });
+
+                const res = getTemplate(core, { first: "first", second: 42 });
+                expect(res).to.deep.equal({ first: "first", second: 42 });
+            });
+
+            it("should not remove non matching properties", () => {
+                core.setSchema({
+                    type: "object",
+                    required: ["first", "second"],
+                    properties: {
+                        first: { type: "string" }
+                    },
+                    additionalProperties: {
+                        type: "string"
+                    }
+                });
+
+                const res = getTemplate(core, { first: "first", second: 42 });
+                expect(res).to.deep.equal({ first: "first", second: 42 });
+            });
+
+            it("should not remove additional properties with `additionalProperties=false`", () => {
+                core.setSchema({
+                    type: "object",
+                    required: ["first", "second"],
+                    properties: {
+                        first: { type: "string" }
+                    },
+                    additionalProperties: false
+                });
+
+                const res = getTemplate(core, { first: "first", second: 42 });
+                expect(res).to.deep.equal({ first: "first", second: 42 });
+            });
+
+            it("should remove unmatched properties with option `removeInvalidData=true`", () => {
+                core.setSchema({
+                    type: "object",
+                    required: ["first", "second"],
+                    properties: {
+                        first: { type: "string" }
+                    },
+                    additionalProperties: false
+                });
+
+                const res = getTemplate(
+                    core,
+                    { first: "first", second: 42, thrid: "third" },
+                    core.getSchema(),
+                    { removeInvalidData: true }
+                );
+                expect(res).to.deep.equal({ first: "first" });
+            });
+
+            it("should remove invalid properties with option `removeInvalidData=true`", () => {
+                core.setSchema({
+                    type: "object",
+                    required: ["first", "second"],
+                    properties: {
+                        first: { type: "string" }
+                    },
+                    additionalProperties: {
+                        type: "number"
+                    }
+                });
+
+                const res = getTemplate(
+                    core,
+                    { first: "first", second: 42, third: "third", fourth: false },
+                    core.getSchema(),
+                    {
+                        removeInvalidData: true
+                    }
+                );
+                expect(res).to.deep.equal({ first: "first", second: 42 });
+            });
+        });
+
         describe("$ref", () => {
             const settings = require("../../lib/config/settings");
             const initialValue = settings.GET_TEMPLATE_RECURSION_LIMIT;
