@@ -16,7 +16,7 @@ import { Draft04, draft04Config } from "./lib/draft04";
 import { Draft06, draft06Config } from "./lib/draft06";
 import { Draft07, draft07Config } from "./lib/draft07";
 import { JsonEditor, draftJsonEditorConfig } from "./lib/jsoneditor";
-import { isJSONError } from "./lib/types";
+import { isJsonError } from "./lib/types";
 
 const config = { strings };
 
@@ -35,7 +35,7 @@ export {
     createCustomError,
     getTypeOf, // returns the javascript datatype
     isDynamicSchema, // NEW
-    isJSONError,
+    isJsonError,
     mergeSchema, // NEW
     render,
     resolveAllOf,
@@ -54,7 +54,7 @@ import { DraftConfig } from "./lib/draft";
 import { EachCallback } from "./lib/each";
 import { EachSchemaCallback } from "./lib/eachSchema";
 import { ErrorData, CreateError } from "./lib/utils/createCustomError";
-import { JSONSchema, JSONPointer, JSONError, JSONValidator, JSONTypeValidator } from "./lib/types";
+import { JsonSchema, JsonPointer, JsonError, JsonValidator, JsonTypeValidator } from "./lib/types";
 import { JSType } from "./lib/getTypeOf";
 
 export type {
@@ -63,10 +63,10 @@ export type {
     EachCallback,
     EachSchemaCallback,
     ErrorData,
-    JSONError,
-    JSONPointer,
-    JSONSchema,
-    JSONTypeValidator,
-    JSONValidator,
+    JsonError,
+    JsonPointer,
+    JsonSchema,
+    JsonTypeValidator,
+    JsonValidator,
     JSType
 };
