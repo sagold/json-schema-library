@@ -3,8 +3,7 @@ import { get } from "@sagold/json-query";
 import getTypeId from "./getTypeId";
 import types from "./types";
 import { JsonSchema, JsonPointer } from "../types";
-
-const isObject = (value: unknown) => Object.prototype.toString.call(value) === "[object Object]";
+import { isObject } from "../utils/isObject";
 
 type TypeDef = { pointer: JsonPointer; def: unknown };
 

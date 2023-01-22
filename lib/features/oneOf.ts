@@ -1,13 +1,13 @@
 /**
  * @draft-04
  */
-import { errorOrPromise } from "../utils/filter";
 import flattenArray from "../utils/flattenArray";
-import settings from "../config/settings";
-import { JsonSchema, JsonPointer, JsonError, isJsonError, JsonValidator } from "../types";
-import { Draft } from "../draft";
-import { createOneOfSchemaResult } from "../schema/createOneOfSchemaResult";
 import getTypeOf from "../getTypeOf";
+import settings from "../config/settings";
+import { createOneOfSchemaResult } from "../schema/createOneOfSchemaResult";
+import { Draft } from "../draft";
+import { errorOrPromise } from "../utils/filter";
+import { JsonSchema, JsonPointer, JsonError, isJsonError, JsonValidator } from "../types";
 
 const { DECLARATOR_ONEOF } = settings;
 

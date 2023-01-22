@@ -1,6 +1,7 @@
 import gp from "@sagold/json-pointer";
 import getTypeDefs from "./schema/getTypeDefs";
 import { JsonSchema, JsonPointer } from "./types";
+import { isObject } from "./utils/isObject";
 
 export type EachSchemaCallback = (schema: JsonSchema, pointer: JsonPointer) => void;
 
@@ -8,9 +9,6 @@ type Walker = {
     nextTypeDefs: typeof nextTypeDefs;
     callback: EachSchemaCallback;
 };
-
-const isObject = (value: unknown): value is Record<string, unknown> =>
-    Object.prototype.toString.call(value) === "[object Object]";
 
 function nextTypeDefs(schema: JsonSchema, pointer: JsonPointer) {
     if (this.callback(schema, pointer) === true) {

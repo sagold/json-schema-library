@@ -1,7 +1,7 @@
 import types from "./types";
 import { JsonSchema } from "../types";
+import { isObject } from "../utils/isObject";
 
-const isObject = (value: unknown) => Object.prototype.toString.call(value) === "[object Object]";
 const typeKeywords = Object.keys(types).filter((id) => types[id].type === false);
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 

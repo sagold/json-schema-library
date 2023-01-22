@@ -13,10 +13,11 @@ import { omit } from "../utils/omit";
  *
  * @returns merged anyOf subschemas which are valid to the given input data.
  */
-export function resolveAnyOfSchema(draft: Draft, schema: JsonSchema, data: unknown) {
+export function mergeValidAnyOfSchema(draft: Draft, schema: JsonSchema, data: unknown) {
     if (!Array.isArray(schema.anyOf) || schema.anyOf.length === 0) {
         return;
     }
+
     let resolvedSchema: JsonSchema;
     schema.anyOf.forEach((anySchema: JsonSchema) => {
         anySchema = draft.resolveRef(anySchema);
@@ -41,7 +42,8 @@ export function resolveAnyOf(
     if (!Array.isArray(anyOf) || anyOf.length === 0) {
         return schema;
     }
-    const resolvedSchema = resolveAnyOfSchema(draft, schema, data);
+
+    const resolvedSchema = mergeValidAnyOfSchema(draft, schema, data);
     if (resolvedSchema == null) {
         return errors.anyOfError({ value: data, pointer, anyOf: JSON.stringify(anyOf) });
     }
@@ -53,9 +55,10 @@ export function resolveAnyOf(
  * validate anyOf definition for given input data
  */
 const validateAnyOf: JsonValidator = (draft, schema, value, pointer) => {
-    if (Array.isArray(schema.anyOf) === false) {
+    if (!Array.isArray(schema.anyOf) || schema.anyOf.length === 0) {
         return undefined;
     }
+
     for (let i = 0; i < schema.anyOf.length; i += 1) {
         if (draft.isValid(value, schema.anyOf[i])) {
             return undefined;

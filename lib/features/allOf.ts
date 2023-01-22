@@ -6,7 +6,6 @@ import { Draft } from "../draft";
 import { mergeSchema } from "../mergeSchema";
 import { omit } from "../utils/omit";
 import copy from "../utils/copy";
-import { mergeArraysUnique } from "../utils/merge";
 import { resolveIfSchema } from "./if";
 
 /**
@@ -31,7 +30,7 @@ export function resolveAllOf(
     for (let i = 0; i < schema.allOf.length; i += 1) {
         // @todo introduce draft.resolveSchema to iteratively resolve
         const allOfSchema = resolveSchema(draft, schema.allOf[i], data);
-        mergedSchema = mergeArraysUnique(mergedSchema, allOfSchema);
+        mergedSchema = mergeSchema(mergedSchema, allOfSchema);
         data = draft.getTemplate(data, mergedSchema);
     }
     delete mergedSchema.allOf;
@@ -39,16 +38,12 @@ export function resolveAllOf(
 }
 
 /**
- * returns allOf as a json schema. does not merge with input json schema. you
- * probably will need to do so to correctly resolve references.
+ * Merge all allOf sub schema into a single schema. Returns undefined for
+ * missing allOf definition.
  *
  * @returns json schema defined by allOf or undefined
  */
-export function resolveAllOfSchema(
-    draft: Draft,
-    schema: JsonSchema,
-    data: unknown
-): JsonSchema | undefined {
+export function mergeAllOfSchema(draft: Draft, schema: JsonSchema): JsonSchema | undefined {
     const { allOf } = schema;
     if (!Array.isArray(allOf) || allOf.length === 0) {
         return;
@@ -57,7 +52,6 @@ export function resolveAllOfSchema(
     allOf.forEach((subschema) => {
         resolvedSchema = mergeSchema(resolvedSchema, draft.resolveRef(subschema));
     });
-    // resolvedSchema.type = resolvedSchema.type || schema.type;
     return resolvedSchema;
 }
 

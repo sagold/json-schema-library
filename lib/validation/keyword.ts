@@ -2,11 +2,12 @@ import getTypeOf from "../getTypeOf";
 import isSame from "../utils/deepCompare";
 import settings from "../config/settings";
 import ucs2decode from "../utils/punycode.ucs2decode";
-import { validateDependencies } from "../features/dependencies";
+import { isObject } from "../utils/isObject";
+import { JsonValidator, isJsonError, JsonError } from "../types";
 import { validateAllOf } from "../features/allOf";
 import { validateAnyOf } from "../features/anyOf";
+import { validateDependencies } from "../features/dependencies";
 import { validateOneOf } from "../features/oneOf";
-import { JsonValidator, isJsonError, JsonError } from "../types";
 const FPP = settings.floatingPointPrecision;
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -54,10 +55,10 @@ const KeywordValidation: Record<string, JsonValidator> = {
         for (let i = 0, l = receivedProperties.length; i < l; i += 1) {
             const property = receivedProperties[i];
             if (expectedProperties.indexOf(property) === -1) {
-                const isObject = typeof schema.additionalProperties === "object";
+                const additionalIsObject = isObject(schema.additionalProperties);
 
                 // additionalProperties { oneOf: [] }
-                if (isObject && Array.isArray(schema.additionalProperties.oneOf)) {
+                if (additionalIsObject && Array.isArray(schema.additionalProperties.oneOf)) {
                     const result = draft.resolveOneOf(
                         value[property],
                         schema.additionalProperties,
@@ -79,7 +80,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
                     }
 
                     // additionalProperties {}
-                } else if (isObject) {
+                } else if (additionalIsObject) {
                     errors.push(
                         ...draft.validate(
                             value[property],

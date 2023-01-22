@@ -3,8 +3,8 @@ import { Draft } from "./draft";
 import { mergeSchema } from "./mergeSchema";
 import { resolveIfSchema } from "./features/if";
 import { resolveDependencies } from "./features/dependencies";
-import { resolveAllOfSchema } from "./features/allOf";
-import { resolveAnyOfSchema } from "./features/anyOf";
+import { mergeAllOfSchema } from "./features/allOf";
+import { mergeValidAnyOfSchema } from "./features/anyOf";
 import { resolveOneOfFuzzy as resolveOneOf } from "./features/oneOf";
 import { JsonData } from "@sagold/json-pointer";
 import { omit } from "./utils/omit";
@@ -46,13 +46,13 @@ export function resolveDynamicSchema(draft: Draft, schema: JsonSchema, data: unk
     }
 
     // @feature allOf
-    const allOfSchema = resolveAllOfSchema(draft, schema, data);
-    if (allOfSchema && allOfSchema.type !== "error") {
+    const allOfSchema = mergeAllOfSchema(draft, schema);
+    if (allOfSchema) {
         resolvedSchema = mergeSchema(resolvedSchema ?? {}, allOfSchema);
     }
 
     // @feature anyOf
-    const anyOfSchema = resolveAnyOfSchema(draft, schema, data);
+    const anyOfSchema = mergeValidAnyOfSchema(draft, schema, data);
     if (anyOfSchema) {
         resolvedSchema = mergeSchema(resolvedSchema ?? {}, anyOfSchema);
     }
