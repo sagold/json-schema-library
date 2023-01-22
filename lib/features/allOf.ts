@@ -1,19 +1,10 @@
-/* draft-04 */
+/**
+ * @draft-04
+ */
 import { JsonSchema, JsonValidator, JsonError } from "../types";
 import { Draft } from "../draft";
 import { mergeSchema } from "../mergeSchema";
 import { omit } from "../utils/omit";
-
-/**
- * resolveAllOf is tricky:
- *
- * resolve all merges all schemas altough each schema in the list must be used
- * for validation. But to use this as a template schema to create data and a
- * resolved schema, structural data must be merged. Currently, it is merged in
- * all case, but separately validated and resolved. This will break at some
- * point, requiring us to be more specific on our current intent (validation
- * vs get (resolved) schema)
- */
 import copy from "../utils/copy";
 import { mergeArraysUnique } from "../utils/merge";
 import { resolveIfSchema } from "./if";
@@ -38,6 +29,7 @@ export function resolveAllOf(
 ): JsonSchema | JsonError {
     let mergedSchema = copy(schema);
     for (let i = 0; i < schema.allOf.length; i += 1) {
+        // @todo introduce draft.resolveSchema to iteratively resolve
         const allOfSchema = resolveSchema(draft, schema.allOf[i], data);
         mergedSchema = mergeArraysUnique(mergedSchema, allOfSchema);
         data = draft.getTemplate(data, mergedSchema);

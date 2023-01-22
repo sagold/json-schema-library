@@ -53,13 +53,11 @@ const validateAnyOf: JsonValidator = (draft, schema, value, pointer) => {
     if (Array.isArray(schema.anyOf) === false) {
         return undefined;
     }
-
     for (let i = 0; i < schema.anyOf.length; i += 1) {
         if (draft.isValid(value, schema.anyOf[i])) {
             return undefined;
         }
     }
-
     return draft.errors.anyOfError({ anyOf: schema.anyOf, value, pointer });
 };
 

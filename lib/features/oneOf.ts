@@ -239,16 +239,12 @@ export function resolveOneOfFuzzy(
  * validates oneOf definition for given input data
  */
 const validateOneOf: JsonValidator = (draft, schema, value, pointer) => {
-    if (Array.isArray(schema.oneOf) === false) {
-        return undefined;
+    if (Array.isArray(schema.oneOf)) {
+        const schemaOrError = draft.resolveOneOf(value, schema, pointer);
+        if (isJsonError(schemaOrError)) {
+            return schemaOrError;
+        }
     }
-
-    schema = draft.resolveOneOf(value, schema, pointer);
-    if (isJsonError(schema)) {
-        return schema;
-    }
-
-    return undefined;
 };
 
 export { validateOneOf };
