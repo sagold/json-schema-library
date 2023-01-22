@@ -1,7 +1,7 @@
 import { errorOrPromise } from "../utils/filter";
 import flattenArray from "../utils/flattenArray";
 import settings from "../config/settings";
-import { JSONSchema, JSONPointer, JSONError, isJSONError } from "../types";
+import { JSONSchema, JSONPointer, JSONError, isJSONError, JSONValidator } from "../types";
 import { Draft as Core } from "../draft";
 import { createOneOfSchemaResult } from "../schema/createOneOfSchemaResult";
 import getTypeOf from "../getTypeOf";
@@ -234,3 +234,18 @@ export function resolveOneOfFuzzy(
 
     return core.errors.oneOfError({ value: JSON.stringify(data), pointer, oneOf: schema.oneOf });
 }
+
+const validateOneOf: JSONValidator = (draft, schema, value, pointer) => {
+    if (Array.isArray(schema.oneOf) === false) {
+        return undefined;
+    }
+
+    schema = draft.resolveOneOf(value, schema, pointer);
+    if (isJSONError(schema)) {
+        return schema;
+    }
+
+    return undefined;
+};
+
+export { validateOneOf };

@@ -4,6 +4,8 @@ import settings from "../config/settings";
 import ucs2decode from "../utils/punycode.ucs2decode";
 import { validateDependencies } from "../features/dependencies";
 import { validateAllOf } from "../features/allOf";
+import { validateAnyOf } from "../features/anyOf";
+import { validateOneOf } from "../features/oneOf";
 import { JSONValidator, isJSONError, JSONError } from "../types";
 const FPP = settings.floatingPointPrecision;
 
@@ -102,19 +104,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
 
     allOf: validateAllOf,
 
-    anyOf: (core, schema, value, pointer) => {
-        if (Array.isArray(schema.anyOf) === false) {
-            return undefined;
-        }
-
-        for (let i = 0; i < schema.anyOf.length; i += 1) {
-            if (core.isValid(value, schema.anyOf[i])) {
-                return undefined;
-            }
-        }
-
-        return core.errors.anyOfError({ anyOf: schema.anyOf, value, pointer });
-    },
+    anyOf: validateAnyOf,
 
     dependencies: validateDependencies,
 
@@ -300,18 +290,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
         }
         return errors;
     },
-    oneOf: (core, schema, value, pointer) => {
-        if (Array.isArray(schema.oneOf) === false) {
-            return undefined;
-        }
-
-        schema = core.resolveOneOf(value, schema, pointer);
-        if (isJSONError(schema)) {
-            return schema;
-        }
-
-        return undefined;
-    },
+    oneOf: validateOneOf,
     pattern: (core, schema, value: string, pointer) => {
         const pattern = new RegExp(schema.pattern, "u");
         if (pattern.test(value) === false) {

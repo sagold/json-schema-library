@@ -49,9 +49,8 @@ export function resolveAllOf(
 }
 
 /**
- * returns allOf as a json schema. does not merge with input
- * json schema. you probably will need to do so to correctly resolve
- * references.
+ * returns allOf as a json schema. does not merge with input json schema. you
+ * probably will need to do so to correctly resolve references.
  *
  * @returns json schema defined by allOf or undefined
  */

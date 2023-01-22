@@ -1,8 +1,7 @@
 import { createError, createCustomError } from "./lib/utils/createCustomError";
 import getTypeOf from "./lib/getTypeOf";
-import resolveOneOf from "./lib/resolveOneOf.strict";
-import resolveAllOf from "./lib/resolveAllOf";
-import resolveOneOfFuzzy from "./lib/resolveOneOf.fuzzy";
+import { resolveOneOf, resolveOneOfFuzzy } from "./lib/features/oneOf";
+import { resolveAllOf } from "./lib/features/allOf";
 import resolveRef from "./lib/resolveRef.strict";
 import resolveRefMerge from "./lib/resolveRef.merge";
 import SchemaService from "./lib/SchemaService";
