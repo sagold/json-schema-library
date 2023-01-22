@@ -364,5 +364,92 @@ describe("resolveDynamicSchema", () => {
         });
     });
 
-    describe("nested dynamic schema", () => {});
+    describe("anyOf", () => {
+        it("should return undefined if anyOf is empty", () => {
+            const schema = resolveDynamicSchema(
+                draft,
+                {
+                    type: "object"
+                },
+                { id: "second" }
+            );
+
+            expect(schema).to.equal(undefined);
+        });
+
+        it("should return undefined if no anyOf matches input data", () => {
+            const schema = resolveDynamicSchema(
+                draft,
+                {
+                    type: "object",
+                    anyOf: [
+                        {
+                            properties: {
+                                id: { const: "first" }
+                            }
+                        }
+                    ]
+                },
+                { id: "second" }
+            );
+
+            expect(schema).to.equal(undefined);
+        });
+
+        it("should return matching oneOf schema", () => {
+            const schema = resolveDynamicSchema(
+                draft,
+                {
+                    type: "object",
+                    anyOf: [
+                        {
+                            properties: {
+                                id: { const: "second" }
+                            }
+                        }
+                    ]
+                },
+                { id: "second" }
+            );
+
+            expect(schema).to.deep.equal({
+                properties: {
+                    id: { const: "second" }
+                }
+            });
+        });
+
+        it("should return all matching oneOf schema as merged schema", () => {
+            const schema = resolveDynamicSchema(
+                draft,
+                {
+                    type: "object",
+                    anyOf: [
+                        {
+                            properties: {
+                                id: { const: "second" }
+                            }
+                        },
+                        {
+                            properties: {
+                                id: { minLength: 4 }
+                            }
+                        },
+                        {
+                            properties: {
+                                id: { maxLength: 4 }
+                            }
+                        }
+                    ]
+                },
+                { id: "second" }
+            );
+
+            expect(schema).to.deep.equal({
+                properties: {
+                    id: { const: "second", minLength: 4 }
+                }
+            });
+        });
+    });
 });

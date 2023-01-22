@@ -12,9 +12,10 @@ export function resolveAnyOfSchema(draft: Draft, schema: JSONSchema, data: unkno
         return;
     }
     let resolvedSchema: JSONSchema;
-    schema.anyOf.forEach((any: JSONSchema) => {
-        if (draft.isValid(data, any)) {
-            resolvedSchema = resolvedSchema ? mergeSchema(resolvedSchema, any) : any;
+    schema.anyOf.forEach((anySchema: JSONSchema) => {
+        anySchema = draft.resolveRef(anySchema);
+        if (draft.isValid(data, anySchema)) {
+            resolvedSchema = resolvedSchema ? mergeSchema(resolvedSchema, anySchema) : anySchema;
         }
     });
     return resolvedSchema;
