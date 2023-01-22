@@ -2,6 +2,7 @@
 import { JSONSchema, JSONValidator, JSONError } from "../types";
 import { Draft } from "../draft";
 import { mergeSchema } from "../mergeSchema";
+import { omit } from "../utils/omit";
 
 /**
  * resolveAllOf is tricky:
@@ -27,10 +28,7 @@ function resolveSchema(draft: Draft, schemaToResolve: JSONSchema, data: unknown)
     if (ifSchema) {
         return ifSchema;
     }
-    delete schema.if;
-    delete schema.then;
-    delete schema.else;
-    return schema;
+    return omit(schema, "if", "then", "else");
 }
 
 export function resolveAllOf(
@@ -71,6 +69,9 @@ export function resolveAllOfSchema(
     return resolvedSchema;
 }
 
+/**
+ * validate allOf definition for given input data
+ */
 const validateAllOf: JSONValidator = (core, schema, value, pointer) => {
     const { allOf } = schema;
     if (!Array.isArray(allOf) || allOf.length === 0) {

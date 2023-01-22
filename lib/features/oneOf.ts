@@ -235,6 +235,9 @@ export function resolveOneOfFuzzy(
     return core.errors.oneOfError({ value: JSON.stringify(data), pointer, oneOf: schema.oneOf });
 }
 
+/**
+ * validates oneOf definition for given input data
+ */
 const validateOneOf: JSONValidator = (draft, schema, value, pointer) => {
     if (Array.isArray(schema.oneOf) === false) {
         return undefined;

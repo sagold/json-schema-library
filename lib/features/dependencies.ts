@@ -87,6 +87,9 @@ export function stepIntoDependencies(
     }
 }
 
+/**
+ * validate dependencies definition for given input data
+ */
 const validateDependencies: JSONValidator = (
     draft,
     schema,

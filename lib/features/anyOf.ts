@@ -3,6 +3,7 @@ import { mergeSchema } from "../mergeSchema";
 import errors from "../validation/errors";
 import { JSONSchema, JSONPointer, JSONValidator, JSONError } from "../types";
 import { Draft } from "../draft";
+import { omit } from "../utils/omit";
 
 /**
  * @returns merged anyOf subschemas which are valid to the given input data.
@@ -45,10 +46,12 @@ export function resolveAnyOf(
         return errors.anyOfError({ value: data, pointer, anyOf: JSON.stringify(schema.anyOf) });
     }
 
-    delete mergedSchema.anyOf;
-    return mergedSchema;
+    return omit(mergedSchema, "anyOf");
 }
 
+/**
+ * validate anyOf definition for given input data
+ */
 const validateAnyOf: JSONValidator = (draft, schema, value, pointer) => {
     if (Array.isArray(schema.anyOf) === false) {
         return undefined;
