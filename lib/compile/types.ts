@@ -1,6 +1,6 @@
-import { JSONSchema, JSONPointer } from "../types";
+import { JsonSchema, JsonPointer } from "../types";
 
 export type Context = {
-    ids: Record<string, JSONPointer>;
-    remotes: Record<string, JSONSchema>;
+    ids: Record<string, JsonPointer>;
+    remotes: Record<string, JsonSchema>;
 };

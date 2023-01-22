@@ -1,4 +1,4 @@
-import { JSONSchema } from "./types";
+import { JsonSchema } from "./types";
 import { mergeArraysUnique } from "./utils/merge";
 import getTypeOf from "./getTypeOf";
 
@@ -6,7 +6,7 @@ import getTypeOf from "./getTypeOf";
  * merges to two json schema. In case of conflicts, will use overwrite first
  * schema or directly return first json schema.
  */
-export function mergeSchema(a: JSONSchema, b: JSONSchema) {
+export function mergeSchema(a: JsonSchema, b: JsonSchema) {
     const aType = getTypeOf(a);
     const bType = getTypeOf(b);
     if (aType !== bType) {

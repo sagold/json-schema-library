@@ -1,5 +1,5 @@
 /* draft-04 */
-import { JSONSchema, JSONValidator, JSONError } from "../types";
+import { JsonSchema, JsonValidator, JsonError } from "../types";
 import { Draft } from "../draft";
 import { mergeSchema } from "../mergeSchema";
 import { omit } from "../utils/omit";
@@ -22,7 +22,7 @@ import { resolveIfSchema } from "./if";
  * resolves schema
  * when complete this will have much duplication to step.object etc
  */
-function resolveSchema(draft: Draft, schemaToResolve: JSONSchema, data: unknown): JSONSchema {
+function resolveSchema(draft: Draft, schemaToResolve: JsonSchema, data: unknown): JsonSchema {
     const schema = { ...(draft.resolveRef(schemaToResolve) ?? {}) };
     const ifSchema = resolveIfSchema(draft, schema, data);
     if (ifSchema) {
@@ -34,8 +34,8 @@ function resolveSchema(draft: Draft, schemaToResolve: JSONSchema, data: unknown)
 export function resolveAllOf(
     draft: Draft,
     data: any,
-    schema: JSONSchema = draft.rootSchema
-): JSONSchema | JSONError {
+    schema: JsonSchema = draft.rootSchema
+): JsonSchema | JsonError {
     let mergedSchema = copy(schema);
     for (let i = 0; i < schema.allOf.length; i += 1) {
         const allOfSchema = resolveSchema(draft, schema.allOf[i], data);
@@ -54,14 +54,14 @@ export function resolveAllOf(
  */
 export function resolveAllOfSchema(
     draft: Draft,
-    schema: JSONSchema,
+    schema: JsonSchema,
     data: unknown
-): JSONSchema | undefined {
+): JsonSchema | undefined {
     const { allOf } = schema;
     if (!Array.isArray(allOf) || allOf.length === 0) {
         return;
     }
-    let resolvedSchema: JSONSchema = {};
+    let resolvedSchema: JsonSchema = {};
     allOf.forEach((subschema) => {
         resolvedSchema = mergeSchema(resolvedSchema, draft.resolveRef(subschema));
     });
@@ -72,13 +72,13 @@ export function resolveAllOfSchema(
 /**
  * validate allOf definition for given input data
  */
-const validateAllOf: JSONValidator = (core, schema, value, pointer) => {
+const validateAllOf: JsonValidator = (core, schema, value, pointer) => {
     const { allOf } = schema;
     if (!Array.isArray(allOf) || allOf.length === 0) {
         return;
     }
-    const errors: JSONError[] = [];
-    schema.allOf.forEach((subSchema: JSONSchema) => {
+    const errors: JsonError[] = [];
+    schema.allOf.forEach((subSchema: JsonSchema) => {
         errors.push(...core.validate(value, subSchema, pointer));
     });
     return errors;

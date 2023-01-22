@@ -1,5 +1,5 @@
 /* draft-07 */
-import { JSONSchema, JSONValidator } from "../types";
+import { JsonSchema, JsonValidator } from "../types";
 import { Draft } from "../draft";
 
 /**
@@ -11,9 +11,9 @@ import { Draft } from "../draft";
  */
 export function resolveIfSchema(
     draft: Draft,
-    schema: JSONSchema,
+    schema: JsonSchema,
     data: unknown
-): JSONSchema | undefined {
+): JsonSchema | undefined {
     if (schema.if === false) {
         return schema.else;
     }
@@ -35,10 +35,10 @@ export function resolveIfSchema(
 export function stepIntoIf(
     draft: Draft,
     key: string,
-    schema: JSONSchema,
+    schema: JsonSchema,
     data: unknown,
     pointer: string
-): JSONSchema | undefined {
+): JsonSchema | undefined {
     if (schema.if && (schema.then || schema.else)) {
         const resolvedSchema = resolveIfSchema(draft, schema, data);
         if (resolvedSchema == null) {
@@ -58,7 +58,7 @@ export function stepIntoIf(
 /**
  * @returns validation result of it-then-else schema
  */
-const validateIf: JSONValidator = (draft, schema, value, pointer) => {
+const validateIf: JsonValidator = (draft, schema, value, pointer) => {
     const resolvedSchema = resolveIfSchema(draft, schema, value);
     if (resolvedSchema) {
         return draft.validate(value, resolvedSchema, pointer);

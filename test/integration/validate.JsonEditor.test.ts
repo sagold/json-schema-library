@@ -2,10 +2,10 @@ import path from "path";
 import fs from "fs";
 import { expect } from "chai";
 import { JsonEditor as Core } from "../../lib/jsoneditor";
-import { JSONSchema } from "../../lib/types";
+import { JsonSchema } from "../../lib/types";
 
 describe("validate.JsonEditor", () => {
-    let schema: JSONSchema;
+    let schema: JsonSchema;
     let data: unknown;
     let core: Core;
 

@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import getSchema from "../../../lib/getSchema";
 import { Draft04 as Core } from "../../../lib/draft04";
-import { JSONSchema, JSONPointer } from "../../../lib/types";
+import { JsonSchema, JsonPointer } from "../../../lib/types";
 import { resolveOneOfFuzzy } from "../../../lib/features/oneOf";
 
 describe("issue#19 - getSchema from dependencies", () => {
@@ -71,7 +71,7 @@ describe("issue#19 - getSchema from dependencies", () => {
         // directly set "oneOfProperty" to "generation"
         // -> validate schema -> no schema is valid (because gneration is missing here)
         // => tell jlib which schema to resolve or let it retrieve a schema on its own
-        core.resolveOneOf = function resolveOneOf(data, schema: JSONSchema, pointer: JSONPointer) {
+        core.resolveOneOf = function resolveOneOf(data, schema: JsonSchema, pointer: JsonPointer) {
             return resolveOneOfFuzzy(this, data, schema, pointer);
         };
 

@@ -1,6 +1,6 @@
 /* eslint-disable max-len, no-control-regex */
 import errors from "./errors";
-import { JSONError, JSONSchema } from "../types";
+import { JsonError, JsonSchema } from "../types";
 import { Draft } from "../draft";
 import validUrl from "valid-url";
 
@@ -20,23 +20,23 @@ const matchDate = /^(\d\d\d\d)-(\d\d)-(\d\d)$/;
 const matchTime = /^(\d\d):(\d\d):(\d\d)(\.\d+)?(z|[+-]\d\d(?::?\d\d)?)?$/i;
 const DAYS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
-const isValidJSONPointer = /^(?:\/(?:[^~/]|~0|~1)*)*$/;
-const isValidRelativeJSONPointer = /^(?:0|[1-9][0-9]*)(?:#|(?:\/(?:[^~/]|~0|~1)*)*)$/;
+const isValidJsonPointer = /^(?:\/(?:[^~/]|~0|~1)*)*$/;
+const isValidRelativeJsonPointer = /^(?:0|[1-9][0-9]*)(?:#|(?:\/(?:[^~/]|~0|~1)*)*)$/;
 const isValidURIRef =
     /^(?:[a-z][a-z0-9+\-.]*:)?(?:\/?\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:]|%[0-9a-f]{2})*@)?(?:\[(?:(?:(?:(?:[0-9a-f]{1,4}:){6}|::(?:[0-9a-f]{1,4}:){5}|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}|(?:(?:[0-9a-f]{1,4}:){0,1}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::)(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?))|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|[Vv][0-9a-f]+\.[a-z0-9\-._~!$&'()*+,;=:]+)\]|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)|(?:[a-z0-9\-._~!$&'"()*+,;=]|%[0-9a-f]{2})*)(?::\d*)?(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*|\/(?:(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*)?|(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*)?(?:\?(?:[a-z0-9\-._~!$&'"()*+,;=:@/?]|%[0-9a-f]{2})*)?(?:#(?:[a-z0-9\-._~!$&'"()*+,;=:@/?]|%[0-9a-f]{2})*)?$/i;
 // uri-template: https://tools.ietf.org/html/rfc6570
 const isValidURITemplate =
     /^(?:(?:[^\x00-\x20"'<>%\\^`{|}]|%[0-9a-f]{2})|\{[+#./;?&=,!@|]?(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?(?:,(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?)*\})*$/i;
 
-// Default JSON-Schema formats: date-time, email, hostname, ipv4, ipv6, uri, uriref
+// Default Json-Schema formats: date-time, email, hostname, ipv4, ipv6, uri, uriref
 const formatValidators: Record<
     string,
     (
         draft: Draft,
-        schema: JSONSchema,
+        schema: JsonSchema,
         value: unknown,
         pointer: string
-    ) => undefined | JSONError | JSONError[]
+    ) => undefined | JsonError | JsonError[]
 > = {
     date: (core, schema, value, pointer) => {
         if (typeof value !== "string") {
@@ -143,20 +143,20 @@ const formatValidators: Record<
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
-        if (isValidJSONPointer.test(value)) {
+        if (isValidJsonPointer.test(value)) {
             return undefined;
         }
-        return errors.formatJSONPointerError({ value, pointer });
+        return errors.formatJsonPointerError({ value, pointer });
     },
 
     "relative-json-pointer": (core, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
-        if (isValidRelativeJSONPointer.test(value)) {
+        if (isValidRelativeJsonPointer.test(value)) {
             return undefined;
         }
-        return errors.formatJSONPointerError({ value, pointer });
+        return errors.formatJsonPointerError({ value, pointer });
     },
 
     regex: (core, schema, value, pointer) => {

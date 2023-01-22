@@ -1,17 +1,17 @@
 import getTypeOf from "./getTypeOf";
 import createSchemaOf from "./createSchemaOf";
 import errors from "./validation/errors";
-import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
+import { JsonSchema, JsonPointer, JsonError, isJsonError } from "./types";
 import { Draft } from "./draft";
 import { reduceSchema } from "./reduceSchema";
 
 type StepFunction = (
     draft: Draft,
     key: string,
-    schema: JSONSchema,
+    schema: JsonSchema,
     data: any,
-    pointer: JSONPointer
-) => JSONSchema | JSONError;
+    pointer: JsonPointer
+) => JsonSchema | JsonError;
 
 const stepType: Record<string, StepFunction> = {
     array: (draft, key, schema, data, pointer) => {
@@ -87,7 +87,7 @@ const stepType: Record<string, StepFunction> = {
             return createSchemaOf(data[key]);
         }
 
-        return new Error(`Invalid array schema for ${key} at ${pointer}`) as JSONError;
+        return new Error(`Invalid array schema for ${key} at ${pointer}`) as JsonError;
     },
 
     object: (draft, key, schema, data, pointer) => {
@@ -109,7 +109,7 @@ const stepType: Record<string, StepFunction> = {
             }
 
             const targetSchema = draft.resolveRef(schema.properties[key]);
-            if (isJSONError(targetSchema)) {
+            if (isJsonError(targetSchema)) {
                 return targetSchema;
             }
 
@@ -174,10 +174,10 @@ const stepType: Record<string, StepFunction> = {
 export default function step(
     draft: Draft,
     key: string | number,
-    schema: JSONSchema,
+    schema: JsonSchema,
     data?: any,
-    pointer: JSONPointer = "#"
-): JSONSchema | JSONError {
+    pointer: JsonPointer = "#"
+): JsonSchema | JsonError {
     // @draft >= 4 ?
     if (Array.isArray(schema.type)) {
         const dataType = getTypeOf(data);
@@ -197,5 +197,5 @@ export default function step(
     if (stepFunction) {
         return stepFunction(draft, `${key}`, schema, data, pointer);
     }
-    return new Error(`Unsupported schema type ${schema.type} for key ${key}`) as JSONError;
+    return new Error(`Unsupported schema type ${schema.type} for key ${key}`) as JsonError;
 }

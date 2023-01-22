@@ -1,4 +1,4 @@
-import { JSONSchema, JSONPointer } from "./types";
+import { JsonSchema, JsonPointer } from "./types";
 import { Draft as Core } from "./draft";
 
 /**
@@ -13,8 +13,8 @@ import { Draft as Core } from "./draft";
 export default function isValid(
     core: Core,
     value: any,
-    schema: JSONSchema = core.rootSchema,
-    pointer: JSONPointer = "#"
+    schema: JsonSchema = core.rootSchema,
+    pointer: JsonPointer = "#"
 ): boolean {
     return core.validate(value, schema, pointer).length === 0;
 }

@@ -1,7 +1,7 @@
 import { errorOrPromise } from "../utils/filter";
 import flattenArray from "../utils/flattenArray";
 import settings from "../config/settings";
-import { JSONSchema, JSONPointer, JSONError, isJSONError, JSONValidator } from "../types";
+import { JsonSchema, JsonPointer, JsonError, isJsonError, JsonValidator } from "../types";
 import { Draft as Core } from "../draft";
 import { createOneOfSchemaResult } from "../schema/createOneOfSchemaResult";
 import getTypeOf from "../getTypeOf";
@@ -20,9 +20,9 @@ const { DECLARATOR_ONEOF } = settings;
 export function resolveOneOf(
     core: Core,
     data: any,
-    schema: JSONSchema = core.rootSchema,
-    pointer: JSONPointer = "#"
-): JSONSchema | JSONError {
+    schema: JsonSchema = core.rootSchema,
+    pointer: JsonPointer = "#"
+): JsonSchema | JsonError {
     // !keyword: oneOfProperty
     // an additional <DECLARATOR_ONEOF> (default `oneOfProperty`) on the schema will exactly determine the
     // oneOf value (if set in data)
@@ -43,7 +43,7 @@ export function resolveOneOf(
             const one = core.resolveRef(schema.oneOf[i]);
             const oneOfPropertySchema = core.step(oneOfProperty, one, data, pointer);
 
-            if (isJSONError(oneOfPropertySchema)) {
+            if (isJsonError(oneOfPropertySchema)) {
                 return oneOfPropertySchema;
             }
 
@@ -110,9 +110,9 @@ export function resolveOneOf(
  */
 function fuzzyObjectValue(
     core: Core,
-    one: JSONSchema,
+    one: JsonSchema,
     data: { [p: string]: any },
-    pointer?: JSONPointer
+    pointer?: JsonPointer
 ) {
     if (data == null || one.properties == null) {
         return -1;
@@ -142,9 +142,9 @@ function fuzzyObjectValue(
 export function resolveOneOfFuzzy(
     core: Core,
     data: any,
-    schema: JSONSchema = core.rootSchema,
-    pointer: JSONPointer = "#"
-): JSONSchema | JSONError {
+    schema: JsonSchema = core.rootSchema,
+    pointer: JsonPointer = "#"
+): JsonSchema | JsonError {
     // !keyword: oneOfProperty
     // an additional <DECLARATOR_ONEOF> (default `oneOfProperty`) on the schema will exactly determine the
     // oneOf value (if set in data)
@@ -165,7 +165,7 @@ export function resolveOneOfFuzzy(
             const one = core.resolveRef(schema.oneOf[i]);
             const oneOfPropertySchema = core.step(oneOfProperty, one, data, pointer);
 
-            if (isJSONError(oneOfPropertySchema)) {
+            if (isJsonError(oneOfPropertySchema)) {
                 return oneOfPropertySchema;
             }
 
@@ -238,13 +238,13 @@ export function resolveOneOfFuzzy(
 /**
  * validates oneOf definition for given input data
  */
-const validateOneOf: JSONValidator = (draft, schema, value, pointer) => {
+const validateOneOf: JsonValidator = (draft, schema, value, pointer) => {
     if (Array.isArray(schema.oneOf) === false) {
         return undefined;
     }
 
     schema = draft.resolveOneOf(value, schema, pointer);
-    if (isJSONError(schema)) {
+    if (isJsonError(schema)) {
         return schema;
     }
 

@@ -1,14 +1,14 @@
 import __ from "./__";
-import { JSONError, JSONPointer } from "../types";
+import { JsonError, JsonPointer } from "../types";
 
-export type ErrorData = { pointer: JSONPointer } & Record<string, unknown>;
-export type CreateError = (data: ErrorData) => JSONError;
+export type ErrorData = { pointer: JsonPointer } & Record<string, unknown>;
+export type CreateError = (data: ErrorData) => JsonError;
 
 function dashCase(text: string): string {
     return text.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 }
 
-export function createError(name: string, data: ErrorData): JSONError {
+export function createError(name: string, data: ErrorData): JsonError {
     return {
         type: "error",
         name,

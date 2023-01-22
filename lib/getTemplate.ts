@@ -4,7 +4,7 @@ import getTypeOf from "./getTypeOf";
 import merge from "./utils/merge";
 import copy from "./utils/copy";
 import settings from "./config/settings";
-import { JSONSchema, JSONPointer, isJSONError } from "./types";
+import { JsonSchema, JsonPointer, isJsonError } from "./types";
 import { Draft as Core } from "./draft";
 import { isEmpty } from "./utils/isEmpty";
 import { resolveIfSchema } from "./features/if";
@@ -24,8 +24,8 @@ const defaultOptions: TemplateOptions = {
     removeInvalidData: false
 };
 
-let cache: Record<string, JSONSchema>;
-function shouldResolveRef(schema: JSONSchema, pointer: JSONPointer) {
+let cache: Record<string, JsonSchema>;
+function shouldResolveRef(schema: JsonSchema, pointer: JsonPointer) {
     const { $ref } = schema;
     if ($ref == null) {
         return true;
@@ -35,7 +35,7 @@ function shouldResolveRef(schema: JSONSchema, pointer: JSONPointer) {
     return value < settings.GET_TEMPLATE_RECURSION_LIMIT;
 }
 
-function resolveRef(core: Core, schema: JSONSchema, pointer: JSONPointer) {
+function resolveRef(core: Core, schema: JsonSchema, pointer: JsonPointer) {
     // ensure we refactored consistently
     if (pointer == null) {
         throw new Error(`missing pointer ${pointer}`);
@@ -79,10 +79,10 @@ function convertValue(type: string, value: any) {
  */
 function createTemplateSchema(
     core: Core,
-    schema: JSONSchema,
+    schema: JsonSchema,
     data: unknown,
-    pointer: JSONPointer
-): JSONSchema | false {
+    pointer: JsonPointer
+): JsonSchema | false {
     // invalid schema
     if (getTypeOf(schema) !== "object") {
         return Object.assign({ pointer }, schema);
@@ -124,7 +124,7 @@ function createTemplateSchema(
     return templateSchema;
 }
 
-const isJSONSchema = (template: unknown): template is JSONSchema =>
+const isJsonSchema = (template: unknown): template is JsonSchema =>
     template && typeof template === "object";
 
 /**
@@ -138,8 +138,8 @@ const isJSONSchema = (template: unknown): template is JSONSchema =>
 function getTemplate(
     core: Core,
     data?: unknown,
-    _schema?: JSONSchema,
-    pointer?: JSONPointer,
+    _schema?: JsonSchema,
+    pointer?: JsonPointer,
     opts?: TemplateOptions
 ) {
     if (_schema == null) {
@@ -151,7 +151,7 @@ function getTemplate(
 
     // resolve $ref references, allOf and first anyOf definitions
     let schema = createTemplateSchema(core, _schema, data, pointer);
-    if (!isJSONSchema(schema)) {
+    if (!isJsonSchema(schema)) {
         return undefined;
     }
     pointer = schema.pointer;
@@ -171,7 +171,7 @@ function getTemplate(
         } else {
             // find correct schema for data
             const resolvedSchema = resolveOneOfFuzzy(core, data, schema);
-            if (isJSONError(resolvedSchema)) {
+            if (isJsonError(resolvedSchema)) {
                 if (data != null && opts.removeInvalidData !== true) {
                     return data;
                 }
@@ -189,7 +189,7 @@ function getTemplate(
     // -> hasDefault? return
     // if not -> pick first types
 
-    if (!isJSONSchema(schema) || schema.type == null) {
+    if (!isJsonSchema(schema) || schema.type == null) {
         return undefined;
     }
 
@@ -236,9 +236,9 @@ const TYPE: Record<
     string,
     (
         core: Core,
-        schema: JSONSchema,
+        schema: JsonSchema,
         data: unknown,
-        pointer: JSONPointer,
+        pointer: JsonPointer,
         opts: TemplateOptions
     ) => unknown
 > = {
@@ -251,7 +251,7 @@ const TYPE: Record<
         core,
         schema,
         data: Record<string, unknown> | undefined,
-        pointer: JSONPointer,
+        pointer: JsonPointer,
         opts: TemplateOptions
     ) => {
         const template = schema.default === undefined ? {} : schema.default;
@@ -327,9 +327,9 @@ const TYPE: Record<
     // build array type of items, ignores additionalItems
     array: (
         core: Core,
-        schema: JSONSchema,
+        schema: JsonSchema,
         data: unknown[],
-        pointer: JSONPointer,
+        pointer: JsonPointer,
         opts: TemplateOptions
     ) => {
         const template = schema.default === undefined ? [] : schema.default;
@@ -393,7 +393,7 @@ const TYPE: Record<
                 let value = d[i] == null ? template[i] : d[i];
                 let one = resolveOneOfFuzzy(core, value, templateSchema);
 
-                if (one == null || isJSONError(one)) {
+                if (one == null || isJsonError(one)) {
                     // schema could not be resolved or data is invalid
                     if (value != null && opts.removeInvalidData !== true) {
                         // keep invalid value
@@ -430,7 +430,7 @@ const TYPE: Record<
     }
 };
 
-function getDefault(schema: JSONSchema, templateValue: any, initValue: any) {
+function getDefault(schema: JsonSchema, templateValue: any, initValue: any) {
     if (templateValue != null) {
         return templateValue;
     } else if (schema.const) {
@@ -446,7 +446,7 @@ function getDefault(schema: JSONSchema, templateValue: any, initValue: any) {
 export default (
     core: Core,
     data?: any,
-    schema: JSONSchema = core.rootSchema,
+    schema: JsonSchema = core.rootSchema,
     opts: TemplateOptions = defaultOptions
 ) => {
     cache = { mi: {} };

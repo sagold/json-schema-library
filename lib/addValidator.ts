@@ -1,5 +1,5 @@
 import { Draft as Core } from "./draft";
-import { JSONValidator } from "./types";
+import { JsonValidator } from "./types";
 import { CreateError } from "./utils/createCustomError";
 
 /**
@@ -25,7 +25,7 @@ function addError(core: Core, errorId: string, errorCreator: CreateError) {
  * @param formatType - format type (i.e. `format: "html"`)
  * @param validationFunction - called with (core, schema, value, pointer)
  */
-function addFormat(core: Core, formatType: string, validationFunction: JSONValidator) {
+function addFormat(core: Core, formatType: string, validationFunction: JsonValidator) {
     if (typeof validationFunction !== "function") {
         throw new Error(`Validation function expected. Received ${typeof validationFunction}`);
     }
@@ -47,7 +47,7 @@ function addKeyword(
     core: Core,
     datatype: string,
     keyword: string,
-    validationFunction: JSONValidator
+    validationFunction: JsonValidator
 ) {
     if (typeof validationFunction !== "function") {
         throw new Error(`Validation function expected. Received ${typeof validationFunction}`);

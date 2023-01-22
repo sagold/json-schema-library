@@ -1,9 +1,9 @@
 import Keywords from "../../validation/keyword";
 import getTypeOf from "../../getTypeOf";
-import { JSONValidator, JSONError } from "../../types";
+import { JsonValidator, JsonError } from "../../types";
 import { validateIf } from "../../features/if";
 
-const KeywordValidation: Record<string, JSONValidator> = {
+const KeywordValidation: Record<string, JsonValidator> = {
     ...Keywords,
     // @draft >= 6
     contains: (core, schema, value: unknown[], pointer) => {
@@ -83,7 +83,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
             return undefined;
         }
 
-        const errors: JSONError[] = [];
+        const errors: JsonError[] = [];
         const keys = Object.keys(value);
         const patterns = Object.keys(pp).map((expr) => ({
             regex: new RegExp(expr),
@@ -162,7 +162,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
             return undefined;
         }
 
-        const errors: JSONError[] = [];
+        const errors: JsonError[] = [];
         const properties = Object.keys(value);
         const propertySchema = { ...schema.propertyNames, type: "string" };
         properties.forEach((prop) => {

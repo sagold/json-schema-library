@@ -19,7 +19,7 @@ export default {
     FormatIPV4LeadingZeroError: "IPv4 addresses starting with zero are invalid, since they are interpreted as octals",
     FormatIPV6Error: "Value `{{value}}` at `{{pointer}}` is not a valid IPv6 address",
     FormatIPV6LeadingZeroError: "IPv6 addresses starting with zero are invalid, since they are interpreted as octals",
-    FormatJSONPointerError: "Value `{{value}}` at `{{pointer}}` is not a valid json-pointer",
+    FormatJsonPointerError: "Value `{{value}}` at `{{pointer}}` is not a valid json-pointer",
     FormatRegExError: "Value `{{value}}` at `{{pointer}}` is not a valid regular expression",
     FormatTimeError: "Value `{{value}}` at `{{pointer}}` is not a valid time",
     FormatURIError: "Value `{{value}}` at `{{pointer}}` is not a valid uri",

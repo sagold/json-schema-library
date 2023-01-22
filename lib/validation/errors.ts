@@ -24,7 +24,7 @@ const errors: Record<string, CreateError> = {
     formatIPV4LeadingZeroError: createCustomError("FormatIPV4LeadingZeroError"),
     formatIPV6Error: createCustomError("FormatIPV6Error"),
     formatIPV6LeadingZeroError: createCustomError("FormatIPV6LeadingZeroError"),
-    formatJSONPointerError: createCustomError("FormatJSONPointerError"),
+    formatJsonPointerError: createCustomError("FormatJsonPointerError"),
     formatRegExError: createCustomError("FormatRegExError"),
     formatTimeError: createCustomError("FormatTimeError"),
     invalidSchemaError: createCustomError("InvalidSchemaError"),

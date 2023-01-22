@@ -1,5 +1,5 @@
 import gp from "@sagold/json-pointer";
-import { JSONSchema, JSONPointer, isJSONError } from "./types";
+import { JsonSchema, JsonPointer, isJsonError } from "./types";
 import { Draft } from "./draft";
 
 const emptyObject = {};
@@ -19,10 +19,10 @@ const emptyObject = {};
  */
 export default function getSchema(
     draft: Draft,
-    pointer: JSONPointer,
+    pointer: JsonPointer,
     data?: unknown,
-    schema: JSONSchema = draft.rootSchema
-): JSONSchema {
+    schema: JsonSchema = draft.rootSchema
+): JsonSchema {
     const frags = gp.split(pointer);
     schema = draft.resolveRef(schema);
     return _get(draft, schema, frags, pointer, data);
@@ -30,18 +30,18 @@ export default function getSchema(
 
 function _get(
     draft: Draft,
-    schema: JSONSchema,
+    schema: JsonSchema,
     frags: Array<string>,
-    pointer: JSONPointer,
+    pointer: JsonPointer,
     data: unknown = emptyObject
-): JSONSchema {
+): JsonSchema {
     if (frags.length === 0) {
         return draft.resolveRef(schema);
     }
 
     const key = frags.shift(); // step key
     schema = draft.step(key, schema, data, pointer); // step schema
-    if (isJSONError(schema)) {
+    if (isJsonError(schema)) {
         return schema;
     }
     // @ts-ignore

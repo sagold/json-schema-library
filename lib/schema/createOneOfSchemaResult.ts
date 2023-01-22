@@ -1,8 +1,8 @@
-import { JSONSchema } from "../types";
+import { JsonSchema } from "../types";
 
 export function createOneOfSchemaResult(
-    schema: JSONSchema,
-    oneOfSchema: JSONSchema,
+    schema: JsonSchema,
+    oneOfSchema: JsonSchema,
     oneOfIndex: number
 ) {
     const childSchema = { ...oneOfSchema };

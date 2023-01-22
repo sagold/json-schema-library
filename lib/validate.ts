@@ -1,7 +1,7 @@
 import getTypeOf, { JSType } from "./getTypeOf";
 import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
-import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
+import { JsonSchema, JsonPointer, JsonError, isJsonError } from "./types";
 import { Draft as Core } from "./draft";
 import equal from "fast-deep-equal";
 
@@ -29,9 +29,9 @@ function getJsonSchemaType(value: unknown, expectedType: string | string[]): JST
 export default function validate(
     core: Core,
     value: unknown,
-    schema: JSONSchema = core.rootSchema,
-    pointer: JSONPointer = "#"
-): Array<JSONError> {
+    schema: JsonSchema = core.rootSchema,
+    pointer: JsonPointer = "#"
+): Array<JsonError> {
     schema = core.resolveRef(schema);
 
     // this is a high level v7 schema validation
@@ -42,8 +42,8 @@ export default function validate(
         return [core.errors.invalidDataError({ value, pointer })];
     }
 
-    if (isJSONError(schema)) {
-        return [schema as JSONError];
+    if (isJsonError(schema)) {
+        return [schema as JsonError];
     }
 
     // @draft >= 6 const

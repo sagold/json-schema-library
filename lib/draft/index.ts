@@ -14,7 +14,7 @@ import createSchemaOf from "../createSchemaOf";
 import compileSchema from "../compileSchema";
 import { CreateError } from "../utils/createCustomError";
 import addRemoteSchema from "../addRemoteSchema";
-import { JSONSchema, JSONPointer, JSONValidator, JSONTypeValidator, JSONError } from "../types";
+import { JsonSchema, JsonPointer, JsonValidator, JsonTypeValidator, JsonError } from "../types";
 
 export type DraftConfig = {
     /** error creators by id */
@@ -22,11 +22,11 @@ export type DraftConfig = {
     /** map for valid keywords of a type  */
     typeKeywords: Record<string, string[]>;
     /** keyword validators  */
-    validateKeyword: Record<string, JSONValidator>;
+    validateKeyword: Record<string, JsonValidator>;
     /** type validators  */
-    validateType: Record<string, JSONTypeValidator>;
+    validateType: Record<string, JsonTypeValidator>;
     /** format validators  */
-    validateFormat: Record<string, JSONValidator>;
+    validateFormat: Record<string, JsonValidator>;
     templateDefaultOptions?: TemplateOptions;
 
     addRemoteSchema: typeof addRemoteSchema;
@@ -49,21 +49,21 @@ export type DraftConfig = {
 export class Draft {
     readonly config: DraftConfig;
     /** entry point of schema */
-    private __rootSchema: JSONSchema;
+    private __rootSchema: JsonSchema;
     /** cache for remote schemas */
-    remotes: Record<string, JSONSchema> = {};
+    remotes: Record<string, JsonSchema> = {};
     /** error creators by id */
     readonly errors: Record<string, CreateError> = {};
     /** map for valid keywords of a type  */
     readonly typeKeywords: Record<string, string[]> = {};
     /** keyword validators  */
-    readonly validateKeyword: Record<string, JSONValidator> = {};
+    readonly validateKeyword: Record<string, JsonValidator> = {};
     /** type validators  */
-    readonly validateType: Record<string, JSONTypeValidator> = {};
+    readonly validateType: Record<string, JsonTypeValidator> = {};
     /** format validators  */
-    readonly validateFormat: Record<string, JSONValidator> = {};
+    readonly validateFormat: Record<string, JsonValidator> = {};
 
-    constructor(config: DraftConfig, schema?: JSONSchema) {
+    constructor(config: DraftConfig, schema?: JsonSchema) {
         this.config = config;
         this.typeKeywords = JSON.parse(JSON.stringify(config.typeKeywords));
         this.validateKeyword = Object.assign({}, config.validateKeyword);
@@ -77,7 +77,7 @@ export class Draft {
         return this.__rootSchema;
     }
 
-    set rootSchema(rootSchema: JSONSchema) {
+    set rootSchema(rootSchema: JsonSchema) {
         if (rootSchema == null) {
             return;
         }
@@ -89,11 +89,11 @@ export class Draft {
      * @param url - base-url of json-schema (aka id)
      * @param schema - json-schema root
      */
-    addRemoteSchema(url: string, schema: JSONSchema): void {
+    addRemoteSchema(url: string, schema: JsonSchema): void {
         this.config.addRemoteSchema(this, url, schema);
     }
 
-    compileSchema(schema: JSONSchema): JSONSchema {
+    compileSchema(schema: JsonSchema): JsonSchema {
         return this.config.compileSchema(this, schema, this.rootSchema ?? schema);
     }
 
@@ -109,7 +109,7 @@ export class Draft {
      * @param [schema] - the schema matching the data. Defaults to rootSchema
      * @param [pointer] - pointer to current data. Default to rootPointer
      */
-    each(data: any, callback: EachCallback, schema?: JSONSchema, pointer?: JSONPointer) {
+    each(data: any, callback: EachCallback, schema?: JsonSchema, pointer?: JsonPointer) {
         return this.config.each(this, data, callback, schema, pointer);
     }
 
@@ -117,7 +117,7 @@ export class Draft {
         return this.config.eachSchema(schema, callback);
     }
 
-    getChildSchemaSelection(property: string | number, schema?: JSONSchema) {
+    getChildSchemaSelection(property: string | number, schema?: JsonSchema) {
         return this.config.getChildSchemaSelection(this, property, schema);
     }
 
@@ -132,7 +132,7 @@ export class Draft {
      * @param [schema] - the json schema to iterate. Defaults to core.rootSchema
      * @return json schema object of the json-pointer or an error
      */
-    getSchema(pointer: JSONPointer = "#", data?: any, schema?: JSONSchema): JSONSchema | JSONError {
+    getSchema(pointer: JsonPointer = "#", data?: any, schema?: JsonSchema): JsonSchema | JsonError {
         return this.config.getSchema(this, pointer, data, schema);
     }
 
@@ -145,33 +145,33 @@ export class Draft {
      */
     getTemplate(
         data?: unknown,
-        schema?: JSONSchema,
+        schema?: JsonSchema,
         opts: TemplateOptions = this.config.templateDefaultOptions
     ) {
         return this.config.getTemplate(this, data, schema, opts);
     }
 
-    isValid(data: any, schema?: JSONSchema, pointer?: JSONPointer): boolean {
+    isValid(data: any, schema?: JsonSchema, pointer?: JsonPointer): boolean {
         return this.config.isValid(this, data, schema, pointer);
     }
 
-    resolveAnyOf(data: any, schema: JSONSchema, pointer?: JSONPointer): JSONSchema {
+    resolveAnyOf(data: any, schema: JsonSchema, pointer?: JsonPointer): JsonSchema {
         return this.config.resolveAnyOf(this, data, schema, pointer);
     }
 
-    resolveAllOf(data: any, schema: JSONSchema): JSONSchema {
+    resolveAllOf(data: any, schema: JsonSchema): JsonSchema {
         return this.config.resolveAllOf(this, data, schema);
     }
 
-    resolveRef(schema: JSONSchema): JSONSchema {
+    resolveRef(schema: JsonSchema): JsonSchema {
         return this.config.resolveRef(schema, this.rootSchema);
     }
 
-    resolveOneOf(data: any, schema: JSONSchema, pointer?: JSONPointer): JSONSchema {
+    resolveOneOf(data: any, schema: JsonSchema, pointer?: JsonPointer): JsonSchema {
         return this.config.resolveOneOf(this, data, schema, pointer);
     }
 
-    setSchema(schema: JSONSchema) {
+    setSchema(schema: JsonSchema) {
         this.rootSchema = schema;
     }
 
@@ -188,7 +188,7 @@ export class Draft {
      * @param  [pointer] - pointer to schema and data (parent of key)
      * @return Schema or Error if failed resolving key
      */
-    step(key: string | number, schema: JSONSchema, data: any, pointer?: JSONPointer): JSONSchema {
+    step(key: string | number, schema: JsonSchema, data: any, pointer?: JsonPointer): JsonSchema {
         return this.config.step(this, key, schema, data, pointer);
     }
 
@@ -200,7 +200,7 @@ export class Draft {
      * @param [pointer] - json pointer pointing to value (used for error-messages only)
      * @return list of errors or empty
      */
-    validate(data: unknown, schema?: JSONSchema, pointer?: JSONPointer): JSONError[] {
+    validate(data: unknown, schema?: JsonSchema, pointer?: JsonPointer): JsonError[] {
         return this.config.validate(this, data, schema, pointer);
     }
 }

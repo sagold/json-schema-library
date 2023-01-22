@@ -1,19 +1,19 @@
 import copy from "../utils/copy";
 import { mergeSchema } from "../mergeSchema";
 import errors from "../validation/errors";
-import { JSONSchema, JSONPointer, JSONValidator, JSONError } from "../types";
+import { JsonSchema, JsonPointer, JsonValidator, JsonError } from "../types";
 import { Draft } from "../draft";
 import { omit } from "../utils/omit";
 
 /**
  * @returns merged anyOf subschemas which are valid to the given input data.
  */
-export function resolveAnyOfSchema(draft: Draft, schema: JSONSchema, data: unknown) {
+export function resolveAnyOfSchema(draft: Draft, schema: JsonSchema, data: unknown) {
     if (!Array.isArray(schema.anyOf) || schema.anyOf.length === 0) {
         return;
     }
-    let resolvedSchema: JSONSchema;
-    schema.anyOf.forEach((anySchema: JSONSchema) => {
+    let resolvedSchema: JsonSchema;
+    schema.anyOf.forEach((anySchema: JsonSchema) => {
         anySchema = draft.resolveRef(anySchema);
         if (draft.isValid(data, anySchema)) {
             resolvedSchema = resolvedSchema ? mergeSchema(resolvedSchema, anySchema) : anySchema;
@@ -23,15 +23,15 @@ export function resolveAnyOfSchema(draft: Draft, schema: JSONSchema, data: unkno
 }
 
 /**
- * @returns extended input schema with valid anyOf subschemas or JSONError if
+ * @returns extended input schema with valid anyOf subschemas or JsonError if
  * no anyOf schema matches input data
  */
 export function resolveAnyOf(
     draft: Draft,
     data: any,
-    schema: JSONSchema = draft.rootSchema,
-    pointer: JSONPointer = "#"
-): JSONSchema | JSONError {
+    schema: JsonSchema = draft.rootSchema,
+    pointer: JsonPointer = "#"
+): JsonSchema | JsonError {
     let found = false;
     let mergedSchema = copy(schema);
     for (let i = 0; i < schema.anyOf.length; i += 1) {
@@ -52,7 +52,7 @@ export function resolveAnyOf(
 /**
  * validate anyOf definition for given input data
  */
-const validateAnyOf: JSONValidator = (draft, schema, value, pointer) => {
+const validateAnyOf: JsonValidator = (draft, schema, value, pointer) => {
     if (Array.isArray(schema.anyOf) === false) {
         return undefined;
     }

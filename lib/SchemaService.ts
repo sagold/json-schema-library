@@ -2,15 +2,15 @@ import getSchema from "./getSchema";
 import { JsonEditor as Core } from "./jsoneditor";
 import gp from "@sagold/json-pointer";
 import copy from "./utils/copy";
-import { JSONSchema, JSONPointer } from "./types";
+import { JsonSchema, JsonPointer } from "./types";
 
 export default class SchemaService {
     core: Core;
-    schema: JSONSchema;
+    schema: JsonSchema;
     data: unknown;
-    cache: Record<string, JSONSchema>;
+    cache: Record<string, JsonSchema>;
 
-    constructor(schema: JSONSchema, data: unknown) {
+    constructor(schema: JsonSchema, data: unknown) {
         this.core = new Core(schema);
         this.schema = schema;
         this.data = data;
@@ -22,13 +22,13 @@ export default class SchemaService {
         this.cache = {};
     }
 
-    updateSchema(schema: JSONSchema) {
+    updateSchema(schema: JsonSchema) {
         this.schema = schema;
         this.core.setSchema(schema);
         this.cache = {};
     }
 
-    get(pointer: JSONPointer, data: unknown): JSONSchema {
+    get(pointer: JsonPointer, data: unknown): JsonSchema {
         if (data) {
             // possibly separate entry point
             const schema = getSchema(this.core, pointer, data, this.schema);

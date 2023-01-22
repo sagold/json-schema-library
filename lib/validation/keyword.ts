@@ -6,7 +6,7 @@ import { validateDependencies } from "../features/dependencies";
 import { validateAllOf } from "../features/allOf";
 import { validateAnyOf } from "../features/anyOf";
 import { validateOneOf } from "../features/oneOf";
-import { JSONValidator, isJSONError, JSONError } from "../types";
+import { JsonValidator, isJsonError, JsonError } from "../types";
 const FPP = settings.floatingPointPrecision;
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -14,7 +14,7 @@ const hasProperty = (value: Record<string, unknown>, property: string) =>
     !(value[property] === undefined || !hasOwnProperty.call(value, property));
 
 // list of validation keywords: http://json-schema.org/latest/json-schema-validation.html#rfc.section.5
-const KeywordValidation: Record<string, JSONValidator> = {
+const KeywordValidation: Record<string, JsonValidator> = {
     additionalProperties: (core, schema, value: Record<string, unknown>, pointer) => {
         if (schema.additionalProperties === true || schema.additionalProperties == null) {
             return undefined;
@@ -29,7 +29,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
             return undefined;
         }
 
-        const errors: JSONError[] = [];
+        const errors: JsonError[] = [];
         let receivedProperties = Object.keys(value).filter(
             (prop) => settings.propertyBlacklist.includes(prop) === false
         );
@@ -63,7 +63,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
                         schema.additionalProperties,
                         `${pointer}/${property}`
                     );
-                    if (isJSONError(result)) {
+                    if (isJsonError(result)) {
                         errors.push(
                             core.errors.additionalPropertiesError({
                                 schema: schema.additionalProperties,
@@ -139,12 +139,12 @@ const KeywordValidation: Record<string, JSONValidator> = {
             return core.errors.invalidDataError({ pointer, value });
         }
 
-        const errors: JSONError[] = [];
+        const errors: JsonError[] = [];
         for (let i = 0; i < value.length; i += 1) {
             const itemData = value[i];
             // @todo reevaluate: incomplete schema is created here
             const itemSchema = core.step(i, schema, value, pointer);
-            if (isJSONError(itemSchema)) {
+            if (isJsonError(itemSchema)) {
                 return [itemSchema];
             }
 
@@ -284,7 +284,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
         return undefined;
     },
     not: (core, schema, value, pointer) => {
-        const errors: JSONError[] = [];
+        const errors: JsonError[] = [];
         if (core.validate(value, schema.not, pointer).length === 0) {
             errors.push(core.errors.notError({ value, not: schema.not, pointer }));
         }
@@ -310,7 +310,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
             return undefined;
         }
 
-        const errors: JSONError[] = [];
+        const errors: JsonError[] = [];
         const keys = Object.keys(value);
         const patterns = Object.keys(pp).map((expr) => ({
             regex: new RegExp(expr),
@@ -353,7 +353,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
         return errors;
     },
     properties: (core, schema, value: Record<string, unknown>, pointer) => {
-        const errors: JSONError[] = [];
+        const errors: JsonError[] = [];
         const keys = Object.keys(schema.properties || {});
         for (let i = 0; i < keys.length; i += 1) {
             const key = keys[i];
@@ -367,7 +367,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
     },
     // @todo move to separate file: this is custom keyword validation for JsonEditor.properties keyword
     propertiesRequired: (core, schema, value: Record<string, unknown>, pointer) => {
-        const errors: JSONError[] = [];
+        const errors: JsonError[] = [];
         const keys = Object.keys(schema.properties || {});
         for (let i = 0; i < keys.length; i += 1) {
             const key = keys[i];
@@ -414,7 +414,7 @@ const KeywordValidation: Record<string, JSONValidator> = {
             return undefined;
         }
 
-        const errors: JSONError[] = [];
+        const errors: JsonError[] = [];
         value.forEach((item, index) => {
             for (let i = index + 1; i < value.length; i += 1) {
                 if (isSame(item, value[i])) {

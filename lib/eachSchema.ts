@@ -1,8 +1,8 @@
 import gp from "@sagold/json-pointer";
 import getTypeDefs from "./schema/getTypeDefs";
-import { JSONSchema, JSONPointer } from "./types";
+import { JsonSchema, JsonPointer } from "./types";
 
-export type EachSchemaCallback = (schema: JSONSchema, pointer: JSONPointer) => void;
+export type EachSchemaCallback = (schema: JsonSchema, pointer: JsonPointer) => void;
 
 type Walker = {
     nextTypeDefs: typeof nextTypeDefs;
@@ -12,7 +12,7 @@ type Walker = {
 const isObject = (value: unknown): value is Record<string, unknown> =>
     Object.prototype.toString.call(value) === "[object Object]";
 
-function nextTypeDefs(schema: JSONSchema, pointer: JSONPointer) {
+function nextTypeDefs(schema: JsonSchema, pointer: JsonPointer) {
     if (this.callback(schema, pointer) === true) {
         // eslint-disable-line no-invalid-this
         return; // stop iteration
@@ -25,8 +25,8 @@ function nextTypeDefs(schema: JSONSchema, pointer: JSONPointer) {
 
 function eachDefinition(
     walk: Walker,
-    schema: JSONSchema,
-    pointer: JSONPointer,
+    schema: JsonSchema,
+    pointer: JsonPointer,
     key = "definitions"
 ) {
     const defs = schema[key];
@@ -40,9 +40,9 @@ function eachDefinition(
 }
 
 export function eachSchema(
-    schema: JSONSchema,
+    schema: JsonSchema,
     callback: EachSchemaCallback,
-    pointer: JSONPointer = "#"
+    pointer: JsonPointer = "#"
 ) {
     const walk = { callback, nextTypeDefs };
     walk.nextTypeDefs(schema, pointer);

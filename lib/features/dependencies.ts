@@ -1,5 +1,5 @@
 /* draft-06 */
-import { JSONSchema, JSONValidator, JSONError, isJSONError } from "../types";
+import { JsonSchema, JsonValidator, JsonError, isJsonError } from "../types";
 import getTypeOf from "../getTypeOf";
 import { Draft } from "../draft";
 import { mergeSchema } from "../mergeSchema";
@@ -18,15 +18,15 @@ function isObject(v: any): v is Record<string, unknown> {
  */
 export function resolveDependencies(
     draft: Draft,
-    schema: JSONSchema,
+    schema: JsonSchema,
     data: unknown
-): JSONSchema | undefined {
+): JsonSchema | undefined {
     const { dependencies } = schema;
     if (!isObject(dependencies) || !isObject(data)) {
         return;
     }
     let updated = false;
-    let resolvedSchema: JSONSchema = { required: [] };
+    let resolvedSchema: JsonSchema = { required: [] };
     Object.keys(dependencies).forEach((prop) => {
         if (
             data[prop] == null &&
@@ -60,7 +60,7 @@ export function resolveDependencies(
 export function stepIntoDependencies(
     draft: Draft,
     key: string,
-    schema: JSONSchema,
+    schema: JsonSchema,
     data: unknown,
     pointer: string
 ) {
@@ -80,7 +80,7 @@ export function stepIntoDependencies(
                 data,
                 `${pointer}/${dependentProperty}`
             );
-            if (!isJSONError(schema)) {
+            if (!isJsonError(schema)) {
                 return schema;
             }
         }
@@ -90,7 +90,7 @@ export function stepIntoDependencies(
 /**
  * validate dependencies definition for given input data
  */
-const validateDependencies: JSONValidator = (
+const validateDependencies: JsonValidator = (
     draft,
     schema,
     value: Record<string, unknown>,
@@ -100,7 +100,7 @@ const validateDependencies: JSONValidator = (
         return undefined;
     }
 
-    const errors: JSONError[] = [];
+    const errors: JsonError[] = [];
     Object.keys(value).forEach((property) => {
         if (schema.dependencies[property] === undefined) {
             return;

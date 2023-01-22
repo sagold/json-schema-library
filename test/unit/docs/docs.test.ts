@@ -1,19 +1,19 @@
 import { expect } from "chai";
 import { Draft07 } from "../../../lib/draft07";
-import { JSONSchema, JSONError, JSONPointer } from "../../../lib/types";
+import { JsonSchema, JsonError, JsonPointer } from "../../../lib/types";
 import draft7Schema from "../../../remotes/draft07.json";
 
 describe("docs", () => {
     describe("draft methods", () => {
         it("validate should return error", () => {
-            // import { Draft07, JSONSchema, JSONError } from "json-schema-library";
-            const myJsonSchema: JSONSchema = {
+            // import { Draft07, JsonSchema, JsonError } from "json-schema-library";
+            const myJsonSchema: JsonSchema = {
                 type: "object",
                 additionalProperties: false
             };
 
             const jsonSchema = new Draft07(myJsonSchema);
-            const errors: JSONError[] = jsonSchema.validate({ name: "my-data" });
+            const errors: JsonError[] = jsonSchema.validate({ name: "my-data" });
 
             expect(errors).to.deep.equal([
                 {
@@ -26,16 +26,16 @@ describe("docs", () => {
             ]);
         });
         it("validate should return error for separate schema", () => {
-            // import { Draft07, JSONSchema, JSONError } from "json-schema-library";
+            // import { Draft07, JsonSchema, JsonError } from "json-schema-library";
 
-            const myJsonSchema: JSONSchema = {
+            const myJsonSchema: JsonSchema = {
                 type: "object",
                 additionalProperties: false
             };
 
             const jsonSchema = new Draft07(myJsonSchema);
             const mySchema = jsonSchema.compileSchema({ type: "number" });
-            const errors: JSONError[] = jsonSchema.validate("my-string", mySchema);
+            const errors: JsonError[] = jsonSchema.validate("my-string", mySchema);
 
             expect(errors).to.deep.equal([
                 {
@@ -53,8 +53,8 @@ describe("docs", () => {
             ]);
         });
         it("should return data using 'getTemplate'", () => {
-            // import { Draft07, JSONSchema } from "json-schema-library";
-            const myJsonSchema: JSONSchema = {
+            // import { Draft07, JsonSchema } from "json-schema-library";
+            const myJsonSchema: JsonSchema = {
                 type: "object",
                 required: ["name", "option", "list"],
                 properties: {
@@ -84,8 +84,8 @@ describe("docs", () => {
             });
         });
         it("should complement data using 'getTemplate'", () => {
-            // import { Draft07, JSONSchema } from "json-schema-library";
-            const myJsonSchema: JSONSchema = {
+            // import { Draft07, JsonSchema } from "json-schema-library";
+            const myJsonSchema: JsonSchema = {
                 type: "object",
                 required: ["name", "option", "list"],
                 properties: {
@@ -115,16 +115,16 @@ describe("docs", () => {
             });
         });
         it("should call for each data point using 'each", () => {
-            // import { Draft07, JSONSchema, JSONPointer } from "json-schema-library";
+            // import { Draft07, JsonSchema, JsonPointer } from "json-schema-library";
 
-            const mySchema: JSONSchema = {
+            const mySchema: JsonSchema = {
                 type: "array",
                 items: [{ type: "number" }, { type: "string" }]
             };
 
             const jsonSchema = new Draft07(mySchema);
             const calls: Record<string, unknown>[] = [];
-            const myCallback = (schema: JSONSchema, value: unknown, pointer: JSONPointer) => {
+            const myCallback = (schema: JsonSchema, value: unknown, pointer: JsonPointer) => {
                 calls.push({ schema, value, pointer });
             };
 
@@ -137,9 +137,9 @@ describe("docs", () => {
             ]);
         });
         it("should call for each sub schema", () => {
-            // import { Draft07, JSONSchema } from "json-schema-library";
+            // import { Draft07, JsonSchema } from "json-schema-library";
 
-            const mySchema: JSONSchema = {
+            const mySchema: JsonSchema = {
                 type: "array",
                 items: {
                     oneOf: [{ type: "number" }, { $ref: "#/$defs/value" }]
@@ -152,7 +152,7 @@ describe("docs", () => {
 
             const jsonSchema = new Draft07(mySchema);
             const calls: Record<string, unknown>[] = [];
-            const myCallback = (schema: JSONSchema) => {
+            const myCallback = (schema: JsonSchema) => {
                 calls.push(schema);
             };
 
@@ -168,7 +168,7 @@ describe("docs", () => {
             ]);
         });
         it("should resolve oneOf item using 'getSchema'", () => {
-            // import { Draft07, JSONSchema, JSONError } from "json-schema-library";
+            // import { Draft07, JsonSchema, JsonError } from "json-schema-library";
             const mySchema = {
                 type: "object",
                 properties: {
@@ -203,7 +203,7 @@ describe("docs", () => {
             };
 
             const jsonSchema = new Draft07(mySchema);
-            const schemaOfItem: JSONSchema | JSONError = jsonSchema.getSchema("/list/1", {
+            const schemaOfItem: JsonSchema | JsonError = jsonSchema.getSchema("/list/1", {
                 list: [{ description: "..." }, { name: "my-item" }]
             });
 

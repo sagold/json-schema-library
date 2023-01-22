@@ -19,7 +19,7 @@ import getChildSchemaSelection from "../getChildSchemaSelection";
 import TYPES from "../validation/type";
 import validate from "../validate";
 import { DraftConfig, Draft } from "../draft";
-import { JSONSchema } from "../types";
+import { JsonSchema } from "../types";
 
 const draft04Config: DraftConfig = {
     typeKeywords: {
@@ -87,7 +87,7 @@ const draft04Config: DraftConfig = {
 };
 
 class Draft04 extends Draft {
-    constructor(schema?: JSONSchema, config: Partial<DraftConfig> = {}) {
+    constructor(schema?: JsonSchema, config: Partial<DraftConfig> = {}) {
         super(merge(draft04Config, config), schema);
     }
 }

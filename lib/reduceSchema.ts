@@ -1,4 +1,4 @@
-import { JSONSchema } from "./types";
+import { JsonSchema } from "./types";
 import { Draft } from "./draft";
 import { mergeSchema } from "./mergeSchema";
 import { resolveIfSchema } from "./features/if";
@@ -33,8 +33,8 @@ export function isDynamicSchema(schema: JsonData): boolean {
  * @returns static schema from resolved dynamic schema definitions for this
  *  specific input data
  */
-export function resolveDynamicSchema(draft: Draft, schema: JSONSchema, data: unknown) {
-    let resolvedSchema: JSONSchema;
+export function resolveDynamicSchema(draft: Draft, schema: JsonSchema, data: unknown) {
+    let resolvedSchema: JsonSchema;
     schema = draft.resolveRef(schema);
 
     // @feature oneOf
@@ -73,7 +73,7 @@ export function resolveDynamicSchema(draft: Draft, schema: JSONSchema, data: unk
         return;
     }
 
-    const nestedSchema: JSONSchema | undefined = resolveDynamicSchema(draft, resolvedSchema, data);
+    const nestedSchema: JsonSchema | undefined = resolveDynamicSchema(draft, resolvedSchema, data);
     if (nestedSchema) {
         resolvedSchema = mergeSchema(resolvedSchema, nestedSchema);
     }
@@ -89,7 +89,7 @@ export function resolveDynamicSchema(draft: Draft, schema: JSONSchema, data: unk
  * @returns input schema reduced by dynamic schema definitions for the given
  * input data
  */
-export function reduceSchema(draft: Draft, schema: JSONSchema, data: unknown) {
+export function reduceSchema(draft: Draft, schema: JsonSchema, data: unknown) {
     let resolvedSchema = resolveDynamicSchema(draft, schema, data);
     if (resolvedSchema) {
         resolvedSchema = mergeSchema(schema, resolvedSchema);

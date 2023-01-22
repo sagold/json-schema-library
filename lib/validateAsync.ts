@@ -1,16 +1,16 @@
 import { errorsOnly } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
-import { JSONSchema, JSONPointer, JSONError, isJSONError } from "./types";
+import { JsonSchema, JsonPointer, JsonError, isJsonError } from "./types";
 import { Draft as Core } from "./draft";
 
 function createErrorNotification(onError: OnError) {
-    return function notifyError(error: JSONError | JSONError[]) {
+    return function notifyError(error: JsonError | JsonError[]) {
         if (Array.isArray(error)) {
             error = flattenArray(error);
             error.forEach(notifyError);
             return error;
         }
-        if (isJSONError(error)) {
+        if (isJsonError(error)) {
             onError(error);
         }
         return error;
@@ -18,12 +18,12 @@ function createErrorNotification(onError: OnError) {
 }
 
 export interface OnError {
-    (error: JSONError): void;
+    (error: JsonError): void;
 }
 
 export type Options = {
-    schema?: JSONSchema;
-    pointer?: JSONPointer;
+    schema?: JsonSchema;
+    pointer?: JsonPointer;
     onError?: OnError;
 };
 
@@ -43,17 +43,17 @@ export default function validateAsync(
     core: Core,
     value: any,
     options?: Options
-): Promise<Array<JSONError>> {
+): Promise<Array<JsonError>> {
     const { schema, pointer, onError } = { schema: core.rootSchema, pointer: "#", ...options };
 
-    let errors: Array<JSONError> = core.validate(value, schema, pointer);
+    let errors: Array<JsonError> = core.validate(value, schema, pointer);
     if (onError) {
         errors = flattenArray(errors);
         const notifyError = createErrorNotification(onError);
         for (let i = 0; i < errors.length; i += 1) {
             if (errors[i] instanceof Promise) {
                 errors[i].then(notifyError);
-            } else if (isJSONError(errors[i])) {
+            } else if (isJsonError(errors[i])) {
                 onError(errors[i]);
             }
         }

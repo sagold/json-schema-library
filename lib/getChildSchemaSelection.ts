@@ -1,5 +1,5 @@
 import { Draft } from "./draft";
-import { isJSONError, JSONError, JSONSchema } from "./types";
+import { isJsonError, JsonError, JsonSchema } from "./types";
 
 /**
  * Returns a list of possible child-schemas for the given property key. In case of a oneOf selection, multiple schemas
@@ -14,13 +14,13 @@ import { isJSONError, JSONError, JSONSchema } from "./types";
 export default function getChildSchemaSelection(
     core: Draft,
     property: string | number,
-    schema: JSONSchema = core.rootSchema
-): JSONSchema[] | JSONError {
+    schema: JsonSchema = core.rootSchema
+): JsonSchema[] | JsonError {
     const result = core.step(property, schema, {}, "#");
 
-    if (isJSONError(result)) {
+    if (isJsonError(result)) {
         if (result.code === "one-of-error") {
-            return result.data.oneOf.map((item: JSONSchema) => core.resolveRef(item));
+            return result.data.oneOf.map((item: JsonSchema) => core.resolveRef(item));
         }
         return result;
     }

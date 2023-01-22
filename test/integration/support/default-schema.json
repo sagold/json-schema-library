@@ -1149,7 +1149,7 @@
                                 },
                                 "config": {
                                     "title": "Optionale Einstellungen",
-                                    "description": "Pseudo JSON-Objekt in der Form { withTitle: false, initialHeight: '512px' }. Wichtig: es dürfen keine doppelten Anführungszeichen (\") verwendet werden",
+                                    "description": "Pseudo Json-Objekt in der Form { withTitle: false, initialHeight: '512px' }. Wichtig: es dürfen keine doppelten Anführungszeichen (\") verwendet werden",
                                     "type": "string"
                                 },
                                 "channel": {

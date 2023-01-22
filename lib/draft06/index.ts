@@ -19,7 +19,7 @@ import step from "../step";
 import TYPES from "../draft06/validation/type";
 import validate from "../validate";
 import { DraftConfig, Draft } from "../draft";
-import { JSONSchema } from "../types";
+import { JsonSchema } from "../types";
 
 const draft06Config: DraftConfig = {
     typeKeywords: {
@@ -93,7 +93,7 @@ const draft06Config: DraftConfig = {
 };
 
 class Draft06 extends Draft {
-    constructor(schema?: JSONSchema, config: Partial<DraftConfig> = {}) {
+    constructor(schema?: JsonSchema, config: Partial<DraftConfig> = {}) {
         super(merge(draft06Config, config), schema);
     }
 }

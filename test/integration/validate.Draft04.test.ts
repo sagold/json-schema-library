@@ -2,10 +2,10 @@ import path from "path";
 import fs from "fs";
 import { expect } from "chai";
 import { Draft04 as Core } from "../../lib/draft04";
-import { JSONSchema } from "../../lib/types";
+import { JsonSchema } from "../../lib/types";
 
 describe("validate.Draft04", () => {
-    let schema: JSONSchema;
+    let schema: JsonSchema;
     let data: unknown;
     let core: Core;
 

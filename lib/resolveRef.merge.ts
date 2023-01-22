@@ -1,7 +1,6 @@
-import { JSONSchema } from "./types";
+import { JsonSchema } from "./types";
 
-
-export default function resolveRefMerge(schema: JSONSchema, rootSchema: JSONSchema): JSONSchema {
+export default function resolveRefMerge(schema: JsonSchema, rootSchema: JsonSchema): JsonSchema {
     if (schema == null || schema.$ref == null) {
         return schema;
     }
@@ -14,4 +13,3 @@ export default function resolveRefMerge(schema: JSONSchema, rootSchema: JSONSche
     Object.defineProperty(mergedSchema, "getRoot", { enumerable: false, value: schema.getRoot });
     return mergedSchema;
 }
-
