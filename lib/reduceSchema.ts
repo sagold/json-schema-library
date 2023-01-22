@@ -47,7 +47,7 @@ export function resolveDynamicSchema(draft: Draft, schema: JsonSchema, data: unk
 
     // @feature allOf
     const allOfSchema = resolveAllOfSchema(draft, schema, data);
-    if (allOfSchema) {
+    if (allOfSchema && allOfSchema.type !== "error") {
         resolvedSchema = mergeSchema(resolvedSchema ?? {}, allOfSchema);
     }
 

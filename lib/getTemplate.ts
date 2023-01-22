@@ -11,6 +11,7 @@ import { resolveIfSchema } from "./features/if";
 import { resolveAllOfSchema } from "./features/allOf";
 import { resolveDependencies } from "./features/dependencies";
 import { mergeSchema } from "./mergeSchema";
+import { reduceSchema } from "./reduceSchema";
 
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
@@ -317,7 +318,13 @@ const TYPE: Record<
         // @feature if-then-else
         const ifSchema = resolveIfSchema(draft, schema, d);
         if (ifSchema) {
-            const additionalData = draft.getTemplate(d, { type: "object", ...ifSchema }, opts);
+            const additionalData = getTemplate(
+                draft,
+                d,
+                { type: "object", ...ifSchema },
+                pointer,
+                opts
+            );
             Object.assign(d, additionalData);
         }
 
@@ -332,23 +339,17 @@ const TYPE: Record<
         pointer: JsonPointer,
         opts: TemplateOptions
     ) => {
-        const template = schema.default === undefined ? [] : schema.default;
-        schema.minItems = schema.minItems || 0;
-
         const d: unknown[] = data || [];
-
-        // items are undefined
         if (schema.items == null) {
-            return d;
+            return d; // items are undefined
         }
+
+        const template = schema.default === undefined ? [] : schema.default;
+        const minItems = schema.minItems || 0;
 
         // build defined set of items
         if (Array.isArray(schema.items)) {
-            for (
-                let i = 0, l = Math.max(schema.minItems ?? 0, schema.items?.length ?? 0);
-                i < l;
-                i += 1
-            ) {
+            for (let i = 0, l = Math.max(minItems ?? 0, schema.items?.length ?? 0); i < l; i += 1) {
                 d[i] = getTemplate(
                     draft,
                     d[i] == null ? template[i] : d[i],
@@ -372,10 +373,10 @@ const TYPE: Record<
         }
         pointer = templateSchema.pointer || pointer;
 
-        // build oneOf
+        // build data for first oneOf-schema
         if (templateSchema.oneOf && d.length === 0) {
             const oneOfSchema = templateSchema.oneOf[0];
-            for (let i = 0; i < schema.minItems; i += 1) {
+            for (let i = 0; i < minItems; i += 1) {
                 d[i] = getTemplate(
                     draft,
                     d[i] == null ? template[i] : d[i],
@@ -387,8 +388,9 @@ const TYPE: Record<
             return d;
         }
 
+        // complete data selecting correct oneOf-schema
         if (templateSchema.oneOf && d.length > 0) {
-            const itemCount = Math.max(schema.minItems, d.length);
+            const itemCount = Math.max(minItems, d.length);
             for (let i = 0; i < itemCount; i += 1) {
                 let value = d[i] == null ? template[i] : d[i];
                 let one = resolveOneOfFuzzy(draft, value, templateSchema);
@@ -412,9 +414,9 @@ const TYPE: Record<
             return d;
         }
 
-        // build items-definition
+        // build data from items-definition
         if (templateSchema.type) {
-            for (let i = 0, l = Math.max(schema.minItems, d.length); i < l; i += 1) {
+            for (let i = 0, l = Math.max(minItems, d.length); i < l; i += 1) {
                 d[i] = getTemplate(
                     draft,
                     d[i] == null ? template[i] : d[i],
@@ -449,6 +451,6 @@ export default (
     schema: JsonSchema = draft.rootSchema,
     opts: TemplateOptions = defaultOptions
 ) => {
-    cache = { mi: {} };
+    cache = {};
     return getTemplate(draft, data, schema, "#", opts);
 };

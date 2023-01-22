@@ -18,7 +18,7 @@ function getJsonSchemaType(value: unknown, expectedType: string | string[]): JST
 }
 
 /**
- * Validate data by a json schema
+ * Validates data with json schema
  *
  * @param draft - validator
  * @param value - value to validate
@@ -75,8 +75,9 @@ export default function validate(
         return [draft.errors.invalidTypeError({ receivedType, pointer })];
     }
 
+    // get type validation results
     const errors = flattenArray(draft.validateType[receivedType](draft, schema, value, pointer));
-    // also promises may be passed along (validateAsync)
-    // @ts-ignore
+
+    // @ts-ignore - also promises may be passed along (validateAsync)
     return errors.filter(errorOrPromise);
 }

@@ -15,10 +15,10 @@ type StepFunction = (
 
 const stepType: Record<string, StepFunction> = {
     array: (draft, key, schema, data, pointer) => {
+        const itemValue = data?.[key];
         const itemsType = getTypeOf(schema.items);
 
         if (itemsType === "object") {
-            const itemValue = data?.[key];
             // @spec: ignore additionalItems, when items is schema-object
             return reduceSchema(draft, schema.items, itemValue) || draft.resolveRef(schema.items);
         }
@@ -26,13 +26,13 @@ const stepType: Record<string, StepFunction> = {
         if (itemsType === "array") {
             // @draft >= 7 bool schema, items:[true, false]
             if (schema.items[key] === true) {
-                return createSchemaOf(data[key]);
+                return createSchemaOf(itemValue);
             }
             // @draft >= 7 bool schema, items:[true, false]
             if (schema.items[key] === false) {
                 return errors.invalidDataError({
                     key,
-                    value: data[key],
+                    value: itemValue,
                     pointer
                 });
             }
@@ -44,13 +44,13 @@ const stepType: Record<string, StepFunction> = {
             if (schema.additionalItems === false) {
                 return errors.additionalItemsError({
                     key,
-                    value: data[key],
+                    value: itemValue,
                     pointer
                 });
             }
 
             if (schema.additionalItems === true || schema.additionalItems === undefined) {
-                return createSchemaOf(data[key]);
+                return createSchemaOf(itemValue);
             }
 
             if (getTypeOf(schema.additionalItems) === "object") {
@@ -66,10 +66,10 @@ const stepType: Record<string, StepFunction> = {
             );
         }
 
-        if (schema.additionalItems !== false && data[key]) {
+        if (schema.additionalItems !== false && itemValue) {
             // @todo reevaluate: incomplete schema is created here
             // @todo support additionalItems: {schema}
-            return createSchemaOf(data[key]);
+            return createSchemaOf(itemValue);
         }
 
         return new Error(`Invalid array schema for ${key} at ${pointer}`) as JsonError;
@@ -78,22 +78,23 @@ const stepType: Record<string, StepFunction> = {
     object: (draft, key, schema, data, pointer) => {
         schema = reduceSchema(draft, schema, data);
 
-        // step into object-properties
-        if (schema.properties && schema.properties[key] !== undefined) {
+        // @feature properties
+        const property = schema?.properties?.[key];
+        if (property !== undefined) {
             // @todo patternProperties also validate properties
 
-            // boolean schema
-            if (schema.properties[key] === false) {
+            // @feature boolean schema
+            if (property === false) {
                 return errors.forbiddenPropertyError({
                     property: key,
                     value: data,
                     pointer: `${pointer}`
                 });
-            } else if (schema.properties[key] === true) {
+            } else if (property === true) {
                 return createSchemaOf(data?.[key]);
             }
 
-            const targetSchema = draft.resolveRef(schema.properties[key]);
+            const targetSchema = draft.resolveRef(property);
             if (isJsonError(targetSchema)) {
                 return targetSchema;
             }
@@ -111,26 +112,26 @@ const stepType: Record<string, StepFunction> = {
             }
         }
 
-        // find matching property key
-        if (getTypeOf(schema.patternProperties) === "object") {
+        // @feature patternProperties
+        const { patternProperties } = schema;
+        if (getTypeOf(patternProperties) === "object") {
+            // find matching property key
             let regex;
-            const patterns = Object.keys(schema.patternProperties);
+            const patterns = Object.keys(patternProperties);
             for (let i = 0, l = patterns.length; i < l; i += 1) {
                 regex = new RegExp(patterns[i]);
                 if (regex.test(key)) {
-                    return schema.patternProperties[patterns[i]];
+                    return patternProperties[patterns[i]];
                 }
             }
         }
 
-        if (getTypeOf(schema.additionalProperties) === "object") {
+        // @feature additionalProperties
+        const { additionalProperties } = schema;
+        if (getTypeOf(additionalProperties) === "object") {
             return schema.additionalProperties;
         }
-
-        if (
-            data &&
-            (schema.additionalProperties === undefined || schema.additionalProperties === true)
-        ) {
+        if (data && (additionalProperties === undefined || additionalProperties === true)) {
             return createSchemaOf(data[key]);
         }
 
@@ -182,5 +183,6 @@ export default function step(
     if (stepFunction) {
         return stepFunction(draft, `${key}`, schema, data, pointer);
     }
+
     return new Error(`Unsupported schema type ${schema.type} for key ${key}`) as JsonError;
 }

@@ -8,8 +8,8 @@ import { Draft } from "../draft";
 import { omit } from "../utils/omit";
 
 /**
- * returns merged all valid anyOf subschemas of the given input data. Does not
- * merge with rest input schema.
+ * returns merged schema of all valid anyOf subschemas for the given input data.
+ * Does not merge with rest input schema.
  *
  * @returns merged anyOf subschemas which are valid to the given input data.
  */
