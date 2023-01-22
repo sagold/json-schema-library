@@ -1,3 +1,6 @@
+/**
+ * @draft-04
+ */
 import { mergeSchema } from "../mergeSchema";
 import errors from "../validation/errors";
 import { JsonSchema, JsonPointer, JsonValidator, JsonError } from "../types";

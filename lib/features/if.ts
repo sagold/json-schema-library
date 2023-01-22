@@ -1,4 +1,6 @@
-/* draft-07 */
+/**
+ * @draft-07
+ */
 import { JsonSchema, JsonValidator } from "../types";
 import { Draft } from "../draft";
 
