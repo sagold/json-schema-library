@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { Draft07 as Draft } from "../../lib/draft07";
-import { resolveDynamicSchema } from "../../lib/reduceSchema";
+import { resolveDynamicSchema } from "../../lib/resolveDynamicSchema";
 
 describe("resolveDynamicSchema", () => {
     let draft: Draft;
