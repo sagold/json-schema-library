@@ -4,13 +4,13 @@ import { validateIf } from "../../features/if";
 const KeywordValidation = {
     ...Keywords,
     // @draft >= 6
-    contains: (core, schema, value, pointer) => {
+    contains: (draft, schema, value, pointer) => {
         if (schema.contains === false) {
-            return core.errors.containsArrayError({ pointer, value });
+            return draft.errors.containsArrayError({ pointer, value });
         }
         if (schema.contains === true) {
             if (Array.isArray(value) && value.length === 0) {
-                return core.errors.containsAnyError({ pointer });
+                return draft.errors.containsAnyError({ pointer });
             }
             return undefined;
         }
@@ -19,18 +19,18 @@ const KeywordValidation = {
             return undefined;
         }
         for (let i = 0; i < value.length; i += 1) {
-            if (core.isValid(value[i], schema.contains)) {
+            if (draft.isValid(value[i], schema.contains)) {
                 return undefined;
             }
         }
-        return core.errors.containsError({ pointer, schema: JSON.stringify(schema.contains) });
+        return draft.errors.containsError({ pointer, schema: JSON.stringify(schema.contains) });
     },
-    exclusiveMaximum: (core, schema, value, pointer) => {
+    exclusiveMaximum: (draft, schema, value, pointer) => {
         if (isNaN(schema.exclusiveMaximum)) {
             return undefined;
         }
         if (schema.exclusiveMaximum <= value) {
-            return core.errors.maximumError({
+            return draft.errors.maximumError({
                 maximum: schema.exclusiveMaximum,
                 length: value,
                 pointer
@@ -38,12 +38,12 @@ const KeywordValidation = {
         }
         return undefined;
     },
-    exclusiveMinimum: (core, schema, value, pointer) => {
+    exclusiveMinimum: (draft, schema, value, pointer) => {
         if (isNaN(schema.exclusiveMinimum)) {
             return undefined;
         }
         if (schema.exclusiveMinimum >= value) {
-            return core.errors.minimumError({
+            return draft.errors.minimumError({
                 minimum: schema.exclusiveMinimum,
                 length: value,
                 pointer
@@ -53,25 +53,25 @@ const KeywordValidation = {
     },
     // @feature if-then-else
     if: validateIf,
-    maximum: (core, schema, value, pointer) => {
+    maximum: (draft, schema, value, pointer) => {
         if (isNaN(schema.maximum)) {
             return undefined;
         }
         if (schema.maximum && schema.maximum < value) {
-            return core.errors.maximumError({ maximum: schema.maximum, length: value, pointer });
+            return draft.errors.maximumError({ maximum: schema.maximum, length: value, pointer });
         }
         return undefined;
     },
-    minimum: (core, schema, value, pointer) => {
+    minimum: (draft, schema, value, pointer) => {
         if (isNaN(schema.minimum)) {
             return undefined;
         }
         if (schema.minimum > value) {
-            return core.errors.minimumError({ minimum: schema.minimum, length: value, pointer });
+            return draft.errors.minimumError({ minimum: schema.minimum, length: value, pointer });
         }
         return undefined;
     },
-    patternProperties: (core, schema, value, pointer) => {
+    patternProperties: (draft, schema, value, pointer) => {
         const properties = schema.properties || {};
         const pp = schema.patternProperties;
         if (getTypeOf(pp) !== "object") {
@@ -90,14 +90,14 @@ const KeywordValidation = {
                     patternFound = true;
                     // for a boolean schema `false`, always invalidate
                     if (patterns[i].patternSchema === false) {
-                        errors.push(core.errors.patternPropertiesError({
+                        errors.push(draft.errors.patternPropertiesError({
                             key,
                             pointer,
                             patterns: Object.keys(pp).join(",")
                         }));
                         return;
                     }
-                    const valErrors = core.validate(value[key], patterns[i].patternSchema, `${pointer}/${key}`);
+                    const valErrors = draft.validate(value[key], patterns[i].patternSchema, `${pointer}/${key}`);
                     if (valErrors && valErrors.length > 0) {
                         errors.push(...valErrors);
                     }
@@ -108,7 +108,7 @@ const KeywordValidation = {
             }
             if (patternFound === false && schema.additionalProperties === false) {
                 // this is an arrangement with additionalProperties
-                errors.push(core.errors.patternPropertiesError({
+                errors.push(draft.errors.patternPropertiesError({
                     key,
                     pointer,
                     patterns: Object.keys(pp).join(",")
@@ -118,14 +118,14 @@ const KeywordValidation = {
         return errors;
     },
     // @draft >= 6
-    propertyNames: (core, schema, value, pointer) => {
+    propertyNames: (draft, schema, value, pointer) => {
         // bool schema
         if (schema.propertyNames === false) {
             // empty objects are valid
             if (Object.keys(value).length === 0) {
                 return undefined;
             }
-            return core.errors.invalidPropertyNameError({
+            return draft.errors.invalidPropertyNameError({
                 property: Object.keys(value),
                 pointer,
                 value
@@ -142,9 +142,9 @@ const KeywordValidation = {
         const properties = Object.keys(value);
         const propertySchema = { ...schema.propertyNames, type: "string" };
         properties.forEach((prop) => {
-            const validationResult = core.validate(prop, propertySchema, `${pointer}/${prop}`);
+            const validationResult = draft.validate(prop, propertySchema, `${pointer}/${prop}`);
             if (validationResult.length > 0) {
-                errors.push(core.errors.invalidPropertyNameError({
+                errors.push(draft.errors.invalidPropertyNameError({
                     property: prop,
                     pointer,
                     validationError: validationResult[0],

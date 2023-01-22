@@ -1,11 +1,11 @@
 import merge from "../utils/merge";
-import resolveOneOf from "../resolveOneOf.fuzzy";
+import { resolveOneOfFuzzy } from "../features/oneOf";
 import resolveRef from "../resolveRef.merge";
 import { Draft } from "../draft";
 import { draft07Config } from "../draft07";
 const draftJsonEditorConfig = {
     ...draft07Config,
-    resolveOneOf,
+    resolveOneOf: resolveOneOfFuzzy,
     resolveRef
 };
 class JsonEditor extends Draft {

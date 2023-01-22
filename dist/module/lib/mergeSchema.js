@@ -10,5 +10,18 @@ export function mergeSchema(a, b) {
     if (aType !== bType) {
         return a;
     }
-    return mergeArraysUnique(a, b);
+    const result = mergeArraysUnique(a, b);
+    if (a.getOneOfOrigin) {
+        Object.defineProperty(result, "getOneOfOrigin", {
+            enumerable: false,
+            value: a.getOneOfOrigin
+        });
+    }
+    else if (b.getOneOfOrigin) {
+        Object.defineProperty(result, "getOneOfOrigin", {
+            enumerable: false,
+            value: b.getOneOfOrigin
+        });
+    }
+    return result;
 }

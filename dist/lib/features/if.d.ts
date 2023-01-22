@@ -1,4 +1,4 @@
-import { JSONSchema, JSONValidator } from "../types";
+import { JsonSchema, JsonValidator } from "../types";
 import { Draft } from "../draft";
 /**
  * returns if-then-else as a json schema. does not merge with input
@@ -7,14 +7,13 @@ import { Draft } from "../draft";
  *
  * @returns json schema defined by if-then-else or undefined
  */
-export declare function resolveIfSchema(draft: Draft, schema: JSONSchema, data: unknown): JSONSchema | undefined;
+export declare function resolveIfSchema(draft: Draft, schema: JsonSchema, data: unknown): JsonSchema | undefined;
 /**
  * steps into if-then-else
  * @returns json schema or undefined if 'key' is not defined
  */
-export declare function stepIntoIf(draft: Draft, key: string, schema: JSONSchema, data: unknown, pointer: string): JSONSchema | undefined;
 /**
  * @returns validation result of it-then-else schema
  */
-declare const validateIf: JSONValidator;
+declare const validateIf: JsonValidator;
 export { validateIf };

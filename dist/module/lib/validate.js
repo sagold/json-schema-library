@@ -1,7 +1,7 @@
 import getTypeOf from "./getTypeOf";
 import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
-import { isJSONError } from "./types";
+import { isJsonError } from "./types";
 import equal from "fast-deep-equal";
 function getJsonSchemaType(value, expectedType) {
     const jsType = getTypeOf(value);
@@ -15,22 +15,22 @@ function getJsonSchemaType(value, expectedType) {
 /**
  * Validate data by a json schema
  *
- * @param core - validator
+ * @param draft - validator
  * @param value - value to validate
  * @param [schema] - json schema, defaults to rootSchema
  * @param [pointer] - json pointer pointing to value (used for error-messages only)
  * @return list of errors or empty
  */
-export default function validate(core, value, schema = core.rootSchema, pointer = "#") {
-    schema = core.resolveRef(schema);
+export default function validate(draft, value, schema = draft.rootSchema, pointer = "#") {
+    schema = draft.resolveRef(schema);
     // this is a high level v7 schema validation
     if (getTypeOf(schema) === "boolean") {
         if (schema) {
             return [];
         }
-        return [core.errors.invalidDataError({ value, pointer })];
+        return [draft.errors.invalidDataError({ value, pointer })];
     }
-    if (isJSONError(schema)) {
+    if (isJsonError(schema)) {
         return [schema];
     }
     // @draft >= 6 const
@@ -38,14 +38,14 @@ export default function validate(core, value, schema = core.rootSchema, pointer 
         if (equal(schema.const, value)) {
             return [];
         }
-        return [core.errors.constError({ value, expected: schema.const, pointer })];
+        return [draft.errors.constError({ value, expected: schema.const, pointer })];
     }
     const receivedType = getJsonSchemaType(value, schema.type);
     const expectedType = schema.type || receivedType;
     if (receivedType !== expectedType &&
         (!Array.isArray(expectedType) || !expectedType.includes(receivedType))) {
         return [
-            core.errors.typeError({
+            draft.errors.typeError({
                 received: receivedType,
                 expected: expectedType,
                 value,
@@ -53,10 +53,10 @@ export default function validate(core, value, schema = core.rootSchema, pointer 
             })
         ];
     }
-    if (core.validateType[receivedType] == null) {
-        return [core.errors.invalidTypeError({ receivedType, pointer })];
+    if (draft.validateType[receivedType] == null) {
+        return [draft.errors.invalidTypeError({ receivedType, pointer })];
     }
-    const errors = flattenArray(core.validateType[receivedType](core, schema, value, pointer));
+    const errors = flattenArray(draft.validateType[receivedType](draft, schema, value, pointer));
     // also promises may be passed along (validateAsync)
     // @ts-ignore
     return errors.filter(errorOrPromise);

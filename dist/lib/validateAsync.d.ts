@@ -1,23 +1,23 @@
-import { JSONSchema, JSONPointer, JSONError } from "./types";
-import { Draft as Core } from "./draft";
+import { JsonSchema, JsonPointer, JsonError } from "./types";
+import { Draft } from "./draft";
 export interface OnError {
-    (error: JSONError): void;
+    (error: JsonError): void;
 }
 export type Options = {
-    schema?: JSONSchema;
-    pointer?: JSONPointer;
+    schema?: JsonSchema;
+    pointer?: JsonPointer;
     onError?: OnError;
 };
 /**
  * @async
  * Validate data by a json schema
  *
- * @param core - validator
+ * @param draft - validator
  * @param value - value to validate
  * @param options
- * @param options.schema - json schema to use, defaults to core.rootSchema
+ * @param options.schema - json schema to use, defaults to draft.rootSchema
  * @param options.pointer - json pointer pointing to current value. Used in error reports
  * @param options.onError   - will be called for each error as soon as it is resolved
  * @return list of errors or empty
  */
-export default function validateAsync(core: Core, value: any, options?: Options): Promise<Array<JSONError>>;
+export default function validateAsync(draft: Draft, value: any, options?: Options): Promise<Array<JsonError>>;

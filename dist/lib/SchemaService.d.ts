@@ -1,12 +1,12 @@
-import { JsonEditor as Core } from "./jsoneditor";
-import { JSONSchema, JSONPointer } from "./types";
+import { JsonEditor as Draft } from "./jsoneditor";
+import { JsonSchema, JsonPointer } from "./types";
 export default class SchemaService {
-    core: Core;
-    schema: JSONSchema;
+    draft: Draft;
+    schema: JsonSchema;
     data: unknown;
-    cache: Record<string, JSONSchema>;
-    constructor(schema: JSONSchema, data: unknown);
+    cache: Record<string, JsonSchema>;
+    constructor(schema: JsonSchema, data: unknown);
     updateData(data: unknown): void;
-    updateSchema(schema: JSONSchema): void;
-    get(pointer: JSONPointer, data: unknown): JSONSchema;
+    updateSchema(schema: JsonSchema): void;
+    get(pointer: JsonPointer, data: unknown): JsonSchema;
 }

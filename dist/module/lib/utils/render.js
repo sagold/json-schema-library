@@ -1,3 +1,6 @@
+import getTypeOf from "../getTypeOf";
+const OBJECT_TYPE = "object";
+const ARRAY_TYPE = "array";
 /**
  * Renders data into a string by {{variables}}.
  * Given a template string, removes all {{property}} substrings and replaces them with the property in the given data
@@ -7,5 +10,13 @@
  * @return rendered string
  */
 export default function render(template, data = {}) {
-    return template.replace(/\{\{\w+\}\}/g, match => data[match.replace(/[{}]/g, "")]);
+    return template.replace(/\{\{\w+\}\}/g, (match) => {
+        const key = match.replace(/[{}]/g, "");
+        const variable = data[key];
+        const variableType = getTypeOf(variable);
+        if (variableType === OBJECT_TYPE || variableType === ARRAY_TYPE) {
+            return JSON.stringify(variable);
+        }
+        return variable;
+    });
 }

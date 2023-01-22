@@ -1,4 +1,7 @@
-import { JSONSchema, JSONValidator } from "../types";
+/**
+ * @draft-06
+ */
+import { JsonSchema, JsonValidator } from "../types";
 import { Draft } from "../draft";
 /**
  * returns dependencies as an object json schema. does not merge with input
@@ -7,11 +10,13 @@ import { Draft } from "../draft";
  *
  * @returns merged json schema defined by dependencies or undefined
  */
-export declare function resolveDependencies(draft: Draft, schema: JSONSchema, data: unknown): JSONSchema | undefined;
+export declare function resolveDependencies(draft: Draft, schema: JsonSchema, data: unknown): JsonSchema | undefined;
 /**
  * steps into dependencies
  * @returns json schema or undefined if 'key' is not defined
  */
-export declare function stepIntoDependencies(draft: Draft, key: string, schema: JSONSchema, data: unknown, pointer: string): JSONSchema;
-declare const validateDependencies: JSONValidator;
+/**
+ * validate dependencies definition for given input data
+ */
+declare const validateDependencies: JsonValidator;
 export { validateDependencies };

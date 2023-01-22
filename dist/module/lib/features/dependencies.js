@@ -1,5 +1,3 @@
-/* draft-06 */
-import { isJSONError } from "../types";
 import getTypeOf from "../getTypeOf";
 import { mergeSchema } from "../mergeSchema";
 import { uniqueItems } from "../utils/uniqueItems";
@@ -47,21 +45,37 @@ export function resolveDependencies(draft, schema, data) {
  * steps into dependencies
  * @returns json schema or undefined if 'key' is not defined
  */
-export function stepIntoDependencies(draft, key, schema, data, pointer) {
-    const { dependencies } = schema;
-    if (getTypeOf(dependencies) === "object") {
-        const dependentProperties = Object.keys(dependencies).filter((propertyName) => 
-        // data[propertyName] !== undefined &&
-        getTypeOf(dependencies[propertyName]) === "object");
-        for (let i = 0, l = dependentProperties.length; i < l; i += 1) {
-            const dependentProperty = dependentProperties[i];
-            const schema = draft.step(key, dependencies[dependentProperty], data, `${pointer}/${dependentProperty}`);
-            if (!isJSONError(schema)) {
-                return schema;
-            }
-        }
-    }
-}
+// export function stepIntoDependencies(
+//     draft: Draft,
+//     key: string,
+//     schema: JsonSchema,
+//     data: unknown,
+//     pointer: string
+// ) {
+//     const { dependencies } = schema;
+//     if (getTypeOf(dependencies) === "object") {
+//         const dependentProperties = Object.keys(dependencies).filter(
+//             (propertyName) =>
+//                 // data[propertyName] !== undefined &&
+//                 getTypeOf(dependencies[propertyName]) === "object"
+//         );
+//         for (let i = 0, l = dependentProperties.length; i < l; i += 1) {
+//             const dependentProperty = dependentProperties[i];
+//             const schema = draft.step(
+//                 key,
+//                 dependencies[dependentProperty],
+//                 data,
+//                 `${pointer}/${dependentProperty}`
+//             );
+//             if (!isJsonError(schema)) {
+//                 return schema;
+//             }
+//         }
+//     }
+// }
+/**
+ * validate dependencies definition for given input data
+ */
 const validateDependencies = (draft, schema, value, pointer) => {
     if (getTypeOf(schema.dependencies) !== "object") {
         return undefined;

@@ -22,6 +22,8 @@ const config = { strings };
 
 export {
     config,
+    createCustomError,
+    createError,
     Draft,
     Draft04, // core implementing draft04 specs
     draft04Config, // config implementing draft04 specs
@@ -29,24 +31,22 @@ export {
     draft06Config, // config implementing draft06 specs
     Draft07, // core implementing draft07 specs
     draft07Config, // config implementing draft07 specs
-    JsonEditor, // adjusted core of draft04 to better support the json-editor
     draftJsonEditorConfig, // adjusted config of draft04 to better support the json-editor
-    createError,
-    createCustomError,
     getTypeOf, // returns the javascript datatype
     isDynamicSchema, // NEW
     isJsonError,
+    JsonEditor, // adjusted core of draft04 to better support the json-editor
     mergeSchema, // NEW
+    reduceSchema, // NEW
     render,
     resolveAllOf,
-    resolveRef,
-    resolveRefMerge,
+    resolveDynamicSchema, // NEW
     resolveOneOf,
     resolveOneOfFuzzy,
-    reduceSchema, // NEW
-    resolveDynamicSchema, // NEW
-    settings,
+    resolveRef,
+    resolveRefMerge,
     SchemaService,
+    settings,
     validateAsync // async validation of data by a schema
 };
 

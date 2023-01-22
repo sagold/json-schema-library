@@ -1,9 +1,9 @@
 import { Draft } from "./draft";
-export type JSONSchema = {
+export type JsonSchema = {
     [p: string]: any;
 };
-export type JSONPointer = string;
-export type JSONError = {
+export type JsonPointer = string;
+export type JsonError = {
     type: "error";
     name: string;
     code: string;
@@ -15,12 +15,12 @@ export type JSONError = {
 };
 /**
  * ts type guard for json error
- * @returns true if passed type is a JSONError
+ * @returns true if passed type is a JsonError
  */
-export declare function isJSONError(error: any): error is JSONError;
-export interface JSONValidator {
-    (draft: Draft, schema: JSONSchema, value: unknown, pointer: JSONPointer): void | undefined | JSONError | JSONError[] | JSONError[][];
+export declare function isJsonError(error: any): error is JsonError;
+export interface JsonValidator {
+    (draft: Draft, schema: JsonSchema, value: unknown, pointer: JsonPointer): void | undefined | JsonError | JsonError[] | JsonError[][];
 }
-export interface JSONTypeValidator {
-    (draft: Draft, schema: JSONSchema, value: unknown, pointer: JSONPointer): Array<void | undefined | JSONError | JSONError[] | JSONError[][]>;
+export interface JsonTypeValidator {
+    (draft: Draft, schema: JsonSchema, value: unknown, pointer: JsonPointer): Array<void | undefined | JsonError | JsonError[] | JsonError[][]>;
 }

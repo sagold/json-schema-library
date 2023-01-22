@@ -11,14 +11,14 @@ const isValidHostname = /^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9
 const matchDate = /^(\d\d\d\d)-(\d\d)-(\d\d)$/;
 const matchTime = /^(\d\d):(\d\d):(\d\d)(\.\d+)?(z|[+-]\d\d(?::?\d\d)?)?$/i;
 const DAYS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-const isValidJSONPointer = /^(?:\/(?:[^~/]|~0|~1)*)*$/;
-const isValidRelativeJSONPointer = /^(?:0|[1-9][0-9]*)(?:#|(?:\/(?:[^~/]|~0|~1)*)*)$/;
+const isValidJsonPointer = /^(?:\/(?:[^~/]|~0|~1)*)*$/;
+const isValidRelativeJsonPointer = /^(?:0|[1-9][0-9]*)(?:#|(?:\/(?:[^~/]|~0|~1)*)*)$/;
 const isValidURIRef = /^(?:[a-z][a-z0-9+\-.]*:)?(?:\/?\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:]|%[0-9a-f]{2})*@)?(?:\[(?:(?:(?:(?:[0-9a-f]{1,4}:){6}|::(?:[0-9a-f]{1,4}:){5}|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}|(?:(?:[0-9a-f]{1,4}:){0,1}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::)(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?))|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|[Vv][0-9a-f]+\.[a-z0-9\-._~!$&'()*+,;=:]+)\]|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)|(?:[a-z0-9\-._~!$&'"()*+,;=]|%[0-9a-f]{2})*)(?::\d*)?(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*|\/(?:(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*)?|(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*)?(?:\?(?:[a-z0-9\-._~!$&'"()*+,;=:@/?]|%[0-9a-f]{2})*)?(?:#(?:[a-z0-9\-._~!$&'"()*+,;=:@/?]|%[0-9a-f]{2})*)?$/i;
 // uri-template: https://tools.ietf.org/html/rfc6570
 const isValidURITemplate = /^(?:(?:[^\x00-\x20"'<>%\\^`{|}]|%[0-9a-f]{2})|\{[+#./;?&=,!@|]?(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?(?:,(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?)*\})*$/i;
-// Default JSON-Schema formats: date-time, email, hostname, ipv4, ipv6, uri, uriref
+// Default Json-Schema formats: date-time, email, hostname, ipv4, ipv6, uri, uriref
 const formatValidators = {
-    date: (core, schema, value, pointer) => {
+    date: (draft, schema, value, pointer) => {
         if (typeof value !== "string") {
             return undefined;
         }
@@ -41,7 +41,7 @@ const formatValidators = {
         }
         return errors.formatDateError({ value, pointer });
     },
-    "date-time": (core, schema, value, pointer) => {
+    "date-time": (draft, schema, value, pointer) => {
         if (typeof value !== "string") {
             return undefined;
         }
@@ -53,7 +53,7 @@ const formatValidators = {
         }
         return errors.formatDateTimeError({ value, pointer });
     },
-    email: (core, schema, value, pointer) => {
+    email: (draft, schema, value, pointer) => {
         // taken from https://github.com/ExodusMovement/schemasafe/blob/master/src/formats.js
         if (typeof value !== "string") {
             return undefined;
@@ -76,7 +76,7 @@ const formatValidators = {
         }
         return undefined;
     },
-    hostname: (core, schema, value, pointer) => {
+    hostname: (draft, schema, value, pointer) => {
         if (typeof value !== "string") {
             return undefined;
         }
@@ -85,7 +85,7 @@ const formatValidators = {
         }
         return errors.formatHostnameError({ value, pointer });
     },
-    ipv4: (core, schema, value, pointer) => {
+    ipv4: (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -98,7 +98,7 @@ const formatValidators = {
         }
         return errors.formatIPV4Error({ value, pointer });
     },
-    ipv6: (core, schema, value, pointer) => {
+    ipv6: (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -111,25 +111,25 @@ const formatValidators = {
         }
         return errors.formatIPV6Error({ value, pointer });
     },
-    "json-pointer": (core, schema, value, pointer) => {
+    "json-pointer": (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
-        if (isValidJSONPointer.test(value)) {
+        if (isValidJsonPointer.test(value)) {
             return undefined;
         }
-        return errors.formatJSONPointerError({ value, pointer });
+        return errors.formatJsonPointerError({ value, pointer });
     },
-    "relative-json-pointer": (core, schema, value, pointer) => {
+    "relative-json-pointer": (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
-        if (isValidRelativeJSONPointer.test(value)) {
+        if (isValidRelativeJsonPointer.test(value)) {
             return undefined;
         }
-        return errors.formatJSONPointerError({ value, pointer });
+        return errors.formatJsonPointerError({ value, pointer });
     },
-    regex: (core, schema, value, pointer) => {
+    regex: (draft, schema, value, pointer) => {
         if (typeof value === "string" && /\\Z$/.test(value) === false) {
             try {
                 new RegExp(value);
@@ -144,7 +144,7 @@ const formatValidators = {
         }
         return errors.formatRegExError({ value, pointer });
     },
-    time: (core, schema, value, pointer) => {
+    time: (draft, schema, value, pointer) => {
         if (typeof value !== "string") {
             return undefined;
         }
@@ -164,7 +164,7 @@ const formatValidators = {
         }
         return errors.formatTimeError({ value, pointer });
     },
-    uri: (core, schema, value, pointer) => {
+    uri: (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -173,7 +173,7 @@ const formatValidators = {
         }
         return errors.formatURIError({ value, pointer });
     },
-    "uri-reference": (core, schema, value, pointer) => {
+    "uri-reference": (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -182,7 +182,7 @@ const formatValidators = {
         }
         return errors.formatURIReferenceError({ value, pointer });
     },
-    "uri-template": (core, schema, value, pointer) => {
+    "uri-template": (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -191,7 +191,7 @@ const formatValidators = {
         }
         return errors.formatURITemplateError({ value, pointer });
     },
-    url: (core, schema, value, pointer) => {
+    url: (draft, schema, value, pointer) => {
         if (value === "" || validUrl.isWebUri(value)) {
             return undefined;
         }

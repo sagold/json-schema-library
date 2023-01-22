@@ -1,8 +1,10 @@
 ## Changelog
 
+- [Breaking] renamed `JSON` types and variables to `Json`
 - [Breaking] remove `oneOfSchema` helper property in favor of `getOneOfOrigin()` non-enumerable function
 - [Breaking] `getTemplate` will add only required properties per default. Use `addOptionalProps:true` to change this behaviour
 - [add] introduce `mergeSchema`, `reduceSchema` and `resolveDynamicSchema`
+- [refactor] move dynamic resolvers `anyOf`, `allOf`, `oneOf`, `dependencies` and `if` to features modules
 
 ### 7.0.0
 
