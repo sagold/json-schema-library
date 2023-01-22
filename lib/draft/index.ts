@@ -1,20 +1,21 @@
-import step from "../step";
-import validate from "../validate";
-import { resolveOneOf } from "../features/oneOf";
-import resolveRef from "../resolveRef.strict";
-import { resolveAllOf } from "../features/allOf";
-import { resolveAnyOf } from "../features/anyOf";
-import getTemplate, { TemplateOptions } from "../getTemplate";
+import addRemoteSchema from "../addRemoteSchema";
+import compileSchema from "../compileSchema";
+import copy from "../utils/copy";
+import createSchemaOf from "../createSchemaOf";
 import getChildSchemaSelection from "../getChildSchemaSelection";
 import getSchema from "../getSchema";
-import { each, EachCallback } from "../each";
+import getTemplate, { TemplateOptions } from "../getTemplate";
 import isValid from "../isValid";
-import { eachSchema, EachSchemaCallback } from "../eachSchema";
-import createSchemaOf from "../createSchemaOf";
-import compileSchema from "../compileSchema";
+import resolveRef from "../resolveRef.strict";
+import step from "../step";
+import validate from "../validate";
 import { CreateError } from "../utils/createCustomError";
-import addRemoteSchema from "../addRemoteSchema";
+import { each, EachCallback } from "../each";
+import { eachSchema, EachSchemaCallback } from "../eachSchema";
 import { JsonSchema, JsonPointer, JsonValidator, JsonTypeValidator, JsonError } from "../types";
+import { resolveAllOf } from "../features/allOf";
+import { resolveAnyOf } from "../features/anyOf";
+import { resolveOneOf } from "../features/oneOf";
 
 export type DraftConfig = {
     /** error creators by id */
@@ -65,7 +66,7 @@ export class Draft {
 
     constructor(config: DraftConfig, schema?: JsonSchema) {
         this.config = config;
-        this.typeKeywords = JSON.parse(JSON.stringify(config.typeKeywords));
+        this.typeKeywords = copy(config.typeKeywords);
         this.validateKeyword = Object.assign({}, config.validateKeyword);
         this.validateType = Object.assign({}, config.validateType);
         this.validateFormat = Object.assign({}, config.validateFormat);

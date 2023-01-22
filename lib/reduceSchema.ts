@@ -9,8 +9,8 @@ import { resolveOneOfFuzzy as resolveOneOf } from "./features/oneOf";
 import { JsonData } from "@sagold/json-pointer";
 import { omit } from "./utils/omit";
 
-const toOmit = ["allOf", "oneOf", "dependencies", "if", "then", "else"];
-const dynamicProperties = ["allOf", "oneOf", "anyOf", "dependencies", "if"];
+const toOmit = ["allOf", "anyOf", "oneOf", "dependencies", "if", "then", "else"];
+const dynamicProperties = ["allOf", "anyOf", "oneOf", "dependencies", "if"];
 
 export function isDynamicSchema(schema: JsonData): boolean {
     const givenProps = Object.keys(schema);

@@ -787,7 +787,7 @@ describe("validate", () => {
                 expect(errors).to.have.length(0);
             });
 
-            it("should return OneOfError if no item does match", () => {
+            it("should return error if no item does match", () => {
                 const errors = validate(draft, [100, { a: "correct", b: "not correct" }], {
                     type: "array",
                     items: {
@@ -802,7 +802,7 @@ describe("validate", () => {
                     }
                 });
                 expect(errors).to.have.length(1);
-                expect(errors[0].name).to.eq("OneOfError");
+                expect(errors[0].name).to.eq("NoAdditionalPropertiesError");
             });
 
             it("should return MultipleOneOfError if multiple oneOf definitions match the given value", () => {

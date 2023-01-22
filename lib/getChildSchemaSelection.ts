@@ -16,12 +16,16 @@ export default function getChildSchemaSelection(
     property: string | number,
     schema: JsonSchema = draft.rootSchema
 ): JsonSchema[] | JsonError {
+    if (schema.oneOf) {
+        return schema.oneOf.map((item: JsonSchema) => draft.resolveRef(item));
+    }
+    if (schema.items?.oneOf) {
+        return schema.items.oneOf.map((item: JsonSchema) => draft.resolveRef(item));
+    }
+
     const result = draft.step(property, schema, {}, "#");
 
     if (isJsonError(result)) {
-        if (result.code === "one-of-error") {
-            return result.data.oneOf.map((item: JsonSchema) => draft.resolveRef(item));
-        }
         return result;
     }
 

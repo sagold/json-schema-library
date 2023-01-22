@@ -18,24 +18,9 @@ const stepType: Record<string, StepFunction> = {
         const itemsType = getTypeOf(schema.items);
 
         if (itemsType === "object") {
-            // oneOf
-            if (Array.isArray(schema.items.oneOf)) {
-                return draft.resolveOneOf(data[key], schema.items, pointer);
-            }
-
-            // anyOf
-            if (Array.isArray(schema.items.anyOf)) {
-                // schema of current object
-                return draft.resolveAnyOf(data[key], schema.items, pointer);
-            }
-
-            // allOf
-            if (Array.isArray(schema.items.allOf)) {
-                return draft.resolveAllOf(data[key], schema.items);
-            }
-
+            const itemValue = data?.[key];
             // @spec: ignore additionalItems, when items is schema-object
-            return draft.resolveRef(schema.items);
+            return reduceSchema(draft, schema.items, itemValue) || draft.resolveRef(schema.items);
         }
 
         if (itemsType === "array") {
