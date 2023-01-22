@@ -1,6 +1,5 @@
 /* eslint max-len: 0 */
 import { expect } from "chai";
-import chalk from "chalk";
 import { Draft07 } from "../../../lib/draft07";
 import { addRemotes } from "../utils/addRemotes";
 import { getDraftTests, FeatureTest } from "../../getDraftTests";
@@ -37,7 +36,7 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
         tc.testCases.forEach((testCase) => {
             const schema = testCase.schema;
             if (skipTest.includes(testCase.description)) {
-                console.log(chalk.red(`Unsupported '${testCase.description}'`));
+                console.log(`Unsupported '${testCase.description}'`);
                 return;
             }
 
