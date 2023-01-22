@@ -1,9 +1,12 @@
-import { errorOrPromise } from "../utils/filter";
+/**
+ * @draft-04
+ */
 import flattenArray from "../utils/flattenArray";
-import settings from "../config/settings";
-import { isJsonError } from "../types";
-import { createOneOfSchemaResult } from "../schema/createOneOfSchemaResult";
 import getTypeOf from "../getTypeOf";
+import settings from "../config/settings";
+import { createOneOfSchemaResult } from "../schema/createOneOfSchemaResult";
+import { errorOrPromise } from "../utils/filter";
+import { isJsonError } from "../types";
 const { DECLARATOR_ONEOF } = settings;
 /**
  * Selects and returns a oneOf schema for the given data

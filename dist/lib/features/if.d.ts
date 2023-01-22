@@ -1,3 +1,6 @@
+/**
+ * @draft-07
+ */
 import { JsonSchema, JsonValidator } from "../types";
 import { Draft } from "../draft";
 /**
@@ -8,10 +11,6 @@ import { Draft } from "../draft";
  * @returns json schema defined by if-then-else or undefined
  */
 export declare function resolveIfSchema(draft: Draft, schema: JsonSchema, data: unknown): JsonSchema | undefined;
-/**
- * steps into if-then-else
- * @returns json schema or undefined if 'key' is not defined
- */
 /**
  * @returns validation result of it-then-else schema
  */

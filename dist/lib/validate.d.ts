@@ -1,7 +1,7 @@
 import { JsonSchema, JsonPointer, JsonError } from "./types";
 import { Draft } from "./draft";
 /**
- * Validate data by a json schema
+ * Validates data with json schema
  *
  * @param draft - validator
  * @param value - value to validate

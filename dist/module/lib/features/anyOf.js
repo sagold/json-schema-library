@@ -1,13 +1,16 @@
+/**
+ * @draft-04
+ */
 import { mergeSchema } from "../mergeSchema";
 import errors from "../validation/errors";
 import { omit } from "../utils/omit";
 /**
- * returns merged all valid anyOf subschemas of the given input data. Does not
- * merge with rest input schema.
+ * returns merged schema of all valid anyOf subschemas for the given input data.
+ * Does not merge with rest input schema.
  *
  * @returns merged anyOf subschemas which are valid to the given input data.
  */
-export function resolveAnyOfSchema(draft, schema, data) {
+export function mergeValidAnyOfSchema(draft, schema, data) {
     if (!Array.isArray(schema.anyOf) || schema.anyOf.length === 0) {
         return;
     }
@@ -29,7 +32,7 @@ export function resolveAnyOf(draft, data, schema = draft.rootSchema, pointer = "
     if (!Array.isArray(anyOf) || anyOf.length === 0) {
         return schema;
     }
-    const resolvedSchema = resolveAnyOfSchema(draft, schema, data);
+    const resolvedSchema = mergeValidAnyOfSchema(draft, schema, data);
     if (resolvedSchema == null) {
         return errors.anyOfError({ value: data, pointer, anyOf: JSON.stringify(anyOf) });
     }
@@ -40,7 +43,7 @@ export function resolveAnyOf(draft, data, schema = draft.rootSchema, pointer = "
  * validate anyOf definition for given input data
  */
 const validateAnyOf = (draft, schema, value, pointer) => {
-    if (Array.isArray(schema.anyOf) === false) {
+    if (!Array.isArray(schema.anyOf) || schema.anyOf.length === 0) {
         return undefined;
     }
     for (let i = 0; i < schema.anyOf.length; i += 1) {

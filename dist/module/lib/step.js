@@ -5,34 +5,22 @@ import { isJsonError } from "./types";
 import { reduceSchema } from "./reduceSchema";
 const stepType = {
     array: (draft, key, schema, data, pointer) => {
+        const itemValue = data === null || data === void 0 ? void 0 : data[key];
         const itemsType = getTypeOf(schema.items);
         if (itemsType === "object") {
-            // oneOf
-            if (Array.isArray(schema.items.oneOf)) {
-                return draft.resolveOneOf(data[key], schema.items, pointer);
-            }
-            // anyOf
-            if (Array.isArray(schema.items.anyOf)) {
-                // schema of current object
-                return draft.resolveAnyOf(data[key], schema.items, pointer);
-            }
-            // allOf
-            if (Array.isArray(schema.items.allOf)) {
-                return draft.resolveAllOf(data[key], schema.items);
-            }
             // @spec: ignore additionalItems, when items is schema-object
-            return draft.resolveRef(schema.items);
+            return reduceSchema(draft, schema.items, itemValue) || draft.resolveRef(schema.items);
         }
         if (itemsType === "array") {
             // @draft >= 7 bool schema, items:[true, false]
             if (schema.items[key] === true) {
-                return createSchemaOf(data[key]);
+                return createSchemaOf(itemValue);
             }
             // @draft >= 7 bool schema, items:[true, false]
             if (schema.items[key] === false) {
                 return errors.invalidDataError({
                     key,
-                    value: data[key],
+                    value: itemValue,
                     pointer
                 });
             }
@@ -42,42 +30,44 @@ const stepType = {
             if (schema.additionalItems === false) {
                 return errors.additionalItemsError({
                     key,
-                    value: data[key],
+                    value: itemValue,
                     pointer
                 });
             }
             if (schema.additionalItems === true || schema.additionalItems === undefined) {
-                return createSchemaOf(data[key]);
+                return createSchemaOf(itemValue);
             }
             if (getTypeOf(schema.additionalItems) === "object") {
                 return schema.additionalItems;
             }
             throw new Error(`Invalid schema ${JSON.stringify(schema, null, 4)} for ${JSON.stringify(data, null, 4)}`);
         }
-        if (schema.additionalItems !== false && data[key]) {
+        if (schema.additionalItems !== false && itemValue) {
             // @todo reevaluate: incomplete schema is created here
             // @todo support additionalItems: {schema}
-            return createSchemaOf(data[key]);
+            return createSchemaOf(itemValue);
         }
         return new Error(`Invalid array schema for ${key} at ${pointer}`);
     },
     object: (draft, key, schema, data, pointer) => {
+        var _a;
         schema = reduceSchema(draft, schema, data);
-        // step into object-properties
-        if (schema.properties && schema.properties[key] !== undefined) {
+        // @feature properties
+        const property = (_a = schema === null || schema === void 0 ? void 0 : schema.properties) === null || _a === void 0 ? void 0 : _a[key];
+        if (property !== undefined) {
             // @todo patternProperties also validate properties
-            // boolean schema
-            if (schema.properties[key] === false) {
+            // @feature boolean schema
+            if (property === false) {
                 return errors.forbiddenPropertyError({
                     property: key,
                     value: data,
                     pointer: `${pointer}`
                 });
             }
-            else if (schema.properties[key] === true) {
+            else if (property === true) {
                 return createSchemaOf(data === null || data === void 0 ? void 0 : data[key]);
             }
-            const targetSchema = draft.resolveRef(schema.properties[key]);
+            const targetSchema = draft.resolveRef(property);
             if (isJsonError(targetSchema)) {
                 return targetSchema;
             }
@@ -92,22 +82,25 @@ const stepType = {
                 return targetSchema;
             }
         }
-        // find matching property key
-        if (getTypeOf(schema.patternProperties) === "object") {
+        // @feature patternProperties
+        const { patternProperties } = schema;
+        if (getTypeOf(patternProperties) === "object") {
+            // find matching property key
             let regex;
-            const patterns = Object.keys(schema.patternProperties);
+            const patterns = Object.keys(patternProperties);
             for (let i = 0, l = patterns.length; i < l; i += 1) {
                 regex = new RegExp(patterns[i]);
                 if (regex.test(key)) {
-                    return schema.patternProperties[patterns[i]];
+                    return patternProperties[patterns[i]];
                 }
             }
         }
-        if (getTypeOf(schema.additionalProperties) === "object") {
+        // @feature additionalProperties
+        const { additionalProperties } = schema;
+        if (getTypeOf(additionalProperties) === "object") {
             return schema.additionalProperties;
         }
-        if (data &&
-            (schema.additionalProperties === undefined || schema.additionalProperties === true)) {
+        if (data && (additionalProperties === undefined || additionalProperties === true)) {
             return createSchemaOf(data[key]);
         }
         return errors.unknownPropertyError({

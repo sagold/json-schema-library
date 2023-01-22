@@ -7,7 +7,7 @@ import settings from "./config/settings";
 import { isJsonError } from "./types";
 import { isEmpty } from "./utils/isEmpty";
 import { resolveIfSchema } from "./features/if";
-import { resolveAllOfSchema } from "./features/allOf";
+import { mergeAllOfSchema } from "./features/allOf";
 import { resolveDependencies } from "./features/dependencies";
 import { mergeSchema } from "./mergeSchema";
 const defaultOptions = {
@@ -24,10 +24,6 @@ function shouldResolveRef(schema, pointer) {
     return value < settings.GET_TEMPLATE_RECURSION_LIMIT;
 }
 function resolveRef(draft, schema, pointer) {
-    // ensure we refactored consistently
-    if (pointer == null) {
-        throw new Error(`missing pointer ${pointer}`);
-    }
     const { $ref } = schema;
     if ($ref == null) {
         return schema;
@@ -57,6 +53,7 @@ function convertValue(type, value) {
 /**
  * Resolves $ref, allOf and anyOf schema-options, returning a combined json-schema.
  * Also returns a pointer-property on schema, that must be used as current pointer.
+ *
  * @param draft
  * @param schema
  * @param data
@@ -74,6 +71,7 @@ function createTemplateSchema(draft, schema, data, pointer) {
     }
     // resolve $ref and copy schema
     let templateSchema = copy(resolveRef(draft, schema, pointer));
+    // @feature anyOf
     if (Array.isArray(schema.anyOf) && schema.anyOf.length > 0) {
         // test if we may resolve
         if (shouldResolveRef(schema.anyOf[0], `${pointer}/anyOf/0`)) {
@@ -84,13 +82,13 @@ function createTemplateSchema(draft, schema, data, pointer) {
         }
         delete templateSchema.anyOf;
     }
-    // resolve allOf
+    // @feature allOf
     if (Array.isArray(schema.allOf)) {
         const mayResolve = schema.allOf
             .map((allOf, index) => shouldResolveRef(allOf, `${pointer}/allOf/${index}`))
             .reduceRight((next, before) => next && before, true);
         if (mayResolve) {
-            const resolvedSchema = resolveAllOfSchema(draft, schema, data);
+            const resolvedSchema = mergeAllOfSchema(draft, schema);
             if (resolvedSchema) {
                 templateSchema = mergeSchema(templateSchema, resolvedSchema);
             }
@@ -125,6 +123,7 @@ function getTemplate(draft, data, _schema, pointer, opts) {
     if (schema === null || schema === void 0 ? void 0 : schema.const) {
         return schema.const;
     }
+    // @feature oneOf
     if (Array.isArray(schema.oneOf)) {
         if (isEmpty(data)) {
             const type = schema.oneOf[0].type ||
@@ -243,7 +242,7 @@ const TYPE = {
         // @feature if-then-else
         const ifSchema = resolveIfSchema(draft, schema, d);
         if (ifSchema) {
-            const additionalData = draft.getTemplate(d, { type: "object", ...ifSchema }, opts);
+            const additionalData = getTemplate(draft, d, { type: "object", ...ifSchema }, pointer, opts);
             Object.assign(d, additionalData);
         }
         // returns object, which is ordered by json-schema
@@ -251,17 +250,16 @@ const TYPE = {
     },
     // build array type of items, ignores additionalItems
     array: (draft, schema, data, pointer, opts) => {
-        var _a, _b, _c;
-        const template = schema.default === undefined ? [] : schema.default;
-        schema.minItems = schema.minItems || 0;
+        var _a, _b;
         const d = data || [];
-        // items are undefined
         if (schema.items == null) {
-            return d;
+            return d; // items are undefined
         }
+        const template = schema.default === undefined ? [] : schema.default;
+        const minItems = schema.minItems || 0;
         // build defined set of items
         if (Array.isArray(schema.items)) {
-            for (let i = 0, l = Math.max((_a = schema.minItems) !== null && _a !== void 0 ? _a : 0, (_c = (_b = schema.items) === null || _b === void 0 ? void 0 : _b.length) !== null && _c !== void 0 ? _c : 0); i < l; i += 1) {
+            for (let i = 0, l = Math.max(minItems !== null && minItems !== void 0 ? minItems : 0, (_b = (_a = schema.items) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0); i < l; i += 1) {
                 d[i] = getTemplate(draft, d[i] == null ? template[i] : d[i], schema.items[i], `${pointer}/items/${i}`, opts);
             }
             return d;
@@ -276,16 +274,17 @@ const TYPE = {
             return d;
         }
         pointer = templateSchema.pointer || pointer;
-        // build oneOf
+        // build data for first oneOf-schema
         if (templateSchema.oneOf && d.length === 0) {
             const oneOfSchema = templateSchema.oneOf[0];
-            for (let i = 0; i < schema.minItems; i += 1) {
+            for (let i = 0; i < minItems; i += 1) {
                 d[i] = getTemplate(draft, d[i] == null ? template[i] : d[i], oneOfSchema, `${pointer}/oneOf/0`, opts);
             }
             return d;
         }
+        // complete data selecting correct oneOf-schema
         if (templateSchema.oneOf && d.length > 0) {
-            const itemCount = Math.max(schema.minItems, d.length);
+            const itemCount = Math.max(minItems, d.length);
             for (let i = 0; i < itemCount; i += 1) {
                 let value = d[i] == null ? template[i] : d[i];
                 let one = resolveOneOfFuzzy(draft, value, templateSchema);
@@ -309,9 +308,9 @@ const TYPE = {
             }
             return d;
         }
-        // build items-definition
+        // build data from items-definition
         if (templateSchema.type) {
-            for (let i = 0, l = Math.max(schema.minItems, d.length); i < l; i += 1) {
+            for (let i = 0, l = Math.max(minItems, d.length); i < l; i += 1) {
                 d[i] = getTemplate(draft, d[i] == null ? template[i] : d[i], templateSchema, `${pointer}/items`, opts);
             }
             return d;
@@ -335,6 +334,6 @@ function getDefault(schema, templateValue, initValue) {
     return schema.default;
 }
 export default (draft, data, schema = draft.rootSchema, opts = defaultOptions) => {
-    cache = { mi: {} };
+    cache = {};
     return getTemplate(draft, data, schema, "#", opts);
 };

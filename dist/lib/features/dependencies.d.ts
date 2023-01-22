@@ -12,10 +12,6 @@ import { Draft } from "../draft";
  */
 export declare function resolveDependencies(draft: Draft, schema: JsonSchema, data: unknown): JsonSchema | undefined;
 /**
- * steps into dependencies
- * @returns json schema or undefined if 'key' is not defined
- */
-/**
  * validate dependencies definition for given input data
  */
 declare const validateDependencies: JsonValidator;

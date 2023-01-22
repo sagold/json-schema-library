@@ -2,11 +2,12 @@ import getTypeOf from "../getTypeOf";
 import isSame from "../utils/deepCompare";
 import settings from "../config/settings";
 import ucs2decode from "../utils/punycode.ucs2decode";
-import { validateDependencies } from "../features/dependencies";
+import { isObject } from "../utils/isObject";
+import { isJsonError } from "../types";
 import { validateAllOf } from "../features/allOf";
 import { validateAnyOf } from "../features/anyOf";
+import { validateDependencies } from "../features/dependencies";
 import { validateOneOf } from "../features/oneOf";
-import { isJsonError } from "../types";
 const FPP = settings.floatingPointPrecision;
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 const hasProperty = (value, property) => !(value[property] === undefined || !hasOwnProperty.call(value, property));
@@ -41,9 +42,9 @@ const KeywordValidation = {
         for (let i = 0, l = receivedProperties.length; i < l; i += 1) {
             const property = receivedProperties[i];
             if (expectedProperties.indexOf(property) === -1) {
-                const isObject = typeof schema.additionalProperties === "object";
+                const additionalIsObject = isObject(schema.additionalProperties);
                 // additionalProperties { oneOf: [] }
-                if (isObject && Array.isArray(schema.additionalProperties.oneOf)) {
+                if (additionalIsObject && Array.isArray(schema.additionalProperties.oneOf)) {
                     const result = draft.resolveOneOf(value[property], schema.additionalProperties, `${pointer}/${property}`);
                     if (isJsonError(result)) {
                         errors.push(draft.errors.additionalPropertiesError({
@@ -60,7 +61,7 @@ const KeywordValidation = {
                     }
                     // additionalProperties {}
                 }
-                else if (isObject) {
+                else if (additionalIsObject) {
                     errors.push(...draft.validate(value[property], schema.additionalProperties, `${pointer}/${property}`));
                 }
                 else {

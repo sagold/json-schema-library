@@ -10,11 +10,15 @@ import { isJsonError } from "./types";
  * @return
  */
 export default function getChildSchemaSelection(draft, property, schema = draft.rootSchema) {
+    var _a;
+    if (schema.oneOf) {
+        return schema.oneOf.map((item) => draft.resolveRef(item));
+    }
+    if ((_a = schema.items) === null || _a === void 0 ? void 0 : _a.oneOf) {
+        return schema.items.oneOf.map((item) => draft.resolveRef(item));
+    }
     const result = draft.step(property, schema, {}, "#");
     if (isJsonError(result)) {
-        if (result.code === "one-of-error") {
-            return result.data.oneOf.map((item) => draft.resolveRef(item));
-        }
         return result;
     }
     return [result];

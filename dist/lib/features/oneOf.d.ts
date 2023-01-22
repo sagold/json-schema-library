@@ -1,5 +1,5 @@
-import { JsonSchema, JsonPointer, JsonError, JsonValidator } from "../types";
 import { Draft } from "../draft";
+import { JsonSchema, JsonPointer, JsonError, JsonValidator } from "../types";
 /**
  * Selects and returns a oneOf schema for the given data
  *

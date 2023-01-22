@@ -5,12 +5,12 @@ import { JsonSchema, JsonValidator, JsonError } from "../types";
 import { Draft } from "../draft";
 export declare function resolveAllOf(draft: Draft, data: any, schema?: JsonSchema): JsonSchema | JsonError;
 /**
- * returns allOf as a json schema. does not merge with input json schema. you
- * probably will need to do so to correctly resolve references.
+ * Merge all allOf sub schema into a single schema. Returns undefined for
+ * missing allOf definition.
  *
  * @returns json schema defined by allOf or undefined
  */
-export declare function resolveAllOfSchema(draft: Draft, schema: JsonSchema, data: unknown): JsonSchema | undefined;
+export declare function mergeAllOfSchema(draft: Draft, schema: JsonSchema): JsonSchema | undefined;
 /**
  * validate allOf definition for given input data
  */

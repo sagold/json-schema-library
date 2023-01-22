@@ -20,32 +20,6 @@ export function resolveIfSchema(draft, schema, data) {
     }
 }
 /**
- * steps into if-then-else
- * @returns json schema or undefined if 'key' is not defined
- */
-// export function stepIntoIf(
-//     draft: Draft,
-//     key: string,
-//     schema: JsonSchema,
-//     data: unknown,
-//     pointer: string
-// ): JsonSchema | undefined {
-//     if (schema.if && (schema.then || schema.else)) {
-//         const resolvedSchema = resolveIfSchema(draft, schema, data);
-//         if (resolvedSchema == null) {
-//             return;
-//         }
-//         // @todo merge with schema before stepping? Note that validation must be separately
-//         const resolvedIfThenElseSchema = draft.step(key, resolvedSchema, data, pointer);
-//         if (
-//             typeof resolvedIfThenElseSchema.type === "string" &&
-//             resolvedIfThenElseSchema.type !== "error"
-//         ) {
-//             return resolvedIfThenElseSchema;
-//         }
-//     }
-// }
-/**
  * @returns validation result of it-then-else schema
  */
 const validateIf = (draft, schema, value, pointer) => {

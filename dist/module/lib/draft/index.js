@@ -1,3 +1,4 @@
+import copy from "../utils/copy";
 export class Draft {
     constructor(config, schema) {
         /** cache for remote schemas */
@@ -13,7 +14,7 @@ export class Draft {
         /** format validators  */
         this.validateFormat = {};
         this.config = config;
-        this.typeKeywords = JSON.parse(JSON.stringify(config.typeKeywords));
+        this.typeKeywords = copy(config.typeKeywords);
         this.validateKeyword = Object.assign({}, config.validateKeyword);
         this.validateType = Object.assign({}, config.validateType);
         this.validateFormat = Object.assign({}, config.validateFormat);
