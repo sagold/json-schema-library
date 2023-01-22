@@ -1,6 +1,6 @@
 /* eslint quote-props: 0 max-len: 0 */
 import { expect } from "chai";
-import resolveOneOf from "../../lib/resolveOneOf.fuzzy";
+import { resolveOneOfFuzzy as resolveOneOf } from "../../lib/features/oneOf";
 import { JsonEditor as Core } from "../../lib/jsoneditor";
 import settings from "../../lib/config/settings";
 

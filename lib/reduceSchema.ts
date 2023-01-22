@@ -4,7 +4,7 @@ import { mergeSchema } from "./mergeSchema";
 import { resolveIfSchema } from "./features/if";
 import { resolveDependencies } from "./features/dependencies";
 import { resolveAllOfSchema } from "./features/allOf";
-import resolveOneOf from "./resolveOneOf.fuzzy";
+import { resolveOneOfFuzzy as resolveOneOf } from "./features/oneOf";
 import { JsonData } from "@sagold/json-pointer";
 
 const toOmit = ["allOf", "oneOf", "dependencies", "if", "then", "else"];

@@ -1,9 +1,9 @@
 import step from "../step";
 import validate from "../validate";
-import resolveOneOf from "../resolveOneOf.strict";
+import { resolveOneOf } from "../features/oneOf";
 import resolveRef from "../resolveRef.strict";
-import resolveAllOf from "../resolveAllOf";
-import resolveAnyOf from "../resolveAnyOf";
+import { resolveAllOf } from "../features/allOf";
+import { resolveAnyOf } from "../features/anyOf";
 import getTemplate, { TemplateOptions } from "../getTemplate";
 import getChildSchemaSelection from "../getChildSchemaSelection";
 import getSchema from "../getSchema";

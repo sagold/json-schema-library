@@ -1,5 +1,5 @@
 /* eslint quote-props: 0, max-statements-per-line: ["error", { "max": 2 }] */
-import resolveOneOfFuzzy from "./resolveOneOf.fuzzy";
+import { resolveOneOfFuzzy } from "./features/oneOf";
 import getTypeOf from "./getTypeOf";
 import merge from "./utils/merge";
 import copy from "./utils/copy";

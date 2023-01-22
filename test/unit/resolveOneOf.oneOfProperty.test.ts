@@ -1,6 +1,6 @@
 /* eslint quote-props: 0 max-len: 0 */
 import { expect } from "chai";
-import resolveOneOf from "../../lib/resolveOneOf.strict";
+import { resolveOneOf } from "../../lib/features/oneOf";
 import { Draft07 } from "../../lib/draft07";
 import settings from "../../lib/config/settings";
 

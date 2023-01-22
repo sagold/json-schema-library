@@ -2,7 +2,7 @@ import { expect } from "chai";
 import getSchema from "../../../lib/getSchema";
 import { Draft04 as Core } from "../../../lib/draft04";
 import { JSONSchema, JSONPointer } from "../../../lib/types";
-import resolveOneOfFuzzy from "../../../lib/resolveOneOf.fuzzy";
+import { resolveOneOfFuzzy } from "../../../lib/features/oneOf";
 
 describe("issue#19 - getSchema from dependencies", () => {
     let core: Core;
