@@ -7,12 +7,12 @@ import settings from "../../lib/config/settings";
 const { DECLARATOR_ONEOF } = settings;
 
 describe("oneOfProperty", () => {
-    let core: Draft07;
-    beforeEach(() => (core = new Draft07()));
+    let draft: Draft07;
+    beforeEach(() => (draft = new Draft07()));
 
     it("should return schema matching oneOfProperty", () => {
         const res = resolveOneOf(
-            core,
+            draft,
             { name: "2", title: 123 },
             {
                 [DECLARATOR_ONEOF]: "name",
@@ -53,7 +53,7 @@ describe("oneOfProperty", () => {
 
     it("should return schema matching oneOfProperty even it is invalid", () => {
         const res = resolveOneOf(
-            core,
+            draft,
             { name: "2", title: "not a number" },
             {
                 [DECLARATOR_ONEOF]: "name",
@@ -94,7 +94,7 @@ describe("oneOfProperty", () => {
 
     it("should return an error if value at oneOfProperty is undefined", () => {
         const res = resolveOneOf(
-            core,
+            draft,
             { title: "not a number" },
             {
                 [DECLARATOR_ONEOF]: "name",
@@ -130,7 +130,7 @@ describe("oneOfProperty", () => {
 
     it("should return an error if no oneOfProperty could be matched", () => {
         const res = resolveOneOf(
-            core,
+            draft,
             { name: "2", title: "not a number" },
             {
                 [DECLARATOR_ONEOF]: "name",

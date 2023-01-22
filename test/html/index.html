@@ -33,10 +33,10 @@
 
     <script type="text/javascript">
 
-        const Draft4 = jlib.default.cores.Draft04;
+        const Draft4 = jlib.default.drafts.Draft04;
         console.log(Draft4);
-        const core = new Draft4(window.schema);
-        console.log("validation errors:", core.validate(window.data));
+        const draft = new Draft4(window.schema);
+        console.log("validation errors:", draft.validate(window.data));
 
     </script>
 </html>

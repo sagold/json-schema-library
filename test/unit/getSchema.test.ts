@@ -3,18 +3,18 @@ import getSchema from "../../lib/getSchema";
 import { JsonEditor as Core } from "../../lib/jsoneditor";
 
 describe("getSchema", () => {
-    let core: Core;
-    before(() => (core = new Core()));
+    let draft: Core;
+    before(() => (draft = new Core()));
 
     describe("value", () => {
         it("should return schema of any value", () => {
-            core.setSchema({ name: "target", type: "*" });
-            const schema = getSchema(core, "#");
+            draft.setSchema({ name: "target", type: "*" });
+            const schema = getSchema(draft, "#");
             expect(schema).to.deep.include({ name: "target", type: "*" });
         });
 
         it("should resolve property through root $ref", () => {
-            core.setSchema({
+            draft.setSchema({
                 $ref: "#/$defs/root",
                 $defs: {
                     root: {
@@ -25,25 +25,25 @@ describe("getSchema", () => {
                     }
                 }
             });
-            const schema = getSchema(core, "#/value", { value: 123 });
+            const schema = getSchema(draft, "#/value", { value: 123 });
             expect(schema).to.deep.include({ name: "target", type: "number" });
         });
     });
 
     describe("object", () => {
         it("should return schema of the given property", () => {
-            core.setSchema({
+            draft.setSchema({
                 type: "object",
                 properties: {
                     title: { name: "title", type: "string" }
                 }
             });
-            const schema = getSchema(core, "#/title");
+            const schema = getSchema(draft, "#/title");
             expect(schema).to.deep.include({ name: "title", type: "string" });
         });
 
         it("should return schema for property within nested object", () => {
-            core.setSchema({
+            draft.setSchema({
                 type: "object",
                 properties: {
                     image: {
@@ -54,12 +54,12 @@ describe("getSchema", () => {
                     }
                 }
             });
-            const schema = getSchema(core, "#/image/title");
+            const schema = getSchema(draft, "#/image/title");
             expect(schema).to.deep.include({ name: "title", type: "string" });
         });
 
         it("should resolve $ref as property", () => {
-            core.setSchema({
+            draft.setSchema({
                 type: "object",
                 definitions: {
                     target: {
@@ -72,12 +72,12 @@ describe("getSchema", () => {
                     }
                 }
             });
-            const schema = getSchema(core, "#/image");
+            const schema = getSchema(draft, "#/image");
             expect(schema).to.deep.include({ name: "target" });
         });
 
         it("should return correct 'oneOf' object definition", () => {
-            core.setSchema({
+            draft.setSchema({
                 type: "object",
                 oneOf: [
                     {
@@ -99,36 +99,36 @@ describe("getSchema", () => {
                     }
                 ]
             });
-            const schema = getSchema(core, "#/second", { second: "string" });
+            const schema = getSchema(draft, "#/second", { second: "string" });
             expect(schema).to.deep.include({ name: "target", type: "string" });
         });
 
         it("should return schema of matching patternProperty", () => {
-            core.setSchema({
+            draft.setSchema({
                 type: "object",
                 patternProperties: {
                     "^abc$": { type: "string" },
                     "^def$": { type: "number" }
                 }
             });
-            const schema = getSchema(core, "#/def");
+            const schema = getSchema(draft, "#/def");
             expect(schema).to.deep.include({ type: "number" });
         });
 
         it("should return an error if schema could not be resolved", () => {
-            core.setSchema({
+            draft.setSchema({
                 type: "object",
                 properties: { coffee: { type: "string" } },
                 patternProperties: { "^tee$": { type: "string" } },
                 additionalProperties: false
             });
-            const schema = getSchema(core, "#/beer");
+            const schema = getSchema(draft, "#/beer");
             expect(schema.name).to.equal("UnknownPropertyError");
         });
 
         describe("dependencies", () => {
             // it("should not return schema from dependencies when dependent property is missing", () => {
-            //     core.setSchema({
+            //     draft.setSchema({
             //         type: "object",
             //         properties: {
             //             test: { type: "string" }
@@ -141,11 +141,11 @@ describe("getSchema", () => {
             //             }
             //         }
             //     });
-            //     const schema = getSchema(core, "#/additionalValue");
+            //     const schema = getSchema(draft, "#/additionalValue");
             //     expect(schema.type).to.equal("error");
             // });
             it("should return schema from dependencies when dependent property is present", () => {
-                core.setSchema({
+                draft.setSchema({
                     type: "object",
                     properties: {
                         test: { type: "string" }
@@ -158,14 +158,14 @@ describe("getSchema", () => {
                         }
                     }
                 });
-                const schema = getSchema(core, "/additionalValue", { test: "is defined" });
+                const schema = getSchema(draft, "/additionalValue", { test: "is defined" });
                 expect(schema).to.deep.include({ type: "string" });
             });
         });
 
         describe("if-then-else", () => {
             it("should return then-schema for matching if-schema", () => {
-                core.setSchema({
+                draft.setSchema({
                     type: "object",
                     properties: {
                         test: { type: "string" }
@@ -182,11 +182,11 @@ describe("getSchema", () => {
                     }
                 });
 
-                const schema = getSchema(core, "/additionalValue", { test: "validates if" });
+                const schema = getSchema(draft, "/additionalValue", { test: "validates if" });
                 expect(schema).to.deep.include({ type: "string", description: "added" });
             });
             it("should return else-schema for non-matching if-schema", () => {
-                core.setSchema({
+                draft.setSchema({
                     type: "object",
                     properties: {
                         test: { type: "string" }
@@ -208,11 +208,11 @@ describe("getSchema", () => {
                     }
                 });
 
-                const schema = getSchema(core, "/elseValue", { test: "" });
+                const schema = getSchema(draft, "/elseValue", { test: "" });
                 expect(schema).to.deep.include({ type: "string", description: "else" });
             });
             it("should return correct schema for duplicate property", () => {
-                core.setSchema({
+                draft.setSchema({
                     type: "object",
                     properties: {
                         test: { type: "string" }
@@ -234,7 +234,7 @@ describe("getSchema", () => {
                     }
                 });
 
-                const schema = getSchema(core, "/dynamicValue", { test: "" });
+                const schema = getSchema(draft, "/dynamicValue", { test: "" });
                 expect(schema).to.deep.include({ type: "string", description: "else" });
             });
         });
@@ -242,25 +242,25 @@ describe("getSchema", () => {
 
     describe("array", () => {
         it("should return item schema", () => {
-            core.setSchema({
+            draft.setSchema({
                 type: "array",
                 items: { name: "title", type: "string" }
             });
-            const schema = getSchema(core, "#/0");
+            const schema = getSchema(draft, "#/0");
             expect(schema).to.deep.include({ name: "title", type: "string" });
         });
 
         it("should return item schema based on index", () => {
-            core.setSchema({
+            draft.setSchema({
                 type: "array",
                 items: [{ type: "number" }, { name: "target", type: "string" }, { type: "number" }]
             });
-            const schema = getSchema(core, "#/1");
+            const schema = getSchema(draft, "#/1");
             expect(schema).to.deep.include({ name: "target", type: "string" });
         });
 
         it("should return schema for matching 'oneOf' item", () => {
-            core.setSchema({
+            draft.setSchema({
                 type: "array",
                 items: {
                     oneOf: [
@@ -284,7 +284,7 @@ describe("getSchema", () => {
                     ]
                 }
             });
-            const schema = getSchema(core, "#/0/second", [{ second: "second" }]);
+            const schema = getSchema(draft, "#/0/second", [{ second: "second" }]);
             expect(schema).to.deep.include({ type: "string", name: "target" });
         });
     });

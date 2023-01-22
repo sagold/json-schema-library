@@ -6,21 +6,21 @@ import { isJsonError, JsonError, JsonSchema } from "./types";
  * could be added at the given property (e.g. item-index), thus an array of options is returned. In all other cases
  * a list with a single item will be returned
  *
- * @param core        - core to use
+ * @param draft        - draft to use
  * @param property    - parent schema of following property
  * @param [schema]    - parent schema of following property
  * @return
  */
 export default function getChildSchemaSelection(
-    core: Draft,
+    draft: Draft,
     property: string | number,
-    schema: JsonSchema = core.rootSchema
+    schema: JsonSchema = draft.rootSchema
 ): JsonSchema[] | JsonError {
-    const result = core.step(property, schema, {}, "#");
+    const result = draft.step(property, schema, {}, "#");
 
     if (isJsonError(result)) {
         if (result.code === "one-of-error") {
-            return result.data.oneOf.map((item: JsonSchema) => core.resolveRef(item));
+            return result.data.oneOf.map((item: JsonSchema) => draft.resolveRef(item));
         }
         return result;
     }

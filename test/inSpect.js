@@ -43,8 +43,8 @@ const TestCase = {
 describe(`[${TestCase.description}]`, () => {
     TestCase.tests.forEach((test) => {
         it(test.description, () => {
-            const core = new Core(TestCase.schema);
-            const errors = core.validate(TestCase.schema, test.data);
+            const draft = new Core(TestCase.schema);
+            const errors = draft.validate(TestCase.schema, test.data);
             const isValid = errors.length === 0;
 
             if (isValid !== test.valid) {

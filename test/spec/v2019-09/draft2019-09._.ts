@@ -1,7 +1,7 @@
 /* eslint max-len: 0 */
 import { expect } from "chai";
 import chalk from "chalk";
-import Draft07 from "../../../lib/cores/Draft07";
+import Draft07 from "../../../lib/drafts/Draft07";
 import addRemoteSchema from "../../../lib/draft07/addRemoteSchema";
 import { addRemotes } from "../utils/addRemotes";
 import TestSuite from "@json-schema-org/tests";

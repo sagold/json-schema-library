@@ -72,14 +72,14 @@ export function resolveAllOfSchema(
 /**
  * validate allOf definition for given input data
  */
-const validateAllOf: JsonValidator = (core, schema, value, pointer) => {
+const validateAllOf: JsonValidator = (draft, schema, value, pointer) => {
     const { allOf } = schema;
     if (!Array.isArray(allOf) || allOf.length === 0) {
         return;
     }
     const errors: JsonError[] = [];
     schema.allOf.forEach((subSchema: JsonSchema) => {
-        errors.push(...core.validate(value, subSchema, pointer));
+        errors.push(...draft.validate(value, subSchema, pointer));
     });
     return errors;
 };

@@ -38,7 +38,7 @@ const formatValidators: Record<
         pointer: string
     ) => undefined | JsonError | JsonError[]
 > = {
-    date: (core, schema, value, pointer) => {
+    date: (draft, schema, value, pointer) => {
         if (typeof value !== "string") {
             return undefined;
         }
@@ -64,7 +64,7 @@ const formatValidators: Record<
         return errors.formatDateError({ value, pointer });
     },
 
-    "date-time": (core, schema, value, pointer) => {
+    "date-time": (draft, schema, value, pointer) => {
         if (typeof value !== "string") {
             return undefined;
         }
@@ -77,7 +77,7 @@ const formatValidators: Record<
         return errors.formatDateTimeError({ value, pointer });
     },
 
-    email: (core, schema, value, pointer) => {
+    email: (draft, schema, value, pointer) => {
         // taken from https://github.com/ExodusMovement/schemasafe/blob/master/src/formats.js
         if (typeof value !== "string") {
             return undefined;
@@ -101,7 +101,7 @@ const formatValidators: Record<
         return undefined;
     },
 
-    hostname: (core, schema, value, pointer) => {
+    hostname: (draft, schema, value, pointer) => {
         if (typeof value !== "string") {
             return undefined;
         }
@@ -111,7 +111,7 @@ const formatValidators: Record<
         return errors.formatHostnameError({ value, pointer });
     },
 
-    ipv4: (core, schema, value, pointer) => {
+    ipv4: (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -125,7 +125,7 @@ const formatValidators: Record<
         return errors.formatIPV4Error({ value, pointer });
     },
 
-    ipv6: (core, schema, value, pointer) => {
+    ipv6: (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -139,7 +139,7 @@ const formatValidators: Record<
         return errors.formatIPV6Error({ value, pointer });
     },
 
-    "json-pointer": (core, schema, value, pointer) => {
+    "json-pointer": (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -149,7 +149,7 @@ const formatValidators: Record<
         return errors.formatJsonPointerError({ value, pointer });
     },
 
-    "relative-json-pointer": (core, schema, value, pointer) => {
+    "relative-json-pointer": (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -159,7 +159,7 @@ const formatValidators: Record<
         return errors.formatJsonPointerError({ value, pointer });
     },
 
-    regex: (core, schema, value, pointer) => {
+    regex: (draft, schema, value, pointer) => {
         if (typeof value === "string" && /\\Z$/.test(value) === false) {
             try {
                 new RegExp(value);
@@ -175,7 +175,7 @@ const formatValidators: Record<
         return errors.formatRegExError({ value, pointer });
     },
 
-    time: (core, schema, value, pointer) => {
+    time: (draft, schema, value, pointer) => {
         if (typeof value !== "string") {
             return undefined;
         }
@@ -198,7 +198,7 @@ const formatValidators: Record<
         return errors.formatTimeError({ value, pointer });
     },
 
-    uri: (core, schema, value, pointer) => {
+    uri: (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -208,7 +208,7 @@ const formatValidators: Record<
         return errors.formatURIError({ value, pointer });
     },
 
-    "uri-reference": (core, schema, value, pointer) => {
+    "uri-reference": (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -218,7 +218,7 @@ const formatValidators: Record<
         return errors.formatURIReferenceError({ value, pointer });
     },
 
-    "uri-template": (core, schema, value, pointer) => {
+    "uri-template": (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -228,7 +228,7 @@ const formatValidators: Record<
         return errors.formatURITemplateError({ value, pointer });
     },
 
-    url: (core, schema, value: string, pointer) => {
+    url: (draft, schema, value: string, pointer) => {
         if (value === "" || validUrl.isWebUri(value)) {
             return undefined;
         }

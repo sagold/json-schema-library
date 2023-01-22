@@ -1,7 +1,7 @@
 import { errorsOnly } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
 import { JsonSchema, JsonPointer, JsonError, isJsonError } from "./types";
-import { Draft as Core } from "./draft";
+import { Draft } from "./draft";
 
 function createErrorNotification(onError: OnError) {
     return function notifyError(error: JsonError | JsonError[]) {
@@ -31,22 +31,22 @@ export type Options = {
  * @async
  * Validate data by a json schema
  *
- * @param core - validator
+ * @param draft - validator
  * @param value - value to validate
  * @param options
- * @param options.schema - json schema to use, defaults to core.rootSchema
+ * @param options.schema - json schema to use, defaults to draft.rootSchema
  * @param options.pointer - json pointer pointing to current value. Used in error reports
  * @param options.onError   - will be called for each error as soon as it is resolved
  * @return list of errors or empty
  */
 export default function validateAsync(
-    core: Core,
+    draft: Draft,
     value: any,
     options?: Options
 ): Promise<Array<JsonError>> {
-    const { schema, pointer, onError } = { schema: core.rootSchema, pointer: "#", ...options };
+    const { schema, pointer, onError } = { schema: draft.rootSchema, pointer: "#", ...options };
 
-    let errors: Array<JsonError> = core.validate(value, schema, pointer);
+    let errors: Array<JsonError> = draft.validate(value, schema, pointer);
     if (onError) {
         errors = flattenArray(errors);
         const notifyError = createErrorNotification(onError);

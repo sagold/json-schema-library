@@ -1,4 +1,4 @@
-import { Draft as Core } from "./draft";
+import { Draft } from "./draft";
 import { JsonValidator } from "./types";
 import { CreateError } from "./utils/createCustomError";
 
@@ -6,45 +6,45 @@ import { CreateError } from "./utils/createCustomError";
  * @throws Error
  * Adds a custom error. May override existing errors
  *
- * @param core
+ * @param draft
  * @param errorId id of error @see /lib/validation/errors
  * @param errorCreator - function returning an error-object @see /lib/utils/createCustomError
  */
-function addError(core: Core, errorId: string, errorCreator: CreateError) {
+function addError(draft: Draft, errorId: string, errorCreator: CreateError) {
     if (typeof errorCreator !== "function") {
         throw new Error(
             `Error callback 'errorCreator' must be of type function. Received '${typeof errorCreator}'`
         );
     }
-    core.errors[errorId] = errorCreator;
+    draft.errors[errorId] = errorCreator;
 }
 
 /**
  * Adds a custom format validator. Existing format may not be overriden (may still be modified manually)
- * @param core
+ * @param draft
  * @param formatType - format type (i.e. `format: "html"`)
- * @param validationFunction - called with (core, schema, value, pointer)
+ * @param validationFunction - called with (draft, schema, value, pointer)
  */
-function addFormat(core: Core, formatType: string, validationFunction: JsonValidator) {
+function addFormat(draft: Draft, formatType: string, validationFunction: JsonValidator) {
     if (typeof validationFunction !== "function") {
         throw new Error(`Validation function expected. Received ${typeof validationFunction}`);
     }
-    if (core.validateFormat[formatType]) {
+    if (draft.validateFormat[formatType]) {
         throw new Error(`A format '${formatType}' is already registered to validation`);
     }
-    core.validateFormat[formatType] = validationFunction;
+    draft.validateFormat[formatType] = validationFunction;
 }
 
 /**
  * Adds a custom keyword validation to a specific type. May not override existing keywords.
  *
- * @param core
+ * @param draft
  * @param datatype - valid datatype like "object", "array", "string", etc
  * @param keyword - The keyword to add, i.e. `minWidth: ...`
- * @param validationFunction - called with (core, schema, value, pointer)
+ * @param validationFunction - called with (draft, schema, value, pointer)
  */
 function addKeyword(
-    core: Core,
+    draft: Draft,
     datatype: string,
     keyword: string,
     validationFunction: JsonValidator
@@ -52,13 +52,13 @@ function addKeyword(
     if (typeof validationFunction !== "function") {
         throw new Error(`Validation function expected. Received ${typeof validationFunction}`);
     }
-    if (core.typeKeywords[datatype] == null) {
+    if (draft.typeKeywords[datatype] == null) {
         throw new Error(`Unknown datatype ${datatype}. Failed adding custom keyword validation.`);
     }
-    if (core.typeKeywords[datatype].includes(keyword) === false) {
-        core.typeKeywords[datatype].push(keyword);
+    if (draft.typeKeywords[datatype].includes(keyword) === false) {
+        draft.typeKeywords[datatype].push(keyword);
     }
-    core.validateKeyword[keyword] = validationFunction;
+    draft.validateKeyword[keyword] = validationFunction;
 }
 
 export default {

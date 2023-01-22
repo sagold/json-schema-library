@@ -3,16 +3,16 @@ import { each } from "../../lib/each";
 import { Draft04 as Core } from "../../lib/draft04";
 
 describe("each", () => {
-    let core: Core;
+    let draft: Core;
     before(() => {
-        core = new Core();
+        draft = new Core();
         // @ts-ignore
-        each.core = core;
+        each.draft = draft;
     });
 
     it("should call callback with schema, value and pointer", () => {
         const calls: [unknown, unknown, string][] = [];
-        core.each(5, (...args: [unknown, unknown, string]) => calls.push(args), {
+        draft.each(5, (...args: [unknown, unknown, string]) => calls.push(args), {
             type: "number"
         });
 
@@ -24,7 +24,7 @@ describe("each", () => {
 
     it("should callback for array and all array items", () => {
         const calls: unknown[] = [];
-        core.each([5, 9], (...args: [unknown, unknown, string]) => calls.push(args), {
+        draft.each([5, 9], (...args: [unknown, unknown, string]) => calls.push(args), {
             type: "array",
             items: { type: "number" }
         });
@@ -39,7 +39,7 @@ describe("each", () => {
 
     it("should callback for array and pick correct schema forEach item", () => {
         const calls: unknown[] = [];
-        core.each([5, "nine"], (...args: [unknown, unknown, string]) => calls.push(args), {
+        draft.each([5, "nine"], (...args: [unknown, unknown, string]) => calls.push(args), {
             type: "array",
             items: [{ type: "number" }, { type: "string" }]
         });
@@ -54,7 +54,7 @@ describe("each", () => {
 
     it("should callback for object and all properties", () => {
         const calls: unknown[] = [];
-        core.each({ a: 5, b: 9 }, (...args: [unknown, unknown, string]) => calls.push(args), {
+        draft.each({ a: 5, b: 9 }, (...args: [unknown, unknown, string]) => calls.push(args), {
             type: "object",
             properties: { a: { type: "number" }, b: { type: "number" } }
         });

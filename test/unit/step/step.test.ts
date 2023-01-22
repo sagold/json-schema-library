@@ -3,17 +3,17 @@ import step from "../../../lib/step";
 import { Draft04 as Core } from "../../../lib/draft04";
 
 describe("step", () => {
-    let core: Core;
-    before(() => (core = new Core()));
+    let draft: Core;
+    before(() => (draft = new Core()));
 
     it("should return an error for unknown types", () => {
-        const res = step(core, 0, { type: "unknown" }, {});
+        const res = step(draft, 0, { type: "unknown" }, {});
         expect(res).to.be.an("error");
     });
 
     describe("object", () => {
         it("should return object property", () => {
-            const res = step(core, "title", {
+            const res = step(draft, "title", {
                 type: "object",
                 properties: {
                     title: { type: "string" }
@@ -24,7 +24,7 @@ describe("step", () => {
         });
 
         it("should return error for unknown property", () => {
-            const res = step(core, "wrongkey", {
+            const res = step(draft, "wrongkey", {
                 type: "object",
                 properties: {
                     title: { type: "string" }
@@ -35,7 +35,7 @@ describe("step", () => {
         });
 
         it("should return error for unknown property", () => {
-            const res = step(core, "thenValue", {
+            const res = step(draft, "thenValue", {
                 type: "object",
                 properties: { test: { type: "string" } },
                 if: {
@@ -56,7 +56,7 @@ describe("step", () => {
 
         it("should create schema for `additionalProperties=true`", () => {
             const res = step(
-                core,
+                draft,
                 "any",
                 {
                     type: "object",
@@ -70,7 +70,7 @@ describe("step", () => {
 
         it("should treat `additionalProperties` as `true` per default", () => {
             const res = step(
-                core,
+                draft,
                 "any",
                 {
                     type: "object"
@@ -83,7 +83,7 @@ describe("step", () => {
 
         it("should return an error if `additionalProperties=false` and property unknown", () => {
             const res = step(
-                core,
+                draft,
                 "any",
                 {
                     type: "object",
@@ -97,7 +97,7 @@ describe("step", () => {
 
         it("should return matching oneOf", () => {
             const res = step(
-                core,
+                draft,
                 "title",
                 {
                     oneOf: [
@@ -119,7 +119,7 @@ describe("step", () => {
 
         it("should return matching oneOf, for objects missing properties", () => {
             const res = step(
-                core,
+                draft,
                 "title",
                 {
                     oneOf: [
@@ -141,7 +141,7 @@ describe("step", () => {
 
         it("should return matching anyOf", () => {
             const res = step(
-                core,
+                draft,
                 "title",
                 {
                     anyOf: [
@@ -163,7 +163,7 @@ describe("step", () => {
 
         it("should return combined anyOf schema", () => {
             const res = step(
-                core,
+                draft,
                 "title",
                 {
                     anyOf: [
@@ -188,7 +188,7 @@ describe("step", () => {
         });
 
         it("should resolve references from anyOf schema", () => {
-            core.setSchema({
+            draft.setSchema({
                 definitions: {
                     string: {
                         type: "object",
@@ -210,7 +210,7 @@ describe("step", () => {
                 ]
             });
 
-            const res = step(core, "title", core.rootSchema, {
+            const res = step(draft, "title", draft.rootSchema, {
                 title: 4,
                 test: 2
             });
@@ -220,7 +220,7 @@ describe("step", () => {
 
         it("should return matching allOf schema", () => {
             const res = step(
-                core,
+                draft,
                 "title",
                 {
                     allOf: [{ type: "object" }, { additionalProperties: { type: "number" } }]
@@ -232,7 +232,7 @@ describe("step", () => {
         });
 
         it("should resolve references in allOf schema", () => {
-            core.setSchema({
+            draft.setSchema({
                 definitions: {
                     object: { type: "object" },
                     additionalNumber: {
@@ -245,7 +245,7 @@ describe("step", () => {
                 ]
             });
 
-            const res = step(core, "title", core.rootSchema, {
+            const res = step(draft, "title", draft.rootSchema, {
                 title: 4,
                 test: 2
             });
@@ -254,7 +254,7 @@ describe("step", () => {
         });
 
         it("should return matching patternProperty", () => {
-            const res = step(core, "second", {
+            const res = step(draft, "second", {
                 type: "object",
                 patternProperties: {
                     "^first$": { type: "number", id: "first" },
@@ -266,7 +266,7 @@ describe("step", () => {
         });
 
         it("should return additionalProperties schema for not matching patternProperty", () => {
-            const res = step(core, "third", {
+            const res = step(draft, "third", {
                 type: "object",
                 patternProperties: {
                     "^first$": { type: "number", id: "first" },
@@ -281,12 +281,12 @@ describe("step", () => {
 
     describe("array", () => {
         it("should return an error for invalid array schema", () => {
-            const res = step(core, 0, { type: "array" }, []);
+            const res = step(draft, 0, { type: "array" }, []);
             expect(res).to.be.an("error");
         });
 
         it("should return item property", () => {
-            const res = step(core, 0, {
+            const res = step(draft, 0, {
                 type: "array",
                 items: {
                     type: "string"
@@ -298,7 +298,7 @@ describe("step", () => {
 
         it("should return item at index", () => {
             const res = step(
-                core,
+                draft,
                 1,
                 {
                     type: "array",
@@ -312,7 +312,7 @@ describe("step", () => {
 
         it("should return matching item in oneOf", () => {
             const res = step(
-                core,
+                draft,
                 0,
                 {
                     type: "array",
@@ -340,7 +340,7 @@ describe("step", () => {
 
         it("should return matching anyOf", () => {
             const res = step(
-                core,
+                draft,
                 1,
                 {
                     items: {
@@ -367,7 +367,7 @@ describe("step", () => {
 
         it("should return combined anyOf schema", () => {
             const res = step(
-                core,
+                draft,
                 1,
                 {
                     items: {
@@ -398,7 +398,7 @@ describe("step", () => {
 
         it("should return combined allOf schema", () => {
             const res = step(
-                core,
+                draft,
                 1,
                 {
                     items: {
@@ -425,7 +425,7 @@ describe("step", () => {
 
         it("should return a generated schema with additionalItems", () => {
             const res = step(
-                core,
+                draft,
                 1,
                 {
                     type: "array",

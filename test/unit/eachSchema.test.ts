@@ -255,7 +255,7 @@ describe("eachSchema", () => {
     });
 
     it("should support array-types", () => {
-        // https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.7.6.1
+        // https://json-schema.org/draft/2020-12/json-schema-draft.html#rfc.section.7.6.1
         const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             type: "object",

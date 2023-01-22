@@ -5,21 +5,21 @@ import addValidator from "../../lib/addValidator";
 import { JsonError } from "../../lib/types";
 
 describe("validateAsync", () => {
-    let core: Core;
-    before(() => (core = new Core()));
+    let draft: Core;
+    before(() => (draft = new Core()));
 
     it("should return a promise", () => {
-        const promise = validateAsync(core, 4, { schema: { type: "number" } });
+        const promise = validateAsync(draft, 4, { schema: { type: "number" } });
         expect(promise).to.be.instanceof(Promise);
     });
 
     it("should resolve successfull with an empty error", () =>
-        validateAsync(core, 4, { schema: { type: "number" } }).then((errors) => {
+        validateAsync(draft, 4, { schema: { type: "number" } }).then((errors) => {
             expect(errors).to.have.length(0);
         }));
 
     it("should resolve with errors for a failed validation", () =>
-        validateAsync(core, "4", { schema: { type: "number" } }).then((errors) => {
+        validateAsync(draft, "4", { schema: { type: "number" } }).then((errors) => {
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("TypeError");
         }));
@@ -28,7 +28,7 @@ describe("validateAsync", () => {
         before(() => {
             // adds an async validation helper to { type: 'string', asyncError: true }
             // @ts-ignore
-            addValidator.keyword(core, "string", "asyncError", (c, schema) => {
+            addValidator.keyword(draft, "string", "asyncError", (c, schema) => {
                 return schema.asyncError
                     ? new Promise((resolve) =>
                           // eslint-disable-next-line max-nested-callbacks
@@ -46,7 +46,7 @@ describe("validateAsync", () => {
         it("should call onProgress immediately with error", () => {
             const errors: JsonError[] = [];
             return validateAsync(
-                core,
+                draft,
                 {
                     async: "test async progres",
                     anotherError: 44

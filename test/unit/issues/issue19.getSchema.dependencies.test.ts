@@ -5,10 +5,10 @@ import { JsonSchema, JsonPointer } from "../../../lib/types";
 import { resolveOneOfFuzzy } from "../../../lib/features/oneOf";
 
 describe("issue#19 - getSchema from dependencies", () => {
-    let core: Core;
+    let draft: Core;
     beforeEach(
         () =>
-            (core = new Core({
+            (draft = new Core({
                 title: "Fill in some steps",
                 required: ["name"],
                 properties: {
@@ -54,7 +54,7 @@ describe("issue#19 - getSchema from dependencies", () => {
     );
 
     it("should return correct schema for existing data property 'customField'", () => {
-        const schema = getSchema(core, "#/customField", {
+        const schema = getSchema(draft, "#/customField", {
             name: "issue #19",
             generation: "Display Custom Field",
             customField: "mi"
@@ -71,11 +71,11 @@ describe("issue#19 - getSchema from dependencies", () => {
         // directly set "oneOfProperty" to "generation"
         // -> validate schema -> no schema is valid (because gneration is missing here)
         // => tell jlib which schema to resolve or let it retrieve a schema on its own
-        core.resolveOneOf = function resolveOneOf(data, schema: JsonSchema, pointer: JsonPointer) {
+        draft.resolveOneOf = function resolveOneOf(data, schema: JsonSchema, pointer: JsonPointer) {
             return resolveOneOfFuzzy(this, data, schema, pointer);
         };
 
-        const schema = getSchema(core, "#/customField", {
+        const schema = getSchema(draft, "#/customField", {
             name: "issue #19",
             generation: "Display Custom Field"
         });

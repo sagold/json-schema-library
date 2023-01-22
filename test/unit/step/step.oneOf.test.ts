@@ -3,12 +3,12 @@ import step from "../../../lib/step";
 import { Draft04 as Core } from "../../../lib/draft04";
 
 describe("step.oneof", () => {
-    let core: Core;
-    before(() => (core = new Core()));
+    let draft: Core;
+    before(() => (draft = new Core()));
 
     it("should return matching schema", () => {
         const res = step(
-            core,
+            draft,
             "title",
             {
                 type: "object",
@@ -34,7 +34,7 @@ describe("step.oneof", () => {
 
     it("should return index of matching schema", () => {
         const res = step(
-            core,
+            draft,
             "title",
             {
                 type: "object",
