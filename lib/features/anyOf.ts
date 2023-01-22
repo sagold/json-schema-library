@@ -1,4 +1,3 @@
-import copy from "../utils/copy";
 import { mergeSchema } from "../mergeSchema";
 import errors from "../validation/errors";
 import { JsonSchema, JsonPointer, JsonValidator, JsonError } from "../types";
@@ -35,20 +34,15 @@ export function resolveAnyOf(
     schema: JsonSchema = draft.rootSchema,
     pointer: JsonPointer = "#"
 ): JsonSchema | JsonError {
-    let found = false;
-    let mergedSchema = copy(schema);
-    for (let i = 0; i < schema.anyOf.length; i += 1) {
-        const anyOfSchema = draft.resolveRef(schema.anyOf[i]);
-        if (draft.isValid(data, schema.anyOf[i], pointer)) {
-            found = true;
-            mergedSchema = mergeSchema(mergedSchema, anyOfSchema);
-        }
+    const { anyOf } = schema;
+    if (!Array.isArray(anyOf) || anyOf.length === 0) {
+        return schema;
     }
-
-    if (found === false) {
-        return errors.anyOfError({ value: data, pointer, anyOf: JSON.stringify(schema.anyOf) });
+    const resolvedSchema = resolveAnyOfSchema(draft, schema, data);
+    if (resolvedSchema == null) {
+        return errors.anyOfError({ value: data, pointer, anyOf: JSON.stringify(anyOf) });
     }
-
+    const mergedSchema = mergeSchema(schema, resolvedSchema);
     return omit(mergedSchema, "anyOf");
 }
 
