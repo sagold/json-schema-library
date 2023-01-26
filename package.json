@@ -9,7 +9,7 @@
         "dist": "rm -rf dist; yarn dist:es5 && yarn dist:es6 && yarn dist:esm",
         "dist:es5": "NODE_ENV=production webpack",
         "dist:es6": "tsc --outDir dist/module --target ES2019",
-        "dist:esm": "esbuild --bundle --minify --sourcemap --outfile=dist/jsonSchemaLibrary.esm.min.js ./dist/module/index.js",
+        "dist:esm": "esbuild --bundle --format=esm --minify --sourcemap --outfile=dist/jsonSchemaLibrary.esm.min.js ./dist/module/index.js",
         "test": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/**/*.test.ts'",
         "test:integration": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/integration/**/*.test.ts'",
         "test:unit": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/unit/**/*.test.ts'",
