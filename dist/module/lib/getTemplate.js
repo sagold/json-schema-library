@@ -159,7 +159,10 @@ function getTemplate(draft, data, _schema, pointer, opts) {
         ? selectType(schema.type, data, schema.default)
         : schema.type;
     // reset invalid type
-    if (data != null && getTypeOf(data) !== type) {
+    const javascriptTypeOfData = getTypeOf(data);
+    if (data != null &&
+        javascriptTypeOfData !== type &&
+        !(javascriptTypeOfData === "number" && type === "integer")) {
         data = convertValue(type, data);
     }
     if (TYPE[type] == null) {
