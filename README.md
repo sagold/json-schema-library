@@ -38,7 +38,7 @@ const errors: JSONError[] = jsonSchema.validate(myData);
 ```
 
 
-What follows is a description of the main draft methods.
+What follows is a description of the main draft methods. 
 
 ## Draft methods
 
@@ -525,35 +525,106 @@ expect(res).to.deep.eq({ type: "number" });
 
 `addRemoteSchema` lets you add additional schemas that can be referenced by an URL using `$ref`. Use this to combine multiple schemas without changing the actual schema.
 
+Each schemas is referenced by their unique `$id` (since draft-06, previously `id`). Usually an `$id` is specified as an url, for example `https://mydomain.com/schema/schema-name` or with a file extension like `https://mydomain.com/schema/schema-name.json`. At least in `json-schema-library` you can use any name, just ensure the `$id` is unique across all schemas.
+
+To add a remote schema use the exposed method `addRemoteSchema`:
+
 ```ts
-const jsonSchema = new Draft07({
-  $ref: "http://json-schema.org/draft-07/schema#definitions/nonNegativeInteger"
+const jsonSchema = new Draft07();
+
+jsonSchema.addRemoteSchema("https://sagold.com/remote", {
+  $id: "https://sagold.com/remote",
+  title: "A character", 
+  type: "string",
+  minLength: 1,
+  maxLength: 1
 });
-jsonSchema.addRemoteSchema("http://json-schema.org/draft-07/schema", draft07Schema);
 ```
 
-<details><summary>Example</summary>
+**Note** the given _url_ and `$id` on the root schema should match. If `$id` is omitted it will be added from the passed url.
+
+To access the remote schema, add a $ref within your local schema
 
 ```ts
-import { Draft07 } from "json-schema-library";
-
-const jsonSchema = new Draft07({
-    $ref: "http://drafts.com/7/schema#definitions/nonNegativeInteger"
+jsonSchema.setSchema({
+  $id: "https://sagold.com/local",
+  type: "object",
+  required: ['character'],
+  properties: {
+    character: {
+      $ref: "https://sagold.com/remote"
+    }
+  }
 });
-jsonSchema.addRemoteSchema("http://drafts.com/7/schema", {
-  definitions: {
-    nonNegativeInteger: { type: "integer", minimum: 0 }
+```
+
+and the remote schema will be resolved automatically:
+
+```ts
+jsonSchema.validate({ character: "AB" }); // maxLength error
+jsonSchema.getTemplate({}); // { character: "A" } - default value resolved
+// returns remote schema (from compiled local schema):
+jsonSchema.getSchema().getRef("https://sagold.com/remote");
+```
+
+**Note** the support for $ref resolution has additional complexities, if you add nested $ids to you schema. Here, json-schema-library has only partial support ([@see integration test result](https://github.com/sagold/json-schema-library/actions/runs/4037856805/jobs/6941448741)). Thus, it is recommended to omit the features of changing scopes by nested $ids. For more details, see [json-schema.org: Structuring a complex schema](https://json-schema.org/understanding-json-schema/structuring.html#base-uri)
+
+<details><summary>Access local subschemas in remote schemas</summary>
+
+You can add a local uri reference to the remote schema by using the `#` separator. The following example resolves hte local path `/$defs/character` in the remote schema `https://sagold.com/remote` throught the combined url:
+`https://sagold.com/remote#/$defs/character`
+
+```ts
+jsonSchema.addRemoteSchema("https://sagold.com/remote", {
+  $defs: {
+    character: {
+      title: "A character", 
+      type: "string",
+      minLength: 1,
+      maxLength: 1
+    }
   }
 });
 
-const errors = jsonSchema.validate(1);
-expect(errors).to.deep.equal([]);
+jsonSchema.setSchema({
+  $id: "https://sagold.com/local",
+  $ref: "https://sagold.com/remote#/$defs/character"
+});
 
-const schema = jsonSchema.getSchema("#");
-expect(schema).to.deep.equal({ type: "integer", minimum: 0 });
+jsonSchema.validate("AB"); // maxLength error
+jsonSchema.getTemplate("A"); // "A" - default value resolved
+// returns remote schema (from compiled local schema):
+jsonSchema.getSchema().getRef("https://sagold.com/remote#/$defs/character"); 
+```
+
+**Note** json-pointers are not restricted to `$defs` (definitions), but can reference any subschema. For example:
+
+```ts
+jsonSchema.addRemoteSchema("https://sagold.com/remote", {
+  type: "object",
+  properties: {
+    character: {
+      title: "A character", 
+      type: "string",
+      minLength: 1,
+      maxLength: 1
+    }
+  }
+});
+
+jsonSchema.setSchema({
+  $id: "https://sagold.com/local",
+  $ref: "https://sagold.com/remote#/properties/character"
+});
+
+jsonSchema.validate("AB"); // maxLength error
+jsonSchema.getTemplate("A"); // "A" - default value resolved
+// returns remote schema (from compiled local schema):
+jsonSchema.getSchema().getRef("https://sagold.com/remote#/properties/character"); 
 ```
 
 </details>
+
 
 ### createSchemaOf
 
