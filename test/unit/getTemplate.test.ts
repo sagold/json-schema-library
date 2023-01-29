@@ -101,6 +101,38 @@ describe("getTemplate", () => {
         });
     });
 
+    describe("number", () => {
+        it("should set default value for number", () => {
+            draft.setSchema({ type: "number", default: 2 });
+            const res = getTemplate(draft);
+
+            expect(res).to.equal(2);
+        });
+
+        it("should not override given number", () => {
+            draft.setSchema({ type: "number", default: 2 });
+            const res = getTemplate(draft, 42);
+
+            expect(res).to.equal(42);
+        });
+    });
+
+    describe("integer", () => {
+        it("should set default value for integer", () => {
+            draft.setSchema({ type: "integer", default: 2 });
+            const res = getTemplate(draft);
+
+            expect(res).to.equal(2);
+        });
+
+        it("should not override given integer", () => {
+            draft.setSchema({ type: "integer", default: 2 });
+            const res = getTemplate(draft, 42);
+
+            expect(res).to.equal(42);
+        });
+    });
+
     describe("object", () => {
         describe("properties", () => {
             it("should return defined properties of object", () => {
