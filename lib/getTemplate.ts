@@ -195,7 +195,8 @@ function getTemplate(
         : schema.type;
 
     // reset invalid type
-    if (data != null && getTypeOf(data) !== type) {
+    const dataType = getTypeOf(data);
+    if (data != null && dataType !== type && !(dataType === "number" && type === "integer")) {
         data = convertValue(type, data);
     }
 

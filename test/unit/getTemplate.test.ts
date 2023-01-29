@@ -100,6 +100,22 @@ describe("getTemplate", () => {
         });
     });
 
+    describe("integer", () => {
+        it("should set default value for integer", () => {
+            core.setSchema({ type: "integer", default: 2 });
+            const res = getTemplate(core);
+
+            expect(res).to.equal(2);
+        });
+
+        it("should not override given integer", () => {
+            core.setSchema({ type: "integer", default: 2 });
+            const res = getTemplate(core, 42);
+
+            expect(res).to.equal(42);
+        });
+    });
+
     describe("object", () => {
         describe("properties", () => {
             it("should return defined properties of object", () => {
