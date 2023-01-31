@@ -254,11 +254,11 @@ const TYPE = {
     // build array type of items, ignores additionalItems
     array: (draft, schema, data, pointer, opts) => {
         var _a, _b;
-        const d = data || [];
         if (schema.items == null) {
-            return d; // items are undefined
+            return data || []; // items are undefined
         }
         const template = schema.default === undefined ? [] : schema.default;
+        const d = data || template;
         const minItems = schema.minItems || 0;
         // build defined set of items
         if (Array.isArray(schema.items)) {

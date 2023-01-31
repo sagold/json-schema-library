@@ -339,12 +339,12 @@ const TYPE: Record<
         pointer: JsonPointer,
         opts: TemplateOptions
     ) => {
-        const d: unknown[] = data || [];
         if (schema.items == null) {
-            return d; // items are undefined
+            return data || []; // items are undefined
         }
 
         const template = schema.default === undefined ? [] : schema.default;
+        const d: unknown[] = data || template;
         const minItems = schema.minItems || 0;
 
         // build defined set of items

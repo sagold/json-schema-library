@@ -831,6 +831,40 @@ describe("getTemplate", () => {
                 expect(res).to.deep.equal([true]);
             });
 
+            it("should return default array even if minItems is not set", () => {
+                draft.setSchema({
+                    type: "array",
+                    default: ["a", "b"],
+                    items: {
+                        type: "string"
+                    }
+                });
+                const res = getTemplate(draft);
+
+                expect(res.length).to.deep.equal(2);
+                expect(res).to.deep.equal(["a", "b"]);
+            });
+
+            it("should return default array if part of object", () => {
+                draft.setSchema({
+                    type: "object",
+                    required: ["list"],
+                    properties: {
+                        list: {
+                            type: "array",
+                            default: ["a", "b"],
+                            items: {
+                                type: "string"
+                            }
+                        }
+                    }
+                });
+                const res = getTemplate(draft);
+
+                expect(res.list.length).to.deep.equal(2);
+                expect(res.list).to.deep.equal(["a", "b"]);
+            });
+
             it("should not override given default values", () => {
                 draft.setSchema({
                     type: "array",
