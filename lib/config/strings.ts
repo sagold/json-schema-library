@@ -51,7 +51,7 @@ export default {
     RequiredPropertyError: "The required property `{{key}}` is missing at `{{pointer}}`",
     TypeError: "Expected `{{value}}` ({{received}}) in `{{pointer}}` to be of type `{{expected}}`",
     UndefinedValueError: "Value must not be undefined in `{{pointer}}`",
-    UniqueItemsError: "Expected unique items in {{pointer}}: duplicate value `{{value}}` found at {{itemPointer}} and {{duplicatePointer}}",
+    UniqueItemsError: "Items in array must be unique. Value `{{value}}` in `{{pointer}}` is a duplicate of {{duplicatePointer}}.",
     UnknownPropertyError: "Could not find a valid schema for property `{{pointer}}` within object",
     ValueNotEmptyError: "A value for `{{property}}` is required at `{{pointer}}`"
 } as Record<string, string>;
