@@ -1,5 +1,4 @@
 import getTypeOf from "../getTypeOf";
-import isSame from "../utils/deepCompare";
 import settings from "../config/settings";
 import ucs2decode from "../utils/punycode.ucs2decode";
 import { isObject } from "../utils/isObject";
@@ -8,6 +7,7 @@ import { validateAllOf } from "../features/allOf";
 import { validateAnyOf } from "../features/anyOf";
 import { validateDependencies } from "../features/dependencies";
 import { validateOneOf } from "../features/oneOf";
+import deepEqual from "fast-deep-equal";
 const FPP = settings.floatingPointPrecision;
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 const hasProperty = (value, property) => !(value[property] === undefined || !hasOwnProperty.call(value, property));
@@ -368,16 +368,18 @@ const KeywordValidation = {
         if ((Array.isArray(value) && schema.uniqueItems) === false) {
             return undefined;
         }
+        const duplicates = [];
         const errors = [];
         value.forEach((item, index) => {
             for (let i = index + 1; i < value.length; i += 1) {
-                if (isSame(item, value[i])) {
+                if (deepEqual(item, value[i]) && !duplicates.includes(i)) {
                     errors.push(draft.errors.uniqueItemsError({
-                        pointer,
-                        itemPointer: `${pointer}/${index}`,
-                        duplicatePointer: `${pointer}/${i}`,
+                        pointer: `${pointer}/${i}`,
+                        duplicatePointer: `${pointer}/${index}`,
+                        arrayPointer: pointer,
                         value: JSON.stringify(item)
                     }));
+                    duplicates.push(i);
                 }
             }
         });
