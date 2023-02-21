@@ -34,7 +34,7 @@ export default function validate(
 ): Array<JsonError> {
     schema = draft.resolveRef(schema);
 
-    // this is a high level v7 schema validation
+    // @draft >= 07
     if (getTypeOf(schema) === "boolean") {
         if (schema) {
             return [];
