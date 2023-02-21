@@ -23,52 +23,64 @@ import { JSONSchema } from "../types";
 
 const draft07Config: DraftConfig = {
     typeKeywords: {
-        array: ["enum", "contains", "items", "minItems", "maxItems", "uniqueItems", "not", "if"],
-        boolean: ["enum", "not"],
+        array: [
+            "allOf",
+            "anyOf",
+            "contains",
+            "enum",
+            "if",
+            "items",
+            "maxItems",
+            "minItems",
+            "not",
+            "oneOf",
+            "uniqueItems"
+        ],
+        boolean: ["allOf", "anyOf", "enum", "not", "oneOf"],
         object: [
             "additionalProperties",
+            "allOf",
+            "anyOf",
             "dependencies",
             "enum",
             "format",
-            "minProperties",
+            "if",
             "maxProperties",
+            "minProperties",
+            "not",
+            "oneOf",
             "patternProperties",
             "properties",
             "propertyNames",
-            "required",
-            "not",
-            "oneOf",
-            "allOf",
-            "anyOf",
-            "if"
+            "required"
         ],
         string: [
-            "enum",
-            "format",
-            "maxLength",
-            "minLength",
-            "pattern",
-            "not",
-            "oneOf",
             "allOf",
             "anyOf",
-            "if"
+            "enum",
+            "format",
+            "if",
+            "maxLength",
+            "minLength",
+            "not",
+            "oneOf",
+            "pattern"
         ],
         number: [
+            "allOf",
+            "anyOf",
             "enum",
             "exclusiveMaximum",
             "exclusiveMinimum",
             "format",
+            "if",
             "maximum",
             "minimum",
             "multipleOf",
             "not",
-            "oneOf",
-            "allOf",
-            "anyOf",
-            "if"
+            "oneOf"
         ],
-        null: ["enum", "format", "not", "oneOf", "allOf", "anyOf"]
+        null: ["allOf", "anyOf", "enum", "format", "not", "oneOf"]
     },
     validateKeyword: KEYWORDS,
     validateType: TYPES,
