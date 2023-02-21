@@ -21,8 +21,18 @@ import validate from "../validate";
 import { Draft } from "../draft";
 const draft04Config = {
     typeKeywords: {
-        array: ["enum", "items", "minItems", "maxItems", "uniqueItems", "not"],
-        boolean: ["enum", "not"],
+        array: [
+            "allOf",
+            "anyOf",
+            "enum",
+            "items",
+            "maxItems",
+            "minItems",
+            "not",
+            "oneOf",
+            "uniqueItems"
+        ],
+        boolean: ["enum", "not", "allOf", "anyOf", "oneOf"],
         object: [
             "additionalProperties",
             "dependencies",
@@ -39,28 +49,28 @@ const draft04Config = {
             "anyOf"
         ],
         string: [
+            "allOf",
+            "anyOf",
             "enum",
             "format",
             "maxLength",
             "minLength",
-            "pattern",
             "not",
             "oneOf",
-            "allOf",
-            "anyOf"
+            "pattern"
         ],
         number: [
+            "allOf",
+            "anyOf",
             "enum",
             "format",
             "maximum",
             "minimum",
             "multipleOf",
             "not",
-            "oneOf",
-            "allOf",
-            "anyOf"
+            "oneOf"
         ],
-        null: ["enum", "format", "not", "oneOf", "allOf", "anyOf"]
+        null: ["allOf", "anyOf", "enum", "format", "not", "oneOf"]
     },
     validateKeyword: KEYWORDS,
     validateType: TYPES,

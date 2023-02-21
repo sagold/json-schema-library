@@ -23,7 +23,7 @@ function getJsonSchemaType(value, expectedType) {
  */
 export default function validate(draft, value, schema = draft.rootSchema, pointer = "#") {
     schema = draft.resolveRef(schema);
-    // this is a high level v7 schema validation
+    // @draft >= 07
     if (getTypeOf(schema) === "boolean") {
         if (schema) {
             return [];
