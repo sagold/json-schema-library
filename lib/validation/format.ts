@@ -232,7 +232,7 @@ const formatValidators: Record<
         if (value === "" || validUrl.isWebUri(value)) {
             return undefined;
         }
-        return errors.formatUrlError({ value, pointer });
+        return errors.formatURLError({ value, pointer });
     }
 };
 
