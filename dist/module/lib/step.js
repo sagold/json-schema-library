@@ -99,7 +99,6 @@ const stepType = {
                 // we resolve the schema here and add the original schema to `oneOfSchema`
                 let resolvedSchema = core.resolveOneOf(data[key], targetSchema, `${pointer}/${key}`);
                 const oneOfIndex = targetSchema.oneOf.findIndex((s) => s === resolvedSchema);
-                resolvedSchema = JSON.parse(JSON.stringify(resolvedSchema));
                 resolvedSchema.variableSchema = true;
                 resolvedSchema.oneOfIndex = oneOfIndex;
                 resolvedSchema.oneOfSchema = targetSchema;
