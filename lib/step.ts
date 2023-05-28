@@ -144,7 +144,6 @@ const stepType = {
 
                 const oneOfIndex = targetSchema.oneOf.findIndex((s) => s === resolvedSchema);
 
-                resolvedSchema = JSON.parse(JSON.stringify(resolvedSchema));
                 resolvedSchema.variableSchema = true;
                 resolvedSchema.oneOfIndex = oneOfIndex;
                 resolvedSchema.oneOfSchema = targetSchema;
