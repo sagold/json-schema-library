@@ -195,7 +195,7 @@ const formatValidators = {
         if (value === "" || validUrl.isWebUri(value)) {
             return undefined;
         }
-        return errors.formatUrlError({ value, pointer });
+        return errors.formatURLError({ value, pointer });
     }
 };
 export default formatValidators;
