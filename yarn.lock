@@ -328,18 +328,18 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@sagold/json-pointer@^5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@sagold/json-pointer/-/json-pointer-5.0.0.tgz#49a3f072cd95c89d82f67cc3d88b8bb86060c9e6"
-  integrity sha512-+kIj/GyAlBfZPPcxXlpMdcDP/HyQBbmVCrQ9VZQ8wEqphIHCg0oLojBCLTqpICie/tIc7nwXh3joLVJ4PTD+NQ==
+"@sagold/json-pointer@^5.1.0", "@sagold/json-pointer@^5.1.1":
+  version "5.1.1"
+  resolved "https://registry.npmjs.org/@sagold/json-pointer/-/json-pointer-5.1.1.tgz#01c2b75a3ea09eebde8c83a8c11409c8573dea67"
+  integrity sha512-/iskWuyGNu09qy09HYmyLnvzpKryymH9T+vTBi2LdFp1TuKvERDADvPMv2ZkQKsrRklOzivmOz9QXof0dKqvgA==
 
-"@sagold/json-query@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@sagold/json-query/-/json-query-6.0.0.tgz#a250a98d19cc20d8c06e8e9eeaf9d1de833f1ed4"
-  integrity sha512-fk9BimvNrzlhXiy+dvlwyA97W2N6GmPWCJo/2kwKEtU9oc93cVKamca9NcnjKx1hhjECjPfu30NQ8Tg2JGv/pA==
+"@sagold/json-query@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.npmjs.org/@sagold/json-query/-/json-query-6.1.0.tgz#cf84a190dbf68494c26596ae2646fbe0a4c68529"
+  integrity sha512-my8W23qwd19HLXiDgeAnwT53sF1DHuW5+Uom46bV0GPHVsJdqS3mh9eDeR7CMoyIbvcUTZcKBKzzoPtWxQh03g==
   dependencies:
-    "@sagold/json-pointer" "^5.0.0"
-    ebnf "^1.9.0"
+    "@sagold/json-pointer" "^5.1.0"
+    ebnf "^1.9.1"
 
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
@@ -1094,10 +1094,10 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
-ebnf@^1.9.0:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/ebnf/-/ebnf-1.9.0.tgz#9c2dd6052f3ed43a69c1f0b07b15bd03cefda764"
-  integrity sha512-LKK899+j758AgPq00ms+y90mo+2P86fMKUWD28sH0zLKUj7aL6iIH2wy4jejAMM9I2BawJ+2kp6C3mMXj+Ii5g==
+ebnf@^1.9.1:
+  version "1.9.1"
+  resolved "https://registry.npmjs.org/ebnf/-/ebnf-1.9.1.tgz#64c25d8208ec0d221ec11c3c5e8094015131a9d3"
+  integrity sha512-uW2UKSsuty9ANJ3YByIQE4ANkD8nqUPO7r6Fwcc1ADKPe9FRdcPpMl3VEput4JSvKBJ4J86npIC2MLP0pYkCuw==
 
 electron-to-chromium@^1.4.251:
   version "1.4.284"
