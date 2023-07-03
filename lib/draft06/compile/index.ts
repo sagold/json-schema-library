@@ -4,7 +4,7 @@ import { eachSchema } from "../../eachSchema";
 // import remotes from "../../../remotes";
 import joinScope from "../../compile/joinScope";
 import getRef from "../../compile/getRef";
-import { JSONSchema } from "../../types";
+import { JsonSchema } from "../../types";
 import { get } from "@sagold/json-pointer";
 
 const COMPILED = "__compiled";
@@ -15,7 +15,7 @@ const suffixes = /(#|\/)+$/g;
 
 type Context = {
     ids: Record<string, unknown>;
-    remotes: Record<string, JSONSchema>;
+    remotes: Record<string, JsonSchema>;
 };
 
 /**
@@ -33,10 +33,10 @@ type Context = {
  */
 export default function compileSchema(
     draft: Draft,
-    schemaToCompile: JSONSchema,
+    schemaToCompile: JsonSchema,
     rootSchema = schemaToCompile,
     force = false
-): JSONSchema {
+): JsonSchema {
     // @ts-ignore
     if (schemaToCompile === true || schemaToCompile === false || schemaToCompile === undefined) {
         return schemaToCompile;

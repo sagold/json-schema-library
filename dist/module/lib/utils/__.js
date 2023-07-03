@@ -8,6 +8,7 @@ import render from "./render";
  * @return resulting string
  */
 export default function __(keyword, data, fallback = keyword) {
-    const template = strings[keyword] || fallback;
+    var _a;
+    const template = (_a = strings[keyword]) !== null && _a !== void 0 ? _a : fallback;
     return render(template, data);
 }

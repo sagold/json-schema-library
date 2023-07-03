@@ -5,10 +5,10 @@ import { Draft07 } from "../../../lib/draft07";
 const INITIAL_RECURSION = settings.GET_TEMPLATE_RECURSION_LIMIT;
 
 describe("issue#21 - getTemplate containing refs", () => {
-    let core: Draft07;
+    let draft: Draft07;
     beforeEach(() => {
         settings.GET_TEMPLATE_RECURSION_LIMIT = 2;
-        core = new Draft07({
+        draft = new Draft07({
             $schema: "http://json-schema.org/draft/2019-09/schema",
             type: "object",
             additionalProperties: false,
@@ -62,7 +62,7 @@ describe("issue#21 - getTemplate containing refs", () => {
     });
 
     it("should append property 'runner' on partial objects", () => {
-        const data = core.getTemplate({
+        const data = draft.getTemplate({
             jobs: [{ name: "job-1" }, { name: "job-2" }]
         });
 

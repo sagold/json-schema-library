@@ -1,18 +1,18 @@
 import merge from "../utils/merge";
-import resolveOneOf from "../resolveOneOf.fuzzy";
+import { resolveOneOfFuzzy } from "../features/oneOf";
 import resolveRef from "../resolveRef.merge";
 import { Draft, DraftConfig } from "../draft";
 import { draft07Config } from "../draft07";
-import { JSONSchema } from "../types";
+import { JsonSchema } from "../types";
 
 const draftJsonEditorConfig: DraftConfig = {
     ...draft07Config,
-    resolveOneOf,
+    resolveOneOf: resolveOneOfFuzzy,
     resolveRef
 };
 
 class JsonEditor extends Draft {
-    constructor(schema?: JSONSchema, config: Partial<DraftConfig> = {}) {
+    constructor(schema?: JsonSchema, config: Partial<DraftConfig> = {}) {
         super(merge(draftJsonEditorConfig, config), schema);
     }
 }

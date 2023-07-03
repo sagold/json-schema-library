@@ -2,7 +2,7 @@ import gp from "@sagold/json-pointer";
 import { get } from "@sagold/json-query";
 import getTypeId from "./getTypeId";
 import types from "./types";
-const isObject = (value) => Object.prototype.toString.call(value) === "[object Object]";
+import { isObject } from "../utils/isObject";
 /**
  * Returns a list of all (direct) type definitions from the given schema
  * @param schema

@@ -4,26 +4,26 @@ import getTemplate from "../../lib/getTemplate";
 import { Draft07 as Core } from "../../lib/draft07";
 
 describe("getTemplate - v7", () => {
-    let core: Core;
-    before(() => (core = new Core()));
+    let draft: Core;
+    before(() => (draft = new Core()));
 
     it("should set default as value", () => {
-        core.setSchema({ type: "string", default: "static" });
-        const res = getTemplate(core);
+        draft.setSchema({ type: "string", default: "static" });
+        const res = getTemplate(draft);
 
         expect(res).to.deep.equal("static");
     });
 
     it("should set const as value", () => {
-        core.setSchema({ const: "static" });
-        const res = getTemplate(core);
+        draft.setSchema({ const: "static" });
+        const res = getTemplate(draft);
 
         expect(res).to.deep.equal("static");
     });
 
     it("should prefer const over default", () => {
-        core.setSchema({ type: "string", const: "static", default: "should be overwritten" });
-        const res = getTemplate(core);
+        draft.setSchema({ type: "string", const: "static", default: "should be overwritten" });
+        const res = getTemplate(draft);
 
         expect(res).to.deep.equal("static");
     });
@@ -31,7 +31,7 @@ describe("getTemplate - v7", () => {
     describe("object", () => {
         describe("if-then-else", () => {
             it("should return template of then-schema for valid if-schema", () => {
-                core.setSchema({
+                draft.setSchema({
                     type: "object",
                     // note that required is necessary for getTemplate behaviour
                     required: ["test"],
@@ -51,7 +51,7 @@ describe("getTemplate - v7", () => {
                     }
                 });
 
-                const res = getTemplate(core);
+                const res = getTemplate(draft);
                 expect(res).to.deep.equal({
                     test: "with value",
                     dynamic: "from then"
@@ -59,7 +59,7 @@ describe("getTemplate - v7", () => {
             });
 
             it("should not create data for then-schema if it is not required", () => {
-                core.setSchema({
+                draft.setSchema({
                     type: "object",
                     // note that required is necessary for getTemplate behaviour
                     required: ["test"],
@@ -78,14 +78,14 @@ describe("getTemplate - v7", () => {
                     }
                 });
 
-                const res = getTemplate(core, undefined, core.getSchema(), {
+                const res = getTemplate(draft, undefined, draft.getSchema(), {
                     addOptionalProps: false
                 });
                 expect(res).to.deep.equal({ test: "with value" });
             });
 
             it("should not return template of then-schema for invalid if-schema", () => {
-                core.setSchema({
+                draft.setSchema({
                     type: "object",
                     // note that required is necessary for getTemplate behaviour
                     required: ["test"],
@@ -104,14 +104,14 @@ describe("getTemplate - v7", () => {
                     }
                 });
 
-                const res = getTemplate(core);
+                const res = getTemplate(draft);
                 expect(res).to.deep.equal({
                     test: "too short"
                 });
             });
 
             it("should return template of else-schema for invalid if-schema", () => {
-                core.setSchema({
+                draft.setSchema({
                     type: "object",
                     // note that required is necessary for getTemplate behaviour
                     required: ["test"],
@@ -124,18 +124,20 @@ describe("getTemplate - v7", () => {
                         }
                     },
                     then: {
+                        required: ["dynamic"],
                         properties: {
                             dynamic: { type: "string", default: "from then" }
                         }
                     },
                     else: {
+                        required: ["dynamic"],
                         properties: {
                             dynamic: { type: "string", default: "from else" }
                         }
                     }
                 });
 
-                const res = getTemplate(core);
+                const res = getTemplate(draft);
                 expect(res).to.deep.equal({
                     test: "with test",
                     dynamic: "from else"

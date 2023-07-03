@@ -1,4 +1,4 @@
-import { JSONSchema } from "../types";
+import { JsonSchema } from "../types";
 /**
  * @throws Error    on multiple matches (invalid schema)
  *
@@ -6,4 +6,4 @@ import { JSONSchema } from "../types";
  * @param schema
  * @return type id, if found
  */
-export default function getTypeId(schema: JSONSchema): string | string[] | undefined;
+export default function getTypeId(schema: JsonSchema): string | string[] | undefined;

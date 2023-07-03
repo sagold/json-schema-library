@@ -1,7 +1,7 @@
 import types from "./types";
-import { JSONSchema } from "../types";
+import { JsonSchema } from "../types";
+import { isObject } from "../utils/isObject";
 
-const isObject = (value: unknown) => Object.prototype.toString.call(value) === "[object Object]";
 const typeKeywords = Object.keys(types).filter((id) => types[id].type === false);
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -12,7 +12,7 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  * @param schema
  * @return type id, if found
  */
-export default function getTypeId(schema: JSONSchema): string | string[] | undefined {
+export default function getTypeId(schema: JsonSchema): string | string[] | undefined {
     if (isObject(schema) === false) {
         return undefined;
     }

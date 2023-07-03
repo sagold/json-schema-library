@@ -1,6 +1,6 @@
 import gp from "@sagold/json-pointer";
 import getTypeDefs from "./schema/getTypeDefs";
-const isObject = (value) => Object.prototype.toString.call(value) === "[object Object]";
+import { isObject } from "./utils/isObject";
 function nextTypeDefs(schema, pointer) {
     if (this.callback(schema, pointer) === true) {
         // eslint-disable-line no-invalid-this

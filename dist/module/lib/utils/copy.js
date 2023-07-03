@@ -1,1 +1,2 @@
-export default (value) => JSON.parse(JSON.stringify(value));
+import copy from "fast-copy";
+export default copy;

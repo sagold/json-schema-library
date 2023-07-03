@@ -1,6 +1,6 @@
 /* eslint quote-props: 0 max-len: 0 */
 import { expect } from "chai";
-import resolveAllOf from "../../lib/resolveAllOf";
+import { resolveAllOf } from "../../lib/features/allOf";
 import { Draft07 } from "../../lib/draft07";
 
 describe("resolveAllOf", () => {
@@ -316,6 +316,7 @@ describe("resolveAllOf", () => {
                                 }
                             },
                             then: {
+                                required: ["additionalSchema"],
                                 properties: {
                                     additionalSchema: { type: "string", default: "additional" }
                                 }
@@ -329,6 +330,7 @@ describe("resolveAllOf", () => {
                                 }
                             },
                             then: {
+                                required: ["anotherSchema"],
                                 properties: {
                                     anotherSchema: { type: "string", default: "another" }
                                 }
@@ -339,7 +341,7 @@ describe("resolveAllOf", () => {
             );
             expect(schema).to.deep.equal({
                 type: "object",
-                required: ["trigger"],
+                required: ["trigger", "additionalSchema", "anotherSchema"],
                 properties: {
                     trigger: { type: "boolean" },
                     additionalSchema: { type: "string", default: "additional" },

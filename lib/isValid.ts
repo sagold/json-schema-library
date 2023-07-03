@@ -1,20 +1,20 @@
-import { JSONSchema, JSONPointer } from "./types";
-import { Draft as Core } from "./draft";
+import { JsonSchema, JsonPointer } from "./types";
+import { Draft } from "./draft";
 
 /**
  * Test if the data is valid according to the given schema
  *
- * @param core - validator
+ * @param draft - validator
  * @param value - value to validate
  * @param [schema] - json schema
  * @param [pointer] - json pointer pointing to value
  * @return if schema does match given value
  */
 export default function isValid(
-    core: Core,
+    draft: Draft,
     value: any,
-    schema: JSONSchema = core.rootSchema,
-    pointer: JSONPointer = "#"
+    schema: JsonSchema = draft.rootSchema,
+    pointer: JsonPointer = "#"
 ): boolean {
-    return core.validate(value, schema, pointer).length === 0;
+    return draft.validate(value, schema, pointer).length === 0;
 }

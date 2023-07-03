@@ -1,6 +1,6 @@
 import { errorsOnly } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
-import { isJSONError } from "./types";
+import { isJsonError } from "./types";
 function createErrorNotification(onError) {
     return function notifyError(error) {
         if (Array.isArray(error)) {
@@ -8,7 +8,7 @@ function createErrorNotification(onError) {
             error.forEach(notifyError);
             return error;
         }
-        if (isJSONError(error)) {
+        if (isJsonError(error)) {
             onError(error);
         }
         return error;
@@ -18,17 +18,17 @@ function createErrorNotification(onError) {
  * @async
  * Validate data by a json schema
  *
- * @param core - validator
+ * @param draft - validator
  * @param value - value to validate
  * @param options
- * @param options.schema - json schema to use, defaults to core.rootSchema
+ * @param options.schema - json schema to use, defaults to draft.rootSchema
  * @param options.pointer - json pointer pointing to current value. Used in error reports
  * @param options.onError   - will be called for each error as soon as it is resolved
  * @return list of errors or empty
  */
-export default function validateAsync(core, value, options) {
-    const { schema, pointer, onError } = { schema: core.rootSchema, pointer: "#", ...options };
-    let errors = core.validate(value, schema, pointer);
+export default function validateAsync(draft, value, options) {
+    const { schema, pointer, onError } = { schema: draft.rootSchema, pointer: "#", ...options };
+    let errors = draft.validate(value, schema, pointer);
     if (onError) {
         errors = flattenArray(errors);
         const notifyError = createErrorNotification(onError);
@@ -36,7 +36,7 @@ export default function validateAsync(core, value, options) {
             if (errors[i] instanceof Promise) {
                 errors[i].then(notifyError);
             }
-            else if (isJSONError(errors[i])) {
+            else if (isJsonError(errors[i])) {
                 onError(errors[i]);
             }
         }

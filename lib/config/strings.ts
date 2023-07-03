@@ -10,6 +10,7 @@ export default {
     ContainsArrayError: "The property at `{{pointer}}` must not be an array",
     ContainsError: "The array at `{{pointer}}` must contain an element that matches `{{schema}}`",
     EnumError: "Expected given value `{{value}}` in `{{pointer}}` to be one of `{{values}}`",
+    ForbiddenPropertyError: "Property name `{{property}}` at `{{pointer}}` is not allowed",
     FormatDateError: "Value `{{value}}` at `{{pointer}}` is not a valid date",
     FormatDateTimeError: "Value `{{value}}` at `{{pointer}}` is not a valid date-time",
     FormatEmailError: "Value `{{value}}` at `{{pointer}}` is not a valid email",
@@ -18,7 +19,7 @@ export default {
     FormatIPV4LeadingZeroError: "IPv4 addresses starting with zero are invalid, since they are interpreted as octals",
     FormatIPV6Error: "Value `{{value}}` at `{{pointer}}` is not a valid IPv6 address",
     FormatIPV6LeadingZeroError: "IPv6 addresses starting with zero are invalid, since they are interpreted as octals",
-    FormatJSONPointerError: "Value `{{value}}` at `{{pointer}}` is not a valid json-pointer",
+    FormatJsonPointerError: "Value `{{value}}` at `{{pointer}}` is not a valid json-pointer",
     FormatRegExError: "Value `{{value}}` at `{{pointer}}` is not a valid regular expression",
     FormatTimeError: "Value `{{value}}` at `{{pointer}}` is not a valid time",
     FormatURIError: "Value `{{value}}` at `{{pointer}}` is not a valid uri",
@@ -50,7 +51,7 @@ export default {
     RequiredPropertyError: "The required property `{{key}}` is missing at `{{pointer}}`",
     TypeError: "Expected `{{value}}` ({{received}}) in `{{pointer}}` to be of type `{{expected}}`",
     UndefinedValueError: "Value must not be undefined in `{{pointer}}`",
-    UniqueItemsError: "Expected unique items in {{pointer}}: duplicate value `{{value}}` found at {{itemPointer}} and {{duplicatePointer}}",
+    UniqueItemsError: "Items in array must be unique. Value `{{value}}` in `{{pointer}}` is a duplicate of {{duplicatePointer}}.",
     UnknownPropertyError: "Could not find a valid schema for property `{{pointer}}` within object",
     ValueNotEmptyError: "A value for `{{property}}` is required at `{{pointer}}`"
 } as Record<string, string>;

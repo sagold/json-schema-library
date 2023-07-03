@@ -1,7 +1,7 @@
 import { get } from "@sagold/json-pointer";
 import splitRef from "./splitRef";
 import getTypeOf from "../getTypeOf";
-import { JSONSchema } from "../types";
+import { JsonSchema } from "../types";
 import { Context } from "./types";
 
 const suffixes = /(#|\/)+$/g;
@@ -10,7 +10,7 @@ const isObject = (val: unknown): val is Record<string, any> => getTypeOf(val) ==
 // 1. combined is known
 // 2. base or pointer is known
 // 3. base + pointer is known
-export default function getRef(context: Context, rootSchema: JSONSchema, $ref: string): JSONSchema {
+export default function getRef(context: Context, rootSchema: JsonSchema, $ref: string): JsonSchema {
     if (isObject($ref)) {
         $ref = $ref.__ref || $ref.$ref;
     }

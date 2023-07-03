@@ -1,4 +1,4 @@
-import { JSONSchema, JSONPointer } from "./types";
+import { JsonSchema, JsonPointer } from "./types";
 import { Draft } from "./draft";
 /**
  * Returns the json-schema of a data-json-pointer.
@@ -13,4 +13,4 @@ import { Draft } from "./draft";
  * @param [schema] - the json schema to iterate. Defaults to draft.rootSchema
  * @return json schema object of the json-pointer or an error
  */
-export default function getSchema(draft: Draft, pointer: JSONPointer, data?: unknown, schema?: JSONSchema): JSONSchema;
+export default function getSchema(draft: Draft, pointer: JsonPointer, data?: unknown, schema?: JsonSchema): JsonSchema;

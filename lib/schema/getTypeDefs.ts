@@ -2,18 +2,17 @@ import gp from "@sagold/json-pointer";
 import { get } from "@sagold/json-query";
 import getTypeId from "./getTypeId";
 import types from "./types";
-import { JSONSchema, JSONPointer } from "../types";
+import { JsonSchema, JsonPointer } from "../types";
+import { isObject } from "../utils/isObject";
 
-const isObject = (value: unknown) => Object.prototype.toString.call(value) === "[object Object]";
-
-type TypeDef = { pointer: JSONPointer; def: unknown };
+type TypeDef = { pointer: JsonPointer; def: unknown };
 
 /**
  * Returns a list of all (direct) type definitions from the given schema
  * @param schema
  * @return list of type definition, given as { pointer, def }
  */
-export default function getTypeDefs(schema: JSONSchema): TypeDef[] {
+export default function getTypeDefs(schema: JsonSchema): TypeDef[] {
     const defs: TypeDef[] = [];
     const id = getTypeId(schema);
     if (id == null) {

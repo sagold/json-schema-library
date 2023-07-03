@@ -1,17 +1,17 @@
 /* eslint quote-props: 0 max-len: 0 */
 import { expect } from "chai";
-import resolveOneOf from "../../lib/resolveOneOf.fuzzy";
+import { resolveOneOfFuzzy as resolveOneOf } from "../../lib/features/oneOf";
 import { JsonEditor as Core } from "../../lib/jsoneditor";
 import settings from "../../lib/config/settings";
 
 const { DECLARATOR_ONEOF } = settings;
 
 describe("resolveOneOf (fuzzy)", () => {
-    let core: Core;
-    beforeEach(() => (core = new Core()));
+    let draft: Core;
+    beforeEach(() => (draft = new Core()));
 
     it("should return schema with matching type", () => {
-        const res = resolveOneOf(core, 4, {
+        const res = resolveOneOf(draft, 4, {
             oneOf: [{ type: "string" }, { type: "number" }, { type: "object" }]
         });
 
@@ -19,7 +19,7 @@ describe("resolveOneOf (fuzzy)", () => {
     });
 
     it("should return schema with matching pattern", () => {
-        const res = resolveOneOf(core, "anasterixcame", {
+        const res = resolveOneOf(draft, "anasterixcame", {
             oneOf: [
                 { type: "string", pattern: "obelix" },
                 { type: "string", pattern: "asterix" }
@@ -30,14 +30,14 @@ describe("resolveOneOf (fuzzy)", () => {
     });
 
     it("should resolve $ref before schema", () => {
-        core.setSchema({
+        draft.setSchema({
             definitions: {
                 a: { type: "string", pattern: "obelix" },
                 b: { type: "string", pattern: "asterix" }
             },
             oneOf: [{ $ref: "#/definitions/a" }, { $ref: "#/definitions/b" }]
         });
-        const res = resolveOneOf(core, "anasterixcame");
+        const res = resolveOneOf(draft, "anasterixcame");
 
         expect(res).to.deep.eq({ type: "string", pattern: "asterix" });
     });
@@ -45,7 +45,7 @@ describe("resolveOneOf (fuzzy)", () => {
     describe("object", () => {
         it("should return schema with matching properties", () => {
             const res = resolveOneOf(
-                core,
+                draft,
                 { description: "..." },
                 {
                     oneOf: [
@@ -64,7 +64,7 @@ describe("resolveOneOf (fuzzy)", () => {
 
         it("should return schema matching nested properties", () => {
             const res = resolveOneOf(
-                core,
+                draft,
                 { title: "asterix" },
                 {
                     oneOf: [
@@ -80,7 +80,7 @@ describe("resolveOneOf (fuzzy)", () => {
         describe("oneOfProperty", () => {
             it("should return schema matching oneOfProperty", () => {
                 const res = resolveOneOf(
-                    core,
+                    draft,
                     { name: "2", title: 123 },
                     {
                         [DECLARATOR_ONEOF]: "name",
@@ -121,7 +121,7 @@ describe("resolveOneOf (fuzzy)", () => {
 
             it("should return schema matching oneOfProperty even it is invalid", () => {
                 const res = resolveOneOf(
-                    core,
+                    draft,
                     { name: "2", title: "not a number" },
                     {
                         [DECLARATOR_ONEOF]: "name",
@@ -162,7 +162,7 @@ describe("resolveOneOf (fuzzy)", () => {
 
             it("should return an error if value at oneOfProperty is undefined", () => {
                 const res = resolveOneOf(
-                    core,
+                    draft,
                     { title: "not a number" },
                     {
                         [DECLARATOR_ONEOF]: "name",
@@ -198,7 +198,7 @@ describe("resolveOneOf (fuzzy)", () => {
 
             it("should return an error if no oneOfProperty could be matched", () => {
                 const res = resolveOneOf(
-                    core,
+                    draft,
                     { name: "2", title: "not a number" },
                     {
                         [DECLARATOR_ONEOF]: "name",
@@ -230,7 +230,7 @@ describe("resolveOneOf (fuzzy)", () => {
             it("should return schema with least missing properties", () => {
                 const t = { type: "number" };
                 const res = resolveOneOf(
-                    core,
+                    draft,
                     { a: 0, b: 1 },
                     {
                         oneOf: [
@@ -247,7 +247,7 @@ describe("resolveOneOf (fuzzy)", () => {
             it("should only count properties that match the schema", () => {
                 const t = { type: "number" };
                 const res = resolveOneOf(
-                    core,
+                    draft,
                     { a: true, b: 1 },
                     {
                         oneOf: [
@@ -265,7 +265,7 @@ describe("resolveOneOf (fuzzy)", () => {
             });
 
             it("should find correct pay type", () => {
-                core.setSchema({
+                draft.setSchema({
                     type: "object",
                     oneOf: [
                         {
@@ -308,7 +308,7 @@ describe("resolveOneOf (fuzzy)", () => {
                         }
                     ]
                 });
-                const res = resolveOneOf(core, {
+                const res = resolveOneOf(draft, {
                     type: "teaser",
                     redirectUrl: "http://gfx.sueddeutsche.de/test/pay/article.html"
                 });
@@ -337,7 +337,7 @@ describe("resolveOneOf (fuzzy)", () => {
         it("should return oneOfError for invalid data", () => {
             // bug found
             const res = resolveOneOf(
-                core,
+                draft,
                 { content: "content" },
                 {
                     oneOf: [

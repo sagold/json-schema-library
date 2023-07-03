@@ -1,3 +1,4 @@
+import copy from "../utils/copy";
 export class Draft {
     constructor(config, schema) {
         /** cache for remote schemas */
@@ -13,7 +14,7 @@ export class Draft {
         /** format validators  */
         this.validateFormat = {};
         this.config = config;
-        this.typeKeywords = JSON.parse(JSON.stringify(config.typeKeywords));
+        this.typeKeywords = copy(config.typeKeywords);
         this.validateKeyword = Object.assign({}, config.validateKeyword);
         this.validateType = Object.assign({}, config.validateType);
         this.validateFormat = Object.assign({}, config.validateFormat);
@@ -64,12 +65,12 @@ export class Draft {
     /**
      * Returns the json-schema of a data-json-pointer.
      * Notes
-     *   - Uses core.step to walk through data and schema
+     *   - Uses draft.step to walk through data and schema
      *
      * @param pointer - json pointer in data to get the json schema for
      * @param [data] - the data object, which includes the json pointers value. This is optional, as
      *    long as no oneOf, anyOf, etc statement is part of the pointers schema
-     * @param [schema] - the json schema to iterate. Defaults to core.rootSchema
+     * @param [schema] - the json schema to iterate. Defaults to draft.rootSchema
      * @return json schema object of the json-pointer or an error
      */
     getSchema(pointer = "#", data, schema) {
@@ -82,7 +83,7 @@ export class Draft {
      * @param [schema] - json schema, defaults to rootSchema
      * @return created template data
      */
-    getTemplate(data, schema, opts) {
+    getTemplate(data, schema, opts = this.config.templateDefaultOptions) {
         return this.config.getTemplate(this, data, schema, opts);
     }
     isValid(data, schema, pointer) {
@@ -91,8 +92,8 @@ export class Draft {
     resolveAnyOf(data, schema, pointer) {
         return this.config.resolveAnyOf(this, data, schema, pointer);
     }
-    resolveAllOf(data, schema, pointer) {
-        return this.config.resolveAllOf(this, data, schema, pointer);
+    resolveAllOf(data, schema) {
+        return this.config.resolveAllOf(this, data, schema);
     }
     resolveRef(schema) {
         return this.config.resolveRef(schema, this.rootSchema);

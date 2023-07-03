@@ -1,13 +1,17 @@
 /* eslint quote-props: 0, max-statements-per-line: ["error", { "max": 2 }] */
-import resolveOneOfFuzzy from "./resolveOneOf.fuzzy";
+import { resolveOneOfFuzzy } from "./features/oneOf";
 import getTypeOf from "./getTypeOf";
 import merge from "./utils/merge";
 import copy from "./utils/copy";
 import settings from "./config/settings";
-import { isJSONError } from "./types";
+import { isJsonError } from "./types";
 import { isEmpty } from "./utils/isEmpty";
+import { resolveIfSchema } from "./features/if";
+import { mergeAllOfSchema } from "./features/allOf";
+import { resolveDependencies } from "./features/dependencies";
+import { mergeSchema } from "./mergeSchema";
 const defaultOptions = {
-    addOptionalProps: true,
+    addOptionalProps: false,
     removeInvalidData: false
 };
 let cache;
@@ -19,11 +23,7 @@ function shouldResolveRef(schema, pointer) {
     const value = cache[pointer] == null || cache[pointer][$ref] == null ? 0 : cache[pointer][$ref];
     return value < settings.GET_TEMPLATE_RECURSION_LIMIT;
 }
-function resolveRef(core, schema, pointer) {
-    // ensure we refactored consistently
-    if (pointer == null) {
-        throw new Error(`missing pointer ${pointer}`);
-    }
+function resolveRef(draft, schema, pointer) {
     const { $ref } = schema;
     if ($ref == null) {
         return schema;
@@ -32,7 +32,7 @@ function resolveRef(core, schema, pointer) {
     cache[pointer] = cache[pointer] || {};
     cache[pointer][$ref] = cache[pointer][$ref] || 0;
     cache[pointer][$ref] += 1;
-    return core.resolveRef(schema);
+    return draft.resolveRef(schema);
 }
 function convertValue(type, value) {
     if (type === "string") {
@@ -53,13 +53,14 @@ function convertValue(type, value) {
 /**
  * Resolves $ref, allOf and anyOf schema-options, returning a combined json-schema.
  * Also returns a pointer-property on schema, that must be used as current pointer.
- * @param core
+ *
+ * @param draft
  * @param schema
  * @param data
  * @param pointer
  * @return resolved json-schema or input-schema
  */
-function createTemplateSchema(core, schema, data, pointer) {
+function createTemplateSchema(draft, schema, data, pointer) {
     // invalid schema
     if (getTypeOf(schema) !== "object") {
         return Object.assign({ pointer }, schema);
@@ -69,42 +70,44 @@ function createTemplateSchema(core, schema, data, pointer) {
         return false;
     }
     // resolve $ref and copy schema
-    let templateSchema = copy(resolveRef(core, schema, pointer));
+    let templateSchema = copy(resolveRef(draft, schema, pointer));
+    // @feature anyOf
     if (Array.isArray(schema.anyOf) && schema.anyOf.length > 0) {
         // test if we may resolve
         if (shouldResolveRef(schema.anyOf[0], `${pointer}/anyOf/0`)) {
-            const resolvedAnyOf = resolveRef(core, schema.anyOf[0], `${pointer}/anyOf/0`);
+            const resolvedAnyOf = resolveRef(draft, schema.anyOf[0], `${pointer}/anyOf/0`);
             templateSchema = merge(templateSchema, resolvedAnyOf);
             // add pointer return-value, if any
             templateSchema.pointer = schema.anyOf[0].$ref || templateSchema.pointer;
         }
         delete templateSchema.anyOf;
     }
-    // resolve allOf
+    // @feature allOf
     if (Array.isArray(schema.allOf)) {
-        for (let i = 0, l = schema.allOf.length; i < l; i += 1) {
-            // test if we may resolve
-            if (shouldResolveRef(schema.allOf[i], `${pointer}/allOf/${i}`)) {
-                templateSchema = merge(templateSchema, resolveRef(core, schema.allOf[i], `${pointer}/allOf/${i}`));
-                // add pointer return-value, if any
-                templateSchema.pointer = schema.allOf[i].$ref || templateSchema.pointer;
+        const mayResolve = schema.allOf
+            .map((allOf, index) => shouldResolveRef(allOf, `${pointer}/allOf/${index}`))
+            .reduceRight((next, before) => next && before, true);
+        if (mayResolve) {
+            const resolvedSchema = mergeAllOfSchema(draft, schema);
+            if (resolvedSchema) {
+                templateSchema = mergeSchema(templateSchema, resolvedSchema);
             }
         }
-        delete templateSchema.allOf;
     }
     templateSchema.pointer = templateSchema.pointer || schema.$ref || pointer;
     return templateSchema;
 }
-const isJSONSchema = (template) => template && typeof template === "object";
+const isJsonSchema = (template) => template && typeof template === "object";
 /**
  * Create data object matching the given schema
  *
- * @param core - json schema core
+ * @param draft - json schema draft
  * @param [data] - optional template data
  * @param [schema] - json schema, defaults to rootSchema
  * @return created template data
  */
-function getTemplate(core, data, _schema, pointer, opts) {
+function getTemplate(draft, data, _schema, pointer, opts) {
+    var _a;
     if (_schema == null) {
         throw new Error(`getTemplate: missing schema for data: ${JSON.stringify(data)}`);
     }
@@ -112,14 +115,15 @@ function getTemplate(core, data, _schema, pointer, opts) {
         throw new Error("Missing pointer");
     }
     // resolve $ref references, allOf and first anyOf definitions
-    let schema = createTemplateSchema(core, _schema, data, pointer);
-    if (!isJSONSchema(schema)) {
+    let schema = createTemplateSchema(draft, _schema, data, pointer);
+    if (!isJsonSchema(schema)) {
         return undefined;
     }
     pointer = schema.pointer;
     if (schema === null || schema === void 0 ? void 0 : schema.const) {
         return schema.const;
     }
+    // @feature oneOf
     if (Array.isArray(schema.oneOf)) {
         if (isEmpty(data)) {
             const type = schema.oneOf[0].type ||
@@ -130,8 +134,8 @@ function getTemplate(core, data, _schema, pointer, opts) {
         }
         else {
             // find correct schema for data
-            const resolvedSchema = resolveOneOfFuzzy(core, data, schema);
-            if (isJSONError(resolvedSchema)) {
+            const resolvedSchema = resolveOneOfFuzzy(draft, data, schema);
+            if (isJsonError(resolvedSchema)) {
                 if (data != null && opts.removeInvalidData !== true) {
                     return data;
                 }
@@ -140,6 +144,7 @@ function getTemplate(core, data, _schema, pointer, opts) {
                 data = undefined;
             }
             else {
+                resolvedSchema.type = (_a = resolvedSchema.type) !== null && _a !== void 0 ? _a : schema.type;
                 schema = resolvedSchema;
             }
         }
@@ -147,15 +152,17 @@ function getTemplate(core, data, _schema, pointer, opts) {
     // @todo Array.isArray(schema.type)
     // -> hasDefault? return
     // if not -> pick first types
-    if (!isJSONSchema(schema) || schema.type == null) {
+    if (!isJsonSchema(schema) || schema.type == null) {
         return undefined;
     }
     const type = Array.isArray(schema.type)
         ? selectType(schema.type, data, schema.default)
         : schema.type;
     // reset invalid type
-    const dataType = getTypeOf(data);
-    if (data != null && dataType !== type && !(dataType === "number" && type === "integer")) {
+    const javascriptTypeOfData = getTypeOf(data);
+    if (data != null &&
+        javascriptTypeOfData !== type &&
+        !(javascriptTypeOfData === "number" && type === "integer")) {
         data = convertValue(type, data);
     }
     if (TYPE[type] == null) {
@@ -166,7 +173,7 @@ function getTemplate(core, data, _schema, pointer, opts) {
         }
         return data;
     }
-    const templateData = TYPE[type](core, schema, data, pointer, opts);
+    const templateData = TYPE[type](draft, schema, data, pointer, opts);
     return templateData;
 }
 function selectType(types, data, defaultValue) {
@@ -186,12 +193,12 @@ function selectType(types, data, defaultValue) {
     return types[0];
 }
 const TYPE = {
-    null: (core, schema, data) => getDefault(schema, data, null),
-    string: (core, schema, data) => getDefault(schema, data, ""),
-    number: (core, schema, data) => getDefault(schema, data, 0),
-    integer: (core, schema, data) => getDefault(schema, data, 0),
-    boolean: (core, schema, data) => getDefault(schema, data, false),
-    object: (core, schema, data, pointer, opts) => {
+    null: (draft, schema, data) => getDefault(schema, data, null),
+    string: (draft, schema, data) => getDefault(schema, data, ""),
+    number: (draft, schema, data) => getDefault(schema, data, 0),
+    integer: (draft, schema, data) => getDefault(schema, data, 0),
+    boolean: (draft, schema, data) => getDefault(schema, data, false),
+    object: (draft, schema, data, pointer, opts) => {
         var _a;
         const template = schema.default === undefined ? {} : schema.default;
         const d = {}; // do not assign data here, to keep ordering from json-schema
@@ -202,70 +209,61 @@ const TYPE = {
                 const isRequired = required.includes(key);
                 // Omit adding a property if it is not required or optional props should be added
                 if (value != null || isRequired || opts.addOptionalProps) {
-                    d[key] = getTemplate(core, value, schema.properties[key], `${pointer}/properties/${key}`, opts);
+                    d[key] = getTemplate(draft, value, schema.properties[key], `${pointer}/properties/${key}`, opts);
                 }
             });
         }
-        if (schema.dependencies) {
-            Object.keys(schema.dependencies).forEach((key) => {
-                if (d[key] === undefined) {
-                    return;
-                }
-                const dependency = schema.dependencies[key];
-                // dependencyRequired: { key: ['prop1', 'prop2'] }
-                if (Array.isArray(dependency)) {
-                    dependency.forEach((prop) => {
-                        d[prop] = getTemplate(core, d[prop], schema.properties[prop], `${pointer}/properties/${prop}`, opts);
-                    });
-                    return;
-                }
-                if (getTypeOf(dependency) !== "object") {
-                    return;
-                }
-                const result = getTemplate(core, data, {
-                    ...dependency,
-                    // required: Object.keys(dependency.properties || {}).concat(
-                    //     dependency.required ?? []
-                    // ),
-                    type: "object"
-                }, `${pointer}/dependencies/${key}`, opts);
-                if (result && !isJSONError(result)) {
-                    Object.assign(d, result);
-                }
-            });
+        // @feature dependencies
+        // has to be done after resolving properties so dependency may trigger
+        let dependenciesSchema = resolveDependencies(draft, schema, d);
+        if (dependenciesSchema) {
+            dependenciesSchema = mergeSchema(schema, dependenciesSchema);
+            delete dependenciesSchema.dependencies;
+            const dependencyData = getTemplate(draft, data, dependenciesSchema, `${pointer}/dependencies`, opts);
+            Object.assign(d, dependencyData);
         }
         if (data) {
-            // merge any missing data (additionals) to resulting object
-            Object.keys(data).forEach((key) => d[key] == null && (d[key] = data[key]));
+            if (opts.removeInvalidData === true &&
+                (schema.additionalProperties === false ||
+                    getTypeOf(schema.additionalProperties) === "object")) {
+                if (getTypeOf(schema.additionalProperties) === "object") {
+                    Object.keys(data).forEach((key) => {
+                        if (d[key] == null) {
+                            // merge valid missing data (additionals) to resulting object
+                            if (draft.isValid(data[key], schema.additionalProperties)) {
+                                d[key] = data[key];
+                            }
+                        }
+                    });
+                }
+            }
+            else {
+                // merge any missing data (additionals) to resulting object
+                Object.keys(data).forEach((key) => d[key] == null && (d[key] = data[key]));
+            }
         }
-        if (schema.if && (schema.then || schema.else)) {
-            const isValid = core.isValid(d, schema.if);
-            if (isValid && schema.then) {
-                const additionalData = core.getTemplate(d, { type: "object", ...schema.then }, opts);
-                Object.assign(d, additionalData);
-            }
-            else if (!isValid && schema.else) {
-                const additionalData = core.getTemplate(d, { type: "object", ...schema.else }, opts);
-                Object.assign(d, additionalData);
-            }
+        // @feature if-then-else
+        const ifSchema = resolveIfSchema(draft, schema, d);
+        if (ifSchema) {
+            const additionalData = getTemplate(draft, d, { type: "object", ...ifSchema }, pointer, opts);
+            Object.assign(d, additionalData);
         }
         // returns object, which is ordered by json-schema
         return d;
     },
     // build array type of items, ignores additionalItems
-    array: (core, schema, data, pointer, opts) => {
-        var _a, _b, _c;
-        const template = schema.default === undefined ? [] : schema.default;
-        schema.minItems = schema.minItems || 0;
-        const d = data || [];
-        // items are undefined
+    array: (draft, schema, data, pointer, opts) => {
+        var _a, _b;
         if (schema.items == null) {
-            return d;
+            return data || []; // items are undefined
         }
+        const template = schema.default === undefined ? [] : schema.default;
+        const d = data || template;
+        const minItems = schema.minItems || 0;
         // build defined set of items
         if (Array.isArray(schema.items)) {
-            for (let i = 0, l = Math.max((_a = schema.minItems) !== null && _a !== void 0 ? _a : 0, (_c = (_b = schema.items) === null || _b === void 0 ? void 0 : _b.length) !== null && _c !== void 0 ? _c : 0); i < l; i += 1) {
-                d[i] = getTemplate(core, d[i] == null ? template[i] : d[i], schema.items[i], `${pointer}/items/${i}`, opts);
+            for (let i = 0, l = Math.max(minItems !== null && minItems !== void 0 ? minItems : 0, (_b = (_a = schema.items) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0); i < l; i += 1) {
+                d[i] = getTemplate(draft, d[i] == null ? template[i] : d[i], schema.items[i], `${pointer}/items/${i}`, opts);
             }
             return d;
         }
@@ -274,25 +272,26 @@ const TYPE = {
             return d;
         }
         // resolve allOf and first anyOf definition
-        const templateSchema = createTemplateSchema(core, schema.items, data, pointer);
+        const templateSchema = createTemplateSchema(draft, schema.items, data, pointer);
         if (templateSchema === false) {
             return d;
         }
         pointer = templateSchema.pointer || pointer;
-        // build oneOf
+        // build data for first oneOf-schema
         if (templateSchema.oneOf && d.length === 0) {
             const oneOfSchema = templateSchema.oneOf[0];
-            for (let i = 0; i < schema.minItems; i += 1) {
-                d[i] = getTemplate(core, d[i] == null ? template[i] : d[i], oneOfSchema, `${pointer}/oneOf/0`, opts);
+            for (let i = 0; i < minItems; i += 1) {
+                d[i] = getTemplate(draft, d[i] == null ? template[i] : d[i], oneOfSchema, `${pointer}/oneOf/0`, opts);
             }
             return d;
         }
+        // complete data selecting correct oneOf-schema
         if (templateSchema.oneOf && d.length > 0) {
-            const itemCount = Math.max(schema.minItems, d.length);
+            const itemCount = Math.max(minItems, d.length);
             for (let i = 0; i < itemCount; i += 1) {
                 let value = d[i] == null ? template[i] : d[i];
-                let one = resolveOneOfFuzzy(core, value, templateSchema);
-                if (one == null || isJSONError(one)) {
+                let one = resolveOneOfFuzzy(draft, value, templateSchema);
+                if (one == null || isJsonError(one)) {
                     // schema could not be resolved or data is invalid
                     if (value != null && opts.removeInvalidData !== true) {
                         // keep invalid value
@@ -302,20 +301,20 @@ const TYPE = {
                         // replace invalid value
                         value = undefined;
                         one = templateSchema.oneOf[0];
-                        d[i] = getTemplate(core, value, one, `${pointer}/oneOf/${i}`, opts);
+                        d[i] = getTemplate(draft, value, one, `${pointer}/oneOf/${i}`, opts);
                     }
                 }
                 else {
                     // schema is valid
-                    d[i] = getTemplate(core, value, one, `${pointer}/oneOf/${i}`, opts);
+                    d[i] = getTemplate(draft, value, one, `${pointer}/oneOf/${i}`, opts);
                 }
             }
             return d;
         }
-        // build items-definition
+        // build data from items-definition
         if (templateSchema.type) {
-            for (let i = 0, l = Math.max(schema.minItems, d.length); i < l; i += 1) {
-                d[i] = getTemplate(core, d[i] == null ? template[i] : d[i], templateSchema, `${pointer}/items`, opts);
+            for (let i = 0, l = Math.max(minItems, d.length); i < l; i += 1) {
+                d[i] = getTemplate(draft, d[i] == null ? template[i] : d[i], templateSchema, `${pointer}/items`, opts);
             }
             return d;
         }
@@ -337,7 +336,7 @@ function getDefault(schema, templateValue, initValue) {
     }
     return schema.default;
 }
-export default (core, data, schema = core.rootSchema, opts = defaultOptions) => {
-    cache = { mi: {} };
-    return getTemplate(core, data, schema, "#", opts);
+export default (draft, data, schema = draft.rootSchema, opts = defaultOptions) => {
+    cache = {};
+    return getTemplate(draft, data, schema, "#", opts);
 };

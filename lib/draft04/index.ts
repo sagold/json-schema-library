@@ -9,9 +9,9 @@ import getTemplate from "../getTemplate";
 import isValid from "../isValid";
 import KEYWORDS from "../validation/keyword";
 import merge from "../utils/merge";
-import resolveAllOf from "../resolveAllOf";
-import resolveAnyOf from "../resolveAnyOf";
-import resolveOneOf from "../resolveOneOf.strict";
+import { resolveAllOf } from "../features/allOf";
+import { resolveAnyOf } from "../features/anyOf";
+import { resolveOneOf } from "../features/oneOf";
 import resolveRef from "../resolveRef.strict";
 import step from "../step";
 import createSchemaOf from "../createSchemaOf";
@@ -19,7 +19,8 @@ import getChildSchemaSelection from "../getChildSchemaSelection";
 import TYPES from "../validation/type";
 import validate from "../validate";
 import { DraftConfig, Draft } from "../draft";
-import { JSONSchema } from "../types";
+import { JsonSchema } from "../types";
+import settings from "../config/settings";
 
 const draft04Config: DraftConfig = {
     typeKeywords: {
@@ -93,11 +94,13 @@ const draft04Config: DraftConfig = {
     resolveOneOf,
     resolveRef,
     step,
-    validate
+    validate,
+
+    templateDefaultOptions: settings.templateDefaultOptions
 };
 
 class Draft04 extends Draft {
-    constructor(schema?: JSONSchema, config: Partial<DraftConfig> = {}) {
+    constructor(schema?: JsonSchema, config: Partial<DraftConfig> = {}) {
         super(merge(draft04Config, config), schema);
     }
 }

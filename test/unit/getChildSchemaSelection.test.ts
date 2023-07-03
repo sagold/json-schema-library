@@ -3,11 +3,11 @@ import { JsonEditor as Core } from "../../lib/jsoneditor";
 import getChildSchemaSelection from "../../lib/getChildSchemaSelection";
 
 describe("getChildSchemaSelection", () => {
-    let core: Core;
-    before(() => (core = new Core()));
+    let draft: Core;
+    before(() => (draft = new Core()));
 
     it("should return a single object-schema as list", () => {
-        const result = getChildSchemaSelection(core, "b", {
+        const result = getChildSchemaSelection(draft, "b", {
             type: "object",
             properties: {
                 a: { type: "string" },
@@ -20,7 +20,7 @@ describe("getChildSchemaSelection", () => {
     });
 
     it("should return a single array-item as list", () => {
-        const result = getChildSchemaSelection(core, 0, {
+        const result = getChildSchemaSelection(draft, 0, {
             type: "array",
             items: [{ type: "string" }, { type: "number" }]
         });
@@ -30,7 +30,7 @@ describe("getChildSchemaSelection", () => {
     });
 
     it("should return list of oneOf elements", () => {
-        const result = getChildSchemaSelection(core, "b", {
+        const result = getChildSchemaSelection(draft, "b", {
             type: "array",
             items: {
                 oneOf: [{ type: "string" }, { type: "number" }]
@@ -43,7 +43,7 @@ describe("getChildSchemaSelection", () => {
 
     it("should resolve items from oneOf elements", () => {
         // @note: ref resolution requires a compiled schema
-        core.setSchema({
+        draft.setSchema({
             type: "array",
             items: {
                 oneOf: [{ $ref: "#/definitions/string" }, { $ref: "#/definitions/number" }]
@@ -54,7 +54,7 @@ describe("getChildSchemaSelection", () => {
             }
         });
 
-        const result = getChildSchemaSelection(core, "b", core.getSchema());
+        const result = getChildSchemaSelection(draft, "b", draft.getSchema());
 
         expect(result).to.have.length(2);
         expect(result).to.deep.eq([{ type: "string" }, { type: "number" }]);

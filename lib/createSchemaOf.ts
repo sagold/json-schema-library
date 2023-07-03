@@ -1,13 +1,13 @@
 import getTypeOf from "./getTypeOf";
-import { JSONSchema } from "./types";
+import { JsonSchema } from "./types";
 
 /**
  * Create a simple json schema for the given input data
  * @param  data - data to get json schema for
  * @return schema
  */
-export default function createSchemaOf(data: any): JSONSchema {
-    const schema: JSONSchema = {
+export default function createSchemaOf(data: any): JsonSchema {
+    const schema: JsonSchema = {
         type: getTypeOf(data)
     };
 

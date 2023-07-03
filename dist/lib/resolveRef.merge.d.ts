@@ -1,2 +1,2 @@
-import { JSONSchema } from "./types";
-export default function resolveRefMerge(schema: JSONSchema, rootSchema: JSONSchema): JSONSchema;
+import { JsonSchema } from "./types";
+export default function resolveRefMerge(schema: JsonSchema, rootSchema: JsonSchema): JsonSchema;

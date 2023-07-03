@@ -1,5 +1,7 @@
 # Tasks
 
+- [ ] template default options retrieved from draft
+- [ ] additionalProperties: true per default
 - [ ] compile needs another parameter for rootschema, in case refs are defined elsewhere
 
 

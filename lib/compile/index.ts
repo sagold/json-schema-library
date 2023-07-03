@@ -3,7 +3,7 @@ import { eachSchema } from "../eachSchema";
 import { Draft } from "../draft";
 import joinScope from "./joinScope";
 import getRef from "./getRef";
-import { JSONSchema } from "../types";
+import { JsonSchema } from "../types";
 import { Context } from "./types";
 import { get } from "@sagold/json-pointer";
 
@@ -29,17 +29,17 @@ const suffixes = /(#|\/)+$/g;
  */
 export default function compileSchema(
     draft: Draft,
-    schemaToCompile: JSONSchema,
-    rootSchema: JSONSchema = schemaToCompile,
+    schemaToCompile: JsonSchema,
+    rootSchema: JsonSchema = schemaToCompile,
     force = false
-): JSONSchema {
+): JsonSchema {
     if (!schemaToCompile || schemaToCompile[COMPILED] !== undefined) {
         return schemaToCompile;
     }
 
     const context: Context = { ids: {}, remotes: draft.remotes };
     const rootSchemaAsString = JSON.stringify(schemaToCompile);
-    const compiledSchema: JSONSchema = JSON.parse(rootSchemaAsString);
+    const compiledSchema: JsonSchema = JSON.parse(rootSchemaAsString);
 
     // flag this schema as compiled
     Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });

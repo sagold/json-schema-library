@@ -1,5 +1,5 @@
 import types from "./types";
-const isObject = (value) => Object.prototype.toString.call(value) === "[object Object]";
+import { isObject } from "../utils/isObject";
 const typeKeywords = Object.keys(types).filter((id) => types[id].type === false);
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 /**

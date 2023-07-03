@@ -1,9 +1,9 @@
-import { JSONError, JSONPointer } from "../types";
+import { JsonError, JsonPointer } from "../types";
 export type ErrorData = {
-    pointer: JSONPointer;
+    pointer: JsonPointer;
 } & Record<string, unknown>;
-export type CreateError = (data: ErrorData) => JSONError;
-export declare function createError(name: string, data: ErrorData): JSONError;
+export type CreateError = (data: ErrorData) => JsonError;
+export declare function createError(name: string, data: ErrorData): JsonError;
 /**
  * Creates a custom Error-Constructor which instances may be identified by `customError instanceof Error`. Its messages
  * are defined by strings-object @see config/strings.ts

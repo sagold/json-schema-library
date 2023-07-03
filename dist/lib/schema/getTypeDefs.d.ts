@@ -1,6 +1,6 @@
-import { JSONSchema, JSONPointer } from "../types";
+import { JsonSchema, JsonPointer } from "../types";
 type TypeDef = {
-    pointer: JSONPointer;
+    pointer: JsonPointer;
     def: unknown;
 };
 /**
@@ -8,5 +8,5 @@ type TypeDef = {
  * @param schema
  * @return list of type definition, given as { pointer, def }
  */
-export default function getTypeDefs(schema: JSONSchema): TypeDef[];
+export default function getTypeDefs(schema: JsonSchema): TypeDef[];
 export {};

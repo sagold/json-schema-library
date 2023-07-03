@@ -1,5 +1,5 @@
 import gp from "@sagold/json-pointer";
-import { isJSONError } from "./types";
+import { isJsonError } from "./types";
 const emptyObject = {};
 /**
  * Returns the json-schema of a data-json-pointer.
@@ -25,7 +25,7 @@ function _get(draft, schema, frags, pointer, data = emptyObject) {
     }
     const key = frags.shift(); // step key
     schema = draft.step(key, schema, data, pointer); // step schema
-    if (isJSONError(schema)) {
+    if (isJsonError(schema)) {
         return schema;
     }
     // @ts-ignore
