@@ -1,10 +1,10 @@
 import { expect } from "chai";
 import step from "../../../lib/step";
-import { Draft04 as Core } from "../../../lib/draft04";
+import { Draft04 } from "../../../lib/draft04";
 
 describe("step.oneof", () => {
-    let draft: Core;
-    before(() => (draft = new Core()));
+    let draft: Draft04;
+    before(() => (draft = new Draft04()));
 
     it("should return matching schema", () => {
         const res = step(
@@ -88,7 +88,7 @@ describe("step.oneof", () => {
     });
 
     it("should maintain references from a remote schema when resolving oneOf with $ref", () => {
-        core.addRemoteSchema("https://my-other-schema.com/schema.json", {
+        draft.addRemoteSchema("https://my-other-schema.com/schema.json", {
             type: "object",
             properties: {
                 innerTitle: { $ref: "#/definitions/number" }
@@ -97,7 +97,7 @@ describe("step.oneof", () => {
                 number: { type: "number", title: "Zahl" }
             }
         });
-        const schema = core.compileSchema({
+        const schema = draft.compileSchema({
             type: "object",
             properties: {
                 title: {
@@ -111,11 +111,11 @@ describe("step.oneof", () => {
                 }
             }
         });
-        const res = step(core, "title", schema, { title: { innerTitle: 111 } });
+        const res = step(draft, "title", schema, { title: { innerTitle: 111 } });
 
         expect(res.type).to.eq("object");
 
-        const nextRes = step(core, "innerTitle", res, { innerTitle: 111 });
+        const nextRes = step(draft, "innerTitle", res, { innerTitle: 111 });
         expect(nextRes.type).to.eq("number");
     });
 });
