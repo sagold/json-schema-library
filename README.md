@@ -921,12 +921,21 @@ const error: JsonError = createError("EnumError", { data: { pointer: "#/location
 
 ### v8.0.0
 
-With version `v8.0.0`, _getTemplate_ was improved to better support optional properties and utilize existing core logic, making it more reliable.
+With version `v8.0.0`, _getTemplate_ was improved to better support optional properties and utilize existing core logic, making it more reliable. Breaking changes:
 
 -   Renamed `JSONError` to `JsonError` and `JSONSchema` to `JsonSchema`
 -   `getTemplate` only adds required properties. Behaviour can be changed by [getTemplate default options](#gettemplate-default-options)
 -   internal schema property `oneOfSchema` has been replaced by `schema.getOneOfOrigin()`
 -   Changed `unique-items-error` to point to error for duplicated item and changed data-properties
+
+<details><summary>Exposed new helper functions</summary>
+
+-   `mergeSchema` - Merges to two json schema
+-   `reduceSchema` - Reduce schema by merging dynamic constructs into a static json schema omitting those properties
+-   `isDynamicSchema` - Returns true if the passed schema contains dynamic properties (_if_, _dependencies_, _allOf_, etc)
+-   `resolveDynamicSchema` - Resolves all dynamic schema definitions for the given input data and returns the resulting json-schema without any dynamic schema definitions.
+
+</details>
 
 ### v7.0.0
 
