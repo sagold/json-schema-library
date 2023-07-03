@@ -671,7 +671,7 @@ expect(resolvedSchema).to.deep.eq({
 
 ## Draft customization
 
-[custom resolvers](#custom-resolvers) | [custom validators](#custom-validators) | [custom errors](#custom-errors)
+[getTemplate default options](#get-template-default-options) | [custom resolvers](#custom-resolvers) | [custom validators](#custom-validators) | [custom errors](#custom-errors)
 
 Each `Draft` in `json-schema-library` is build around a [DraftConfig](./lib/draft/index.ts#19). A `DraftConfig` holds all _functions_ and _configurations_ for each json-schema drafts. The `DraftConfig` is your main way to alter or extend behaviour for `json-schema-library`. You can either create your own _draftConfig_ or adjust any existing _draftConfig_. For the current drafts (4-7), each _draftConfig_ is exposed along with its actual _class_. For example:
 
@@ -693,6 +693,26 @@ import { Draft07, draft07Config, resolveOneOfFuzzy } from "json-schema-library";
 // the following calls are identical:
 new Draft07(mySchema, { resolveOneOf: resolveOneOfFuzzy });
 new Draft({ ...draft07Config, resolveOneOf: resolveOneOfFuzzy }, mySchema);
+```
+
+### getTemplate default options
+
+With **version 8** _json-schema-library_ has changed `getTemplate` to only add required properties per default. This can be changed on draft initialization, by passing `templateDefaultOptions` in the _draftConfig_:
+
+```js
+const draft = new Draft(schema, {
+    templateDefaultOptions: {
+        addOptionalProps: true
+    }
+});
+```
+
+**Note:** You can still pass options to getTemplate overriding the draft default settings by:
+
+```js
+const data = draft.getTemplate(data, draft.getSchema(), {
+    addOptionalProps: true
+});
 ```
 
 ### custom resolvers
@@ -901,8 +921,9 @@ const error: JsonError = createError("EnumError", { data: { pointer: "#/location
 
 ### v8.0.0
 
--   Renamed JSON to JSON, mainly: `JSONError` to `JsonError` and `JSONSchema` to `JsonSchema`
--   `getTemplate` only adds required properties. Can be changed by setting `addOptionalProps:true`
+-   Renamed `JSONError` to `JsonError` and `JSONSchema` to `JsonSchema`
+-   `getTemplate` only adds required properties. Behaviour can be changed by [getTemplate default options](#get-template-default-options)
+-   internal schema property `oneOfSchema` has been replaced by `schema.getOneOfOrigin()`
 
 ### v7.0.0
 

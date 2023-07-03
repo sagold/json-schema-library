@@ -20,6 +20,7 @@ import TYPES from "../draft06/validation/type";
 import validate from "../validate";
 import { DraftConfig, Draft } from "../draft";
 import { JsonSchema } from "../types";
+import settings from "../config/settings";
 
 const draft06Config: DraftConfig = {
     typeKeywords: {
@@ -101,7 +102,9 @@ const draft06Config: DraftConfig = {
     resolveOneOf,
     resolveRef,
     step,
-    validate
+    validate,
+
+    templateDefaultOptions: settings.templateDefaultOptions
 };
 
 class Draft06 extends Draft {

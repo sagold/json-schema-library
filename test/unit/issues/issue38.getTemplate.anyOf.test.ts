@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { Draft07 as Draft } from "../../../lib/draft07";
 
-describe.only("issue#38 - getTemplate anyOf should not modify valid default value", () => {
+describe("issue#38 - getTemplate anyOf should not modify valid default value", () => {
     let draft: Draft;
     beforeEach(() => {
         draft = new Draft({
