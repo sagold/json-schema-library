@@ -19,6 +19,7 @@ import step from "../step";
 import TYPES from "../draft06/validation/type";
 import validate from "../validate";
 import { Draft } from "../draft";
+import settings from "../config/settings";
 const draft07Config = {
     typeKeywords: {
         array: [
@@ -98,7 +99,8 @@ const draft07Config = {
     resolveOneOf,
     resolveRef,
     step,
-    validate
+    validate,
+    templateDefaultOptions: settings.templateDefaultOptions
 };
 class Draft07 extends Draft {
     constructor(schema, config = {}) {

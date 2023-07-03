@@ -19,6 +19,7 @@ import getChildSchemaSelection from "../getChildSchemaSelection";
 import TYPES from "../validation/type";
 import validate from "../validate";
 import { Draft } from "../draft";
+import settings from "../config/settings";
 const draft04Config = {
     typeKeywords: {
         array: [
@@ -90,7 +91,8 @@ const draft04Config = {
     resolveOneOf,
     resolveRef,
     step,
-    validate
+    validate,
+    templateDefaultOptions: settings.templateDefaultOptions
 };
 class Draft04 extends Draft {
     constructor(schema, config = {}) {

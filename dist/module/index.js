@@ -4,7 +4,6 @@ import { resolveOneOf, resolveOneOfFuzzy } from "./lib/features/oneOf";
 import { resolveAllOf } from "./lib/features/allOf";
 import resolveRef from "./lib/resolveRef.strict";
 import resolveRefMerge from "./lib/resolveRef.merge";
-import SchemaService from "./lib/SchemaService";
 import settings from "./lib/config/settings";
 import strings from "./lib/config/strings";
 import validateAsync from "./lib/validateAsync";
@@ -28,9 +27,9 @@ draft07Config, // config implementing draft07 specs
 draftJsonEditorConfig, // adjusted config of draft04 to better support the json-editor
 getTypeOf, // returns the javascript datatype
 isDynamicSchema, // NEW
-isJsonError, JsonEditor, // adjusted core of draft04 to better support the json-editor
+isJsonError, JsonEditor, // adjusted core of draft07 to better support the json-editor
 mergeSchema, // NEW
 reduceSchema, // NEW
 render, resolveAllOf, resolveDynamicSchema, // NEW
-resolveOneOf, resolveOneOfFuzzy, resolveRef, resolveRefMerge, SchemaService, settings, validateAsync // async validation of data by a schema
+resolveOneOf, resolveOneOfFuzzy, resolveRef, resolveRefMerge, settings, validateAsync // async validation of data by a schema
  };
