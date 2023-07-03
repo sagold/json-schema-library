@@ -187,7 +187,7 @@ const jsonSchema = new Draft07(myJsonSchema);
 const myData = jsonSchema.getTemplate({ name: "input-data" });
 ```
 
-**Note:** If you are using references in your schema, `getTemplate` will only resolve the first _$ref_ in each path, ensuring no inifinte data structures are created. In case the limit of **1** _$ref_ resolution is too low, you can modify the value globally one by adjusting the json-schema-library settings:
+**Note** If you are using references in your schema, `getTemplate` will only resolve the first _$ref_ in each path, ensuring no inifinte data structures are created. In case the limit of **1** _$ref_ resolution is too low, you can modify the value globally one by adjusting the json-schema-library settings:
 
 ```ts
 import { settings } from "json-schema-library";
@@ -435,7 +435,7 @@ expect(schemaOfItem).to.deep.equal({
 
 This helper always returns a list of schemas.
 
-**Note:** This helper currenly supports a subset of json-schema for multiple results, mainly _oneOf_-definitions
+**Note** This helper currenly supports a subset of json-schema for multiple results, mainly _oneOf_-definitions
 
 ```ts
 const jsonSchema = new Draft07(mySchema);
@@ -624,7 +624,7 @@ const compiledSchema = jsonSchema.compileSchema({ $ref: "/$defs/table" });
 const tableSchema = compiledSchema.getRef();
 ```
 
-**Note:** that `draft.compileSchema` compiles a schema under the current rootSchema. That is, definitions from root schema will be copied to the local schema, to enable _$ref_ resolutions.
+**Note** that `draft.compileSchema` compiles a schema under the current rootSchema. That is, definitions from root schema will be copied to the local schema, to enable _$ref_ resolutions.
 
 ## Draft extensions
 
@@ -671,7 +671,7 @@ expect(resolvedSchema).to.deep.eq({
 
 ## Draft customization
 
-[getTemplate default options](#get-template-default-options) | [custom resolvers](#custom-resolvers) | [custom validators](#custom-validators) | [custom errors](#custom-errors)
+[getTemplate default options](#gettemplate-default-options) | [custom resolvers](#custom-resolvers) | [custom validators](#custom-validators) | [custom errors](#custom-errors)
 
 Each `Draft` in `json-schema-library` is build around a [DraftConfig](./lib/draft/index.ts#19). A `DraftConfig` holds all _functions_ and _configurations_ for each json-schema drafts. The `DraftConfig` is your main way to alter or extend behaviour for `json-schema-library`. You can either create your own _draftConfig_ or adjust any existing _draftConfig_. For the current drafts (4-7), each _draftConfig_ is exposed along with its actual _class_. For example:
 
@@ -699,7 +699,7 @@ new Draft({ ...draft07Config, resolveOneOf: resolveOneOfFuzzy }, mySchema);
 
 With **version 8** _json-schema-library_ has changed `getTemplate` to only add required properties per default. This can be changed on draft initialization, by passing `templateDefaultOptions` in the _draftConfig_:
 
-```js
+```ts
 const draft = new Draft(schema, {
     templateDefaultOptions: {
         addOptionalProps: true
@@ -707,10 +707,10 @@ const draft = new Draft(schema, {
 });
 ```
 
-**Note:** You can still pass options to getTemplate overriding the draft default settings by:
+**Note** You can still pass options to getTemplate overriding the draft default settings by:
 
-```js
-const data = draft.getTemplate(data, draft.getSchema(), {
+```ts
+const data = draft.getTemplate({}, draft.getSchema(), {
     addOptionalProps: true
 });
 ```
@@ -921,9 +921,12 @@ const error: JsonError = createError("EnumError", { data: { pointer: "#/location
 
 ### v8.0.0
 
+With version `v8.0.0`, _getTemplate_ was improved to better support optional properties and utilize existing core logic, making it more reliable.
+
 -   Renamed `JSONError` to `JsonError` and `JSONSchema` to `JsonSchema`
--   `getTemplate` only adds required properties. Behaviour can be changed by [getTemplate default options](#get-template-default-options)
+-   `getTemplate` only adds required properties. Behaviour can be changed by [getTemplate default options](#gettemplate-default-options)
 -   internal schema property `oneOfSchema` has been replaced by `schema.getOneOfOrigin()`
+-   Changed `unique-items-error` to point to error for duplicated item and changed data-properties
 
 ### v7.0.0
 
