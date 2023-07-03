@@ -925,8 +925,9 @@ With version `v8.0.0`, _getTemplate_ was improved to better support optional pro
 
 -   Renamed `JSONError` to `JsonError` and `JSONSchema` to `JsonSchema`
 -   `getTemplate` only adds required properties. Behaviour can be changed by [getTemplate default options](#gettemplate-default-options)
--   internal schema property `oneOfSchema` has been replaced by `schema.getOneOfOrigin()`
+-   Internal schema property `oneOfSchema` has been replaced by `schema.getOneOfOrigin()`
 -   Changed `unique-items-error` to point to error for duplicated item and changed data-properties
+-   Removed `SchemaService` as it was no longer used nor tested
 
 <details><summary>Exposed new helper functions</summary>
 
