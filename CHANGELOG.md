@@ -1,5 +1,7 @@
 ## Changelog
 
+### 8.0.0
+
 -   [Breaking] renamed `JSON` types and variables to `Json`
 -   [Breaking] remove `oneOfSchema` helper property in favor of `getOneOfOrigin()` non-enumerable function
 -   [Breaking] `getTemplate` will add only required properties per default. Use `addOptionalProps:true` to change this behaviour
