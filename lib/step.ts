@@ -102,7 +102,7 @@ const stepType: Record<string, StepFunction> = {
             // check if there is a oneOf selection, which must be resolved
             if (targetSchema && Array.isArray(targetSchema.oneOf)) {
                 // if no data is supplied, return the full targetSchema
-                if(!data || !data[key]) {
+                if(data === undefined || data[key] === undefined) {
                     return targetSchema
                 }
                 // @special case: this is a mix of a schema and optional definitions
