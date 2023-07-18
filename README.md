@@ -44,6 +44,7 @@ What follows is a description of the main draft methods.
 -   [each](#each)
 -   [eachSchema](#eachschema)
 -   [getSchema](#getschema)
+-   [getRawSchema](#getrawschema)
 -   [getChildSchemaSelection](#getchildschemaselection)
 -   [step](#step)
 -   [addRemoteSchema](#addremoteschema)
@@ -418,6 +419,94 @@ expect(schemaOfItem).to.deep.equal({
             title: "name of item"
         }
     }
+});
+```
+
+</details>
+
+<details><summary>About JsonPointer</summary>
+
+**[Json-Pointer](https://tools.ietf.org/html/rfc6901)** defines a string syntax for identifying a specific value within a Json document and is [supported by Json-Schema](https://json-schema.org/understanding-json-schema/structuring.html). Given a Json document, it behaves similar to a [lodash path](https://lodash.com/docs/4.17.5#get) (`a[0].b.c`), which follows JS-syntax, but instead uses `/` separators (e.g., `a/0/b/c`). In the end, you describe a path into the Json data to a specific point.
+
+</details>
+
+### getRawSchema
+
+`getRawSchema` retrieves the json-schema of a specific location without data. The location in data is given by a _json-pointer_. In situations where the schema is dynamic, it returns the entire schema for that pointer
+
+```ts
+const jsonSchema = new Draft07(mySchema);
+let schemaOfName: JsonSchema | JsonError;
+schemaOfName = jsonSchema.getRawSchema("/list/1/name");
+```
+
+<details><summary>Example</summary>
+
+```ts
+import { Draft07, JsonSchema, JsonError } from "json-schema-library";
+
+const mySchema = {
+    type: "object",
+    properties: {
+        list: {
+            type: "array",
+            items: {
+                description: "Example oneOf type",
+                oneOf: [
+                    {
+                        type: "object",
+                        required: ["name"],
+                        properties: {
+                            name: {
+                                type: "string",
+                                title: "name of item"
+                            }
+                        }
+                    },
+                    {
+                        type: "object",
+                        required: ["description"],
+                        properties: {
+                            description: {
+                                type: "string",
+                                title: "description of item"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+};
+
+const jsonSchema = new Draft07(mySchema);
+let schemaOfItem: JsonSchema | JsonError;
+schemaOfItem = jsonSchema.getRawSchema("/list/1");
+
+expect(schemaOfItem).to.deep.equal({
+    description: "Example oneOf type",
+    oneOf: [
+        {
+            type: "object",
+            required: ["name"],
+            properties: {
+                name: {
+                    type: "string",
+                    title: "name of item"
+                }
+            }
+        },
+        {
+            type: "object",
+            required: ["description"],
+            properties: {
+                description: {
+                    type: "string",
+                    title: "description of item"
+                }
+            }
+        }
+    ]
 });
 ```
 

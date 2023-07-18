@@ -189,8 +189,8 @@ export class Draft {
      * @param  [pointer] - pointer to schema and data (parent of key)
      * @return Schema or Error if failed resolving key
      */
-    step(key: string | number, schema: JsonSchema, data: any, pointer?: JsonPointer): JsonSchema {
-        return this.config.step(this, key, schema, data, pointer);
+    step(key: string | number, schema: JsonSchema, data: any, pointer?: JsonPointer, skipDataResolution?: boolean): JsonSchema {
+        return this.config.step(this, key, schema, data, pointer, skipDataResolution);
     }
 
     /**

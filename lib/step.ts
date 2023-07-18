@@ -10,7 +10,8 @@ type StepFunction = (
     key: string,
     schema: JsonSchema,
     data: any,
-    pointer: JsonPointer
+    pointer: JsonPointer,
+    skipDataResolution?: boolean
 ) => JsonSchema | JsonError;
 
 const stepType: Record<string, StepFunction> = {
@@ -75,7 +76,7 @@ const stepType: Record<string, StepFunction> = {
         return new Error(`Invalid array schema for ${key} at ${pointer}`) as JsonError;
     },
 
-    object: (draft, key, schema, data, pointer) => {
+    object: (draft, key, schema, data, pointer, skipDataResolution) => {
         schema = reduceSchema(draft, schema, data);
 
         // @feature properties
@@ -101,6 +102,10 @@ const stepType: Record<string, StepFunction> = {
 
             // check if there is a oneOf selection, which must be resolved
             if (targetSchema && Array.isArray(targetSchema.oneOf)) {
+                // if no data is supplied, return the full targetSchema
+                if (skipDataResolution && (!data || !data[key])) {
+                    return targetSchema;
+                }
                 // @special case: this is a mix of a schema and optional definitions
                 // we resolve the schema here and add the original schema to `oneOfSchema`
                 return draft.resolveOneOf(data[key], targetSchema, `${pointer}/${key}`);
@@ -162,13 +167,14 @@ export default function step(
     key: string | number,
     schema: JsonSchema,
     data?: any,
-    pointer: JsonPointer = "#"
+    pointer: JsonPointer = "#",
+    skipDataResolution?: boolean
 ): JsonSchema | JsonError {
     // @draft >= 4 ?
     if (Array.isArray(schema.type)) {
         const dataType = getTypeOf(data);
         if (schema.type.includes(dataType)) {
-            return stepType[dataType](draft, `${key}`, schema, data, pointer);
+            return stepType[dataType](draft, `${key}`, schema, data, pointer, skipDataResolution);
         }
         return draft.errors.typeError({
             value: data,
@@ -181,7 +187,7 @@ export default function step(
     const expectedType = schema.type || getTypeOf(data);
     const stepFunction = stepType[expectedType];
     if (stepFunction) {
-        return stepFunction(draft, `${key}`, schema, data, pointer);
+        return stepFunction(draft, `${key}`, schema, data, pointer, skipDataResolution);
     }
 
     return new Error(`Unsupported schema type ${schema.type} for key ${key}`) as JsonError;
