@@ -357,7 +357,7 @@ expect(calls).to.deep.equal([
 
 ### getSchema
 
-`getSchema` retrieves the json-schema of a specific location in data. The location in data is given by a _json-pointer_. In many cases the schema can be retrieved without passing the actual data, but in situations where the schema is dynamic (e.g., in _oneOf_, _dependencies_, etc.), the data is required or will return a _JsonError_ if the location cannot be found.
+`getSchema` retrieves the json-schema of a specific location in data. The location in data is given by a _json-pointer_. In many cases the schema can be retrieved without passing the actual data.
 
 ```ts
 const jsonSchema = new Draft07(mySchema);

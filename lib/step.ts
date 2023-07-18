@@ -101,6 +101,10 @@ const stepType: Record<string, StepFunction> = {
 
             // check if there is a oneOf selection, which must be resolved
             if (targetSchema && Array.isArray(targetSchema.oneOf)) {
+                // if no data is supplied, return the full targetSchema
+                if(!data || !data[key]) {
+                    return targetSchema
+                }
                 // @special case: this is a mix of a schema and optional definitions
                 // we resolve the schema here and add the original schema to `oneOfSchema`
                 return draft.resolveOneOf(data[key], targetSchema, `${pointer}/${key}`);
