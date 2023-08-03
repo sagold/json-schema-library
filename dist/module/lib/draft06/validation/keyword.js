@@ -6,11 +6,11 @@ const KeywordValidation = {
     // @draft >= 6
     contains: (draft, schema, value, pointer) => {
         if (schema.contains === false) {
-            return draft.errors.containsArrayError({ pointer, value });
+            return draft.errors.containsArrayError({ pointer, value, schema });
         }
         if (schema.contains === true) {
             if (Array.isArray(value) && value.length === 0) {
-                return draft.errors.containsAnyError({ pointer });
+                return draft.errors.containsAnyError({ pointer, value, schema });
             }
             return undefined;
         }
@@ -23,7 +23,7 @@ const KeywordValidation = {
                 return undefined;
             }
         }
-        return draft.errors.containsError({ pointer, schema: JSON.stringify(schema.contains) });
+        return draft.errors.containsError({ pointer, schema, value });
     },
     exclusiveMaximum: (draft, schema, value, pointer) => {
         if (isNaN(schema.exclusiveMaximum)) {
@@ -33,7 +33,9 @@ const KeywordValidation = {
             return draft.errors.maximumError({
                 maximum: schema.exclusiveMaximum,
                 length: value,
-                pointer
+                pointer,
+                schema,
+                value
             });
         }
         return undefined;
@@ -46,7 +48,9 @@ const KeywordValidation = {
             return draft.errors.minimumError({
                 minimum: schema.exclusiveMinimum,
                 length: value,
-                pointer
+                pointer,
+                schema,
+                value
             });
         }
         return undefined;
@@ -58,7 +62,13 @@ const KeywordValidation = {
             return undefined;
         }
         if (schema.maximum && schema.maximum < value) {
-            return draft.errors.maximumError({ maximum: schema.maximum, length: value, pointer });
+            return draft.errors.maximumError({
+                maximum: schema.maximum,
+                length: value,
+                pointer,
+                schema,
+                value
+            });
         }
         return undefined;
     },
@@ -67,7 +77,13 @@ const KeywordValidation = {
             return undefined;
         }
         if (schema.minimum > value) {
-            return draft.errors.minimumError({ minimum: schema.minimum, length: value, pointer });
+            return draft.errors.minimumError({
+                minimum: schema.minimum,
+                length: value,
+                pointer,
+                schema,
+                value
+            });
         }
         return undefined;
     },
@@ -93,7 +109,9 @@ const KeywordValidation = {
                         errors.push(draft.errors.patternPropertiesError({
                             key,
                             pointer,
-                            patterns: Object.keys(pp).join(",")
+                            patterns: Object.keys(pp).join(","),
+                            schema,
+                            value
                         }));
                         return;
                     }
@@ -111,7 +129,9 @@ const KeywordValidation = {
                 errors.push(draft.errors.patternPropertiesError({
                     key,
                     pointer,
-                    patterns: Object.keys(pp).join(",")
+                    patterns: Object.keys(pp).join(","),
+                    schema,
+                    value
                 }));
             }
         });
@@ -128,7 +148,8 @@ const KeywordValidation = {
             return draft.errors.invalidPropertyNameError({
                 property: Object.keys(value),
                 pointer,
-                value
+                value,
+                schema
             });
         }
         if (schema.propertyNames === true) {
@@ -148,7 +169,8 @@ const KeywordValidation = {
                     property: prop,
                     pointer,
                     validationError: validationResult[0],
-                    value: value[prop]
+                    value: value[prop],
+                    schema
                 }));
             }
         });

@@ -33,11 +33,12 @@ export default function validateAsync(draft, value, options) {
         errors = flattenArray(errors);
         const notifyError = createErrorNotification(onError);
         for (let i = 0; i < errors.length; i += 1) {
-            if (errors[i] instanceof Promise) {
-                errors[i].then(notifyError);
+            const error = errors[i];
+            if (error instanceof Promise) {
+                error.then(notifyError);
             }
-            else if (isJsonError(errors[i])) {
-                onError(errors[i]);
+            else if (isJsonError(error)) {
+                onError(error);
             }
         }
     }

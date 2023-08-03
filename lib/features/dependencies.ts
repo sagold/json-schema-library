@@ -79,7 +79,7 @@ const validateDependencies: JsonValidator = (
             return;
         }
         if (schema.dependencies[property] === false) {
-            errors.push(draft.errors.missingDependencyError({ pointer }));
+            errors.push(draft.errors.missingDependencyError({ pointer, schema, value }));
             return;
         }
 
@@ -89,7 +89,7 @@ const validateDependencies: JsonValidator = (
             dependencyErrors = schema.dependencies[property]
                 .filter((dependency: any) => value[dependency] === undefined)
                 .map((missingProperty: any) =>
-                    draft.errors.missingDependencyError({ missingProperty, pointer })
+                    draft.errors.missingDependencyError({ missingProperty, pointer, schema, value })
                 );
         } else if (type === "object") {
             dependencyErrors = draft.validate(value, schema.dependencies[property], pointer);

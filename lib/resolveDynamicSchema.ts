@@ -1,4 +1,4 @@
-import { JsonSchema } from "./types";
+import { JsonError, JsonPointer, JsonSchema, isJsonError } from "./types";
 import { Draft } from "./draft";
 import { mergeSchema } from "./mergeSchema";
 import { resolveIfSchema } from "./features/if";
@@ -33,14 +33,22 @@ export function isDynamicSchema(schema: JsonData): boolean {
  * @returns static schema from resolved dynamic schema definitions for this
  *  specific input data
  */
-export function resolveDynamicSchema(draft: Draft, schema: JsonSchema, data: unknown) {
+export function resolveDynamicSchema(
+    draft: Draft,
+    schema: JsonSchema,
+    data: unknown,
+    pointer: JsonPointer
+) {
     let resolvedSchema: JsonSchema;
+    let error: JsonError;
     schema = draft.resolveRef(schema);
 
     // @feature oneOf
     if (schema.oneOf) {
-        const oneOfSchema = resolveOneOf(draft, data, schema);
-        if (oneOfSchema && oneOfSchema.type !== "error") {
+        const oneOfSchema = resolveOneOf(draft, data, schema, pointer);
+        if (isJsonError(oneOfSchema)) {
+            error = oneOfSchema;
+        } else if (oneOfSchema) {
             resolvedSchema = mergeSchema(resolvedSchema ?? {}, oneOfSchema);
         }
     }
@@ -70,10 +78,15 @@ export function resolveDynamicSchema(draft: Draft, schema: JsonSchema, data: unk
     }
 
     if (resolvedSchema == null) {
-        return;
+        return error;
     }
 
-    const nestedSchema: JsonSchema | undefined = resolveDynamicSchema(draft, resolvedSchema, data);
+    const nestedSchema: JsonSchema | undefined = resolveDynamicSchema(
+        draft,
+        resolvedSchema,
+        data,
+        pointer
+    );
     if (nestedSchema) {
         resolvedSchema = mergeSchema(resolvedSchema, nestedSchema);
     }

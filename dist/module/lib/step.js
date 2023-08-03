@@ -9,7 +9,8 @@ const stepType = {
         const itemsType = getTypeOf(schema.items);
         if (itemsType === "object") {
             // @spec: ignore additionalItems, when items is schema-object
-            return reduceSchema(draft, schema.items, itemValue) || draft.resolveRef(schema.items);
+            return (reduceSchema(draft, schema.items, itemValue, `${pointer}/${key}`) ||
+                draft.resolveRef(schema.items));
         }
         if (itemsType === "array") {
             // @draft >= 7 bool schema, items:[true, false]
@@ -21,7 +22,8 @@ const stepType = {
                 return errors.invalidDataError({
                     key,
                     value: itemValue,
-                    pointer
+                    pointer,
+                    schema
                 });
             }
             if (schema.items[key]) {
@@ -31,7 +33,8 @@ const stepType = {
                 return errors.additionalItemsError({
                     key,
                     value: itemValue,
-                    pointer
+                    pointer,
+                    schema
                 });
             }
             if (schema.additionalItems === true || schema.additionalItems === undefined) {
@@ -40,7 +43,7 @@ const stepType = {
             if (getTypeOf(schema.additionalItems) === "object") {
                 return schema.additionalItems;
             }
-            throw new Error(`Invalid schema ${JSON.stringify(schema, null, 4)} for ${JSON.stringify(data, null, 4)}`);
+            throw new Error(`Invalid schema ${JSON.stringify(schema, null, 2)} for ${JSON.stringify(data, null, 2)}`);
         }
         if (schema.additionalItems !== false && itemValue) {
             // @todo reevaluate: incomplete schema is created here
@@ -51,7 +54,7 @@ const stepType = {
     },
     object: (draft, key, schema, data, pointer) => {
         var _a;
-        schema = reduceSchema(draft, schema, data);
+        schema = reduceSchema(draft, schema, data, pointer);
         // @feature properties
         const property = (_a = schema === null || schema === void 0 ? void 0 : schema.properties) === null || _a === void 0 ? void 0 : _a[key];
         if (property !== undefined) {
@@ -61,7 +64,8 @@ const stepType = {
                 return errors.forbiddenPropertyError({
                     property: key,
                     value: data,
-                    pointer: `${pointer}`
+                    pointer,
+                    schema
                 });
             }
             else if (property === true) {
@@ -106,7 +110,8 @@ const stepType = {
         return errors.unknownPropertyError({
             property: key,
             value: data,
-            pointer: `${pointer}`
+            pointer: `${pointer}`,
+            schema
         });
     }
 };
@@ -125,23 +130,34 @@ const stepType = {
  * @return Schema or Error if failed resolving key
  */
 export default function step(draft, key, schema, data, pointer = "#") {
+    var _a;
+    const typeOfData = getTypeOf(data);
+    let schemaType = (_a = schema.type) !== null && _a !== void 0 ? _a : typeOfData;
     // @draft >= 4 ?
-    if (Array.isArray(schema.type)) {
-        const dataType = getTypeOf(data);
-        if (schema.type.includes(dataType)) {
-            return stepType[dataType](draft, `${key}`, schema, data, pointer);
+    if (Array.isArray(schemaType)) {
+        if (!schemaType.includes(typeOfData)) {
+            return draft.errors.typeError({
+                value: data,
+                pointer,
+                expected: schema.type,
+                received: typeOfData,
+                schema
+            });
         }
-        return draft.errors.typeError({
-            value: data,
-            pointer,
-            expected: schema.type,
-            received: dataType
-        });
+        schemaType = typeOfData;
     }
-    const expectedType = schema.type || getTypeOf(data);
-    const stepFunction = stepType[expectedType];
+    const stepFunction = stepType[schemaType];
     if (stepFunction) {
-        return stepFunction(draft, `${key}`, schema, data, pointer);
+        const schemaResult = stepFunction(draft, `${key}`, schema, data, pointer);
+        if (schemaResult === undefined) {
+            return draft.errors.schemaWarning({
+                pointer,
+                value: data,
+                schema,
+                key
+            });
+        }
+        return schemaResult;
     }
     return new Error(`Unsupported schema type ${schema.type} for key ${key}`);
 }

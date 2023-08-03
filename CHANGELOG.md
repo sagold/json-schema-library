@@ -1,6 +1,12 @@
 ## Changelog
 
-### 8.0.0
+### v9.0.0
+
+-   [Breaking] error data to always contain `schema` and `value`
+-   [Breaking] getSchema arguments changed to options-object
+-   [Add] withSchemaWarning option for getSchema to always return an error fpr undefined schema
+
+### v8.0.0
 
 -   [Breaking] renamed `JSON` types and variables to `Json`
 -   [Breaking] remove `oneOfSchema` helper property in favor of `getOneOfOrigin()` non-enumerable function

@@ -10,8 +10,8 @@ const toOmit = ["allOf", "anyOf", "oneOf", "dependencies", "if", "then", "else"]
  * @returns input schema reduced by dynamic schema definitions for the given
  * input data
  */
-export function reduceSchema(draft, schema, data) {
-    let resolvedSchema = resolveDynamicSchema(draft, schema, data);
+export function reduceSchema(draft, schema, data, pointer) {
+    let resolvedSchema = resolveDynamicSchema(draft, schema, data, pointer);
     if (resolvedSchema) {
         resolvedSchema = mergeSchema(schema, resolvedSchema);
         return omit(resolvedSchema, ...toOmit);

@@ -46,7 +46,7 @@ const formatValidators: Record<
         // full-date from http://tools.ietf.org/html/rfc3339#section-5.6
         const matches = value.match(matchDate);
         if (!matches) {
-            return errors.formatDateTimeError({ value, pointer });
+            return errors.formatDateTimeError({ value, pointer, schema });
         }
         const year = +matches[1];
         const month = +matches[2];
@@ -61,7 +61,7 @@ const formatValidators: Record<
         ) {
             return undefined;
         }
-        return errors.formatDateError({ value, pointer });
+        return errors.formatDateError({ value, pointer, schema });
     },
 
     "date-time": (draft, schema, value, pointer) => {
@@ -70,11 +70,11 @@ const formatValidators: Record<
         }
         if (value === "" || isValidDateTime.test(value)) {
             if (new Date(value).toString() === "Invalid Date") {
-                return errors.formatDateTimeError({ value, pointer });
+                return errors.formatDateTimeError({ value, pointer, schema });
             }
             return undefined;
         }
-        return errors.formatDateTimeError({ value, pointer });
+        return errors.formatDateTimeError({ value, pointer, schema });
     },
 
     email: (draft, schema, value, pointer) => {
@@ -83,20 +83,20 @@ const formatValidators: Record<
             return undefined;
         }
         if (value[0] === '"') {
-            return errors.formatEmailError({ value, pointer });
+            return errors.formatEmailError({ value, pointer, schema });
         }
         const [name, host, ...rest] = value.split("@");
         if (!name || !host || rest.length !== 0 || name.length > 64 || host.length > 253) {
-            return errors.formatEmailError({ value, pointer });
+            return errors.formatEmailError({ value, pointer, schema });
         }
         if (name[0] === "." || name.endsWith(".") || name.includes("..")) {
-            return errors.formatEmailError({ value, pointer });
+            return errors.formatEmailError({ value, pointer, schema });
         }
         if (!/^[a-z0-9.-]+$/i.test(host) || !/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+$/i.test(name)) {
-            return errors.formatEmailError({ value, pointer });
+            return errors.formatEmailError({ value, pointer, schema });
         }
         if (!host.split(".").every((part) => /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/i.test(part))) {
-            return errors.formatEmailError({ value, pointer });
+            return errors.formatEmailError({ value, pointer, schema });
         }
         return undefined;
     },
@@ -108,7 +108,7 @@ const formatValidators: Record<
         if (value === "" || isValidHostname.test(value)) {
             return undefined;
         }
-        return errors.formatHostnameError({ value, pointer });
+        return errors.formatHostnameError({ value, pointer, schema });
     },
 
     ipv4: (draft, schema, value, pointer) => {
@@ -117,12 +117,12 @@ const formatValidators: Record<
         }
         if (value && value[0] === "0") {
             // leading zeroes should be rejected, as they are treated as octals
-            return errors.formatIPV4LeadingZeroError({ value, pointer });
+            return errors.formatIPV4LeadingZeroError({ value, pointer, schema });
         }
         if (value.length <= 15 && isValidIPV4.test(value)) {
             return undefined;
         }
-        return errors.formatIPV4Error({ value, pointer });
+        return errors.formatIPV4Error({ value, pointer, schema });
     },
 
     ipv6: (draft, schema, value, pointer) => {
@@ -131,12 +131,12 @@ const formatValidators: Record<
         }
         if (value && value[0] === "0") {
             // leading zeroes should be rejected, as they are treated as octals
-            return errors.formatIPV6LeadingZeroError({ value, pointer });
+            return errors.formatIPV6LeadingZeroError({ value, pointer, schema });
         }
         if (value.length <= 45 && isValidIPV6.test(value)) {
             return undefined;
         }
-        return errors.formatIPV6Error({ value, pointer });
+        return errors.formatIPV6Error({ value, pointer, schema });
     },
 
     "json-pointer": (draft, schema, value, pointer) => {
@@ -146,7 +146,7 @@ const formatValidators: Record<
         if (isValidJsonPointer.test(value)) {
             return undefined;
         }
-        return errors.formatJsonPointerError({ value, pointer });
+        return errors.formatJsonPointerError({ value, pointer, schema });
     },
 
     "relative-json-pointer": (draft, schema, value, pointer) => {
@@ -156,7 +156,7 @@ const formatValidators: Record<
         if (isValidRelativeJsonPointer.test(value)) {
             return undefined;
         }
-        return errors.formatJsonPointerError({ value, pointer });
+        return errors.formatJsonPointerError({ value, pointer, schema });
     },
 
     regex: (draft, schema, value, pointer) => {
@@ -166,13 +166,13 @@ const formatValidators: Record<
                 return undefined;
             } catch (e) {} // eslint-disable-line no-empty
 
-            return errors.formatRegExError({ value, pointer });
+            return errors.formatRegExError({ value, pointer, schema });
         }
         // v7 tests, ignore non-regex values
         if (typeof value === "object" || typeof value === "number" || Array.isArray(value)) {
             return undefined;
         }
-        return errors.formatRegExError({ value, pointer });
+        return errors.formatRegExError({ value, pointer, schema });
     },
 
     time: (draft, schema, value, pointer) => {
@@ -182,7 +182,7 @@ const formatValidators: Record<
         // https://github.com/cfworker/cfworker/blob/main/packages/json-schema/src/format.ts
         const matches = value.match(matchTime);
         if (!matches) {
-            return errors.formatDateTimeError({ value, pointer });
+            return errors.formatDateTimeError({ value, pointer, schema });
         }
         const hour = +matches[1];
         const minute = +matches[2];
@@ -195,7 +195,7 @@ const formatValidators: Record<
         ) {
             return undefined;
         }
-        return errors.formatTimeError({ value, pointer });
+        return errors.formatTimeError({ value, pointer, schema });
     },
 
     uri: (draft, schema, value, pointer) => {
@@ -205,7 +205,7 @@ const formatValidators: Record<
         if (validUrl.isUri(value)) {
             return undefined;
         }
-        return errors.formatURIError({ value, pointer });
+        return errors.formatURIError({ value, pointer, schema });
     },
 
     "uri-reference": (draft, schema, value, pointer) => {
@@ -215,7 +215,7 @@ const formatValidators: Record<
         if (isValidURIRef.test(value)) {
             return undefined;
         }
-        return errors.formatURIReferenceError({ value, pointer });
+        return errors.formatURIReferenceError({ value, pointer, schema });
     },
 
     "uri-template": (draft, schema, value, pointer) => {
@@ -225,14 +225,14 @@ const formatValidators: Record<
         if (isValidURITemplate.test(value)) {
             return undefined;
         }
-        return errors.formatURITemplateError({ value, pointer });
+        return errors.formatURITemplateError({ value, pointer, schema });
     },
 
     url: (draft, schema, value: string, pointer) => {
         if (value === "" || validUrl.isWebUri(value)) {
             return undefined;
         }
-        return errors.formatURLError({ value, pointer });
+        return errors.formatURLError({ value, pointer, schema });
     }
 };
 

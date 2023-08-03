@@ -49,6 +49,7 @@ export default {
     PatternError: "Value in `{{pointer}}` should match `{{description}}`, but received `{{received}}`",
     PatternPropertiesError: "Property `{{key}}` does not match any patterns in `{{pointer}}`. Valid patterns are: {{patterns}}",
     RequiredPropertyError: "The required property `{{key}}` is missing at `{{pointer}}`",
+    SchemaWarning: "Failed retrieving a schema from '{{pointer}}' to key '{{key}}'",
     TypeError: "Expected `{{value}}` ({{received}}) in `{{pointer}}` to be of type `{{expected}}`",
     UndefinedValueError: "Value must not be undefined in `{{pointer}}`",
     UniqueItemsError: "Items in array must be unique. Value `{{value}}` in `{{pointer}}` is a duplicate of {{duplicatePointer}}.",

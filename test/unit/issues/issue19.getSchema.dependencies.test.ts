@@ -54,10 +54,13 @@ describe("issue#19 - getSchema from dependencies", () => {
     );
 
     it("should return correct schema for existing data property 'customField'", () => {
-        const schema = getSchema(draft, "#/customField", {
-            name: "issue #19",
-            generation: "Display Custom Field",
-            customField: "mi"
+        const schema = getSchema(draft, {
+            pointer: "#/customField",
+            data: {
+                name: "issue #19",
+                generation: "Display Custom Field",
+                customField: "mi"
+            }
         });
 
         expect(schema).to.deep.equal({
@@ -75,9 +78,12 @@ describe("issue#19 - getSchema from dependencies", () => {
             return resolveOneOfFuzzy(this, data, schema, pointer);
         };
 
-        const schema = getSchema(draft, "#/customField", {
-            name: "issue #19",
-            generation: "Display Custom Field"
+        const schema = getSchema(draft, {
+            pointer: "#/customField",
+            data: {
+                name: "issue #19",
+                generation: "Display Custom Field"
+            }
         });
 
         expect(schema).to.deep.equal({

@@ -1,4 +1,4 @@
-import { JsonSchema } from "./types";
+import { JsonSchema, JsonPointer } from "./types";
 import { Draft } from "./draft";
 import { mergeSchema } from "./mergeSchema";
 import { resolveDynamicSchema } from "./resolveDynamicSchema";
@@ -14,8 +14,13 @@ const toOmit = ["allOf", "anyOf", "oneOf", "dependencies", "if", "then", "else"]
  * @returns input schema reduced by dynamic schema definitions for the given
  * input data
  */
-export function reduceSchema(draft: Draft, schema: JsonSchema, data: unknown) {
-    let resolvedSchema = resolveDynamicSchema(draft, schema, data);
+export function reduceSchema(
+    draft: Draft,
+    schema: JsonSchema,
+    data: unknown,
+    pointer: JsonPointer
+) {
+    let resolvedSchema = resolveDynamicSchema(draft, schema, data, pointer);
     if (resolvedSchema) {
         resolvedSchema = mergeSchema(schema, resolvedSchema);
         return omit(resolvedSchema, ...toOmit);

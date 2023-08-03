@@ -15,15 +15,19 @@ describe("docs", () => {
             const jsonSchema = new Draft07(myJsonSchema);
             const errors: JsonError[] = jsonSchema.validate({ name: "my-data" });
 
-            expect(errors).to.deep.equal([
-                {
-                    type: "error",
-                    name: "NoAdditionalPropertiesError",
-                    code: "no-additional-properties-error",
-                    message: "Additional property `name` in `#` is not allowed",
-                    data: { property: "name", properties: [], pointer: "#" }
+            expect(errors[0]).to.deep.include({
+                type: "error",
+                name: "NoAdditionalPropertiesError",
+                code: "no-additional-properties-error",
+                message: "Additional property `name` in `#` is not allowed",
+                data: {
+                    value: { name: "my-data" },
+                    schema: myJsonSchema,
+                    property: "name",
+                    properties: [],
+                    pointer: "#"
                 }
-            ]);
+            });
         });
         it("validate should return error for separate schema", () => {
             // import { Draft07, JsonSchema, JsonError } from "json-schema-library";
@@ -47,7 +51,8 @@ describe("docs", () => {
                         received: "string",
                         expected: "number",
                         value: "my-string",
-                        pointer: "#"
+                        pointer: "#",
+                        schema: mySchema
                     }
                 }
             ]);
@@ -203,8 +208,11 @@ describe("docs", () => {
             };
 
             const jsonSchema = new Draft07(mySchema);
-            const schemaOfItem: JsonSchema | JsonError = jsonSchema.getSchema("/list/1", {
-                list: [{ description: "..." }, { name: "my-item" }]
+            const schemaOfItem: JsonSchema | JsonError | undefined = jsonSchema.getSchema({
+                pointer: "/list/1",
+                data: {
+                    list: [{ description: "..." }, { name: "my-item" }]
+                }
             });
 
             expect(schemaOfItem).to.deep.equal({
@@ -224,7 +232,7 @@ describe("docs", () => {
             });
             jsonSchema.addRemoteSchema("http://ohmy/schema", draft7Schema);
 
-            const schema = jsonSchema.getSchema("#");
+            const schema = jsonSchema.getSchema();
             expect(schema).to.deep.equal({ type: "integer", minimum: 0 });
         });
     });

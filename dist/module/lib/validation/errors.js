@@ -51,6 +51,7 @@ const errors = {
     patternError: createCustomError("PatternError"),
     patternPropertiesError: createCustomError("PatternPropertiesError"),
     requiredPropertyError: createCustomError("RequiredPropertyError"),
+    schemaWarning: createCustomError("SchemaWarning"),
     typeError: createCustomError("TypeError"),
     undefinedValueError: createCustomError("UndefinedValueError"),
     uniqueItemsError: createCustomError("UniqueItemsError"),

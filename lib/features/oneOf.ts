@@ -39,7 +39,12 @@ export function resolveOneOf(
         const oneOfValue = data[schema[DECLARATOR_ONEOF]];
 
         if (oneOfValue === undefined) {
-            return draft.errors.missingOneOfPropertyError({ property: oneOfProperty, pointer });
+            return draft.errors.missingOneOfPropertyError({
+                property: oneOfProperty,
+                pointer,
+                schema,
+                value: data
+            });
         }
 
         for (let i = 0; i < schema.oneOf.length; i += 1) {
@@ -64,6 +69,7 @@ export function resolveOneOf(
             property: oneOfProperty,
             value: oneOfValue,
             pointer,
+            schema,
             errors
         });
     }
@@ -90,6 +96,7 @@ export function resolveOneOf(
         return draft.errors.multipleOneOfError({
             value: data,
             pointer,
+            schema,
             matches
         });
     }
@@ -97,6 +104,7 @@ export function resolveOneOf(
     return draft.errors.oneOfError({
         value: JSON.stringify(data),
         pointer,
+        schema,
         oneOf: schema.oneOf,
         errors
     });
@@ -161,7 +169,12 @@ export function resolveOneOfFuzzy(
         const oneOfValue = data[schema[DECLARATOR_ONEOF]];
 
         if (oneOfValue === undefined) {
-            return draft.errors.missingOneOfPropertyError({ property: oneOfProperty, pointer });
+            return draft.errors.missingOneOfPropertyError({
+                property: oneOfProperty,
+                pointer,
+                schema,
+                value: data
+            });
         }
 
         for (let i = 0; i < schema.oneOf.length; i += 1) {
@@ -186,6 +199,7 @@ export function resolveOneOfFuzzy(
             property: oneOfProperty,
             value: oneOfValue,
             pointer,
+            schema,
             errors
         });
     }
@@ -224,6 +238,7 @@ export function resolveOneOfFuzzy(
             return draft.errors.oneOfError({
                 value: JSON.stringify(data),
                 pointer,
+                schema,
                 oneOf: schema.oneOf
             });
         }
@@ -232,10 +247,15 @@ export function resolveOneOfFuzzy(
     }
 
     if (matches.length > 1) {
-        return draft.errors.multipleOneOfError({ matches, data, pointer });
+        return draft.errors.multipleOneOfError({ matches, pointer, schema, value: data });
     }
 
-    return draft.errors.oneOfError({ value: JSON.stringify(data), pointer, oneOf: schema.oneOf });
+    return draft.errors.oneOfError({
+        value: JSON.stringify(data),
+        pointer,
+        schema,
+        oneOf: schema.oneOf
+    });
 }
 
 /**

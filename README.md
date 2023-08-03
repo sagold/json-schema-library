@@ -357,12 +357,28 @@ expect(calls).to.deep.equal([
 
 ### getSchema
 
-`getSchema` retrieves the json-schema of a specific location in data. The location in data is given by a _json-pointer_. In many cases the schema can be retrieved without passing the actual data, but in situations where the schema is dynamic (e.g., in _oneOf_, _dependencies_, etc.), the data is required or will return a _JsonError_ if the location cannot be found.
+`getSchema` retrieves the json-schema of a specific location in data. The location in data is given by a _json-pointer_. In many cases the json-schema can be retrieved without passing any data, but in situations where the schema is dynamic (for example in _oneOf_, _dependencies_, etc.), the data is required or will return a _JsonError_ if the location cannot be found.
 
 ```ts
 const jsonSchema = new Draft07(mySchema);
-let schemaOfName: JsonSchema | JsonError;
-schemaOfName = jsonSchema.getSchema("/list/1/name", myData);
+let schemaOfName: JsonSchema | JsonError | undefined;
+schemaOfName = jsonSchema.getSchema({ pointer: "/list/1/name", data: myData });
+```
+
+**Note** that `getSchema` will return `undefined` for paths that lead to valid properties, but miss a schema definition. For example:
+
+```ts
+const jsonSchema = new Draft07({ type: "object" });
+let schemaOfName = jsonSchema.getSchema({ pointer: "/name" });
+console.log(schemaOfName); // undefined
+```
+
+In case this is unwanted behaviour, use the `withSchemaWarning` option to return a json-error with code `schema-warning` instead:
+
+```ts
+const jsonSchema = new Draft07({ type: "object" });
+let schemaOfName = jsonSchema.getSchema({ pointer: "/name", withSchemaWarning: true });
+console.log(schemaOfName); // { type: "error", code: "schema-warning" }
 ```
 
 <details><summary>Example</summary>
@@ -404,9 +420,12 @@ const mySchema = {
 };
 
 const jsonSchema = new Draft07(mySchema);
-let schemaOfItem: JsonSchema | JsonError;
-schemaOfItem = jsonSchema.getSchema("/list/1", {
-    list: [{ description: "..." }, { name: "my-item" }]
+let schemaOfItem: JsonSchema | JsonError | undefined;
+schemaOfItem = jsonSchema.getSchema({
+    pointer: "/list/1",
+    data: {
+        list: [{ description: "..." }, { name: "my-item" }]
+    }
 });
 
 expect(schemaOfItem).to.deep.equal({
@@ -419,6 +438,23 @@ expect(schemaOfItem).to.deep.equal({
         }
     }
 });
+```
+
+</details>
+
+<details><summary>Evaluating errors</summary>
+
+All returned json-errors have a data property with the following properties
+
+-   `pointer` json-pointer to the location where the error occured. In case of omitted data, this is the last json-schema location that could be resolved
+-   `schema` the json-schema of the last resolved location and the source of the error
+-   `value` the data value at this location that could not be resolved
+
+```ts
+const schema = jsonSchema.getSchema({ pointer: "/list/1" });
+if (isJsonError(schema)) {
+    console.log(Object.keys(schema.data)); // [pointer, schema, value]
+}
 ```
 
 </details>
@@ -918,6 +954,17 @@ const error: JsonError = createError("EnumError", { data: { pointer: "#/location
 ```
 
 ## Breaking Changes
+
+### v9.0.0
+
+**breaking changes**:
+
+-   _getSchema_ signature changed in favor of an options object. Instead of `draft.getSchema(pointer, data)` arguments have to be passed as an object `draft.getSchema({ pointer, data })`. This removes setting unwanted optional arguments and keeps the api more stable in the future (e.g. `withSchemaWarning` option)
+-   _JsonError_ now must expose `pointer`, `schema` and `value` consistently on data property
+
+**updates**
+
+-   _getSchema_ consistently returns errors and can return errors for empty schema using `withSchemaWarning` option
 
 ### v8.0.0
 

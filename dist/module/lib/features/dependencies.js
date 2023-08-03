@@ -58,7 +58,7 @@ const validateDependencies = (draft, schema, value, pointer) => {
             return;
         }
         if (schema.dependencies[property] === false) {
-            errors.push(draft.errors.missingDependencyError({ pointer }));
+            errors.push(draft.errors.missingDependencyError({ pointer, schema, value }));
             return;
         }
         let dependencyErrors;
@@ -66,7 +66,7 @@ const validateDependencies = (draft, schema, value, pointer) => {
         if (type === "array") {
             dependencyErrors = schema.dependencies[property]
                 .filter((dependency) => value[dependency] === undefined)
-                .map((missingProperty) => draft.errors.missingDependencyError({ missingProperty, pointer }));
+                .map((missingProperty) => draft.errors.missingDependencyError({ missingProperty, pointer, schema, value }));
         }
         else if (type === "object") {
             dependencyErrors = draft.validate(value, schema.dependencies[property], pointer);

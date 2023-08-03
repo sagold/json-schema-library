@@ -3,15 +3,20 @@ export type JsonSchema = {
     [p: string]: any;
 };
 export type JsonPointer = string;
-export type JsonError = {
+export type ErrorData<T extends Record<string, unknown> = {
+    [p: string]: unknown;
+}> = T & {
+    pointer: string;
+    schema: JsonSchema;
+    value: unknown;
+};
+export type JsonError<T extends ErrorData = ErrorData> = {
     type: "error";
     name: string;
     code: string;
     message: string;
-    data?: {
-        [p: string]: any;
-    };
-    [p: string]: any;
+    data: T;
+    [p: string]: unknown;
 };
 /**
  * ts type guard for json error

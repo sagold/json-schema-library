@@ -1,16 +1,23 @@
 import { Draft } from "./draft";
 
 export type JsonSchema = { [p: string]: any };
-
 export type JsonPointer = string;
+export type ErrorData<T extends Record<string, unknown> = { [p: string]: unknown }> = T & {
+    /* json-pointer to location of error */
+    pointer: string;
+    /* json-schema of error location */
+    schema: JsonSchema;
+    /* value: data in error location */
+    value: unknown;
+};
 
-export type JsonError = {
+export type JsonError<T extends ErrorData = ErrorData> = {
     type: "error";
     name: string;
     code: string;
     message: string;
-    data?: { [p: string]: any };
-    [p: string]: any;
+    data: T;
+    [p: string]: unknown;
 };
 
 /**

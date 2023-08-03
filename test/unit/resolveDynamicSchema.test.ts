@@ -34,7 +34,12 @@ describe("resolveDynamicSchema", () => {
                     }
                 }
             });
-            const schema = resolveDynamicSchema(draft, { $ref: "#/$defs/schema" }, { one: "" });
+            const schema = resolveDynamicSchema(
+                draft,
+                { $ref: "#/$defs/schema" },
+                { one: "" },
+                "#"
+            );
             expect(schema).to.deep.equal({
                 required: ["two", "three"],
                 properties: {
@@ -58,7 +63,7 @@ describe("resolveDynamicSchema", () => {
                     }
                 }
             });
-            const schema = resolveDynamicSchema(draft, { $ref: "#/$defs/schema" }, {});
+            const schema = resolveDynamicSchema(draft, { $ref: "#/$defs/schema" }, {}, "#");
             expect(schema).to.deep.equal(undefined);
         });
         it("should resolve nested dependencies schema", () => {
@@ -91,7 +96,12 @@ describe("resolveDynamicSchema", () => {
                     }
                 }
             });
-            const schema = resolveDynamicSchema(draft, { $ref: "#/$defs/schema" }, { one: "" });
+            const schema = resolveDynamicSchema(
+                draft,
+                { $ref: "#/$defs/schema" },
+                { one: "" },
+                "#"
+            );
             expect(schema).to.deep.equal({
                 required: ["two", "three"],
                 properties: {
@@ -127,7 +137,12 @@ describe("resolveDynamicSchema", () => {
                     }
                 }
             });
-            const schema = resolveDynamicSchema(draft, { $ref: "#/$defs/schema" }, { one: "" });
+            const schema = resolveDynamicSchema(
+                draft,
+                { $ref: "#/$defs/schema" },
+                { one: "" },
+                "#"
+            );
             expect(schema).to.deep.equal({
                 required: ["two"],
                 properties: {
@@ -157,7 +172,7 @@ describe("resolveDynamicSchema", () => {
                     }
                 }
             });
-            const schema = resolveDynamicSchema(draft, { $ref: "#/$defs/schema" }, {});
+            const schema = resolveDynamicSchema(draft, { $ref: "#/$defs/schema" }, {}, "#");
             expect(schema).to.deep.equal(undefined);
         });
 
@@ -190,7 +205,12 @@ describe("resolveDynamicSchema", () => {
                     }
                 }
             });
-            const schema = resolveDynamicSchema(draft, { $ref: "#/$defs/schema" }, { one: "" });
+            const schema = resolveDynamicSchema(
+                draft,
+                { $ref: "#/$defs/schema" },
+                { one: "" },
+                "#"
+            );
             expect(schema).to.deep.equal({
                 required: ["two"],
                 properties: {
@@ -230,7 +250,7 @@ describe("resolveDynamicSchema", () => {
                     }
                 }
             });
-            const schema = resolveDynamicSchema(draft, { $ref: "/$defs/schema" }, {});
+            const schema = resolveDynamicSchema(draft, { $ref: "/$defs/schema" }, {}, "#");
             expect(schema).to.deep.equal({
                 required: ["one", "two"],
                 properties: {
@@ -250,7 +270,8 @@ describe("resolveDynamicSchema", () => {
                     },
                     allOf: []
                 },
-                {}
+                {},
+                "#"
             );
             expect(schema).to.deep.equal(undefined);
         });
@@ -288,7 +309,7 @@ describe("resolveDynamicSchema", () => {
                     }
                 }
             });
-            const schema = resolveDynamicSchema(draft, { $ref: "/$defs/schema" }, {});
+            const schema = resolveDynamicSchema(draft, { $ref: "/$defs/schema" }, {}, "#");
             expect(schema).to.deep.equal({
                 required: ["one", "two"],
                 properties: {
@@ -321,7 +342,8 @@ describe("resolveDynamicSchema", () => {
                         }
                     ]
                 },
-                { one: "string" }
+                { one: "string" },
+                "#"
             );
             expect(schema).to.deep.equal({
                 properties: {
@@ -352,7 +374,8 @@ describe("resolveDynamicSchema", () => {
                         }
                     ]
                 },
-                { id: "second" }
+                { id: "second" },
+                "#"
             );
 
             expect(schema).to.deep.equal({
@@ -371,7 +394,8 @@ describe("resolveDynamicSchema", () => {
                 {
                     type: "object"
                 },
-                { id: "second" }
+                { id: "second" },
+                "#"
             );
 
             expect(schema).to.equal(undefined);
@@ -390,7 +414,8 @@ describe("resolveDynamicSchema", () => {
                         }
                     ]
                 },
-                { id: "second" }
+                { id: "second" },
+                "#"
             );
 
             expect(schema).to.equal(undefined);
@@ -409,7 +434,8 @@ describe("resolveDynamicSchema", () => {
                         }
                     ]
                 },
-                { id: "second" }
+                { id: "second" },
+                "#"
             );
 
             expect(schema).to.deep.equal({
@@ -442,7 +468,8 @@ describe("resolveDynamicSchema", () => {
                         }
                     ]
                 },
-                { id: "second" }
+                { id: "second" },
+                "#"
             );
 
             expect(schema).to.deep.equal({

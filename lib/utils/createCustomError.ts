@@ -1,14 +1,13 @@
 import __ from "./__";
-import { JsonError, JsonPointer } from "../types";
+import { JsonError, ErrorData } from "../types";
 
-export type ErrorData = { pointer: JsonPointer } & Record<string, unknown>;
-export type CreateError = (data: ErrorData) => JsonError;
+export type CreateError<T extends ErrorData = ErrorData> = (data: T) => JsonError<T>;
 
 function dashCase(text: string): string {
     return text.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 }
 
-export function createError(name: string, data: ErrorData): JsonError {
+export function createError<T extends ErrorData = ErrorData>(name: string, data: T): JsonError<T> {
     return {
         type: "error",
         name,
@@ -19,12 +18,11 @@ export function createError(name: string, data: ErrorData): JsonError {
 }
 
 /**
- * Creates a custom Error-Constructor which instances may be identified by `customError instanceof Error`. Its messages
- * are defined by strings-object @see config/strings.ts
+ * Creates a custom Error Creator. Its messages are defined by strings-object @see config/strings.ts
  *
  * @param name - id of error (camelcased)
  * @return error constructor function
  */
-export function createCustomError(name: string): CreateError {
-    return createError.bind(null, name);
+export function createCustomError<T extends ErrorData = ErrorData>(name: string): CreateError<T> {
+    return createError.bind(null, name) as CreateError<T>;
 }

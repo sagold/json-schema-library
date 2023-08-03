@@ -39,7 +39,7 @@ export default function validate(
         if (schema) {
             return [];
         }
-        return [draft.errors.invalidDataError({ value, pointer })];
+        return [draft.errors.invalidDataError({ pointer, schema, value })];
     }
 
     if (isJsonError(schema)) {
@@ -51,7 +51,7 @@ export default function validate(
         if (equal(schema.const, value)) {
             return [];
         }
-        return [draft.errors.constError({ value, expected: schema.const, pointer })];
+        return [draft.errors.constError({ pointer, schema, value, expected: schema.const })];
     }
 
     const receivedType = getJsonSchemaType(value, schema.type);
@@ -63,21 +63,20 @@ export default function validate(
     ) {
         return [
             draft.errors.typeError({
-                received: receivedType,
-                expected: expectedType,
+                pointer,
+                schema,
                 value,
-                pointer
+                received: receivedType,
+                expected: expectedType
             })
         ];
     }
 
     if (draft.validateType[receivedType] == null) {
-        return [draft.errors.invalidTypeError({ receivedType, pointer })];
+        return [draft.errors.invalidTypeError({ pointer, schema, value, receivedType })];
     }
 
     // get type validation results
     const errors = flattenArray(draft.validateType[receivedType](draft, schema, value, pointer));
-
-    // @ts-ignore - also promises may be passed along (validateAsync)
-    return errors.filter(errorOrPromise);
+    return errors.filter(errorOrPromise) as JsonError[]; // ignore promises here
 }

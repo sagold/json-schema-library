@@ -67,10 +67,11 @@ const KeywordValidation: Record<string, JsonValidator> = {
                     if (isJsonError(result)) {
                         errors.push(
                             draft.errors.additionalPropertiesError({
+                                pointer,
                                 schema: schema.additionalProperties,
+                                value,
                                 property: receivedProperties[i],
                                 properties: expectedProperties,
-                                pointer,
                                 // pass all validation errors
                                 errors: result.data.errors
                             })
@@ -91,9 +92,11 @@ const KeywordValidation: Record<string, JsonValidator> = {
                 } else {
                     errors.push(
                         draft.errors.noAdditionalPropertiesError({
+                            pointer,
+                            schema,
+                            value,
                             property: receivedProperties[i],
-                            properties: expectedProperties,
-                            pointer
+                            properties: expectedProperties
                         })
                     );
                 }
@@ -121,7 +124,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         } else if (schema.enum.includes(value)) {
             return undefined;
         }
-        return draft.errors.enumError({ values: schema.enum, value, pointer });
+        return draft.errors.enumError({ pointer, schema, value, values: schema.enum });
     },
     format: (draft, schema, value, pointer) => {
         if (draft.validateFormat[schema.format]) {
@@ -137,7 +140,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
             if (Array.isArray(value) && value.length === 0) {
                 return undefined;
             }
-            return draft.errors.invalidDataError({ pointer, value });
+            return draft.errors.invalidDataError({ pointer, value, schema });
         }
 
         const errors: JsonError[] = [];
@@ -160,10 +163,22 @@ const KeywordValidation: Record<string, JsonValidator> = {
             return undefined;
         }
         if (schema.maximum && schema.maximum < value) {
-            return draft.errors.maximumError({ maximum: schema.maximum, length: value, pointer });
+            return draft.errors.maximumError({
+                maximum: schema.maximum,
+                length: value,
+                value,
+                pointer,
+                schema
+            });
         }
         if (schema.maximum && schema.exclusiveMaximum === true && schema.maximum === value) {
-            return draft.errors.maximumError({ maximum: schema.maximum, length: value, pointer });
+            return draft.errors.maximumError({
+                maximum: schema.maximum,
+                length: value,
+                pointer,
+                schema,
+                value
+            });
         }
         return undefined;
     },
@@ -175,6 +190,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
             return draft.errors.maxItemsError({
                 maximum: schema.maxItems,
                 length: value.length,
+                schema,
+                value,
                 pointer
             });
         }
@@ -189,7 +206,9 @@ const KeywordValidation: Record<string, JsonValidator> = {
             return draft.errors.maxLengthError({
                 maxLength: schema.maxLength,
                 length: lengthOfString,
-                pointer
+                pointer,
+                schema,
+                value
             });
         }
         return undefined;
@@ -200,7 +219,9 @@ const KeywordValidation: Record<string, JsonValidator> = {
             return draft.errors.maxPropertiesError({
                 maxProperties: schema.maxProperties,
                 length: propertyCount,
-                pointer
+                pointer,
+                schema,
+                value
             });
         }
         return undefined;
@@ -215,13 +236,17 @@ const KeywordValidation: Record<string, JsonValidator> = {
                 return draft.errors.minLengthOneError({
                     minLength: schema.minLength,
                     length: lengthOfString,
-                    pointer
+                    pointer,
+                    schema,
+                    value
                 });
             }
             return draft.errors.minLengthError({
                 minLength: schema.minLength,
                 length: lengthOfString,
-                pointer
+                pointer,
+                schema,
+                value
             });
         }
         return undefined;
@@ -231,10 +256,22 @@ const KeywordValidation: Record<string, JsonValidator> = {
             return undefined;
         }
         if (schema.minimum > value) {
-            return draft.errors.minimumError({ minimum: schema.minimum, length: value, pointer });
+            return draft.errors.minimumError({
+                minimum: schema.minimum,
+                length: value,
+                pointer,
+                schema,
+                value
+            });
         }
         if (schema.exclusiveMinimum === true && schema.minimum === value) {
-            return draft.errors.minimumError({ minimum: schema.minimum, length: value, pointer });
+            return draft.errors.minimumError({
+                minimum: schema.minimum,
+                length: value,
+                pointer,
+                schema,
+                value
+            });
         }
         return undefined;
     },
@@ -247,13 +284,17 @@ const KeywordValidation: Record<string, JsonValidator> = {
                 return draft.errors.minItemsOneError({
                     minItems: schema.minItems,
                     length: value.length,
-                    pointer
+                    pointer,
+                    schema,
+                    value
                 });
             }
             return draft.errors.minItemsError({
                 minItems: schema.minItems,
                 length: value.length,
-                pointer
+                pointer,
+                schema,
+                value
             });
         }
         return undefined;
@@ -267,7 +308,9 @@ const KeywordValidation: Record<string, JsonValidator> = {
             return draft.errors.minPropertiesError({
                 minProperties: schema.minProperties,
                 length: propertyCount,
-                pointer
+                pointer,
+                schema,
+                value
             });
         }
         return undefined;
@@ -279,7 +322,12 @@ const KeywordValidation: Record<string, JsonValidator> = {
         // https://github.com/cfworker/cfworker/blob/master/packages/json-schema/src/validate.ts#L1061
         // https://github.com/ExodusMovement/schemasafe/blob/master/src/compile.js#L441
         if (((value * FPP) % (schema.multipleOf * FPP)) / FPP !== 0) {
-            return draft.errors.multipleOfError({ multipleOf: schema.multipleOf, value, pointer });
+            return draft.errors.multipleOfError({
+                multipleOf: schema.multipleOf,
+                value,
+                pointer,
+                schema
+            });
         }
         // also check https://stackoverflow.com/questions/1815367/catch-and-compute-overflow-during-multiplication-of-two-large-integers
         return undefined;
@@ -287,7 +335,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
     not: (draft, schema, value, pointer) => {
         const errors: JsonError[] = [];
         if (draft.validate(value, schema.not, pointer).length === 0) {
-            errors.push(draft.errors.notError({ value, not: schema.not, pointer }));
+            errors.push(draft.errors.notError({ value, not: schema.not, pointer, schema }));
         }
         return errors;
     },
@@ -299,6 +347,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
                 pattern: schema.pattern,
                 description: schema.patternExample || schema.pattern,
                 received: value,
+                schema,
+                value,
                 pointer
             });
         }
@@ -345,6 +395,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
                     draft.errors.patternPropertiesError({
                         key,
                         pointer,
+                        schema,
+                        value,
                         patterns: Object.keys(pp).join(",")
                     })
                 );
@@ -373,7 +425,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         for (let i = 0; i < keys.length; i += 1) {
             const key = keys[i];
             if (value[key] === undefined) {
-                errors.push(draft.errors.requiredPropertyError({ key, pointer }));
+                errors.push(draft.errors.requiredPropertyError({ key, pointer, schema, value }));
             } else {
                 const itemSchema = draft.step(key, schema, value, pointer);
                 const keyErrors = draft.validate(value[key], itemSchema, `${pointer}/${key}`);
@@ -389,7 +441,12 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         return schema.required.map((property: string) => {
             if (!hasProperty(value, property)) {
-                return draft.errors.requiredPropertyError({ key: property, pointer });
+                return draft.errors.requiredPropertyError({
+                    key: property,
+                    pointer,
+                    schema,
+                    value
+                });
             }
             return undefined;
         });
@@ -404,7 +461,9 @@ const KeywordValidation: Record<string, JsonValidator> = {
             if (value[property] == null || value[property] === "") {
                 return draft.errors.valueNotEmptyError({
                     property,
-                    pointer: `${pointer}/${property}`
+                    pointer: `${pointer}/${property}`,
+                    schema,
+                    value
                 });
             }
             return undefined;
@@ -425,7 +484,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
                             pointer: `${pointer}/${i}`,
                             duplicatePointer: `${pointer}/${index}`,
                             arrayPointer: pointer,
-                            value: JSON.stringify(item)
+                            value: JSON.stringify(item),
+                            schema
                         })
                     );
                     duplicates.push(i);

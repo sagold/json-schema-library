@@ -32,11 +32,11 @@ describe("reduceSchema", () => {
                         }
                     ]
                 },
-                { type: "section", title: "" }
+                { type: "section", title: "" },
+                "#"
             );
 
             assert.equal(typeof staticSchema.getOneOfOrigin, "function");
-            // @ts-ignore
             assert.equal(staticSchema.getOneOfOrigin().index, 1);
         });
     });

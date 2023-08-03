@@ -52,8 +52,16 @@ export {
 import { DraftConfig } from "./lib/draft";
 import { EachCallback } from "./lib/each";
 import { EachSchemaCallback } from "./lib/eachSchema";
-import { ErrorData, CreateError } from "./lib/utils/createCustomError";
-import { JsonSchema, JsonPointer, JsonError, JsonValidator, JsonTypeValidator } from "./lib/types";
+import { CreateError } from "./lib/utils/createCustomError";
+import { GetSchemaOptions } from "./lib/getSchema";
+import {
+    JsonSchema,
+    JsonPointer,
+    JsonError,
+    JsonValidator,
+    JsonTypeValidator,
+    ErrorData
+} from "./lib/types";
 import { JSType } from "./lib/getTypeOf";
 
 export type {
@@ -62,6 +70,7 @@ export type {
     EachCallback,
     EachSchemaCallback,
     ErrorData,
+    GetSchemaOptions,
     JsonError,
     JsonPointer,
     JsonSchema,

@@ -45,7 +45,7 @@ export function resolveAnyOf(
 
     const resolvedSchema = mergeValidAnyOfSchema(draft, schema, data);
     if (resolvedSchema == null) {
-        return errors.anyOfError({ value: data, pointer, anyOf: JSON.stringify(anyOf) });
+        return errors.anyOfError({ pointer, schema, value: data, anyOf: JSON.stringify(anyOf) });
     }
     const mergedSchema = mergeSchema(schema, resolvedSchema);
     return omit(mergedSchema, "anyOf");
@@ -64,7 +64,7 @@ const validateAnyOf: JsonValidator = (draft, schema, value, pointer) => {
             return undefined;
         }
     }
-    return draft.errors.anyOfError({ anyOf: schema.anyOf, value, pointer });
+    return draft.errors.anyOfError({ pointer, schema, value, anyOf: schema.anyOf });
 };
 
 export { validateAnyOf };

@@ -12,8 +12,7 @@ export function createError(name, data) {
     };
 }
 /**
- * Creates a custom Error-Constructor which instances may be identified by `customError instanceof Error`. Its messages
- * are defined by strings-object @see config/strings.ts
+ * Creates a custom Error Creator. Its messages are defined by strings-object @see config/strings.ts
  *
  * @param name - id of error (camelcased)
  * @return error constructor function
