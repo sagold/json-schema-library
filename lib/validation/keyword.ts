@@ -7,8 +7,8 @@ import { validateAllOf } from "../features/allOf";
 import { validateAnyOf } from "../features/anyOf";
 import { validateDependencies } from "../features/dependencies";
 import { validateOneOf } from "../features/oneOf";
+import { getPrecision } from "../utils/getPrecision";
 import deepEqual from "fast-deep-equal";
-const FPP = settings.floatingPointPrecision;
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 const hasProperty = (value: Record<string, unknown>, property: string) =>
@@ -316,12 +316,14 @@ const KeywordValidation: Record<string, JsonValidator> = {
         return undefined;
     },
     multipleOf: (draft, schema, value: number, pointer) => {
-        if (isNaN(schema.multipleOf)) {
+        if (isNaN(schema.multipleOf) || typeof value !== "number") {
             return undefined;
         }
-        // https://github.com/cfworker/cfworker/blob/master/packages/json-schema/src/validate.ts#L1061
-        // https://github.com/ExodusMovement/schemasafe/blob/master/src/compile.js#L441
-        if (((value * FPP) % (schema.multipleOf * FPP)) / FPP !== 0) {
+
+        const valuePrecision = getPrecision(value);
+        const multiplePrecision = getPrecision(schema.multipleOf);
+        if (valuePrecision > multiplePrecision) {
+            // value with higher precision then multipleOf-precision can never be multiple
             return draft.errors.multipleOfError({
                 multipleOf: schema.multipleOf,
                 value,
@@ -329,7 +331,21 @@ const KeywordValidation: Record<string, JsonValidator> = {
                 schema
             });
         }
-        // also check https://stackoverflow.com/questions/1815367/catch-and-compute-overflow-during-multiplication-of-two-large-integers
+
+        const precision = Math.pow(10, multiplePrecision);
+        const val = Math.round(value * precision);
+        const multiple = Math.round(schema.multipleOf * precision);
+        if ((val % multiple) / precision !== 0) {
+            return draft.errors.multipleOfError({
+                multipleOf: schema.multipleOf,
+                value,
+                pointer,
+                schema
+            });
+        }
+
+        // maybe also check overflow
+        // https://stackoverflow.com/questions/1815367/catch-and-compute-overflow-during-multiplication-of-two-large-integers
         return undefined;
     },
     not: (draft, schema, value, pointer) => {

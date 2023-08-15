@@ -24,7 +24,6 @@ export default function getChildSchemaSelection(
     }
 
     const result = draft.step(property, schema, {}, "#");
-
     if (isJsonError(result)) {
         return result;
     }

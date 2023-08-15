@@ -7,8 +7,8 @@ import { validateAllOf } from "../features/allOf";
 import { validateAnyOf } from "../features/anyOf";
 import { validateDependencies } from "../features/dependencies";
 import { validateOneOf } from "../features/oneOf";
+import { getPrecision } from "../utils/getPrecision";
 import deepEqual from "fast-deep-equal";
-const FPP = settings.floatingPointPrecision;
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 const hasProperty = (value, property) => !(value[property] === undefined || !hasOwnProperty.call(value, property));
 // list of validation keywords: http://json-schema.org/latest/json-schema-validation.html#rfc.section.5
@@ -283,12 +283,24 @@ const KeywordValidation = {
         return undefined;
     },
     multipleOf: (draft, schema, value, pointer) => {
-        if (isNaN(schema.multipleOf)) {
+        if (isNaN(schema.multipleOf) || typeof value !== "number") {
             return undefined;
         }
-        // https://github.com/cfworker/cfworker/blob/master/packages/json-schema/src/validate.ts#L1061
-        // https://github.com/ExodusMovement/schemasafe/blob/master/src/compile.js#L441
-        if (((value * FPP) % (schema.multipleOf * FPP)) / FPP !== 0) {
+        const valuePrecision = getPrecision(value);
+        const multiplePrecision = getPrecision(schema.multipleOf);
+        if (valuePrecision > multiplePrecision) {
+            // higher precision of value can never be multiple of value
+            return draft.errors.multipleOfError({
+                multipleOf: schema.multipleOf,
+                value,
+                pointer,
+                schema
+            });
+        }
+        const precision = Math.pow(10, multiplePrecision);
+        const val = Math.round(value * precision);
+        const multiple = Math.round(schema.multipleOf * precision);
+        if ((val % multiple) / precision !== 0) {
             return draft.errors.multipleOfError({
                 multipleOf: schema.multipleOf,
                 value,
