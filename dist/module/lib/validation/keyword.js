@@ -289,7 +289,7 @@ const KeywordValidation = {
         const valuePrecision = getPrecision(value);
         const multiplePrecision = getPrecision(schema.multipleOf);
         if (valuePrecision > multiplePrecision) {
-            // higher precision of value can never be multiple of value
+            // value with higher precision then multipleOf-precision can never be multiple
             return draft.errors.multipleOfError({
                 multipleOf: schema.multipleOf,
                 value,
@@ -308,7 +308,8 @@ const KeywordValidation = {
                 schema
             });
         }
-        // also check https://stackoverflow.com/questions/1815367/catch-and-compute-overflow-during-multiplication-of-two-large-integers
+        // maybe also check overflow
+        // https://stackoverflow.com/questions/1815367/catch-and-compute-overflow-during-multiplication-of-two-large-integers
         return undefined;
     },
     not: (draft, schema, value, pointer) => {
