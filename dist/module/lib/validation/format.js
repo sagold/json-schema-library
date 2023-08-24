@@ -19,7 +19,7 @@ const isValidURITemplate = /^(?:(?:[^\x00-\x20"'<>%\\^`{|}]|%[0-9a-f]{2})|\{[+#.
 // Default Json-Schema formats: date-time, email, hostname, ipv4, ipv6, uri, uriref
 const formatValidators = {
     date: (draft, schema, value, pointer) => {
-        if (typeof value !== "string") {
+        if (typeof value !== "string" || value === "") {
             return undefined;
         }
         // https://github.com/cfworker/cfworker/blob/main/packages/json-schema/src/format.ts
@@ -42,7 +42,7 @@ const formatValidators = {
         return errors.formatDateError({ value, pointer, schema });
     },
     "date-time": (draft, schema, value, pointer) => {
-        if (typeof value !== "string") {
+        if (typeof value !== "string" || value === "") {
             return undefined;
         }
         if (value === "" || isValidDateTime.test(value)) {
@@ -55,7 +55,7 @@ const formatValidators = {
     },
     email: (draft, schema, value, pointer) => {
         // taken from https://github.com/ExodusMovement/schemasafe/blob/master/src/formats.js
-        if (typeof value !== "string") {
+        if (typeof value !== "string" || value === "") {
             return undefined;
         }
         if (value[0] === '"') {
@@ -145,7 +145,7 @@ const formatValidators = {
         return errors.formatRegExError({ value, pointer, schema });
     },
     time: (draft, schema, value, pointer) => {
-        if (typeof value !== "string") {
+        if (typeof value !== "string" || value === "") {
             return undefined;
         }
         // https://github.com/cfworker/cfworker/blob/main/packages/json-schema/src/format.ts
