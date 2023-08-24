@@ -39,7 +39,7 @@ const formatValidators: Record<
     ) => undefined | JsonError | JsonError[]
 > = {
     date: (draft, schema, value, pointer) => {
-        if (typeof value !== "string") {
+        if (typeof value !== "string" || value === "") {
             return undefined;
         }
         // https://github.com/cfworker/cfworker/blob/main/packages/json-schema/src/format.ts
@@ -65,7 +65,7 @@ const formatValidators: Record<
     },
 
     "date-time": (draft, schema, value, pointer) => {
-        if (typeof value !== "string") {
+        if (typeof value !== "string" || value === "") {
             return undefined;
         }
         if (value === "" || isValidDateTime.test(value)) {
@@ -79,7 +79,7 @@ const formatValidators: Record<
 
     email: (draft, schema, value, pointer) => {
         // taken from https://github.com/ExodusMovement/schemasafe/blob/master/src/formats.js
-        if (typeof value !== "string") {
+        if (typeof value !== "string" || value === "") {
             return undefined;
         }
         if (value[0] === '"') {
@@ -176,7 +176,7 @@ const formatValidators: Record<
     },
 
     time: (draft, schema, value, pointer) => {
-        if (typeof value !== "string") {
+        if (typeof value !== "string" || value === "") {
             return undefined;
         }
         // https://github.com/cfworker/cfworker/blob/main/packages/json-schema/src/format.ts
