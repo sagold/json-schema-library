@@ -9,7 +9,8 @@ const isValidIPV4 = /^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\
 const isValidIPV6 = /^((([0-9a-f]{1,4}:){7}([0-9a-f]{1,4}|:))|(([0-9a-f]{1,4}:){6}(:[0-9a-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9a-f]{1,4}:){5}(((:[0-9a-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9a-f]{1,4}:){4}(((:[0-9a-f]{1,4}){1,3})|((:[0-9a-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){3}(((:[0-9a-f]{1,4}){1,4})|((:[0-9a-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){2}(((:[0-9a-f]{1,4}){1,5})|((:[0-9a-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){1}(((:[0-9a-f]{1,4}){1,6})|((:[0-9a-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9a-f]{1,4}){1,7})|((:[0-9a-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))$/i;
 const isValidHostname = /^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\.?$/;
 const matchDate = /^(\d\d\d\d)-(\d\d)-(\d\d)$/;
-const matchTime = /^(\d\d):(\d\d):(\d\d)(\.\d+)?(z|[+-]\d\d(?::?\d\d)?)?$/i;
+// const matchTime = /^(\d\d):(\d\d):(\d\d)(\.\d+)?(z|[+-]\d\d(?::?\d\d)?)?$/i;
+const matchTime = /^(?:[0-2]\d:[0-5]\d:[0-5]\d|23:59:60)(?:\.\d+)?(?:z|[+-]\d\d(?::?\d\d)?)?$/i;
 const DAYS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const isValidJsonPointer = /^(?:\/(?:[^~/]|~0|~1)*)*$/;
 const isValidRelativeJsonPointer = /^(?:0|[1-9][0-9]*)(?:#|(?:\/(?:[^~/]|~0|~1)*)*)$/;
@@ -144,25 +145,31 @@ const formatValidators = {
         }
         return errors.formatRegExError({ value, pointer, schema });
     },
+    // hh:mm:ss.sTZD
+    // https://opis.io/json-schema/2.x/formats.html
+    // regex https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch04s07.html
     time: (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
         // https://github.com/cfworker/cfworker/blob/main/packages/json-schema/src/format.ts
         const matches = value.match(matchTime);
-        if (!matches) {
-            return errors.formatDateTimeError({ value, pointer, schema });
-        }
-        const hour = +matches[1];
-        const minute = +matches[2];
-        const second = +matches[3];
-        const timeZone = !!matches[5];
-        if (((hour <= 23 && minute <= 59 && second <= 59) ||
-            (hour == 23 && minute == 59 && second == 60)) &&
-            timeZone) {
-            return undefined;
-        }
-        return errors.formatTimeError({ value, pointer, schema });
+        return matches ? undefined : errors.formatDateTimeError({ value, pointer, schema });
+        // if (!matches) {
+        //     return errors.formatDateTimeError({ value, pointer, schema });
+        // }
+        // const hour = +matches[1];
+        // const minute = +matches[2];
+        // const second = +matches[3];
+        // const timeZone = !!matches[5];
+        // if (
+        //     ((hour <= 23 && minute <= 59 && second <= 59) ||
+        //         (hour == 23 && minute == 59 && second == 60)) &&
+        //     timeZone
+        // ) {
+        //     return undefined;
+        // }
+        // return errors.formatTimeError({ value, pointer, schema });
     },
     uri: (draft, schema, value, pointer) => {
         if (typeof value !== "string" || value === "") {
