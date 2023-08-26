@@ -6,6 +6,64 @@ describe("validate format", () => {
     let draft: Draft04;
     before(() => (draft = new Draft04()));
 
+    describe("time", () => {
+        it("should validate HH:mm:ss", () => {
+            const errors = validate(draft, "15:31:12", {
+                type: "string",
+                format: "time"
+            });
+            assert.deepEqual(errors, []);
+        });
+
+        it("should validate HH:mm:ss.s", () => {
+            const errors = validate(draft, "15:31:12.99", {
+                type: "string",
+                format: "time"
+            });
+            assert.deepEqual(errors, []);
+        });
+
+        it("should validate HH:mm:ss-HH:mm", () => {
+            const errors = validate(draft, "15:31:12-02:30", {
+                type: "string",
+                format: "time"
+            });
+            assert.deepEqual(errors, []);
+        });
+
+        it("should validate HH:mm:ssZ", () => {
+            const errors = validate(draft, "15:31:12Z", {
+                type: "string",
+                format: "time"
+            });
+            assert.deepEqual(errors, []);
+        });
+
+        it("should not validate minutes above 59", () => {
+            const errors = validate(draft, "15:60:12", {
+                type: "string",
+                format: "time"
+            });
+            assert.equal(errors.length, 1);
+        });
+
+        it("should not validate seconds above 59", () => {
+            const errors = validate(draft, "15:31:60", {
+                type: "string",
+                format: "time"
+            });
+            assert.equal(errors.length, 1);
+        });
+
+        it("should not validate HH:mm", () => {
+            const errors = validate(draft, "15:31", {
+                type: "string",
+                format: "time"
+            });
+            assert.equal(errors.length, 1);
+        });
+    });
+
     describe("url", () => {
         it("should validate format url", () => {
             const errors = validate(draft, "https://developer.mozilla.org/en-US/", {
