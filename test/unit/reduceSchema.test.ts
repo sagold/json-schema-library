@@ -6,6 +6,54 @@ describe("reduceSchema", () => {
     let draft: Draft;
     beforeEach(() => (draft = new Draft()));
 
+    describe("allOf", () => {
+        it("should iteratively resolve allOf before merging (issue#44)", () => {
+            const staticSchema = reduceSchema(
+                draft,
+                {
+                    type: "object",
+                    properties: {
+                        trigger: { type: "boolean" }
+                    },
+                    allOf: [
+                        {
+                            if: {
+                                not: {
+                                    properties: {
+                                        trigger: { type: "boolean", const: true }
+                                    }
+                                }
+                            },
+                            then: {
+                                properties: {
+                                    trigger: { type: "boolean", const: false }
+                                }
+                            }
+                        },
+                        {
+                            if: {
+                                not: {
+                                    properties: {
+                                        trigger: { type: "boolean", const: false }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                { trigger: true },
+                "#"
+            );
+
+            assert.deepEqual(staticSchema, {
+                type: "object",
+                properties: {
+                    trigger: { type: "boolean" }
+                }
+            });
+        });
+    });
+
     describe("oneOf", () => {
         it("should return oneOf source schema for resolved oneOf object", () => {
             const staticSchema = reduceSchema(

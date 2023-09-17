@@ -165,6 +165,7 @@ describe("resolveAllOf", () => {
                 }
             });
         });
+
         it("should return 'then'-schema when 'if' does match", () => {
             const schema = resolveAllOf(
                 draft,
@@ -200,6 +201,7 @@ describe("resolveAllOf", () => {
                 }
             });
         });
+
         it("should merge multiple 'then'-schema", () => {
             const schema = resolveAllOf(
                 draft,

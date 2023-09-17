@@ -16,9 +16,13 @@ export function resolveIfSchema(
     schema: JsonSchema,
     data: unknown
 ): JsonSchema | undefined {
+    if (schema.if == null) {
+        return undefined;
+    }
     if (schema.if === false) {
         return schema.else;
     }
+
     if (schema.if && (schema.then || schema.else)) {
         const ifErrors = draft.validate(data, draft.resolveRef(schema.if));
         if (ifErrors.length === 0 && schema.then) {
