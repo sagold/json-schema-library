@@ -959,7 +959,7 @@ const error: JsonError = createError("EnumError", { data: { pointer: "#/location
 
 **breaking changes**:
 
--   _getSchema_ signature changed in favor of an options object. Instead of `draft.getSchema(pointer, data)` arguments have to be passed as an object `draft.getSchema({ pointer, data })`. This removes setting unwanted optional arguments and keeps the api more stable in the future (e.g. `withSchemaWarning` option)
+-   _getSchema_ signature changed in favour of an options object. Instead of `draft.getSchema(pointer, data)` arguments have to be passed as an object `draft.getSchema({ pointer, data })`. This removes setting unwanted optional arguments and keeps the api more stable in the future (e.g. `withSchemaWarning` option)
 -   _JsonError_ now must expose `pointer`, `schema` and `value` consistently on data property
 
 **updates**
