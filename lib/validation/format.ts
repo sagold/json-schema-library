@@ -3,6 +3,7 @@ import errors from "./errors";
 import { JsonError, JsonSchema } from "../types";
 import { Draft } from "../draft";
 import validUrl from "valid-url";
+import { parse as parseIdnEmail } from "smtp-address-parser";
 
 // referenced
 // https://github.com/cfworker/cfworker/blob/main/packages/json-schema/src/format.ts
@@ -79,10 +80,10 @@ const formatValidators: Record<
     },
 
     email: (draft, schema, value, pointer) => {
-        // taken from https://github.com/ExodusMovement/schemasafe/blob/master/src/formats.js
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
+        // taken from https://github.com/ExodusMovement/schemasafe/blob/master/src/formats.js
         if (value[0] === '"') {
             return errors.formatEmailError({ value, pointer, schema });
         }
@@ -100,6 +101,22 @@ const formatValidators: Record<
             return errors.formatEmailError({ value, pointer, schema });
         }
         return undefined;
+    },
+
+    /**
+     * @draft 7
+     * [RFC6531] https://json-schema.org/draft-07/json-schema-validation.html#RFC6531
+     */
+    "idn-email": (draft, schema, value, pointer) => {
+        if (typeof value !== "string" || value === "") {
+            return undefined;
+        }
+        try {
+            parseIdnEmail(value);
+            return undefined;
+        } catch (e) {
+            return errors.formatEmailError({ value, pointer, schema });
+        }
     },
 
     hostname: (draft, schema, value, pointer) => {

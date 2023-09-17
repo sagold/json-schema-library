@@ -22,7 +22,7 @@ const supportedTestCases = (t: FeatureTest) =>
               "format-idn",
               "format-idn-reference",
               "format-idn-hostname",
-              "format-idn-email",
+              // "format-idn-email",
               "float-overflow",
               "non-bmp-regex"
           ].includes(t.name)
