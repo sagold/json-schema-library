@@ -43,9 +43,25 @@ export function resolveDynamicSchema(draft, schema, data, pointer) {
         }
     }
     // @feature allOf
-    const allOfSchema = mergeAllOfSchema(draft, schema);
-    if (allOfSchema) {
-        resolvedSchema = mergeSchema(resolvedSchema !== null && resolvedSchema !== void 0 ? resolvedSchema : {}, allOfSchema);
+    if (Array.isArray(schema.allOf)) {
+        const allOf = schema.allOf.map((s) => {
+            // before merging allOf schema we need to resolve all subschemas
+            // if not, we would wrongly merge oneOf, if-then statements, etc
+            if (isDynamicSchema(s)) {
+                // copy of reduceSchema
+                let result = resolveDynamicSchema(draft, s, data, pointer);
+                if (result) {
+                    result = mergeSchema(s, result);
+                    return omit(result, ...toOmit);
+                }
+                return undefined;
+            }
+            return s;
+        });
+        if (allOf.length > 0) {
+            const allOfSchema = mergeAllOfSchema(draft, { allOf });
+            resolvedSchema = mergeSchema(resolvedSchema !== null && resolvedSchema !== void 0 ? resolvedSchema : {}, allOfSchema);
+        }
     }
     // @feature anyOf
     const anyOfSchema = mergeValidAnyOfSchema(draft, schema, data);

@@ -6,6 +6,9 @@
  * @returns json schema defined by if-then-else or undefined
  */
 export function resolveIfSchema(draft, schema, data) {
+    if (schema.if == null) {
+        return undefined;
+    }
     if (schema.if === false) {
         return schema.else;
     }

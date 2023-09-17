@@ -27,6 +27,7 @@ export function resolveAllOf(draft, data, schema = draft.rootSchema) {
     return mergedSchema;
 }
 /**
+ * @attention: subschemas have to be resolved upfront (e.g. if-else that do not apply)
  * Merge all allOf sub schema into a single schema. Returns undefined for
  * missing allOf definition.
  *
