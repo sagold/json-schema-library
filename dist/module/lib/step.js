@@ -1,6 +1,5 @@
 import getTypeOf from "./getTypeOf";
 import createSchemaOf from "./createSchemaOf";
-import errors from "./validation/errors";
 import { isJsonError } from "./types";
 import { reduceSchema } from "./reduceSchema";
 const stepType = {
@@ -19,7 +18,7 @@ const stepType = {
             }
             // @draft >= 7 bool schema, items:[true, false]
             if (schema.items[key] === false) {
-                return errors.invalidDataError({
+                return draft.errors.invalidDataError({
                     key,
                     value: itemValue,
                     pointer,
@@ -30,7 +29,7 @@ const stepType = {
                 return draft.resolveRef(schema.items[key]);
             }
             if (schema.additionalItems === false) {
-                return errors.additionalItemsError({
+                return draft.errors.additionalItemsError({
                     key,
                     value: itemValue,
                     pointer,
@@ -61,7 +60,7 @@ const stepType = {
             // @todo patternProperties also validate properties
             // @feature boolean schema
             if (property === false) {
-                return errors.forbiddenPropertyError({
+                return draft.errors.forbiddenPropertyError({
                     property: key,
                     value: data,
                     pointer,
@@ -107,7 +106,7 @@ const stepType = {
         if (data && (additionalProperties === undefined || additionalProperties === true)) {
             return createSchemaOf(data[key]);
         }
-        return errors.unknownPropertyError({
+        return draft.errors.unknownPropertyError({
             property: key,
             value: data,
             pointer: `${pointer}`,
