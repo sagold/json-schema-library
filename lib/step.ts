@@ -1,6 +1,5 @@
 import getTypeOf from "./getTypeOf";
 import createSchemaOf from "./createSchemaOf";
-import errors from "./validation/errors";
 import { JsonSchema, JsonPointer, JsonError, isJsonError } from "./types";
 import { Draft } from "./draft";
 import { reduceSchema } from "./reduceSchema";
@@ -33,7 +32,7 @@ const stepType: Record<string, StepFunction> = {
             }
             // @draft >= 7 bool schema, items:[true, false]
             if (schema.items[key] === false) {
-                return errors.invalidDataError({
+                return draft.errors.invalidDataError({
                     key,
                     value: itemValue,
                     pointer,
@@ -46,7 +45,7 @@ const stepType: Record<string, StepFunction> = {
             }
 
             if (schema.additionalItems === false) {
-                return errors.additionalItemsError({
+                return draft.errors.additionalItemsError({
                     key,
                     value: itemValue,
                     pointer,
@@ -90,7 +89,7 @@ const stepType: Record<string, StepFunction> = {
 
             // @feature boolean schema
             if (property === false) {
-                return errors.forbiddenPropertyError({
+                return draft.errors.forbiddenPropertyError({
                     property: key,
                     value: data,
                     pointer,
@@ -141,7 +140,7 @@ const stepType: Record<string, StepFunction> = {
             return createSchemaOf(data[key]);
         }
 
-        return errors.unknownPropertyError({
+        return draft.errors.unknownPropertyError({
             property: key,
             value: data,
             pointer: `${pointer}`,
