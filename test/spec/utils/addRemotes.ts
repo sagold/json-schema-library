@@ -1,5 +1,5 @@
 /* eslint max-len: 0 */
-import glob from "glob";
+import {globSync} from "glob";
 import path from "path";
 import { Draft } from "../../../lib/draft";
 
@@ -20,7 +20,7 @@ export function addRemotes(draft: Draft, baseURI = "http://localhost:1234") {
         "**",
         "*.json"
     );
-    const remotes = glob.sync(remotesPattern);
+    const remotes = globSync(remotesPattern);
     // console.log("remotes:");
     remotes.forEach((filepath: string) => {
         const file = require(filepath); // eslint-disable-line

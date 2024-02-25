@@ -66,7 +66,7 @@
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-optimize-regex": "^1.2.0",
         "eslint-plugin-promise": "^6.0.0",
-        "glob": "^8.1.0",
+        "glob": "^10.3.10",
         "json-schema-test-suite": "https://github.com/json-schema-org/JSON-Schema-Test-Suite#f5bd2f6c3184ecec15250a48b7086985402fce56",
         "mocha": "^10.2.0",
         "nyc": "^15.1.0",

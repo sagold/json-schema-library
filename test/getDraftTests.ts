@@ -1,4 +1,4 @@
-import glob from "glob";
+import { globSync } from "glob";
 import path from "path";
 import fs from "fs";
 
@@ -58,7 +58,7 @@ export type Test = {
 
 export function getDraftTests(draft: Draft): FeatureTest[] {
     const source = path.resolve(`./node_modules/json-schema-test-suite/tests/draft${draft}`);
-    const filenames = glob.sync(`${source}/**/*.json`);
+    const filenames = globSync(`${source}/**/*.json`);
     const testCases: FeatureTest[] = filenames.map((filename) => {
         const testCaseData = readTestFile(filename);
         const { optional, name } = getFilenameAttributes(filename);
