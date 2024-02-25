@@ -20,9 +20,16 @@ function readTestFile(filepath: string): TestCase[] {
 
 function getFilenameAttributes(filename: string) {
     let relative = filename.split(/draft[^/]+\//).pop();
+    if (relative == null) {
+        throw new Error(`Error in spec generation. Failed parsing filename '${filename}'`)
+    }
     relative = relative.replace(".json", "").replace(/^\//, "");
     const attributes = relative.replace(".json", "").split("/");
-    const optional = attributes[0] === "optional" ? attributes.shift() && true : false;
+    let optional = false;
+    if (attributes[0] === "optional") {
+        attributes.shift();
+        optional = true;
+    }
     return { optional, name: attributes.join("-") };
 }
 
