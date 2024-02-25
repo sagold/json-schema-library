@@ -21,9 +21,9 @@ export default function getTypeId(schema: JsonSchema): string | string[] | undef
         return "enum";
     }
 
-    // @ts-ignore
-    if (types[schema.type] || Array.isArray(schema.type)) {
-        return schema.type;
+    const type = schema.type as string | string[];
+    if (Array.isArray(type) || types[type]) {
+        return type;
     }
 
     const ids = typeKeywords.filter((type) => schema[type]);
