@@ -22,7 +22,7 @@ const suffixes = /(#|\/)+$/g;
  * @return compiled json-schema
  */
 export default function compileSchema(draft, schemaToCompile, rootSchema = schemaToCompile, force = false) {
-    // @ts-ignore
+    // @ts-expect-error incomplete JsonSchema type
     if (schemaToCompile === true || schemaToCompile === false || schemaToCompile === undefined) {
         return schemaToCompile;
     }
