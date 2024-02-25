@@ -5,8 +5,8 @@ export function isEmpty(v: unknown): boolean {
     switch (type) {
         case "string":
         case "array":
-            // @ts-ignore
-            return v.length === 0;
+            // @ts-expect-error tested as array - could use ts type guard
+            return v?.length === 0;
         case "null":
         case "undefined":
             return true;

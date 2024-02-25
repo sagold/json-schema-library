@@ -37,7 +37,7 @@ export default function compileSchema(
     rootSchema = schemaToCompile,
     force = false
 ): JsonSchema {
-    // @ts-ignore
+    // @ts-expect-error incomplete JsonSchema type
     if (schemaToCompile === true || schemaToCompile === false || schemaToCompile === undefined) {
         return schemaToCompile;
     }
