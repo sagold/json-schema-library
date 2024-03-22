@@ -1279,5 +1279,74 @@ describe("getTemplate", () => {
 
             expect({ list: [], author: "jane" }).to.deep.equal(template);
         });
+
+
+        describe("extendDefaults", () => {
+
+            it("should keep array default-value with 'extendDefaults:false'", () => {
+                draft.setSchema({
+                    type: "array",
+                    default: [],
+                    items: {
+                        type: "string",
+                        enum: ["one", "two"]
+                    },
+                    minItems: 1 // usually adds an enty, but default states: []
+                });
+                const res = getTemplate(draft, undefined, draft.getSchema(), {
+                    extendDefaults: false
+                });
+
+                expect(res).to.deep.equal([]);
+            });
+
+            it("should add items to array with no default-value given and 'extendDefaults:false'", () => {
+                draft.setSchema({
+                    type: "array",
+                    items: {
+                        type: "string",
+                        enum: ["one", "two"]
+                    },
+                    minItems: 1 // usually adds an enty, but default states: []
+                });
+                const res = getTemplate(draft, undefined, draft.getSchema(), {
+                    extendDefaults: false
+                });
+
+                expect(res).to.deep.equal(["one"]);
+            });
+
+            it("should not add required items to object with default-value given and 'extendDefaults:false'", () => {
+                draft.setSchema({
+                    type: "object",
+                    required: ["title"],
+                    default: {},
+                    properties: {
+                        title: { type: "string" }
+                    }
+                });
+                const res = getTemplate(draft, undefined, draft.getSchema(), {
+                    extendDefaults: false
+                });
+
+                expect(res).to.deep.equal({});
+            });
+
+            it("should extend object by required property with no default-value given and 'extendDefaults:false'", () => {
+                draft.setSchema({
+                    type: "object",
+                    required: ["title"],
+                    properties: {
+                        title: { type: "string" }
+                    }
+                });
+                const res = getTemplate(draft, undefined, draft.getSchema(), {
+                    extendDefaults: false
+                });
+
+                expect(res).to.deep.equal({ title: "" });
+            });
+        });
+
     });
 });

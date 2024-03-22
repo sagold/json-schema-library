@@ -15,8 +15,14 @@ import { mergeSchema } from "./mergeSchema";
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
     addOptionalProps?: boolean;
-    /** remove data that does not match input schema. Defaults to false */
+    /** Remove data that does not match input schema. Defaults to false */
     removeInvalidData?: boolean;
+    /** Set to false to take default values as they are and not extend them.
+     *  Defaults to true.
+     *  This allows to control template data e.g. enforcing arrays to be empty,
+     *  regardless of minItems settings.
+     */
+    extendDefaults?: boolean;
 };
 
 const defaultOptions: TemplateOptions = {
@@ -257,7 +263,7 @@ const TYPE: Record<
     ) => {
         const template = schema.default === undefined ? {} : schema.default;
         const d: Record<string, unknown> = {}; // do not assign data here, to keep ordering from json-schema
-        const required = schema.required ?? [];
+        const required = (opts.extendDefaults === false && schema.default !== undefined) ? [] : (schema.required ?? []);
 
         if (schema.properties) {
             Object.keys(schema.properties).forEach((key) => {
@@ -345,7 +351,7 @@ const TYPE: Record<
 
         const template = schema.default === undefined ? [] : schema.default;
         const d: unknown[] = data || template;
-        const minItems = schema.minItems || 0;
+        const minItems = (opts.extendDefaults === false && schema.default !== undefined) ? 0 : (schema.minItems || 0);
 
         // build defined set of items
         if (Array.isArray(schema.items)) {

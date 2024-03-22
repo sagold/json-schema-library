@@ -268,6 +268,32 @@ expect(myData).to.deep.equal({
 
 </details>
 
+<details><summary>Option: extendDefaults</summary>
+
+Per default, `getTemplate` does try to create data that is valid to the json-schema. Example: array-schemas with `minItems: 1` will add one item to fullfil the validation criteria. You can use the option and pass `{ extendDefaults: false }` to override this behaviour with a default value:
+
+```ts
+import { Draft07 } from "json-schema-library";
+
+const myJsonSchema = {
+    type: "array",
+    default: [], // if omitted will add an array item
+    items: {
+        type: "string",
+        enum: ["one", "two"]
+    },
+    minItems: 1 // usually adds an enty, but default states: []
+};
+
+const jsonSchema = new Draft07(myJsonSchema);
+const myData = jsonSchema.getTemplate(undefined, undefined, { extendDefaults: false });
+
+expect(myData).to.deep.equal([]);
+```
+
+</details>
+
+
 ### each
 
 `each` iterates over each data-item (_object_, _array_ and _value_) and emits the data-item, schema and location to a callback.
