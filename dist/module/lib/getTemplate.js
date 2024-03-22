@@ -202,7 +202,7 @@ const TYPE = {
         var _a;
         const template = schema.default === undefined ? {} : schema.default;
         const d = {}; // do not assign data here, to keep ordering from json-schema
-        const required = (_a = schema.required) !== null && _a !== void 0 ? _a : [];
+        const required = (opts.extendDefaults === false && schema.default !== undefined) ? [] : ((_a = schema.required) !== null && _a !== void 0 ? _a : []);
         if (schema.properties) {
             Object.keys(schema.properties).forEach((key) => {
                 const value = data == null || data[key] == null ? template[key] : data[key];
@@ -259,7 +259,7 @@ const TYPE = {
         }
         const template = schema.default === undefined ? [] : schema.default;
         const d = data || template;
-        const minItems = schema.minItems || 0;
+        const minItems = (opts.extendDefaults === false && schema.default !== undefined) ? 0 : (schema.minItems || 0);
         // build defined set of items
         if (Array.isArray(schema.items)) {
             for (let i = 0, l = Math.max(minItems !== null && minItems !== void 0 ? minItems : 0, (_b = (_a = schema.items) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0); i < l; i += 1) {
