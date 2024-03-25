@@ -187,9 +187,14 @@ function getTemplate(
     // @todo Array.isArray(schema.type)
     // -> hasDefault? return
     // if not -> pick first types
-
     if (!isJsonSchema(schema) || schema.type == null) {
         return undefined;
+    }
+
+    // @attention - very special case to support file instances
+    if (data instanceof File) {
+        console.log("is file")
+        return data;
     }
 
     const type = Array.isArray(schema.type)
@@ -198,6 +203,8 @@ function getTemplate(
 
     // reset invalid type
     const javascriptTypeOfData = getTypeOf(data);
+
+
     if (
         data != null &&
         javascriptTypeOfData !== type &&

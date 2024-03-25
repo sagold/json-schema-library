@@ -1280,6 +1280,18 @@ describe("getTemplate", () => {
             expect({ list: [], author: "jane" }).to.deep.equal(template);
         });
 
+        describe("file", () => {
+            it("should not modify file-instance", () => {
+                const file = new File([], "testfile.pdf");
+                draft.setSchema({
+                    type: ["string", "object"],
+                    format: "file"
+                });
+                const res = getTemplate(draft, file, draft.getSchema());
+                expect(res).to.deep.equal(file);
+            });
+        });
+
 
         describe("extendDefaults", () => {
 
