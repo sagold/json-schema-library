@@ -10,10 +10,7 @@ import { resolveIfSchema } from "./features/if";
 import { mergeAllOfSchema } from "./features/allOf";
 import { resolveDependencies } from "./features/dependencies";
 import { mergeSchema } from "./mergeSchema";
-const defaultOptions = {
-    addOptionalProps: false,
-    removeInvalidData: false
-};
+const defaultOptions = settings.templateDefaultOptions;
 let cache;
 function shouldResolveRef(schema, pointer) {
     const { $ref } = schema;
@@ -336,7 +333,10 @@ function getDefault(schema, templateValue, initValue) {
     }
     return schema.default;
 }
-export default (draft, data, schema = draft.rootSchema, opts = defaultOptions) => {
+export default (draft, data, schema = draft.rootSchema, opts) => {
     cache = {};
-    return getTemplate(draft, data, schema, "#", opts);
+    if (opts) {
+        return getTemplate(draft, data, schema, "#", { ...defaultOptions, ...opts });
+    }
+    return getTemplate(draft, data, schema, "#", defaultOptions);
 };

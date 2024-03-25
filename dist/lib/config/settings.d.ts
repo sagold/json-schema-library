@@ -5,6 +5,7 @@ declare const _default: {
     templateDefaultOptions: {
         addOptionalProps: boolean;
         removeInvalidData: boolean;
+        extendDefaults: boolean;
     };
 };
 export default _default;

@@ -4,6 +4,7 @@ export default {
     propertyBlacklist: ["_id"],
     templateDefaultOptions: {
         addOptionalProps: false,
-        removeInvalidData: false
+        removeInvalidData: false,
+        extendDefaults: true
     }
 };
