@@ -1316,6 +1316,23 @@ describe("getTemplate", () => {
                 expect(res).to.deep.equal(["one"]);
             });
 
+            it("should add items to default-array with 'extendDefaults:true'", () => {
+                draft.setSchema({
+                    type: "array",
+                    default: [],
+                    items: {
+                        type: "string",
+                        enum: ["one", "two"]
+                    },
+                    minItems: 1 // usually adds an enty, but default states: []
+                });
+                const res = getTemplate(draft, undefined, draft.getSchema(), {
+                    extendDefaults: true
+                });
+
+                expect(res).to.deep.equal(["one"]);
+            });
+
             it("should not add required items to object with default-value given and 'extendDefaults:false'", () => {
                 draft.setSchema({
                     type: "object",
@@ -1342,6 +1359,21 @@ describe("getTemplate", () => {
                 });
                 const res = getTemplate(draft, undefined, draft.getSchema(), {
                     extendDefaults: false
+                });
+
+                expect(res).to.deep.equal({ title: "" });
+            });
+            it("should extend default-object with 'extendDefaults:true'", () => {
+                draft.setSchema({
+                    type: "object",
+                    required: ["title"],
+                    default: {},
+                    properties: {
+                        title: { type: "string" }
+                    }
+                });
+                const res = getTemplate(draft, undefined, draft.getSchema(), {
+                    extendDefaults: true
                 });
 
                 expect(res).to.deep.equal({ title: "" });
