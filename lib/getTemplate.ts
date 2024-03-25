@@ -25,10 +25,7 @@ export type TemplateOptions = {
     extendDefaults?: boolean;
 };
 
-const defaultOptions: TemplateOptions = {
-    addOptionalProps: false,
-    removeInvalidData: false
-};
+const defaultOptions: TemplateOptions = settings.templateDefaultOptions;
 
 let cache: Record<string, JsonSchema>;
 function shouldResolveRef(schema: JsonSchema, pointer: JsonPointer) {
@@ -455,8 +452,11 @@ export default (
     draft: Draft,
     data?: any,
     schema: JsonSchema = draft.rootSchema,
-    opts: TemplateOptions = defaultOptions
+    opts?: TemplateOptions
 ) => {
     cache = {};
-    return getTemplate(draft, data, schema, "#", opts);
+    if (opts) {
+        return getTemplate(draft, data, schema, "#", { ...defaultOptions, ...opts });
+    }
+    return getTemplate(draft, data, schema, "#", defaultOptions);
 };
