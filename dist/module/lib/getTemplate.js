@@ -154,7 +154,6 @@ function getTemplate(draft, data, _schema, pointer, opts) {
     }
     // @attention - very special case to support file instances
     if (data instanceof File) {
-        console.log("is file");
         return data;
     }
     const type = Array.isArray(schema.type)

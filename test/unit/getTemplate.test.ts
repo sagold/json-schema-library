@@ -1290,6 +1290,21 @@ describe("getTemplate", () => {
                 const res = getTemplate(draft, file, draft.getSchema());
                 expect(res).to.deep.equal(file);
             });
+
+            it("should not modify file-instance on object", () => {
+                const file = new File([], "testfile.pdf");
+                draft.setSchema({
+                    type: "object",
+                    properties: {
+                        file: {
+                            type: ["string", "object"],
+                            format: "file"
+                        }
+                    }
+                });
+                const res = getTemplate(draft, { file }, draft.getSchema());
+                expect(res).to.deep.equal({ file });
+            });
         });
 
 
