@@ -303,7 +303,10 @@ describe("resolveAllOf", () => {
         it("should incrementally resolve multiple 'then'-schema", () => {
             const schema = resolveAllOf(
                 draft,
-                { trigger: true },
+                {
+                    trigger: true,
+                    additionalSchema: "12345"
+                },
                 {
                     type: "object",
                     required: ["trigger"],

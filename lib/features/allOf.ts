@@ -31,7 +31,6 @@ export function resolveAllOf(
         // @todo introduce draft.resolveSchema to iteratively resolve
         const allOfSchema = resolveSchema(draft, schema.allOf[i], data);
         mergedSchema = mergeSchema(mergedSchema, allOfSchema);
-        data = draft.getTemplate(data, mergedSchema);
     }
     delete mergedSchema.allOf;
     return mergedSchema;
