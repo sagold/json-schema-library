@@ -33,7 +33,7 @@ export default {
     MaxLengthError: "Value `{{pointer}}` should have a maximum length of `{{maxLength}}`, but got `{{length}}`.",
     MaxPropertiesError: "Too many properties in `{{pointer}}`, should be `{{maximum}}` at most, but got `{{length}}`",
     MinimumError: "Value in `{{pointer}}` is `{{length}}`, but should be `{{minimum}}` at minimum",
-    MinItemsError: "Too few items in `{{pointer}}`, should be at least `{{minimum}}`, but got `{{length}}`",
+    MinItemsError: "Too few items in `{{pointer}}`, should be at least `{{minItems}}`, but got `{{length}}`",
     MinItemsOneError: "At least one item is required in `{{pointer}}`",
     MinLengthError: "Value `{{pointer}}` should have a minimum length of `{{minLength}}`, but got `{{length}}`.",
     MinLengthOneError: "A value is required in `{{pointer}}`",
