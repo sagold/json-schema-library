@@ -6,7 +6,7 @@ import { resolveIfSchema } from "./if";
  * resolves schema
  * when complete this will have much duplication to step.object etc
  */
-function resolveSchema(draft, schemaToResolve, data) {
+export function resolveSchema(draft, schemaToResolve, data) {
     var _a;
     const schema = { ...((_a = draft.resolveRef(schemaToResolve)) !== null && _a !== void 0 ? _a : {}) };
     const ifSchema = resolveIfSchema(draft, schema, data);
