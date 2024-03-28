@@ -8,7 +8,7 @@ import { JsonSchema, JsonPointer, isJsonError } from "./types";
 import { Draft } from "./draft";
 import { isEmpty } from "./utils/isEmpty";
 import { resolveIfSchema } from "./features/if";
-import { mergeAllOfSchema } from "./features/allOf";
+import { mergeAllOfSchema, resolveSchema } from "./features/allOf";
 import { resolveDependencies } from "./features/dependencies";
 import { mergeSchema } from "./mergeSchema";
 
@@ -78,7 +78,8 @@ function createTemplateSchema(
     draft: Draft,
     schema: JsonSchema,
     data: unknown,
-    pointer: JsonPointer
+    pointer: JsonPointer,
+    opts: TemplateOptions
 ): JsonSchema | false {
     // invalid schema
     if (getTypeOf(schema) !== "object") {
@@ -111,7 +112,17 @@ function createTemplateSchema(
             .reduceRight((next, before) => next && before, true);
 
         if (mayResolve) {
-            const resolvedSchema = mergeAllOfSchema(draft, schema);
+            // before merging all-of, we need to resolve all if-then-else statesments
+            // we need to udpate data on the way to trigger if-then-else schemas sequentially.
+            // Note that this will make if-then-else order-dependent
+            const allOf = [];
+            let extendedData = copy(data);
+            for (let i = 0; i < schema.allOf.length; i += 1) {
+                allOf.push(resolveSchema(draft, schema.allOf[i], extendedData));
+                extendedData = getTemplate(draft, extendedData, { type: schema.type, ...allOf[i] }, `${pointer}/allOf/${i}`, opts);
+            }
+
+            const resolvedSchema = mergeAllOfSchema(draft, { allOf });
             if (resolvedSchema) {
                 templateSchema = mergeSchema(templateSchema, resolvedSchema);
             }
@@ -148,7 +159,7 @@ function getTemplate(
     }
 
     // resolve $ref references, allOf and first anyOf definitions
-    let schema = createTemplateSchema(draft, _schema, data, pointer);
+    let schema = createTemplateSchema(draft, _schema, data, pointer, opts);
     if (!isJsonSchema(schema)) {
         return undefined;
     }
@@ -376,7 +387,7 @@ const TYPE: Record<
         }
 
         // resolve allOf and first anyOf definition
-        const templateSchema = createTemplateSchema(draft, schema.items, data, pointer);
+        const templateSchema = createTemplateSchema(draft, schema.items, data, pointer, opts);
         if (templateSchema === false) {
             return d;
         }

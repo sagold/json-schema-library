@@ -143,6 +143,51 @@ describe("getTemplate - v7", () => {
                     dynamic: "from else"
                 });
             });
+
+            it("should incrementally resolve multiple 'then'-schema", () => {
+                draft.setSchema({
+                    type: "object",
+                    required: ["trigger"],
+                    properties: {
+                        trigger: { type: "boolean" }
+                    },
+                    allOf: [
+                        {
+                            if: {
+                                properties: {
+                                    trigger: { const: true }
+                                }
+                            },
+                            then: {
+                                required: ["additionalSchema"],
+                                properties: {
+                                    additionalSchema: { type: "string", default: "additional" }
+                                }
+                            }
+                        },
+                        {
+                            if: {
+                                required: ["additionalSchema"],
+                                properties: {
+                                    additionalSchema: { minLength: 5 }
+                                }
+                            },
+                            then: {
+                                required: ["anotherSchema"],
+                                properties: {
+                                    anotherSchema: { type: "string", default: "another" }
+                                }
+                            }
+                        }
+                    ]
+                });
+                const res = getTemplate(draft, { trigger: true }, draft.getSchema());
+                expect(res).to.deep.equal({
+                    trigger: true,
+                    additionalSchema: "additional",
+                    anotherSchema: "another"
+                });
+            });
         });
     });
 });
