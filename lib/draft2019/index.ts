@@ -59,6 +59,8 @@ const draft2019Config: DraftConfig = {
             "allOf",
             "anyOf",
             "dependencies",
+            "dependentSchemas",
+            "dependentRequired",
             "enum",
             "format",
             "if",

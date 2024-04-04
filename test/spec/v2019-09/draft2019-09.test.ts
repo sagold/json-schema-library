@@ -9,11 +9,28 @@ const cache = new Draft2019();
 cache.addRemoteSchema("http://json-schema.org/draft-2019-09/schema", draft2019Meta);
 addRemotes(cache);
 
-const supportedTestCases = (t: FeatureTest) => !t.optional && t.name === "unevaluatedItems"
+const supportedTestCases = (t: FeatureTest) => !t.optional && ![
+    // todo list
+    "anchor",
+    "defs",
+    "dependentRequired",
+    "id",
+    "maxContains",
+    "minContains",
+    "not",
+    "recursiveRef",
+    "ref",
+    "refRemote",
+    "vocabulary"
+].includes(t.name)
 const draftFeatureTests = getDraftTests("2019-09")
     .filter(supportedTestCases);
 
 /*
+~ dependentRequired
+~ not
+~ unevaluatedItems
+~ unevaluatedProperties - expect for one test
 ✓ additionalItems
 ✓ additionalProperties
 ✓ allOf
@@ -23,6 +40,7 @@ const draftFeatureTests = getDraftTests("2019-09")
 ✓ contains
 ✓ content
 ✓ default
+✓ dependentSchemas
 ✓ enum
 ✓ exclusiveMaximum
 ✓ exclusiveMinimum
@@ -46,21 +64,16 @@ const draftFeatureTests = getDraftTests("2019-09")
 ✓ propertyNames
 ✓ required
 ✓ type
-✓ unevaluatedProperties - expect for one test
 ✓ uniqueItems
 ✓ unknownKeyword
 ✖ anchor
 ✖ defs
-✖ dependentRequired
-✖ dependentSchemas
 ✖ id
 ✖ maxContains
 ✖ minContains
-✖ not
 ✖ recursiveRef
 ✖ ref
 ✖ refRemote
-✖ unevaluatedItems
 ✖ vocabulary - skipped evaluation of meta-schema
 */
 

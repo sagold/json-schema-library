@@ -65,35 +65,37 @@ const validateDependencies: JsonValidator = (
     value: Record<string, unknown>,
     pointer
 ) => {
-    if (getTypeOf(schema.dependencies) !== "object") {
+    // @draft >= 2019-09 dependentSchemas
+    const dependencies = schema.dependencies ?? schema.dependentSchemas;
+    if (getTypeOf(dependencies) !== "object") {
         return undefined;
     }
 
     const errors: JsonError[] = [];
     Object.keys(value).forEach((property) => {
-        if (schema.dependencies[property] === undefined) {
+        if (dependencies[property] === undefined) {
             return;
         }
 
         // @draft >= 6 boolean schema
-        if (schema.dependencies[property] === true) {
+        if (dependencies[property] === true) {
             return;
         }
-        if (schema.dependencies[property] === false) {
+        if (dependencies[property] === false) {
             errors.push(draft.errors.missingDependencyError({ pointer, schema, value }));
             return;
         }
 
         let dependencyErrors;
-        const type = getTypeOf(schema.dependencies[property]);
+        const type = getTypeOf(dependencies[property]);
         if (type === "array") {
-            dependencyErrors = schema.dependencies[property]
+            dependencyErrors = dependencies[property]
                 .filter((dependency: any) => value[dependency] === undefined)
                 .map((missingProperty: any) =>
                     draft.errors.missingDependencyError({ missingProperty, pointer, schema, value })
                 );
         } else if (type === "object") {
-            dependencyErrors = draft.validate(value, schema.dependencies[property], pointer);
+            dependencyErrors = draft.validate(value, dependencies[property], pointer);
         } else {
             throw new Error(
                 `Invalid dependency definition for ${pointer}/${property}. Must be string[] or schema`

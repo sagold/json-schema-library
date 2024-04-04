@@ -3,9 +3,12 @@ import getTypeOf from "../../getTypeOf";
 import { JsonValidator, JsonError } from "../../types";
 import { isObject } from "../../utils/isObject";
 import { reduceSchema } from "../../reduceSchema";
+import { validateDependencies } from "../../features/dependencies";
 
 const KeywordValidation: Record<string, JsonValidator> = {
     ...Keywords,
+    dependentSchemas: validateDependencies,
+    dependentRequired: validateDependencies,
     /**
      * @draft >= 2019-09
      * Similar to additionalProperties, but can "see" into subschemas and across references
