@@ -76,6 +76,65 @@ const KeywordValidation: Record<string, JsonValidator> = {
             errors.push(...keyErrors);
         });
         return errors;
+    },
+    /**
+     * @draft >= 2019-09
+     * Similar to additionalItems, but can "see" into subschemas and across references
+     * https://json-schema.org/draft/2019-09/json-schema-core#rfc.section.9.3.1.3
+     */
+    unevaluatedItems: (draft, schema, value: unknown[], pointer) => {
+        // if not in items, and not matches additionalItems
+        if (!Array.isArray(value) || schema.unevaluatedItems == null) {
+            return undefined;
+        }
+
+        // resolve all dynamic schemas
+        const resolvedSchema = reduceSchema(draft, schema, value, pointer);
+        if (resolvedSchema.unevaluatedItems === true || resolvedSchema.additionalItems === true) {
+            return undefined;
+        }
+
+        if (isObject(resolvedSchema.items)) {
+            const errors = draft.validate(value, { ...resolvedSchema, unevaluatedItems: undefined }, pointer);
+            return errors.map(e => draft.errors.unevaluatedItemsError({ ...e.data }));
+        }
+
+        if (Array.isArray(resolvedSchema.items)) {
+            const items: { index: number, value: unknown }[] = [];
+            for (let i = resolvedSchema.items.length; i < value.length; i += 1) {
+                items.push({ index: i, value: value[i] });
+            }
+            return items.map(item => draft.errors.unevaluatedItemsError({
+                pointer: `${pointer}/${item.index}`,
+                value: JSON.stringify(item.value),
+                schema: resolvedSchema.unevaluatedItems
+            }))
+        }
+
+        if (isObject(resolvedSchema.unevaluatedItems)) {
+            return value.map((item, index) => {
+                if (!draft.isValid(item, resolvedSchema.unevaluatedItems)) {
+                    return draft.errors.unevaluatedItemsError({
+                        pointer: `${pointer}/${index}`,
+                        value: JSON.stringify(item),
+                        schema: resolvedSchema.unevaluatedItems
+                    });
+                }
+            });
+            // const errors = draft.validate(value, { ...schema, unevaluatedItems: undefined }, pointer);
+            // return errors.map(e => draft.errors.unevaluatedItemsError({ ...e.data }));
+        }
+
+        const errors: JsonError[] = [];
+        value.forEach((item, index) => {
+            errors.push(draft.errors.unevaluatedItemsError({
+                pointer: `${pointer}/${index}`,
+                value: JSON.stringify(item),
+                schema
+            }))
+        })
+
+        return errors;
     }
 };
 

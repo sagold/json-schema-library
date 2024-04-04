@@ -50,6 +50,7 @@ const draft2019Config: DraftConfig = {
             "minItems",
             "not",
             "oneOf",
+            "unevaluatedItems",
             "uniqueItems"
         ],
         boolean: ["allOf", "anyOf", "enum", "not", "oneOf"],
