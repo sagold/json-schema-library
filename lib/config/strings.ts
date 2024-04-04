@@ -52,6 +52,7 @@ export default {
     SchemaWarning: "Failed retrieving a schema from '{{pointer}}' to key '{{key}}'",
     TypeError: "Expected `{{value}}` ({{received}}) in `{{pointer}}` to be of type `{{expected}}`",
     UndefinedValueError: "Value must not be undefined in `{{pointer}}`",
+    UnevaluatedPropertyError: "Invalid unevaluated property `{{pointer}}`",
     UniqueItemsError: "Items in array must be unique. Value `{{value}}` in `{{pointer}}` is a duplicate of {{duplicatePointer}}.",
     UnknownPropertyError: "Could not find a valid schema for property `{{pointer}}` within object",
     ValueNotEmptyError: "A value for `{{property}}` is required at `{{pointer}}`"

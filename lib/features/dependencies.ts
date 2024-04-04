@@ -20,7 +20,8 @@ export function resolveDependencies(
     schema: JsonSchema,
     data: unknown
 ): JsonSchema | undefined {
-    const { dependencies } = schema;
+    // @draft >= 2019-09 dependentSchemas
+    const dependencies = schema.dependencies ?? schema.dependentSchemas;
     if (!isObject(dependencies) || !isObject(data)) {
         return;
     }

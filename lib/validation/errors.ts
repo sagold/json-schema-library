@@ -55,6 +55,7 @@ const errors: Record<string, CreateError> = {
     schemaWarning: createCustomError("SchemaWarning"),
     typeError: createCustomError("TypeError"),
     undefinedValueError: createCustomError("UndefinedValueError"),
+    unevaluatedPropertyError: createCustomError("UnevaluatedPropertyError"),
     uniqueItemsError: createCustomError("UniqueItemsError"),
     unknownPropertyError: createCustomError("UnknownPropertyError"),
     valueNotEmptyError: createCustomError("ValueNotEmptyError")
