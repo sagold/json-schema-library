@@ -10,21 +10,20 @@ function eachProperty(
     pointer: JsonPointer
 ) {
     const target = schema[property];
-    if (isObject(target)) {
-        const keys = Object.keys(target);
-        if (property === "dependencies") {
-            keys.forEach(key => {
-                // ignore depndencies list (of properties)
-                if (!Array.isArray(target[key])) {
-                    eachSchema(target[key], callback, `${pointer}/${property}/${key}`);
-                }
-            });
+    if (!isObject(target)) {
+        return;
+    }
+    Object.keys(target).forEach(key => {
+        if (Array.isArray(target[key])) {
+            // ignore depndencies list (of properties)
             return;
         }
-        keys.forEach(key => {
+        if (key === "$defs") {
+            eachProperty("$defs", target[key], callback, `${pointer}/${property}/$defs`);
+        } else {
             eachSchema(target[key], callback, `${pointer}/${property}/${key}`);
-        });
-    }
+        }
+    });
 }
 
 function eachItem(
@@ -34,11 +33,10 @@ function eachItem(
     pointer: JsonPointer
 ) {
     const target = schema[property];
-    if (Array.isArray(target)) {
-        target.forEach((s, key) => {
-            eachSchema(s, callback, `${pointer}/${property}/${key}`);
-        });
+    if (!Array.isArray(target)) {
+        return;
     }
+    target.forEach((s, key) => eachSchema(s, callback, `${pointer}/${property}/${key}`));
 }
 
 
