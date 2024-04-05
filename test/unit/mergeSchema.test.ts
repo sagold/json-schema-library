@@ -37,4 +37,40 @@ describe("mergeSchema", () => {
             one: { type: "string", minLength: 1, maxLength: 2 }
         });
     });
+    it("should overwrite properties by last argument", () => {
+        const schema = mergeSchema({ type: "array" }, { type: "object" });
+        expect(schema.type).to.equal("object");
+    });
+
+    it("should overwrite items by last argument", () => {
+        const schema = mergeSchema(
+            { type: "array", items: [{ type: "string" }] },
+            { type: "array", items: [true] }
+        );
+        expect(schema.items).to.deep.equal([true]);
+    });
+
+    it("should merge items of same type", () => {
+        const schema = mergeSchema(
+            { type: "array", items: [{ type: "string", minLength: 1 }] },
+            { type: "array", items: [{ type: "string", maxLength: 9 }] }
+        );
+        expect(schema.items).to.deep.equal([{ type: "string", minLength: 1, maxLength: 9 }]);
+    });
+
+    it("should not merge items of different type", () => {
+        const schema = mergeSchema(
+            { type: "array", items: [{ type: "number", minimum: 1 }] },
+            { type: "array", items: [{ type: "string", maxLength: 9 }] }
+        );
+        expect(schema.items).to.deep.equal([{ type: "string", maxLength: 9 }]);
+    });
+
+    it("should replace items by last argument", () => {
+        const schema = mergeSchema(
+            { type: "array", items: [{ type: "string" }, { type: "number" }] },
+            { type: "array", items: [{ type: "boolean" }] }
+        );
+        expect(schema.items).to.deep.equal([{ type: "boolean" }]);
+    });
 });
