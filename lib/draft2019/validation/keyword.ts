@@ -1,9 +1,39 @@
 import Keywords from "../../draft06/validation/keyword";
-import getTypeOf from "../../getTypeOf";
-import { JsonValidator, JsonError } from "../../types";
+import { JsonValidator, JsonError, JsonSchema } from "../../types";
 import { isObject } from "../../utils/isObject";
 import { reduceSchema } from "../../reduceSchema";
 import { validateDependencies } from "../../features/dependencies";
+import { Draft } from "../../draft";
+
+
+/**
+ * Get a list of tests to search for a matching pattern to a property
+ */
+const getPatternTests = (patternProperties: unknown) => isObject(patternProperties) ?
+    Object.keys(patternProperties).map((pattern) => new RegExp(pattern))
+    : []
+
+/** tests if a property is evaluated */
+function isEvaluated(draft: Draft, objectSchema: JsonSchema, propertyName: string, value: unknown) {
+    const schema = draft.resolveRef(objectSchema);
+    if (schema.additionalProperties === true) {
+        return true;
+    }
+    // PROPERTIES
+    if (schema.properties?.[propertyName] && draft.isValid(value, schema.properties?.[propertyName])) {
+        return true;
+    }
+    // PATTERN-PROPERTIES
+    const patterns = getPatternTests(schema.patternProperties);
+    if (patterns.find(pattern => pattern.test(propertyName))) {
+        return true;
+    }
+    // ADDITIONAL-PROPERTIES
+    if (isObject(schema.additionalProperties)) {
+        return draft.validate(value, schema.additionalProperties);
+    }
+    return false;
+}
 
 const KeywordValidation: Record<string, JsonValidator> = {
     ...Keywords,
@@ -15,6 +45,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
      * https://json-schema.org/draft/2019-09/json-schema-core#rfc.section.9.3.2.4
      */
     unevaluatedProperties: (draft, schema, value: Record<string, unknown>, pointer) => {
+
         // if not in properties, evaluated by additionalProperties and not matches patternProperties
         // @todo we need to know dynamic parent statements - they should not be counted as evaluated...
         if (!isObject(value) || schema.unevaluatedProperties == null) {
@@ -27,28 +58,23 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         // resolve all dynamic schemas
         const resolvedSchema = reduceSchema(draft, schema, value, pointer);
-
-        let patterns: RegExp[];
-        if (getTypeOf(resolvedSchema.patternProperties) === "object") {
-            patterns = Object.keys(resolvedSchema.patternProperties).map(
-                (pattern) => new RegExp(pattern)
-            );
+        // console.log("unevaluatedProperties", JSON.stringify(resolvedSchema, null, 2), value);
+        if (resolvedSchema.unevaluatedProperties === true) {
+            return undefined;
         }
+
+        const testPatterns = getPatternTests(resolvedSchema.patternProperties);
+
         properties = properties.filter(key => {
             if (resolvedSchema.properties?.[key]) {
                 return false;
             }
             // special case: an evaluation in if statement counts too
-            // @attention - this might miss different configurations
-            const ifSchema = schema.if;
-            if (isObject(ifSchema?.properties) && ifSchema.properties?.[key]) {
-                // we have an unevaluated prop only if the if-schema does not match
-                const ifErrors = draft.validate(value, draft.resolveRef(schema.if));
-                if (ifErrors.length === 0) {
-                    return false;
-                }
+            // we have an unevaluated prop only if the if-schema does not match
+            if (isObject(schema.if) && isEvaluated(draft, { type: "object", ...schema.if }, key, value[key])) {
+                return false;
             }
-            if (patterns && patterns.find(pattern => pattern.test(key))) {
+            if (testPatterns.find(pattern => pattern.test(key))) {
                 return false;
             }
             // @todo is this evaluated by additionaProperties per property
