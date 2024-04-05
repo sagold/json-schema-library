@@ -20,21 +20,7 @@ import validate from "../validate";
 import { DraftConfig, Draft } from "../draft";
 import { JsonSchema } from "../types";
 import settings from "../config/settings";
-// import resolveRef from "../resolveRef.merge"; // @attention we now merge refs?
-import { mergeSchema } from "../mergeSchema";
-function resolveRef(schema: JsonSchema, rootSchema: JsonSchema): JsonSchema {
-    if (schema == null || schema.$ref == null) {
-        return schema;
-    }
-    const resolvedSchema = rootSchema.getRef(schema);
-    // @draft >= 2019-09 we now merge schemas?
-    const mergedSchema = mergeSchema(schema, resolvedSchema);
-    delete mergedSchema.$ref;
-    // @todo the following might not be safe nor incomplete
-    Object.defineProperty(mergedSchema, "__ref", { enumerable: false, value: schema.__ref });
-    Object.defineProperty(mergedSchema, "getRoot", { enumerable: false, value: schema.getRoot });
-    return mergedSchema;
-}
+import resolveRef from "../resolveRef.merge";
 
 
 const draft2019Config: DraftConfig = {

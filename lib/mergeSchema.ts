@@ -46,12 +46,16 @@ export function mergeSchema<T extends JsonSchema>(a: T, b: T): T {
     }
 
     const schema = mergeSchema2(a, b) as T;
-    if (a.getOneOfOrigin) {
+    if (!isObject(schema)) {
+        return schema;
+    }
+
+    if (a?.getOneOfOrigin) {
         Object.defineProperty(schema, "getOneOfOrigin", {
             enumerable: false,
             value: a.getOneOfOrigin
         });
-    } else if (b.getOneOfOrigin) {
+    } else if (b?.getOneOfOrigin) {
         Object.defineProperty(schema, "getOneOfOrigin", {
             enumerable: false,
             value: b.getOneOfOrigin
