@@ -10,7 +10,7 @@ cache.addRemoteSchema("http://json-schema.org/draft-2019-09/schema", draft2019Me
 addRemotes(cache);
 
 const supportedTestCases = (t: FeatureTest) => !t.optional
-    && t.name === "unevaluatedProperties"
+    && t.name === "unevaluatedItems"
     && ![
         // todo list
         "anchor",
@@ -30,7 +30,7 @@ const draftFeatureTests = getDraftTests("2019-09")
 ~ dependentRequired
 ~ not
 ~ unevaluatedItems
-~ unevaluatedProperties - expect for one test
+~ unevaluatedProperties - expect for uncle-schema support
 ✓ additionalItems
 ✓ additionalProperties
 ✓ allOf
@@ -88,28 +88,23 @@ const postponedTestcases = [
     // this tests expects knowledge of a parent-allOf statement
     // we currently do not have the logic for this
     "property is evaluated in an uncle schema to unevaluatedProperties",
-    // @todo when recursiveRef is not implemented
+    // @todo when recursiveRef is implemented
     "unevaluatedProperties with $recursiveRef",
+    "unevaluatedItems with $recursiveRef",
     // @todo unevaluatedItems
+    // https://stackoverflow.com/questions/66936884/deeply-nested-unevaluatedproperties-and-their-expectations
+    // this tests expects knowledge of a parent-allOf statement
+    // we currently do not have the logic for this
     "item is evaluated in an uncle schema to unevaluatedItems",
-    "when one schema matches and has no unevaluated items",
-    // @todo unevaluatedItems with nested tuple
-    // this is a bug in mergeSchema, where we should not append items-array in allOf
-    "unevaluatedItems with nested tuple",
-    "unevaluatedItems with anyOf",
-    "unevaluatedItems with oneOf",
-    // "unevaluatedItems with if/then/else",
-    "unevaluatedItems with $ref"
 ];
 
 
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "unevaluatedProperties with if/then/else") {
+            // if (testCase.description !== "unevaluatedItems with if/then/else") {
             //     return;
             // }
-
             const schema = testCase.schema;
             if (skipTest.includes(testCase.description)) {
                 console.log(`Unsupported '${testCase.description}'`);

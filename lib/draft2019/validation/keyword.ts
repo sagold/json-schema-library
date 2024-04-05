@@ -14,7 +14,7 @@ const getPatternTests = (patternProperties: unknown) => isObject(patternProperti
     : []
 
 /** tests if a property is evaluated */
-function isEvaluated(draft: Draft, objectSchema: JsonSchema, propertyName: string, value: unknown) {
+function isPropertyEvaluated(draft: Draft, objectSchema: JsonSchema, propertyName: string, value: unknown) {
     const schema = draft.resolveRef(objectSchema);
     if (schema.additionalProperties === true) {
         return true;
@@ -51,8 +51,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
         if (!isObject(value) || schema.unevaluatedProperties == null) {
             return undefined;
         }
-        let properties = Object.keys(value);
-        if (properties.length === 0) {
+        let unevaluated = Object.keys(value);
+        if (unevaluated.length === 0) {
             return undefined;
         }
 
@@ -65,13 +65,13 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         const testPatterns = getPatternTests(resolvedSchema.patternProperties);
 
-        properties = properties.filter(key => {
+        unevaluated = unevaluated.filter(key => {
             if (resolvedSchema.properties?.[key]) {
                 return false;
             }
             // special case: an evaluation in if statement counts too
             // we have an unevaluated prop only if the if-schema does not match
-            if (isObject(schema.if) && isEvaluated(draft, { type: "object", ...schema.if }, key, value[key])) {
+            if (isObject(schema.if) && isPropertyEvaluated(draft, { type: "object", ...schema.if }, key, value[key])) {
                 return false;
             }
             if (testPatterns.find(pattern => pattern.test(key))) {
@@ -84,13 +84,13 @@ const KeywordValidation: Record<string, JsonValidator> = {
             return true;
         });
 
-        if (properties.length === 0) {
+        if (unevaluated.length === 0) {
             return undefined;
         }
 
         const errors: JsonError[] = [];
         if (resolvedSchema.unevaluatedProperties === false) {
-            properties.forEach(key => {
+            unevaluated.forEach(key => {
                 errors.push(draft.errors.unevaluatedPropertyError({
                     pointer: `${pointer}/${key}`,
                     value: JSON.stringify(value[key]),
@@ -100,7 +100,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
             return errors;
         }
 
-        properties.forEach(key => {
+        unevaluated.forEach(key => {
             const keyErrors = draft.validate(value[key], resolvedSchema.unevaluatedProperties, `${pointer}/${key}`);
             errors.push(...keyErrors);
         });
@@ -113,14 +113,25 @@ const KeywordValidation: Record<string, JsonValidator> = {
      */
     unevaluatedItems: (draft, schema, value: unknown[], pointer) => {
         // if not in items, and not matches additionalItems
-        if (!Array.isArray(value) || schema.unevaluatedItems == null) {
+        if (!Array.isArray(value) || value.length === 0 || schema.unevaluatedItems == null || schema.unevaluatedItems === true) {
             return undefined;
         }
 
         // resolve all dynamic schemas
-        const resolvedSchema = reduceSchema(draft, schema, value, pointer);
+        const resolvedSchema = reduceSchema(draft, draft.resolveRef(schema), value, pointer);
+        // console.log("unevaluatedItems", JSON.stringify(resolvedSchema, null, 2), value);
         if (resolvedSchema.unevaluatedItems === true || resolvedSchema.additionalItems === true) {
             return undefined;
+        }
+
+        if (isObject(schema.if)) {
+            const ifSchema: JsonSchema = { type: "array", ...schema.if };
+            if (draft.isValid(value, ifSchema)) {
+                if (Array.isArray(ifSchema.items) && ifSchema.items.length === value.length) {
+                    return undefined
+                }
+            }
+            // need to test remaining items?
         }
 
         if (isObject(resolvedSchema.items)) {
@@ -131,7 +142,13 @@ const KeywordValidation: Record<string, JsonValidator> = {
         if (Array.isArray(resolvedSchema.items)) {
             const items: { index: number, value: unknown }[] = [];
             for (let i = resolvedSchema.items.length; i < value.length; i += 1) {
-                items.push({ index: i, value: value[i] });
+                if (i < resolvedSchema.items.length) {
+                    if (!draft.isValid(value[i], resolvedSchema.items[i])) {
+                        items.push({ index: i, value: value[i] });
+                    }
+                } else {
+                    items.push({ index: i, value: value[i] });
+                }
             }
             return items.map(item => draft.errors.unevaluatedItemsError({
                 pointer: `${pointer}/${item.index}`,
