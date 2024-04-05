@@ -28,7 +28,7 @@ function resolveRef(schema: JsonSchema, rootSchema: JsonSchema): JsonSchema {
     }
     const resolvedSchema = rootSchema.getRef(schema);
     // @draft >= 2019-09 we now merge schemas?
-    const mergedSchema = mergeSchema(resolvedSchema, schema);
+    const mergedSchema = mergeSchema(schema, resolvedSchema);
     delete mergedSchema.$ref;
     // @todo the following might not be safe nor incomplete
     Object.defineProperty(mergedSchema, "__ref", { enumerable: false, value: schema.__ref });
