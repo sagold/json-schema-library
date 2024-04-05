@@ -20,7 +20,6 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
     }
 
     let schema;
-
     // is it a known $ref?
     const $remote = $ref.replace(suffixes, "");
     if (context.remotes[$remote]) {
@@ -33,7 +32,8 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
     if (context.ids[$ref]) {
         schema = get(rootSchema, context.ids[$ref]);
         if (schema && schema.$ref) {
-            return getRef(context, rootSchema, schema.$ref);
+            // @todo add missing test for the following line
+            return getRef(context, schema, schema.$ref);
         }
         return schema;
     }
@@ -62,7 +62,6 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
     if (fragments.length === 2) {
         const base = fragments[0];
         $ref = fragments[1];
-
         if (context.remotes[base]) {
             if (context.remotes[base].getRef) {
                 return context.remotes[base].getRef($ref);
