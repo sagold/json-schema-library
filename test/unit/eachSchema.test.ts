@@ -15,8 +15,7 @@ describe("eachSchema", () => {
         expect(firstCall).to.eq(rootSchema);
     });
 
-    // maybe not. This would remove simple pointer config
-    it.skip("should call on unspecified properties", () => {
+    it("should call on unspecified properties", () => {
         const calls: unknown[] = [];
         const rootSchema = {
             type: "object",
@@ -48,6 +47,21 @@ describe("eachSchema", () => {
         expect(calls[1].pointer).to.eq("/properties/first");
         expect(calls[2].schema).to.eq(rootSchema.properties.second);
         expect(calls[2].pointer).to.eq("/properties/second");
+    });
+
+    it("should call on each property schema if type is missing", () => {
+        const calls: Record<string, unknown>[] = [];
+        const rootSchema = {
+            properties: {
+                first: { type: "string" },
+                second: { type: "number" }
+            },
+            "$ref": "schema-relative-uri-defs2.json"
+        };
+
+        eachSchema(rootSchema, (schema, pointer) => calls.push({ schema, pointer }));
+
+        expect(calls.length).to.eq(3);
     });
 
     it("should call on each item schema", () => {
@@ -186,7 +200,7 @@ describe("eachSchema", () => {
         expect(calls[1]).to.eq(rootSchema.additionalProperties);
     });
 
-    it("should ignore depedency list", () => {
+    it("should ignore dependency list", () => {
         const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             dependencies: {
@@ -199,7 +213,7 @@ describe("eachSchema", () => {
         expect(calls.length).to.eq(1);
     });
 
-    it("should call on each depedency schema", () => {
+    it("should call on each dependency schema", () => {
         const calls: Record<string, unknown>[] = [];
         const rootSchema = {
             type: "object",
