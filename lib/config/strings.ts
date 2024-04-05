@@ -9,6 +9,8 @@ export default {
     containsAnyError: "The array at `{{pointer}}` must contain at least one item",
     ContainsArrayError: "The property at `{{pointer}}` must not be an array",
     ContainsError: "The array at `{{pointer}}` must contain an element that matches `{{schema}}`",
+    ContainsMinError: "The array at `{{pointer}}` contains {{delta}} too few items matching `{{schema}}`",
+    ContainsMaxError: "The array at `{{pointer}}` contains {{delta}} too many items matching `{{schema}}`",
     EnumError: "Expected given value `{{value}}` in `{{pointer}}` to be one of `{{values}}`",
     ForbiddenPropertyError: "Property name `{{property}}` at `{{pointer}}` is not allowed",
     FormatDateError: "Value `{{value}}` at `{{pointer}}` is not a valid date",

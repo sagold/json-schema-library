@@ -9,20 +9,19 @@ const cache = new Draft2019();
 cache.addRemoteSchema("http://json-schema.org/draft-2019-09/schema", draft2019Meta);
 addRemotes(cache);
 
-const supportedTestCases = (t: FeatureTest) => !t.optional && ![
-    // todo list
-    "anchor",
-    "defs",
-    "dependentRequired",
-    "id",
-    "maxContains",
-    "minContains",
-    "not",
-    "recursiveRef",
-    "ref",
-    "refRemote",
-    "vocabulary"
-].includes(t.name)
+const supportedTestCases = (t: FeatureTest) => !t.optional
+    && ![
+        // todo list
+        "anchor",
+        "defs",
+        "dependentRequired",
+        "id",
+        "not",
+        "recursiveRef",
+        "ref",
+        "refRemote",
+        "vocabulary"
+    ].includes(t.name)
 const draftFeatureTests = getDraftTests("2019-09")
     .filter(supportedTestCases);
 
@@ -48,10 +47,12 @@ const draftFeatureTests = getDraftTests("2019-09")
 ✓ if-then-else
 ✓ infinite-loop-detection
 ✓ items
+✓ maxContains
 ✓ maximum
 ✓ maxItems
 ✓ maxLength
 ✓ maxProperties
+✓ minContains
 ✓ minimum
 ✓ minItems
 ✓ minLength
@@ -69,8 +70,6 @@ const draftFeatureTests = getDraftTests("2019-09")
 ✖ anchor
 ✖ defs
 ✖ id
-✖ maxContains
-✖ minContains
 ✖ recursiveRef
 ✖ ref
 ✖ refRemote
@@ -78,7 +77,7 @@ const draftFeatureTests = getDraftTests("2019-09")
 */
 
 
-const postPonedTestcases = [
+const postponedTestcases = [
     // @todo vocabulary
     // we need to evaluate meta-schema for supported validation methods
     // we currently do not have the logic for this
@@ -97,7 +96,7 @@ const postPonedTestcases = [
     "unevaluatedItems with nested tuple",
     "unevaluatedItems with anyOf",
     "unevaluatedItems with oneOf",
-    "unevaluatedItems with if/then/else",
+    // "unevaluatedItems with if/then/else",
     "unevaluatedItems with $ref"
 ];
 
@@ -105,7 +104,7 @@ const postPonedTestcases = [
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "unevaluatedItems with oneOf") {
+            // if (testCase.description !== "maxContains") {
             //     return;
             // }
 
@@ -119,7 +118,7 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
                 testCase.tests.forEach((testData) => {
                     const test = skipTest.includes(testData.description) ? it.skip : it;
 
-                    if (postPonedTestcases.includes(testCase.description)) {
+                    if (postponedTestcases.includes(testCase.description)) {
                         it.skip(testData.description, () => {});
                         return;
                     }

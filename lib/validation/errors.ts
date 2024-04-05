@@ -8,6 +8,8 @@ const errors: Record<string, CreateError> = {
     allOfError: createCustomError("AllOfError"),
     constError: createCustomError("ConstError"),
     containsError: createCustomError("ContainsError"),
+    containsMaxError: createCustomError("ContainsMaxError"),
+    containsMinError: createCustomError("ContainsMinError"),
     containsArrayError: createCustomError("ContainsArrayError"),
     containsAnyError: createCustomError("ContainsAnyError"),
     enumError: createCustomError("EnumError"),

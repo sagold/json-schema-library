@@ -23,10 +23,24 @@ const KeywordValidation: Record<string, JsonValidator> = {
             return undefined;
         }
 
+        let count = 0;
         for (let i = 0; i < value.length; i += 1) {
             if (draft.isValid(value[i], schema.contains)) {
-                return undefined;
+                count++;
             }
+        }
+
+        // @draft >= 2019-09
+        const max = schema.maxContains ?? Infinity;
+        const min = schema.minContains ?? 1;
+        if (max >= count && min <= count) {
+            return undefined;
+        }
+        if (max < count) {
+            return draft.errors.containsMaxError({ pointer, schema, delta: count - max, value });
+        }
+        if (min > count) {
+            return draft.errors.containsMinError({ pointer, schema, delta: min - count, value });
         }
         return draft.errors.containsError({ pointer, schema, value });
     },
