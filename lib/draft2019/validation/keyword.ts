@@ -2,7 +2,7 @@ import Keywords from "../../draft06/validation/keyword";
 import { JsonValidator, JsonError, JsonSchema } from "../../types";
 import { isObject } from "../../utils/isObject";
 import { reduceSchema } from "../../reduceSchema";
-import { validateDependencies } from "../../features/dependencies";
+import { validateDependentSchemas, validateDependentRequired } from "../../features/dependencies";
 import { Draft } from "../../draft";
 
 
@@ -13,7 +13,7 @@ const getPatternTests = (patternProperties: unknown) => isObject(patternProperti
     Object.keys(patternProperties).map((pattern) => new RegExp(pattern))
     : []
 
-/** tests if a property is evaluated */
+/** tests if a property is evaluated by the given schema */
 function isPropertyEvaluated(draft: Draft, objectSchema: JsonSchema, propertyName: string, value: unknown) {
     const schema = draft.resolveRef(objectSchema);
     if (schema.additionalProperties === true) {
@@ -37,8 +37,9 @@ function isPropertyEvaluated(draft: Draft, objectSchema: JsonSchema, propertyNam
 
 const KeywordValidation: Record<string, JsonValidator> = {
     ...Keywords,
-    dependentSchemas: validateDependencies,
-    dependentRequired: validateDependencies,
+    dependencies: undefined,
+    dependentSchemas: validateDependentSchemas,
+    dependentRequired: validateDependentRequired,
     /**
      * @draft >= 2019-09
      * Similar to additionalProperties, but can "see" into subschemas and across references

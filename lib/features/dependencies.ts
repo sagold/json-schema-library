@@ -1,5 +1,5 @@
 /**
- * @draft-06
+ * @draft 06, 2019-09
  */
 import { JsonSchema, JsonValidator, JsonError } from "../types";
 import getTypeOf from "../getTypeOf";
@@ -9,6 +9,7 @@ import { uniqueItems } from "../utils/uniqueItems";
 import { isObject } from "../utils/isObject";
 
 /**
+ * @todo add support for dependentRequired (draft 2019-09)
  * returns dependencies as an object json schema. does not merge with input
  * json schema. you probably will need to do so to correctly resolve
  * references.
@@ -57,17 +58,85 @@ export function resolveDependencies(
 }
 
 /**
+ * @draft 2019-09
+ */
+export const validateDependentRequired: JsonValidator = (
+    draft,
+    schema,
+    value: Record<string, unknown>,
+    pointer
+) => {
+    const dependentRequired = schema.dependentRequired;
+    if (!isObject(dependentRequired)) {
+        return undefined;
+    }
+    const errors: JsonError[] = [];
+    Object.keys(value).forEach((property) => {
+        const dependencies = dependentRequired[property];
+        // @draft >= 6 boolean schema
+        if (dependencies === true) {
+            return;
+        }
+        if (dependencies === false) {
+            errors.push(draft.errors.missingDependencyError({ pointer, schema, value }));
+            return;
+        }
+        if (!Array.isArray(dependencies)) {
+            return;
+        }
+        for (let i = 0, l = dependencies.length; i < l; i += 1) {
+            if (value[dependencies[i]] === undefined) {
+                errors.push(draft.errors.missingDependencyError({ missingProperty: dependencies[i], pointer, schema, value }));
+            }
+        }
+    });
+    return errors;
+};
+
+/**
+ * @draft 2019-09
+ */
+export const validateDependentSchemas: JsonValidator = (
+    draft,
+    schema,
+    value: Record<string, unknown>,
+    pointer
+) => {
+    const dependentSchemas = schema.dependentSchemas;
+    if (!isObject(dependentSchemas)) {
+        return undefined;
+    }
+    const errors: JsonError[] = [];
+    Object.keys(value).forEach((property) => {
+        const dependencies = dependentSchemas[property];
+        // @draft >= 6 boolean schema
+        if (dependencies === true) {
+            return;
+        }
+        if (dependencies === false) {
+            errors.push(draft.errors.missingDependencyError({ pointer, schema, value }));
+            return;
+        }
+        if (!isObject(dependencies)) {
+            return;
+        }
+        draft.validate(value, dependencies, pointer).map(error => errors.push(error));
+    });
+    return errors;
+};
+
+/**
  * validate dependencies definition for given input data
  */
-const validateDependencies: JsonValidator = (
+export const validateDependencies: JsonValidator = (
     draft,
     schema,
     value: Record<string, unknown>,
     pointer
 ) => {
     // @draft >= 2019-09 dependentSchemas
-    const dependencies = schema.dependencies ?? schema.dependentSchemas;
-    if (getTypeOf(dependencies) !== "object") {
+    const dependencies = schema.dependencies;
+    if (!isObject(dependencies)) {
         return undefined;
     }
 
@@ -76,7 +145,6 @@ const validateDependencies: JsonValidator = (
         if (dependencies[property] === undefined) {
             return;
         }
-
         // @draft >= 6 boolean schema
         if (dependencies[property] === true) {
             return;
@@ -85,11 +153,11 @@ const validateDependencies: JsonValidator = (
             errors.push(draft.errors.missingDependencyError({ pointer, schema, value }));
             return;
         }
-
         let dependencyErrors;
         const type = getTypeOf(dependencies[property]);
-        if (type === "array") {
-            dependencyErrors = dependencies[property]
+        const propertyValue = dependencies[property];
+        if (Array.isArray(propertyValue)) {
+            dependencyErrors = propertyValue
                 .filter((dependency: any) => value[dependency] === undefined)
                 .map((missingProperty: any) =>
                     draft.errors.missingDependencyError({ missingProperty, pointer, schema, value })
@@ -107,5 +175,3 @@ const validateDependencies: JsonValidator = (
 
     return errors.length > 0 ? errors : undefined;
 };
-
-export { validateDependencies };
