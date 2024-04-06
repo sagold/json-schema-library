@@ -19,21 +19,28 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
         return rootSchema;
     }
 
-    // console.log("$ref", $ref);
+    console.log("$ref", $ref);
 
     let schema;
     // is it a known $ref?
     const $remote = $ref.replace(suffixes, "");
     if (context.remotes[$remote] != null) {
-        // console.log("» remote");
+        console.log("» remote");
         schema = context.remotes[$remote];
         if (schema && schema.$ref) {
             return getRef(context, rootSchema, schema.$ref);
         }
         return schema;
     }
+
+    // @ts-expect-error @draft 2019-09
+    const $anchor = context.anchors?.[$ref];
+    if ($anchor) {
+        return get(rootSchema, $anchor);
+    }
+
     if (context.ids[$ref] != null) {
-        // console.log("» id");
+        console.log("» id", context.ids[$ref]);
         schema = get(rootSchema, context.ids[$ref]);
         if (schema && schema.$ref) {
             // @todo add missing test for the following line
@@ -49,7 +56,7 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
     }
 
     if (fragments.length === 1) {
-        // console.log("» frag1", fragments);
+        console.log("» frag1", fragments);
         $ref = fragments[0];
         if (context.remotes[$ref]) {
             schema = context.remotes[$ref];
@@ -65,7 +72,7 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
     }
 
     if (fragments.length === 2) {
-        // console.log("» frag2", fragments);
+        console.log("» frag2", fragments);
         const base = fragments[0];
         $ref = fragments[1];
         if (context.remotes[base]) {
@@ -80,7 +87,7 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
         }
     }
 
-    // console.log("» other");
+    console.log("» other");
     schema = get(rootSchema, context.ids[$ref] ?? $ref);
     if (schema && schema.$ref) {
         return getRef(context, rootSchema, schema.$ref);

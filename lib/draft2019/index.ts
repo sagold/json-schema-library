@@ -1,5 +1,5 @@
 import addRemoteSchema from "../addRemoteSchema";
-import compileSchema from "../draft06/compile";
+import compileSchema from "./compile";
 import { each } from "../each";
 import { eachSchema } from "../eachSchema";
 import ERRORS from "../validation/errors";
