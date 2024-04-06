@@ -7,7 +7,6 @@ import { JsonSchema } from "./types";
  * @param schema
  */
 export default function addRemoteSchema(draft: Draft, url: string, schema: JsonSchema): void {
-    // @draft >= 6
-    schema.$id = schema.$id || url;
+    schema.id = schema.id || url;
     draft.remotes[url] = draft.compileSchema(schema);
 }

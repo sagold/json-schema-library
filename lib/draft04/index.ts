@@ -1,4 +1,4 @@
-import addRemoteSchema from "../addRemoteSchema";
+import addRemoteSchema from "./addRemoteSchema";
 import compileSchema from "../compileSchema";
 import { each } from "../each";
 import { eachSchema } from "../eachSchema";

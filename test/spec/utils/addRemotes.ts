@@ -1,5 +1,5 @@
 /* eslint max-len: 0 */
-import {globSync} from "glob";
+import { globSync } from "glob";
 import path from "path";
 import { Draft } from "../../../lib/draft";
 
