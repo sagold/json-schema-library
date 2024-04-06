@@ -25,11 +25,11 @@ This library currently supports draft4, draft6, draft7 and draft2019-09 features
 `json-schema-library` exposes a `Draft` for most json-schema drafts. Each `Draft` can be instantiated and offers a common set of actions working on the specified json-schema version. Example:
 
 ```ts
-import { Draft04, Draft06, Draft07, Draft, JsonError } from "json-schema-library";
+import { Draft04, Draft06, Draft07, Draft2019, Draft, JsonError } from "json-schema-library";
 import myJsonSchema from "./myJsonSchema.json";
 import myData from "./myData.json";
 
-const jsonSchema: Draft = new Draft07(myJsonSchema);
+const jsonSchema: Draft = new Draft2019(myJsonSchema);
 const errors: JsonError[] = jsonSchema.validate(myData);
 ```
 
@@ -55,14 +55,14 @@ What follows is a description of the main draft methods.
 `validate` is a complete _json-schema validator_ for your input data. Calling _validate_ will return a list of validation errors for the passed data.
 
 ```ts
-const jsonSchema = new Draft07(myJsonSchema);
+const jsonSchema = new Draft2019(myJsonSchema);
 const errors: JsonError[] = jsonSchema.validate(myData);
 ```
 
 Additionally, you can validate a sub-schema and its data. Doing this, the intial schema will be used as rootSchema (for example, to resolve `$ref` from _definitions_).
 
 ```ts
-const jsonSchema = new Draft07(myJsonSchema);
+const jsonSchema = new Draft2019(myJsonSchema);
 const errors: JsonError[] = jsonSchema.validate("my-string", { type: "number" });
 ```
 
@@ -91,14 +91,14 @@ For more details on how to work with errors, refer to section [custom errors](#c
 <details><summary>Example</summary>
 
 ```ts
-import { Draft07, JsonSchema, JsonError } from "json-schema-library";
+import { Draft2019, JsonSchema, JsonError } from "json-schema-library";
 
 const myJsonSchema: JsonSchema = {
     type: "object",
     additionalProperties: false
 };
 
-const jsonSchema = new Draft07(myJsonSchema);
+const jsonSchema = new Draft2019(myJsonSchema);
 const errors: JsonError[] = jsonSchema.validate({ name: "my-data" });
 
 expect(errors).to.deep.equal([
@@ -117,14 +117,14 @@ expect(errors).to.deep.equal([
 <details><summary>Example with separate schema</summary>
 
 ```ts
-import { Draft07, JsonSchema, JsonError } from "json-schema-library";
+import { Draft2019, JsonSchema, JsonError } from "json-schema-library";
 
 const myJsonSchema: JsonSchema = {
     type: "object",
     additionalProperties: false
 };
 
-const jsonSchema = new Draft07(myJsonSchema);
+const jsonSchema = new Draft2019(myJsonSchema);
 const mySchema = jsonSchema.compileSchema({ type: "number" });
 const errors: JsonError[] = jsonSchema.validate("my-string", mySchema);
 
@@ -151,7 +151,7 @@ expect(errors).to.deep.equal([
 `isValid` will return `true` if the given json-data is valid against the json-schema.
 
 ```ts
-const jsonSchema = new Draft07(myJsonSchema);
+const jsonSchema = new Draft2019(myJsonSchema);
 const isValid: boolean = jsonSchema.isValid(myData);
 ```
 
@@ -162,9 +162,9 @@ const isValid: boolean = jsonSchema.isValid(myData);
 Optional support for `onError` helper, which is invoked for each error (after being resolved):
 
 ```ts
-import { Draft07, JsonError, validateAsync } from "json-schema-library";
+import { Draft2019, JsonError, validateAsync } from "json-schema-library";
 
-const draft = new Core(mySchema);
+const draft = new Draft2019(mySchema);
 
 validateAsync(draft, "", { onError: (err: JsonError) => {}, schema: draft.getSchema() }).then(
     (allErrors: JsonError[]) => {}
@@ -176,14 +176,14 @@ validateAsync(draft, "", { onError: (err: JsonError) => {}, schema: draft.getSch
 `getTemplate` creates input data from a json-schema that is valid to the schema. Where possible, the json-schema `default` property will be used to initially setup input data. Otherwise, the first values encountered (enum values, initial values, etc.) are user to build up the json-data.
 
 ```ts
-const jsonSchema = new Draft07(myJsonSchema);
+const jsonSchema = new Draft2019(myJsonSchema);
 const myData = jsonSchema.getTemplate();
 ```
 
 Additionally, you can pass input data. `getTemplate` will then complement any missing values from the schema, while keeping the initial values.
 
 ```ts
-const jsonSchema = new Draft07(myJsonSchema);
+const jsonSchema = new Draft2019(myJsonSchema);
 const myData = jsonSchema.getTemplate({ name: "input-data" });
 ```
 
@@ -197,7 +197,7 @@ settings..GET_TEMPLATE_RECURSION_LIMIT = 5;
 <details><summary>Example</summary>
 
 ```ts
-import { Draft07, JsonSchema } from 'json-schema-library';
+import { Draft2019, JsonSchema } from 'json-schema-library';
 
 const myJsonSchema: JsonSchema = {
   type: 'object',
@@ -219,7 +219,7 @@ const myJsonSchema: JsonSchema = {
   }
 };
 
-const jsonSchema = new Draft07(myJsonSchema);
+const jsonSchema = new Draft2019(myJsonSchema);
 const myData = jsonSchema.getTemplate();
 
 expect(myData).to.deep.equal({
@@ -234,7 +234,7 @@ expect(myData).to.deep.equal({
 <details><summary>Example with input data</summary>
 
 ```ts
-import { Draft07, JsonSchema } from "json-schema-library";
+import { Draft2019, JsonSchema } from "json-schema-library";
 
 const myJsonSchema: JsonSchema = {
     type: "object",
@@ -256,7 +256,7 @@ const myJsonSchema: JsonSchema = {
     }
 };
 
-const jsonSchema = new Draft07(myJsonSchema);
+const jsonSchema = new Draft2019(myJsonSchema);
 const myData = jsonSchema.getTemplate({ name: "input-data", list: [] });
 
 expect(myData).to.deep.equal({
@@ -273,7 +273,7 @@ expect(myData).to.deep.equal({
 Per default, `getTemplate` does try to create data that is valid to the json-schema. Example: array-schemas with `minItems: 1` will add one item to fullfil the validation criteria. You can use the option and pass `{ extendDefaults: false }` to override this behaviour with a default value:
 
 ```ts
-import { Draft07 } from "json-schema-library";
+import { Draft2019 } from "json-schema-library";
 
 const myJsonSchema = {
     type: "array",
@@ -285,7 +285,7 @@ const myJsonSchema = {
     minItems: 1 // usually adds an enty, but default states: []
 };
 
-const jsonSchema = new Draft07(myJsonSchema);
+const jsonSchema = new Draft2019(myJsonSchema);
 const myData = jsonSchema.getTemplate(undefined, undefined, { extendDefaults: false });
 
 expect(myData).to.deep.equal([]);
@@ -299,7 +299,7 @@ expect(myData).to.deep.equal([]);
 `each` iterates over each data-item (_object_, _array_ and _value_) and emits the data-item, schema and location to a callback.
 
 ```ts
-const jsonSchema = new Draft07(mySchema);
+const jsonSchema = new Draft2019(mySchema);
 const myCallback = (schema: JsonSchema, value: unknown, pointer: JsonPointer) => {
     console.log(schema, value, pointer);
 };
@@ -309,14 +309,14 @@ jsonSchema.each(myData, myCallback);
 <details><summary>Example</summary>
 
 ```ts
-import { Draft07, JsonSchema, JsonPointer } from "json-schema-library";
+import { Draft2019, JsonSchema, JsonPointer } from "json-schema-library";
 
 const mySchema: JsonSchema = {
     type: "array",
     items: [{ type: "number" }, { type: "string" }]
 };
 
-const jsonSchema = new Draft07(mySchema);
+const jsonSchema = new Draft2019(mySchema);
 const calls = [];
 const myCallback = (schema: JsonSchema, value: unknown, pointer: JsonPointer) => {
     calls.push({ schema, value, pointer });
@@ -338,7 +338,7 @@ expect(calls).to.deep.equal([
 `eachSchema` emits each sub-schema definition to a callback.
 
 ```ts
-const jsonSchema = new Draft07(mySchema);
+const jsonSchema = new Draft2019(mySchema);
 const myCallback = (schema: JsonSchema) => {
     console.log(schema);
 };
@@ -348,7 +348,7 @@ jsonSchema.eachSchema(myCallback);
 <details><summary>Example</summary>
 
 ```ts
-import { Draft07, JsonSchema } from "json-schema-library";
+import { Draft2019, JsonSchema } from "json-schema-library";
 
 const mySchema: JsonSchema = {
     type: "array",
@@ -361,7 +361,7 @@ const mySchema: JsonSchema = {
     }
 };
 
-const jsonSchema = new Draft07(mySchema);
+const jsonSchema = new Draft2019(mySchema);
 const calls = [];
 const myCallback = (schema: JsonSchema) => {
     calls.push(schema);
@@ -386,7 +386,7 @@ expect(calls).to.deep.equal([
 `getSchema` retrieves the json-schema of a specific location in data. The location in data is given by a _json-pointer_. In many cases the json-schema can be retrieved without passing any data, but in situations where the schema is dynamic (for example in _oneOf_, _dependencies_, etc.), the data is required or will return a _JsonError_ if the location cannot be found.
 
 ```ts
-const jsonSchema = new Draft07(mySchema);
+const jsonSchema = new Draft2019(mySchema);
 let schemaOfName: JsonSchema | JsonError | undefined;
 schemaOfName = jsonSchema.getSchema({ pointer: "/list/1/name", data: myData });
 ```
@@ -394,7 +394,7 @@ schemaOfName = jsonSchema.getSchema({ pointer: "/list/1/name", data: myData });
 **Note** that `getSchema` will return `undefined` for paths that lead to valid properties, but miss a schema definition. For example:
 
 ```ts
-const jsonSchema = new Draft07({ type: "object" });
+const jsonSchema = new Draft2019({ type: "object" });
 let schemaOfName = jsonSchema.getSchema({ pointer: "/name" });
 console.log(schemaOfName); // undefined
 ```
@@ -402,7 +402,7 @@ console.log(schemaOfName); // undefined
 In case this is unwanted behaviour, use the `withSchemaWarning` option to return a json-error with code `schema-warning` instead:
 
 ```ts
-const jsonSchema = new Draft07({ type: "object" });
+const jsonSchema = new Draft2019({ type: "object" });
 let schemaOfName = jsonSchema.getSchema({ pointer: "/name", withSchemaWarning: true });
 console.log(schemaOfName); // { type: "error", code: "schema-warning" }
 ```
@@ -410,7 +410,7 @@ console.log(schemaOfName); // { type: "error", code: "schema-warning" }
 <details><summary>Example</summary>
 
 ```ts
-import { Draft07, JsonSchema, JsonError } from "json-schema-library";
+import { Draft2019, JsonSchema, JsonError } from "json-schema-library";
 
 const mySchema = {
     type: "object",
@@ -445,7 +445,7 @@ const mySchema = {
     }
 };
 
-const jsonSchema = new Draft07(mySchema);
+const jsonSchema = new Draft2019(mySchema);
 let schemaOfItem: JsonSchema | JsonError | undefined;
 schemaOfItem = jsonSchema.getSchema({
     pointer: "/list/1",
@@ -500,16 +500,16 @@ This helper always returns a list of schemas.
 **Note** This helper currenly supports a subset of json-schema for multiple results, mainly _oneOf_-definitions
 
 ```ts
-const jsonSchema = new Draft07(mySchema);
+const jsonSchema = new Draft2019(mySchema);
 const schemas: JsonSchema[] = jsonSchema.getChildSchemaSelection("content", localSchema);
 ```
 
 <details><summary>Example</summary>
 
 ```ts
-import { Draft07, JsonSchema, JsonError } from "json-schema-library";
+import { Draft2019, JsonSchema } from "json-schema-library";
 
-const jsonSchema = new Draft07();
+const jsonSchema = new Draft2019();
 const localSchema = {
     type: "object",
     properties: {
@@ -531,7 +531,7 @@ expect(schemas).to.deep.equal([{ type: "string" }, { type: "number" }]);
 `step` retrieves the json-schema of a child property or index. Using `step` it is possible to incrementally go through the data, retrieving the schema for each next item.
 
 ```ts
-const jsonSchema = new Draft07(mySchema);
+const jsonSchema = new Draft2019(mySchema);
 const localSchema = { type: "object", properties: { title: { type: "string" } } };
 const localData = { title: "value" };
 const schemaOfTitle = jsonSchema.step("title", localSchema, localData);
@@ -540,10 +540,10 @@ const schemaOfTitle = jsonSchema.step("title", localSchema, localData);
 <details><summary>Example</summary>
 
 ```ts
-import { Draft07, JsonSchema, JsonError } from "json-schema-library";
+import { Draft2019, JsonSchema } from "json-schema-library";
 
-const jsonSchema = new Draft07(mySchema);
-const localSchema = {
+const jsonSchema = new Draft2019(mySchema);
+const localSchema: JsonSchema = {
     oneOf: [
         {
             type: "object",
@@ -572,7 +572,7 @@ Each schemas is referenced by their unique `$id` (since draft-06, previously `id
 To add a remote schema use the exposed method `addRemoteSchema`:
 
 ```ts
-const jsonSchema = new Draft07();
+const jsonSchema = new Draft2019();
 
 jsonSchema.addRemoteSchema("https://sagold.com/remote", {
     $id: "https://sagold.com/remote",
@@ -672,7 +672,7 @@ jsonSchema.getSchema().getRef("https://sagold.com/remote#/properties/character")
 `createSchemaOf` returns a simple json-schema of the input data.
 
 ```ts
-const jsonSchema = new Draft07(mySchema);
+const jsonSchema = new Draft2019(mySchema);
 const schema: JsonSchema = jsonSchema.createSchemaOf({ title: "initial value" });
 ```
 
@@ -681,7 +681,7 @@ const schema: JsonSchema = jsonSchema.createSchemaOf({ title: "initial value" })
 `compileSchema` adds _$ref_ resolution support to a json-schema. Internally, each draft compiles a passed schema on its own, but when passing additional schemas to individual functions, `compileSchema` has to be called manually for json-schemas containing _$ref_-references.
 
 ```ts
-const jsonSchema = new Draft07(mySchema);
+const jsonSchema = new Draft2019(mySchema);
 const compiledSchema = jsonSchema.compileSchema({ $ref: "/$defs/table" });
 const tableSchema = compiledSchema.getRef();
 ```
@@ -738,12 +738,12 @@ expect(resolvedSchema).to.deep.eq({
 Each `Draft` in `json-schema-library` is build around a [DraftConfig](./lib/draft/index.ts#19). A `DraftConfig` holds all _functions_ and _configurations_ for each json-schema drafts. The `DraftConfig` is your main way to alter or extend behaviour for `json-schema-library`. You can either create your own _draftConfig_ or adjust any existing _draftConfig_. For the current drafts (4-7), each _draftConfig_ is exposed along with its actual _class_. For example:
 
 ```ts
-import { Draft, Draft07, draft07Config } from "json-schema-library";
+import { Draft, Draft2019, draft2019Config } from "json-schema-library";
 // the following calls are identical:
-new Draft(draft07Config, mySchema);
-new Draft07(mySchema, draft07Config);
-new Draft07(mySchema, {});
-new Draft07(mySchema);
+new Draft(draft2019Config, mySchema);
+new Draft2019(mySchema, draft2019Config);
+new Draft2019(mySchema, {});
+new Draft2019(mySchema);
 ```
 
 All draft configurations for specific `Draft` classes accept a partial configuration that lets you overwrite default behaviour:
@@ -751,10 +751,10 @@ All draft configurations for specific `Draft` classes accept a partial configura
 > replace the strict `resolveOneOf` behaviour to use fuzzy search instead:
 
 ```ts
-import { Draft07, draft07Config, resolveOneOfFuzzy } from "json-schema-library";
+import { Draft2019, draft2019Config, resolveOneOfFuzzy } from "json-schema-library";
 // the following calls are identical:
-new Draft07(mySchema, { resolveOneOf: resolveOneOfFuzzy });
-new Draft({ ...draft07Config, resolveOneOf: resolveOneOfFuzzy }, mySchema);
+new Draft2019(mySchema, { resolveOneOf: resolveOneOfFuzzy });
+new Draft({ ...draft2019Config, resolveOneOf: resolveOneOfFuzzy }, mySchema);
 ```
 
 ### getTemplate default options
@@ -786,8 +786,8 @@ A _resolver_ is a simple method implementing a specific feature of json-schema t
 The default json-schema behaviour for `$ref` resolution is to replace the schema where a `$ref` is defined. In some scenarios you what to add context-specific information (e.g., a specific _title_). For this, a modified `$ref`-resolver is exposed by `json-schema-library`:
 
 ```ts
-import { Draft07, draft07Config, resolveRefMerge } from "json-schema-library";
-const jsonSchema = new Draft07(mySchema, { resolveRef: resolveRefMerge });
+import { Draft2019, resolveRefMerge } from "json-schema-library";
+const jsonSchema = new Draft2019(mySchema, { resolveRef: resolveRefMerge });
 ```
 
 `resolveRefMerge` performs a shallow merge (first level of properties), adding the local schemas properties last.
@@ -797,7 +797,7 @@ const jsonSchema = new Draft07(mySchema, { resolveRef: resolveRefMerge });
 <details><summary>Example</summary>
 
 ```ts
-import { Draft07, draft07Config, resolveRefMerge } from "json-schema-library";
+import { Draft2019, resolveRefMerge } from "json-schema-library";
 const mySchema = {
     type: "object",
     properties: {
@@ -814,7 +814,7 @@ const mySchema = {
     }
 };
 
-const jsonSchema = new Draft07(mySchema, { resolveRef: resolveRefMerge });
+const jsonSchema = new Draft2019(mySchema, { resolveRef: resolveRefMerge });
 const subHeaderSchema = jsonSchema.getSchema("#/subHeader");
 
 expect(subHeaderSchema).to.eq({
@@ -832,8 +832,8 @@ The default json-schema behaviour for `oneOf` resolution is to validate all cont
 `json-schema-library` exposes a method `resolveOneOfFuzzy`, which will return a single schema in cases where no valid schema could be resolved. `resolveOneOfFuzzy` uses a simple scoring mechanism to return the best fitting schema for the given input data. Thus, `resolveOneOfFuzzy` may return schemas that do not validate a given input data.
 
 ```ts
-import { Draft07, draft07Config, resolveOneOfFuzzy } from "json-schema-library";
-const jsonSchema = new Draft07(mySchema, { resolveOneOf: resolveOneOfFuzzy });
+import { Draft2019, resolveOneOfFuzzy } from "json-schema-library";
+const jsonSchema = new Draft2019(mySchema, { resolveOneOf: resolveOneOfFuzzy });
 ```
 
 ### custom validators
@@ -849,9 +849,9 @@ All json-schema validation is done using validator functions for _keywords_ and 
 Since valid json-schema keywords vary by their `type` an additional mapping registers, which keyword should be tested per schema-type. This mapping is defined in `draft.typeKeywords`:
 
 ```ts
-import { draft07Config } from "json-schema-library";
+import { draft2019Config } from "json-schema-library";
 
-console.log(draft07Config.typeKeywords.array);
+console.log(draft2019Config.typeKeywords.array);
 // ["enum", "contains", "items", "minItems", "maxItems", "uniqueItems", "not", "if"];
 ```
 
@@ -870,16 +870,16 @@ To add or overwrite a keyword validator, you must add a validator function on yo
 Using specific Draft configuration, where draft configuration objects will be merged:
 
 ```ts
-import { Draft07, JsonValidator } from "json-schema-library";
+import { Draft2019, draft2019Config, JsonValidator } from "json-schema-library";
 
-const jsonSchema = new Draft07(mySchema, {
+const jsonSchema = new Draft2019(mySchema, {
     validateKeyword: {
         customKeyword: myCustomKeywordValidator as JsonValidator
     },
     // in case for new keywords, or if keyword should be supported on other types
     // add keyword-name to typeKeywords
     typeKeywords: {
-        object: draft07Config.typeKeywords.object.concat("customKeyword")
+        object: draft2019Config.typeKeywords.object.concat("customKeyword")
     }
 });
 ```
@@ -887,20 +887,20 @@ const jsonSchema = new Draft07(mySchema, {
 **Example:** Manually extending draft configuration:
 
 ```ts
-import { Draft, draft07Config, JsonValidator } from "json-schema-library";
+import { Draft, draft2019Config, JsonValidator } from "json-schema-library";
 
 const myDraftConfiguration = {
-    ...draft07Config,
-    draft07Config,
+    ...draft2019Config,
+    draft2019Config,
     validateKeyword: {
-        ...draft07Config.validateKeyword,
+        ...draft2019Config.validateKeyword,
         customKeyword: myCustomKeywordValidator as JsonValidator
     },
     // in case for new keywords, or if keyword should be supported on other types
     // add keyword-name to typeKeywords
     typeKeywords: {
-        ...draft07Config.typeKeywords,
-        object: draft07Config.typeKeywords.object.concat("customKeyword")
+        ...draft2019Config.typeKeywords,
+        object: draft2019Config.typeKeywords.object.concat("customKeyword")
     }
 };
 
@@ -912,9 +912,9 @@ const jsonSchema = new Draft(myDraftConfiguration, mySchema);
 To add or overwrite a format validator you must add a validator function on your draft config in `validateFormat`.
 
 ```ts
-import { Draft07, JsonValidator } from "json-schema-library";
+import { Draft2019, JsonValidator } from "json-schema-library";
 
-const jsonSchema = new Draft07(mySchema, {
+const jsonSchema = new Draft2019(mySchema, {
     validateFormat: {
         customFormat: myCustomFormatValidator as JsonValidator
     }
@@ -926,9 +926,9 @@ const jsonSchema = new Draft07(mySchema, {
 `json-schema-library` exposes available errors on its draft configurations on `DraftConfig.errors` and uses a global configuration `config.strings` for error messages. Both can be extended or modified.
 
 ```ts
-import { draft07Config, createCustomError, config } from "json-schema-library";
+import { draft2019Config, createCustomError, config } from "json-schema-library";
 
-draft07Config.errors.enumError;
+draft2019Config.errors.enumError;
 // (data: { pointer: JsonPointer } & Record<string, unknown>) => JsonError
 
 console.log(config.strings.EnumError);
@@ -958,9 +958,9 @@ config.strings.EnumError = "Invalid enum value {{value}} in {{pointer}}`";
 #### customize errors
 
 ```ts
-import { draft07Config, ErrorData, JsonError } from "json-schema-library";
+import { draft2019Config, ErrorData, JsonError } from "json-schema-library";
 
-draft07Config.errors.EnumError = (data: ErrorData): JsonError => {
+draft2019Config.errors.EnumError = (data: ErrorData): JsonError => {
     return {
         type: "error",
         code: "my-error",
@@ -974,7 +974,7 @@ draft07Config.errors.EnumError = (data: ErrorData): JsonError => {
 #### create errors
 
 ```ts
-import { draft07Config, createError } from "json-schema-library";
+import { createError } from "json-schema-library";
 // will use the string from `config.strings.EnumError` as message
 const error: JsonError = createError("EnumError", { data: { pointer: "#/location" } });
 ```
