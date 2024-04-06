@@ -6,11 +6,11 @@ import draft2019Meta from "../../../remotes/draft2019-09.json";
 import { getDraftTests, FeatureTest } from "../../getDraftTests";
 
 const cache = new Draft2019();
-cache.addRemoteSchema("http://json-schema.org/draft-2019-09/schema", draft2019Meta);
+cache.addRemoteSchema("https://json-schema.org/draft/2019-09/schema", draft2019Meta);
 addRemotes(cache);
 
 const supportedTestCases = (t: FeatureTest) => !t.optional
-    && t.name === "unevaluatedItems"
+    && t.name === "ref"
     && ![
         // todo list
         "anchor",
@@ -19,7 +19,7 @@ const supportedTestCases = (t: FeatureTest) => !t.optional
         "id",
         "not",
         "recursiveRef",
-        "ref",
+        // "ref",
         "refRemote",
         "vocabulary"
     ].includes(t.name)
@@ -29,8 +29,8 @@ const draftFeatureTests = getDraftTests("2019-09")
 /*
 ~ dependentRequired
 ~ not
-~ unevaluatedItems
-~ unevaluatedProperties - expect for uncle-schema support
+~ unevaluatedItems - expect for uncle-schema and recursiveRef support
+~ unevaluatedProperties - expect for uncle-schema and recursiveRef support
 ✓ additionalItems
 ✓ additionalProperties
 ✓ allOf
@@ -83,6 +83,8 @@ const postponedTestcases = [
     // we need to evaluate meta-schema for supported validation methods
     // we currently do not have the logic for this
     "schema that uses custom metaschema with with no validation vocabulary",
+    "remote ref, containing refs itself", // ref
+    "ref creates new scope when adjacent to keywords", // ref
     // @todo unevaluatedProperties
     // https://stackoverflow.com/questions/66936884/deeply-nested-unevaluatedproperties-and-their-expectations
     // this tests expects knowledge of a parent-allOf statement
@@ -102,9 +104,9 @@ const postponedTestcases = [
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "unevaluatedItems with if/then/else") {
-            //     return;
-            // }
+
+            // if (testCase.description !== "empty tokens in $ref json-pointer") { return; }
+
             const schema = testCase.schema;
             if (skipTest.includes(testCase.description)) {
                 console.log(`Unsupported '${testCase.description}'`);

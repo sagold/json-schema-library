@@ -1,5 +1,14 @@
 import { expect } from "chai";
 import getRef from "../../../lib/compile/getRef";
+import gp from "@sagold/json-pointer";
+
+
+describe("json-pointer", () => {
+    it("should resolve empty token in json-pointer", () => {
+        const result = gp.get({ bag: { "": { stick: 123 } } }, "/bag//stick");
+        expect(result).to.eq(123);
+    })
+});
 
 
 describe("compile.getRef", () => {
@@ -29,10 +38,11 @@ describe("compile.getRef", () => {
     });
 
     it("should return remote schema", () => {
-        const context = { remotes: {
-            remote: { a: { b: "c" } }
-        }, ids: {} };
-
+        const context = {
+            remotes: {
+                remote: { a: { b: "c" } }
+            }, ids: {}
+        };
         const result = getRef(context, null, "remote");
 
         expect(result).to.eq(context.remotes.remote);
@@ -95,10 +105,12 @@ describe("compile.getRef", () => {
 
         it("should resolve pointer recursively", () => {
             const context = { remotes: {}, ids: {} };
-            const schema = { definitions: {
-                a: { $ref: "#/definitions/b" },
-                b: { type: "integer" }
-            } };
+            const schema = {
+                definitions: {
+                    a: { $ref: "#/definitions/b" },
+                    b: { type: "integer" }
+                }
+            };
 
             const result = getRef(context, schema, "#/definitions/a");
 
@@ -107,10 +119,12 @@ describe("compile.getRef", () => {
 
         it("should resolve id recursively", () => {
             const context = { remotes: {}, ids: { "#target": "#/definitions/b" } };
-            const schema = { definitions: {
-                a: { $ref: "#target" },
-                b: { type: "integer" }
-            } };
+            const schema = {
+                definitions: {
+                    a: { $ref: "#target" },
+                    b: { type: "integer" }
+                }
+            };
 
             const result = getRef(context, schema, "#/definitions/a");
 

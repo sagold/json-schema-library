@@ -4,7 +4,7 @@ import getTypeOf from "../getTypeOf";
 import { JsonSchema } from "../types";
 import { Context } from "./types";
 
-const suffixes = /(#|\/)+$/g;
+const suffixes = /(#)+$/g;
 const isObject = (val: unknown): val is Record<string, any> => getTypeOf(val) === "object";
 
 // 1. combined is known
@@ -19,10 +19,13 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
         return rootSchema;
     }
 
+    // console.log("$ref", $ref);
+
     let schema;
     // is it a known $ref?
     const $remote = $ref.replace(suffixes, "");
     if (context.remotes[$remote] != null) {
+        // console.log("» remote");
         schema = context.remotes[$remote];
         if (schema && schema.$ref) {
             return getRef(context, rootSchema, schema.$ref);
@@ -30,6 +33,7 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
         return schema;
     }
     if (context.ids[$ref] != null) {
+        // console.log("» id");
         schema = get(rootSchema, context.ids[$ref]);
         if (schema && schema.$ref) {
             // @todo add missing test for the following line
@@ -45,6 +49,7 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
     }
 
     if (fragments.length === 1) {
+        // console.log("» frag1", fragments);
         $ref = fragments[0];
         if (context.remotes[$ref]) {
             schema = context.remotes[$ref];
@@ -60,13 +65,14 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
     }
 
     if (fragments.length === 2) {
+        // console.log("» frag2", fragments);
         const base = fragments[0];
         $ref = fragments[1];
         if (context.remotes[base]) {
             if (context.remotes[base].getRef) {
                 return context.remotes[base].getRef($ref);
             }
-            // console.log("warning: uncompiled remote - context may be wrong", base);
+            //log("warning: uncompiled remote - context may be wrong", base);
             return getRef(context, context.remotes[base], $ref);
         }
         if (context.ids[base]) {
@@ -74,7 +80,8 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
         }
     }
 
-    schema = get(rootSchema, context.ids[$ref] || $ref);
+    // console.log("» other");
+    schema = get(rootSchema, context.ids[$ref] ?? $ref);
     if (schema && schema.$ref) {
         return getRef(context, rootSchema, schema.$ref);
     }

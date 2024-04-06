@@ -98,6 +98,7 @@ export default function compileSchema(
         }
 
         if (schema.$ref && !schema[COMPILED_REF]) {
+            // console.log("JOIN ref", `'${scope}'`, "+", schema.$ref, joinScope(scope, schema.$ref));
             Object.defineProperty(schema, COMPILED_REF, {
                 enumerable: false,
                 value: joinScope(scope, schema.$ref)

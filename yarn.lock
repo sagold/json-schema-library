@@ -364,6 +364,11 @@
   resolved "https://registry.npmjs.org/@sagold/json-pointer/-/json-pointer-5.1.2.tgz#7f07884050fd2139eeb5d7423e917160ee7e0b8d"
   integrity sha512-+wAhJZBXa6MNxRScg6tkqEbChEHMgVZAhTHVJ60Y7sbtXtu9XA49KfUkdWlS2x78D6H9nryiKePiYozumauPfA==
 
+"@sagold/json-pointer@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.npmjs.org/@sagold/json-pointer/-/json-pointer-6.0.1.tgz#4d4e1723ca417c30c46b0e2d261fdcf9f8d7354a"
+  integrity sha512-yDOl6ljS0gHSwfLhQH/6mVB2dpN5WnG8MXSjiyPJvukJkq4iu7XZEzovobBxBYvI/o04a6PjYGnHXh2F9jLRzg==
+
 "@sagold/json-query@^6.1.3":
   version "6.1.3"
   resolved "https://registry.npmjs.org/@sagold/json-query/-/json-query-6.1.3.tgz#82fba49c6f20d427984dc0eb8a5083bf3953df00"

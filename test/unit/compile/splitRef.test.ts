@@ -16,10 +16,16 @@ describe("compile.splitRef", () => {
         expect(result).to.deep.eq([]);
     });
 
-    it("should return input pointer", () => {
+    it("should return input pointer from uri fragment", () => {
         const result = splitRef("#/a/b");
 
         expect(result).to.deep.eq(["#/a/b"]);
+    });
+
+    it("should return input pointer", () => {
+        const result = splitRef("/a/b");
+
+        expect(result).to.deep.eq(["/a/b"]);
     });
 
     it("should return input id", () => {
