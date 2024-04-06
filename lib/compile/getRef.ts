@@ -67,6 +67,8 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $search
     if (fragments.length === 1) {
         // console.log("» frag1", fragments);
 
+        // console.log("ids", rootSchema.getContext().ids);
+
         $ref = fragments[0];
         if (context.remotes[$ref]) {
             // console.log("» remote");
@@ -84,6 +86,11 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $search
                 return getRef(context, rootSchema, schema);
             }
             return schema;
+        }
+        // @todo why this special case
+        const rootContextRef = rootSchema.getContext?.().ids[$ref];
+        if (rootContextRef) {
+            return getRef(context, rootSchema, rootContextRef);
         }
     }
 

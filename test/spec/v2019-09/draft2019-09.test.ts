@@ -101,7 +101,7 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
 
-            // if (testCase.description !== "Location-independent identifier in remote ref") { return; }
+            // if (testCase.description !== "remote HTTP ref with nested absolute ref") { return; }
 
             const schema = testCase.schema;
             if (skipTest.includes(testCase.description)) {
