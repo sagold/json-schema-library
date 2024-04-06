@@ -10,19 +10,18 @@ cache.addRemoteSchema("https://json-schema.org/draft/2019-09/schema", draft2019M
 addRemotes(cache);
 
 const supportedTestCases = (t: FeatureTest) => !t.optional
-    // && t.name === "refRemote"
     && ![
         // todo list
-        "not",
         "recursiveRef",
         "vocabulary"
     ].includes(t.name)
 const draftFeatureTests = getDraftTests("2019-09")
+    // .filter(testcase => testcase.name === "recursiveRef")
     .filter(supportedTestCases);
 
 /*
-~ not
-~ ref
+~ not - expect for uncle-schema support
+~ ref - except meta-schema evaluation
 ~ unevaluatedItems - expect for uncle-schema and recursiveRef support
 ~ unevaluatedProperties - expect for uncle-schema and recursiveRef support
 ✓ additionalItems
@@ -65,35 +64,29 @@ const draftFeatureTests = getDraftTests("2019-09")
 ✓ type
 ✓ uniqueItems
 ✓ unknownKeyword
-✖ defs
+✓ defs
 ✖ recursiveRef
 ✖ vocabulary - skipped evaluation of meta-schema
 */
 
 
 const postponedTestcases = [
-    // possible errors in tests
-    "root ref in remote ref", // remoteRef
-    // @todo validate $def-syntax against metaschema
-    "validate definition against metaschema",
-    // @todo evaluate support by meta-schema
-    // we need to evaluate meta-schema for supported validation methods
-    // we currently do not have the logic for this
-    "schema that uses custom metaschema with with no validation vocabulary", // vocabulary
-    "remote ref, containing refs itself", // ref
-    "ref creates new scope when adjacent to keywords", // ref
     // @todo when recursiveRef is implemented
     "unevaluatedProperties with $recursiveRef",
     "unevaluatedItems with $recursiveRef",
-    // @todo when anchor ref is implemented
-    "URN base URI with URN and anchor ref", // ref
-    "order of evaluation: $id and $anchor and $ref", // ref
+    // @todo validate $def-syntax against metaschema
+    "validate definition against metaschema",
+    // @todo evaluate support by meta-schema
+    // we need to evaluate meta-schema for supported validation methods we currently do not have the logic for this
+    "schema that uses custom metaschema with with no validation vocabulary", // vocabulary
+    "remote ref, containing refs itself", // ref
+    "ref creates new scope when adjacent to keywords", // ref
     // @todo support uncle-schema
     // https://stackoverflow.com/questions/66936884/deeply-nested-unevaluatedproperties-and-their-expectations
-    // this tests expects knowledge of a parent-allOf statement
-    // we currently do not have the logic for this
+    // this tests expects knowledge of a parent-allOf statement we currently do not have the logic for this
     "property is evaluated in an uncle schema to unevaluatedProperties", // unevaluatedProperties
     "item is evaluated in an uncle schema to unevaluatedItems", // unevaluatedItems
+    "collect annotations inside a 'not', even if collection is disabled" // not
 ];
 
 
