@@ -29,13 +29,15 @@ jobs:
               run: yarn test:spec:4:ci
             - name: Test spec v6
               run: yarn test:spec:6:ci
+            - name: Test spec v7
+              run: yarn test:spec:7:ci
+            - name: Test spec 2019-09
+              run: yarn test:spec:2019:ci
             - name: Archive code coverage results
               uses: actions/upload-artifact@v3
               with:
-                  name: spec v6 test results
-                  path: test-result-spec6.json
-            - name: Test spec v7
-              run: yarn test:spec:7:ci
+                  name: spec 2019-09 test results
+                  path: test-result-spec2019-09.json
             - uses: dorny/test-reporter@v1.6.0
               with:
                   fail-on-error: false

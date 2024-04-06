@@ -17,6 +17,7 @@
         "test:spec:4:ci": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R json 'test/spec/v4/*.test.ts' > test-result-spec4.json; exit 0",
         "test:spec:6:ci": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R json 'test/spec/v6/*.test.ts' > test-result-spec6.json; exit 0",
         "test:spec:7:ci": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R json 'test/spec/v7/*.test.ts' > test-result-spec7.json; exit 0",
+        "test:spec:2019:ci": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R json 'test/spec/v2019-09/*.test.ts' > test-result-spec2019-09.json; exit 0",
         "test:4": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/spec/v4/*.test.ts'",
         "test:6": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/spec/v6/*.test.ts'",
         "test:7": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/spec/v7/*.test.ts'",
