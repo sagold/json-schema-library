@@ -11,6 +11,7 @@ const COMPILED = "__compiled";
 const COMPILED_REF = "__ref";
 const GET_REF = "getRef";
 const GET_ROOT = "getRoot";
+const GET_CONTEXT = "getContext";
 const suffixes = /(#|\/)+$/g;
 
 /**
@@ -58,6 +59,7 @@ export default function compileSchema(
     const rootSchemaAsString = JSON.stringify(schemaToCompile);
     const compiledSchema = JSON.parse(rootSchemaAsString);
     Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });
+    Object.defineProperty(compiledSchema, GET_CONTEXT, { enumerable: false, value: () => context });
     Object.defineProperty(compiledSchema, GET_REF, {
         enumerable: false,
         value: getRef.bind(null, context, compiledSchema)
@@ -124,7 +126,7 @@ export default function compileSchema(
         }
     });
 
-    console.log("ids", context.ids);
+    // console.log("ids", context.ids);
     // console.log("anchors", context.anchors);
 
     return compiledSchema;
