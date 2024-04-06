@@ -18,7 +18,7 @@
 [![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml)
 [![CI](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml)
 
-This library currently supports draft4, draft6 and draft7 features [@see benchmark](https://github.com/sagold/json-schema-benchmark)
+This library currently supports draft4, draft6, draft7 and draft2019-09 features [@see benchmark](https://github.com/sagold/json-schema-benchmark)
 
 **usage**
 
@@ -980,6 +980,10 @@ const error: JsonError = createError("EnumError", { data: { pointer: "#/location
 ```
 
 ## Breaking Changes
+
+### v10.0.0
+
+- with version `v10.0.0` draft 2019-09 is supported and can be used with `import { Draft2019 } from "json-schema-library";`
 
 ### v9.0.0
 

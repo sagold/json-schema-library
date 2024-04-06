@@ -11,15 +11,26 @@ const COMPILED = "__compiled";
 const COMPILED_REF = "__ref";
 const GET_REF = "getRef";
 const GET_ROOT = "getRoot";
+const GET_CONTEXT = "getContext";
 const suffixes = /(#|\/)+$/g;
 
+/**
+ * Context is the state of a compiled json-schema. A context stores only
+ * information of the current json-schema (id/scope) and retrievable references
+ * are only related to the current json-schema.
+ * It is protected in private scope.
+ */
 type Context = {
     ids: Record<string, unknown>;
     remotes: Record<string, JsonSchema>;
+    anchors: Record<string, string>;
 };
 
 /**
- * @draft starting with _draft 06_ keyword `id` has been renamed to `$id`
+ * @draft starting with _draft 2019-09_ plain name fragments are no longer
+ * defined with $id, but instead with the new keyword $anchor
+ * (which has a different syntax)
+ * https://json-schema.org/draft/2019-09/release-notes#incompatible-changes
  *
  * compiles the input root schema for $ref resolution and returns it again
  * @attention this modifies input schema but maintains object-structure
@@ -44,10 +55,11 @@ export default function compileSchema(
     if (schemaToCompile[COMPILED] !== undefined) {
         return schemaToCompile;
     } // eslint-disable-line
-    const context: Context = { ids: {}, remotes: draft.remotes };
+    const context: Context = { ids: {}, anchors: {}, remotes: draft.remotes };
     const rootSchemaAsString = JSON.stringify(schemaToCompile);
     const compiledSchema = JSON.parse(rootSchemaAsString);
     Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });
+    Object.defineProperty(compiledSchema, GET_CONTEXT, { enumerable: false, value: () => context });
     Object.defineProperty(compiledSchema, GET_REF, {
         enumerable: false,
         value: getRef.bind(null, context, compiledSchema)
@@ -92,9 +104,14 @@ export default function compileSchema(
         const parentPointer = pointer.replace(/\/[^/]+\/[^/]+$/, "");
         const previousScope = scopes[previousPointer] || scopes[parentPointer];
         const scope = joinScope(previousScope, schema.$id);
+        // // @todo specify behaviour - we do not save ids with trailing slashes...
         scopes[pointer] = scope;
         if (context.ids[scope] == null) {
             context.ids[scope] = pointer;
+        }
+
+        if (schema.$anchor) {
+            context.anchors[`${scope}#${schema.$anchor}`] = pointer;
         }
 
         if (schema.$ref && !schema[COMPILED_REF]) {
@@ -108,6 +125,9 @@ export default function compileSchema(
             // console.log("compiled ref", scope, schema.$ref, "=>", joinScope(scope, schema.$ref));
         }
     });
+
+    // console.log("ids", context.ids);
+    // console.log("anchors", context.anchors);
 
     return compiledSchema;
 }
