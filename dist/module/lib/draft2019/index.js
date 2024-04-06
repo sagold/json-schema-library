@@ -1,5 +1,5 @@
-import addRemoteSchema from "./addRemoteSchema";
-import compileSchema from "../compileSchema";
+import addRemoteSchema from "../addRemoteSchema";
+import compileSchema from "../draft06/compile";
 import { each } from "../each";
 import { eachSchema } from "../eachSchema";
 import ERRORS from "../validation/errors";
@@ -7,53 +7,62 @@ import FORMATS from "../validation/format";
 import getSchema from "../getSchema";
 import getTemplate from "../getTemplate";
 import isValid from "../isValid";
-import KEYWORDS from "../validation/keyword";
+import KEYWORDS from "./validation/keyword";
 import merge from "../utils/merge";
 import { resolveAllOf } from "../features/allOf";
 import { resolveAnyOf } from "../features/anyOf";
 import { resolveOneOf } from "../features/oneOf";
-import resolveRef from "../resolveRef.strict";
-import step from "../step";
 import createSchemaOf from "../createSchemaOf";
 import getChildSchemaSelection from "../getChildSchemaSelection";
-import TYPES from "../validation/type";
+import step from "../step";
+import TYPES from "../draft06/validation/type";
 import validate from "../validate";
 import { Draft } from "../draft";
 import settings from "../config/settings";
-const draft04Config = {
+import resolveRef from "../resolveRef.merge";
+const draft2019Config = {
     typeKeywords: {
         array: [
             "allOf",
             "anyOf",
+            "contains",
             "enum",
+            "if",
             "items",
             "maxItems",
             "minItems",
             "not",
             "oneOf",
+            "unevaluatedItems",
             "uniqueItems"
         ],
-        boolean: ["enum", "not", "allOf", "anyOf", "oneOf"],
+        boolean: ["allOf", "anyOf", "enum", "not", "oneOf"],
         object: [
             "additionalProperties",
+            "allOf",
+            "anyOf",
             "dependencies",
+            "dependentSchemas",
+            "dependentRequired",
             "enum",
             "format",
-            "minProperties",
+            "if",
             "maxProperties",
-            "patternProperties",
-            "properties",
-            "required",
+            "minProperties",
             "not",
             "oneOf",
-            "allOf",
-            "anyOf"
+            "patternProperties",
+            "properties",
+            "propertyNames",
+            "required",
+            "unevaluatedProperties" // 2019-09
         ],
         string: [
             "allOf",
             "anyOf",
             "enum",
             "format",
+            "if",
             "maxLength",
             "minLength",
             "not",
@@ -64,7 +73,10 @@ const draft04Config = {
             "allOf",
             "anyOf",
             "enum",
+            "exclusiveMaximum",
+            "exclusiveMinimum",
             "format",
+            "if",
             "maximum",
             "minimum",
             "multipleOf",
@@ -94,9 +106,9 @@ const draft04Config = {
     validate,
     templateDefaultOptions: settings.templateDefaultOptions
 };
-class Draft04 extends Draft {
+class Draft2019 extends Draft {
     constructor(schema, config = {}) {
-        super(merge(draft04Config, config), schema);
+        super(merge(draft2019Config, config), schema);
     }
 }
-export { Draft04, draft04Config };
+export { Draft2019, draft2019Config };

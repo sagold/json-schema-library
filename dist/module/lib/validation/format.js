@@ -137,7 +137,7 @@ const formatValidators = {
         return draft.errors.formatJsonPointerError({ value, pointer, schema });
     },
     "relative-json-pointer": (draft, schema, value, pointer) => {
-        if (typeof value !== "string" || value === "") {
+        if (typeof value !== "string") {
             return undefined;
         }
         if (isValidRelativeJsonPointer.test(value)) {

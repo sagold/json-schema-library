@@ -9,6 +9,8 @@ export default {
     containsAnyError: "The array at `{{pointer}}` must contain at least one item",
     ContainsArrayError: "The property at `{{pointer}}` must not be an array",
     ContainsError: "The array at `{{pointer}}` must contain an element that matches `{{schema}}`",
+    ContainsMinError: "The array at `{{pointer}}` contains {{delta}} too few items matching `{{schema}}`",
+    ContainsMaxError: "The array at `{{pointer}}` contains {{delta}} too many items matching `{{schema}}`",
     EnumError: "Expected given value `{{value}}` in `{{pointer}}` to be one of `{{values}}`",
     ForbiddenPropertyError: "Property name `{{property}}` at `{{pointer}}` is not allowed",
     FormatDateError: "Value `{{value}}` at `{{pointer}}` is not a valid date",
@@ -52,6 +54,8 @@ export default {
     SchemaWarning: "Failed retrieving a schema from '{{pointer}}' to key '{{key}}'",
     TypeError: "Expected `{{value}}` ({{received}}) in `{{pointer}}` to be of type `{{expected}}`",
     UndefinedValueError: "Value must not be undefined in `{{pointer}}`",
+    UnevaluatedPropertyError: "Invalid unevaluated property `{{pointer}}`",
+    UnevaluatedItemsError: "Invalid unevaluated item `{{pointer}}`",
     UniqueItemsError: "Items in array must be unique. Value `{{value}}` in `{{pointer}}` is a duplicate of {{duplicatePointer}}.",
     UnknownPropertyError: "Could not find a valid schema for property `{{pointer}}` within object",
     ValueNotEmptyError: "A value for `{{property}}` is required at `{{pointer}}`"

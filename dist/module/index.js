@@ -15,6 +15,7 @@ import { Draft } from "./lib/draft";
 import { Draft04, draft04Config } from "./lib/draft04";
 import { Draft06, draft06Config } from "./lib/draft06";
 import { Draft07, draft07Config } from "./lib/draft07";
+import { Draft2019, draft2019Config } from "./lib/draft2019";
 import { JsonEditor, draftJsonEditorConfig } from "./lib/jsoneditor";
 import { isJsonError } from "./lib/types";
 const config = { strings };
@@ -24,6 +25,8 @@ Draft06, // core implementing draft06 specs
 draft06Config, // config implementing draft06 specs
 Draft07, // core implementing draft07 specs
 draft07Config, // config implementing draft07 specs
+Draft2019, // core implementing draft2019-09 specs
+draft2019Config, // config implementing draft2019-09 specs
 draftJsonEditorConfig, // adjusted config of draft04 to better support the json-editor
 getTypeOf, // returns the javascript datatype
 isDynamicSchema, // NEW

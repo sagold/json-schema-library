@@ -1,44 +1,58 @@
-import gp from "@sagold/json-pointer";
-import getTypeDefs from "./schema/getTypeDefs";
 import { isObject } from "./utils/isObject";
-function nextTypeDefs(schema, pointer) {
-    if (this.callback(schema, pointer) === true) {
-        // eslint-disable-line no-invalid-this
-        return; // stop iteration
+function eachProperty(property, schema, callback, pointer) {
+    const target = schema[property];
+    if (!isObject(target)) {
+        return;
     }
-    const defs = getTypeDefs(schema);
-    // eslint-disable-next-line no-invalid-this
-    defs.forEach((next) => this.nextTypeDefs(next.def, gp.join(pointer, next.pointer, false)));
-}
-function eachDefinition(walk, schema, pointer, key = "definitions") {
-    const defs = schema[key];
-    Object.keys(defs).forEach((defId) => {
-        if (defs[defId] === false || isObject(defs[defId])) {
-            walk.nextTypeDefs(defs[defId], gp.join(pointer, key, defId, false));
+    Object.keys(target).forEach(key => {
+        if (Array.isArray(target[key])) {
+            // ignore depndencies list (of properties)
             return;
         }
-        // console.log(`Invalid schema in ${pointer}/${key}/${defId}`);
+        if (key === "$defs") {
+            eachProperty("$defs", target[key], callback, `${pointer}/${property}/$defs`);
+        }
+        else {
+            eachSchema(target[key], callback, `${pointer}/${property}/${key}`);
+        }
     });
 }
-export function eachSchema(schema, callback, pointer = "#") {
-    const walk = { callback, nextTypeDefs };
-    walk.nextTypeDefs(schema, pointer);
-    if (schema.definitions != null) {
-        walk.callback = (defschema, schemaPointer) => {
-            callback(defschema, schemaPointer);
-            if (defschema.definitions != null) {
-                eachDefinition(walk, defschema, schemaPointer);
-            }
-        };
-        eachDefinition(walk, schema, pointer);
+function eachItem(property, schema, callback, pointer) {
+    const target = schema[property];
+    if (!Array.isArray(target)) {
+        return;
     }
-    if (schema.$defs != null) {
-        walk.callback = (defschema, schemaPointer) => {
-            callback(defschema, schemaPointer);
-            if (defschema.definitions != null) {
-                eachDefinition(walk, defschema, schemaPointer);
-            }
-        };
-        eachDefinition(walk, schema, pointer, "$defs");
+    target.forEach((s, key) => eachSchema(s, callback, `${pointer}/${property}/${key}`));
+}
+export function eachSchema(schema, callback, pointer = "") {
+    if (schema === undefined) {
+        return;
     }
+    // @ts-expect-error untyped
+    if (callback(schema, pointer) === true) {
+        return;
+    }
+    if (!isObject(schema)) {
+        return;
+    }
+    eachProperty("properties", schema, callback, pointer);
+    eachProperty("patternProperties", schema, callback, pointer);
+    eachSchema(schema.not, callback, `${pointer}/not`);
+    eachSchema(schema.additionalProperties, callback, `${pointer}/additionalProperties`);
+    eachProperty("dependencies", schema, callback, pointer);
+    // items
+    isObject(schema.items) && eachSchema(schema.items, callback, `${pointer}/items`);
+    eachItem("items", schema, callback, pointer);
+    // additional items
+    eachSchema(schema.additionalItems, callback, `${pointer}/additionalItems`);
+    // dynamic schemas
+    eachItem("allOf", schema, callback, pointer);
+    eachItem("anyOf", schema, callback, pointer);
+    eachItem("oneOf", schema, callback, pointer);
+    eachSchema(schema.if, callback, `${pointer}/if`);
+    eachSchema(schema.then, callback, `${pointer}/then`);
+    eachSchema(schema.else, callback, `${pointer}/else`);
+    // definitions
+    eachProperty("definitions", schema, callback, pointer);
+    eachProperty("$defs", schema, callback, pointer);
 }

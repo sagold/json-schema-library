@@ -4,7 +4,6 @@
  * @param schema
  */
 export default function addRemoteSchema(draft, url, schema) {
-    // @draft >= 6
-    schema.$id = schema.$id || url;
+    schema.id = schema.id || url;
     draft.remotes[url] = draft.compileSchema(schema);
 }

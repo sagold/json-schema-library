@@ -1,7 +1,10 @@
 import { Draft } from "../../draft";
 import { JsonSchema } from "../../types";
 /**
- * @draft starting with _draft 06_ keyword `id` has been renamed to `$id`
+ * @draft starting with _draft 2019-09_ plain name fragments are no longer
+ * defined with $id, but instead with the new keyword $anchor
+ * (which has a different syntax)
+ * https://json-schema.org/draft/2019-09/release-notes#incompatible-changes
  *
  * compiles the input root schema for $ref resolution and returns it again
  * @attention this modifies input schema but maintains object-structure

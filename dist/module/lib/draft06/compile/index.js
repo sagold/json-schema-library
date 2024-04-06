@@ -7,9 +7,13 @@ const COMPILED = "__compiled";
 const COMPILED_REF = "__ref";
 const GET_REF = "getRef";
 const GET_ROOT = "getRoot";
+const GET_CONTEXT = "getContext";
 const suffixes = /(#|\/)+$/g;
 /**
- * @draft starting with _draft 06_ keyword `id` has been renamed to `$id`
+ * @draft starting with _draft 2019-09_ plain name fragments are no longer
+ * defined with $id, but instead with the new keyword $anchor
+ * (which has a different syntax)
+ * https://json-schema.org/draft/2019-09/release-notes#incompatible-changes
  *
  * compiles the input root schema for $ref resolution and returns it again
  * @attention this modifies input schema but maintains object-structure
@@ -29,10 +33,11 @@ export default function compileSchema(draft, schemaToCompile, rootSchema = schem
     if (schemaToCompile[COMPILED] !== undefined) {
         return schemaToCompile;
     } // eslint-disable-line
-    const context = { ids: {}, remotes: draft.remotes };
+    const context = { ids: {}, anchors: {}, remotes: draft.remotes };
     const rootSchemaAsString = JSON.stringify(schemaToCompile);
     const compiledSchema = JSON.parse(rootSchemaAsString);
     Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });
+    Object.defineProperty(compiledSchema, GET_CONTEXT, { enumerable: false, value: () => context });
     Object.defineProperty(compiledSchema, GET_REF, {
         enumerable: false,
         value: getRef.bind(null, context, compiledSchema)
@@ -68,11 +73,16 @@ export default function compileSchema(draft, schemaToCompile, rootSchema = schem
         const parentPointer = pointer.replace(/\/[^/]+\/[^/]+$/, "");
         const previousScope = scopes[previousPointer] || scopes[parentPointer];
         const scope = joinScope(previousScope, schema.$id);
+        // // @todo specify behaviour - we do not save ids with trailing slashes...
         scopes[pointer] = scope;
         if (context.ids[scope] == null) {
             context.ids[scope] = pointer;
         }
+        if (schema.$anchor) {
+            context.anchors[`${scope}#${schema.$anchor}`] = pointer;
+        }
         if (schema.$ref && !schema[COMPILED_REF]) {
+            // console.log("JOIN ref", `'${scope}'`, "+", schema.$ref, joinScope(scope, schema.$ref));
             Object.defineProperty(schema, COMPILED_REF, {
                 enumerable: false,
                 value: joinScope(scope, schema.$ref)
@@ -82,5 +92,7 @@ export default function compileSchema(draft, schemaToCompile, rootSchema = schem
             // console.log("compiled ref", scope, schema.$ref, "=>", joinScope(scope, schema.$ref));
         }
     });
+    // console.log("ids", context.ids);
+    // console.log("anchors", context.anchors);
     return compiledSchema;
 }

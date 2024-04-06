@@ -7,6 +7,8 @@ const errors = {
     allOfError: createCustomError("AllOfError"),
     constError: createCustomError("ConstError"),
     containsError: createCustomError("ContainsError"),
+    containsMaxError: createCustomError("ContainsMaxError"),
+    containsMinError: createCustomError("ContainsMinError"),
     containsArrayError: createCustomError("ContainsArrayError"),
     containsAnyError: createCustomError("ContainsAnyError"),
     enumError: createCustomError("EnumError"),
@@ -54,6 +56,8 @@ const errors = {
     schemaWarning: createCustomError("SchemaWarning"),
     typeError: createCustomError("TypeError"),
     undefinedValueError: createCustomError("UndefinedValueError"),
+    unevaluatedPropertyError: createCustomError("UnevaluatedPropertyError"),
+    unevaluatedItemsError: createCustomError("UnevaluatedItemsError"),
     uniqueItemsError: createCustomError("UniqueItemsError"),
     unknownPropertyError: createCustomError("UnknownPropertyError"),
     valueNotEmptyError: createCustomError("ValueNotEmptyError")

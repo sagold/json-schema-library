@@ -5,6 +5,7 @@ const KeywordValidation = {
     ...Keywords,
     // @draft >= 6
     contains: (draft, schema, value, pointer) => {
+        var _a, _b;
         if (schema.contains === false) {
             return draft.errors.containsArrayError({ pointer, value, schema });
         }
@@ -18,10 +19,23 @@ const KeywordValidation = {
             // ignore invalid schema
             return undefined;
         }
+        let count = 0;
         for (let i = 0; i < value.length; i += 1) {
             if (draft.isValid(value[i], schema.contains)) {
-                return undefined;
+                count++;
             }
+        }
+        // @draft >= 2019-09
+        const max = (_a = schema.maxContains) !== null && _a !== void 0 ? _a : Infinity;
+        const min = (_b = schema.minContains) !== null && _b !== void 0 ? _b : 1;
+        if (max >= count && min <= count) {
+            return undefined;
+        }
+        if (max < count) {
+            return draft.errors.containsMaxError({ pointer, schema, delta: count - max, value });
+        }
+        if (min > count) {
+            return draft.errors.containsMinError({ pointer, schema, delta: min - count, value });
         }
         return draft.errors.containsError({ pointer, schema, value });
     },
