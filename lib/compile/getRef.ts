@@ -22,14 +22,14 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
     let schema;
     // is it a known $ref?
     const $remote = $ref.replace(suffixes, "");
-    if (context.remotes[$remote]) {
+    if (context.remotes[$remote] != null) {
         schema = context.remotes[$remote];
         if (schema && schema.$ref) {
             return getRef(context, rootSchema, schema.$ref);
         }
         return schema;
     }
-    if (context.ids[$ref]) {
+    if (context.ids[$ref] != null) {
         schema = get(rootSchema, context.ids[$ref]);
         if (schema && schema.$ref) {
             // @todo add missing test for the following line
@@ -78,5 +78,6 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
     if (schema && schema.$ref) {
         return getRef(context, rootSchema, schema.$ref);
     }
+
     return schema;
 }
