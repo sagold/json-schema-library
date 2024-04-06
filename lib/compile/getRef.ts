@@ -19,16 +19,17 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
         return rootSchema;
     }
 
-    console.log("$ref", $ref);
+    // console.log("$ref", $ref);
 
     let schema;
     // is it a known $ref?
     const $remote = $ref.replace(suffixes, "");
     if (context.remotes[$remote] != null) {
-        console.log("» remote");
         schema = context.remotes[$remote];
+        // console.log("» remote", schema);
         if (schema && schema.$ref) {
-            return getRef(context, rootSchema, schema.$ref);
+            // @todo add missing test for the following line
+            return getRef(context, schema, schema.$ref);
         }
         return schema;
     }
@@ -40,7 +41,7 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
     }
 
     if (context.ids[$ref] != null) {
-        console.log("» id", context.ids[$ref]);
+        // console.log("» id", context.ids[$ref]);
         schema = get(rootSchema, context.ids[$ref]);
         if (schema && schema.$ref) {
             // @todo add missing test for the following line
@@ -56,7 +57,7 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
     }
 
     if (fragments.length === 1) {
-        console.log("» frag1", fragments);
+        // console.log("» frag1", fragments);
         $ref = fragments[0];
         if (context.remotes[$ref]) {
             schema = context.remotes[$ref];
@@ -72,22 +73,28 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
     }
 
     if (fragments.length === 2) {
-        console.log("» frag2", fragments);
+        // console.log("» frag2", fragments);
         const base = fragments[0];
         $ref = fragments[1];
-        if (context.remotes[base]) {
-            if (context.remotes[base].getRef) {
-                return context.remotes[base].getRef($ref);
+
+        // @todo this is unnecessary due to inconsistencies
+        const fromRemote = context.remotes[base] ?? context.remotes[`${base}/`];
+        if (fromRemote) {
+            if (fromRemote.getRef) {
+                return fromRemote.getRef($ref);
             }
             //log("warning: uncompiled remote - context may be wrong", base);
-            return getRef(context, context.remotes[base], $ref);
+            return getRef(context, fromRemote, $ref);
         }
-        if (context.ids[base]) {
-            return getRef(context, get(rootSchema, context.ids[base]), $ref);
+
+        // @todo this is unnecessary due to inconsistencies
+        const fromId = context.ids[base] ?? context.ids[`${base}/`];
+        if (fromId) {
+            return getRef(context, get(rootSchema, fromId), $ref);
         }
     }
 
-    console.log("» other");
+    // console.log("» other");
     schema = get(rootSchema, context.ids[$ref] ?? $ref);
     if (schema && schema.$ref) {
         return getRef(context, rootSchema, schema.$ref);
