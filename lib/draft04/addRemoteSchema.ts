@@ -1,5 +1,5 @@
-import { Draft } from "./draft";
-import { JsonSchema } from "./types";
+import { Draft } from "../draft";
+import { JsonSchema } from "../types";
 
 /**
  * register a json-schema to be referenced from another json-schema
