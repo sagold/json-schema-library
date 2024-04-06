@@ -23,7 +23,6 @@ const draftFeatureTests = getDraftTests("2019-09")
 /*
 ~ not
 ~ ref
-~ refRemote
 ~ unevaluatedItems - expect for uncle-schema and recursiveRef support
 ~ unevaluatedProperties - expect for uncle-schema and recursiveRef support
 ✓ additionalItems
@@ -61,6 +60,7 @@ const draftFeatureTests = getDraftTests("2019-09")
 ✓ patternProperties
 ✓ properties
 ✓ propertyNames
+✓ refRemote
 ✓ required
 ✓ type
 ✓ uniqueItems
@@ -101,7 +101,7 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
 
-            // if (testCase.description !== "retrieved nested refs resolve relative to their URI not $id") { return; }
+            // if (testCase.description !== "Location-independent identifier in remote ref") { return; }
 
             const schema = testCase.schema;
             if (skipTest.includes(testCase.description)) {

@@ -10,9 +10,12 @@ const isObject = (val: unknown): val is Record<string, any> => getTypeOf(val) ==
 // 1. combined is known
 // 2. base or pointer is known
 // 3. base + pointer is known
-export default function getRef(context: Context, rootSchema: JsonSchema, $ref: string): JsonSchema {
-    if (isObject($ref)) {
-        $ref = $ref.__ref || $ref.$ref;
+export default function getRef(context: Context, rootSchema: JsonSchema, $search: string | JsonSchema): JsonSchema {
+    let $ref: string;
+    if (isObject($search)) {
+        $ref = $search.__ref || $search.$ref;
+    } else {
+        $ref = $search;
     }
 
     if ($ref == null) {
@@ -30,7 +33,7 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
         if (schema && schema.$ref) {
             // console.log("»» reresolve", schema);
             // @todo add missing test for the following line
-            return getRef(context, schema, schema.$ref);
+            return getRef(context, schema, schema);
         }
         // console.log("»» return", schema);
         return schema;
@@ -38,8 +41,8 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
 
     // @ts-expect-error @draft 2019-09
     const $anchor = context.anchors?.[$ref];
-    // console.log("» anchor?", $anchor);
     if ($anchor) {
+        // console.log("» anchor", $anchor);
         return get(rootSchema, $anchor);
     }
 
@@ -48,7 +51,7 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
         schema = get(rootSchema, context.ids[$ref]);
         if (schema && schema.$ref) {
             // @todo add missing test for the following line
-            return getRef(context, schema, schema.$ref);
+            return getRef(context, rootSchema, schema);
         }
         return schema;
     }
@@ -66,17 +69,19 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
 
         $ref = fragments[0];
         if (context.remotes[$ref]) {
+            // console.log("» remote");
             schema = context.remotes[$ref];
 
             if (schema && schema.$ref) {
-                return getRef(context, rootSchema, schema.$ref);
+                return getRef(context, rootSchema, schema);
             }
         }
         if (context.ids[$ref]) {
+            // console.log("» id");
             schema = get(rootSchema, context.ids[$ref]);
 
             if (schema && schema.$ref) {
-                return getRef(context, rootSchema, schema.$ref);
+                return getRef(context, rootSchema, schema);
             }
             return schema;
         }
@@ -91,11 +96,13 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
         // @todo this is unnecessary due to inconsistencies
         const fromRemote = context.remotes[base] ?? context.remotes[`${base}/`];
         if (fromRemote) {
+            // console.log("» remote");
             // We have retrieved a different compiled json-schema. This compiled schema contains a
             // separate scope (context) where we might need to work with
 
             // ANCHOR
             if (fromRemote.getContext && fromRemote.getContext().anchors[$inputRef] != null) {
+                // console.log("» remote » anchor");
                 // an anchor is stored with its scope (id) it is defined in. Thus collisions are
                 // avoided, but the current condition is required to resolve the anchor for now
                 return fromRemote.getRef($inputRef);
@@ -103,6 +110,7 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
 
             // PATH (get_ref)
             if (fromRemote.getRef) {
+                // console.log("» remote » ref");
                 // resolve the local part of the reference in the new schema
                 return fromRemote.getRef($ref);
             }
@@ -123,7 +131,7 @@ export default function getRef(context: Context, rootSchema: JsonSchema, $ref: s
     // console.log("» other");
     schema = get(rootSchema, context.ids[$ref] ?? $ref);
     if (schema && schema.$ref) {
-        return getRef(context, rootSchema, schema.$ref);
+        return getRef(context, rootSchema, schema);
     }
 
     return schema;
