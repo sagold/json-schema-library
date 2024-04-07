@@ -2,14 +2,30 @@ import { JsonSchema } from "./types";
 import { mergeSchema } from "./mergeSchema";
 
 function resolveRecursiveRef(rootSchema: JsonSchema, schema: JsonSchema) {
-    // find anchor
     const history = schema.__scope.history;
+    // for (let i = 0; i < history.length; i += 1) {
+    //     console.log(i, history[i], history[i].__scope);
+    // }
+
+    // find anchor
     for (let i = history.length - 1; i >= 0; i--) {
-        if (history[i].$recursiveAnchor) {
+        if (history[i].$recursiveAnchor === true) {
             return history[i];
         }
+        // if (history[i].$recursiveAnchor === false) {
+        //     return rootSchema;
+        // }
+        if (history[i].$id) {
+            return history[i];
+        }
+        // if (history[i].$id && /^https?:\/\//.test(history[i].$id)) {
+        //     // new root
+        //     return history[i];
+        // }
+        if (history[i].$recursiveAnchor === false) {
+            break;
+        }
     }
-    console.log("failed finding an anchor from", history);
     return rootSchema;
 }
 

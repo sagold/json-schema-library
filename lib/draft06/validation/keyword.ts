@@ -26,7 +26,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         let count = 0;
         for (let i = 0; i < value.length; i += 1) {
-            if (draft.isValid(value[i], Q.addScope(schema.contains, schema.__scope))) {
+            const nextSchema = Q.next(i, schema.contains, schema);
+            if (draft.isValid(value[i], nextSchema)) {
                 count++;
             }
         }
@@ -127,7 +128,6 @@ const KeywordValidation: Record<string, JsonValidator> = {
             for (let i = 0, l = patterns.length; i < l; i += 1) {
                 if (patterns[i].regex.test(key)) {
                     patternFound = true;
-
                     // for a boolean schema `false`, always invalidate
                     if (patterns[i].patternSchema === false) {
                         errors.push(
@@ -141,12 +141,11 @@ const KeywordValidation: Record<string, JsonValidator> = {
                         );
                         return;
                     }
-
-                    const valErrors = draft.validate(
-                        value[key],
-                        Q.addScope(patterns[i].patternSchema, schema.__scope),
-                        `${pointer}/${key}`
-                    );
+                    const nextSchema = Q.newScope(patterns[i].patternSchema, {
+                        pointer: `${pointer}/${key}`,
+                        history: [...schema.__scope.history]
+                    });
+                    const valErrors = draft.validate(value[key], nextSchema, `${pointer}/${key}`);
                     if (valErrors && valErrors.length > 0) {
                         errors.push(...valErrors);
                     }
@@ -202,7 +201,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         const properties = Object.keys(value);
         const propertySchema = { ...schema.propertyNames, type: "string" };
         properties.forEach((prop) => {
-            const validationResult = draft.validate(prop, Q.addScope(propertySchema, schema.__scope), `${pointer}/${prop}`);
+            const validationResult = draft.validate(prop, Q.next(prop, propertySchema, schema), `${pointer}/${prop}`);
             if (validationResult.length > 0) {
                 errors.push(
                     draft.errors.invalidPropertyNameError({

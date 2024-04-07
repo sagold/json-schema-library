@@ -40,9 +40,6 @@ function addScope(schema: JsonSchema, scope: SchemaScope) {
     if (!isObject(schema)) {
         return schema;
     }
-    // if (scope == null) {
-    //     throw new Error("scope passed is null");
-    // }
     // @scope
     const clone = { ...schema };
     Object.defineProperty(clone, "__compiled", { enumerable: false, value: true });
@@ -50,6 +47,16 @@ function addScope(schema: JsonSchema, scope: SchemaScope) {
     Object.defineProperty(clone, "__ref", { enumerable: false, value: schema.__ref });
     Object.defineProperty(clone, "getOneOfOrigin", { enumerable: false, value: schema.getOneOfOrigin });
     return clone;
+}
+
+function next(key: string | number, schema: JsonSchema, parentSchema: JsonSchema) {
+    if (parentSchema.__scope == null) {
+        throw new Error("missing parent scope");
+    }
+    return newScope(schema, {
+        pointer: `${parentSchema.__scope.pointer}/${key}`,
+        history: [...parentSchema.__scope.history]
+    })
 }
 
 /**
@@ -73,6 +80,7 @@ function newScope(schema: JsonSchema, scope: SchemaScope) {
 export default {
     omit,
     clone,
+    next,
     newScope,
     addScope
 }

@@ -21,8 +21,11 @@ function isPropertyEvaluated(draft: Draft, objectSchema: JsonSchema, propertyNam
         return true;
     }
     // PROPERTIES
-    if (schema.properties?.[propertyName] && draft.isValid(value, Q.addScope(schema.properties?.[propertyName], objectSchema.__scope))) {
-        return true;
+    if (schema.properties?.[propertyName]) {
+        const nextSchema = Q.next(propertyName, schema.properties?.[propertyName], objectSchema);
+        if (draft.isValid(value, nextSchema)) {
+            return true;
+        }
     }
     // PATTERN-PROPERTIES
     const patterns = getPatternTests(schema.patternProperties);
@@ -31,7 +34,8 @@ function isPropertyEvaluated(draft: Draft, objectSchema: JsonSchema, propertyNam
     }
     // ADDITIONAL-PROPERTIES
     if (isObject(schema.additionalProperties)) {
-        return draft.validate(value, Q.addScope(schema.additionalProperties, objectSchema.__scope));
+        const nextSchema = Q.next(propertyName, schema.additionalProperties, objectSchema);
+        return draft.validate(value, nextSchema);
     }
     return false;
 }
@@ -105,7 +109,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         unevaluated.forEach(key => {
             const keyErrors = draft.validate(
                 value[key],
-                Q.addScope(resolvedSchema.unevaluatedProperties, schema.__scope),
+                Q.next(key, resolvedSchema.unevaluatedProperties, schema),
                 `${pointer}/${key}`
             );
             errors.push(...keyErrors);
@@ -150,7 +154,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
             const items: { index: number, value: unknown }[] = [];
             for (let i = resolvedSchema.items.length; i < value.length; i += 1) {
                 if (i < resolvedSchema.items.length) {
-                    if (!draft.isValid(value[i], Q.addScope(resolvedSchema.items[i], schema.__scope))) {
+                    if (!draft.isValid(value[i], Q.next(i, resolvedSchema.items[i], schema))) {
                         items.push({ index: i, value: value[i] });
                     }
                 } else {
@@ -166,7 +170,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         if (isObject(resolvedSchema.unevaluatedItems)) {
             return value.map((item, index) => {
-                if (!draft.isValid(item, Q.addScope(resolvedSchema.unevaluatedItems, schema.__scope))) {
+                if (!draft.isValid(item, Q.next(index, resolvedSchema.unevaluatedItems, schema))) {
                     return draft.errors.unevaluatedItemsError({
                         pointer: `${pointer}/${index}`,
                         value: JSON.stringify(item),

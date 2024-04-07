@@ -19,9 +19,13 @@ const stepType: Record<string, StepFunction> = {
         const itemsType = getTypeOf(schema.items);
 
         if (itemsType === "object") {
+            const nextSchema = Q.newScope(schema.items, {
+                pointer: `${pointer}/${key}`,
+                history: [...schema.__scope.history]
+            });
             // @spec: ignore additionalItems, when items is schema-object
             return (
-                reduceSchema(draft, Q.addScope(schema.items, schema.__scope), itemValue, `${pointer}/${key}`) ||
+                reduceSchema(draft, nextSchema, itemValue, `${pointer}/${key}`) ||
                 draft.resolveRef(schema.items)
             );
         }
@@ -42,7 +46,11 @@ const stepType: Record<string, StepFunction> = {
             }
 
             if (schema.items[key]) {
-                return draft.resolveRef(Q.addScope(schema.items[key], schema.__scope));
+                const nextSchema = Q.newScope(schema.items[key], {
+                    pointer: `${pointer}/${key}`,
+                    history: [...schema.__scope.history]
+                });
+                return draft.resolveRef(nextSchema);
             }
 
             if (schema.additionalItems === false) {
@@ -101,8 +109,11 @@ const stepType: Record<string, StepFunction> = {
                 return createSchemaOf(data?.[key]);
             }
 
-
-            const targetSchema = draft.resolveRef(Q.addScope(property, inputSchema.__scope));
+            const nextSchema = Q.newScope(property, {
+                pointer: `${pointer}/${key}`,
+                history: [...schema.__scope.history]
+            });
+            const targetSchema = draft.resolveRef(nextSchema);
             if (isJsonError(targetSchema)) {
                 return targetSchema;
             }
@@ -208,11 +219,12 @@ export default function step(
                 key
             });
         }
+
+
         // UPDATE SCOPE and clone schema
         return Q.newScope(schemaResult, {
             pointer: `${pointer}/${key}`,
-            history: [...schema.__scope.history],
-            anchor: schemaResult.$recursiveAnchor
+            history: [...schema.__scope.history]
         });
     }
 

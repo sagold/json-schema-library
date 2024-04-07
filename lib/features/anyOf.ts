@@ -58,9 +58,16 @@ const validateAnyOf: JsonValidator = (draft, schema, value, pointer) => {
     if (!Array.isArray(schema.anyOf) || schema.anyOf.length === 0) {
         return undefined;
     }
-
+    // console.log("validate any of", pointer, value);
     for (let i = 0; i < schema.anyOf.length; i += 1) {
-        if (draft.isValid(value, Q.addScope(schema.anyOf[i], schema.__scope))) {
+        const nextSchema = draft.resolveRef(schema.anyOf[i]);
+        // @todo @recursiveRef here we create an intermediary scope that is required
+        // this duplicates pointers and probably can be solved by resolving the root scope correctly
+        const nextNode = Q.newScope(nextSchema, {
+            pointer,
+            history: [...schema.__scope.history]
+        });
+        if (draft.isValid(value, nextNode)) {
             return undefined;
         }
     }

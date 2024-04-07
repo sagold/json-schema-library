@@ -78,17 +78,26 @@ const KeywordValidation: Record<string, JsonValidator> = {
                             })
                         );
                     } else {
-                        errors.push(...draft.validate(value[property], Q.addScope(result, schema.__scope), pointer));
+                        errors.push(...draft.validate(value[property], Q.newScope(result, {
+                            pointer: `${schema.__scope.pointer}/${property}`,
+                            history: [...schema.__scope.history]
+                        }), pointer));
                     }
 
                     // additionalProperties {}
                 } else if (additionalIsObject) {
+                    const nextSchema = Q.next(property, schema.additionalProperties, schema)
+                    if (!nextSchema.__scope) {
+                        throw new Error("missing scope");
+                    }
+                    // console.log("additional property", property, schema.additionalProperties);
+                    const res = draft.validate(
+                        value[property],
+                        nextSchema,
+                        `${pointer}/${property}`
+                    );
                     errors.push(
-                        ...draft.validate(
-                            value[property],
-                            Q.addScope(schema.additionalProperties, schema.__scope),
-                            `${pointer}/${property}`
-                        )
+                        ...res
                     );
                 } else {
                     errors.push(
@@ -153,7 +162,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
                 return [itemSchema];
             }
 
-            const itemErrors = draft.validate(itemData, Q.addScope(itemSchema, schema.__scope), `${pointer}/${i}`);
+            const itemErrors = draft.validate(itemData, Q.next(i, itemSchema, schema), `${pointer}/${i}`);
             errors.push(...itemErrors);
         }
 
@@ -393,7 +402,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
                     patternFound = true;
                     const valErrors = draft.validate(
                         value[key],
-                        Q.addScope(patterns[i].patternSchema, schema.__scope),
+                        Q.next(key, patterns[i].patternSchema, schema),
                         `${pointer}/${key}`
                     );
                     if (valErrors && valErrors.length > 0) {
@@ -429,7 +438,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
             const key = keys[i];
             if (hasProperty(value, key)) {
                 const itemSchema = draft.step(key, schema, value, pointer);
-                const keyErrors = draft.validate(value[key], Q.addScope(itemSchema, schema.__scope), `${pointer}/${key}`);
+                const keyErrors = draft.validate(value[key], Q.next(key, itemSchema, schema), `${pointer}/${key}`);
                 errors.push(...keyErrors);
             }
         }
@@ -445,7 +454,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
                 errors.push(draft.errors.requiredPropertyError({ key, pointer, schema, value }));
             } else {
                 const itemSchema = draft.step(key, schema, value, pointer);
-                const keyErrors = draft.validate(value[key], Q.addScope(itemSchema, schema.__scope), `${pointer}/${key}`);
+                const keyErrors = draft.validate(value[key], Q.next(key, itemSchema, schema), `${pointer}/${key}`);
                 errors.push(...keyErrors);
             }
         }
