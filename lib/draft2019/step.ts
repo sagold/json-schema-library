@@ -1,8 +1,9 @@
-import getTypeOf from "./getTypeOf";
-import createSchemaOf from "./createSchemaOf";
-import { JsonSchema, JsonPointer, JsonError, isJsonError } from "./types";
-import { Draft } from "./draft";
-import { reduceSchema } from "./reduceSchema";
+import getTypeOf from "../getTypeOf";
+import createSchemaOf from "../createSchemaOf";
+import { JsonSchema, JsonPointer, JsonError, isJsonError } from "../types";
+import { Draft } from "../draft";
+import { reduceSchema } from "../reduceSchema";
+import Q from "../Q";
 
 type StepFunction = (
     draft: Draft,
@@ -79,8 +80,9 @@ const stepType: Record<string, StepFunction> = {
         return new Error(`Invalid array schema for ${key} at ${pointer}`) as JsonError;
     },
 
-    object: (draft, key, schema, data, pointer) => {
-        schema = reduceSchema(draft, schema, data, pointer);
+    object: (draft, key, inputSchema, data, pointer) => {
+        const schema = reduceSchema(draft, inputSchema, data, pointer);
+        // console.log("step object", key, schema.__scope);
 
         // @feature properties
         const property = schema?.properties?.[key];
@@ -99,6 +101,18 @@ const stepType: Record<string, StepFunction> = {
                 return createSchemaOf(data?.[key]);
             }
 
+            if (property.$recursiveRef) {
+                // find anchor
+                const history = schema.__scope.history;
+                for (let i = history.length - 1; i >= 0; i--) {
+                    if (history[i].__scope.anchor) {
+                        return history[i];
+                    }
+                }
+
+                return draft.getSchema();
+            }
+
             const targetSchema = draft.resolveRef(property);
             if (isJsonError(targetSchema)) {
                 return targetSchema;
@@ -111,7 +125,7 @@ const stepType: Record<string, StepFunction> = {
                 return draft.resolveOneOf(data[key], targetSchema, `${pointer}/${key}`);
             }
 
-            // resolved schema or error
+            // resolved schema
             if (targetSchema) {
                 return targetSchema;
             }
@@ -170,6 +184,8 @@ export default function step(
     data?: any,
     pointer: JsonPointer = "#"
 ): JsonSchema | JsonError {
+    schema = draft.compileSchema(schema);
+
     const typeOfData = getTypeOf(data);
     let schemaType = schema.type ?? typeOfData;
 
@@ -189,6 +205,7 @@ export default function step(
 
     const stepFunction = stepType[schemaType];
     if (stepFunction) {
+        // GET SCHEMA
         const schemaResult = stepFunction(draft, `${key}`, schema, data, pointer);
         if (schemaResult === undefined) {
             return draft.errors.schemaWarning({
@@ -198,7 +215,12 @@ export default function step(
                 key
             });
         }
-        return schemaResult;
+        // UPDATE SCOPE and clone schema
+        return Q.newScope(schemaResult, {
+            pointer: `${pointer}/${key}`,
+            history: [...schema.__scope.history],
+            anchor: schemaResult.$recursiveAnchor
+        });
     }
 
     return new Error(`Unsupported schema type ${schema.type} for key ${key}`) as JsonError;

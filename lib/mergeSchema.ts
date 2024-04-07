@@ -14,19 +14,11 @@ export function _mergeSchema(a: JsonSchema, b: JsonSchema) {
         return a;
     }
 
+    // @scope
     const result = mergeArraysUnique(a, b);
-    if (a.getOneOfOrigin) {
-        Object.defineProperty(result, "getOneOfOrigin", {
-            enumerable: false,
-            value: a.getOneOfOrigin
-        });
-    } else if (b.getOneOfOrigin) {
-        Object.defineProperty(result, "getOneOfOrigin", {
-            enumerable: false,
-            value: b.getOneOfOrigin
-        });
-    }
-
+    Object.defineProperty(result, "__scope", { enumerable: false, value: b.__scope ?? a.__scope });
+    Object.defineProperty(result, "__ref", { enumerable: false, value: b.__ref ?? a.__ref });
+    Object.defineProperty(result, "getOneOfOrigin", { enumerable: false, value: b.getOneOfOrigin ?? a.getOneOfOrigin });
     return result;
 }
 
@@ -50,23 +42,10 @@ export function mergeSchema<T extends JsonSchema>(a: T, b: T): T {
         return schema;
     }
 
-    if (a?.getOneOfOrigin) {
-        Object.defineProperty(schema, "getOneOfOrigin", {
-            enumerable: false,
-            value: a.getOneOfOrigin
-        });
-    } else if (b?.getOneOfOrigin) {
-        Object.defineProperty(schema, "getOneOfOrigin", {
-            enumerable: false,
-            value: b.getOneOfOrigin
-        });
-    }
-
-    if (a.__scope || b.__scope) {
-        Object.defineProperty(schema, "__scope", { enumerable: false, value: a.__scope ?? b.__scope });
-    }
-
-    // console.log("result", schema);
+    // @scope
+    Object.defineProperty(schema, "__scope", { enumerable: false, value: b.__scope ?? a.__scope });
+    Object.defineProperty(schema, "__ref", { enumerable: false, value: b.__ref ?? a.__ref });
+    Object.defineProperty(schema, "getOneOfOrigin", { enumerable: false, value: b.getOneOfOrigin ?? a.getOneOfOrigin });
     return schema;
 }
 

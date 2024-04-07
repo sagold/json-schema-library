@@ -1,6 +1,7 @@
 import { Draft } from "./draft";
 
 export type JsonSchema = { [p: string]: any };
+
 export type SchemaScope = {
     anchor?: boolean;
     pointer: string;
