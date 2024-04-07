@@ -21,5 +21,9 @@ export function omit(object: Record<string, unknown>, ...keysToOmit: string[]) {
             value: object.getOneOfOrigin
         });
     }
+    if (object.__scope) {
+        Object.defineProperty(result, "__scope", { enumerable: false, value: object.__scope });
+    }
+
     return result;
 }

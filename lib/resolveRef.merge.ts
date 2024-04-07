@@ -6,7 +6,11 @@ import { mergeSchema } from "./mergeSchema";
  * Note: JsonSchema my be false
  */
 export default function resolveRefMerge(schema: JsonSchema, rootSchema: JsonSchema): JsonSchema {
-    if (schema == null || schema.$ref == null) {
+    if (schema == null) {
+        return schema;
+    }
+
+    if (schema.$ref == null) {
         return schema;
     }
     const resolvedSchema = rootSchema.getRef(schema);

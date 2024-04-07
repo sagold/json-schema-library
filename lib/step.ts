@@ -1,8 +1,9 @@
 import getTypeOf from "./getTypeOf";
 import createSchemaOf from "./createSchemaOf";
-import { JsonSchema, JsonPointer, JsonError, isJsonError } from "./types";
+import { JsonSchema, SchemaScope, JsonPointer, JsonError, isJsonError } from "./types";
 import { Draft } from "./draft";
 import { reduceSchema } from "./reduceSchema";
+import { isObject } from "./utils/isObject";
 
 type StepFunction = (
     draft: Draft,
@@ -79,8 +80,9 @@ const stepType: Record<string, StepFunction> = {
         return new Error(`Invalid array schema for ${key} at ${pointer}`) as JsonError;
     },
 
-    object: (draft, key, schema, data, pointer) => {
-        schema = reduceSchema(draft, schema, data, pointer);
+    object: (draft, key, inputSchema, data, pointer) => {
+        const schema = reduceSchema(draft, inputSchema, data, pointer);
+        // console.log("step object", key, schema.__scope);
 
         // @feature properties
         const property = schema?.properties?.[key];
@@ -99,6 +101,18 @@ const stepType: Record<string, StepFunction> = {
                 return createSchemaOf(data?.[key]);
             }
 
+            if (property.$recursiveRef) {
+                // find anchor
+                const history = schema.__scope.history;
+                for (let i = history.length - 1; i >= 0; i--) {
+                    if (history[i].__scope.anchor) {
+                        return history[i];
+                    }
+                }
+
+                return draft.getSchema();
+            }
+
             const targetSchema = draft.resolveRef(property);
             if (isJsonError(targetSchema)) {
                 return targetSchema;
@@ -111,8 +125,9 @@ const stepType: Record<string, StepFunction> = {
                 return draft.resolveOneOf(data[key], targetSchema, `${pointer}/${key}`);
             }
 
-            // resolved schema or error
+            // resolved schema
             if (targetSchema) {
+                console.log("property found", key, targetSchema);
                 return targetSchema;
             }
         }
@@ -148,6 +163,56 @@ const stepType: Record<string, StepFunction> = {
         });
     }
 };
+
+function cloneSchema(schema: JsonSchema, scope: SchemaScope) {
+    if (schema == null) {
+        return;
+    }
+
+    const clone = { ...schema };
+    Object.defineProperty(clone, "__scope", { enumerable: false, value: scope });
+    clone.__scope.history.push(clone);
+
+    if (schema.__ref) {
+        Object.defineProperty(clone, "__ref", { enumerable: false, value: schema.__ref });
+    }
+    if (schema.getOneOfOrigin) {
+        Object.defineProperty(clone, "getOneOfOrigin", { enumerable: false, value: schema.getOneOfOrigin });
+    }
+    return clone;
+}
+
+
+type SchemaNode = {
+    type: "schema-node",
+    pointer: string;
+    schema: JsonSchema;
+    parent?: SchemaNode;
+    children?: SchemaNode[];
+}
+
+const isSchemaNode = (value: unknown): value is SchemaNode =>
+    isObject(value) && value.type === "schema-node";
+
+export function createNode(schema: JsonSchema, pointer = "#") {
+    return {
+        type: "schema-node",
+        pointer: "#",
+        schema
+    };
+}
+
+export function createChildNode(parent: SchemaNode, schema: JsonSchema, pointer: string) {
+    const childNode: SchemaNode = {
+        type: "schema-node",
+        pointer,
+        schema,
+        parent
+    };
+    parent.children = parent.children ?? [];
+    parent.children.push(childNode);
+    return childNode
+}
 
 /**
  * Returns the json-schema of the given object property or array item.
@@ -198,7 +263,12 @@ export default function step(
                 key
             });
         }
-        return schemaResult;
+        console.log("step result", schemaResult)
+        return cloneSchema(schemaResult, {
+            pointer: `${pointer}/${key}`,
+            history: [...schema.__scope.history],
+            anchor: schemaResult.$recursiveAnchor
+        });
     }
 
     return new Error(`Unsupported schema type ${schema.type} for key ${key}`) as JsonError;

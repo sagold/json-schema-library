@@ -62,6 +62,10 @@ export function mergeSchema<T extends JsonSchema>(a: T, b: T): T {
         });
     }
 
+    if (a.__scope || b.__scope) {
+        Object.defineProperty(schema, "__scope", { enumerable: false, value: a.__scope ?? b.__scope });
+    }
+
     // console.log("result", schema);
     return schema;
 }

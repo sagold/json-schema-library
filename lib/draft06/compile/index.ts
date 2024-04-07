@@ -4,7 +4,7 @@ import { eachSchema } from "../../eachSchema";
 // import remotes from "../../../remotes";
 import joinScope from "../../compile/joinScope";
 import getRef from "../../compile/getRef";
-import { JsonSchema } from "../../types";
+import { JsonSchema, SchemaScope } from "../../types";
 import { get } from "@sagold/json-pointer";
 
 const COMPILED = "__compiled";
@@ -60,8 +60,13 @@ export default function compileSchema(
     const context: Context = { ids: {}, anchors: {}, remotes: draft.remotes };
     const rootSchemaAsString = JSON.stringify(schemaToCompile);
     const compiledSchema = JSON.parse(rootSchemaAsString);
+    const rootScope: SchemaScope = {
+        pointer: "#",
+        history: [compiledSchema]
+    };
     Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });
     Object.defineProperty(compiledSchema, GET_CONTEXT, { enumerable: false, value: () => context });
+    Object.defineProperty(compiledSchema, "__scope", { enumerable: false, value: rootScope });
     Object.defineProperty(compiledSchema, GET_REF, {
         enumerable: false,
         value: getRef.bind(null, context, compiledSchema)
@@ -92,8 +97,8 @@ export default function compileSchema(
         if (schema.$id) {
             // if this is a schema being merged on root object, we cannot override
             // parents locations, but must reuse it
-            if (schema.$id.startsWith("http") && /(allOf|anyOf|oneOf)\/\d+$/.test(pointer)) {
-                const parentPointer = pointer.replace(/\/(allOf|anyOf|oneOf)\/\d+$/, "");
+            if (schema.$id.startsWith("http") && /(allOf|anyOf|oneOf|if)\/\d+$/.test(pointer)) {
+                const parentPointer = pointer.replace(/\/(allOf|anyOf|oneOf|if)\/\d+$/, "");
                 const parentSchema = get(compiledSchema, parentPointer);
                 schema.$id = parentSchema.$id ?? schema.$id;
             }
@@ -117,14 +122,11 @@ export default function compileSchema(
         }
 
         if (schema.$ref && !schema[COMPILED_REF]) {
-            // console.log("JOIN ref", `'${scope}'`, "+", schema.$ref, joinScope(scope, schema.$ref));
             Object.defineProperty(schema, COMPILED_REF, {
                 enumerable: false,
                 value: joinScope(scope, schema.$ref)
             });
-            // @todo currently not used:
             Object.defineProperty(schema, GET_ROOT, { enumerable: false, value: getRoot });
-            // console.log("compiled ref", scope, schema.$ref, "=>", joinScope(scope, schema.$ref));
         }
     });
 
