@@ -4,6 +4,7 @@ import { isObject } from "../../utils/isObject";
 import { reduceSchema } from "../../reduceSchema";
 import { validateDependentSchemas, validateDependentRequired } from "../../features/dependencies";
 import { Draft } from "../../draft";
+import Q from "../../Q";
 
 
 /**
@@ -20,7 +21,7 @@ function isPropertyEvaluated(draft: Draft, objectSchema: JsonSchema, propertyNam
         return true;
     }
     // PROPERTIES
-    if (schema.properties?.[propertyName] && draft.isValid(value, schema.properties?.[propertyName])) {
+    if (schema.properties?.[propertyName] && draft.isValid(value, Q.addScope(schema.properties?.[propertyName], objectSchema.__scope))) {
         return true;
     }
     // PATTERN-PROPERTIES
@@ -30,7 +31,7 @@ function isPropertyEvaluated(draft: Draft, objectSchema: JsonSchema, propertyNam
     }
     // ADDITIONAL-PROPERTIES
     if (isObject(schema.additionalProperties)) {
-        return draft.validate(value, schema.additionalProperties);
+        return draft.validate(value, Q.addScope(schema.additionalProperties, objectSchema.__scope));
     }
     return false;
 }
@@ -72,7 +73,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
             }
             // special case: an evaluation in if statement counts too
             // we have an unevaluated prop only if the if-schema does not match
-            if (isObject(schema.if) && isPropertyEvaluated(draft, { type: "object", ...schema.if }, key, value[key])) {
+            if (isObject(schema.if) && isPropertyEvaluated(draft, Q.addScope({ type: "object", ...schema.if }, schema.__scope), key, value[key])) {
                 return false;
             }
             if (testPatterns.find(pattern => pattern.test(key))) {
@@ -102,11 +103,16 @@ const KeywordValidation: Record<string, JsonValidator> = {
         }
 
         unevaluated.forEach(key => {
-            const keyErrors = draft.validate(value[key], resolvedSchema.unevaluatedProperties, `${pointer}/${key}`);
+            const keyErrors = draft.validate(
+                value[key],
+                Q.addScope(resolvedSchema.unevaluatedProperties, schema.__scope),
+                `${pointer}/${key}`
+            );
             errors.push(...keyErrors);
         });
         return errors;
     },
+
     /**
      * @draft >= 2019-09
      * Similar to additionalItems, but can "see" into subschemas and across references
@@ -127,7 +133,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         if (isObject(schema.if)) {
             const ifSchema: JsonSchema = { type: "array", ...schema.if };
-            if (draft.isValid(value, ifSchema)) {
+            if (draft.isValid(value, Q.addScope(ifSchema, schema.__scope))) {
                 if (Array.isArray(ifSchema.items) && ifSchema.items.length === value.length) {
                     return undefined
                 }
@@ -136,7 +142,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         }
 
         if (isObject(resolvedSchema.items)) {
-            const errors = draft.validate(value, { ...resolvedSchema, unevaluatedItems: undefined }, pointer);
+            const errors = draft.validate(value, Q.addScope({ ...resolvedSchema, unevaluatedItems: undefined }, schema.__scope), pointer);
             return errors.map(e => draft.errors.unevaluatedItemsError({ ...e.data }));
         }
 
@@ -144,7 +150,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
             const items: { index: number, value: unknown }[] = [];
             for (let i = resolvedSchema.items.length; i < value.length; i += 1) {
                 if (i < resolvedSchema.items.length) {
-                    if (!draft.isValid(value[i], resolvedSchema.items[i])) {
+                    if (!draft.isValid(value[i], Q.addScope(resolvedSchema.items[i], schema.__scope))) {
                         items.push({ index: i, value: value[i] });
                     }
                 } else {
@@ -160,7 +166,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         if (isObject(resolvedSchema.unevaluatedItems)) {
             return value.map((item, index) => {
-                if (!draft.isValid(item, resolvedSchema.unevaluatedItems)) {
+                if (!draft.isValid(item, Q.addScope(resolvedSchema.unevaluatedItems, schema.__scope))) {
                     return draft.errors.unevaluatedItemsError({
                         pointer: `${pointer}/${index}`,
                         value: JSON.stringify(item),

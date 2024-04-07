@@ -16,6 +16,7 @@ export function _mergeSchema(a: JsonSchema, b: JsonSchema) {
 
     // @scope
     const result = mergeArraysUnique(a, b);
+    Object.defineProperty(result, "__compiled", { enumerable: false, value: true });
     Object.defineProperty(result, "__scope", { enumerable: false, value: b.__scope ?? a.__scope });
     Object.defineProperty(result, "__ref", { enumerable: false, value: b.__ref ?? a.__ref });
     Object.defineProperty(result, "getOneOfOrigin", { enumerable: false, value: b.getOneOfOrigin ?? a.getOneOfOrigin });

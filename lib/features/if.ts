@@ -3,6 +3,7 @@
  */
 import { JsonSchema, JsonValidator } from "../types";
 import { Draft } from "../draft";
+import Q from "../Q";
 
 /**
  * returns if-then-else as a json schema. does not merge with input
@@ -24,7 +25,7 @@ export function resolveIfSchema(
     }
 
     if (schema.if && (schema.then || schema.else)) {
-        const ifErrors = draft.validate(data, draft.resolveRef(schema.if));
+        const ifErrors = draft.validate(data, Q.addScope(draft.resolveRef(schema.if), schema.__scope));
         if (ifErrors.length === 0 && schema.then) {
             return draft.resolveRef(schema.then);
         }
@@ -40,7 +41,7 @@ export function resolveIfSchema(
 const validateIf: JsonValidator = (draft, schema, value, pointer) => {
     const resolvedSchema = resolveIfSchema(draft, schema, value);
     if (resolvedSchema) {
-        return draft.validate(value, resolvedSchema, pointer);
+        return draft.validate(value, Q.addScope(resolvedSchema, schema.__scope), pointer);
     }
 };
 

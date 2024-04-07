@@ -9,6 +9,7 @@ import { validateDependencies } from "../features/dependencies";
 import { validateOneOf } from "../features/oneOf";
 import { getPrecision } from "../utils/getPrecision";
 import deepEqual from "fast-deep-equal";
+import Q from "../Q";
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 const hasProperty = (value: Record<string, unknown>, property: string) =>
@@ -77,7 +78,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
                             })
                         );
                     } else {
-                        errors.push(...draft.validate(value[property], result, pointer));
+                        errors.push(...draft.validate(value[property], Q.addScope(result, schema.__scope), pointer));
                     }
 
                     // additionalProperties {}
@@ -85,7 +86,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
                     errors.push(
                         ...draft.validate(
                             value[property],
-                            schema.additionalProperties,
+                            Q.addScope(schema.additionalProperties, schema.__scope),
                             `${pointer}/${property}`
                         )
                     );
@@ -152,7 +153,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
                 return [itemSchema];
             }
 
-            const itemErrors = draft.validate(itemData, itemSchema, `${pointer}/${i}`);
+            const itemErrors = draft.validate(itemData, Q.addScope(itemSchema, schema.__scope), `${pointer}/${i}`);
             errors.push(...itemErrors);
         }
 
@@ -350,7 +351,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
     },
     not: (draft, schema, value, pointer) => {
         const errors: JsonError[] = [];
-        if (draft.validate(value, schema.not, pointer).length === 0) {
+        if (draft.validate(value, Q.addScope(schema.not, schema.__scope), pointer).length === 0) {
             errors.push(draft.errors.notError({ value, not: schema.not, pointer, schema }));
         }
         return errors;
@@ -392,7 +393,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
                     patternFound = true;
                     const valErrors = draft.validate(
                         value[key],
-                        patterns[i].patternSchema,
+                        Q.addScope(patterns[i].patternSchema, schema.__scope),
                         `${pointer}/${key}`
                     );
                     if (valErrors && valErrors.length > 0) {
@@ -428,7 +429,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
             const key = keys[i];
             if (hasProperty(value, key)) {
                 const itemSchema = draft.step(key, schema, value, pointer);
-                const keyErrors = draft.validate(value[key], itemSchema, `${pointer}/${key}`);
+                const keyErrors = draft.validate(value[key], Q.addScope(itemSchema, schema.__scope), `${pointer}/${key}`);
                 errors.push(...keyErrors);
             }
         }
@@ -444,7 +445,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
                 errors.push(draft.errors.requiredPropertyError({ key, pointer, schema, value }));
             } else {
                 const itemSchema = draft.step(key, schema, value, pointer);
-                const keyErrors = draft.validate(value[key], itemSchema, `${pointer}/${key}`);
+                const keyErrors = draft.validate(value[key], Q.addScope(itemSchema, schema.__scope), `${pointer}/${key}`);
                 errors.push(...keyErrors);
             }
         }

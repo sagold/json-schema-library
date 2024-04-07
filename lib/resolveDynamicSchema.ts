@@ -8,6 +8,7 @@ import { mergeValidAnyOfSchema } from "./features/anyOf";
 import { resolveOneOfFuzzy as resolveOneOf } from "./features/oneOf";
 import { JsonData } from "@sagold/json-pointer";
 import { omit } from "./utils/omit";
+import Q from "./Q";
 
 const toOmit = ["allOf", "anyOf", "oneOf", "dependencies", "if", "then", "else"];
 const dynamicProperties = ["allOf", "anyOf", "oneOf", "dependencies", "if"];
@@ -39,6 +40,10 @@ export function resolveDynamicSchema(
     data: unknown,
     pointer: JsonPointer
 ) {
+    if (!schema.__scope) {
+        throw new Error("required scope is missing in 'resolveDynamicSchema'");
+    }
+
     let resolvedSchema: JsonSchema;
     let error: JsonError;
     schema = draft.resolveRef(schema);
@@ -60,7 +65,7 @@ export function resolveDynamicSchema(
             // if not, we would wrongly merge oneOf, if-then statements, etc
             if (isDynamicSchema(s)) {
                 // copy of reduceSchema
-                let result = resolveDynamicSchema(draft, s, data, pointer);
+                let result = resolveDynamicSchema(draft, Q.addScope(s, schema.__scope), data, pointer);
                 if (result) {
                     result = mergeSchema(s, result);
                     return omit(result, ...toOmit);
@@ -99,7 +104,7 @@ export function resolveDynamicSchema(
 
     const nestedSchema: JsonSchema | undefined = resolveDynamicSchema(
         draft,
-        resolvedSchema,
+        Q.addScope(resolvedSchema, schema.__scope),
         data,
         pointer
     );
@@ -107,5 +112,6 @@ export function resolveDynamicSchema(
         resolvedSchema = mergeSchema(resolvedSchema, nestedSchema);
     }
 
-    return omit(resolvedSchema, ...toOmit);
+    const finalSchema = omit(resolvedSchema, ...toOmit);
+    return Q.addScope(finalSchema, schema.__scope);
 }

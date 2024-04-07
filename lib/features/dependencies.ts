@@ -7,6 +7,7 @@ import { Draft } from "../draft";
 import { mergeSchema } from "../mergeSchema";
 import { uniqueItems } from "../utils/uniqueItems";
 import { isObject } from "../utils/isObject";
+import Q from "../Q";
 
 /**
  * @todo add support for dependentRequired (draft 2019-09)
@@ -120,7 +121,7 @@ export const validateDependentSchemas: JsonValidator = (
         if (!isObject(dependencies)) {
             return;
         }
-        draft.validate(value, dependencies, pointer).map(error => errors.push(error));
+        draft.validate(value, Q.addScope(dependencies, schema.__scope), pointer).map(error => errors.push(error));
     });
     return errors;
 };
@@ -163,7 +164,7 @@ export const validateDependencies: JsonValidator = (
                     draft.errors.missingDependencyError({ missingProperty, pointer, schema, value })
                 );
         } else if (type === "object") {
-            dependencyErrors = draft.validate(value, dependencies[property], pointer);
+            dependencyErrors = draft.validate(value, Q.addScope(dependencies[property], schema.__scope), pointer);
         } else {
             throw new Error(
                 `Invalid dependency definition for ${pointer}/${property}. Must be string[] or schema`

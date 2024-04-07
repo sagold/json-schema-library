@@ -5,6 +5,7 @@ import { mergeSchema } from "../mergeSchema";
 import { JsonSchema, JsonPointer, JsonValidator, JsonError } from "../types";
 import { Draft } from "../draft";
 import { omit } from "../utils/omit";
+import Q from "../Q";
 
 /**
  * returns merged schema of all valid anyOf subschemas for the given input data.
@@ -20,7 +21,7 @@ export function mergeValidAnyOfSchema(draft: Draft, schema: JsonSchema, data: un
     let resolvedSchema: JsonSchema;
     schema.anyOf.forEach((anySchema: JsonSchema) => {
         anySchema = draft.resolveRef(anySchema);
-        if (draft.isValid(data, anySchema)) {
+        if (draft.isValid(data, Q.addScope(anySchema, schema.__scope))) {
             resolvedSchema = resolvedSchema ? mergeSchema(resolvedSchema, anySchema) : anySchema;
         }
     });
@@ -59,7 +60,7 @@ const validateAnyOf: JsonValidator = (draft, schema, value, pointer) => {
     }
 
     for (let i = 0; i < schema.anyOf.length; i += 1) {
-        if (draft.isValid(value, schema.anyOf[i])) {
+        if (draft.isValid(value, Q.addScope(schema.anyOf[i], schema.__scope))) {
             return undefined;
         }
     }

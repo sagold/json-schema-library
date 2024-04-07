@@ -21,7 +21,7 @@ const stepType: Record<string, StepFunction> = {
         if (itemsType === "object") {
             // @spec: ignore additionalItems, when items is schema-object
             return (
-                reduceSchema(draft, schema.items, itemValue, `${pointer}/${key}`) ||
+                reduceSchema(draft, Q.addScope(schema.items, schema.__scope), itemValue, `${pointer}/${key}`) ||
                 draft.resolveRef(schema.items)
             );
         }
@@ -42,7 +42,7 @@ const stepType: Record<string, StepFunction> = {
             }
 
             if (schema.items[key]) {
-                return draft.resolveRef(schema.items[key]);
+                return draft.resolveRef(Q.addScope(schema.items[key], schema.__scope));
             }
 
             if (schema.additionalItems === false) {
@@ -82,7 +82,6 @@ const stepType: Record<string, StepFunction> = {
 
     object: (draft, key, inputSchema, data, pointer) => {
         const schema = reduceSchema(draft, inputSchema, data, pointer);
-        // console.log("step object", key, schema.__scope);
 
         // @feature properties
         const property = schema?.properties?.[key];
@@ -97,23 +96,17 @@ const stepType: Record<string, StepFunction> = {
                     pointer,
                     schema
                 });
+
             } else if (property === true) {
                 return createSchemaOf(data?.[key]);
             }
 
-            if (property.$recursiveRef) {
-                // find anchor
-                const history = schema.__scope.history;
-                for (let i = history.length - 1; i >= 0; i--) {
-                    if (history[i].__scope.anchor) {
-                        return history[i];
-                    }
-                }
 
-                return draft.getSchema();
+            const targetSchema = draft.resolveRef(Q.addScope(property, inputSchema.__scope));
+            if (isJsonError(targetSchema)) {
+                return targetSchema;
             }
 
-            const targetSchema = draft.resolveRef(property);
             if (isJsonError(targetSchema)) {
                 return targetSchema;
             }
@@ -184,7 +177,7 @@ export default function step(
     data?: any,
     pointer: JsonPointer = "#"
 ): JsonSchema | JsonError {
-    schema = draft.compileSchema(schema);
+    // schema = draft.compileSchema(schema);
 
     const typeOfData = getTypeOf(data);
     let schemaType = schema.type ?? typeOfData;

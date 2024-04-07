@@ -5,7 +5,7 @@ import { JsonSchema, JsonValidator, JsonError } from "../types";
 import { Draft } from "../draft";
 import { mergeSchema } from "../mergeSchema";
 import { omit } from "../utils/omit";
-import copy from "../utils/copy";
+import Q from "../Q";
 import { resolveIfSchema } from "./if";
 
 /**
@@ -13,7 +13,7 @@ import { resolveIfSchema } from "./if";
  * when complete this will have much duplication to step.object etc
  */
 export function resolveSchema(draft: Draft, schemaToResolve: JsonSchema, data: unknown): JsonSchema {
-    const schema = { ...(draft.resolveRef(schemaToResolve) ?? {}) };
+    const schema = Q.clone(schemaToResolve);
     const ifSchema = resolveIfSchema(draft, schema, data);
     if (ifSchema) {
         return ifSchema;
@@ -26,7 +26,7 @@ export function resolveAllOf(
     data: any,
     schema: JsonSchema = draft.rootSchema
 ): JsonSchema | JsonError {
-    let mergedSchema = copy(schema);
+    let mergedSchema = Q.clone(schema);
     for (let i = 0; i < schema.allOf.length; i += 1) {
         // @todo introduce draft.resolveSchema to iteratively resolve
         const allOfSchema = resolveSchema(draft, schema.allOf[i], data);
@@ -65,7 +65,7 @@ const validateAllOf: JsonValidator = (draft, schema, value, pointer) => {
     }
     const errors: JsonError[] = [];
     schema.allOf.forEach((subSchema: JsonSchema) => {
-        errors.push(...draft.validate(value, subSchema, pointer));
+        errors.push(...draft.validate(value, Q.addScope(subSchema, schema.__scope), pointer));
     });
     return errors;
 };

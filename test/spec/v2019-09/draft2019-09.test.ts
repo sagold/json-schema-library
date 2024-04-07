@@ -94,7 +94,7 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
 
-            // if (testCase.description !== "remote HTTP ref with nested absolute ref") { return; }
+            // if (testCase.description !== "allOf with boolean schemas, some false") { return; }
 
             const schema = testCase.schema;
             if (skipTest.includes(testCase.description)) {

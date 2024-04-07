@@ -2,6 +2,7 @@ import Keywords from "../../validation/keyword";
 import getTypeOf from "../../getTypeOf";
 import { JsonValidator, JsonError } from "../../types";
 import { validateIf } from "../../features/if";
+import Q from "../../Q";
 
 const KeywordValidation: Record<string, JsonValidator> = {
     ...Keywords,
@@ -25,7 +26,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         let count = 0;
         for (let i = 0; i < value.length; i += 1) {
-            if (draft.isValid(value[i], schema.contains)) {
+            if (draft.isValid(value[i], Q.addScope(schema.contains, schema.__scope))) {
                 count++;
             }
         }
@@ -143,7 +144,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
                     const valErrors = draft.validate(
                         value[key],
-                        patterns[i].patternSchema,
+                        Q.addScope(patterns[i].patternSchema, schema.__scope),
                         `${pointer}/${key}`
                     );
                     if (valErrors && valErrors.length > 0) {
@@ -201,7 +202,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         const properties = Object.keys(value);
         const propertySchema = { ...schema.propertyNames, type: "string" };
         properties.forEach((prop) => {
-            const validationResult = draft.validate(prop, propertySchema, `${pointer}/${prop}`);
+            const validationResult = draft.validate(prop, Q.addScope(propertySchema, schema.__scope), `${pointer}/${prop}`);
             if (validationResult.length > 0) {
                 errors.push(
                     draft.errors.invalidPropertyNameError({

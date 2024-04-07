@@ -57,6 +57,9 @@ export default function compileSchema(
     if (schemaToCompile[COMPILED] !== undefined) {
         return schemaToCompile;
     } // eslint-disable-line
+
+    // console.log("compile schema", schemaToCompile.$id);
+
     const context: Context = { ids: {}, anchors: {}, remotes: draft.remotes };
     const rootSchemaAsString = JSON.stringify(schemaToCompile);
     const compiledSchema = JSON.parse(rootSchemaAsString);
