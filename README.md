@@ -35,6 +35,23 @@ const errors: JsonError[] = jsonSchema.validate(myData);
 
 What follows is a description of the main draft methods.
 
+
+## Draft support
+
+`json-schema-library` supports almost all draft features. This sections lists currently unsupported features for each draft
+
+<details><summary>Draft 2019-09</summary>
+
+**Currently unsupported core features:**
+
+- `$recursiveRef` and `$recursiveAnchor` - are currently not supported
+- `$vocabulary` - meta-schemas are not parsed for enabled features
+- `unevaluatedItems: uncle-schema` - evaluation of uncle-schemas is not supported. Properties will be return as evaluated
+- `unevaluatedProperties: uncle-schema` - evaluation of uncle-schemas is not supported. Properties will be return as evaluated
+
+</details>
+
+
 ## Draft methods
 
 -   [validate](#validate)
