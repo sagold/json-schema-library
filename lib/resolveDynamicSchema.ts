@@ -40,10 +40,6 @@ export function resolveDynamicSchema(
     data: unknown,
     pointer: JsonPointer
 ) {
-    if (!schema.__scope) {
-        throw new Error("required scope is missing in 'resolveDynamicSchema'");
-    }
-
     let resolvedSchema: JsonSchema;
     let error: JsonError;
     schema = draft.resolveRef(schema);

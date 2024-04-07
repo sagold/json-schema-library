@@ -72,9 +72,9 @@ export default function validate(
         ];
     }
 
-    if (!schema.__scope) {
-        throw new Error("requires scope in validation");
-    }
+    // if (!schema.__scope) {
+    //     throw new Error("requires scope in validation");
+    // }
 
     if (draft.validateType[receivedType] == null) {
         return [draft.errors.invalidTypeError({ pointer, schema, value, receivedType })];

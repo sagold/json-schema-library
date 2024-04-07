@@ -40,9 +40,9 @@ function addScope(schema: JsonSchema, scope: SchemaScope) {
     if (!isObject(schema)) {
         return schema;
     }
-    if (scope == null) {
-        throw new Error("scope passed is null");
-    }
+    // if (scope == null) {
+    //     throw new Error("scope passed is null");
+    // }
     // @scope
     const clone = { ...schema };
     Object.defineProperty(clone, "__compiled", { enumerable: false, value: true });

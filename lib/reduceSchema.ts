@@ -20,9 +20,6 @@ export function reduceSchema(
     data: unknown,
     pointer: JsonPointer
 ) {
-    if (!schema.__scope) {
-        throw new Error("required scope is missing in 'reduceSchema'");
-    }
     let resolvedSchema = resolveDynamicSchema(draft, schema, data, pointer);
     if (resolvedSchema) {
         resolvedSchema = mergeSchema(schema, resolvedSchema);

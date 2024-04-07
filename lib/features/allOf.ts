@@ -29,7 +29,7 @@ export function resolveAllOf(
     let mergedSchema = Q.clone(schema);
     for (let i = 0; i < schema.allOf.length; i += 1) {
         // @todo introduce draft.resolveSchema to iteratively resolve
-        const allOfSchema = resolveSchema(draft, schema.allOf[i], data);
+        const allOfSchema = resolveSchema(draft, Q.addScope(draft.resolveRef(schema.allOf[i]), schema.__scope), data);
         mergedSchema = mergeSchema(mergedSchema, allOfSchema);
     }
     delete mergedSchema.allOf;

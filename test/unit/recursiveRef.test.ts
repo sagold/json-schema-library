@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { Draft2019 } from "../../lib/draft2019"
 import { JsonSchema } from "../../lib/types";
 
-describe.only("recursiveRef", () => {
+describe("recursiveRef", () => {
 
     describe("properties", () => {
         let inputSchema: JsonSchema = {};
