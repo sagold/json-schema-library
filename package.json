@@ -68,7 +68,7 @@
         "eslint-plugin-optimize-regex": "^1.2.0",
         "eslint-plugin-promise": "^6.0.0",
         "glob": "^10.3.10",
-        "json-schema-test-suite": "https://github.com/json-schema-org/JSON-Schema-Test-Suite#604f5f99bfb669b38487e627890dd07b79780b18",
+        "json-schema-test-suite": "https://github.com/json-schema-org/JSON-Schema-Test-Suite#57617f254a6734d5c64fa86fd3b08e8799970b25",
         "mocha": "^10.4.0",
         "nyc": "^15.1.0",
         "terser-webpack-plugin": "^5.3.10",
