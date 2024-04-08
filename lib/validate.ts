@@ -34,18 +34,7 @@ export default function validate(
     schema: JsonSchema = draft.rootSchema,
     pointer: JsonPointer = "#"
 ): Array<JsonError> {
-    // if (!schema.__scope) {
-    //     throw new Error("initially requires scope in validation");
-    // }
-    // if (schema.__scope.history.includes(undefined)) {
-    //     throw new Error("undefined in history");
-    // }
     schema = draft.resolveRef(schema);
-    // if (value !== prev) {
-    //     prev = value;
-    //     console.log("validate", pointer, value);
-    //     // console.log(schema);
-    // }
 
     // @draft >= 07
     if (getTypeOf(schema) === "boolean") {
@@ -85,9 +74,9 @@ export default function validate(
         ];
     }
 
-    if (!schema.__scope) {
-        throw new Error("requires scope in validation");
-    }
+    // if (!schema.__scope) {
+    //     throw new Error("requires scope in validation");
+    // }
 
     if (draft.validateType[receivedType] == null) {
         return [draft.errors.invalidTypeError({ pointer, schema, value, receivedType })];

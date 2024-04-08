@@ -1,3 +1,8 @@
+# Draft 2019-09 Scope
+
+- [ ] add all subSchemas to scope-history as only if and anyOf are tested
+
+
 # Tasks
 
 - [ ] template default options retrieved from draft

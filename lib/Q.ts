@@ -3,6 +3,11 @@ import { isObject } from "./utils/isObject";
 // import copy from "./utils/copy";
 
 /**
+ * Note: scope history = validation path ~ dynamic scope
+ * This list should contain any subschema encountered
+ */
+
+/**
  * Omit properties from input schema. Accepts any number of properties to
  * remove. Example:
  *
@@ -54,7 +59,6 @@ function next(key: string | number, schema: JsonSchema, parentSchema: JsonSchema
     // if (scope == null) {
     //     throw new Error("missing parent scope");
     // }
-
     return newScope(schema, {
         pointer: `${scope.pointer}/${key}`,
         history: [...scope.history]
@@ -68,7 +72,6 @@ function newScope(schema: JsonSchema, scope: SchemaScope) {
     if (!isObject(schema)) {
         return schema;
     }
-    console.log("new", scope.pointer, schema);
     // @scope
     const clone: JsonSchema = { ...schema };
     Object.defineProperty(clone, "__compiled", { enumerable: false, value: true });
@@ -76,16 +79,7 @@ function newScope(schema: JsonSchema, scope: SchemaScope) {
     Object.defineProperty(clone, "__ref", { enumerable: false, value: schema.__ref });
     Object.defineProperty(clone, "getOneOfOrigin", { enumerable: false, value: schema.getOneOfOrigin });
     const history = scope.history;
-
-    // if (history[history.length - 1] && history[history.length - 1].__scope.pointer === scope.pointer) {
-    //     scope.history[scope.history.length - 1] = clone;
-    // } else {
-    //     // history contains current node as last item
-    //     history.push(clone);
-    // }
-
     history.push(clone);
-
     return clone;
 }
 

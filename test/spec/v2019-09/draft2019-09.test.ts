@@ -11,7 +11,7 @@ addRemotes(cache);
 
 const supportedTestCases = (t: FeatureTest) => !t.optional
     && ![
-        // todo list
+        // TODO CORE FEATURES
         // "recursiveRef",
         "vocabulary"
     ].includes(t.name)
@@ -94,6 +94,7 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
 
+            // if (testCase.description !== "$recursiveRef with nesting") { return; }
             // if (testCase.description !== "$recursiveRef without using nesting") { return; }
 
             const schema = testCase.schema;

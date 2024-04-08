@@ -66,7 +66,7 @@ const validateAnyOf: JsonValidator = (draft, schema, value, pointer) => {
         const nextNode = schema.__scope ? Q.newScope(nextSchema, {
             pointer,
             history: [...schema.__scope.history]
-        }) : { pointer, history: [] };
+        }) : nextSchema;
         // const nextNode = Q.addScope(nextSchema, schema.__scope);
         if (draft.isValid(value, nextNode)) {
             return undefined;

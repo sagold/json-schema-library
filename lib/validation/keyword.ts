@@ -78,10 +78,10 @@ const KeywordValidation: Record<string, JsonValidator> = {
                             })
                         );
                     } else {
-                        errors.push(...draft.validate(value[property], Q.newScope(result, {
+                        errors.push(...draft.validate(value[property], Q.newScope(result, schema.__scope ? {
                             pointer: `${schema.__scope.pointer}/${property}`,
                             history: [...schema.__scope.history]
-                        }), pointer));
+                        } : { pointer: `${pointer}/${property}`, history: [] }), pointer));
                     }
 
                     // additionalProperties {}

@@ -1,31 +1,33 @@
 import { JsonSchema } from "./types";
 import { mergeSchema } from "./mergeSchema";
 
+// 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
+
+
 function resolveRecursiveRef(rootSchema: JsonSchema, schema: JsonSchema) {
     const history = schema.__scope.history;
-    // for (let i = 0; i < history.length; i += 1) {
-    //     console.log(i, history[i], history[i].__scope);
-    // }
-
-    // find anchor
+    console.log("» history", history.map((v: JsonSchema) => v.__scope.pointer));
+    console.log("»» history", history.map((v: JsonSchema) => v));
+    // RESTRICT BY CHANGE IN BASE-URL
+    let startIndex = 0;
     for (let i = history.length - 1; i >= 0; i--) {
-        if (history[i].$recursiveAnchor === true) {
-            return history[i];
-        }
-        // if (history[i].$recursiveAnchor === false) {
-        //     return rootSchema;
-        // }
-        if (history[i].$id) {
-            return history[i];
-        }
-        // if (history[i].$id && /^https?:\/\//.test(history[i].$id)) {
-        //     // new root
-        //     return history[i];
-        // }
-        if (history[i].$recursiveAnchor === false) {
+        if (history[i].$id && /^https?:\/\//.test(history[i].$id)) {
+            startIndex = i;
             break;
         }
     }
+    // FROM THERE FIND FIRST OCCURENCE OF ANCHOR
+    const firstAnchor = history.find((s: JsonSchema, index: number) => index >= startIndex && s.$recursiveAnchor === true);
+    if (firstAnchor) {
+        return firstAnchor;
+    }
+    // THEN RETURN LATEST BASE AS TARGET
+    for (let i = history.length - 1; i >= 0; i--) {
+        if (history[i].$id) {
+            return history[i];
+        }
+    }
+    // OR RETURN ROOT
     return rootSchema;
 }
 
@@ -38,7 +40,8 @@ export default function resolveRefMerge(schema: JsonSchema, rootSchema: JsonSche
         return schema;
     }
     if (schema.$recursiveRef) {
-        return resolveRecursiveRef(rootSchema, schema);
+        const nextSchema = resolveRecursiveRef(rootSchema, schema);
+        return resolveRefMerge(nextSchema, rootSchema);
     }
     if (schema.$ref == null) {
         return schema;
