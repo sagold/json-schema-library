@@ -1,3 +1,4 @@
+import Q from "../Q";
 /**
  * returns if-then-else as a json schema. does not merge with input
  * json schema. you probably will need to do so to correctly resolve
@@ -13,7 +14,7 @@ export function resolveIfSchema(draft, schema, data) {
         return schema.else;
     }
     if (schema.if && (schema.then || schema.else)) {
-        const ifErrors = draft.validate(data, draft.resolveRef(schema.if));
+        const ifErrors = draft.validate(data, Q.add(schema, draft.resolveRef(schema.if)));
         if (ifErrors.length === 0 && schema.then) {
             return draft.resolveRef(schema.then);
         }
@@ -28,7 +29,9 @@ export function resolveIfSchema(draft, schema, data) {
 const validateIf = (draft, schema, value, pointer) => {
     const resolvedSchema = resolveIfSchema(draft, schema, value);
     if (resolvedSchema) {
-        return draft.validate(value, resolvedSchema, pointer);
+        // @recursiveRef ok, we not just add per pointer, but any evlauation to dynamic scope / validation path
+        const nextScope = Q.add(schema, resolvedSchema);
+        return draft.validate(value, nextScope, pointer);
     }
 };
 export { validateIf };

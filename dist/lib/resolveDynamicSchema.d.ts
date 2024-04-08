@@ -18,4 +18,4 @@ export declare function isDynamicSchema(schema: JsonData): boolean;
  * @returns static schema from resolved dynamic schema definitions for this
  *  specific input data
  */
-export declare function resolveDynamicSchema(draft: Draft, schema: JsonSchema, data: unknown, pointer: JsonPointer): Record<string, unknown>;
+export declare function resolveDynamicSchema(draft: Draft, schema: JsonSchema, data: unknown, pointer: JsonPointer): JsonSchema;

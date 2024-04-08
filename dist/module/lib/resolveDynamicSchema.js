@@ -6,6 +6,7 @@ import { mergeAllOfSchema } from "./features/allOf";
 import { mergeValidAnyOfSchema } from "./features/anyOf";
 import { resolveOneOfFuzzy as resolveOneOf } from "./features/oneOf";
 import { omit } from "./utils/omit";
+import Q from "./Q";
 const toOmit = ["allOf", "anyOf", "oneOf", "dependencies", "if", "then", "else"];
 const dynamicProperties = ["allOf", "anyOf", "oneOf", "dependencies", "if"];
 export function isDynamicSchema(schema) {
@@ -49,7 +50,7 @@ export function resolveDynamicSchema(draft, schema, data, pointer) {
             // if not, we would wrongly merge oneOf, if-then statements, etc
             if (isDynamicSchema(s)) {
                 // copy of reduceSchema
-                let result = resolveDynamicSchema(draft, s, data, pointer);
+                let result = resolveDynamicSchema(draft, Q.add(schema, s), data, pointer);
                 if (result) {
                     result = mergeSchema(s, result);
                     return omit(result, ...toOmit);
@@ -81,9 +82,10 @@ export function resolveDynamicSchema(draft, schema, data, pointer) {
     if (resolvedSchema == null) {
         return error;
     }
-    const nestedSchema = resolveDynamicSchema(draft, resolvedSchema, data, pointer);
+    const nestedSchema = resolveDynamicSchema(draft, Q.add(schema, resolvedSchema), data, pointer);
     if (nestedSchema) {
         resolvedSchema = mergeSchema(resolvedSchema, nestedSchema);
     }
-    return omit(resolvedSchema, ...toOmit);
+    const finalSchema = omit(resolvedSchema, ...toOmit);
+    return Q.add(schema, finalSchema);
 }

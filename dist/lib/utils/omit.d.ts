@@ -1,5 +1,5 @@
 /**
- * Omit properties from input object. Accepts any number of properties to
+ * Omit properties from input schema. Accepts any number of properties to
  * remove. Example:
  *
  * ```ts

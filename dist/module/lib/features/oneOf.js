@@ -7,6 +7,7 @@ import settings from "../config/settings";
 import { createOneOfSchemaResult } from "../schema/createOneOfSchemaResult";
 import { errorOrPromise } from "../utils/filter";
 import { isJsonError } from "../types";
+import Q from "../Q";
 const { DECLARATOR_ONEOF } = settings;
 /**
  * Selects and returns a oneOf schema for the given data
@@ -38,11 +39,11 @@ export function resolveOneOf(draft, data, schema = draft.rootSchema, pointer = "
         }
         for (let i = 0; i < schema.oneOf.length; i += 1) {
             const one = draft.resolveRef(schema.oneOf[i]);
-            const oneOfPropertySchema = draft.step(oneOfProperty, one, data, pointer);
+            const oneOfPropertySchema = draft.step(oneOfProperty, Q.add(schema, one), data, pointer);
             if (isJsonError(oneOfPropertySchema)) {
                 return oneOfPropertySchema;
             }
-            let result = flattenArray(draft.validate(oneOfValue, oneOfPropertySchema, pointer));
+            let result = flattenArray(draft.validate(oneOfValue, Q.add(schema, oneOfPropertySchema), pointer));
             result = result.filter(errorOrPromise);
             if (result.length > 0) {
                 errors.push(...result);
@@ -63,7 +64,7 @@ export function resolveOneOf(draft, data, schema = draft.rootSchema, pointer = "
     const errors = [];
     for (let i = 0; i < schema.oneOf.length; i += 1) {
         const one = draft.resolveRef(schema.oneOf[i]);
-        let result = flattenArray(draft.validate(data, one, pointer));
+        let result = flattenArray(draft.validate(data, Q.add(schema, one), pointer));
         result = result.filter(errorOrPromise);
         if (result.length > 0) {
             errors.push(...result);
@@ -108,7 +109,7 @@ function fuzzyObjectValue(draft, one, data, pointer) {
     const keys = Object.keys(one.properties);
     for (let i = 0; i < keys.length; i += 1) {
         const key = keys[i];
-        if (data[key] != null && draft.isValid(data[key], one.properties[key], pointer)) {
+        if (data[key] != null && draft.isValid(data[key], Q.add(one, one.properties[key]), pointer)) {
             value += 1;
         }
     }
@@ -144,11 +145,11 @@ export function resolveOneOfFuzzy(draft, data, schema = draft.rootSchema, pointe
         }
         for (let i = 0; i < schema.oneOf.length; i += 1) {
             const one = draft.resolveRef(schema.oneOf[i]);
-            const oneOfPropertySchema = draft.step(oneOfProperty, one, data, pointer);
+            const oneOfPropertySchema = draft.step(oneOfProperty, Q.add(schema, one), data, pointer);
             if (isJsonError(oneOfPropertySchema)) {
                 return oneOfPropertySchema;
             }
-            let result = flattenArray(draft.validate(oneOfValue, oneOfPropertySchema, pointer));
+            let result = flattenArray(draft.validate(oneOfValue, Q.add(schema, oneOfPropertySchema), pointer));
             result = result.filter(errorOrPromise);
             if (result.length > 0) {
                 errors.push(...result);
@@ -169,7 +170,7 @@ export function resolveOneOfFuzzy(draft, data, schema = draft.rootSchema, pointe
     const matches = [];
     for (let i = 0; i < schema.oneOf.length; i += 1) {
         const one = draft.resolveRef(schema.oneOf[i]);
-        if (draft.isValid(data, one, pointer)) {
+        if (draft.isValid(data, Q.add(schema, one), pointer)) {
             matches.push({ schema: one, index: i });
         }
     }
@@ -183,7 +184,7 @@ export function resolveOneOfFuzzy(draft, data, schema = draft.rootSchema, pointe
         let fuzzyGreatest = 0;
         for (let i = 0; i < schema.oneOf.length; i += 1) {
             const one = draft.resolveRef(schema.oneOf[i]);
-            const fuzzyValue = fuzzyObjectValue(draft, one, data);
+            const fuzzyValue = fuzzyObjectValue(draft, Q.add(schema, one), data);
             if (fuzzyGreatest < fuzzyValue) {
                 fuzzyGreatest = fuzzyValue;
                 schemaOfItem = schema.oneOf[i];

@@ -1,14 +1,13 @@
 import { mergeSchema } from "../mergeSchema";
 import { omit } from "../utils/omit";
-import copy from "../utils/copy";
+import Q from "../Q";
 import { resolveIfSchema } from "./if";
 /**
  * resolves schema
  * when complete this will have much duplication to step.object etc
  */
 export function resolveSchema(draft, schemaToResolve, data) {
-    var _a;
-    const schema = { ...((_a = draft.resolveRef(schemaToResolve)) !== null && _a !== void 0 ? _a : {}) };
+    const schema = Q.clone(schemaToResolve);
     const ifSchema = resolveIfSchema(draft, schema, data);
     if (ifSchema) {
         return ifSchema;
@@ -16,10 +15,10 @@ export function resolveSchema(draft, schemaToResolve, data) {
     return omit(schema, "if", "then", "else");
 }
 export function resolveAllOf(draft, data, schema = draft.rootSchema) {
-    let mergedSchema = copy(schema);
+    let mergedSchema = Q.clone(schema);
     for (let i = 0; i < schema.allOf.length; i += 1) {
         // @todo introduce draft.resolveSchema to iteratively resolve
-        const allOfSchema = resolveSchema(draft, schema.allOf[i], data);
+        const allOfSchema = resolveSchema(draft, Q.add(schema, draft.resolveRef(schema.allOf[i])), data);
         mergedSchema = mergeSchema(mergedSchema, allOfSchema);
     }
     delete mergedSchema.allOf;
@@ -53,7 +52,7 @@ const validateAllOf = (draft, schema, value, pointer) => {
     }
     const errors = [];
     schema.allOf.forEach((subSchema) => {
-        errors.push(...draft.validate(value, subSchema, pointer));
+        errors.push(...draft.validate(value, Q.add(schema, subSchema), pointer));
     });
     return errors;
 };

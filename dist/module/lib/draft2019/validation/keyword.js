@@ -2,6 +2,7 @@ import Keywords from "../../draft06/validation/keyword";
 import { isObject } from "../../utils/isObject";
 import { reduceSchema } from "../../reduceSchema";
 import { validateDependentSchemas, validateDependentRequired } from "../../features/dependencies";
+import Q from "../../Q";
 /**
  * Get a list of tests to search for a matching pattern to a property
  */
@@ -16,8 +17,11 @@ function isPropertyEvaluated(draft, objectSchema, propertyName, value) {
         return true;
     }
     // PROPERTIES
-    if (((_a = schema.properties) === null || _a === void 0 ? void 0 : _a[propertyName]) && draft.isValid(value, (_b = schema.properties) === null || _b === void 0 ? void 0 : _b[propertyName])) {
-        return true;
+    if ((_a = schema.properties) === null || _a === void 0 ? void 0 : _a[propertyName]) {
+        const nextSchema = Q.next(objectSchema, (_b = schema.properties) === null || _b === void 0 ? void 0 : _b[propertyName], propertyName);
+        if (draft.isValid(value, nextSchema)) {
+            return true;
+        }
     }
     // PATTERN-PROPERTIES
     const patterns = getPatternTests(schema.patternProperties);
@@ -26,7 +30,8 @@ function isPropertyEvaluated(draft, objectSchema, propertyName, value) {
     }
     // ADDITIONAL-PROPERTIES
     if (isObject(schema.additionalProperties)) {
-        return draft.validate(value, schema.additionalProperties);
+        const nextSchema = Q.next(objectSchema, schema.additionalProperties, propertyName);
+        return draft.validate(value, nextSchema);
     }
     return false;
 }
@@ -64,7 +69,7 @@ const KeywordValidation = {
             }
             // special case: an evaluation in if statement counts too
             // we have an unevaluated prop only if the if-schema does not match
-            if (isObject(schema.if) && isPropertyEvaluated(draft, { type: "object", ...schema.if }, key, value[key])) {
+            if (isObject(schema.if) && isPropertyEvaluated(draft, Q.add(schema, { type: "object", ...schema.if }), key, value[key])) {
                 return false;
             }
             if (testPatterns.find(pattern => pattern.test(key))) {
@@ -91,7 +96,7 @@ const KeywordValidation = {
             return errors;
         }
         unevaluated.forEach(key => {
-            const keyErrors = draft.validate(value[key], resolvedSchema.unevaluatedProperties, `${pointer}/${key}`);
+            const keyErrors = draft.validate(value[key], Q.next(schema, resolvedSchema.unevaluatedProperties, key), `${pointer}/${key}`);
             errors.push(...keyErrors);
         });
         return errors;
@@ -114,7 +119,7 @@ const KeywordValidation = {
         }
         if (isObject(schema.if)) {
             const ifSchema = { type: "array", ...schema.if };
-            if (draft.isValid(value, ifSchema)) {
+            if (draft.isValid(value, Q.add(schema, ifSchema))) {
                 if (Array.isArray(ifSchema.items) && ifSchema.items.length === value.length) {
                     return undefined;
                 }
@@ -122,14 +127,14 @@ const KeywordValidation = {
             // need to test remaining items?
         }
         if (isObject(resolvedSchema.items)) {
-            const errors = draft.validate(value, { ...resolvedSchema, unevaluatedItems: undefined }, pointer);
+            const errors = draft.validate(value, Q.add(schema, { ...resolvedSchema, unevaluatedItems: undefined }), pointer);
             return errors.map(e => draft.errors.unevaluatedItemsError({ ...e.data }));
         }
         if (Array.isArray(resolvedSchema.items)) {
             const items = [];
             for (let i = resolvedSchema.items.length; i < value.length; i += 1) {
                 if (i < resolvedSchema.items.length) {
-                    if (!draft.isValid(value[i], resolvedSchema.items[i])) {
+                    if (!draft.isValid(value[i], Q.next(schema, resolvedSchema.items[i], i))) {
                         items.push({ index: i, value: value[i] });
                     }
                 }
@@ -145,7 +150,7 @@ const KeywordValidation = {
         }
         if (isObject(resolvedSchema.unevaluatedItems)) {
             return value.map((item, index) => {
-                if (!draft.isValid(item, resolvedSchema.unevaluatedItems)) {
+                if (!draft.isValid(item, Q.next(schema, resolvedSchema.unevaluatedItems, index))) {
                     return draft.errors.unevaluatedItemsError({
                         pointer: `${pointer}/${index}`,
                         value: JSON.stringify(item),

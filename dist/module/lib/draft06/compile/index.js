@@ -10,10 +10,12 @@ const GET_ROOT = "getRoot";
 const GET_CONTEXT = "getContext";
 const suffixes = /(#|\/)+$/g;
 /**
- * @draft starting with _draft 2019-09_ plain name fragments are no longer
- * defined with $id, but instead with the new keyword $anchor
- * (which has a different syntax)
- * https://json-schema.org/draft/2019-09/release-notes#incompatible-changes
+ * @draft 6, 2019-09
+ * - starting with _draft 2019-09_ plain name fragments are no longer defined with $id,
+ *  but instead with the new keyword $anchor (which has a different syntax)
+ *  https://json-schema.org/draft/2019-09/release-notes#incompatible-changes
+ * - in _draft 2019-09_ only $recursiveAnchor and $recursiveRef have been introduced
+ * - starting with _draft 6_ id is named $id
  *
  * compiles the input root schema for $ref resolution and returns it again
  * @attention this modifies input schema but maintains object-structure
@@ -33,11 +35,17 @@ export default function compileSchema(draft, schemaToCompile, rootSchema = schem
     if (schemaToCompile[COMPILED] !== undefined) {
         return schemaToCompile;
     } // eslint-disable-line
+    // console.log("compile schema", schemaToCompile.$id);
     const context = { ids: {}, anchors: {}, remotes: draft.remotes };
     const rootSchemaAsString = JSON.stringify(schemaToCompile);
     const compiledSchema = JSON.parse(rootSchemaAsString);
+    const rootScope = {
+        pointer: "#",
+        history: [compiledSchema]
+    };
     Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });
     Object.defineProperty(compiledSchema, GET_CONTEXT, { enumerable: false, value: () => context });
+    Object.defineProperty(compiledSchema, "__scope", { enumerable: false, value: rootScope });
     Object.defineProperty(compiledSchema, GET_REF, {
         enumerable: false,
         value: getRef.bind(null, context, compiledSchema)
@@ -60,8 +68,8 @@ export default function compileSchema(draft, schemaToCompile, rootSchema = schem
         if (schema.$id) {
             // if this is a schema being merged on root object, we cannot override
             // parents locations, but must reuse it
-            if (schema.$id.startsWith("http") && /(allOf|anyOf|oneOf)\/\d+$/.test(pointer)) {
-                const parentPointer = pointer.replace(/\/(allOf|anyOf|oneOf)\/\d+$/, "");
+            if (schema.$id.startsWith("http") && /(allOf|anyOf|oneOf|if)\/\d+$/.test(pointer)) {
+                const parentPointer = pointer.replace(/\/(allOf|anyOf|oneOf|if)\/\d+$/, "");
                 const parentSchema = get(compiledSchema, parentPointer);
                 schema.$id = (_a = parentSchema.$id) !== null && _a !== void 0 ? _a : schema.$id;
             }
@@ -82,14 +90,11 @@ export default function compileSchema(draft, schemaToCompile, rootSchema = schem
             context.anchors[`${scope}#${schema.$anchor}`] = pointer;
         }
         if (schema.$ref && !schema[COMPILED_REF]) {
-            // console.log("JOIN ref", `'${scope}'`, "+", schema.$ref, joinScope(scope, schema.$ref));
             Object.defineProperty(schema, COMPILED_REF, {
                 enumerable: false,
                 value: joinScope(scope, schema.$ref)
             });
-            // @todo currently not used:
             Object.defineProperty(schema, GET_ROOT, { enumerable: false, value: getRoot });
-            // console.log("compiled ref", scope, schema.$ref, "=>", joinScope(scope, schema.$ref));
         }
     });
     // console.log("ids", context.ids);

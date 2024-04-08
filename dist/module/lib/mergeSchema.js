@@ -6,27 +6,22 @@ import { isObject } from "./utils/isObject";
  * schema or directly return first json schema.
  */
 export function _mergeSchema(a, b) {
+    var _a, _b, _c;
     const aType = getTypeOf(a);
     const bType = getTypeOf(b);
     if (aType !== bType) {
         return a;
     }
+    // @scope
     const result = mergeArraysUnique(a, b);
-    if (a.getOneOfOrigin) {
-        Object.defineProperty(result, "getOneOfOrigin", {
-            enumerable: false,
-            value: a.getOneOfOrigin
-        });
-    }
-    else if (b.getOneOfOrigin) {
-        Object.defineProperty(result, "getOneOfOrigin", {
-            enumerable: false,
-            value: b.getOneOfOrigin
-        });
-    }
+    Object.defineProperty(result, "__compiled", { enumerable: false, value: true });
+    Object.defineProperty(result, "__scope", { enumerable: false, value: (_a = b.__scope) !== null && _a !== void 0 ? _a : a.__scope });
+    Object.defineProperty(result, "__ref", { enumerable: false, value: (_b = b.__ref) !== null && _b !== void 0 ? _b : a.__ref });
+    Object.defineProperty(result, "getOneOfOrigin", { enumerable: false, value: (_c = b.getOneOfOrigin) !== null && _c !== void 0 ? _c : a.getOneOfOrigin });
     return result;
 }
 export function mergeSchema(a, b) {
+    var _a, _b, _c;
     // console.log("a", JSON.stringify(a, null, 2));
     // console.log("b", JSON.stringify(b, null, 2));
     if ((b === null || b === void 0 ? void 0 : b.type) === "error") {
@@ -44,19 +39,10 @@ export function mergeSchema(a, b) {
     if (!isObject(schema)) {
         return schema;
     }
-    if (a === null || a === void 0 ? void 0 : a.getOneOfOrigin) {
-        Object.defineProperty(schema, "getOneOfOrigin", {
-            enumerable: false,
-            value: a.getOneOfOrigin
-        });
-    }
-    else if (b === null || b === void 0 ? void 0 : b.getOneOfOrigin) {
-        Object.defineProperty(schema, "getOneOfOrigin", {
-            enumerable: false,
-            value: b.getOneOfOrigin
-        });
-    }
-    // console.log("result", schema);
+    // @scope
+    Object.defineProperty(schema, "__scope", { enumerable: false, value: (_a = b.__scope) !== null && _a !== void 0 ? _a : a.__scope });
+    Object.defineProperty(schema, "__ref", { enumerable: false, value: (_b = b.__ref) !== null && _b !== void 0 ? _b : a.__ref });
+    Object.defineProperty(schema, "getOneOfOrigin", { enumerable: false, value: (_c = b.getOneOfOrigin) !== null && _c !== void 0 ? _c : a.getOneOfOrigin });
     return schema;
 }
 export function mergeSchema2(a, b, property) {

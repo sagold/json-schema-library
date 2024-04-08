@@ -1,5 +1,5 @@
 /**
- * Omit properties from input object. Accepts any number of properties to
+ * Omit properties from input schema. Accepts any number of properties to
  * remove. Example:
  *
  * ```ts
@@ -15,11 +15,9 @@ export function omit(object, ...keysToOmit) {
             result[key] = object[key];
         }
     });
-    if (object.getOneOfOrigin) {
-        Object.defineProperty(result, "getOneOfOrigin", {
-            enumerable: false,
-            value: object.getOneOfOrigin
-        });
-    }
+    // @scope
+    Object.defineProperty(result, "__scope", { enumerable: false, value: object.__scope });
+    Object.defineProperty(result, "__ref", { enumerable: false, value: object.__ref });
+    Object.defineProperty(result, "getOneOfOrigin", { enumerable: false, value: object.getOneOfOrigin });
     return result;
 }

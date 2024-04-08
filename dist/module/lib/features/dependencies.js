@@ -2,6 +2,7 @@ import getTypeOf from "../getTypeOf";
 import { mergeSchema } from "../mergeSchema";
 import { uniqueItems } from "../utils/uniqueItems";
 import { isObject } from "../utils/isObject";
+import Q from "../Q";
 /**
  * @todo add support for dependentRequired (draft 2019-09)
  * returns dependencies as an object json schema. does not merge with input
@@ -96,7 +97,7 @@ export const validateDependentSchemas = (draft, schema, value, pointer) => {
         if (!isObject(dependencies)) {
             return;
         }
-        draft.validate(value, dependencies, pointer).map(error => errors.push(error));
+        draft.validate(value, Q.add(schema, dependencies), pointer).map(error => errors.push(error));
     });
     return errors;
 };
@@ -131,7 +132,7 @@ export const validateDependencies = (draft, schema, value, pointer) => {
                 .map((missingProperty) => draft.errors.missingDependencyError({ missingProperty, pointer, schema, value }));
         }
         else if (type === "object") {
-            dependencyErrors = draft.validate(value, dependencies[property], pointer);
+            dependencyErrors = draft.validate(value, Q.add(schema, dependencies[property]), pointer);
         }
         else {
             throw new Error(`Invalid dependency definition for ${pointer}/${property}. Must be string[] or schema`);

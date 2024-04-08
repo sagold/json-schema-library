@@ -3,6 +3,7 @@
  */
 import { mergeSchema } from "../mergeSchema";
 import { omit } from "../utils/omit";
+import Q from "../Q";
 /**
  * returns merged schema of all valid anyOf subschemas for the given input data.
  * Does not merge with rest input schema.
@@ -16,7 +17,7 @@ export function mergeValidAnyOfSchema(draft, schema, data) {
     let resolvedSchema;
     schema.anyOf.forEach((anySchema) => {
         anySchema = draft.resolveRef(anySchema);
-        if (draft.isValid(data, anySchema)) {
+        if (draft.isValid(data, Q.add(schema, anySchema))) {
             resolvedSchema = resolvedSchema ? mergeSchema(resolvedSchema, anySchema) : anySchema;
         }
     });
@@ -45,8 +46,11 @@ const validateAnyOf = (draft, schema, value, pointer) => {
     if (!Array.isArray(schema.anyOf) || schema.anyOf.length === 0) {
         return undefined;
     }
+    // console.log("validate any of", pointer, value);
     for (let i = 0; i < schema.anyOf.length; i += 1) {
-        if (draft.isValid(value, schema.anyOf[i])) {
+        const nextSchema = draft.resolveRef(schema.anyOf[i]);
+        const node = Q.add(schema, nextSchema);
+        if (draft.isValid(value, node)) {
             return undefined;
         }
     }

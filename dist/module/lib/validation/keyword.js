@@ -9,6 +9,7 @@ import { validateDependencies } from "../features/dependencies";
 import { validateOneOf } from "../features/oneOf";
 import { getPrecision } from "../utils/getPrecision";
 import deepEqual from "fast-deep-equal";
+import Q from "../Q";
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 const hasProperty = (value, property) => !(value[property] === undefined || !hasOwnProperty.call(value, property));
 // list of validation keywords: http://json-schema.org/latest/json-schema-validation.html#rfc.section.5
@@ -58,12 +59,18 @@ const KeywordValidation = {
                         }));
                     }
                     else {
-                        errors.push(...draft.validate(value[property], result, pointer));
+                        errors.push(...draft.validate(value[property], Q.next(schema, result, property)));
                     }
                     // additionalProperties {}
                 }
                 else if (additionalIsObject) {
-                    errors.push(...draft.validate(value[property], schema.additionalProperties, `${pointer}/${property}`));
+                    const nextSchema = Q.next(schema, schema.additionalProperties, property);
+                    if (!nextSchema.__scope) {
+                        throw new Error("missing scope");
+                    }
+                    // console.log("additional property", property, schema.additionalProperties);
+                    const res = draft.validate(value[property], nextSchema, `${pointer}/${property}`);
+                    errors.push(...res);
                 }
                 else {
                     errors.push(draft.errors.noAdditionalPropertiesError({
@@ -120,7 +127,7 @@ const KeywordValidation = {
             if (isJsonError(itemSchema)) {
                 return [itemSchema];
             }
-            const itemErrors = draft.validate(itemData, itemSchema, `${pointer}/${i}`);
+            const itemErrors = draft.validate(itemData, Q.next(schema, itemSchema, i), `${pointer}/${i}`);
             errors.push(...itemErrors);
         }
         return errors;
@@ -314,7 +321,7 @@ const KeywordValidation = {
     },
     not: (draft, schema, value, pointer) => {
         const errors = [];
-        if (draft.validate(value, schema.not, pointer).length === 0) {
+        if (draft.validate(value, Q.add(schema, schema.not), pointer).length === 0) {
             errors.push(draft.errors.notError({ value, not: schema.not, pointer, schema }));
         }
         return errors;
@@ -351,7 +358,7 @@ const KeywordValidation = {
             for (let i = 0, l = patterns.length; i < l; i += 1) {
                 if (patterns[i].regex.test(key)) {
                     patternFound = true;
-                    const valErrors = draft.validate(value[key], patterns[i].patternSchema, `${pointer}/${key}`);
+                    const valErrors = draft.validate(value[key], Q.next(schema, patterns[i].patternSchema, key), `${pointer}/${key}`);
                     if (valErrors && valErrors.length > 0) {
                         errors.push(...valErrors);
                     }
@@ -380,7 +387,7 @@ const KeywordValidation = {
             const key = keys[i];
             if (hasProperty(value, key)) {
                 const itemSchema = draft.step(key, schema, value, pointer);
-                const keyErrors = draft.validate(value[key], itemSchema, `${pointer}/${key}`);
+                const keyErrors = draft.validate(value[key], Q.next(schema, itemSchema, key), `${pointer}/${key}`);
                 errors.push(...keyErrors);
             }
         }
@@ -397,7 +404,7 @@ const KeywordValidation = {
             }
             else {
                 const itemSchema = draft.step(key, schema, value, pointer);
-                const keyErrors = draft.validate(value[key], itemSchema, `${pointer}/${key}`);
+                const keyErrors = draft.validate(value[key], Q.next(schema, itemSchema, key), `${pointer}/${key}`);
                 errors.push(...keyErrors);
             }
         }

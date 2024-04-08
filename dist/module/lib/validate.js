@@ -12,6 +12,7 @@ function getJsonSchemaType(value, expectedType) {
     }
     return jsType;
 }
+// let prev: any;
 /**
  * Validates data with json schema
  *
@@ -23,6 +24,9 @@ function getJsonSchemaType(value, expectedType) {
  */
 export default function validate(draft, value, schema = draft.rootSchema, pointer = "#") {
     schema = draft.resolveRef(schema);
+    if (schema == null) {
+        throw new Error("missing schema");
+    }
     // @draft >= 07
     if (getTypeOf(schema) === "boolean") {
         if (schema) {
@@ -54,6 +58,9 @@ export default function validate(draft, value, schema = draft.rootSchema, pointe
             })
         ];
     }
+    // if (!schema.__scope) {
+    //     throw new Error("requires scope in validation");
+    // }
     if (draft.validateType[receivedType] == null) {
         return [draft.errors.invalidTypeError({ pointer, schema, value, receivedType })];
     }

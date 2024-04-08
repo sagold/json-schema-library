@@ -2,6 +2,13 @@ import { Draft } from "./draft";
 export type JsonSchema = {
     [p: string]: any;
 };
+export type SchemaScope = {
+    pointer: string;
+    history: JsonSchema[];
+};
+export type SchemaNode = JsonSchema & {
+    __scope: SchemaScope;
+};
 export type JsonPointer = string;
 export type ErrorData<T extends Record<string, unknown> = {
     [p: string]: unknown;
