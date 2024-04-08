@@ -25,7 +25,7 @@ export function resolveIfSchema(
     }
 
     if (schema.if && (schema.then || schema.else)) {
-        const ifErrors = draft.validate(data, Q.addScope(draft.resolveRef(schema.if), schema.__scope));
+        const ifErrors = draft.validate(data, Q.add(schema, draft.resolveRef(schema.if)));
         if (ifErrors.length === 0 && schema.then) {
             return draft.resolveRef(schema.then);
         }
@@ -41,11 +41,8 @@ export function resolveIfSchema(
 const validateIf: JsonValidator = (draft, schema, value, pointer) => {
     const resolvedSchema = resolveIfSchema(draft, schema, value);
     if (resolvedSchema) {
-        const nextScope = Q.newScope(resolvedSchema, schema.__scope ? {
-            pointer,
-            history: [...schema.__scope.history]
-        } : { pointer, history: [] });
         // @recursiveRef ok, we not just add per pointer, but any evlauation to dynamic scope / validation path
+        const nextScope = Q.add(schema, resolvedSchema);
         return draft.validate(value, nextScope, pointer);
     }
 };

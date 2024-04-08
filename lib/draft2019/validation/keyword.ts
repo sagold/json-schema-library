@@ -22,7 +22,7 @@ function isPropertyEvaluated(draft: Draft, objectSchema: JsonSchema, propertyNam
     }
     // PROPERTIES
     if (schema.properties?.[propertyName]) {
-        const nextSchema = Q.next(propertyName, schema.properties?.[propertyName], objectSchema);
+        const nextSchema = Q.next(objectSchema, schema.properties?.[propertyName], propertyName);
         if (draft.isValid(value, nextSchema)) {
             return true;
         }
@@ -34,7 +34,7 @@ function isPropertyEvaluated(draft: Draft, objectSchema: JsonSchema, propertyNam
     }
     // ADDITIONAL-PROPERTIES
     if (isObject(schema.additionalProperties)) {
-        const nextSchema = Q.next(propertyName, schema.additionalProperties, objectSchema);
+        const nextSchema = Q.next(objectSchema, schema.additionalProperties, propertyName);
         return draft.validate(value, nextSchema);
     }
     return false;
@@ -77,7 +77,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
             }
             // special case: an evaluation in if statement counts too
             // we have an unevaluated prop only if the if-schema does not match
-            if (isObject(schema.if) && isPropertyEvaluated(draft, Q.addScope({ type: "object", ...schema.if }, schema.__scope), key, value[key])) {
+            if (isObject(schema.if) && isPropertyEvaluated(draft, Q.add(schema, { type: "object", ...schema.if }), key, value[key])) {
                 return false;
             }
             if (testPatterns.find(pattern => pattern.test(key))) {
@@ -109,7 +109,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         unevaluated.forEach(key => {
             const keyErrors = draft.validate(
                 value[key],
-                Q.next(key, resolvedSchema.unevaluatedProperties, schema),
+                Q.next(schema, resolvedSchema.unevaluatedProperties, key),
                 `${pointer}/${key}`
             );
             errors.push(...keyErrors);
@@ -137,7 +137,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         if (isObject(schema.if)) {
             const ifSchema: JsonSchema = { type: "array", ...schema.if };
-            if (draft.isValid(value, Q.addScope(ifSchema, schema.__scope))) {
+            if (draft.isValid(value, Q.add(schema, ifSchema))) {
                 if (Array.isArray(ifSchema.items) && ifSchema.items.length === value.length) {
                     return undefined
                 }
@@ -146,7 +146,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         }
 
         if (isObject(resolvedSchema.items)) {
-            const errors = draft.validate(value, Q.addScope({ ...resolvedSchema, unevaluatedItems: undefined }, schema.__scope), pointer);
+            const errors = draft.validate(value, Q.add(schema, { ...resolvedSchema, unevaluatedItems: undefined }), pointer);
             return errors.map(e => draft.errors.unevaluatedItemsError({ ...e.data }));
         }
 
@@ -154,7 +154,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
             const items: { index: number, value: unknown }[] = [];
             for (let i = resolvedSchema.items.length; i < value.length; i += 1) {
                 if (i < resolvedSchema.items.length) {
-                    if (!draft.isValid(value[i], Q.next(i, resolvedSchema.items[i], schema))) {
+                    if (!draft.isValid(value[i], Q.next(schema, resolvedSchema.items[i], i))) {
                         items.push({ index: i, value: value[i] });
                     }
                 } else {
@@ -170,7 +170,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         if (isObject(resolvedSchema.unevaluatedItems)) {
             return value.map((item, index) => {
-                if (!draft.isValid(item, Q.next(index, resolvedSchema.unevaluatedItems, schema))) {
+                if (!draft.isValid(item, Q.next(schema, resolvedSchema.unevaluatedItems, index))) {
                     return draft.errors.unevaluatedItemsError({
                         pointer: `${pointer}/${index}`,
                         value: JSON.stringify(item),

@@ -121,7 +121,7 @@ export const validateDependentSchemas: JsonValidator = (
         if (!isObject(dependencies)) {
             return;
         }
-        draft.validate(value, Q.addScope(dependencies, schema.__scope), pointer).map(error => errors.push(error));
+        draft.validate(value, Q.add(schema, dependencies), pointer).map(error => errors.push(error));
     });
     return errors;
 };
@@ -164,7 +164,7 @@ export const validateDependencies: JsonValidator = (
                     draft.errors.missingDependencyError({ missingProperty, pointer, schema, value })
                 );
         } else if (type === "object") {
-            dependencyErrors = draft.validate(value, Q.addScope(dependencies[property], schema.__scope), pointer);
+            dependencyErrors = draft.validate(value, Q.add(schema, dependencies[property]), pointer);
         } else {
             throw new Error(
                 `Invalid dependency definition for ${pointer}/${property}. Must be string[] or schema`

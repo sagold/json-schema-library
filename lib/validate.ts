@@ -36,6 +36,10 @@ export default function validate(
 ): Array<JsonError> {
     schema = draft.resolveRef(schema);
 
+    if (schema == null) {
+        throw new Error("missing schema")
+    }
+
     // @draft >= 07
     if (getTypeOf(schema) === "boolean") {
         if (schema) {

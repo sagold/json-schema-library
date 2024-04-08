@@ -19,10 +19,7 @@ const stepType: Record<string, StepFunction> = {
         const itemsType = getTypeOf(schema.items);
 
         if (itemsType === "object") {
-            const nextSchema = Q.newScope(schema.items, {
-                pointer: `${pointer}/${key}`,
-                history: [...schema.__scope.history]
-            });
+            const nextSchema = Q.next(schema, schema.items, key);
             // @spec: ignore additionalItems, when items is schema-object
             return (
                 reduceSchema(draft, nextSchema, itemValue, `${pointer}/${key}`) ||
@@ -46,10 +43,7 @@ const stepType: Record<string, StepFunction> = {
             }
 
             if (schema.items[key]) {
-                const nextSchema = Q.newScope(schema.items[key], {
-                    pointer: `${pointer}/${key}`,
-                    history: [...schema.__scope.history]
-                });
+                const nextSchema = Q.next(schema, schema.items[key], key);
                 return draft.resolveRef(nextSchema);
             }
 
@@ -109,10 +103,7 @@ const stepType: Record<string, StepFunction> = {
                 return createSchemaOf(data?.[key]);
             }
 
-            const nextSchema = Q.newScope(property, {
-                pointer: `${pointer}/${key}`,
-                history: [...schema.__scope.history]
-            });
+            const nextSchema = Q.next(schema, property, key);
             const targetSchema = draft.resolveRef(nextSchema);
             if (isJsonError(targetSchema)) {
                 return targetSchema;
@@ -219,13 +210,8 @@ export default function step(
                 key
             });
         }
-
-
         // UPDATE SCOPE and clone schema
-        return Q.newScope(schemaResult, {
-            pointer: `${pointer}/${key}`,
-            history: [...schema.__scope.history]
-        });
+        return Q.next(schema, schemaResult, key);
     }
 
     return new Error(`Unsupported schema type ${schema.type} for key ${key}`) as JsonError;

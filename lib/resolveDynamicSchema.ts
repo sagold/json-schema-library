@@ -61,7 +61,7 @@ export function resolveDynamicSchema(
             // if not, we would wrongly merge oneOf, if-then statements, etc
             if (isDynamicSchema(s)) {
                 // copy of reduceSchema
-                let result = resolveDynamicSchema(draft, Q.addScope(s, schema.__scope), data, pointer);
+                let result = resolveDynamicSchema(draft, Q.add(schema, s), data, pointer);
                 if (result) {
                     result = mergeSchema(s, result);
                     return omit(result, ...toOmit);
@@ -100,7 +100,7 @@ export function resolveDynamicSchema(
 
     const nestedSchema: JsonSchema | undefined = resolveDynamicSchema(
         draft,
-        Q.addScope(resolvedSchema, schema.__scope),
+        Q.add(schema, resolvedSchema),
         data,
         pointer
     );
@@ -109,5 +109,5 @@ export function resolveDynamicSchema(
     }
 
     const finalSchema = omit(resolvedSchema, ...toOmit);
-    return Q.addScope(finalSchema, schema.__scope);
+    return Q.add(schema, finalSchema);
 }

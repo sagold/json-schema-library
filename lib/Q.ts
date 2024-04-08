@@ -1,11 +1,19 @@
 import { JsonSchema, SchemaScope } from "./types";
 import { isObject } from "./utils/isObject";
-// import copy from "./utils/copy";
 
 /**
  * Note: scope history = validation path ~ dynamic scope
  * This list should contain any subschema encountered
  */
+
+function shallowCloneSchemaNode(node: JsonSchema) {
+    const result = { ...node };
+    Object.defineProperty(result, "__compiled", { enumerable: false, value: true });
+    Object.defineProperty(result, "__ref", { enumerable: false, value: node.__ref });
+    Object.defineProperty(result, "getOneOfOrigin", { enumerable: false, value: node.getOneOfOrigin });
+    Object.defineProperty(result, "getRoot", { enumerable: false, value: node.getRoot });
+    return result;
+}
 
 /**
  * Omit properties from input schema. Accepts any number of properties to
@@ -24,69 +32,55 @@ function omit(object: JsonSchema, ...keysToOmit: string[]) {
         }
     });
     // @scope
-    Object.defineProperty(result, "__compiled", { enumerable: false, value: true });
     Object.defineProperty(result, "__scope", { enumerable: false, value: object.__scope });
-    Object.defineProperty(result, "__ref", { enumerable: false, value: object.__ref });
     Object.defineProperty(result, "getOneOfOrigin", { enumerable: false, value: object.getOneOfOrigin });
+    Object.defineProperty(result, "__compiled", { enumerable: false, value: true });
+    Object.defineProperty(result, "__ref", { enumerable: false, value: object.__ref });
+    Object.defineProperty(result, "getRoot", { enumerable: false, value: object.getRoot });
     return result;
 }
 
 function clone(schema: JsonSchema) {
-    // const result = copy(schema);
-    const result = { ...schema };
-    Object.defineProperty(result, "__compiled", { enumerable: false, value: true });
+    const result = shallowCloneSchemaNode(schema);
     Object.defineProperty(result, "__scope", { enumerable: false, value: schema.__scope });
-    Object.defineProperty(result, "__ref", { enumerable: false, value: schema.__ref });
-    Object.defineProperty(result, "getOneOfOrigin", { enumerable: false, value: schema.getOneOfOrigin });
     return result;
 }
 
-function addScope(schema: JsonSchema, scope: SchemaScope) {
-    if (!isObject(schema)) {
-        return schema;
+/**
+ * Get a new compiled schema node to pass on in validation. This will register the passed
+ * json-schema to the validation-path, stored in `current > scope`.
+ *
+ * @param current - schema node (compiled schema) of current validation step (input)
+ * @param next - next json-schema in validation step which does not yet refer to a new value (sharing json-pointer)
+ * @return new schema node to pass on to next validation methods
+ */
+function add(current: JsonSchema, next: JsonSchema) {
+    if (!isObject(next)) {
+        return next;
     }
     // @scope
-    const clone = { ...schema };
-    Object.defineProperty(clone, "__compiled", { enumerable: false, value: true });
-    Object.defineProperty(clone, "__scope", { enumerable: false, value: scope });
-    Object.defineProperty(clone, "__ref", { enumerable: false, value: schema.__ref });
-    Object.defineProperty(clone, "getOneOfOrigin", { enumerable: false, value: schema.getOneOfOrigin });
+    const { pointer = "?", history = [] } = (current.__scope ?? {}) as SchemaScope;
+    const clone: JsonSchema = shallowCloneSchemaNode(next);
+    Object.defineProperty(clone, "__scope", { enumerable: false, value: { pointer, history: [...history, clone] } });
     return clone;
 }
 
-function next(key: string | number, schema: JsonSchema, parentSchema: JsonSchema) {
-    const scope = parentSchema.__scope ?? { pointer: `?/${key}`, history: [] };
-    // if (scope == null) {
-    //     throw new Error("missing parent scope");
-    // }
-    return newScope(schema, {
-        pointer: `${scope.pointer}/${key}`,
-        history: [...scope.history]
-    })
-}
-
-/**
- * creates a new scope in history based on the passed schema
- */
-function newScope(schema: JsonSchema, scope: SchemaScope) {
-    if (!isObject(schema)) {
-        return schema;
+function next(current: JsonSchema, next: JsonSchema, key: string | number) {
+    if (!isObject(next)) {
+        return next;
     }
-    // @scope
-    const clone: JsonSchema = { ...schema };
-    Object.defineProperty(clone, "__compiled", { enumerable: false, value: true });
-    Object.defineProperty(clone, "__scope", { enumerable: false, value: scope });
-    Object.defineProperty(clone, "__ref", { enumerable: false, value: schema.__ref });
-    Object.defineProperty(clone, "getOneOfOrigin", { enumerable: false, value: schema.getOneOfOrigin });
-    const history = scope.history;
-    history.push(clone);
+    if (!isObject(current)) {
+        return current;
+    }
+    const { pointer = "?", history = [] } = (current.__scope ?? {}) as SchemaScope;
+    const clone: JsonSchema = shallowCloneSchemaNode(next);
+    Object.defineProperty(clone, "__scope", { enumerable: false, value: { pointer: `${pointer}/${key}`, history: [...history, clone] } });
     return clone;
 }
 
 export default {
     omit,
     clone,
-    next,
-    newScope,
-    addScope
+    add,
+    next
 }

@@ -6,8 +6,8 @@ import { mergeSchema } from "./mergeSchema";
 
 function resolveRecursiveRef(rootSchema: JsonSchema, schema: JsonSchema) {
     const history = schema.__scope.history;
-    console.log("» history", history.map((v: JsonSchema) => v.__scope.pointer));
-    console.log("»» history", history.map((v: JsonSchema) => v));
+    // console.log("» history", history.map((v: JsonSchema) => v.__scope.pointer));
+    // console.log("»» history", history.map((v: JsonSchema) => v));
     // RESTRICT BY CHANGE IN BASE-URL
     let startIndex = 0;
     for (let i = history.length - 1; i >= 0; i--) {

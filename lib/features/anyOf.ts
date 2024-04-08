@@ -21,7 +21,7 @@ export function mergeValidAnyOfSchema(draft: Draft, schema: JsonSchema, data: un
     let resolvedSchema: JsonSchema;
     schema.anyOf.forEach((anySchema: JsonSchema) => {
         anySchema = draft.resolveRef(anySchema);
-        if (draft.isValid(data, Q.addScope(anySchema, schema.__scope))) {
+        if (draft.isValid(data, Q.add(schema, anySchema))) {
             resolvedSchema = resolvedSchema ? mergeSchema(resolvedSchema, anySchema) : anySchema;
         }
     });
@@ -61,14 +61,8 @@ const validateAnyOf: JsonValidator = (draft, schema, value, pointer) => {
     // console.log("validate any of", pointer, value);
     for (let i = 0; i < schema.anyOf.length; i += 1) {
         const nextSchema = draft.resolveRef(schema.anyOf[i]);
-        // @todo @recursiveRef here we create an intermediary scope that is required
-        // this duplicates pointers and probably can be solved by resolving the root scope correctly
-        const nextNode = schema.__scope ? Q.newScope(nextSchema, {
-            pointer,
-            history: [...schema.__scope.history]
-        }) : nextSchema;
-        // const nextNode = Q.addScope(nextSchema, schema.__scope);
-        if (draft.isValid(value, nextNode)) {
+        const node = Q.add(schema, nextSchema);
+        if (draft.isValid(value, node)) {
             return undefined;
         }
     }

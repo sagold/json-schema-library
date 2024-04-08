@@ -26,7 +26,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         let count = 0;
         for (let i = 0; i < value.length; i += 1) {
-            const nextSchema = Q.next(i, schema.contains, schema);
+            const nextSchema = Q.next(schema, schema.contains, i);
             if (draft.isValid(value[i], nextSchema)) {
                 count++;
             }
@@ -141,10 +141,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
                         );
                         return;
                     }
-                    const nextSchema = Q.newScope(patterns[i].patternSchema, {
-                        pointer: `${pointer}/${key}`,
-                        history: [...schema.__scope.history]
-                    });
+                    const nextSchema = Q.next(schema, patterns[i].patternSchema, key);
                     const valErrors = draft.validate(value[key], nextSchema, `${pointer}/${key}`);
                     if (valErrors && valErrors.length > 0) {
                         errors.push(...valErrors);
@@ -201,7 +198,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         const properties = Object.keys(value);
         const propertySchema = { ...schema.propertyNames, type: "string" };
         properties.forEach((prop) => {
-            const validationResult = draft.validate(prop, Q.next(prop, propertySchema, schema), `${pointer}/${prop}`);
+            const validationResult = draft.validate(prop, Q.next(schema, propertySchema, prop), `${pointer}/${prop}`);
             if (validationResult.length > 0) {
                 errors.push(
                     draft.errors.invalidPropertyNameError({

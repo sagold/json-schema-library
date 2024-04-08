@@ -29,7 +29,7 @@ export function resolveAllOf(
     let mergedSchema = Q.clone(schema);
     for (let i = 0; i < schema.allOf.length; i += 1) {
         // @todo introduce draft.resolveSchema to iteratively resolve
-        const allOfSchema = resolveSchema(draft, Q.addScope(draft.resolveRef(schema.allOf[i]), schema.__scope), data);
+        const allOfSchema = resolveSchema(draft, Q.add(schema, draft.resolveRef(schema.allOf[i])), data);
         mergedSchema = mergeSchema(mergedSchema, allOfSchema);
     }
     delete mergedSchema.allOf;
@@ -65,7 +65,7 @@ const validateAllOf: JsonValidator = (draft, schema, value, pointer) => {
     }
     const errors: JsonError[] = [];
     schema.allOf.forEach((subSchema: JsonSchema) => {
-        errors.push(...draft.validate(value, Q.addScope(subSchema, schema.__scope), pointer));
+        errors.push(...draft.validate(value, Q.add(schema, subSchema), pointer));
     });
     return errors;
 };
