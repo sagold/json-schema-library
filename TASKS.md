@@ -1,7 +1,12 @@
 # Draft 2019-09 Scope
 
+- [ ] introduction of scopes reduces jlib performance by ~20-22%. can we do sth about this?
+  - moving this logic to draft 2019 would solve this, but introduce two different apis unless we can hide it
+  - a consistent api might lead to performance impacts of legacy drafts
+  - an inconsistent api would not be manageable (duplicate utils like getTemplate etc)
+  - there is probably a lot that can be improved (also in compile time)
 - [ ] add all subSchemas to scope-history as only if and anyOf are tested
-
+- [ ] decision on supported draft 2019-09 format-options
 
 # Tasks
 

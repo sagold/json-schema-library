@@ -9,12 +9,25 @@ const cache = new Draft2019();
 cache.addRemoteSchema("https://json-schema.org/draft/2019-09/schema", draft2019Meta);
 addRemotes(cache);
 
-const supportedTestCases = (t: FeatureTest) => !t.optional
-    && ![
-        // TODO CORE FEATURES
-        // "recursiveRef",
-        "vocabulary"
-    ].includes(t.name)
+const supportedTestCases = (t: FeatureTest) => ![
+    // TODO CORE FEATURES
+    // "recursiveRef",
+    "vocabulary",
+    // OPTIONAL FEATURES
+    "cross-draft",
+    "ecmascript-regex", // should
+    "float-overflow",
+    "dependencies-compatibility",  // should
+    "format-duration",  // should
+    "format-date-time", // should
+    "format-time", // should
+    "format-iri",
+    "format-iri-reference",
+    "format-idn-hostname",
+    "format-uuid",
+    "non-bmp-regex", // should
+    "patterns always use unicode semantics with patternProperties"
+].includes(t.name)
 const draftFeatureTests = getDraftTests("2019-09")
     // .filter(testcase => testcase.name === "recursiveRef")
     .filter(supportedTestCases);
