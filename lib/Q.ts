@@ -50,12 +50,14 @@ function addScope(schema: JsonSchema, scope: SchemaScope) {
 }
 
 function next(key: string | number, schema: JsonSchema, parentSchema: JsonSchema) {
-    if (parentSchema.__scope == null) {
-        throw new Error("missing parent scope");
-    }
+    const scope = parentSchema.__scope ?? { pointer: `?/${key}`, history: [] };
+    // if (scope == null) {
+    //     throw new Error("missing parent scope");
+    // }
+
     return newScope(schema, {
-        pointer: `${parentSchema.__scope.pointer}/${key}`,
-        history: [...parentSchema.__scope.history]
+        pointer: `${scope.pointer}/${key}`,
+        history: [...scope.history]
     })
 }
 
@@ -66,14 +68,24 @@ function newScope(schema: JsonSchema, scope: SchemaScope) {
     if (!isObject(schema)) {
         return schema;
     }
+    console.log("new", scope.pointer, schema);
     // @scope
     const clone: JsonSchema = { ...schema };
     Object.defineProperty(clone, "__compiled", { enumerable: false, value: true });
     Object.defineProperty(clone, "__scope", { enumerable: false, value: scope });
     Object.defineProperty(clone, "__ref", { enumerable: false, value: schema.__ref });
     Object.defineProperty(clone, "getOneOfOrigin", { enumerable: false, value: schema.getOneOfOrigin });
-    // history contains current node as last item
-    scope.history.push(clone);
+    const history = scope.history;
+
+    // if (history[history.length - 1] && history[history.length - 1].__scope.pointer === scope.pointer) {
+    //     scope.history[scope.history.length - 1] = clone;
+    // } else {
+    //     // history contains current node as last item
+    //     history.push(clone);
+    // }
+
+    history.push(clone);
+
     return clone;
 }
 
