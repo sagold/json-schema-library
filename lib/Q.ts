@@ -16,8 +16,8 @@ function shallowCloneSchemaNode(node: JsonSchema) {
 }
 
 /**
- * Omit properties from input schema. Accepts any number of properties to
- * remove. Example:
+ * Omit properties from input schema. Accepts any number of properties to remove.
+ * Example:
  *
  * ```ts
  * omit(myObject, "if", "dependencies");
@@ -40,6 +40,9 @@ function omit(object: JsonSchema, ...keysToOmit: string[]) {
     return result;
 }
 
+/**
+ * Create a shallow clone of the given schema-node
+ */
 function clone(schema: JsonSchema) {
     const result = shallowCloneSchemaNode(schema);
     Object.defineProperty(result, "__scope", { enumerable: false, value: schema.__scope });
@@ -52,7 +55,7 @@ function clone(schema: JsonSchema) {
  *
  * @param current - schema node (compiled schema) of current validation step (input)
  * @param next - next json-schema in validation step which does not yet refer to a new value (sharing json-pointer)
- * @return new schema node to pass on to next validation methods
+ * @returns new schema node to pass on to next validation methods
  */
 function add(current: JsonSchema, next: JsonSchema) {
     if (!isObject(next)) {
@@ -65,6 +68,15 @@ function add(current: JsonSchema, next: JsonSchema) {
     return clone;
 }
 
+/**
+ * Get a new compiled schema node to pass on in validation. This will register the passed
+ * json-schema to the validation-path, stored in `current > scope`.
+ *
+ * @param current - schema node (compiled schema) of current validation step (input)
+ * @param next - next json-schema in validation step which does  refer to a new value (new json-pointer)
+ * @param key - next property-name or array-index `next` refers to
+ * @returns new schema node to pass on to next validation methods
+ */
 function next(current: JsonSchema, next: JsonSchema, key: string | number) {
     if (!isObject(next)) {
         return next;

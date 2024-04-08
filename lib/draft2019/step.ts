@@ -23,7 +23,7 @@ const stepType: Record<string, StepFunction> = {
             // @spec: ignore additionalItems, when items is schema-object
             return (
                 reduceSchema(draft, nextSchema, itemValue, `${pointer}/${key}`) ||
-                draft.resolveRef(schema.items)
+                draft.resolveRef(nextSchema)
             );
         }
 
