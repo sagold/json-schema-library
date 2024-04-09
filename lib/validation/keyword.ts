@@ -78,24 +78,17 @@ const KeywordValidation: Record<string, JsonValidator> = {
                             })
                         );
                     } else {
-                        errors.push(...draft.validate(value[property], Q.next(schema, result, property)));
+                        const nextSchemaNode = Q.next(schema, result, property);
+                        errors.push(...draft.validate(value[property], nextSchemaNode));
                     }
 
                     // additionalProperties {}
                 } else if (additionalIsObject) {
-                    const nextSchema = Q.next(schema, schema.additionalProperties, property)
-                    if (!nextSchema.__scope) {
-                        throw new Error("missing scope");
-                    }
-                    // console.log("additional property", property, schema.additionalProperties);
-                    const res = draft.validate(
-                        value[property],
-                        nextSchema,
-                        `${pointer}/${property}`
-                    );
-                    errors.push(
-                        ...res
-                    );
+
+                    const nextSchemaNode = Q.next(schema, schema.additionalProperties, property);
+                    const res = draft.validate(value[property], nextSchemaNode, `${pointer}/${property}`);
+
+                    errors.push(...res);
                 } else {
                     errors.push(
                         draft.errors.noAdditionalPropertiesError({
@@ -357,7 +350,10 @@ const KeywordValidation: Record<string, JsonValidator> = {
     },
     not: (draft, schema, value, pointer) => {
         const errors: JsonError[] = [];
-        if (draft.validate(value, Q.add(schema, schema.not), pointer).length === 0) {
+
+        const nextSchemaNode = Q.add(schema, schema.not);
+        if (draft.validate(value, nextSchemaNode, pointer).length === 0) {
+
             errors.push(draft.errors.notError({ value, not: schema.not, pointer, schema }));
         }
         return errors;
@@ -397,11 +393,10 @@ const KeywordValidation: Record<string, JsonValidator> = {
             for (let i = 0, l = patterns.length; i < l; i += 1) {
                 if (patterns[i].regex.test(key)) {
                     patternFound = true;
-                    const valErrors = draft.validate(
-                        value[key],
-                        Q.next(schema, patterns[i].patternSchema, key),
-                        `${pointer}/${key}`
-                    );
+
+                    const nextSchemaNode = Q.next(schema, patterns[i].patternSchema, key);
+                    const valErrors = draft.validate(value[key], nextSchemaNode, `${pointer}/${key}`);
+
                     if (valErrors && valErrors.length > 0) {
                         errors.push(...valErrors);
                     }
@@ -434,8 +429,12 @@ const KeywordValidation: Record<string, JsonValidator> = {
         for (let i = 0; i < keys.length; i += 1) {
             const key = keys[i];
             if (hasProperty(value, key)) {
+
                 const itemSchema = draft.step(key, schema, value, pointer);
-                const keyErrors = draft.validate(value[key], Q.next(schema, itemSchema, key), `${pointer}/${key}`);
+
+                const nextSchemaNode = Q.next(schema, itemSchema, key);
+                const keyErrors = draft.validate(value[key], nextSchemaNode, `${pointer}/${key}`);
+
                 errors.push(...keyErrors);
             }
         }
@@ -450,8 +449,11 @@ const KeywordValidation: Record<string, JsonValidator> = {
             if (value[key] === undefined) {
                 errors.push(draft.errors.requiredPropertyError({ key, pointer, schema, value }));
             } else {
+
                 const itemSchema = draft.step(key, schema, value, pointer);
-                const keyErrors = draft.validate(value[key], Q.next(schema, itemSchema, key), `${pointer}/${key}`);
+                const nextSchemaNode = Q.next(schema, itemSchema, key);
+                const keyErrors = draft.validate(value[key], nextSchemaNode, `${pointer}/${key}`);
+
                 errors.push(...keyErrors);
             }
         }

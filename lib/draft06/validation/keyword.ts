@@ -26,6 +26,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         let count = 0;
         for (let i = 0; i < value.length; i += 1) {
+
             const nextSchema = Q.next(schema, schema.contains, i);
             if (draft.isValid(value[i], nextSchema)) {
                 count++;
@@ -141,8 +142,10 @@ const KeywordValidation: Record<string, JsonValidator> = {
                         );
                         return;
                     }
+
                     const nextSchema = Q.next(schema, patterns[i].patternSchema, key);
                     const valErrors = draft.validate(value[key], nextSchema, `${pointer}/${key}`);
+
                     if (valErrors && valErrors.length > 0) {
                         errors.push(...valErrors);
                     }

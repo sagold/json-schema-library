@@ -14,13 +14,13 @@ const supportedTestCases = (t: FeatureTest) => ![
     // "recursiveRef",
     "vocabulary",
     // OPTIONAL FEATURES
-    "cross-draft",
+    "cross-draft", // feature
     "ecmascript-regex", // should
     "float-overflow",
     "dependencies-compatibility",  // should
     "format-duration",  // should
-    "format-date-time", // should
-    "format-time", // should
+    "format-date-time", // MUST
+    "format-time", // MUST
     "format-iri",
     "format-iri-reference",
     "format-idn-hostname",
