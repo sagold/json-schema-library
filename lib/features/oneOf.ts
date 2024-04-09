@@ -9,6 +9,7 @@ import { Draft } from "../draft";
 import { errorOrPromise } from "../utils/filter";
 import { JsonSchema, JsonPointer, JsonError, isJsonError, JsonValidator } from "../types";
 import Q from "../Q";
+import { isObject } from "../utils/isObject";
 
 const { DECLARATOR_ONEOF } = settings;
 
@@ -139,14 +140,12 @@ function fuzzyObjectValue(
     const keys = Object.keys(one.properties);
     for (let i = 0; i < keys.length; i += 1) {
         const key = keys[i];
-        if (data[key] == null) {
-            return;
-        }
+        if (data[key]) {
+            const nextSchemaNode = Q.next(one, one.properties[key], key);
+            if (draft.isValid(data[key], nextSchemaNode, pointer)) {
 
-        const nextSchemaNode = Q.add(one, one.properties[key]);
-        if (draft.isValid(data[key], nextSchemaNode, pointer)) {
-
-            value += 1;
+                value += 1;
+            }
         }
     }
 
@@ -227,7 +226,7 @@ export function resolveOneOfFuzzy(
         const nextSchemaNode = Q.add(schema, one);
         if (draft.isValid(data, nextSchemaNode, pointer)) {
 
-            matches.push({ schema: one, index: i });
+            matches.push({ schema: nextSchemaNode, index: i });
         }
     }
 
@@ -236,20 +235,20 @@ export function resolveOneOfFuzzy(
     }
 
     // fuzzy match oneOf
-    if (getTypeOf(data) === "object") {
+    if (isObject(data)) {
         let schemaOfItem;
         let schemaOfIndex = -1;
         let fuzzyGreatest = 0;
 
         for (let i = 0; i < schema.oneOf.length; i += 1) {
-            const one = draft.resolveRef(schema.oneOf[i]);
 
+            const one = draft.resolveRef(schema.oneOf[i]);
             const nextSchemaNode = Q.add(schema, one);
             const fuzzyValue = fuzzyObjectValue(draft, nextSchemaNode, data);
 
             if (fuzzyGreatest < fuzzyValue) {
                 fuzzyGreatest = fuzzyValue;
-                schemaOfItem = schema.oneOf[i];
+                schemaOfItem = nextSchemaNode;
                 schemaOfIndex = i;
             }
         }
