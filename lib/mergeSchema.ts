@@ -1,31 +1,8 @@
 import { JsonSchema } from "./types";
-import { mergeArraysUnique } from "./utils/merge";
 import getTypeOf from "./getTypeOf";
 import { isObject } from "./utils/isObject";
 
-/**
- * merges to two json schema. In case of conflicts, will use overwrite first
- * schema or directly return first json schema.
- */
-export function _mergeSchema(a: JsonSchema, b: JsonSchema) {
-    const aType = getTypeOf(a);
-    const bType = getTypeOf(b);
-    if (aType !== bType) {
-        return a;
-    }
-
-    // @scope
-    const result = mergeArraysUnique(a, b);
-    Object.defineProperty(result, "__compiled", { enumerable: false, value: true });
-    Object.defineProperty(result, "__scope", { enumerable: false, value: b.__scope ?? a.__scope });
-    Object.defineProperty(result, "__ref", { enumerable: false, value: b.__ref ?? a.__ref });
-    Object.defineProperty(result, "getOneOfOrigin", { enumerable: false, value: b.getOneOfOrigin ?? a.getOneOfOrigin });
-    return result;
-}
-
-export function mergeSchema<T extends JsonSchema>(a: T, b: T): T {
-    // console.log("a", JSON.stringify(a, null, 2));
-    // console.log("b", JSON.stringify(b, null, 2));
+export function mergeSchema<T extends JsonSchema>(a: T, b: T, ...omit: string[]): T {
     if (b?.type === "error") {
         return b;
     } else if (a?.type === "error") {
@@ -39,6 +16,10 @@ export function mergeSchema<T extends JsonSchema>(a: T, b: T): T {
     }
 
     const schema = mergeSchema2(a, b) as T;
+    for (let i = 0; i < omit.length; i += 1) {
+        // @ts-expect-error readonly
+        schema[omit[i]] = undefined;
+    }
     if (!isObject(schema)) {
         return schema;
     }
