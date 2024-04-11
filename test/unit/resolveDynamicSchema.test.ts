@@ -1,6 +1,15 @@
 import { expect } from "chai";
 import { Draft07 as Draft } from "../../lib/draft07";
-import { resolveDynamicSchema } from "../../lib/resolveDynamicSchema";
+import { resolveDynamicSchema as resolve } from "../../lib/resolveDynamicSchema";
+import { JsonSchema, createNode, isSchemaNode } from "../../lib/types";
+
+function resolveDynamicSchema(draft: Draft, schema: JsonSchema, data: unknown, pointer = "#") {
+    const r = resolve(createNode(draft, schema, pointer), data);
+    if (r && isSchemaNode(r)) {
+        return r.schema;
+    }
+    return r;
+}
 
 describe("resolveDynamicSchema", () => {
     let draft: Draft;

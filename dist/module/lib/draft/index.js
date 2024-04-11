@@ -1,4 +1,5 @@
 import copy from "../utils/copy";
+import { createNode, isSchemaNode } from "../types";
 export class Draft {
     constructor(config, schema) {
         /** cache for remote schemas */
@@ -85,7 +86,7 @@ export class Draft {
      * @return resolved json-schema object of requested json-pointer location
      */
     getSchema(options) {
-        return this.config.getSchema(this, options);
+        return this.config.getSchema(this, options).schema;
     }
     /**
      * Create data object matching the given schema
@@ -101,45 +102,36 @@ export class Draft {
         return this.config.isValid(this, data, schema, pointer);
     }
     resolveAnyOf(data, schema, pointer) {
-        return this.config.resolveAnyOf(this, data, schema, pointer);
+        const node = createNode(this, schema, pointer);
+        return this.config.resolveAnyOf(node, data);
     }
     resolveAllOf(data, schema) {
         return this.config.resolveAllOf(this, data, schema);
     }
-    resolveRef(schema) {
-        return this.config.resolveRef(schema, this.rootSchema);
+    resolveRef(node) {
+        return this.config.resolveRef(node);
     }
     resolveOneOf(data, schema, pointer) {
-        return this.config.resolveOneOf(this, data, schema, pointer);
+        const node = createNode(this, schema, pointer);
+        return this.config.resolveOneOf(node, data);
     }
     setSchema(schema) {
         this.rootSchema = schema;
     }
-    /**
-     * Returns the json-schema of the given object property or array item.
-     * e.g. it steps by one key into the data
-     *
-     *  This helper determines the location of the property within the schema (additional properties, oneOf, ...) and
-     *  returns the correct schema.
-     *
-     * @param  key       - property-name or array-index
-     * @param  schema    - json schema of current data
-     * @param  data      - parent of key
-     * @param  [pointer] - pointer to schema and data (parent of key)
-     * @return Schema or Error if failed resolving key
-     */
     step(key, schema, data, pointer) {
-        return this.config.step(this, key, schema, data, pointer);
+        if (isSchemaNode(key)) {
+            return this.config.step(key, schema, data);
+        }
+        const node = createNode(this, schema !== null && schema !== void 0 ? schema : this.rootSchema, pointer);
+        return this.config.step(node, key, data);
     }
-    /**
-     * Validate data by a json schema
-     *
-     * @param value - value to validate
-     * @param [schema] - json schema, defaults to rootSchema
-     * @param [pointer] - json pointer pointing to value (used for error-messages only)
-     * @return list of errors or empty
-     */
-    validate(data, schema, pointer) {
-        return this.config.validate(this, data, schema, pointer);
+    validate(data, schema = this.rootSchema, pointer) {
+        if (isSchemaNode(data)) {
+            const inputData = schema;
+            const inuptNode = data;
+            return this.config.validate(inuptNode, inputData);
+        }
+        const node = createNode(this, schema, pointer);
+        return this.config.validate(node, data);
     }
 }

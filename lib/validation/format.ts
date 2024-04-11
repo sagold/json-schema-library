@@ -1,5 +1,5 @@
 /* eslint-disable max-len, no-control-regex */
-import { JsonError, JsonSchema } from "../types";
+import { JsonError, JsonSchema, SchemaNode } from "../types";
 import { Draft } from "../draft";
 import validUrl from "valid-url";
 import { parse as parseIdnEmail } from "smtp-address-parser";
@@ -33,13 +33,12 @@ const isValidURITemplate =
 const formatValidators: Record<
     string,
     (
-        draft: Draft,
-        schema: JsonSchema,
-        value: unknown,
-        pointer: string
+        node: SchemaNode,
+        value: unknown
     ) => undefined | JsonError | JsonError[]
 > = {
-    date: (draft, schema, value, pointer) => {
+    date: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -65,7 +64,8 @@ const formatValidators: Record<
         return draft.errors.formatDateError({ value, pointer, schema });
     },
 
-    "date-time": (draft, schema, value, pointer) => {
+    "date-time": (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -78,7 +78,8 @@ const formatValidators: Record<
         return draft.errors.formatDateTimeError({ value, pointer, schema });
     },
 
-    email: (draft, schema, value, pointer) => {
+    email: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -106,7 +107,8 @@ const formatValidators: Record<
      * @draft 7
      * [RFC6531] https://json-schema.org/draft-07/json-schema-validation.html#RFC6531
      */
-    "idn-email": (draft, schema, value, pointer) => {
+    "idn-email": (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -118,7 +120,8 @@ const formatValidators: Record<
         }
     },
 
-    hostname: (draft, schema, value, pointer) => {
+    hostname: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string") {
             return undefined;
         }
@@ -128,7 +131,8 @@ const formatValidators: Record<
         return draft.errors.formatHostnameError({ value, pointer, schema });
     },
 
-    ipv4: (draft, schema, value, pointer) => {
+    ipv4: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -142,7 +146,8 @@ const formatValidators: Record<
         return draft.errors.formatIPV4Error({ value, pointer, schema });
     },
 
-    ipv6: (draft, schema, value, pointer) => {
+    ipv6: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -156,7 +161,8 @@ const formatValidators: Record<
         return draft.errors.formatIPV6Error({ value, pointer, schema });
     },
 
-    "json-pointer": (draft, schema, value, pointer) => {
+    "json-pointer": (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -166,7 +172,8 @@ const formatValidators: Record<
         return draft.errors.formatJsonPointerError({ value, pointer, schema });
     },
 
-    "relative-json-pointer": (draft, schema, value, pointer) => {
+    "relative-json-pointer": (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string") {
             return undefined;
         }
@@ -176,7 +183,8 @@ const formatValidators: Record<
         return draft.errors.formatJsonPointerError({ value, pointer, schema });
     },
 
-    regex: (draft, schema, value, pointer) => {
+    regex: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value === "string" && /\\Z$/.test(value) === false) {
             try {
                 new RegExp(value);
@@ -195,7 +203,8 @@ const formatValidators: Record<
     // hh:mm:ss.sTZD
     // https://opis.io/json-schema/2.x/formats.html
     // regex https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch04s07.html
-    time: (draft, schema, value, pointer) => {
+    time: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -219,7 +228,8 @@ const formatValidators: Record<
         // return errors.formatTimeError({ value, pointer, schema });
     },
 
-    uri: (draft, schema, value, pointer) => {
+    uri: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -229,7 +239,8 @@ const formatValidators: Record<
         return draft.errors.formatURIError({ value, pointer, schema });
     },
 
-    "uri-reference": (draft, schema, value, pointer) => {
+    "uri-reference": (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -239,7 +250,8 @@ const formatValidators: Record<
         return draft.errors.formatURIReferenceError({ value, pointer, schema });
     },
 
-    "uri-template": (draft, schema, value, pointer) => {
+    "uri-template": (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -249,7 +261,8 @@ const formatValidators: Record<
         return draft.errors.formatURITemplateError({ value, pointer, schema });
     },
 
-    url: (draft, schema, value: string, pointer) => {
+    url: (node, value: string) => {
+        const { draft, schema, pointer } = node;
         if (value === "" || validUrl.isWebUri(value)) {
             return undefined;
         }

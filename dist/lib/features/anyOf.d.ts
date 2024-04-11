@@ -1,4 +1,4 @@
-import { JsonSchema, JsonPointer, JsonValidator, JsonError } from "../types";
+import { JsonSchema, JsonValidator, JsonError, SchemaNode } from "../types";
 import { Draft } from "../draft";
 /**
  * returns merged schema of all valid anyOf subschemas for the given input data.
@@ -8,12 +8,12 @@ import { Draft } from "../draft";
  */
 export declare function mergeValidAnyOfSchema(draft: Draft, schema: JsonSchema, data: unknown): JsonSchema;
 /**
+ * @unused this function is only exposed via draft and not used otherwise
  * @returns extended input schema with valid anyOf subschemas or JsonError if
  * no anyOf schema matches input data
  */
-export declare function resolveAnyOf(draft: Draft, data: any, schema?: JsonSchema, pointer?: JsonPointer): JsonSchema | JsonError;
+export declare function resolveAnyOf(node: SchemaNode, data: any): SchemaNode | JsonError;
 /**
  * validate anyOf definition for given input data
  */
-declare const validateAnyOf: JsonValidator;
-export { validateAnyOf };
+export declare const validateAnyOf: JsonValidator;

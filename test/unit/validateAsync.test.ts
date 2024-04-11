@@ -27,23 +27,23 @@ describe("validateAsync", () => {
     describe("onError", () => {
         before(() => {
             // adds an async validation helper to { type: 'string', asyncError: true }
-            // @ts-ignore
-            addValidator.keyword(draft, "string", "asyncError", (c, schema) => {
-                return schema.asyncError
+            // @ts-expect-error type mismatch of vladation function
+            addValidator.keyword(draft, "string", "asyncError", (node) => {
+                return node.schema.asyncError
                     ? new Promise((resolve) =>
-                          // eslint-disable-next-line max-nested-callbacks
-                          resolve({
-                              type: "error",
-                              name: "AsyncError",
-                              code: "test-async-error",
-                              message: "custom test error"
-                          })
-                      )
+                        // eslint-disable-next-line max-nested-callbacks
+                        resolve({
+                            type: "error",
+                            name: "AsyncError",
+                            code: "test-async-error",
+                            message: "custom test error"
+                        })
+                    )
                     : Promise.resolve();
             });
         });
 
-        it("should call onProgress immediately with error", () => {
+        it("should call onProgress immediately with error", async () => {
             const errors: JsonError[] = [];
             return validateAsync(
                 draft,

@@ -3,45 +3,45 @@ import { JsonTypeValidator } from "../types";
 /**
  * @todo: type is also a keyword, as is properties, items, etc
  *
- * An instance has one of six primitive types (http://json-schema.org/latest/json-schema-draft.html#rfc.section.4.2)
+ * An instance has one of six primitive types (http://json-schema.org/latest/json-schema-node.draft.html#rfc.section.4.2)
  * or seven in case of ajv https://github.com/epoberezkin/ajv/blob/master/KEYWORDS.md#type
  * 1 null, 2 boolean, 3 object, 4 array, 5 number, 6 string (7 integer)
  */
 const typeValidators: Record<string, JsonTypeValidator> = {
-    array: (draft, schema, value, pointer) =>
-        draft.typeKeywords.array
-            .filter((key) => schema && schema[key] != null)
-            .map((key) => draft.validateKeyword[key](draft, schema, value, pointer)),
+    array: (node, value) =>
+        node.draft.typeKeywords.array
+            .filter((key) => node.schema && node.schema[key] != null)
+            .map((key) => node.draft.validateKeyword[key](node, value)),
 
-    object: (draft, schema, value, pointer) =>
-        draft.typeKeywords.object
-            .filter((key) => schema && schema[key] != null)
-            .map((key) => draft.validateKeyword[key](draft, schema, value, pointer)),
+    object: (node, value) =>
+        node.draft.typeKeywords.object
+            .filter((key) => node.schema && node.schema[key] != null)
+            .map((key) => node.draft.validateKeyword[key](node, value)),
 
-    string: (draft, schema, value, pointer) =>
-        draft.typeKeywords.string
-            .filter((key) => schema && schema[key] != null)
-            .map((key) => draft.validateKeyword[key](draft, schema, value, pointer)),
+    string: (node, value) =>
+        node.draft.typeKeywords.string
+            .filter((key) => node.schema && node.schema[key] != null)
+            .map((key) => node.draft.validateKeyword[key](node, value)),
 
-    integer: (draft, schema, value, pointer) =>
-        draft.typeKeywords.number
-            .filter((key) => schema && schema[key] != null)
-            .map((key) => draft.validateKeyword[key](draft, schema, value, pointer)),
+    integer: (node, value) =>
+        node.draft.typeKeywords.number
+            .filter((key) => node.schema && node.schema[key] != null)
+            .map((key) => node.draft.validateKeyword[key](node, value)),
 
-    number: (draft, schema, value, pointer) =>
-        draft.typeKeywords.number
-            .filter((key) => schema && schema[key] != null)
-            .map((key) => draft.validateKeyword[key](draft, schema, value, pointer)),
+    number: (node, value) =>
+        node.draft.typeKeywords.number
+            .filter((key) => node.schema && node.schema[key] != null)
+            .map((key) => node.draft.validateKeyword[key](node, value)),
 
-    boolean: (draft, schema, value, pointer) =>
-        draft.typeKeywords.boolean
-            .filter((key) => schema && schema[key] != null)
-            .map((key) => draft.validateKeyword[key](draft, schema, value, pointer)),
+    boolean: (node, value) =>
+        node.draft.typeKeywords.boolean
+            .filter((key) => node.schema && node.schema[key] != null)
+            .map((key) => node.draft.validateKeyword[key](node, value)),
 
-    null: (draft, schema, value, pointer) =>
-        draft.typeKeywords.null
-            .filter((key) => schema && schema[key] != null)
-            .map((key) => draft.validateKeyword[key](draft, schema, value, pointer))
+    null: (node, value) =>
+        node.draft.typeKeywords.null
+            .filter((key) => node.schema && node.schema[key] != null)
+            .map((key) => node.draft.validateKeyword[key](node, value))
 };
 
 export default typeValidators;

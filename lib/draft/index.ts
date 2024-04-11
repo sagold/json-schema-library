@@ -12,7 +12,7 @@ import validate from "../validate";
 import { CreateError } from "../utils/createCustomError";
 import { each, EachCallback } from "../each";
 import { eachSchema, EachSchemaCallback } from "../eachSchema";
-import { JsonSchema, JsonPointer, JsonValidator, JsonTypeValidator, JsonError } from "../types";
+import { JsonSchema, JsonPointer, JsonValidator, JsonTypeValidator, JsonError, createNode, SchemaNode, isSchemaNode } from "../types";
 import { resolveAllOf } from "../features/allOf";
 import { resolveAnyOf } from "../features/anyOf";
 import { resolveOneOf } from "../features/oneOf";
@@ -145,7 +145,7 @@ export class Draft {
      * @return resolved json-schema object of requested json-pointer location
      */
     getSchema(options?: GetSchemaOptions): JsonSchema | JsonError | undefined {
-        return this.config.getSchema(this, options);
+        return this.config.getSchema(this, options).schema;
     }
 
     /**
@@ -163,30 +163,33 @@ export class Draft {
         return this.config.getTemplate(this, data, schema, opts);
     }
 
-    isValid(data: any, schema?: JsonSchema, pointer?: JsonPointer): boolean {
+    isValid(data: unknown, schema?: JsonSchema, pointer?: JsonPointer): boolean {
         return this.config.isValid(this, data, schema, pointer);
     }
 
-    resolveAnyOf(data: any, schema: JsonSchema, pointer?: JsonPointer): JsonSchema {
-        return this.config.resolveAnyOf(this, data, schema, pointer);
+    resolveAnyOf(data: any, schema: JsonSchema, pointer?: JsonPointer): SchemaNode | JsonError {
+        const node = createNode(this, schema, pointer);
+        return this.config.resolveAnyOf(node, data);
     }
 
     resolveAllOf(data: any, schema: JsonSchema): JsonSchema {
         return this.config.resolveAllOf(this, data, schema);
     }
 
-    resolveRef(schema: JsonSchema): JsonSchema {
-        return this.config.resolveRef(schema, this.rootSchema);
+    resolveRef(node: SchemaNode): SchemaNode {
+        return this.config.resolveRef(node);
     }
 
-    resolveOneOf(data: any, schema: JsonSchema, pointer?: JsonPointer): JsonSchema {
-        return this.config.resolveOneOf(this, data, schema, pointer);
+    resolveOneOf(data: any, schema: JsonSchema, pointer?: JsonPointer): SchemaNode | JsonError {
+        const node = createNode(this, schema, pointer);
+        return this.config.resolveOneOf(node, data);
     }
 
     setSchema(schema: JsonSchema) {
         this.rootSchema = schema;
     }
 
+    step(node: SchemaNode, key: string | number, data: any): SchemaNode | JsonError;
     /**
      * Returns the json-schema of the given object property or array item.
      * e.g. it steps by one key into the data
@@ -200,8 +203,13 @@ export class Draft {
      * @param  [pointer] - pointer to schema and data (parent of key)
      * @return Schema or Error if failed resolving key
      */
-    step(key: string | number, schema: JsonSchema, data: any, pointer?: JsonPointer): JsonSchema {
-        return this.config.step(this, key, schema, data, pointer);
+    step(key: string | number, schema: JsonSchema, data: any, pointer?: JsonPointer): SchemaNode | JsonError;
+    step(key: string | number | SchemaNode, schema: any, data: any, pointer?: JsonPointer): SchemaNode | JsonError {
+        if (isSchemaNode(key)) {
+            return this.config.step(key, schema, data);
+        }
+        const node = createNode(this, schema ?? this.rootSchema, pointer);
+        return this.config.step(node, key, data);
     }
 
     /**
@@ -212,7 +220,16 @@ export class Draft {
      * @param [pointer] - json pointer pointing to value (used for error-messages only)
      * @return list of errors or empty
      */
-    validate(data: unknown, schema?: JsonSchema, pointer?: JsonPointer): JsonError[] {
-        return this.config.validate(this, data, schema, pointer);
+    validate(node: SchemaNode, data: unknown): JsonError[];
+    validate(data: unknown, schema?: JsonSchema, pointer?: JsonPointer): JsonError[];
+    validate(data: unknown, schema: JsonSchema = this.rootSchema, pointer?: JsonPointer): JsonError[] {
+        if (isSchemaNode(data)) {
+            const inputData = schema;
+            const inuptNode = data;
+            return this.config.validate(inuptNode, inputData);
+        }
+
+        const node = createNode(this, schema, pointer);
+        return this.config.validate(node, data);
     }
 }

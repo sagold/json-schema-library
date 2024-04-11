@@ -1,6 +1,6 @@
 import { Draft } from "./draft";
 import getTypeOf from "./getTypeOf";
-import { JsonSchema, JsonPointer } from "./types";
+import { JsonSchema, JsonPointer, createNode } from "./types";
 
 export type EachCallback = (schema: JsonSchema, data: unknown, pointer: JsonPointer) => void;
 
@@ -20,20 +20,21 @@ export function each(
     schema: JsonSchema = draft.rootSchema,
     pointer: JsonPointer = "#"
 ) {
-    schema = draft.resolveRef(schema);
+    const node = createNode(draft, schema, pointer);
+    schema = draft.resolveRef(node).schema;
     callback(schema, data, pointer);
     const dataType = getTypeOf(data);
 
     if (dataType === "object") {
         Object.keys(data).forEach((key) => {
-            const nextSchema = draft.step(key, schema, data, pointer); // not save
+            const nextNode = draft.step(key, schema, data, pointer); // not save
             const next = data[key]; // save
-            draft.each(next, callback, nextSchema, `${pointer}/${key}`);
+            draft.each(next, callback, nextNode.schema, `${pointer}/${key}`);
         });
     } else if (dataType === "array") {
         data.forEach((next: unknown, key: number) => {
-            const nextSchema = draft.step(key, schema, data, pointer);
-            draft.each(next, callback, nextSchema, `${pointer}/${key}`);
+            const nextNode = draft.step(key, schema, data, pointer);
+            draft.each(next, callback, nextNode.schema, `${pointer}/${key}`);
         });
     }
 }

@@ -1,5 +1,5 @@
 import { Draft } from "./draft";
-import { isJsonError, JsonError, JsonSchema } from "./types";
+import { createNode, isJsonError, JsonError, JsonSchema } from "./types";
 
 /**
  * Returns a list of possible child-schemas for the given property key. In case of a oneOf selection, multiple schemas
@@ -17,16 +17,16 @@ export default function getChildSchemaSelection(
     schema: JsonSchema = draft.rootSchema
 ): JsonSchema[] | JsonError {
     if (schema.oneOf) {
-        return schema.oneOf.map((item: JsonSchema) => draft.resolveRef(item));
+        return schema.oneOf.map((item: JsonSchema) => draft.resolveRef(createNode(draft, item)).schema);
     }
     if (schema.items?.oneOf) {
-        return schema.items.oneOf.map((item: JsonSchema) => draft.resolveRef(item));
+        return schema.items.oneOf.map((item: JsonSchema) => draft.resolveRef(createNode(draft, item)).schema);
     }
 
-    const result = draft.step(property, schema, {}, "#");
-    if (isJsonError(result)) {
-        return result;
+    const node = draft.step(property, schema, {}, "#");
+    if (isJsonError(node)) {
+        return node;
     }
 
-    return [result];
+    return [node.schema];
 }

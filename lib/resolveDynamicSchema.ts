@@ -1,5 +1,4 @@
-import { JsonError, JsonPointer, JsonSchema, isJsonError } from "./types";
-import { Draft } from "./draft";
+import { JsonError, JsonSchema, SchemaNode, createNode, isJsonError, isSchemaNode } from "./types";
 import { mergeSchema } from "./mergeSchema";
 import { resolveIfSchema } from "./features/if";
 import { resolveDependencies } from "./features/dependencies";
@@ -8,7 +7,6 @@ import { mergeValidAnyOfSchema } from "./features/anyOf";
 import { resolveOneOfFuzzy as resolveOneOf } from "./features/oneOf";
 import { JsonData } from "@sagold/json-pointer";
 import { omit } from "./utils/omit";
-import Q from "./Q";
 
 const toOmit = ["allOf", "anyOf", "oneOf", "dependencies", "if", "then", "else"];
 const dynamicProperties = ["allOf", "anyOf", "oneOf", "dependencies", "if"];
@@ -34,23 +32,20 @@ export function isDynamicSchema(schema: JsonData): boolean {
  * @returns static schema from resolved dynamic schema definitions for this
  *  specific input data
  */
-export function resolveDynamicSchema(
-    draft: Draft,
-    schema: JsonSchema,
-    data: unknown,
-    pointer: JsonPointer
-) {
+export function resolveDynamicSchema(_node: SchemaNode, data: unknown) {
     let resolvedSchema: JsonSchema;
     let error: JsonError;
-    schema = draft.resolveRef(schema);
+    const node = _node.draft.resolveRef(_node);
+    const { pointer, draft } = node;
+    const schema = isSchemaNode(node) ? node.schema : node;
 
     // @feature oneOf
     if (schema.oneOf) {
-        const oneOfSchema = resolveOneOf(draft, data, schema, pointer);
+        const oneOfSchema = resolveOneOf(node, data);
         if (isJsonError(oneOfSchema)) {
             error = oneOfSchema;
         } else if (oneOfSchema) {
-            resolvedSchema = mergeSchema(resolvedSchema ?? {}, oneOfSchema);
+            resolvedSchema = mergeSchema(resolvedSchema ?? {}, oneOfSchema.schema);
         }
     }
 
@@ -61,17 +56,13 @@ export function resolveDynamicSchema(
             // if not, we would wrongly merge oneOf, if-then statements, etc
             if (isDynamicSchema(s)) {
                 // copy of reduceSchema
-                const nextSchemaNode = Q.add(schema, s);
-                let result = resolveDynamicSchema(draft, nextSchemaNode, data, pointer);
-
+                const result = resolveDynamicSchema(node.next(s as JsonSchema), data);
                 // note: result has no scope
-                if (result == null) {
+                if (result == null || isJsonError(result)) {
                     return result;
                 }
-
-                result = mergeSchema(s, result);
-                const finalSchemaNode = Q.add(nextSchemaNode, result);
-                return Q.omit(finalSchemaNode, ...toOmit);
+                const finalSchema = mergeSchema(s, result.schema);
+                return omit(finalSchema, ...toOmit);
             }
             return s;
         });
@@ -88,28 +79,31 @@ export function resolveDynamicSchema(
     }
 
     // @feature dependencies
-    const dependenciesSchema = resolveDependencies(draft, schema, data);
+    const dNode = createNode(draft, schema, pointer);
+    const dependenciesSchema = resolveDependencies(dNode, data);
     if (dependenciesSchema) {
         resolvedSchema = mergeSchema(resolvedSchema ?? {}, dependenciesSchema);
     }
 
     // @feature if-then-else
-    const ifSchema = resolveIfSchema(draft, schema, data);
-    if (ifSchema) {
-        resolvedSchema = mergeSchema(resolvedSchema ?? {}, ifSchema);
+    const ifNode = createNode(draft, schema, pointer);
+    const ifNodeResolved = resolveIfSchema(ifNode, data);
+    if (isSchemaNode(ifNodeResolved)) {
+        resolvedSchema = mergeSchema(resolvedSchema ?? {}, ifNodeResolved.schema);
     }
 
     if (resolvedSchema == null) {
         return error;
     }
+    if (isJsonError(resolvedSchema)) {
+        return resolvedSchema;
+    }
 
-    const nextSchemaNode = Q.add(schema, resolvedSchema);
-    const nestedSchema: JsonSchema | undefined = resolveDynamicSchema(draft, nextSchemaNode, data, pointer);
-
-    if (nestedSchema) {
-        resolvedSchema = mergeSchema(resolvedSchema, nestedSchema);
+    const nestedSchema: JsonSchema | undefined = resolveDynamicSchema(node.next(resolvedSchema), data);
+    if (isSchemaNode(nestedSchema)) {
+        resolvedSchema = mergeSchema(resolvedSchema, nestedSchema.schema);
     }
 
     const finalSchema = omit(resolvedSchema, ...toOmit);
-    return Q.add(schema, finalSchema);
+    return node.next(finalSchema);
 }

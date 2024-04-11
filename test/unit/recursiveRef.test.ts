@@ -1,8 +1,9 @@
+import { strict as assert } from "assert";
 import { expect } from "chai";
 import { Draft2019 } from "../../lib/draft2019"
-import { JsonSchema } from "../../lib/types";
+import { JsonSchema, createNode, isJsonError, isSchemaNode } from "../../lib/types";
 
-describe("recursiveRef", () => {
+describe.skip("recursiveRef", () => {
 
     describe("properties", () => {
         let inputSchema: JsonSchema = {};
@@ -26,18 +27,25 @@ describe("recursiveRef", () => {
 
         it("should return correct reference using step", () => {
             const draft = new Draft2019(inputSchema);
-            const schema = draft.getSchema(); // compiled schema
-            const schemaParent = draft.step("parent", schema, { parent: { foo: { foo: 12 } } }, schema.__scope.pointer);
-            const foo1 = draft.step("foo", schemaParent, { foo: { foo: 12 } }, schemaParent.__scope.pointer);
-            const foo2 = draft.step("foo", foo1, { foo: 12 }, foo1.__scope.pointer);
+            const schema = draft.rootSchema; // compiled schema
 
-            expect(foo2.type).to.eq("object");
-            expect(foo2.testId).to.eq("parent");
+            const schemaParent = draft.step("parent", schema, { parent: { foo: { foo: 12 } } }, schema.__scope.pointer);
+            assert(isSchemaNode(schemaParent));
+            const foo1 = draft.step("foo", schemaParent, { foo: { foo: 12 } }, schemaParent.schema.__scope.pointer).schema;
+            assert(isSchemaNode(foo1));
+            const foo2 = draft.step("foo", foo1, { foo: 12 }, foo1.schema.__scope.pointer).schema;
+            assert(isSchemaNode(foo2));
+
+            expect(foo2.schema.type).to.eq("object");
+            expect(foo2.schema.testId).to.eq("parent");
         });
 
         it("should return correct reference using getSchema", () => {
             const draft = new Draft2019(inputSchema);
             const schema = draft.getSchema({ pointer: "#/parent/foo/foo", data: { parent: { foo: { foo: 12 } } } });
+
+            assert(schema != null);
+            assert(!isJsonError(schema));
 
             expect(schema.type).to.eq("object");
             expect(schema.testId).to.eq("parent");

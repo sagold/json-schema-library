@@ -1,56 +1,65 @@
 import { expect } from "chai";
-import getSchema from "../../../lib/getSchema";
+import _getSchema, { GetSchemaOptions } from "../../../lib/getSchema";
 import { Draft04 as Core } from "../../../lib/draft04";
-import { JsonSchema, JsonPointer } from "../../../lib/types";
+import { JsonSchema, JsonPointer, isJsonError, createNode } from "../../../lib/types";
 import { resolveOneOfFuzzy } from "../../../lib/features/oneOf";
+import { Draft } from "../../../lib/draft";
+
+function getSchema(draft: Draft, options: GetSchemaOptions) {
+    const result = _getSchema(draft, options);
+    if (result == null || isJsonError(result)) {
+        return result;
+    }
+    return result.schema;
+}
 
 describe("issue#19 - getSchema from dependencies", () => {
     let draft: Core;
     beforeEach(
         () =>
-            (draft = new Core({
-                title: "Fill in some steps",
-                required: ["name"],
-                properties: {
-                    name: {
-                        title: "Name",
-                        type: "string",
-                        description: "Unique name of the component"
-                    },
-                    generation: {
-                        type: "string",
-                        title: "Generation Method",
-                        enum: ["Hide Custom Field", "Display Custom Field"],
-                        default: "Hide Custom Field"
-                    }
+        (draft = new Core({
+            title: "Fill in some steps",
+            required: ["name"],
+            properties: {
+                name: {
+                    title: "Name",
+                    type: "string",
+                    description: "Unique name of the component"
                 },
-                dependencies: {
-                    generation: {
-                        // oneOfProperty: "generation",
-                        oneOf: [
-                            {
-                                properties: {
-                                    generation: {
-                                        const: "Hide Custom Field"
-                                    }
-                                }
-                            },
-                            {
-                                required: ["customField"],
-                                properties: {
-                                    generation: {
-                                        const: "Display Custom Field"
-                                    },
-                                    customField: {
-                                        title: "Custom Field",
-                                        type: "string"
-                                    }
+                generation: {
+                    type: "string",
+                    title: "Generation Method",
+                    enum: ["Hide Custom Field", "Display Custom Field"],
+                    default: "Hide Custom Field"
+                }
+            },
+            dependencies: {
+                generation: {
+                    // oneOfProperty: "generation",
+                    oneOf: [
+                        {
+                            properties: {
+                                generation: {
+                                    const: "Hide Custom Field"
                                 }
                             }
-                        ]
-                    }
+                        },
+                        {
+                            required: ["customField"],
+                            properties: {
+                                generation: {
+                                    const: "Display Custom Field"
+                                },
+                                customField: {
+                                    title: "Custom Field",
+                                    type: "string"
+                                }
+                            }
+                        }
+                    ]
                 }
-            }))
+            }
+        }))
     );
 
     it("should return correct schema for existing data property 'customField'", () => {
@@ -75,7 +84,8 @@ describe("issue#19 - getSchema from dependencies", () => {
         // -> validate schema -> no schema is valid (because gneration is missing here)
         // => tell jlib which schema to resolve or let it retrieve a schema on its own
         draft.resolveOneOf = function resolveOneOf(data, schema: JsonSchema, pointer: JsonPointer) {
-            return resolveOneOfFuzzy(this, data, schema, pointer);
+            const node = createNode(draft, schema, pointer);
+            return resolveOneOfFuzzy(node, data);
         };
 
         const schema = getSchema(draft, {

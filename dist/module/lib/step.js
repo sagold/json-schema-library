@@ -3,18 +3,18 @@ import createSchemaOf from "./createSchemaOf";
 import { isJsonError } from "./types";
 import { reduceSchema } from "./reduceSchema";
 const stepType = {
-    array: (draft, key, schema, data, pointer) => {
+    array: (node, key, data) => {
+        const { draft, schema, pointer } = node;
         const itemValue = data === null || data === void 0 ? void 0 : data[key];
         const itemsType = getTypeOf(schema.items);
         if (itemsType === "object") {
             // @spec: ignore additionalItems, when items is schema-object
-            return (reduceSchema(draft, schema.items, itemValue, `${pointer}/${key}`) ||
-                draft.resolveRef(schema.items));
+            return reduceSchema(node.next(schema.items, key), itemValue);
         }
         if (itemsType === "array") {
             // @draft >= 7 bool schema, items:[true, false]
             if (schema.items[key] === true) {
-                return createSchemaOf(itemValue);
+                return node.next(createSchemaOf(itemValue), key);
             }
             // @draft >= 7 bool schema, items:[true, false]
             if (schema.items[key] === false) {
@@ -26,7 +26,7 @@ const stepType = {
                 });
             }
             if (schema.items[key]) {
-                return draft.resolveRef(schema.items[key]);
+                return draft.resolveRef(node.next(schema.items[key], key));
             }
             if (schema.additionalItems === false) {
                 return draft.errors.additionalItemsError({
@@ -37,25 +37,27 @@ const stepType = {
                 });
             }
             if (schema.additionalItems === true || schema.additionalItems === undefined) {
-                return createSchemaOf(itemValue);
+                return node.next(createSchemaOf(itemValue), key);
             }
             if (getTypeOf(schema.additionalItems) === "object") {
-                return schema.additionalItems;
+                return node.next(schema.additionalItems, key);
             }
             throw new Error(`Invalid schema ${JSON.stringify(schema, null, 2)} for ${JSON.stringify(data, null, 2)}`);
         }
         if (schema.additionalItems !== false && itemValue) {
             // @todo reevaluate: incomplete schema is created here
             // @todo support additionalItems: {schema}
-            return createSchemaOf(itemValue);
+            return node.next(createSchemaOf(itemValue), key);
         }
         return new Error(`Invalid array schema for ${key} at ${pointer}`);
     },
-    object: (draft, key, schema, data, pointer) => {
-        var _a;
-        schema = reduceSchema(draft, schema, data, pointer);
+    object: (node, key, data) => {
+        var _a, _b;
+        const { draft, pointer } = node;
+        const reduction = reduceSchema(node, data);
+        const schema = ((_a = reduction.schema) !== null && _a !== void 0 ? _a : reduction);
         // @feature properties
-        const property = (_a = schema === null || schema === void 0 ? void 0 : schema.properties) === null || _a === void 0 ? void 0 : _a[key];
+        const property = (_b = schema === null || schema === void 0 ? void 0 : schema.properties) === null || _b === void 0 ? void 0 : _b[key];
         if (property !== undefined) {
             // @todo patternProperties also validate properties
             // @feature boolean schema
@@ -68,21 +70,20 @@ const stepType = {
                 });
             }
             else if (property === true) {
-                return createSchemaOf(data === null || data === void 0 ? void 0 : data[key]);
+                return node.next(createSchemaOf(data === null || data === void 0 ? void 0 : data[key]), key);
             }
-            const targetSchema = draft.resolveRef(property);
-            if (isJsonError(targetSchema)) {
-                return targetSchema;
+            const nextPropertyNode = draft.resolveRef(node.next(property, key));
+            if (isJsonError(nextPropertyNode)) {
+                return nextPropertyNode;
             }
             // check if there is a oneOf selection, which must be resolved
-            if (targetSchema && Array.isArray(targetSchema.oneOf)) {
+            if (nextPropertyNode && Array.isArray(nextPropertyNode.schema.oneOf)) {
                 // @special case: this is a mix of a schema and optional definitions
                 // we resolve the schema here and add the original schema to `oneOfSchema`
-                return draft.resolveOneOf(data[key], targetSchema, `${pointer}/${key}`);
+                return draft.resolveOneOf(data[key], nextPropertyNode.schema, nextPropertyNode.pointer);
             }
-            // resolved schema or error
-            if (targetSchema) {
-                return targetSchema;
+            if (nextPropertyNode) {
+                return nextPropertyNode;
             }
         }
         // @feature patternProperties
@@ -94,17 +95,18 @@ const stepType = {
             for (let i = 0, l = patterns.length; i < l; i += 1) {
                 regex = new RegExp(patterns[i]);
                 if (regex.test(key)) {
-                    return patternProperties[patterns[i]];
+                    return node.next(patternProperties[patterns[i]], key);
                 }
             }
         }
         // @feature additionalProperties
         const { additionalProperties } = schema;
         if (getTypeOf(additionalProperties) === "object") {
-            return schema.additionalProperties;
+            return node.next(schema.additionalProperties, key);
         }
         if (data && (additionalProperties === undefined || additionalProperties === true)) {
-            return createSchemaOf(data[key]);
+            const generatedSchema = createSchemaOf(data[key]);
+            return generatedSchema ? node.next(generatedSchema, key) : undefined;
         }
         return draft.errors.unknownPropertyError({
             property: key,
@@ -128,8 +130,9 @@ const stepType = {
  * @param  [pointer] - pointer to schema and data (parent of key)
  * @return Schema or Error if failed resolving key
  */
-export default function step(draft, key, schema, data, pointer = "#") {
+export default function step(node, key, data) {
     var _a;
+    const { draft, schema, pointer } = node;
     const typeOfData = getTypeOf(data);
     let schemaType = (_a = schema.type) !== null && _a !== void 0 ? _a : typeOfData;
     // @draft >= 4 ?
@@ -147,7 +150,7 @@ export default function step(draft, key, schema, data, pointer = "#") {
     }
     const stepFunction = stepType[schemaType];
     if (stepFunction) {
-        const schemaResult = stepFunction(draft, `${key}`, schema, data, pointer);
+        const schemaResult = stepFunction(node, `${key}`, data);
         if (schemaResult === undefined) {
             return draft.errors.schemaWarning({
                 pointer,

@@ -1,3 +1,4 @@
+import { isSchemaNode } from "./types";
 import { mergeSchema } from "./mergeSchema";
 import { resolveDynamicSchema } from "./resolveDynamicSchema";
 import { omit } from "./utils/omit";
@@ -10,11 +11,14 @@ const toOmit = ["allOf", "anyOf", "oneOf", "dependencies", "if", "then", "else"]
  * @returns input schema reduced by dynamic schema definitions for the given
  * input data
  */
-export function reduceSchema(draft, schema, data, pointer) {
-    let resolvedSchema = resolveDynamicSchema(draft, schema, data, pointer);
-    if (resolvedSchema) {
-        resolvedSchema = mergeSchema(schema, resolvedSchema);
-        return omit(resolvedSchema, ...toOmit);
+export function reduceSchema(node, data) {
+    const resolvedSchema = resolveDynamicSchema(node, data);
+    if (isSchemaNode(resolvedSchema)) {
+        const result = mergeSchema(node.schema, resolvedSchema.schema);
+        return node.next(omit(result, ...toOmit));
     }
-    return schema;
+    if (resolvedSchema) {
+        return resolvedSchema; // error
+    }
+    return node;
 }

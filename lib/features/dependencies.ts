@@ -1,13 +1,11 @@
 /**
  * @draft 06, 2019-09
  */
-import { JsonSchema, JsonValidator, JsonError } from "../types";
+import { JsonSchema, JsonValidator, JsonError, SchemaNode } from "../types";
 import getTypeOf from "../getTypeOf";
-import { Draft } from "../draft";
 import { mergeSchema } from "../mergeSchema";
 import { uniqueItems } from "../utils/uniqueItems";
 import { isObject } from "../utils/isObject";
-import Q from "../Q";
 
 /**
  * @todo add support for dependentRequired (draft 2019-09)
@@ -18,10 +16,10 @@ import Q from "../Q";
  * @returns merged json schema defined by dependencies or undefined
  */
 export function resolveDependencies(
-    draft: Draft,
-    schema: JsonSchema,
+    node: SchemaNode,
     data: unknown
 ): JsonSchema | undefined {
+    const { schema, draft } = node;
     // @draft >= 2019-09 dependentSchemas
     const dependencies = schema.dependencies ?? schema.dependentSchemas;
     if (!isObject(dependencies) || !isObject(data)) {
@@ -48,7 +46,8 @@ export function resolveDependencies(
         // dependency schema
         if (isObject(dependency)) {
             updated = true;
-            resolvedSchema = mergeSchema(resolvedSchema, draft.resolveRef(dependency));
+            const dNode = node.next(dependency);
+            resolvedSchema = mergeSchema(resolvedSchema, draft.resolveRef(dNode).schema);
             return;
         }
     });
@@ -61,12 +60,8 @@ export function resolveDependencies(
 /**
  * @draft 2019-09
  */
-export const validateDependentRequired: JsonValidator = (
-    draft,
-    schema,
-    value: Record<string, unknown>,
-    pointer
-) => {
+export const validateDependentRequired: JsonValidator = (node, value: Record<string, unknown>) => {
+    const { draft, schema, pointer } = node;
     const dependentRequired = schema.dependentRequired;
     if (!isObject(dependentRequired)) {
         return undefined;
@@ -97,12 +92,8 @@ export const validateDependentRequired: JsonValidator = (
 /**
  * @draft 2019-09
  */
-export const validateDependentSchemas: JsonValidator = (
-    draft,
-    schema,
-    value: Record<string, unknown>,
-    pointer
-) => {
+export const validateDependentSchemas: JsonValidator = (node, value: Record<string, unknown>) => {
+    const { draft, schema, pointer } = node;
     const dependentSchemas = schema.dependentSchemas;
     if (!isObject(dependentSchemas)) {
         return undefined;
@@ -122,8 +113,7 @@ export const validateDependentSchemas: JsonValidator = (
             return;
         }
 
-        const nextSchemaNode = Q.add(schema, dependencies);
-        draft.validate(value, nextSchemaNode, pointer).map(error => errors.push(error));
+        draft.validate(node.next(dependencies), value).map(error => errors.push(error));
     });
     return errors;
 };
@@ -131,12 +121,8 @@ export const validateDependentSchemas: JsonValidator = (
 /**
  * validate dependencies definition for given input data
  */
-export const validateDependencies: JsonValidator = (
-    draft,
-    schema,
-    value: Record<string, unknown>,
-    pointer
-) => {
+export const validateDependencies: JsonValidator = (node, value: Record<string, unknown>) => {
+    const { draft, schema, pointer } = node;
     // @draft >= 2019-09 dependentSchemas
     const dependencies = schema.dependencies;
     if (!isObject(dependencies)) {
@@ -166,9 +152,7 @@ export const validateDependencies: JsonValidator = (
                     draft.errors.missingDependencyError({ missingProperty, pointer, schema, value })
                 );
         } else if (type === "object") {
-
-            const nextSchemaNode = Q.add(schema, dependencies[property]);
-            dependencyErrors = draft.validate(value, nextSchemaNode, pointer);
+            dependencyErrors = draft.validate(node.next(dependencies[property]), value);
 
         } else {
             throw new Error(

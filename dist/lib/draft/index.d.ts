@@ -11,7 +11,7 @@ import validate from "../validate";
 import { CreateError } from "../utils/createCustomError";
 import { each, EachCallback } from "../each";
 import { eachSchema, EachSchemaCallback } from "../eachSchema";
-import { JsonSchema, JsonPointer, JsonValidator, JsonTypeValidator, JsonError } from "../types";
+import { JsonSchema, JsonPointer, JsonValidator, JsonTypeValidator, JsonError, SchemaNode } from "../types";
 import { resolveAllOf } from "../features/allOf";
 import { resolveAnyOf } from "../features/anyOf";
 import { resolveOneOf } from "../features/oneOf";
@@ -80,7 +80,7 @@ export declare class Draft {
      */
     each(data: any, callback: EachCallback, schema?: JsonSchema, pointer?: JsonPointer): void;
     eachSchema(callback: EachSchemaCallback, schema?: JsonSchema): void;
-    getChildSchemaSelection(property: string | number, schema?: JsonSchema): JsonError | JsonSchema[];
+    getChildSchemaSelection(property: string | number, schema?: JsonSchema): JsonSchema[] | JsonError;
     /**
      * Returns the json-schema of a data-json-pointer.
      *
@@ -112,11 +112,11 @@ export declare class Draft {
      * @return created template data
      */
     getTemplate(data?: unknown, schema?: JsonSchema, opts?: TemplateOptions): any;
-    isValid(data: any, schema?: JsonSchema, pointer?: JsonPointer): boolean;
-    resolveAnyOf(data: any, schema: JsonSchema, pointer?: JsonPointer): JsonSchema;
+    isValid(data: unknown, schema?: JsonSchema, pointer?: JsonPointer): boolean;
+    resolveAnyOf(data: any, schema: JsonSchema, pointer?: JsonPointer): SchemaNode | JsonError;
     resolveAllOf(data: any, schema: JsonSchema): JsonSchema;
-    resolveRef(schema: JsonSchema): JsonSchema;
-    resolveOneOf(data: any, schema: JsonSchema, pointer?: JsonPointer): JsonSchema;
+    resolveRef(node: SchemaNode): SchemaNode;
+    resolveOneOf(data: any, schema: JsonSchema, pointer?: JsonPointer): SchemaNode | JsonError;
     setSchema(schema: JsonSchema): void;
     /**
      * Returns the json-schema of the given object property or array item.
@@ -131,7 +131,8 @@ export declare class Draft {
      * @param  [pointer] - pointer to schema and data (parent of key)
      * @return Schema or Error if failed resolving key
      */
-    step(key: string | number, schema: JsonSchema, data: any, pointer?: JsonPointer): JsonSchema;
+    step(node: SchemaNode, key: string | number, data: any): SchemaNode | JsonError;
+    step(key: string | number, schema: JsonSchema, data: any, pointer?: JsonPointer): SchemaNode | JsonError;
     /**
      * Validate data by a json schema
      *
@@ -140,5 +141,6 @@ export declare class Draft {
      * @param [pointer] - json pointer pointing to value (used for error-messages only)
      * @return list of errors or empty
      */
+    validate(node: SchemaNode, data: unknown): JsonError[];
     validate(data: unknown, schema?: JsonSchema, pointer?: JsonPointer): JsonError[];
 }

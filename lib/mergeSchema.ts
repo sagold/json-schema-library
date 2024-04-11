@@ -17,15 +17,13 @@ export function mergeSchema<T extends JsonSchema>(a: T, b: T, ...omit: string[])
 
     const schema = mergeSchema2(a, b) as T;
     for (let i = 0; i < omit.length; i += 1) {
-        // @ts-expect-error readonly
-        schema[omit[i]] = undefined;
+        delete schema[omit[i]];
     }
     if (!isObject(schema)) {
         return schema;
     }
 
     // @scope
-    Object.defineProperty(schema, "__scope", { enumerable: false, value: b.__scope ?? a.__scope });
     Object.defineProperty(schema, "__ref", { enumerable: false, value: b.__ref ?? a.__ref });
     Object.defineProperty(schema, "getOneOfOrigin", { enumerable: false, value: b.getOneOfOrigin ?? a.getOneOfOrigin });
     return schema;

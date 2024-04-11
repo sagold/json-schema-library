@@ -1,5 +1,4 @@
-import { JsonSchema, JsonPointer, JsonError } from "../types";
-import { Draft } from "../draft";
+import { JsonError, SchemaNode } from "../types";
 /**
  * Returns the json-schema of the given object property or array item.
  * e.g. it steps by one key into the data
@@ -14,4 +13,4 @@ import { Draft } from "../draft";
  * @param  [pointer] - pointer to schema and data (parent of key)
  * @return Schema or Error if failed resolving key
  */
-export default function step(draft: Draft, key: string | number, schema: JsonSchema, data?: any, pointer?: JsonPointer): JsonSchema | JsonError;
+export default function step(node: SchemaNode, key: string | number, data?: any): SchemaNode | JsonError;

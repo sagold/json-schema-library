@@ -1,7 +1,18 @@
 import { strict as assert } from "assert";
 import { expect } from "chai";
-import getSchema from "../../lib/getSchema";
+import _getSchema, { GetSchemaOptions } from "../../lib/getSchema";
 import { JsonEditor as Core } from "../../lib/jsoneditor";
+import { Draft } from "../../lib/draft";
+import { isJsonError } from "../../lib/types";
+
+function getSchema(draft: Draft, options: GetSchemaOptions) {
+    const result = _getSchema(draft, options);
+    if (result == null || isJsonError(result)) {
+        return result;
+    }
+    console.log(result.path);
+    return result.schema;
+}
 
 describe("getSchema", () => {
     let draft: Core;
@@ -169,7 +180,8 @@ describe("getSchema", () => {
 
             draft.setSchema(schema);
             const result = getSchema(draft, { pointer: "#/nested/second" });
-            assert(result != null);
+            console.log("result", result);
+            assert(isJsonError(result));
             expect(result.code).to.eq("one-of-error");
             expect(result.data?.pointer).to.equal("#/nested", "it should expose location of error");
             expect(result.data?.schema.oneOf).to.deep.equal(
@@ -202,7 +214,7 @@ describe("getSchema", () => {
                 additionalProperties: false
             });
             const schema = getSchema(draft, { pointer: "#/beer" });
-            assert(schema != null);
+            assert(isJsonError(schema));
             expect(schema.name).to.equal("UnknownPropertyError");
         });
 
@@ -407,7 +419,7 @@ describe("getSchema", () => {
 
             draft.setSchema(schema);
             const error = getSchema(draft, { pointer: "#/0/second", data: [] });
-            assert(error != null);
+            assert(isJsonError(error));
             expect(error.code).to.eq("one-of-error");
             expect(error.data.schema).to.deep.include(
                 schema.items,

@@ -1,24 +1,29 @@
+/**
+ * @draft-04
+ */
+import { createNode } from "../types";
 import { mergeSchema } from "../mergeSchema";
 import { omit } from "../utils/omit";
-import Q from "../Q";
 import { resolveIfSchema } from "./if";
+import { shallowCloneSchemaNode } from "../utils/shallowCloneSchema";
 /**
  * resolves schema
  * when complete this will have much duplication to step.object etc
  */
-export function resolveSchema(draft, schemaToResolve, data) {
-    const schema = Q.clone(schemaToResolve);
-    const ifSchema = resolveIfSchema(draft, schema, data);
+export function resolveSchema(node, data) {
+    const schema = shallowCloneSchemaNode(node.schema);
+    const ifSchema = resolveIfSchema(node, data);
     if (ifSchema) {
         return ifSchema;
     }
-    return omit(schema, "if", "then", "else");
+    return node.next(omit(schema, "if", "then", "else"));
 }
 export function resolveAllOf(draft, data, schema = draft.rootSchema) {
-    let mergedSchema = Q.clone(schema);
+    let mergedSchema = shallowCloneSchemaNode(schema);
     for (let i = 0; i < schema.allOf.length; i += 1) {
+        const allOfNode = draft.resolveRef(createNode(draft, schema.allOf[i]));
         // @todo introduce draft.resolveSchema to iteratively resolve
-        const allOfSchema = resolveSchema(draft, Q.add(schema, draft.resolveRef(schema.allOf[i])), data);
+        const allOfSchema = resolveSchema(allOfNode, data).schema;
         mergedSchema = mergeSchema(mergedSchema, allOfSchema);
     }
     delete mergedSchema.allOf;
@@ -38,21 +43,26 @@ export function mergeAllOfSchema(draft, schema) {
     }
     let resolvedSchema = {};
     allOf.forEach((subschema) => {
-        resolvedSchema = mergeSchema(resolvedSchema, draft.resolveRef(subschema));
+        if (subschema == null) {
+            return;
+        }
+        const subSchemaNode = draft.resolveRef(createNode(draft, subschema));
+        resolvedSchema = mergeSchema(resolvedSchema, subSchemaNode.schema);
     });
     return resolvedSchema;
 }
 /**
  * validate allOf definition for given input data
  */
-const validateAllOf = (draft, schema, value, pointer) => {
+const validateAllOf = (node, value) => {
+    const { draft, schema, pointer } = node;
     const { allOf } = schema;
     if (!Array.isArray(allOf) || allOf.length === 0) {
         return;
     }
     const errors = [];
     schema.allOf.forEach((subSchema) => {
-        errors.push(...draft.validate(value, Q.add(schema, subSchema), pointer));
+        errors.push(...draft.validate(value, subSchema, pointer));
     });
     return errors;
 };

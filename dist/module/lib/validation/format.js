@@ -18,7 +18,8 @@ const isValidURIRef = /^(?:[a-z][a-z0-9+\-.]*:)?(?:\/?\/(?:(?:[a-z0-9\-._~!$&'()
 const isValidURITemplate = /^(?:(?:[^\x00-\x20"'<>%\\^`{|}]|%[0-9a-f]{2})|\{[+#./;?&=,!@|]?(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?(?:,(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?)*\})*$/i;
 // Default Json-Schema formats: date-time, email, hostname, ipv4, ipv6, uri, uriref
 const formatValidators = {
-    date: (draft, schema, value, pointer) => {
+    date: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -41,7 +42,8 @@ const formatValidators = {
         }
         return draft.errors.formatDateError({ value, pointer, schema });
     },
-    "date-time": (draft, schema, value, pointer) => {
+    "date-time": (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -53,7 +55,8 @@ const formatValidators = {
         }
         return draft.errors.formatDateTimeError({ value, pointer, schema });
     },
-    email: (draft, schema, value, pointer) => {
+    email: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -80,7 +83,8 @@ const formatValidators = {
      * @draft 7
      * [RFC6531] https://json-schema.org/draft-07/json-schema-validation.html#RFC6531
      */
-    "idn-email": (draft, schema, value, pointer) => {
+    "idn-email": (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -92,7 +96,8 @@ const formatValidators = {
             return draft.errors.formatEmailError({ value, pointer, schema });
         }
     },
-    hostname: (draft, schema, value, pointer) => {
+    hostname: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string") {
             return undefined;
         }
@@ -101,7 +106,8 @@ const formatValidators = {
         }
         return draft.errors.formatHostnameError({ value, pointer, schema });
     },
-    ipv4: (draft, schema, value, pointer) => {
+    ipv4: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -114,7 +120,8 @@ const formatValidators = {
         }
         return draft.errors.formatIPV4Error({ value, pointer, schema });
     },
-    ipv6: (draft, schema, value, pointer) => {
+    ipv6: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -127,7 +134,8 @@ const formatValidators = {
         }
         return draft.errors.formatIPV6Error({ value, pointer, schema });
     },
-    "json-pointer": (draft, schema, value, pointer) => {
+    "json-pointer": (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -136,7 +144,8 @@ const formatValidators = {
         }
         return draft.errors.formatJsonPointerError({ value, pointer, schema });
     },
-    "relative-json-pointer": (draft, schema, value, pointer) => {
+    "relative-json-pointer": (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string") {
             return undefined;
         }
@@ -145,7 +154,8 @@ const formatValidators = {
         }
         return draft.errors.formatJsonPointerError({ value, pointer, schema });
     },
-    regex: (draft, schema, value, pointer) => {
+    regex: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value === "string" && /\\Z$/.test(value) === false) {
             try {
                 new RegExp(value);
@@ -163,7 +173,8 @@ const formatValidators = {
     // hh:mm:ss.sTZD
     // https://opis.io/json-schema/2.x/formats.html
     // regex https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch04s07.html
-    time: (draft, schema, value, pointer) => {
+    time: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -186,7 +197,8 @@ const formatValidators = {
         // }
         // return errors.formatTimeError({ value, pointer, schema });
     },
-    uri: (draft, schema, value, pointer) => {
+    uri: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -195,7 +207,8 @@ const formatValidators = {
         }
         return draft.errors.formatURIError({ value, pointer, schema });
     },
-    "uri-reference": (draft, schema, value, pointer) => {
+    "uri-reference": (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -204,7 +217,8 @@ const formatValidators = {
         }
         return draft.errors.formatURIReferenceError({ value, pointer, schema });
     },
-    "uri-template": (draft, schema, value, pointer) => {
+    "uri-template": (node, value) => {
+        const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
@@ -213,7 +227,8 @@ const formatValidators = {
         }
         return draft.errors.formatURITemplateError({ value, pointer, schema });
     },
-    url: (draft, schema, value, pointer) => {
+    url: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (value === "" || validUrl.isWebUri(value)) {
             return undefined;
         }

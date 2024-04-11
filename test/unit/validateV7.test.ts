@@ -1,7 +1,12 @@
 import { expect } from "chai";
-import validate from "../../lib/validate";
+import _validate from "../../lib/validate";
 import { Draft07 as Core } from "../../lib/draft07";
-// import remotes from "../../remotes";
+import { JsonSchema, createNode } from "../../lib/types";
+import { Draft } from "../../lib/draft";
+
+function validate(draft: Draft, value: unknown, schema: JsonSchema = draft.getSchema() as JsonSchema) {
+    return _validate(createNode(draft, schema), value);
+}
 
 describe("validate draft07", () => {
     let draft: Core;

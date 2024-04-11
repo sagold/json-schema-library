@@ -1,12 +1,12 @@
 import Keywords from "../../validation/keyword";
 import getTypeOf from "../../getTypeOf";
 import { validateIf } from "../../features/if";
-import Q from "../../Q";
 const KeywordValidation = {
     ...Keywords,
     // @draft >= 6
-    contains: (draft, schema, value, pointer) => {
+    contains: (node, value) => {
         var _a, _b;
+        const { draft, schema, pointer } = node;
         if (schema.contains === false) {
             return draft.errors.containsArrayError({ pointer, value, schema });
         }
@@ -22,8 +22,7 @@ const KeywordValidation = {
         }
         let count = 0;
         for (let i = 0; i < value.length; i += 1) {
-            const nextSchema = Q.next(schema, schema.contains, i);
-            if (draft.isValid(value[i], nextSchema)) {
+            if (draft.validate(node.next(schema.contains, i), value[i]).length === 0) {
                 count++;
             }
         }
@@ -41,7 +40,8 @@ const KeywordValidation = {
         }
         return draft.errors.containsError({ pointer, schema, value });
     },
-    exclusiveMaximum: (draft, schema, value, pointer) => {
+    exclusiveMaximum: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (isNaN(schema.exclusiveMaximum)) {
             return undefined;
         }
@@ -56,7 +56,8 @@ const KeywordValidation = {
         }
         return undefined;
     },
-    exclusiveMinimum: (draft, schema, value, pointer) => {
+    exclusiveMinimum: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (isNaN(schema.exclusiveMinimum)) {
             return undefined;
         }
@@ -73,7 +74,8 @@ const KeywordValidation = {
     },
     // @feature if-then-else
     if: validateIf,
-    maximum: (draft, schema, value, pointer) => {
+    maximum: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (isNaN(schema.maximum)) {
             return undefined;
         }
@@ -88,7 +90,8 @@ const KeywordValidation = {
         }
         return undefined;
     },
-    minimum: (draft, schema, value, pointer) => {
+    minimum: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (isNaN(schema.minimum)) {
             return undefined;
         }
@@ -103,7 +106,8 @@ const KeywordValidation = {
         }
         return undefined;
     },
-    patternProperties: (draft, schema, value, pointer) => {
+    patternProperties: (node, value) => {
+        const { draft, schema, pointer } = node;
         const properties = schema.properties || {};
         const pp = schema.patternProperties;
         if (getTypeOf(pp) !== "object") {
@@ -131,8 +135,7 @@ const KeywordValidation = {
                         }));
                         return;
                     }
-                    const nextSchema = Q.next(schema, patterns[i].patternSchema, key);
-                    const valErrors = draft.validate(value[key], nextSchema, `${pointer}/${key}`);
+                    const valErrors = draft.validate(node.next(patterns[i].patternSchema, key), value[key]);
                     if (valErrors && valErrors.length > 0) {
                         errors.push(...valErrors);
                     }
@@ -155,7 +158,8 @@ const KeywordValidation = {
         return errors;
     },
     // @draft >= 6
-    propertyNames: (draft, schema, value, pointer) => {
+    propertyNames: (node, value) => {
+        const { draft, schema, pointer } = node;
         // bool schema
         if (schema.propertyNames === false) {
             // empty objects are valid
@@ -180,7 +184,8 @@ const KeywordValidation = {
         const properties = Object.keys(value);
         const propertySchema = { ...schema.propertyNames, type: "string" };
         properties.forEach((prop) => {
-            const validationResult = draft.validate(prop, Q.next(schema, propertySchema, prop), `${pointer}/${prop}`);
+            const nextNode = node.next(propertySchema, prop);
+            const validationResult = draft.validate(nextNode, prop);
             if (validationResult.length > 0) {
                 errors.push(draft.errors.invalidPropertyNameError({
                     property: prop,

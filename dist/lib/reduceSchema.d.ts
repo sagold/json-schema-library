@@ -1,5 +1,4 @@
-import { JsonSchema, JsonPointer } from "./types";
-import { Draft } from "./draft";
+import { SchemaNode } from "./types";
 /**
  * reduces json schema by merging dynamic constructs like if-then-else,
  * dependencies, allOf, anyOf, oneOf, etc into a static json schema
@@ -8,4 +7,6 @@ import { Draft } from "./draft";
  * @returns input schema reduced by dynamic schema definitions for the given
  * input data
  */
-export declare function reduceSchema(draft: Draft, schema: JsonSchema, data: unknown, pointer: JsonPointer): JsonSchema;
+export declare function reduceSchema(node: SchemaNode, data: unknown): SchemaNode | import("./types").JsonError<import("./types").ErrorData<{
+    [p: string]: unknown;
+}>>;

@@ -1,10 +1,9 @@
 import Keywords from "../../draft06/validation/keyword";
-import { JsonValidator, JsonError, JsonSchema } from "../../types";
+import { JsonValidator, JsonError, JsonSchema, createNode } from "../../types";
 import { isObject } from "../../utils/isObject";
 import { reduceSchema } from "../../reduceSchema";
 import { validateDependentSchemas, validateDependentRequired } from "../../features/dependencies";
 import { Draft } from "../../draft";
-import Q from "../../Q";
 
 
 /**
@@ -16,13 +15,14 @@ const getPatternTests = (patternProperties: unknown) => isObject(patternProperti
 
 /** tests if a property is evaluated by the given schema */
 function isPropertyEvaluated(draft: Draft, objectSchema: JsonSchema, propertyName: string, value: unknown) {
-    const schema = draft.resolveRef(objectSchema);
+    const node = createNode(draft, objectSchema, propertyName);
+    const schema = draft.resolveRef(node).schema;
     if (schema.additionalProperties === true) {
         return true;
     }
     // PROPERTIES
     if (schema.properties?.[propertyName]) {
-        const nextSchema = Q.next(objectSchema, schema.properties?.[propertyName], propertyName);
+        const nextSchema = schema.properties?.[propertyName];
         if (draft.isValid(value, nextSchema)) {
             return true;
         }
@@ -34,7 +34,7 @@ function isPropertyEvaluated(draft: Draft, objectSchema: JsonSchema, propertyNam
     }
     // ADDITIONAL-PROPERTIES
     if (isObject(schema.additionalProperties)) {
-        const nextSchema = Q.next(objectSchema, schema.additionalProperties, propertyName);
+        const nextSchema = schema.additionalProperties;
         return draft.validate(value, nextSchema);
     }
     return false;
@@ -50,7 +50,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
      * Similar to additionalProperties, but can "see" into subschemas and across references
      * https://json-schema.org/draft/2019-09/json-schema-core#rfc.section.9.3.2.4
      */
-    unevaluatedProperties: (draft, schema, value: Record<string, unknown>, pointer) => {
+    unevaluatedProperties: (node, value: Record<string, unknown>) => {
+        const { draft, schema, pointer } = node;
 
         // if not in properties, evaluated by additionalProperties and not matches patternProperties
         // @todo we need to know dynamic parent statements - they should not be counted as evaluated...
@@ -63,7 +64,9 @@ const KeywordValidation: Record<string, JsonValidator> = {
         }
 
         // resolve all dynamic schemas
-        const resolvedSchema = reduceSchema(draft, schema, value, pointer);
+        const reduction = reduceSchema(node, value);
+        const resolvedSchema = (reduction.schema ?? reduction) as JsonSchema;
+
         // console.log("unevaluatedProperties", JSON.stringify(resolvedSchema, null, 2), value);
         if (resolvedSchema.unevaluatedProperties === true) {
             return undefined;
@@ -77,7 +80,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
             }
             // special case: an evaluation in if statement counts too
             // we have an unevaluated prop only if the if-schema does not match
-            if (isObject(schema.if) && isPropertyEvaluated(draft, Q.add(schema, { type: "object", ...schema.if }), key, value[key])) {
+            if (isObject(schema.if) && isPropertyEvaluated(draft, { type: "object", ...schema.if }, key, value[key])) {
                 return false;
             }
             if (testPatterns.find(pattern => pattern.test(key))) {
@@ -108,7 +111,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         unevaluated.forEach(key => {
             // note: only key changes
-            const nextSchemaNode = Q.next(schema, resolvedSchema.unevaluatedProperties, key);
+            const nextSchemaNode = resolvedSchema.unevaluatedProperties;
             const keyErrors = draft.validate(
                 value[key],
                 nextSchemaNode,
@@ -124,21 +127,26 @@ const KeywordValidation: Record<string, JsonValidator> = {
      * Similar to additionalItems, but can "see" into subschemas and across references
      * https://json-schema.org/draft/2019-09/json-schema-core#rfc.section.9.3.1.3
      */
-    unevaluatedItems: (draft, schema, value: unknown[], pointer) => {
+    unevaluatedItems: (node, value: unknown[]) => {
+        const { draft, schema, pointer } = node;
         // if not in items, and not matches additionalItems
         if (!Array.isArray(value) || value.length === 0 || schema.unevaluatedItems == null || schema.unevaluatedItems === true) {
             return undefined;
         }
 
+
+
         // resolve all dynamic schemas
-        const resolvedSchema = reduceSchema(draft, draft.resolveRef(schema), value, pointer);
+        const reduction = reduceSchema(draft.resolveRef(node), value);
+        const resolvedSchema = (reduction.schema ?? reduction) as JsonSchema;
+
         // console.log("unevaluatedItems", JSON.stringify(resolvedSchema, null, 2), value);
         if (resolvedSchema.unevaluatedItems === true || resolvedSchema.additionalItems === true) {
             return undefined;
         }
 
         if (isObject(schema.if)) {
-            const nextSchemaNode = Q.add(schema, { type: "array", ...schema.if });
+            const nextSchemaNode: JsonSchema = { type: "array", ...schema.if };
             if (draft.isValid(value, nextSchemaNode)) {
 
                 if (Array.isArray(nextSchemaNode.items) && nextSchemaNode.items.length === value.length) {
@@ -149,7 +157,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         }
 
         if (isObject(resolvedSchema.items)) {
-            const nextSchemaNode = Q.add(schema, { ...resolvedSchema, unevaluatedItems: undefined });
+            const nextSchemaNode = { ...resolvedSchema, unevaluatedItems: undefined } as JsonSchema;
             const errors = draft.validate(value, nextSchemaNode, pointer);
 
             return errors.map(e => draft.errors.unevaluatedItemsError({ ...e.data }));
@@ -160,8 +168,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
             for (let i = resolvedSchema.items.length; i < value.length; i += 1) {
                 if (i < resolvedSchema.items.length) {
 
-                    const nextSchemaNode = Q.next(schema, resolvedSchema.items[i], i);
-                    if (!draft.isValid(value[i], nextSchemaNode)) {
+                    if (!draft.isValid(value[i], resolvedSchema.items[i])) {
 
                         items.push({ index: i, value: value[i] });
                     }
@@ -179,8 +186,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         if (isObject(resolvedSchema.unevaluatedItems)) {
             return value.map((item, index) => {
 
-                const nextSchemaNode = Q.next(schema, resolvedSchema.unevaluatedItems, index);
-                if (!draft.isValid(item, nextSchemaNode)) {
+                if (!draft.isValid(item, resolvedSchema.unevaluatedItems)) {
 
                     return draft.errors.unevaluatedItemsError({
                         pointer: `${pointer}/${index}`,

@@ -1,10 +1,23 @@
 /* eslint quote-props: 0 max-len: 0 */
 import { expect } from "chai";
-import { resolveOneOfFuzzy as resolveOneOf } from "../../lib/features/oneOf";
-import { JsonEditor as Core } from "../../lib/jsoneditor";
+import { resolveOneOfFuzzy as _resolveOneOf } from "../../lib/features/oneOf";
+import { JsonEditor as Core, JsonEditor } from "../../lib/jsoneditor";
 import settings from "../../lib/config/settings";
+import { Draft } from "../../lib/draft";
+import { JsonError, JsonSchema, createNode, isJsonError } from "../../lib/types";
 
 const { DECLARATOR_ONEOF } = settings;
+
+
+function resolveOneOf(draft: Draft, data: any, schema: JsonSchema = draft.rootSchema, pointer = "#"): JsonSchema | JsonError {
+    const node = createNode(draft, schema, pointer);
+    const result = _resolveOneOf(node, data);
+    if (result && !isJsonError(result)) {
+        return result.schema;
+    }
+    return result;
+}
+
 
 describe("resolveOneOf (fuzzy)", () => {
     let draft: Core;

@@ -1,13 +1,13 @@
 import Keywords from "../../validation/keyword";
 import getTypeOf from "../../getTypeOf";
-import { JsonValidator, JsonError } from "../../types";
+import { JsonValidator, JsonError, JsonSchema } from "../../types";
 import { validateIf } from "../../features/if";
-import Q from "../../Q";
 
 const KeywordValidation: Record<string, JsonValidator> = {
     ...Keywords,
     // @draft >= 6
-    contains: (draft, schema, value: unknown[], pointer) => {
+    contains: (node, value: unknown[]) => {
+        const { draft, schema, pointer } = node;
         if (schema.contains === false) {
             return draft.errors.containsArrayError({ pointer, value, schema });
         }
@@ -26,9 +26,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         let count = 0;
         for (let i = 0; i < value.length; i += 1) {
-
-            const nextSchema = Q.next(schema, schema.contains, i);
-            if (draft.isValid(value[i], nextSchema)) {
+            if (draft.validate(node.next(schema.contains, i), value[i]).length === 0) {
                 count++;
             }
         }
@@ -47,7 +45,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
         }
         return draft.errors.containsError({ pointer, schema, value });
     },
-    exclusiveMaximum: (draft, schema, value, pointer) => {
+    exclusiveMaximum: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (isNaN(schema.exclusiveMaximum)) {
             return undefined;
         }
@@ -62,7 +61,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
         }
         return undefined;
     },
-    exclusiveMinimum: (draft, schema, value, pointer) => {
+    exclusiveMinimum: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (isNaN(schema.exclusiveMinimum)) {
             return undefined;
         }
@@ -79,7 +79,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
     },
     // @feature if-then-else
     if: validateIf,
-    maximum: (draft, schema, value, pointer) => {
+    maximum: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (isNaN(schema.maximum)) {
             return undefined;
         }
@@ -94,7 +95,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
         }
         return undefined;
     },
-    minimum: (draft, schema, value, pointer) => {
+    minimum: (node, value) => {
+        const { draft, schema, pointer } = node;
         if (isNaN(schema.minimum)) {
             return undefined;
         }
@@ -109,7 +111,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
         }
         return undefined;
     },
-    patternProperties: (draft, schema, value: Record<string, unknown>, pointer) => {
+    patternProperties: (node, value: Record<string, unknown>) => {
+        const { draft, schema, pointer } = node;
         const properties = schema.properties || {};
         const pp = schema.patternProperties;
         if (getTypeOf(pp) !== "object") {
@@ -143,9 +146,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
                         return;
                     }
 
-                    const nextSchema = Q.next(schema, patterns[i].patternSchema, key);
-                    const valErrors = draft.validate(value[key], nextSchema, `${pointer}/${key}`);
-
+                    const valErrors = draft.validate(node.next(patterns[i].patternSchema, key), value[key]);
                     if (valErrors && valErrors.length > 0) {
                         errors.push(...valErrors);
                     }
@@ -173,7 +174,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
         return errors;
     },
     // @draft >= 6
-    propertyNames: (draft, schema, value: Record<string, unknown>, pointer) => {
+    propertyNames: (node, value: Record<string, unknown>) => {
+        const { draft, schema, pointer } = node;
         // bool schema
         if (schema.propertyNames === false) {
             // empty objects are valid
@@ -199,9 +201,10 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         const errors: JsonError[] = [];
         const properties = Object.keys(value);
-        const propertySchema = { ...schema.propertyNames, type: "string" };
+        const propertySchema: JsonSchema = { ...schema.propertyNames, type: "string" };
         properties.forEach((prop) => {
-            const validationResult = draft.validate(prop, Q.next(schema, propertySchema, prop), `${pointer}/${prop}`);
+            const nextNode = node.next(propertySchema, prop);
+            const validationResult = draft.validate(nextNode, prop);
             if (validationResult.length > 0) {
                 errors.push(
                     draft.errors.invalidPropertyNameError({

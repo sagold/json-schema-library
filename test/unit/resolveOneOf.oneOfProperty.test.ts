@@ -1,10 +1,21 @@
 /* eslint quote-props: 0 max-len: 0 */
 import { expect } from "chai";
-import { resolveOneOf } from "../../lib/features/oneOf";
+import { resolveOneOf as _resolveOneOf } from "../../lib/features/oneOf";
 import { Draft07 } from "../../lib/draft07";
 import settings from "../../lib/config/settings";
+import { JsonError, JsonSchema, createNode, isJsonError } from "../../lib/types";
+import { Draft } from "../../lib/draft";
 
 const { DECLARATOR_ONEOF } = settings;
+
+function resolveOneOf(draft: Draft, data: any, schema: JsonSchema = draft.rootSchema, pointer = "#"): JsonSchema | JsonError {
+    const node = createNode(draft, schema, pointer);
+    const result = _resolveOneOf(node, data);
+    if (result && !isJsonError(result)) {
+        return result.schema;
+    }
+    return result;
+}
 
 describe("oneOfProperty", () => {
     let draft: Draft07;

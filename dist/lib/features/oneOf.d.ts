@@ -1,5 +1,4 @@
-import { Draft } from "../draft";
-import { JsonSchema, JsonPointer, JsonError, JsonValidator } from "../types";
+import { JsonError, JsonValidator, SchemaNode } from "../types";
 /**
  * Selects and returns a oneOf schema for the given data
  *
@@ -9,7 +8,7 @@ import { JsonSchema, JsonPointer, JsonError, JsonValidator } from "../types";
  * @param pointer - json pointer to data
  * @return oneOf schema or an error
  */
-export declare function resolveOneOf(draft: Draft, data: any, schema?: JsonSchema, pointer?: JsonPointer): JsonSchema | JsonError;
+export declare function resolveOneOf(node: SchemaNode, data: any): SchemaNode | JsonError;
 /**
  * Selects and returns a oneOf schema for the given data
  *
@@ -19,7 +18,7 @@ export declare function resolveOneOf(draft: Draft, data: any, schema?: JsonSchem
  * @param [pointer] - json pointer to data
  * @return oneOf schema or an error
  */
-export declare function resolveOneOfFuzzy(draft: Draft, data: any, schema?: JsonSchema, pointer?: JsonPointer): JsonSchema | JsonError;
+export declare function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | JsonError;
 /**
  * validates oneOf definition for given input data
  */

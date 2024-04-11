@@ -1,13 +1,11 @@
-import { JsonSchema } from "./types";
+import { JsonSchema, SchemaNode, isSchemaNode } from "./types";
 import { mergeSchema } from "./mergeSchema";
 
 // 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
 
 
-function resolveRecursiveRef(rootSchema: JsonSchema, schema: JsonSchema) {
-    const history = schema.__scope.history;
-    // console.log("» history", history.map((v: JsonSchema) => v.__scope.pointer));
-    // console.log("»» history", history.map((v: JsonSchema) => v));
+function resolveRecursiveRef(node: SchemaNode): SchemaNode {
+    const history = node.path;
     // RESTRICT BY CHANGE IN BASE-URL
     let startIndex = 0;
     for (let i = history.length - 1; i >= 0; i--) {
@@ -19,40 +17,43 @@ function resolveRecursiveRef(rootSchema: JsonSchema, schema: JsonSchema) {
     // FROM THERE FIND FIRST OCCURENCE OF ANCHOR
     const firstAnchor = history.find((s: JsonSchema, index: number) => index >= startIndex && s.$recursiveAnchor === true);
     if (firstAnchor) {
-        return firstAnchor;
+        return node.next(firstAnchor);
     }
     // THEN RETURN LATEST BASE AS TARGET
     for (let i = history.length - 1; i >= 0; i--) {
         if (history[i].$id) {
-            return history[i];
+            return node.next(history[i]);
         }
     }
     // OR RETURN ROOT
-    return rootSchema;
+    return node.next(node.draft.rootSchema);
 }
 
 /**
  * @todo update types
  * Note: JsonSchema my be false
  */
-export default function resolveRefMerge(schema: JsonSchema, rootSchema: JsonSchema): JsonSchema {
-    if (schema == null) {
-        return schema;
+export default function resolveRefMerge(node: SchemaNode): SchemaNode {
+    if (!isSchemaNode(node)) {
+        throw new Error("expected node")
     }
-    if (schema.$recursiveRef) {
-        const nextSchema = resolveRecursiveRef(rootSchema, schema);
-        return resolveRefMerge(nextSchema, rootSchema);
+    if (node.schema == null) {
+        return node;
     }
-    if (schema.$ref == null) {
-        return schema;
+
+    if (node.schema.$recursiveRef) {
+        return resolveRefMerge(resolveRecursiveRef(node));
     }
-    const resolvedSchema = rootSchema.getRef(schema);
+    if (node.schema.$ref == null) {
+        return node;
+    }
+    const resolvedSchema = node.draft.rootSchema.getRef(node.schema);
     if (resolvedSchema === false) {
-        return resolvedSchema;
+        return node.next(resolvedSchema as JsonSchema);
     }
     // @draft >= 2019-09 we now merge schemas: in draft <= 7 $ref is treated as reference, not as schema
-    const mergedSchema = mergeSchema(schema, resolvedSchema);
+    const mergedSchema = mergeSchema(node.schema, resolvedSchema);
     delete mergedSchema.$ref;
 
-    return mergedSchema;
+    return node.next(mergedSchema as JsonSchema);
 }

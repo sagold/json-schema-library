@@ -1,9 +1,7 @@
 /**
  * @draft-07
  */
-import { JsonSchema, JsonValidator } from "../types";
-import { Draft } from "../draft";
-import Q from "../Q";
+import { JsonError, JsonSchema, JsonValidator, SchemaNode } from "../types";
 
 /**
  * returns if-then-else as a json schema. does not merge with input
@@ -13,24 +11,27 @@ import Q from "../Q";
  * @returns json schema defined by if-then-else or undefined
  */
 export function resolveIfSchema(
-    draft: Draft,
-    schema: JsonSchema,
+    node: SchemaNode,
     data: unknown
-): JsonSchema | undefined {
-    if (schema.if == null) {
+): SchemaNode | JsonError | undefined {
+    if (node.schema.if == null) {
         return undefined;
     }
-    if (schema.if === false) {
-        return schema.else;
+    if (node.schema.if === false) {
+        return node.next(node.schema.else);
     }
 
-    if (schema.if && (schema.then || schema.else)) {
-        const ifErrors = draft.validate(data, Q.add(schema, draft.resolveRef(schema.if)));
-        if (ifErrors.length === 0 && schema.then) {
-            return draft.resolveRef(schema.then);
+    if (node.schema.if && (node.schema.then || node.schema.else)) {
+        const ifNode = node.draft.resolveRef(node.next(node.schema.if as JsonSchema));
+        const ifErrors = node.draft.validate(ifNode, data);
+
+        if (ifErrors.length === 0 && node.schema.then) {
+            const thenNode = node.next(node.schema.then as JsonSchema);
+            return node.draft.resolveRef(thenNode);
         }
-        if (ifErrors.length !== 0 && schema.else) {
-            return draft.resolveRef(schema.else);
+        if (ifErrors.length !== 0 && node.schema.else) {
+            const elseNode = node.next(node.schema.else as JsonSchema);
+            return node.draft.resolveRef(elseNode);
         }
     }
 }
@@ -38,12 +39,11 @@ export function resolveIfSchema(
 /**
  * @returns validation result of it-then-else schema
  */
-const validateIf: JsonValidator = (draft, schema, value, pointer) => {
-    const resolvedSchema = resolveIfSchema(draft, schema, value);
+const validateIf: JsonValidator = (node, value) => {
+    const resolvedSchema = resolveIfSchema(node, value);
     if (resolvedSchema) {
         // @recursiveRef ok, we not just add per pointer, but any evlauation to dynamic scope / validation path
-        const nextScope = Q.add(schema, resolvedSchema);
-        return draft.validate(value, nextScope, pointer);
+        return node.draft.validate(resolvedSchema, value);
     }
 };
 

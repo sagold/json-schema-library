@@ -1,4 +1,3 @@
-import Q from "../Q";
 /**
  * returns if-then-else as a json schema. does not merge with input
  * json schema. you probably will need to do so to correctly resolve
@@ -6,32 +5,34 @@ import Q from "../Q";
  *
  * @returns json schema defined by if-then-else or undefined
  */
-export function resolveIfSchema(draft, schema, data) {
-    if (schema.if == null) {
+export function resolveIfSchema(node, data) {
+    if (node.schema.if == null) {
         return undefined;
     }
-    if (schema.if === false) {
-        return schema.else;
+    if (node.schema.if === false) {
+        return node.next(node.schema.else);
     }
-    if (schema.if && (schema.then || schema.else)) {
-        const ifErrors = draft.validate(data, Q.add(schema, draft.resolveRef(schema.if)));
-        if (ifErrors.length === 0 && schema.then) {
-            return draft.resolveRef(schema.then);
+    if (node.schema.if && (node.schema.then || node.schema.else)) {
+        const ifNode = node.draft.resolveRef(node.next(node.schema.if));
+        const ifErrors = node.draft.validate(ifNode, data);
+        if (ifErrors.length === 0 && node.schema.then) {
+            const thenNode = node.next(node.schema.then);
+            return node.draft.resolveRef(thenNode);
         }
-        if (ifErrors.length !== 0 && schema.else) {
-            return draft.resolveRef(schema.else);
+        if (ifErrors.length !== 0 && node.schema.else) {
+            const elseNode = node.next(node.schema.else);
+            return node.draft.resolveRef(elseNode);
         }
     }
 }
 /**
  * @returns validation result of it-then-else schema
  */
-const validateIf = (draft, schema, value, pointer) => {
-    const resolvedSchema = resolveIfSchema(draft, schema, value);
+const validateIf = (node, value) => {
+    const resolvedSchema = resolveIfSchema(node, value);
     if (resolvedSchema) {
         // @recursiveRef ok, we not just add per pointer, but any evlauation to dynamic scope / validation path
-        const nextScope = Q.add(schema, resolvedSchema);
-        return draft.validate(value, nextScope, pointer);
+        return node.draft.validate(resolvedSchema, value);
     }
 };
 export { validateIf };

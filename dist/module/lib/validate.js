@@ -1,7 +1,7 @@
 import getTypeOf from "./getTypeOf";
 import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
-import { isJsonError } from "./types";
+import { isJsonError, isSchemaNode } from "./types";
 import equal from "fast-deep-equal";
 function getJsonSchemaType(value, expectedType) {
     const jsType = getTypeOf(value);
@@ -22,8 +22,13 @@ function getJsonSchemaType(value, expectedType) {
  * @param [pointer] - json pointer pointing to value (used for error-messages only)
  * @return list of errors or empty
  */
-export default function validate(draft, value, schema = draft.rootSchema, pointer = "#") {
-    schema = draft.resolveRef(schema);
+export default function validate(node, value) {
+    if (!isSchemaNode(node)) {
+        throw new Error("node expected");
+    }
+    const { draft, pointer } = node;
+    node = draft.resolveRef(node);
+    const schema = node.schema;
     if (schema == null) {
         throw new Error("missing schema");
     }
@@ -58,13 +63,10 @@ export default function validate(draft, value, schema = draft.rootSchema, pointe
             })
         ];
     }
-    // if (!schema.__scope) {
-    //     throw new Error("requires scope in validation");
-    // }
     if (draft.validateType[receivedType] == null) {
         return [draft.errors.invalidTypeError({ pointer, schema, value, receivedType })];
     }
     // get type validation results
-    const errors = flattenArray(draft.validateType[receivedType](draft, schema, value, pointer));
+    const errors = flattenArray(draft.validateType[receivedType](node, value));
     return errors.filter(errorOrPromise); // ignore promises here
 }

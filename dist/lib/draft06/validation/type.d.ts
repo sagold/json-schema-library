@@ -6,5 +6,5 @@ import { JsonTypeValidator } from "../../types";
  * or seven in case of ajv https://github.com/epoberezkin/ajv/blob/master/KEYWORDS.md#type
  * 1 null, 2 boolean, 3 object, 4 array, 5 number, 6 string (7 integer)
  */
-declare const validationType: Record<string, JsonTypeValidator>;
-export default validationType;
+declare const typeValidators: Record<string, JsonTypeValidator>;
+export default typeValidators;

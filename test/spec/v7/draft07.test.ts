@@ -41,6 +41,9 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
 
+            // if (testCase.description !== "$recursiveRef with nesting") { return; }
+            // if (testCase.description !== "properties with boolean schema") { return; }
+
             const schema = testCase.schema;
             if (skipTest.includes(testCase.description)) {
                 console.log(`Unsupported '${testCase.description}'`);

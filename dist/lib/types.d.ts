@@ -6,9 +6,6 @@ export type SchemaScope = {
     pointer: string;
     history: JsonSchema[];
 };
-export type SchemaNode = JsonSchema & {
-    __scope: SchemaScope;
-};
 export type JsonPointer = string;
 export type ErrorData<T extends Record<string, unknown> = {
     [p: string]: unknown;
@@ -30,9 +27,24 @@ export type JsonError<T extends ErrorData = ErrorData> = {
  * @returns true if passed type is a JsonError
  */
 export declare function isJsonError(error: any): error is JsonError;
+/**
+ * create next node based from current node
+ */
+declare function next(schema: JsonError, key?: string | number): JsonError;
+declare function next(schema: JsonSchema, key?: string | number): SchemaNode;
+export type SchemaNode = {
+    draft: Draft;
+    pointer: string;
+    schema: JsonSchema;
+    path: JsonSchema[];
+    next: typeof next;
+};
+export declare function isSchemaNode(value: unknown): value is SchemaNode;
+export declare function createNode(draft: Draft, schema: JsonSchema, pointer?: string): SchemaNode;
 export interface JsonValidator {
-    (draft: Draft, schema: JsonSchema, value: unknown, pointer: JsonPointer): void | undefined | JsonError | JsonError[] | JsonError[][];
+    (node: SchemaNode, value: unknown): void | undefined | JsonError | JsonError[] | JsonError[][];
 }
 export interface JsonTypeValidator {
-    (draft: Draft, schema: JsonSchema, value: unknown, pointer: JsonPointer): Array<void | undefined | JsonError | JsonError[] | JsonError[][]>;
+    (node: SchemaNode, value: unknown): Array<void | undefined | JsonError | JsonError[] | JsonError[][]>;
 }
+export {};

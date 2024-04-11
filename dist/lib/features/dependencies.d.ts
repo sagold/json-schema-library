@@ -1,8 +1,7 @@
 /**
  * @draft 06, 2019-09
  */
-import { JsonSchema, JsonValidator } from "../types";
-import { Draft } from "../draft";
+import { JsonSchema, JsonValidator, SchemaNode } from "../types";
 /**
  * @todo add support for dependentRequired (draft 2019-09)
  * returns dependencies as an object json schema. does not merge with input
@@ -11,7 +10,7 @@ import { Draft } from "../draft";
  *
  * @returns merged json schema defined by dependencies or undefined
  */
-export declare function resolveDependencies(draft: Draft, schema: JsonSchema, data: unknown): JsonSchema | undefined;
+export declare function resolveDependencies(node: SchemaNode, data: unknown): JsonSchema | undefined;
 /**
  * @draft 2019-09
  */

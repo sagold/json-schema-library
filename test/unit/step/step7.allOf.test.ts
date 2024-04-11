@@ -1,6 +1,13 @@
 import { expect } from "chai";
-import step from "../../../lib/step";
+import _step from "../../../lib/step";
 import { Draft07 } from "../../../lib/draft07";
+import { Draft } from "../../../lib/draft";
+import { JsonSchema, createNode, isSchemaNode } from "../../../lib/types";
+
+function step(draft: Draft, key: string | number, schema: JsonSchema, data?: unknown, pointer = '#') {
+    const res = _step(createNode(draft, schema, pointer), key, data);
+    return isSchemaNode(res) ? res.schema : res;
+}
 
 describe.skip("step[v7].allOf", () => {
     let draft: Draft07;

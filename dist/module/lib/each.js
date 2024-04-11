@@ -1,4 +1,5 @@
 import getTypeOf from "./getTypeOf";
+import { createNode } from "./types";
 /**
  * Iterates over data, retrieving its schema
  *
@@ -9,20 +10,21 @@ import getTypeOf from "./getTypeOf";
  * @param [pointer] - pointer to current data. Default to rootPointer
  */
 export function each(draft, data, callback, schema = draft.rootSchema, pointer = "#") {
-    schema = draft.resolveRef(schema);
+    const node = createNode(draft, schema, pointer);
+    schema = draft.resolveRef(node).schema;
     callback(schema, data, pointer);
     const dataType = getTypeOf(data);
     if (dataType === "object") {
         Object.keys(data).forEach((key) => {
-            const nextSchema = draft.step(key, schema, data, pointer); // not save
+            const nextNode = draft.step(key, schema, data, pointer); // not save
             const next = data[key]; // save
-            draft.each(next, callback, nextSchema, `${pointer}/${key}`);
+            draft.each(next, callback, nextNode.schema, `${pointer}/${key}`);
         });
     }
     else if (dataType === "array") {
         data.forEach((next, key) => {
-            const nextSchema = draft.step(key, schema, data, pointer);
-            draft.each(next, callback, nextSchema, `${pointer}/${key}`);
+            const nextNode = draft.step(key, schema, data, pointer);
+            draft.each(next, callback, nextNode.schema, `${pointer}/${key}`);
         });
     }
 }

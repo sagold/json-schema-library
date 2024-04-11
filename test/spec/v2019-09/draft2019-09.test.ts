@@ -108,7 +108,7 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
         tc.testCases.forEach((testCase) => {
 
             // if (testCase.description !== "$recursiveRef with nesting") { return; }
-            // if (testCase.description !== "ref with absolute-path-reference") { return; }
+            // if (testCase.description !== "$ref to boolean schema false") { return; }
 
             const schema = testCase.schema;
             if (skipTest.includes(testCase.description)) {

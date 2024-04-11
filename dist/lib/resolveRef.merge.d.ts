@@ -1,6 +1,6 @@
-import { JsonSchema } from "./types";
+import { SchemaNode } from "./types";
 /**
  * @todo update types
  * Note: JsonSchema my be false
  */
-export default function resolveRefMerge(schema: JsonSchema, rootSchema: JsonSchema): JsonSchema;
+export default function resolveRefMerge(node: SchemaNode): SchemaNode;

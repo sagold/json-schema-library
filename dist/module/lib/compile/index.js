@@ -31,7 +31,6 @@ export default function compileSchema(draft, schemaToCompile, rootSchema = schem
     const compiledSchema = JSON.parse(rootSchemaAsString);
     // flag this schema as compiled
     Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });
-    Object.defineProperty(compiledSchema, "__scope", { enumerable: false, value: { pointer: "#", history: [] } });
     // add getRef-helper to this object
     Object.defineProperty(compiledSchema, GET_REF, {
         enumerable: false,

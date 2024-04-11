@@ -1,5 +1,5 @@
 import gp from "@sagold/json-pointer";
-import { isJsonError } from "./types";
+import { isJsonError, createNode } from "./types";
 const emptyObject = {};
 /**
  * Returns the json-schema of a data-json-pointer.
@@ -26,22 +26,23 @@ const emptyObject = {};
 export default function getSchema(draft, options = emptyObject) {
     const { pointer = "#", data, schema = draft.rootSchema, withSchemaWarning = false } = options;
     const path = gp.split(pointer);
-    const result = _getSchema(draft, draft.resolveRef(schema), path, "#", data);
-    if (!withSchemaWarning && (result === null || result === void 0 ? void 0 : result.code) === "schema-warning") {
+    const node = draft.resolveRef(createNode(draft, schema));
+    const result = _getSchema(node, path, data);
+    if (!withSchemaWarning && isJsonError(result) && result.code === "schema-warning") {
         return undefined;
     }
     return result;
 }
-function _getSchema(draft, schema, path, pointer, data = emptyObject) {
+function _getSchema(node, path, data = emptyObject) {
     if (path.length === 0) {
-        return draft.resolveRef(schema);
+        return node.draft.resolveRef(node);
     }
     const key = path.shift(); // step key
-    schema = draft.step(key, schema, data, pointer); // step schema
-    if (isJsonError(schema)) {
-        return schema;
+    const nextNode = node.draft.step(key, node.schema, data, node.pointer); // step schema
+    if (isJsonError(nextNode)) {
+        return nextNode;
     }
     // @ts-expect-error data
     data = data[key]; // step data
-    return _getSchema(draft, schema, path, `${pointer}/${key}`, data);
+    return _getSchema(nextNode, path, data);
 }

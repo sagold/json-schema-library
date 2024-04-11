@@ -43,7 +43,6 @@ export default function compileSchema(
 
     // flag this schema as compiled
     Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });
-    Object.defineProperty(compiledSchema, "__scope", { enumerable: false, value: { pointer: "#", history: [] } });
 
     // add getRef-helper to this object
     Object.defineProperty(compiledSchema, GET_REF, {

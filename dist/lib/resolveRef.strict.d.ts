@@ -1,2 +1,2 @@
-import { JsonSchema } from "./types";
-export default function resolveRef(schema: JsonSchema, rootSchema: JsonSchema): JsonSchema;
+import { SchemaNode } from "./types";
+export default function resolveRef(node: SchemaNode): SchemaNode;

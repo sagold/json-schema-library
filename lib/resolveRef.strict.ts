@@ -1,18 +1,22 @@
-import { JsonSchema } from "./types";
+import { JsonSchema, SchemaNode, isSchemaNode } from "./types";
 
-export default function resolveRef(schema: JsonSchema, rootSchema: JsonSchema): JsonSchema {
-    if (schema == null || schema.$ref == null) {
-        return schema;
+export default function resolveRef(node: SchemaNode): SchemaNode {
+    if (!isSchemaNode(node)) {
+        throw new Error("schema node expected");
     }
 
-    if (schema.getRoot) {
+    if (node.schema == null || node.schema.$ref == null) {
+        return node;
+    }
+
+    if (node.schema.getRoot) {
         // we actually always need to resolve the schema like this, since returned subschemas
         // must resolve relative from their schema
-        const resolvedSchema = schema.getRoot().getRef(schema);
-        return resolvedSchema;
+        const resolvedSchema = node.schema.getRoot().getRef(node.schema);
+        return node.next(resolvedSchema as JsonSchema);
     }
 
     // tryout - this should never be called, except we missed something
-    const resolvedSchema = rootSchema.getRef(schema);
-    return resolvedSchema;
+    const resolvedSchema = node.draft.rootSchema.getRef(node.schema);
+    return node.next(resolvedSchema as JsonSchema);
 }

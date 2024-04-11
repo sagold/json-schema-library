@@ -1,8 +1,7 @@
 /**
  * @draft-07
  */
-import { JsonSchema, JsonValidator } from "../types";
-import { Draft } from "../draft";
+import { JsonError, JsonValidator, SchemaNode } from "../types";
 /**
  * returns if-then-else as a json schema. does not merge with input
  * json schema. you probably will need to do so to correctly resolve
@@ -10,7 +9,7 @@ import { Draft } from "../draft";
  *
  * @returns json schema defined by if-then-else or undefined
  */
-export declare function resolveIfSchema(draft: Draft, schema: JsonSchema, data: unknown): JsonSchema | undefined;
+export declare function resolveIfSchema(node: SchemaNode, data: unknown): SchemaNode | JsonError | undefined;
 /**
  * @returns validation result of it-then-else schema
  */

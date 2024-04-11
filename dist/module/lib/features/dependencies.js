@@ -2,7 +2,6 @@ import getTypeOf from "../getTypeOf";
 import { mergeSchema } from "../mergeSchema";
 import { uniqueItems } from "../utils/uniqueItems";
 import { isObject } from "../utils/isObject";
-import Q from "../Q";
 /**
  * @todo add support for dependentRequired (draft 2019-09)
  * returns dependencies as an object json schema. does not merge with input
@@ -11,8 +10,9 @@ import Q from "../Q";
  *
  * @returns merged json schema defined by dependencies or undefined
  */
-export function resolveDependencies(draft, schema, data) {
+export function resolveDependencies(node, data) {
     var _a;
+    const { schema, draft } = node;
     // @draft >= 2019-09 dependentSchemas
     const dependencies = (_a = schema.dependencies) !== null && _a !== void 0 ? _a : schema.dependentSchemas;
     if (!isObject(dependencies) || !isObject(data)) {
@@ -36,7 +36,8 @@ export function resolveDependencies(draft, schema, data) {
         // dependency schema
         if (isObject(dependency)) {
             updated = true;
-            resolvedSchema = mergeSchema(resolvedSchema, draft.resolveRef(dependency));
+            const dNode = node.next(dependency);
+            resolvedSchema = mergeSchema(resolvedSchema, draft.resolveRef(dNode).schema);
             return;
         }
     });
@@ -48,7 +49,8 @@ export function resolveDependencies(draft, schema, data) {
 /**
  * @draft 2019-09
  */
-export const validateDependentRequired = (draft, schema, value, pointer) => {
+export const validateDependentRequired = (node, value) => {
+    const { draft, schema, pointer } = node;
     const dependentRequired = schema.dependentRequired;
     if (!isObject(dependentRequired)) {
         return undefined;
@@ -78,7 +80,8 @@ export const validateDependentRequired = (draft, schema, value, pointer) => {
 /**
  * @draft 2019-09
  */
-export const validateDependentSchemas = (draft, schema, value, pointer) => {
+export const validateDependentSchemas = (node, value) => {
+    const { draft, schema, pointer } = node;
     const dependentSchemas = schema.dependentSchemas;
     if (!isObject(dependentSchemas)) {
         return undefined;
@@ -97,14 +100,15 @@ export const validateDependentSchemas = (draft, schema, value, pointer) => {
         if (!isObject(dependencies)) {
             return;
         }
-        draft.validate(value, Q.add(schema, dependencies), pointer).map(error => errors.push(error));
+        draft.validate(node.next(dependencies), value).map(error => errors.push(error));
     });
     return errors;
 };
 /**
  * validate dependencies definition for given input data
  */
-export const validateDependencies = (draft, schema, value, pointer) => {
+export const validateDependencies = (node, value) => {
+    const { draft, schema, pointer } = node;
     // @draft >= 2019-09 dependentSchemas
     const dependencies = schema.dependencies;
     if (!isObject(dependencies)) {
@@ -132,7 +136,7 @@ export const validateDependencies = (draft, schema, value, pointer) => {
                 .map((missingProperty) => draft.errors.missingDependencyError({ missingProperty, pointer, schema, value }));
         }
         else if (type === "object") {
-            dependencyErrors = draft.validate(value, Q.add(schema, dependencies[property]), pointer);
+            dependencyErrors = draft.validate(node.next(dependencies[property]), value);
         }
         else {
             throw new Error(`Invalid dependency definition for ${pointer}/${property}. Must be string[] or schema`);

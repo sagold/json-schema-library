@@ -63,13 +63,8 @@ export default function compileSchema(
     const context: Context = { ids: {}, anchors: {}, remotes: draft.remotes };
     const rootSchemaAsString = JSON.stringify(schemaToCompile);
     const compiledSchema = JSON.parse(rootSchemaAsString);
-    const rootScope: SchemaScope = {
-        pointer: "#",
-        history: [compiledSchema]
-    };
     Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });
     Object.defineProperty(compiledSchema, GET_CONTEXT, { enumerable: false, value: () => context });
-    Object.defineProperty(compiledSchema, "__scope", { enumerable: false, value: rootScope });
     Object.defineProperty(compiledSchema, GET_REF, {
         enumerable: false,
         value: getRef.bind(null, context, compiledSchema)
