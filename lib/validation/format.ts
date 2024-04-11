@@ -3,6 +3,7 @@ import { JsonError, JsonSchema, SchemaNode } from "../types";
 import { Draft } from "../draft";
 import validUrl from "valid-url";
 import { parse as parseIdnEmail } from "smtp-address-parser";
+import getTypeOf from "../getTypeOf";
 
 // referenced
 // https://github.com/cfworker/cfworker/blob/main/packages/json-schema/src/format.ts
@@ -28,6 +29,8 @@ const isValidURIRef =
 // uri-template: https://tools.ietf.org/html/rfc6570
 const isValidURITemplate =
     /^(?:(?:[^\x00-\x20"'<>%\\^`{|}]|%[0-9a-f]{2})|\{[+#./;?&=,!@|]?(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?(?:,(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?)*\})*$/i;
+const isValidDurationString = /^P(?!$)(\d+Y)?(\d+M)?(\d+W)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+S)?)?$/;
+
 
 // Default Json-Schema formats: date-time, email, hostname, ipv4, ipv6, uri, uriref
 const formatValidators: Record<
@@ -78,6 +81,19 @@ const formatValidators: Record<
         return draft.errors.formatDateTimeError({ value, pointer, schema });
     },
 
+    duration: (node, value) => {
+        const type = getTypeOf(value);
+        if (type !== "string") {
+            return undefined;
+        }
+
+        // weeks cannot be combined with other units
+        const isInvalidDurationString = /(\d+M)(\d+W)|(\d+Y)(\d+W)/;
+
+        if (!isValidDurationString.test(value as string) || isInvalidDurationString.test(value as string)) {
+            return node.draft.errors.formatDurationError({ value, pointer: node.pointer, schema: node.schema });
+        }
+    },
     email: (node, value) => {
         const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {

@@ -18,7 +18,7 @@ const supportedTestCases = (t: FeatureTest) => ![
     "ecmascript-regex", // should
     "float-overflow",
     "dependencies-compatibility",  // should
-    "format-duration",  // should
+    // "format-duration",  // should
     "format-date-time", // MUST
     "format-time", // MUST
     "format-iri",

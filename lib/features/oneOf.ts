@@ -154,9 +154,6 @@ function fuzzyObjectValue(
  * @return oneOf schema or an error
  */
 export function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | JsonError {
-    if (!isSchemaNode(node)) {
-        throw new Error("invalid node");
-    }
     const { schema, pointer, draft } = node;
     if (!Array.isArray(schema.oneOf)) {
         throw new Error("not a oneof schema")
