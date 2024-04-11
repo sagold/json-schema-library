@@ -19,6 +19,7 @@ const errors = {
     formatURITemplateError: createCustomError("FormatURITemplateError"),
     formatDateError: createCustomError("FormatDateError"),
     formatDateTimeError: createCustomError("FormatDateTimeError"),
+    formatDurationError: createCustomError("FormatDurationError"),
     formatEmailError: createCustomError("FormatEmailError"),
     formatHostnameError: createCustomError("FormatHostnameError"),
     formatIPV4Error: createCustomError("FormatIPV4Error"),

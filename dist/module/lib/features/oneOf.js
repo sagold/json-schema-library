@@ -5,7 +5,7 @@ import flattenArray from "../utils/flattenArray";
 import settings from "../config/settings";
 import { createOneOfSchemaResult } from "../schema/createOneOfSchemaResult";
 import { errorOrPromise } from "../utils/filter";
-import { isJsonError, isSchemaNode, createNode } from "../types";
+import { isJsonError, createNode } from "../types";
 import { isObject } from "../utils/isObject";
 const { DECLARATOR_ONEOF } = settings;
 /**
@@ -131,9 +131,6 @@ function fuzzyObjectValue(draft, one, data, pointer) {
  * @return oneOf schema or an error
  */
 export function resolveOneOfFuzzy(node, data) {
-    if (!isSchemaNode(node)) {
-        throw new Error("invalid node");
-    }
     const { schema, pointer, draft } = node;
     if (!Array.isArray(schema.oneOf)) {
         throw new Error("not a oneof schema");

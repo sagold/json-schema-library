@@ -118,6 +118,7 @@ export declare class Draft {
     resolveRef(node: SchemaNode): SchemaNode;
     resolveOneOf(data: any, schema: JsonSchema, pointer?: JsonPointer): SchemaNode | JsonError;
     setSchema(schema: JsonSchema): void;
+    step(node: SchemaNode, key: string | number, data: any): SchemaNode | JsonError;
     /**
      * Returns the json-schema of the given object property or array item.
      * e.g. it steps by one key into the data
@@ -131,7 +132,6 @@ export declare class Draft {
      * @param  [pointer] - pointer to schema and data (parent of key)
      * @return Schema or Error if failed resolving key
      */
-    step(node: SchemaNode, key: string | number, data: any): SchemaNode | JsonError;
     step(key: string | number, schema: JsonSchema, data: any, pointer?: JsonPointer): SchemaNode | JsonError;
     /**
      * Validate data by a json schema

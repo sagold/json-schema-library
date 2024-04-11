@@ -15,6 +15,7 @@ export default {
     ForbiddenPropertyError: "Property name `{{property}}` at `{{pointer}}` is not allowed",
     FormatDateError: "Value `{{value}}` at `{{pointer}}` is not a valid date",
     FormatDateTimeError: "Value `{{value}}` at `{{pointer}}` is not a valid date-time",
+    FormatDurationError: "Value `{{value}}` at `{{pointer}}` is not a valid duration",
     FormatEmailError: "Value `{{value}}` at `{{pointer}}` is not a valid email",
     FormatHostnameError: "Value `{{value}}` at `{{pointer}}` is not a valid hostname",
     FormatIPV4Error: "Value `{{value}}` at `{{pointer}}` is not a valid IPv4 address",
