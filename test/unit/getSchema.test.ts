@@ -10,7 +10,6 @@ function getSchema(draft: Draft, options: GetSchemaOptions) {
     if (result == null || isJsonError(result)) {
         return result;
     }
-    console.log(result.path);
     return result.schema;
 }
 
