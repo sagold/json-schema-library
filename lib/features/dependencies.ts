@@ -15,10 +15,7 @@ import { isObject } from "../utils/isObject";
  *
  * @returns merged json schema defined by dependencies or undefined
  */
-export function resolveDependencies(
-    node: SchemaNode,
-    data: unknown
-): JsonSchema | undefined {
+export function resolveDependencies(node: SchemaNode, data: unknown): JsonSchema | undefined {
     const { schema, draft } = node;
     // @draft >= 2019-09 dependentSchemas
     const dependencies = schema.dependencies ?? schema.dependentSchemas;

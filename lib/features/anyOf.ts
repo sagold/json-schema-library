@@ -2,8 +2,7 @@
  * @draft-04
  */
 import { mergeSchema } from "../mergeSchema";
-import { JsonSchema, JsonValidator, JsonError, SchemaNode, createNode } from "../types";
-import { Draft } from "../draft";
+import { JsonSchema, JsonValidator, JsonError, SchemaNode } from "../types";
 import { omit } from "../utils/omit";
 
 /**
@@ -12,20 +11,21 @@ import { omit } from "../utils/omit";
  *
  * @returns merged anyOf subschemas which are valid to the given input data.
  */
-export function mergeValidAnyOfSchema(draft: Draft, schema: JsonSchema, data: unknown) {
+export function mergeValidAnyOfSchema(node: SchemaNode, data: unknown) {
+    const { draft, schema } = node;
     if (!Array.isArray(schema.anyOf) || schema.anyOf.length === 0) {
         return;
     }
-
     let resolvedSchema: JsonSchema;
     schema.anyOf.forEach((anySchema: JsonSchema) => {
-        const node = createNode(draft, anySchema);
-        anySchema = draft.resolveRef(node).schema;
-        if (draft.isValid(data, anySchema)) {
-            resolvedSchema = resolvedSchema ? mergeSchema(resolvedSchema, anySchema) : anySchema;
+        const anyNode = draft.resolveRef(node.next(anySchema));
+        if (draft.validate(anyNode, data).length === 0) {
+            resolvedSchema = resolvedSchema ? mergeSchema(resolvedSchema, anyNode.schema) : anyNode.schema;
         }
     });
-    return resolvedSchema;
+    if (resolvedSchema) {
+        return node.next(resolvedSchema);
+    }
 }
 
 /**
@@ -38,12 +38,14 @@ export function resolveAnyOf(node: SchemaNode, data: any): SchemaNode | JsonErro
     if (!Array.isArray(anyOf) || anyOf.length === 0) {
         return node;
     }
-    const resolvedSchema = mergeValidAnyOfSchema(node.draft, node.schema, data);
-    if (resolvedSchema == null) {
+    const resolvedNode = mergeValidAnyOfSchema(node, data);
+    if (resolvedNode) {
         const { pointer, schema } = node;
         return node.draft.errors.anyOfError({ pointer, schema, value: data, anyOf: JSON.stringify(anyOf) });
     }
-    const mergedSchema = mergeSchema(node.schema, resolvedSchema);
+
+    // node.merge(resolvedNode.schema, "anyOf")
+    const mergedSchema = mergeSchema(node.schema, resolvedNode.schema);
     return node.next(omit(mergedSchema, "anyOf"));
 }
 

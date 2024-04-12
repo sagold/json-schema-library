@@ -1,7 +1,18 @@
 /* eslint quote-props: 0 max-len: 0 */
 import { expect } from "chai";
-import { resolveAllOf } from "../../lib/features/allOf";
+import { resolveAllOf as _resolveAllOf } from "../../lib/features/allOf";
 import { Draft07 } from "../../lib/draft07";
+import { JsonSchema, createNode, isSchemaNode } from "../../lib/types";
+import { Draft } from "../../lib/draft";
+
+function resolveAllOf(draft: Draft, data: any, schema: JsonSchema, pointer = "#") {
+    const node = createNode(draft, schema, pointer);
+    const result = _resolveAllOf(node, data);
+    if (isSchemaNode(result)) {
+        return result.schema;
+    }
+    return result;
+}
 
 describe("resolveAllOf", () => {
     let draft: Draft07;
@@ -29,7 +40,7 @@ describe("resolveAllOf", () => {
             }
         });
 
-        const schema = resolveAllOf(draft, "a-value", draft.getSchema());
+        const schema = resolveAllOf(draft, "a-value", draft.rootSchema);
 
         // root schema details
         delete schema.$defs;

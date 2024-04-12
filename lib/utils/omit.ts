@@ -16,7 +16,11 @@ export function omit(object: Record<string, unknown>, ...keysToOmit: string[]) {
         }
     });
     // @scope
-    Object.defineProperty(result, "__ref", { enumerable: false, value: object.__ref });
-    Object.defineProperty(result, "getOneOfOrigin", { enumerable: false, value: object.getOneOfOrigin });
+    if (object.__ref) {
+        Object.defineProperty(result, "__ref", { enumerable: false, value: object.__ref });
+    }
+    if (object.getOneOfOrigin) {
+        Object.defineProperty(result, "getOneOfOrigin", { enumerable: false, value: object.getOneOfOrigin });
+    }
     return result;
 }

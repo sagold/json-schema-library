@@ -4,9 +4,8 @@
 import flattenArray from "../utils/flattenArray";
 import settings from "../config/settings";
 import { createOneOfSchemaResult } from "../schema/createOneOfSchemaResult";
-import { Draft } from "../draft";
 import { errorOrPromise } from "../utils/filter";
-import { JsonSchema, JsonPointer, JsonError, isJsonError, JsonValidator, SchemaNode, isSchemaNode, createNode } from "../types";
+import { JsonSchema, JsonError, isJsonError, JsonValidator, SchemaNode, createNode } from "../types";
 import { isObject } from "../utils/isObject";
 
 const { DECLARATOR_ONEOF } = settings;
@@ -120,22 +119,18 @@ export function resolveOneOf(node: SchemaNode, data: any): SchemaNode | JsonErro
  * @param [pointer]
  * @return ranking value (higher is better)
  */
-function fuzzyObjectValue(
-    draft: Draft,
-    one: JsonSchema,
-    data: Record<string, unknown>,
-    pointer?: JsonPointer
-) {
-    if (data == null || one.properties == null) {
+function fuzzyObjectValue(node: SchemaNode, data: Record<string, unknown>) {
+    const { draft, schema, pointer } = node;
+    if (data == null || schema.properties == null) {
         return -1;
     }
 
     let value = 0;
-    const keys = Object.keys(one.properties);
+    const keys = Object.keys(schema.properties);
     for (let i = 0; i < keys.length; i += 1) {
         const key = keys[i];
         if (data[key]) {
-            if (draft.isValid(data[key], one.properties[key], pointer)) {
+            if (draft.isValid(data[key], schema.properties[key], pointer)) {
                 value += 1;
             }
         }
@@ -231,12 +226,11 @@ export function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | Jso
 
         for (let i = 0; i < schema.oneOf.length; i += 1) {
             const oneNode = draft.resolveRef(node.next(schema.oneOf[i] as JsonSchema));
-            const one = oneNode.schema;
-            const fuzzyValue = fuzzyObjectValue(draft, one, data);
+            const fuzzyValue = fuzzyObjectValue(oneNode, data);
 
             if (fuzzyGreatest < fuzzyValue) {
                 fuzzyGreatest = fuzzyValue;
-                schemaOfItem = one;
+                schemaOfItem = oneNode.schema;
                 schemaOfIndex = i;
             }
         }

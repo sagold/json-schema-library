@@ -24,8 +24,14 @@ export function mergeSchema<T extends JsonSchema>(a: T, b: T, ...omit: string[])
     }
 
     // @scope
-    Object.defineProperty(schema, "__ref", { enumerable: false, value: b.__ref ?? a.__ref });
-    Object.defineProperty(schema, "getOneOfOrigin", { enumerable: false, value: b.getOneOfOrigin ?? a.getOneOfOrigin });
+    const originalRef = b.__ref ?? a.__ref;
+    if (originalRef) {
+        Object.defineProperty(schema, "__ref", { enumerable: false, value: originalRef });
+    }
+    const originalOrigin = b.getOneOfOrigin ?? a.getOneOfOrigin;
+    if (originalOrigin) {
+        Object.defineProperty(schema, "getOneOfOrigin", { enumerable: false, value: originalOrigin });
+    }
     return schema;
 }
 

@@ -10,10 +10,7 @@ import { JsonError, JsonSchema, JsonValidator, SchemaNode } from "../types";
  *
  * @returns json schema defined by if-then-else or undefined
  */
-export function resolveIfSchema(
-    node: SchemaNode,
-    data: unknown
-): SchemaNode | JsonError | undefined {
+export function resolveIfSchema(node: SchemaNode, data: unknown): SchemaNode | JsonError | undefined {
     if (node.schema.if == null) {
         return undefined;
     }

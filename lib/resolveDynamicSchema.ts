@@ -73,9 +73,10 @@ export function resolveDynamicSchema(_node: SchemaNode, data: unknown) {
     }
 
     // @feature anyOf
-    const anyOfSchema = mergeValidAnyOfSchema(draft, schema, data);
-    if (anyOfSchema) {
-        resolvedSchema = mergeSchema(resolvedSchema ?? {}, anyOfSchema);
+    const aNode = createNode(draft, schema, pointer);
+    const anyNode = mergeValidAnyOfSchema(aNode, data);
+    if (anyNode && anyNode.schema) {
+        resolvedSchema = mergeSchema(resolvedSchema ?? {}, anyNode.schema);
     }
 
     // @feature dependencies

@@ -172,8 +172,9 @@ export class Draft {
         return this.config.resolveAnyOf(node, data);
     }
 
-    resolveAllOf(data: any, schema: JsonSchema): JsonSchema {
-        return this.config.resolveAllOf(this, data, schema);
+    resolveAllOf(data: any, schema: JsonSchema): SchemaNode | JsonError {
+        const node = createNode(this, schema, data);
+        return this.config.resolveAllOf(node, data);
     }
 
     resolveRef(node: SchemaNode): SchemaNode {

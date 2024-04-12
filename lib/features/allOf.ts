@@ -21,21 +21,17 @@ export function resolveSchema(node: SchemaNode, data: unknown): SchemaNode | Jso
     return node.next(omit(schema, "if", "then", "else"));
 }
 
-export function resolveAllOf(
-    draft: Draft,
-    data: any,
-    schema: JsonSchema = draft.rootSchema
-): JsonSchema | JsonError {
+export function resolveAllOf(node: SchemaNode, data: any): SchemaNode | JsonError {
+    const { schema, draft } = node;
     let mergedSchema = shallowCloneSchemaNode(schema);
     for (let i = 0; i < schema.allOf.length; i += 1) {
-        const allOfNode = draft.resolveRef(createNode(draft, schema.allOf[i]));
+        const allOfNode = draft.resolveRef(node.next(schema.allOf[i] as JsonSchema));
         // @todo introduce draft.resolveSchema to iteratively resolve
         const allOfSchema = resolveSchema(allOfNode, data).schema;
-
         mergedSchema = mergeSchema(mergedSchema, allOfSchema);
     }
     delete mergedSchema.allOf;
-    return mergedSchema;
+    return node.next(mergedSchema);
 }
 
 /**

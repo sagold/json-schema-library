@@ -4,7 +4,7 @@ import { eachSchema } from "../../eachSchema";
 // import remotes from "../../../remotes";
 import joinScope from "../../compile/joinScope";
 import getRef from "../../compile/getRef";
-import { JsonSchema, SchemaScope } from "../../types";
+import { JsonSchema } from "../../types";
 import { get } from "@sagold/json-pointer";
 
 const COMPILED = "__compiled";
@@ -63,11 +63,13 @@ export default function compileSchema(
     const context: Context = { ids: {}, anchors: {}, remotes: draft.remotes };
     const rootSchemaAsString = JSON.stringify(schemaToCompile);
     const compiledSchema = JSON.parse(rootSchemaAsString);
-    Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });
-    Object.defineProperty(compiledSchema, GET_CONTEXT, { enumerable: false, value: () => context });
-    Object.defineProperty(compiledSchema, GET_REF, {
-        enumerable: false,
-        value: getRef.bind(null, context, compiledSchema)
+    Object.defineProperties(compiledSchema, {
+        [COMPILED]: { enumerable: false, value: true },
+        [GET_CONTEXT]: { enumerable: false, value: () => context },
+        [GET_REF]: {
+            enumerable: false,
+            value: getRef.bind(null, context, compiledSchema)
+        }
     });
 
     // bail early, when no $refs are defined
