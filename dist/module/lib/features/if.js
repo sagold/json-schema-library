@@ -29,10 +29,10 @@ export function resolveIfSchema(node, data) {
  * @returns validation result of it-then-else schema
  */
 const validateIf = (node, value) => {
-    const resolvedSchema = resolveIfSchema(node, value);
-    if (resolvedSchema) {
+    const resolvedNode = resolveIfSchema(node, value);
+    if (resolvedNode) {
         // @recursiveRef ok, we not just add per pointer, but any evlauation to dynamic scope / validation path
-        return node.draft.validate(resolvedSchema, value);
+        return node.draft.validate(resolvedNode, value);
     }
 };
 export { validateIf };

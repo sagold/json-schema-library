@@ -29,12 +29,14 @@ export default function compileSchema(draft, schemaToCompile, rootSchema = schem
     const context = { ids: {}, remotes: draft.remotes };
     const rootSchemaAsString = JSON.stringify(schemaToCompile);
     const compiledSchema = JSON.parse(rootSchemaAsString);
-    // flag this schema as compiled
-    Object.defineProperty(compiledSchema, COMPILED, { enumerable: false, value: true });
-    // add getRef-helper to this object
-    Object.defineProperty(compiledSchema, GET_REF, {
-        enumerable: false,
-        value: getRef.bind(null, context, compiledSchema)
+    Object.defineProperties(compiledSchema, {
+        // flag this schema as compiled
+        [COMPILED]: { enumerable: false, value: true },
+        // add getRef-helper to this object
+        [GET_REF]: {
+            enumerable: false,
+            value: getRef.bind(null, context, compiledSchema)
+        }
     });
     // bail early, when no $refs are defined
     if (force === false && rootSchemaAsString.includes("$ref") === false) {

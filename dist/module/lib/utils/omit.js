@@ -15,8 +15,8 @@ export function omit(object, ...keysToOmit) {
             result[key] = object[key];
         }
     });
-    // @scope
-    Object.defineProperty(result, "__ref", { enumerable: false, value: object.__ref });
-    Object.defineProperty(result, "getOneOfOrigin", { enumerable: false, value: object.getOneOfOrigin });
+    if (object.getOneOfOrigin) {
+        Object.defineProperty(result, "getOneOfOrigin", { enumerable: false, value: object.getOneOfOrigin });
+    }
     return result;
 }

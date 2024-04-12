@@ -1,4 +1,4 @@
-import { createNode, isJsonError, isSchemaNode } from "./types";
+import { isJsonError, isSchemaNode } from "./types";
 import { mergeSchema } from "./mergeSchema";
 import { resolveIfSchema } from "./features/if";
 import { resolveDependencies } from "./features/dependencies";
@@ -28,11 +28,11 @@ export function isDynamicSchema(schema) {
  * @returns static schema from resolved dynamic schema definitions for this
  *  specific input data
  */
-export function resolveDynamicSchema(_node, data) {
+export function resolveDynamicSchema(schemaNode, data) {
     let resolvedSchema;
     let error;
-    const node = _node.draft.resolveRef(_node);
-    const { pointer, draft } = node;
+    const node = schemaNode.draft.resolveRef(schemaNode);
+    const { draft } = node;
     const schema = isSchemaNode(node) ? node.schema : node;
     // @feature oneOf
     if (schema.oneOf) {
@@ -67,19 +67,17 @@ export function resolveDynamicSchema(_node, data) {
         }
     }
     // @feature anyOf
-    const anyOfSchema = mergeValidAnyOfSchema(draft, schema, data);
-    if (anyOfSchema) {
-        resolvedSchema = mergeSchema(resolvedSchema !== null && resolvedSchema !== void 0 ? resolvedSchema : {}, anyOfSchema);
+    const anyNode = mergeValidAnyOfSchema(node, data);
+    if (anyNode && anyNode.schema) {
+        resolvedSchema = mergeSchema(resolvedSchema !== null && resolvedSchema !== void 0 ? resolvedSchema : {}, anyNode.schema);
     }
     // @feature dependencies
-    const dNode = createNode(draft, schema, pointer);
-    const dependenciesSchema = resolveDependencies(dNode, data);
+    const dependenciesSchema = resolveDependencies(node, data);
     if (dependenciesSchema) {
         resolvedSchema = mergeSchema(resolvedSchema !== null && resolvedSchema !== void 0 ? resolvedSchema : {}, dependenciesSchema);
     }
     // @feature if-then-else
-    const ifNode = createNode(draft, schema, pointer);
-    const ifNodeResolved = resolveIfSchema(ifNode, data);
+    const ifNodeResolved = resolveIfSchema(node, data);
     if (isSchemaNode(ifNodeResolved)) {
         resolvedSchema = mergeSchema(resolvedSchema !== null && resolvedSchema !== void 0 ? resolvedSchema : {}, ifNodeResolved.schema);
     }

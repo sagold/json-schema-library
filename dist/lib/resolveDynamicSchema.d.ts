@@ -17,6 +17,6 @@ export declare function isDynamicSchema(schema: JsonData): boolean;
  * @returns static schema from resolved dynamic schema definitions for this
  *  specific input data
  */
-export declare function resolveDynamicSchema(_node: SchemaNode, data: unknown): SchemaNode | JsonError<import("./types").ErrorData<{
+export declare function resolveDynamicSchema(schemaNode: SchemaNode, data: unknown): SchemaNode | JsonError<import("./types").ErrorData<{
     [p: string]: unknown;
 }>>;

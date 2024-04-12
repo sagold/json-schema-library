@@ -46,7 +46,7 @@ const KeywordValidation = {
                 const additionalIsObject = isObject(schema.additionalProperties);
                 // additionalProperties { oneOf: [] }
                 if (additionalIsObject && Array.isArray(schema.additionalProperties.oneOf)) {
-                    const result = draft.resolveOneOf(value[property], schema.additionalProperties, `${pointer}/${property}`);
+                    const result = draft.resolveOneOf(node.next(schema.additionalProperties), value[property]);
                     if (isJsonError(result)) {
                         errors.push(draft.errors.additionalPropertiesError({
                             pointer,

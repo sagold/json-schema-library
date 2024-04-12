@@ -1,7 +1,7 @@
 import getTypeOf from "./getTypeOf";
 import { isObject } from "./utils/isObject";
 export function mergeSchema(a, b, ...omit) {
-    var _a, _b;
+    var _a;
     if ((b === null || b === void 0 ? void 0 : b.type) === "error") {
         return b;
     }
@@ -20,9 +20,10 @@ export function mergeSchema(a, b, ...omit) {
     if (!isObject(schema)) {
         return schema;
     }
-    // @scope
-    Object.defineProperty(schema, "__ref", { enumerable: false, value: (_a = b.__ref) !== null && _a !== void 0 ? _a : a.__ref });
-    Object.defineProperty(schema, "getOneOfOrigin", { enumerable: false, value: (_b = b.getOneOfOrigin) !== null && _b !== void 0 ? _b : a.getOneOfOrigin });
+    const originalOrigin = (_a = b.getOneOfOrigin) !== null && _a !== void 0 ? _a : a.getOneOfOrigin;
+    if (originalOrigin) {
+        Object.defineProperty(schema, "getOneOfOrigin", { enumerable: false, value: originalOrigin });
+    }
     return schema;
 }
 export function mergeSchema2(a, b, property) {

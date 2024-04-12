@@ -55,7 +55,8 @@ export class Draft {
      * @param [pointer] - pointer to current data. Default to rootPointer
      */
     each(data, callback, schema, pointer) {
-        return this.config.each(this, data, callback, schema, pointer);
+        const node = createNode(this, schema !== null && schema !== void 0 ? schema : this.rootSchema, pointer);
+        return this.config.each(node, data, callback);
     }
     eachSchema(callback, schema = this.rootSchema) {
         return this.config.eachSchema(schema, callback);
@@ -106,13 +107,13 @@ export class Draft {
         return this.config.resolveAnyOf(node, data);
     }
     resolveAllOf(data, schema) {
-        return this.config.resolveAllOf(this, data, schema);
+        const node = createNode(this, schema, data);
+        return this.config.resolveAllOf(node, data);
     }
     resolveRef(node) {
         return this.config.resolveRef(node);
     }
-    resolveOneOf(data, schema, pointer) {
-        const node = createNode(this, schema, pointer);
+    resolveOneOf(node, data) {
         return this.config.resolveOneOf(node, data);
     }
     setSchema(schema) {

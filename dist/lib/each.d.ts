@@ -1,5 +1,4 @@
-import { Draft } from "./draft";
-import { JsonSchema, JsonPointer } from "./types";
+import { JsonSchema, JsonPointer, SchemaNode } from "./types";
 export type EachCallback = (schema: JsonSchema, data: unknown, pointer: JsonPointer) => void;
 /**
  * Iterates over data, retrieving its schema
@@ -10,4 +9,4 @@ export type EachCallback = (schema: JsonSchema, data: unknown, pointer: JsonPoin
  * @param [schema] - the schema matching the data. Defaults to rootSchema
  * @param [pointer] - pointer to current data. Default to rootPointer
  */
-export declare function each(draft: Draft, data: any, callback: EachCallback, schema?: JsonSchema, pointer?: JsonPointer): void;
+export declare function each(schemaNode: SchemaNode, data: any, callback: EachCallback): void;

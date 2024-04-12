@@ -3,10 +3,11 @@ import { mergeSchema } from "./mergeSchema";
 // 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
 function resolveRecursiveRef(node) {
     const history = node.path;
+    // console.log(...history);
     // RESTRICT BY CHANGE IN BASE-URL
     let startIndex = 0;
     for (let i = history.length - 1; i >= 0; i--) {
-        if (history[i].$id && /^https?:\/\//.test(history[i].$id)) {
+        if (history[i].$id && /^https?:\/\//.test(history[i].$id) && history[i].$recursiveAnchor !== true) {
             startIndex = i;
             break;
         }

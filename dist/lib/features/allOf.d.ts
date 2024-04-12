@@ -8,7 +8,7 @@ import { Draft } from "../draft";
  * when complete this will have much duplication to step.object etc
  */
 export declare function resolveSchema(node: SchemaNode, data: unknown): SchemaNode | JsonError;
-export declare function resolveAllOf(draft: Draft, data: any, schema?: JsonSchema): JsonSchema | JsonError;
+export declare function resolveAllOf(node: SchemaNode, data: any): SchemaNode | JsonError;
 /**
  * @attention: subschemas have to be resolved upfront (e.g. if-else that do not apply)
  * Merge all allOf sub schema into a single schema. Returns undefined for

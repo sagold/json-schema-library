@@ -80,7 +80,7 @@ const stepType = {
             if (nextPropertyNode && Array.isArray(nextPropertyNode.schema.oneOf)) {
                 // @special case: this is a mix of a schema and optional definitions
                 // we resolve the schema here and add the original schema to `oneOfSchema`
-                return draft.resolveOneOf(data[key], nextPropertyNode.schema, nextPropertyNode.pointer);
+                return draft.resolveOneOf(node.next(nextPropertyNode.schema, key), data[key]);
             }
             if (nextPropertyNode) {
                 return nextPropertyNode;

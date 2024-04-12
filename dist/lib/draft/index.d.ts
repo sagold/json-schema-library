@@ -114,9 +114,9 @@ export declare class Draft {
     getTemplate(data?: unknown, schema?: JsonSchema, opts?: TemplateOptions): any;
     isValid(data: unknown, schema?: JsonSchema, pointer?: JsonPointer): boolean;
     resolveAnyOf(data: any, schema: JsonSchema, pointer?: JsonPointer): SchemaNode | JsonError;
-    resolveAllOf(data: any, schema: JsonSchema): JsonSchema;
+    resolveAllOf(data: any, schema: JsonSchema): SchemaNode | JsonError;
     resolveRef(node: SchemaNode): SchemaNode;
-    resolveOneOf(data: any, schema: JsonSchema, pointer?: JsonPointer): SchemaNode | JsonError;
+    resolveOneOf(node: SchemaNode, data: unknown): SchemaNode | JsonError;
     setSchema(schema: JsonSchema): void;
     step(node: SchemaNode, key: string | number, data: any): SchemaNode | JsonError;
     /**

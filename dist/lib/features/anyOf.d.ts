@@ -1,12 +1,11 @@
-import { JsonSchema, JsonValidator, JsonError, SchemaNode } from "../types";
-import { Draft } from "../draft";
+import { JsonValidator, JsonError, SchemaNode } from "../types";
 /**
  * returns merged schema of all valid anyOf subschemas for the given input data.
  * Does not merge with rest input schema.
  *
  * @returns merged anyOf subschemas which are valid to the given input data.
  */
-export declare function mergeValidAnyOfSchema(draft: Draft, schema: JsonSchema, data: unknown): JsonSchema;
+export declare function mergeValidAnyOfSchema(node: SchemaNode, data: unknown): SchemaNode;
 /**
  * @unused this function is only exposed via draft and not used otherwise
  * @returns extended input schema with valid anyOf subschemas or JsonError if
