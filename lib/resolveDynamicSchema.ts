@@ -32,10 +32,10 @@ export function isDynamicSchema(schema: JsonData): boolean {
  * @returns static schema from resolved dynamic schema definitions for this
  *  specific input data
  */
-export function resolveDynamicSchema(_node: SchemaNode, data: unknown) {
+export function resolveDynamicSchema(schemaNode: SchemaNode, data: unknown) {
     let resolvedSchema: JsonSchema;
     let error: JsonError;
-    const node = _node.draft.resolveRef(_node);
+    const node = schemaNode.draft.resolveRef(schemaNode);
     const { pointer, draft } = node;
     const schema = isSchemaNode(node) ? node.schema : node;
 
