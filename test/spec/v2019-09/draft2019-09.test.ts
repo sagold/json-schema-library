@@ -101,8 +101,6 @@ const postponedTestcases = [
     // @todo when recursiveRef is implemented
     "unevaluatedProperties with $recursiveRef",
     "unevaluatedItems with $recursiveRef",
-    // @todo validate $def-syntax against metaschema
-    "validate definition against metaschema",
     // @vocabulary
     // @todo evaluate support by meta-schema
     // we need to evaluate meta-schema for supported validation methods we currently do not have the logic for this
@@ -116,7 +114,6 @@ const postponedTestcases = [
     "item is evaluated in an uncle schema to unevaluatedItems", // unevaluatedItems
     "collect annotations inside a 'not', even if collection is disabled" // not
 ];
-
 
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
