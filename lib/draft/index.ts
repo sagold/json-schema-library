@@ -146,7 +146,15 @@ export class Draft {
      * @return resolved json-schema object of requested json-pointer location
      */
     getSchema(options?: GetSchemaOptions): JsonSchema | JsonError | undefined {
-        return this.config.getSchema(this, options).schema;
+        const result = this.getSchemaNode(options);
+        if (isSchemaNode(result)) {
+            return result.schema;
+        }
+        return result;
+    }
+
+    getSchemaNode(options?: GetSchemaOptions): SchemaNode | JsonError | undefined {
+        return this.config.getSchema(this, options);
     }
 
     /**
