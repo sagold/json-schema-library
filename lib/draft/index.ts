@@ -168,13 +168,11 @@ export class Draft {
         return this.config.isValid(this, data, schema, pointer);
     }
 
-    resolveAnyOf(data: any, schema: JsonSchema, pointer?: JsonPointer): SchemaNode | JsonError {
-        const node = createNode(this, schema, pointer);
+    resolveAnyOf(node: SchemaNode, data: unknown): SchemaNode | JsonError {
         return this.config.resolveAnyOf(node, data);
     }
 
-    resolveAllOf(data: any, schema: JsonSchema): SchemaNode | JsonError {
-        const node = createNode(this, schema, data);
+    resolveAllOf(node: SchemaNode, data: unknown): SchemaNode | JsonError {
         return this.config.resolveAllOf(node, data);
     }
 
