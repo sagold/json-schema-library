@@ -182,8 +182,7 @@ export class Draft {
         return this.config.resolveRef(node);
     }
 
-    resolveOneOf(data: any, schema: JsonSchema, pointer?: JsonPointer): SchemaNode | JsonError {
-        const node = createNode(this, schema, pointer);
+    resolveOneOf(node: SchemaNode, data: unknown): SchemaNode | JsonError {
         return this.config.resolveOneOf(node, data);
     }
 

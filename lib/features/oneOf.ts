@@ -174,19 +174,17 @@ export function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | Jso
 
         for (let i = 0; i < schema.oneOf.length; i += 1) {
             const oneNode = draft.resolveRef(node.next(schema.oneOf[i] as JsonSchema));
-            const one = oneNode.schema;
-            const resultNode = draft.step(oneOfProperty, one, data, pointer);
+            const resultNode = draft.step(oneNode, oneOfProperty, data);
             if (isJsonError(resultNode)) {
                 return resultNode;
             }
 
-            let result = flattenArray(draft.validate(oneOfValue, resultNode.schema, pointer));
-
+            let result = flattenArray(draft.validate(resultNode, oneOfValue));
             result = result.filter(errorOrPromise);
             if (result.length > 0) {
                 errors.push(...result);
             } else {
-                const nextSchema = createOneOfSchemaResult(schema, one, i);
+                const nextSchema = createOneOfSchemaResult(schema, oneNode.schema, i);
                 return resultNode.next(nextSchema);
             }
         }
@@ -261,9 +259,8 @@ export function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | Jso
  * validates oneOf definition for given input data
  */
 const validateOneOf: JsonValidator = (node, value) => {
-    const { draft, schema } = node;
-    if (Array.isArray(schema.oneOf)) {
-        const nodeOrError = draft.resolveOneOf(value, node.schema, node.pointer);
+    if (Array.isArray(node.schema.oneOf)) {
+        const nodeOrError = node.draft.resolveOneOf(node, value);
         if (isJsonError(nodeOrError)) {
             return nodeOrError;
         }

@@ -61,14 +61,14 @@ export function mergeAllOfSchema(draft: Draft, schema: JsonSchema): JsonSchema |
  * validate allOf definition for given input data
  */
 const validateAllOf: JsonValidator = (node, value) => {
-    const { draft, schema, pointer } = node;
+    const { draft, schema } = node;
     const { allOf } = schema;
     if (!Array.isArray(allOf) || allOf.length === 0) {
         return;
     }
     const errors: JsonError[] = [];
     schema.allOf.forEach((subSchema: JsonSchema) => {
-        errors.push(...draft.validate(value, subSchema, pointer));
+        errors.push(...draft.validate(node.next(subSchema), value));
     });
     return errors;
 };

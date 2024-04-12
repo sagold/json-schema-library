@@ -180,7 +180,7 @@ describe("getSchema", () => {
 
             draft.setSchema(schema);
             const result = getSchema(draft, { pointer: "#/nested/second" });
-            console.log("result", result);
+            // console.log("result", result);
             assert(isJsonError(result));
             expect(result.code).to.eq("one-of-error");
             expect(result.data?.pointer).to.equal("#/nested", "it should expose location of error");

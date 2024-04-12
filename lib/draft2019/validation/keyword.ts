@@ -109,14 +109,11 @@ const KeywordValidation: Record<string, JsonValidator> = {
         }
 
         unevaluated.forEach(key => {
-            // note: only key changes
-            const nextSchemaNode = resolvedSchema.unevaluatedProperties;
-            const keyErrors = draft.validate(
-                value[key],
-                nextSchemaNode,
-                `${pointer}/${key}`
-            );
-            errors.push(...keyErrors);
+            if (isObject(resolvedSchema.unevaluatedProperties)) {
+                // note: only key changes
+                const keyErrors = draft.validate(node.next(resolvedSchema.unevaluatedProperties, key), value[key]);
+                errors.push(...keyErrors);
+            }
         });
         return errors;
     },
@@ -132,8 +129,6 @@ const KeywordValidation: Record<string, JsonValidator> = {
         if (!Array.isArray(value) || value.length === 0 || schema.unevaluatedItems == null || schema.unevaluatedItems === true) {
             return undefined;
         }
-
-
 
         // resolve all dynamic schemas
         const reduction = reduceSchema(draft.resolveRef(node), value);
@@ -157,7 +152,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         if (isObject(resolvedSchema.items)) {
             const nextSchemaNode = { ...resolvedSchema, unevaluatedItems: undefined } as JsonSchema;
-            const errors = draft.validate(value, nextSchemaNode, pointer);
+            const errors = draft.validate(node.next(nextSchemaNode), value);
             return errors.map(e => draft.errors.unevaluatedItemsError({ ...e.data }));
         }
 
@@ -165,9 +160,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
             const items: { index: number, value: unknown }[] = [];
             for (let i = resolvedSchema.items.length; i < value.length; i += 1) {
                 if (i < resolvedSchema.items.length) {
-
-                    if (!draft.isValid(value[i], resolvedSchema.items[i])) {
-
+                    if (draft.validate(node.next(resolvedSchema.items[i], i), value[i]).length > 0) {
                         items.push({ index: i, value: value[i] });
                     }
                 } else {

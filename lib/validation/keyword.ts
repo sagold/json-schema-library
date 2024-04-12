@@ -2,7 +2,7 @@ import getTypeOf from "../getTypeOf";
 import settings from "../config/settings";
 import ucs2decode from "../utils/punycode.ucs2decode";
 import { isObject } from "../utils/isObject";
-import { JsonValidator, isJsonError, JsonError } from "../types";
+import { JsonValidator, isJsonError, JsonError, JsonSchema } from "../types";
 import { validateAllOf } from "../features/allOf";
 import { validateAnyOf } from "../features/anyOf";
 import { validateDependencies } from "../features/dependencies";
@@ -61,9 +61,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
                 // additionalProperties { oneOf: [] }
                 if (additionalIsObject && Array.isArray(schema.additionalProperties.oneOf)) {
                     const result = draft.resolveOneOf(
-                        value[property],
-                        schema.additionalProperties,
-                        `${pointer}/${property}`
+                        node.next(schema.additionalProperties as JsonSchema),
+                        value[property]
                     );
                     if (isJsonError(result)) {
                         errors.push(

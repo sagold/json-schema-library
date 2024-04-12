@@ -105,7 +105,7 @@ const stepType: Record<string, StepFunction> = {
             if (targetNode && Array.isArray(targetNode.schema.oneOf)) {
                 // @special case: this is a mix of a schema and optional definitions
                 // we resolve the schema here and add the original schema to `oneOfSchema`
-                return draft.resolveOneOf(data[key], targetNode.schema, `${pointer}/${key}`);
+                return draft.resolveOneOf(targetNode, data[key]);
             }
             return targetNode;
         }

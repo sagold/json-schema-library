@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import _getSchema, { GetSchemaOptions } from "../../../lib/getSchema";
 import { Draft04 as Core } from "../../../lib/draft04";
-import { JsonSchema, JsonPointer, isJsonError, createNode } from "../../../lib/types";
+import { JsonSchema, JsonPointer, isJsonError, createNode, SchemaNode } from "../../../lib/types";
 import { resolveOneOfFuzzy } from "../../../lib/features/oneOf";
 import { Draft } from "../../../lib/draft";
 
@@ -83,8 +83,7 @@ describe("issue#19 - getSchema from dependencies", () => {
         // directly set "oneOfProperty" to "generation"
         // -> validate schema -> no schema is valid (because gneration is missing here)
         // => tell jlib which schema to resolve or let it retrieve a schema on its own
-        draft.resolveOneOf = function resolveOneOf(data, schema: JsonSchema, pointer: JsonPointer) {
-            const node = createNode(draft, schema, pointer);
+        draft.resolveOneOf = function resolveOneOf(node: SchemaNode, data) {
             return resolveOneOfFuzzy(node, data);
         };
 
