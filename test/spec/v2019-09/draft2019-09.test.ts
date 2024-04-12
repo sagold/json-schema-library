@@ -3,10 +3,24 @@ import { expect } from "chai";
 import { Draft2019 } from "../../../lib/draft2019";
 import { addRemotes } from "../utils/addRemotes";
 import draft2019Meta from "../../../remotes/draft2019-09.json";
+import draft2019MetaApplicator from "../../../remotes/draft2019-09_meta_applicator.json";
+import draft2019MetaContent from "../../../remotes/draft2019-09_meta_content.json";
+import draft2019MetaCore from "../../../remotes/draft2019-09_meta_core.json";
+import draft2019MetaFormat from "../../../remotes/draft2019-09_meta_format.json";
+import draft2019MetaMetaData from "../../../remotes/draft2019-09_meta_meta-data.json";
+import draft2019MetaValidation from "../../../remotes/draft2019-09_meta_validation.json";
 import { getDraftTests, FeatureTest } from "../../getDraftTests";
 
 const cache = new Draft2019();
-cache.addRemoteSchema("https://json-schema.org/draft/2019-09/schema", draft2019Meta);
+[
+    draft2019Meta,
+    draft2019MetaApplicator,
+    draft2019MetaCore,
+    draft2019MetaContent,
+    draft2019MetaFormat,
+    draft2019MetaMetaData,
+    draft2019MetaValidation
+].forEach(schema => { cache.addRemoteSchema(schema.$id, schema); })
 addRemotes(cache);
 
 const supportedTestCases = (t: FeatureTest) => ![
@@ -18,7 +32,6 @@ const supportedTestCases = (t: FeatureTest) => ![
     "ecmascript-regex", // should
     "float-overflow",
     "dependencies-compatibility",  // should
-    // "format-duration",  // should
     "format-date-time", // MUST
     "format-time", // MUST
     "format-iri",
@@ -30,6 +43,7 @@ const supportedTestCases = (t: FeatureTest) => ![
 ].includes(t.name)
 const draftFeatureTests = getDraftTests("2019-09")
     // .filter(testcase => testcase.name === "recursiveRef")
+    // .filter(testcase => testcase.name === "defs")
     .filter(supportedTestCases);
 
 /*
@@ -89,6 +103,7 @@ const postponedTestcases = [
     "unevaluatedItems with $recursiveRef",
     // @todo validate $def-syntax against metaschema
     "validate definition against metaschema",
+    // @vocabulary
     // @todo evaluate support by meta-schema
     // we need to evaluate meta-schema for supported validation methods we currently do not have the logic for this
     "schema that uses custom metaschema with with no validation vocabulary", // vocabulary
@@ -108,7 +123,7 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
         tc.testCases.forEach((testCase) => {
 
             // if (testCase.description !== "$recursiveRef with nesting") { return; }
-            // if (testCase.description !== "$ref to boolean schema false") { return; }
+            // if (testCase.description !== "remote ref, containing refs itself") { return; }
 
             const schema = testCase.schema;
             if (skipTest.includes(testCase.description)) {
