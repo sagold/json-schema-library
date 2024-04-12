@@ -111,7 +111,8 @@ export class Draft {
      * @param [pointer] - pointer to current data. Default to rootPointer
      */
     each(data: any, callback: EachCallback, schema?: JsonSchema, pointer?: JsonPointer) {
-        return this.config.each(this, data, callback, schema, pointer);
+        const node = createNode(this, schema ?? this.rootSchema, pointer);
+        return this.config.each(node, data, callback);
     }
 
     eachSchema(callback: EachSchemaCallback, schema = this.rootSchema) {

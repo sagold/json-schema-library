@@ -1,9 +1,8 @@
 import Keywords from "../../draft06/validation/keyword";
-import { JsonValidator, JsonError, JsonSchema, createNode } from "../../types";
+import { JsonValidator, JsonError, JsonSchema, SchemaNode } from "../../types";
 import { isObject } from "../../utils/isObject";
 import { reduceSchema } from "../../reduceSchema";
 import { validateDependentSchemas, validateDependentRequired } from "../../features/dependencies";
-import { Draft } from "../../draft";
 
 
 /**
@@ -14,16 +13,16 @@ const getPatternTests = (patternProperties: unknown) => isObject(patternProperti
     : []
 
 /** tests if a property is evaluated by the given schema */
-function isPropertyEvaluated(draft: Draft, objectSchema: JsonSchema, propertyName: string, value: unknown) {
-    const node = createNode(draft, objectSchema, propertyName);
-    const schema = draft.resolveRef(node).schema;
+function isPropertyEvaluated(schemaNode: SchemaNode, propertyName: string, value: unknown) {
+    const node = schemaNode.draft.resolveRef(schemaNode);
+    const { schema } = node;
     if (schema.additionalProperties === true) {
         return true;
     }
     // PROPERTIES
     if (schema.properties?.[propertyName]) {
         const nextSchema = schema.properties?.[propertyName];
-        if (draft.isValid(value, nextSchema)) {
+        if (node.draft.isValid(value, nextSchema)) {
             return true;
         }
     }
@@ -35,7 +34,7 @@ function isPropertyEvaluated(draft: Draft, objectSchema: JsonSchema, propertyNam
     // ADDITIONAL-PROPERTIES
     if (isObject(schema.additionalProperties)) {
         const nextSchema = schema.additionalProperties;
-        return draft.validate(value, nextSchema);
+        return node.draft.validate(value, nextSchema);
     }
     return false;
 }
@@ -80,7 +79,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
             }
             // special case: an evaluation in if statement counts too
             // we have an unevaluated prop only if the if-schema does not match
-            if (isObject(schema.if) && isPropertyEvaluated(draft, { type: "object", ...schema.if }, key, value[key])) {
+            if (isObject(schema.if) && isPropertyEvaluated(node.next({ type: "object", ...schema.if }), key, value[key])) {
                 return false;
             }
             if (testPatterns.find(pattern => pattern.test(key))) {
@@ -159,7 +158,6 @@ const KeywordValidation: Record<string, JsonValidator> = {
         if (isObject(resolvedSchema.items)) {
             const nextSchemaNode = { ...resolvedSchema, unevaluatedItems: undefined } as JsonSchema;
             const errors = draft.validate(value, nextSchemaNode, pointer);
-
             return errors.map(e => draft.errors.unevaluatedItemsError({ ...e.data }));
         }
 
@@ -187,7 +185,6 @@ const KeywordValidation: Record<string, JsonValidator> = {
             return value.map((item, index) => {
 
                 if (!draft.isValid(item, resolvedSchema.unevaluatedItems)) {
-
                     return draft.errors.unevaluatedItemsError({
                         pointer: `${pointer}/${index}`,
                         value: JSON.stringify(item),

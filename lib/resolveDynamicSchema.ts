@@ -1,4 +1,4 @@
-import { JsonError, JsonSchema, SchemaNode, createNode, isJsonError, isSchemaNode } from "./types";
+import { JsonError, JsonSchema, SchemaNode, isJsonError, isSchemaNode } from "./types";
 import { mergeSchema } from "./mergeSchema";
 import { resolveIfSchema } from "./features/if";
 import { resolveDependencies } from "./features/dependencies";
@@ -36,7 +36,7 @@ export function resolveDynamicSchema(schemaNode: SchemaNode, data: unknown) {
     let resolvedSchema: JsonSchema;
     let error: JsonError;
     const node = schemaNode.draft.resolveRef(schemaNode);
-    const { pointer, draft } = node;
+    const { draft } = node;
     const schema = isSchemaNode(node) ? node.schema : node;
 
     // @feature oneOf
@@ -73,22 +73,19 @@ export function resolveDynamicSchema(schemaNode: SchemaNode, data: unknown) {
     }
 
     // @feature anyOf
-    const aNode = createNode(draft, schema, pointer);
-    const anyNode = mergeValidAnyOfSchema(aNode, data);
+    const anyNode = mergeValidAnyOfSchema(node, data);
     if (anyNode && anyNode.schema) {
         resolvedSchema = mergeSchema(resolvedSchema ?? {}, anyNode.schema);
     }
 
     // @feature dependencies
-    const dNode = createNode(draft, schema, pointer);
-    const dependenciesSchema = resolveDependencies(dNode, data);
+    const dependenciesSchema = resolveDependencies(node, data);
     if (dependenciesSchema) {
         resolvedSchema = mergeSchema(resolvedSchema ?? {}, dependenciesSchema);
     }
 
     // @feature if-then-else
-    const ifNode = createNode(draft, schema, pointer);
-    const ifNodeResolved = resolveIfSchema(ifNode, data);
+    const ifNodeResolved = resolveIfSchema(node, data);
     if (isSchemaNode(ifNodeResolved)) {
         resolvedSchema = mergeSchema(resolvedSchema ?? {}, ifNodeResolved.schema);
     }

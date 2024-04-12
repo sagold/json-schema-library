@@ -5,7 +5,7 @@ import flattenArray from "../utils/flattenArray";
 import settings from "../config/settings";
 import { createOneOfSchemaResult } from "../schema/createOneOfSchemaResult";
 import { errorOrPromise } from "../utils/filter";
-import { JsonSchema, JsonError, isJsonError, JsonValidator, SchemaNode, createNode } from "../types";
+import { JsonSchema, JsonError, isJsonError, JsonValidator, SchemaNode } from "../types";
 import { isObject } from "../utils/isObject";
 
 const { DECLARATOR_ONEOF } = settings;
@@ -74,17 +74,14 @@ export function resolveOneOf(node: SchemaNode, data: any): SchemaNode | JsonErro
     const matches = [];
     const errors = [];
     for (let i = 0; i < schema.oneOf.length; i += 1) {
-        const oneNode = draft.resolveRef(createNode(draft, schema.oneOf[i]));
-        const one = oneNode.schema;
-
-        let result = flattenArray(draft.validate(data, one, pointer));
-
+        const oneNode = draft.resolveRef(node.next(schema.oneOf[i] as JsonSchema));
+        let result = flattenArray(draft.validate(oneNode, data));
         result = result.filter(errorOrPromise);
 
         if (result.length > 0) {
             errors.push(...result);
         } else {
-            matches.push({ index: i, schema: one });
+            matches.push({ index: i, schema: oneNode.schema });
         }
     }
 

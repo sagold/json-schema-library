@@ -1,6 +1,5 @@
-import { Draft } from "./draft";
 import getTypeOf from "./getTypeOf";
-import { JsonSchema, JsonPointer, createNode } from "./types";
+import { JsonSchema, JsonPointer, SchemaNode, isSchemaNode } from "./types";
 
 export type EachCallback = (schema: JsonSchema, data: unknown, pointer: JsonPointer) => void;
 
@@ -13,28 +12,25 @@ export type EachCallback = (schema: JsonSchema, data: unknown, pointer: JsonPoin
  * @param [schema] - the schema matching the data. Defaults to rootSchema
  * @param [pointer] - pointer to current data. Default to rootPointer
  */
-export function each(
-    draft: Draft,
-    data: any,
-    callback: EachCallback,
-    schema: JsonSchema = draft.rootSchema,
-    pointer: JsonPointer = "#"
-) {
-    const node = createNode(draft, schema, pointer);
-    schema = draft.resolveRef(node).schema;
+export function each(schemaNode: SchemaNode, data: any, callback: EachCallback) {
+    const node = schemaNode.draft.resolveRef(schemaNode);
+    const { draft, schema, pointer } = node;
     callback(schema, data, pointer);
     const dataType = getTypeOf(data);
 
     if (dataType === "object") {
         Object.keys(data).forEach((key) => {
-            const nextNode = draft.step(key, schema, data, pointer); // not save
-            const next = data[key]; // save
-            draft.each(next, callback, nextNode.schema, `${pointer}/${key}`);
+            const nextNode = draft.step(node, key, data);
+            if (isSchemaNode(nextNode)) {
+                each(nextNode, data[key], callback);
+            }
         });
     } else if (dataType === "array") {
         data.forEach((next: unknown, key: number) => {
-            const nextNode = draft.step(key, schema, data, pointer);
-            draft.each(next, callback, nextNode.schema, `${pointer}/${key}`);
+            const nextNode = draft.step(node, key, data);
+            if (isSchemaNode(nextNode)) {
+                each(nextNode, data[key], callback);
+            }
         });
     }
 }
