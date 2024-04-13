@@ -17,8 +17,6 @@ function getJsonSchemaType(value: unknown, expectedType: string | string[]): JST
     return jsType;
 }
 
-// let prev: any;
-
 /**
  * Validates data with json schema
  *
@@ -33,7 +31,7 @@ export default function validate(node: SchemaNode, value: unknown): Array<JsonEr
         throw new Error("node expected");
     }
     const { draft, pointer } = node;
-    node = draft.resolveRef(node);
+    node = node.resolveRef();
     const schema = node.schema;
 
     if (schema == null) {

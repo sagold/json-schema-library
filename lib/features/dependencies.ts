@@ -18,7 +18,7 @@ import { SchemaNode } from "../schemaNode";
  * @returns merged json schema defined by dependencies or undefined
  */
 export function resolveDependencies(node: SchemaNode, data: unknown): JsonSchema | undefined {
-    const { schema, draft } = node;
+    const { schema } = node;
     // @draft >= 2019-09 dependentSchemas
     const dependencies = schema.dependencies ?? schema.dependentSchemas;
     if (!isObject(dependencies) || !isObject(data)) {
@@ -45,8 +45,8 @@ export function resolveDependencies(node: SchemaNode, data: unknown): JsonSchema
         // dependency schema
         if (isObject(dependency)) {
             updated = true;
-            const dNode = node.next(dependency);
-            resolvedSchema = mergeSchema(resolvedSchema, draft.resolveRef(dNode).schema);
+            const dNode = node.next(dependency).resolveRef();
+            resolvedSchema = mergeSchema(resolvedSchema, dNode.schema);
             return;
         }
     });

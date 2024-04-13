@@ -98,7 +98,7 @@ export function resolveDynamicSchema(schemaNode: SchemaNode, data: unknown) {
         return resolvedSchema;
     }
 
-    const nestedSchema: JsonSchema | undefined = resolveDynamicSchema(node.next(resolvedSchema), data);
+    const nestedSchema = resolveDynamicSchema(node.next(resolvedSchema), data);
     if (isSchemaNode(nestedSchema)) {
         resolvedSchema = mergeSchema(resolvedSchema, nestedSchema.schema);
     }

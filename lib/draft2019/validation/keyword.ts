@@ -6,7 +6,6 @@ import { validateDependentSchemas, validateDependentRequired } from "../../featu
 import { JsonValidator } from "../../validation/type";
 import { SchemaNode } from "../../schemaNode";
 
-
 /**
  * Get a list of tests to search for a matching pattern to a property
  */

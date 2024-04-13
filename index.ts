@@ -2,8 +2,8 @@ import { createError, createCustomError } from "./lib/utils/createCustomError";
 import getTypeOf from "./lib/getTypeOf";
 import { resolveOneOf, resolveOneOfFuzzy } from "./lib/features/oneOf";
 import { resolveAllOf } from "./lib/features/allOf";
-import resolveRef from "./lib/resolveRef.strict";
-import resolveRefMerge from "./lib/resolveRef.merge";
+import resolveRefStrict from "./lib/resolveRef.strict";
+import resolveRef from "./lib/resolveRef";
 import settings from "./lib/config/settings";
 import strings from "./lib/config/strings";
 import validateAsync from "./lib/validateAsync";
@@ -49,8 +49,8 @@ export {
     resolveDynamicSchema, // v8
     resolveOneOf,
     resolveOneOfFuzzy,
+    resolveRefStrict,
     resolveRef,
-    resolveRefMerge,
     settings,
     validateAsync // async validation of data by a schema
 };

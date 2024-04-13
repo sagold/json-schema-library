@@ -1,5 +1,5 @@
 import addRemoteSchema from "../addRemoteSchema";
-import compileSchema from "../compileSchema";
+import compileSchema from "../compile";
 import copy from "../utils/copy";
 import createSchemaOf from "../createSchemaOf";
 import getChildSchemaSelection from "../getChildSchemaSelection";
@@ -32,6 +32,7 @@ export type DraftConfig = {
     validateFormat: Record<string, JsonValidator>;
     templateDefaultOptions?: TemplateOptions;
 
+    createNode: typeof createNode;
     addRemoteSchema: typeof addRemoteSchema;
     compileSchema: typeof compileSchema;
     createSchemaOf: typeof createSchemaOf;
@@ -113,7 +114,7 @@ export class Draft {
      * @param [pointer] - pointer to current data. Default to rootPointer
      */
     each(data: any, callback: EachCallback, schema?: JsonSchema, pointer?: JsonPointer) {
-        const node = createNode(this, schema ?? this.rootSchema, pointer);
+        const node = this.createNode(schema ?? this.rootSchema, pointer);
         return this.config.each(node, data, callback);
     }
 
@@ -178,6 +179,10 @@ export class Draft {
         return this.config.isValid(this, data, schema, pointer);
     }
 
+    createNode(schema: JsonSchema, pointer = "#") {
+        return this.config.createNode(this, schema, pointer);
+    }
+
     resolveAnyOf(node: SchemaNode, data: unknown): SchemaNode | JsonError {
         return this.config.resolveAnyOf(node, data);
     }
@@ -217,7 +222,7 @@ export class Draft {
         if (isSchemaNode(key)) {
             return this.config.step(key, schema, data);
         }
-        const node = createNode(this, schema ?? this.rootSchema, pointer);
+        const node = this.createNode(schema ?? this.rootSchema, pointer);
         return this.config.step(node, key, data);
     }
 
@@ -238,7 +243,7 @@ export class Draft {
             return this.config.validate(inuptNode, inputData);
         }
 
-        const node = createNode(this, schema, pointer);
+        const node = this.createNode(schema, pointer);
         return this.config.validate(node, data);
     }
 }

@@ -1,6 +1,6 @@
 import gp, { JsonPath } from "@sagold/json-pointer";
-import { JsonSchema, JsonPointer, isJsonError, JsonError } from "./types";
-import { createNode, SchemaNode } from "./schemaNode";
+import { JsonSchema, JsonPointer, isJsonError } from "./types";
+import { SchemaNode } from "./schemaNode";
 import { Draft } from "./draft";
 
 const emptyObject = {} as const;
@@ -43,7 +43,7 @@ export type GetSchemaOptions = {
 export default function getSchema(draft: Draft, options: GetSchemaOptions = emptyObject) {
     const { pointer = "#", data, schema = draft.rootSchema, withSchemaWarning = false } = options;
     const path = gp.split(pointer);
-    const node = draft.resolveRef(createNode(draft, schema));
+    const node = draft.createNode(schema).resolveRef();
     const result = _getSchema(node, path, data);
     if (!withSchemaWarning && isJsonError(result) && result.code === "schema-warning") {
         return undefined;
@@ -51,16 +51,12 @@ export default function getSchema(draft: Draft, options: GetSchemaOptions = empt
     return result;
 }
 
-function _getSchema(
-    node: SchemaNode,
-    path: JsonPath,
-    data: unknown = emptyObject
-): SchemaNode | JsonError {
+function _getSchema(node: SchemaNode, path: JsonPath, data: unknown = emptyObject) {
     if (path.length === 0) {
-        return node.draft.resolveRef(node);
+        return node.resolveRef();
     }
     const key = path.shift(); // step key
-    const nextNode = node.draft.step(key, node.schema, data, node.pointer); // step schema
+    const nextNode = node.draft.step(node, key, data); // step schema
     if (isJsonError(nextNode)) {
         return nextNode;
     }

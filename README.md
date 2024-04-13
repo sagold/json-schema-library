@@ -799,21 +799,20 @@ A _resolver_ is a simple method implementing a specific feature of json-schema t
 
 #### `resolveRef` with merge
 
-The default json-schema behaviour for `$ref` resolution is to replace the schema where a `$ref` is defined. In some scenarios you what to add context-specific information (e.g., a specific _title_). For this, a modified `$ref`-resolver is exposed by `json-schema-library`:
+Until _draft07_ json-schema behaviour for `$ref` resolution is to replace the schema where a `$ref` is defined. Since _draft2019-09_ $ref resolution merges the resolved schema, which can be used to add context-specific information (e.g., a specific _title_). 
+To add this behaviour to older drafts, a `$ref`-resolver is exposed by `json-schema-library`:
 
 ```ts
-import { Draft2019, resolveRefMerge } from "json-schema-library";
-const jsonSchema = new Draft2019(mySchema, { resolveRef: resolveRefMerge });
+import { Draft2019, resolveRef } from "json-schema-library";
+const jsonSchema = new Draft2019(mySchema, { resolveRef });
 ```
 
-`resolveRefMerge` performs a shallow merge (first level of properties), adding the local schemas properties last.
-
-**Caution:** With this resolver, it is possible to overwrite json-schema behavioural properties. Treat with care.
+`resolveRef` performs a shallow merge (first level of properties), adding the local schemas properties last. The ref-resolver for draft07 and below is exported as `resolveRefStrict`.
 
 <details><summary>Example</summary>
 
 ```ts
-import { Draft2019, resolveRefMerge } from "json-schema-library";
+import { Draft07, resolveRef } from "json-schema-library";
 const mySchema = {
     type: "object",
     properties: {
@@ -830,7 +829,7 @@ const mySchema = {
     }
 };
 
-const jsonSchema = new Draft2019(mySchema, { resolveRef: resolveRefMerge });
+const jsonSchema = new Draft07(mySchema, { resolveRef });
 const subHeaderSchema = jsonSchema.getSchema("#/subHeader");
 
 expect(subHeaderSchema).to.eq({

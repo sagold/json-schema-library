@@ -14,7 +14,7 @@ export type EachCallback = (schema: JsonSchema, data: unknown, pointer: JsonPoin
  * @param [pointer] - pointer to current data. Default to rootPointer
  */
 export function each(schemaNode: SchemaNode, data: any, callback: EachCallback) {
-    const node = schemaNode.draft.resolveRef(schemaNode);
+    const node = schemaNode.resolveRef();
     const { draft, schema, pointer } = node;
     callback(schema, data, pointer);
     const dataType = getTypeOf(data);

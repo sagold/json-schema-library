@@ -1,26 +1,27 @@
 import addRemoteSchema from "../addRemoteSchema";
 import compileSchema from "../draft06/compile";
-import { each } from "../each";
-import { eachSchema } from "../eachSchema";
+import createSchemaOf from "../createSchemaOf";
 import ERRORS from "../validation/errors";
 import FORMATS from "../validation/format";
+import getChildSchemaSelection from "../getChildSchemaSelection";
 import getSchema from "../getSchema";
 import getTemplate from "../getTemplate";
 import isValid from "../isValid";
 import KEYWORDS from "./validation/keyword";
 import merge from "../utils/merge";
+import resolveRef from "../resolveRef";
+import settings from "../config/settings";
+import step from "../step";
+import TYPES from "../validation/type";
+import validate from "../validate";
+import { createNode } from "../schemaNode";
+import { DraftConfig, Draft } from "../draft";
+import { each } from "../each";
+import { eachSchema } from "../eachSchema";
+import { JsonSchema } from "../types";
 import { resolveAllOf } from "../features/allOf";
 import { resolveAnyOf } from "../features/anyOf";
 import { resolveOneOf } from "../features/oneOf";
-import createSchemaOf from "../createSchemaOf";
-import getChildSchemaSelection from "../getChildSchemaSelection";
-import step from "../step";
-import TYPES from "../draft06/validation/type";
-import validate from "../validate";
-import { DraftConfig, Draft } from "../draft";
-import { JsonSchema } from "../types";
-import settings from "../config/settings";
-import resolveRef from "../resolveRef.merge";
 
 
 const draft2019Config: DraftConfig = {
@@ -93,6 +94,7 @@ const draft2019Config: DraftConfig = {
     validateFormat: FORMATS,
     errors: ERRORS,
 
+    createNode,
     addRemoteSchema,
     compileSchema,
     createSchemaOf,

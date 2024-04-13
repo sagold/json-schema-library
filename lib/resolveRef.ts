@@ -1,10 +1,7 @@
 import { JsonSchema } from "./types";
-import { mergeSchema } from "./mergeSchema";
 import { SchemaNode, isSchemaNode } from "./schemaNode";
 
 // 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
-
-
 function resolveRecursiveRef(node: SchemaNode): SchemaNode {
     const history = node.path;
 
@@ -36,16 +33,15 @@ function resolveRecursiveRef(node: SchemaNode): SchemaNode {
  * @todo update types
  * Note: JsonSchema my be false
  */
-export default function resolveRefMerge(node: SchemaNode): SchemaNode {
+export default function resolveRef(node: SchemaNode): SchemaNode {
     if (!isSchemaNode(node)) {
         throw new Error("expected node")
     }
     if (node.schema == null) {
         return node;
     }
-
     if (node.schema.$recursiveRef) {
-        return resolveRefMerge(resolveRecursiveRef(node));
+        return resolveRef(resolveRecursiveRef(node));
     }
     if (node.schema.$ref == null) {
         return node;
@@ -55,8 +51,5 @@ export default function resolveRefMerge(node: SchemaNode): SchemaNode {
         return node.next(resolvedSchema as JsonSchema);
     }
     // @draft >= 2019-09 we now merge schemas: in draft <= 7 $ref is treated as reference, not as schema
-    const mergedSchema = mergeSchema(node.schema, resolvedSchema);
-    delete mergedSchema.$ref;
-
-    return node.next(mergedSchema as JsonSchema);
+    return node.merge(resolvedSchema, "$ref");
 }

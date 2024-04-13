@@ -3,7 +3,6 @@
  */
 import { mergeSchema } from "../mergeSchema";
 import { JsonSchema, JsonError } from "../types";
-import { omit } from "../utils/omit";
 import { JsonValidator } from "../validation/type";
 import { SchemaNode } from "../schemaNode";
 
@@ -45,10 +44,7 @@ export function resolveAnyOf(node: SchemaNode, data: any): SchemaNode | JsonErro
         const { pointer, schema } = node;
         return node.draft.errors.anyOfError({ pointer, schema, value: data, anyOf: JSON.stringify(anyOf) });
     }
-
-    // node.merge(resolvedNode.schema, "anyOf")
-    const mergedSchema = mergeSchema(node.schema, resolvedNode.schema);
-    return node.next(omit(mergedSchema, "anyOf"));
+    return node.merge(resolvedNode.schema, "anyOf");
 }
 
 /**

@@ -15,19 +15,19 @@ import { JsonValidator } from "../validation/type";
  * when complete this will have much duplication to step.object etc
  */
 export function resolveSchema(node: SchemaNode, data: unknown): SchemaNode | JsonError {
-    const schema = shallowCloneSchemaNode(node.schema);
     const ifSchema = resolveIfSchema(node, data);
     if (ifSchema) {
         return ifSchema;
     }
+    const schema = shallowCloneSchemaNode(node.schema);
     return node.next(omit(schema, "if", "then", "else"));
 }
 
 export function resolveAllOf(node: SchemaNode, data: any): SchemaNode | JsonError {
-    const { schema, draft } = node;
+    const { schema } = node;
     let mergedSchema = shallowCloneSchemaNode(schema);
     for (let i = 0; i < schema.allOf.length; i += 1) {
-        const allOfNode = draft.resolveRef(node.next(schema.allOf[i] as JsonSchema));
+        const allOfNode = node.next(schema.allOf[i] as JsonSchema).resolveRef();
         // @todo introduce draft.resolveSchema to iteratively resolve
         const allOfSchema = resolveSchema(allOfNode, data).schema;
         mergedSchema = mergeSchema(mergedSchema, allOfSchema);
@@ -53,7 +53,7 @@ export function mergeAllOfSchema(draft: Draft, schema: JsonSchema): JsonSchema |
         if (subschema == null) {
             return;
         }
-        const subSchemaNode = draft.resolveRef(createNode(draft, subschema));
+        const subSchemaNode = draft.createNode(subschema).resolveRef();
         resolvedSchema = mergeSchema(resolvedSchema, subSchemaNode.schema);
     });
     return resolvedSchema;

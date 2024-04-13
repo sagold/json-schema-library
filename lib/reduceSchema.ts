@@ -1,7 +1,5 @@
 import { isSchemaNode, SchemaNode } from "./schemaNode";
-import { mergeSchema } from "./mergeSchema";
 import { resolveDynamicSchema } from "./resolveDynamicSchema";
-import { omit } from "./utils/omit";
 
 const toOmit = ["allOf", "anyOf", "oneOf", "dependencies", "if", "then", "else"];
 
@@ -16,8 +14,7 @@ const toOmit = ["allOf", "anyOf", "oneOf", "dependencies", "if", "then", "else"]
 export function reduceSchema(node: SchemaNode, data: unknown) {
     const resolvedSchema = resolveDynamicSchema(node, data);
     if (isSchemaNode(resolvedSchema)) {
-        const result = mergeSchema(node.schema, resolvedSchema.schema);
-        return node.next(omit(result, ...toOmit));
+        return node.merge(resolvedSchema.schema, ...toOmit);
     }
     if (resolvedSchema) {
         return resolvedSchema; // error

@@ -2,6 +2,21 @@ import { Draft } from "./draft";
 import getTypeOf from "./getTypeOf";
 import { isObject } from "./utils/isObject";
 import { JsonSchema, JsonError, isJsonError } from "./types";
+import { mergeSchema } from "./mergeSchema";
+
+function merge(schema: JsonSchema, ...omit: string[]): SchemaNode {
+    if (schema == null) {
+        throw new Error(`undefined schema`);
+    }
+    const node = this as SchemaNode;
+    const mergedSchema = mergeSchema(node.schema, schema, ...omit);
+    return { ...node, schema: mergedSchema, path: [...node.path, node.schema] };
+}
+
+function resolveRef() {
+    const node = this as SchemaNode;
+    return node.draft.resolveRef(node);
+}
 
 /**
  * create next node based from current node
@@ -31,11 +46,13 @@ function next(schema: JsonSchema, key?: string | number) {
 }
 
 export type SchemaNode = {
-    draft: Draft,
-    pointer: string,
-    schema: JsonSchema,
-    path: JsonSchema[],
-    next: typeof next
+    draft: Draft;
+    pointer: string;
+    schema: JsonSchema;
+    path: JsonSchema[];
+    next: typeof next;
+    merge: typeof merge;
+    resolveRef: typeof resolveRef;
 }
 
 export function isSchemaNode(value: unknown): value is SchemaNode {
@@ -44,11 +61,5 @@ export function isSchemaNode(value: unknown): value is SchemaNode {
 }
 
 export function createNode(draft: Draft, schema: JsonSchema, pointer: string = "#"): SchemaNode {
-    return {
-        draft,
-        pointer,
-        schema,
-        path: [],
-        next
-    }
+    return { draft, pointer, schema, path: [], next, merge, resolveRef };
 }
