@@ -14,7 +14,7 @@ import { resolveAnyOf } from "../features/anyOf";
 import { resolveOneOf } from "../features/oneOf";
 import createSchemaOf from "../createSchemaOf";
 import getChildSchemaSelection from "../getChildSchemaSelection";
-import step from "./step";
+import step from "../step";
 import TYPES from "../draft06/validation/type";
 import validate from "../validate";
 import { DraftConfig, Draft } from "../draft";

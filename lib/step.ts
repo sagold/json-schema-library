@@ -3,11 +3,7 @@ import createSchemaOf from "./createSchemaOf";
 import { JsonSchema, JsonError, isJsonError, SchemaNode } from "./types";
 import { reduceSchema } from "./reduceSchema";
 
-type StepFunction = (
-    node: SchemaNode,
-    key: string,
-    data: any
-) => SchemaNode | JsonError | undefined;
+type StepFunction = (node: SchemaNode, key: string, data: any) => SchemaNode | JsonError | undefined;
 
 const stepType: Record<string, StepFunction> = {
     array: (node, key, data) => {
@@ -158,11 +154,7 @@ const stepType: Record<string, StepFunction> = {
  * @param  [pointer] - pointer to schema and data (parent of key)
  * @return Schema or Error if failed resolving key
  */
-export default function step(
-    node: SchemaNode,
-    key: string | number,
-    data?: any
-): SchemaNode | JsonError {
+export default function step(node: SchemaNode, key: string | number, data?: any): SchemaNode | JsonError {
     const { draft, schema, pointer } = node;
     const typeOfData = getTypeOf(data);
     let schemaType = schema.type ?? typeOfData;
@@ -183,16 +175,11 @@ export default function step(
 
     const stepFunction = stepType[schemaType];
     if (stepFunction) {
-        const schemaResult = stepFunction(node, `${key}`, data);
-        if (schemaResult === undefined) {
-            return draft.errors.schemaWarning({
-                pointer,
-                value: data,
-                schema,
-                key
-            });
+        const childNode = stepFunction(node, `${key}`, data);
+        if (childNode === undefined) {
+            return draft.errors.schemaWarning({ pointer, value: data, schema, key });
         }
-        return schemaResult;
+        return childNode;
     }
 
     return new Error(`Unsupported schema type ${schema.type} for key ${key}`) as JsonError;

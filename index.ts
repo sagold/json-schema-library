@@ -17,7 +17,7 @@ import { Draft06, draft06Config } from "./lib/draft06";
 import { Draft07, draft07Config } from "./lib/draft07";
 import { Draft2019, draft2019Config } from "./lib/draft2019";
 import { JsonEditor, draftJsonEditorConfig } from "./lib/jsoneditor";
-import { isJsonError } from "./lib/types";
+import { createNode, isJsonError, isSchemaNode } from "./lib/types";
 
 const config = { strings };
 
@@ -25,6 +25,7 @@ export {
     config,
     createCustomError,
     createError,
+    createNode, // v10
     Draft,
     Draft04, // core implementing draft04 specs
     draft04Config, // config implementing draft04 specs
@@ -36,14 +37,15 @@ export {
     draft2019Config, // config implementing draft2019-09 specs
     draftJsonEditorConfig, // adjusted config of draft04 to better support the json-editor
     getTypeOf, // returns the javascript datatype
-    isDynamicSchema, // NEW
+    isDynamicSchema, // v8
     isJsonError,
+    isSchemaNode, // v10
     JsonEditor, // adjusted core of draft07 to better support the json-editor
-    mergeSchema, // NEW
-    reduceSchema, // NEW
+    mergeSchema, // v8
+    reduceSchema, // v8
     render,
     resolveAllOf,
-    resolveDynamicSchema, // NEW
+    resolveDynamicSchema, // v8
     resolveOneOf,
     resolveOneOfFuzzy,
     resolveRef,
@@ -63,7 +65,8 @@ import {
     JsonError,
     JsonValidator,
     JsonTypeValidator,
-    ErrorData
+    ErrorData,
+    SchemaNode
 } from "./lib/types";
 import { JSType } from "./lib/getTypeOf";
 
@@ -79,5 +82,6 @@ export type {
     JsonSchema,
     JsonTypeValidator,
     JsonValidator,
-    JSType
+    JSType,
+    SchemaNode
 };
