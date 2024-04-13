@@ -1,4 +1,4 @@
-import { JsonTypeValidator } from "../../types";
+import { JsonTypeValidator } from "../../validation/type";
 
 /**
  * @todo: type is also a keyword, as is properties, items, etc

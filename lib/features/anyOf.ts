@@ -2,8 +2,10 @@
  * @draft-04
  */
 import { mergeSchema } from "../mergeSchema";
-import { JsonSchema, JsonValidator, JsonError, SchemaNode } from "../types";
+import { JsonSchema, JsonError } from "../types";
 import { omit } from "../utils/omit";
+import { JsonValidator } from "../validation/type";
+import { SchemaNode } from "../schemaNode";
 
 /**
  * returns merged schema of all valid anyOf subschemas for the given input data.

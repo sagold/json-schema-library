@@ -2,13 +2,14 @@ import getTypeOf from "../getTypeOf";
 import settings from "../config/settings";
 import ucs2decode from "../utils/punycode.ucs2decode";
 import { isObject } from "../utils/isObject";
-import { JsonValidator, isJsonError, JsonError, JsonSchema } from "../types";
+import { isJsonError, JsonError, JsonSchema } from "../types";
 import { validateAllOf } from "../features/allOf";
 import { validateAnyOf } from "../features/anyOf";
 import { validateDependencies } from "../features/dependencies";
 import { validateOneOf } from "../features/oneOf";
 import { getPrecision } from "../utils/getPrecision";
 import deepEqual from "fast-deep-equal";
+import { JsonValidator } from "./type";
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 const hasProperty = (value: Record<string, unknown>, property: string) =>

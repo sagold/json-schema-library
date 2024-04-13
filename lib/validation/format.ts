@@ -1,9 +1,9 @@
 /* eslint-disable max-len, no-control-regex */
-import { JsonError, JsonSchema, SchemaNode } from "../types";
-import { Draft } from "../draft";
+import { JsonError } from "../types";
 import validUrl from "valid-url";
 import { parse as parseIdnEmail } from "smtp-address-parser";
 import getTypeOf from "../getTypeOf";
+import { SchemaNode } from "../schemaNode";
 
 // referenced
 // https://github.com/cfworker/cfworker/blob/main/packages/json-schema/src/format.ts

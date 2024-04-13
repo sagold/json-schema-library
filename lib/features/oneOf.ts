@@ -5,8 +5,10 @@ import flattenArray from "../utils/flattenArray";
 import settings from "../config/settings";
 import { createOneOfSchemaResult } from "../schema/createOneOfSchemaResult";
 import { errorOrPromise } from "../utils/filter";
-import { JsonSchema, JsonError, isJsonError, JsonValidator, SchemaNode } from "../types";
+import { JsonSchema, JsonError, isJsonError } from "../types";
 import { isObject } from "../utils/isObject";
+import { JsonValidator } from "../validation/type"
+import { SchemaNode } from "../schemaNode";
 
 const { DECLARATOR_ONEOF } = settings;
 

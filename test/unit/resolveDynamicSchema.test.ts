@@ -1,7 +1,8 @@
-import { expect } from "chai";
 import { Draft07 as Draft } from "../../lib/draft07";
+import { expect } from "chai";
+import { JsonSchema } from "../../lib/types";
 import { resolveDynamicSchema as resolve } from "../../lib/resolveDynamicSchema";
-import { JsonSchema, createNode, isSchemaNode } from "../../lib/types";
+import { createNode, isSchemaNode } from "../../lib/schemaNode";
 
 function resolveDynamicSchema(draft: Draft, schema: JsonSchema, data: unknown, pointer = "#") {
     const r = resolve(createNode(draft, schema, pointer), data);

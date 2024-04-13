@@ -17,7 +17,8 @@ import { Draft06, draft06Config } from "./lib/draft06";
 import { Draft07, draft07Config } from "./lib/draft07";
 import { Draft2019, draft2019Config } from "./lib/draft2019";
 import { JsonEditor, draftJsonEditorConfig } from "./lib/jsoneditor";
-import { createNode, isJsonError, isSchemaNode } from "./lib/types";
+import { isJsonError } from "./lib/types";
+import { SchemaNode, isSchemaNode, createNode } from "./lib/schemaNode";
 
 const config = { strings };
 
@@ -63,11 +64,12 @@ import {
     JsonSchema,
     JsonPointer,
     JsonError,
-    JsonValidator,
-    JsonTypeValidator,
     ErrorData,
-    SchemaNode
 } from "./lib/types";
+import {
+    JsonValidator,
+    JsonTypeValidator
+} from "./lib/validation/type";
 import { JSType } from "./lib/getTypeOf";
 
 export type {

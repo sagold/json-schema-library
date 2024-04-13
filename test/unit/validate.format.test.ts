@@ -1,8 +1,9 @@
-import { strict as assert } from "assert";
 import _validate from "../../lib/validate";
-import { Draft04 } from "../../lib/draft04";
-import { JsonSchema, createNode } from "../../lib/types";
+import { createNode } from "../../lib/schemaNode";
 import { Draft } from "../../lib/draft";
+import { Draft04 } from "../../lib/draft04";
+import { JsonSchema } from "../../lib/types";
+import { strict as assert } from "assert";
 
 function validate(draft: Draft, value: unknown, schema: JsonSchema = draft.getSchema() as JsonSchema) {
     return _validate(createNode(draft, schema), value);

@@ -1,10 +1,11 @@
 /* eslint quote-props: 0 max-len: 0 */
-import { expect } from "chai";
-import { resolveOneOf as _resolveOneOf } from "../../lib/features/oneOf";
-import { Draft07 } from "../../lib/draft07";
 import settings from "../../lib/config/settings";
-import { JsonError, JsonSchema, createNode, isJsonError } from "../../lib/types";
+import { createNode } from "../../lib/schemaNode";
 import { Draft } from "../../lib/draft";
+import { Draft07 } from "../../lib/draft07";
+import { expect } from "chai";
+import { JsonError, JsonSchema, isJsonError } from "../../lib/types";
+import { resolveOneOf as _resolveOneOf } from "../../lib/features/oneOf";
 
 const { DECLARATOR_ONEOF } = settings;
 

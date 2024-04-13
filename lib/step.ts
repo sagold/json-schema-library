@@ -1,6 +1,7 @@
 import getTypeOf from "./getTypeOf";
 import createSchemaOf from "./createSchemaOf";
-import { JsonSchema, JsonError, isJsonError, SchemaNode } from "./types";
+import { JsonSchema, JsonError, isJsonError } from "./types";
+import { SchemaNode } from "./schemaNode";
 import { reduceSchema } from "./reduceSchema";
 
 type StepFunction = (node: SchemaNode, key: string, data: any) => SchemaNode | JsonError | undefined;

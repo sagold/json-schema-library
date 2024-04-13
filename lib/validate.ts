@@ -1,7 +1,8 @@
 import getTypeOf, { JSType } from "./getTypeOf";
 import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
-import { JsonError, isJsonError, SchemaNode, isSchemaNode } from "./types";
+import { JsonError, isJsonError } from "./types";
+import { SchemaNode, isSchemaNode } from "./schemaNode";
 import equal from "fast-deep-equal";
 
 function getJsonSchemaType(value: unknown, expectedType: string | string[]): JSType | "integer" {

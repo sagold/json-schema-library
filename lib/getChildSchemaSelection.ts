@@ -1,5 +1,6 @@
 import { Draft } from "./draft";
-import { createNode, isJsonError, JsonError, JsonSchema } from "./types";
+import { isJsonError, JsonError, JsonSchema } from "./types";
+import { createNode } from "./schemaNode";
 
 /**
  * Returns a list of possible child-schemas for the given property key. In case of a oneOf selection, multiple schemas

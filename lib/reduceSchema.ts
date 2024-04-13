@@ -1,4 +1,4 @@
-import { isSchemaNode, SchemaNode } from "./types";
+import { isSchemaNode, SchemaNode } from "./schemaNode";
 import { mergeSchema } from "./mergeSchema";
 import { resolveDynamicSchema } from "./resolveDynamicSchema";
 import { omit } from "./utils/omit";

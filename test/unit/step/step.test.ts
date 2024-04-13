@@ -1,8 +1,9 @@
-import { expect } from "chai";
 import _step from "../../../lib/step";
-import { Draft04 as Core } from "../../../lib/draft04";
+import { createNode, isSchemaNode } from "../../../lib/schemaNode";
 import { Draft } from "../../../lib/draft";
-import { JsonSchema, createNode, isSchemaNode } from "../../../lib/types";
+import { Draft04 as Core } from "../../../lib/draft04";
+import { expect } from "chai";
+import { JsonSchema } from "../../../lib/types";
 
 function step(draft: Draft, key: string | number, schema: JsonSchema, data?: unknown, pointer = '#') {
     const res = _step(createNode(draft, schema, pointer), key, data);

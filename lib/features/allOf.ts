@@ -1,12 +1,14 @@
 /**
  * @draft-04
  */
-import { JsonSchema, JsonValidator, JsonError, SchemaNode, createNode } from "../types";
+import { SchemaNode, createNode } from "../schemaNode";
+import { JsonSchema, JsonError } from "../types";
 import { Draft } from "../draft";
 import { mergeSchema } from "../mergeSchema";
 import { omit } from "../utils/omit";
 import { resolveIfSchema } from "./if";
 import { shallowCloneSchemaNode } from "../utils/shallowCloneSchema";
+import { JsonValidator } from "../validation/type";
 
 /**
  * resolves schema

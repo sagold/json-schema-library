@@ -2,7 +2,8 @@ import { expect } from "chai";
 import _step from "../../../lib/step";
 import { Draft07 } from "../../../lib/draft07";
 import { Draft } from "../../../lib/draft";
-import { JsonSchema, createNode, isSchemaNode } from "../../../lib/types";
+import { JsonSchema } from "../../../lib/types";
+import { createNode, isSchemaNode } from "../../../lib/schemaNode";
 
 function step(draft: Draft, key: string | number, schema: JsonSchema, data?: unknown, pointer = '#') {
     const res = _step(createNode(draft, schema, pointer), key, data);

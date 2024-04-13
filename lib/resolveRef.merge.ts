@@ -1,5 +1,6 @@
-import { JsonSchema, SchemaNode, isSchemaNode } from "./types";
+import { JsonSchema } from "./types";
 import { mergeSchema } from "./mergeSchema";
+import { SchemaNode, isSchemaNode } from "./schemaNode";
 
 // 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
 

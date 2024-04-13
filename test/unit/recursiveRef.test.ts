@@ -1,7 +1,8 @@
 import { strict as assert } from "assert";
 import { expect } from "chai";
 import { Draft2019 } from "../../lib/draft2019"
-import { JsonSchema, createNode, isJsonError, isSchemaNode } from "../../lib/types";
+import { JsonSchema, isJsonError } from "../../lib/types";
+import { isSchemaNode } from "../../lib/schemaNode";
 
 describe.skip("recursiveRef", () => {
 

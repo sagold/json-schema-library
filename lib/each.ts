@@ -1,5 +1,6 @@
 import getTypeOf from "./getTypeOf";
-import { JsonSchema, JsonPointer, SchemaNode, isSchemaNode } from "./types";
+import { JsonSchema, JsonPointer } from "./types";
+import { SchemaNode, isSchemaNode } from "./schemaNode";
 
 export type EachCallback = (schema: JsonSchema, data: unknown, pointer: JsonPointer) => void;
 

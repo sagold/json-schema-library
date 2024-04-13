@@ -1,7 +1,9 @@
 /**
  * @draft-07
  */
-import { JsonError, JsonSchema, JsonValidator, SchemaNode } from "../types";
+import { JsonError, JsonSchema, } from "../types";
+import { JsonValidator } from "../validation/type";
+import { SchemaNode } from "../schemaNode";
 
 /**
  * returns if-then-else as a json schema. does not merge with input

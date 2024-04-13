@@ -1,4 +1,5 @@
-import { JsonSchema, SchemaNode, isSchemaNode } from "./types";
+import { JsonSchema } from "./types";
+import { SchemaNode, isSchemaNode } from "./schemaNode";
 
 export default function resolveRef(node: SchemaNode): SchemaNode {
     if (!isSchemaNode(node)) {

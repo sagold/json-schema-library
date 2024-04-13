@@ -1,7 +1,8 @@
 import Keywords from "../../validation/keyword";
 import getTypeOf from "../../getTypeOf";
-import { JsonValidator, JsonError, JsonSchema } from "../../types";
+import { JsonError, JsonSchema } from "../../types";
 import { validateIf } from "../../features/if";
+import { JsonValidator } from "../../validation/type";
 
 const KeywordValidation: Record<string, JsonValidator> = {
     ...Keywords,

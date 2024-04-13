@@ -1,5 +1,6 @@
 import gp, { JsonPath } from "@sagold/json-pointer";
-import { JsonSchema, JsonPointer, isJsonError, JsonError, createNode, SchemaNode } from "./types";
+import { JsonSchema, JsonPointer, isJsonError, JsonError } from "./types";
+import { createNode, SchemaNode } from "./schemaNode";
 import { Draft } from "./draft";
 
 const emptyObject = {} as const;

@@ -1,7 +1,8 @@
 import { strict as assert } from "assert";
 import { Draft07 as Draft } from "../../lib/draft07";
 import { reduceSchema as _reduceSchema } from "../../lib/reduceSchema";
-import { JsonSchema, createNode, isSchemaNode } from "../../lib/types";
+import { createNode, isSchemaNode } from "../../lib/schemaNode";
+import { JsonSchema } from "../../lib/types";
 
 function reduceSchema(draft: Draft, schema: JsonSchema, data: any, pointer = "#") {
     const node = createNode(draft, schema, pointer);

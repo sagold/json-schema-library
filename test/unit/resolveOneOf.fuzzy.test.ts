@@ -1,10 +1,11 @@
 /* eslint quote-props: 0 max-len: 0 */
-import { expect } from "chai";
-import { resolveOneOfFuzzy as _resolveOneOf } from "../../lib/features/oneOf";
-import { JsonEditor as Core, JsonEditor } from "../../lib/jsoneditor";
 import settings from "../../lib/config/settings";
+import { createNode } from "../../lib/schemaNode";
 import { Draft } from "../../lib/draft";
-import { JsonError, JsonSchema, createNode, isJsonError } from "../../lib/types";
+import { expect } from "chai";
+import { JsonEditor as Core } from "../../lib/jsoneditor";
+import { JsonError, JsonSchema, isJsonError } from "../../lib/types";
+import { resolveOneOfFuzzy as _resolveOneOf } from "../../lib/features/oneOf";
 
 const { DECLARATOR_ONEOF } = settings;
 

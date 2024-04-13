@@ -1,11 +1,13 @@
 /**
  * @draft 06, 2019-09
  */
-import { JsonSchema, JsonValidator, JsonError, SchemaNode } from "../types";
+import { JsonSchema, JsonError } from "../types";
 import getTypeOf from "../getTypeOf";
 import { mergeSchema } from "../mergeSchema";
 import { uniqueItems } from "../utils/uniqueItems";
 import { isObject } from "../utils/isObject";
+import { JsonValidator } from "../validation/type";
+import { SchemaNode } from "../schemaNode";
 
 /**
  * @todo add support for dependentRequired (draft 2019-09)

@@ -1,9 +1,10 @@
-import { expect } from "chai";
 import _getSchema, { GetSchemaOptions } from "../../../lib/getSchema";
-import { Draft04 as Core } from "../../../lib/draft04";
-import { JsonSchema, JsonPointer, isJsonError, createNode, SchemaNode } from "../../../lib/types";
-import { resolveOneOfFuzzy } from "../../../lib/features/oneOf";
+import { SchemaNode } from "../../../lib/schemaNode";
 import { Draft } from "../../../lib/draft";
+import { Draft04 as Core } from "../../../lib/draft04";
+import { expect } from "chai";
+import { isJsonError } from "../../../lib/types";
+import { resolveOneOfFuzzy } from "../../../lib/features/oneOf";
 
 function getSchema(draft: Draft, options: GetSchemaOptions) {
     const result = _getSchema(draft, options);

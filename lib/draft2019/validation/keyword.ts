@@ -1,8 +1,10 @@
 import Keywords from "../../draft06/validation/keyword";
-import { JsonValidator, JsonError, JsonSchema, SchemaNode } from "../../types";
+import { JsonError, JsonSchema } from "../../types";
 import { isObject } from "../../utils/isObject";
 import { reduceSchema } from "../../reduceSchema";
 import { validateDependentSchemas, validateDependentRequired } from "../../features/dependencies";
+import { JsonValidator } from "../../validation/type";
+import { SchemaNode } from "../../schemaNode";
 
 
 /**

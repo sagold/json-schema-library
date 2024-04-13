@@ -1,5 +1,5 @@
 import { Draft } from "./draft";
-import { JsonValidator } from "./types";
+import { JsonValidator } from "./validation/type";
 import { CreateError } from "./utils/createCustomError";
 
 /**

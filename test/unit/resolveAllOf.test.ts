@@ -1,9 +1,10 @@
 /* eslint quote-props: 0 max-len: 0 */
-import { expect } from "chai";
-import { resolveAllOf as _resolveAllOf } from "../../lib/features/allOf";
-import { Draft07 } from "../../lib/draft07";
-import { JsonSchema, createNode, isSchemaNode } from "../../lib/types";
 import { Draft } from "../../lib/draft";
+import { Draft07 } from "../../lib/draft07";
+import { expect } from "chai";
+import { JsonSchema } from "../../lib/types";
+import { resolveAllOf as _resolveAllOf } from "../../lib/features/allOf";
+import { createNode, isSchemaNode } from "../../lib/schemaNode";
 
 function resolveAllOf(draft: Draft, data: any, schema: JsonSchema, pointer = "#") {
     const node = createNode(draft, schema, pointer);

@@ -1,8 +1,9 @@
-import { expect } from "chai";
 import _validate from "../../lib/validate";
-import { Draft07 as Core } from "../../lib/draft07";
-import { JsonSchema, createNode } from "../../lib/types";
+import { createNode } from "../../lib/schemaNode";
 import { Draft } from "../../lib/draft";
+import { Draft07 as Core } from "../../lib/draft07";
+import { expect } from "chai";
+import { JsonSchema } from "../../lib/types";
 
 function validate(draft: Draft, value: unknown, schema: JsonSchema = draft.getSchema() as JsonSchema) {
     return _validate(createNode(draft, schema), value);
