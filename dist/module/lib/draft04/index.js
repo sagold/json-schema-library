@@ -1,25 +1,26 @@
 import addRemoteSchema from "./addRemoteSchema";
-import compileSchema from "../compileSchema";
-import { each } from "../each";
-import { eachSchema } from "../eachSchema";
+import compileSchema from "../compile";
+import createSchemaOf from "../createSchemaOf";
 import ERRORS from "../validation/errors";
 import FORMATS from "../validation/format";
+import getChildSchemaSelection from "../getChildSchemaSelection";
 import getSchema from "../getSchema";
 import getTemplate from "../getTemplate";
 import isValid from "../isValid";
 import KEYWORDS from "../validation/keyword";
 import merge from "../utils/merge";
+import resolveRef from "../resolveRef.strict";
+import settings from "../config/settings";
+import step from "../step";
+import TYPES from "../validation/type";
+import validate from "../validate";
+import { createNode } from "../schemaNode";
+import { Draft } from "../draft";
+import { each } from "../each";
+import { eachSchema } from "../eachSchema";
 import { resolveAllOf } from "../features/allOf";
 import { resolveAnyOf } from "../features/anyOf";
 import { resolveOneOf } from "../features/oneOf";
-import resolveRef from "../resolveRef.strict";
-import step from "../step";
-import createSchemaOf from "../createSchemaOf";
-import getChildSchemaSelection from "../getChildSchemaSelection";
-import TYPES from "../validation/type";
-import validate from "../validate";
-import { Draft } from "../draft";
-import settings from "../config/settings";
 const draft04Config = {
     typeKeywords: {
         array: [
@@ -73,6 +74,7 @@ const draft04Config = {
         ],
         null: ["allOf", "anyOf", "enum", "format", "not", "oneOf"]
     },
+    createNode,
     validateKeyword: KEYWORDS,
     validateType: TYPES,
     validateFormat: FORMATS,

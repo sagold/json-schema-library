@@ -1,7 +1,8 @@
 import getTypeOf from "./getTypeOf";
 import { errorOrPromise } from "./utils/filter";
 import flattenArray from "./utils/flattenArray";
-import { isJsonError, isSchemaNode } from "./types";
+import { isJsonError } from "./types";
+import { isSchemaNode } from "./schemaNode";
 import equal from "fast-deep-equal";
 function getJsonSchemaType(value, expectedType) {
     const jsType = getTypeOf(value);
@@ -12,7 +13,6 @@ function getJsonSchemaType(value, expectedType) {
     }
     return jsType;
 }
-// let prev: any;
 /**
  * Validates data with json schema
  *
@@ -27,7 +27,7 @@ export default function validate(node, value) {
         throw new Error("node expected");
     }
     const { draft, pointer } = node;
-    node = draft.resolveRef(node);
+    node = node.resolveRef();
     const schema = node.schema;
     if (schema == null) {
         throw new Error("missing schema");

@@ -1,4 +1,6 @@
-import { JsonError, JsonValidator, SchemaNode } from "../types";
+import { JsonError } from "../types";
+import { JsonValidator } from "../validation/type";
+import { SchemaNode } from "../schemaNode";
 /**
  * Selects and returns a oneOf schema for the given data
  *

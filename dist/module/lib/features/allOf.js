@@ -1,7 +1,3 @@
-/**
- * @draft-04
- */
-import { createNode } from "../types";
 import { mergeSchema } from "../mergeSchema";
 import { omit } from "../utils/omit";
 import { resolveIfSchema } from "./if";
@@ -11,18 +7,18 @@ import { shallowCloneSchemaNode } from "../utils/shallowCloneSchema";
  * when complete this will have much duplication to step.object etc
  */
 export function resolveSchema(node, data) {
-    const schema = shallowCloneSchemaNode(node.schema);
     const ifSchema = resolveIfSchema(node, data);
     if (ifSchema) {
         return ifSchema;
     }
+    const schema = shallowCloneSchemaNode(node.schema);
     return node.next(omit(schema, "if", "then", "else"));
 }
 export function resolveAllOf(node, data) {
-    const { schema, draft } = node;
+    const { schema } = node;
     let mergedSchema = shallowCloneSchemaNode(schema);
     for (let i = 0; i < schema.allOf.length; i += 1) {
-        const allOfNode = draft.resolveRef(node.next(schema.allOf[i]));
+        const allOfNode = node.next(schema.allOf[i]).resolveRef();
         // @todo introduce draft.resolveSchema to iteratively resolve
         const allOfSchema = resolveSchema(allOfNode, data).schema;
         mergedSchema = mergeSchema(mergedSchema, allOfSchema);
@@ -47,7 +43,7 @@ export function mergeAllOfSchema(draft, schema) {
         if (subschema == null) {
             return;
         }
-        const subSchemaNode = draft.resolveRef(createNode(draft, subschema));
+        const subSchemaNode = draft.createNode(subschema).resolveRef();
         resolvedSchema = mergeSchema(resolvedSchema, subSchemaNode.schema);
     });
     return resolvedSchema;

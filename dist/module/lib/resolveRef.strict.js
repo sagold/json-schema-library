@@ -1,4 +1,4 @@
-import { isSchemaNode } from "./types";
+import { isSchemaNode } from "./schemaNode";
 export default function resolveRef(node) {
     if (!isSchemaNode(node)) {
         throw new Error("schema node expected");

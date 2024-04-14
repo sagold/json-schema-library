@@ -2,7 +2,6 @@
  * @draft-04
  */
 import { mergeSchema } from "../mergeSchema";
-import { omit } from "../utils/omit";
 /**
  * returns merged schema of all valid anyOf subschemas for the given input data.
  * Does not merge with rest input schema.
@@ -40,9 +39,7 @@ export function resolveAnyOf(node, data) {
         const { pointer, schema } = node;
         return node.draft.errors.anyOfError({ pointer, schema, value: data, anyOf: JSON.stringify(anyOf) });
     }
-    // node.merge(resolvedNode.schema, "anyOf")
-    const mergedSchema = mergeSchema(node.schema, resolvedNode.schema);
-    return node.next(omit(mergedSchema, "anyOf"));
+    return node.merge(resolvedNode.schema, "anyOf");
 }
 /**
  * validate anyOf definition for given input data

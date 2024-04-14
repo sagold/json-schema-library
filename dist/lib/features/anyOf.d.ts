@@ -1,4 +1,6 @@
-import { JsonValidator, JsonError, SchemaNode } from "../types";
+import { JsonError } from "../types";
+import { JsonValidator } from "../validation/type";
+import { SchemaNode } from "../schemaNode";
 /**
  * returns merged schema of all valid anyOf subschemas for the given input data.
  * Does not merge with rest input schema.

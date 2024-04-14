@@ -1,7 +1,5 @@
-import { isSchemaNode } from "./types";
-import { mergeSchema } from "./mergeSchema";
+import { isSchemaNode } from "./schemaNode";
 import { resolveDynamicSchema } from "./resolveDynamicSchema";
-import { omit } from "./utils/omit";
 const toOmit = ["allOf", "anyOf", "oneOf", "dependencies", "if", "then", "else"];
 /**
  * reduces json schema by merging dynamic constructs like if-then-else,
@@ -14,8 +12,7 @@ const toOmit = ["allOf", "anyOf", "oneOf", "dependencies", "if", "then", "else"]
 export function reduceSchema(node, data) {
     const resolvedSchema = resolveDynamicSchema(node, data);
     if (isSchemaNode(resolvedSchema)) {
-        const result = mergeSchema(node.schema, resolvedSchema.schema);
-        return node.next(omit(result, ...toOmit));
+        return node.merge(resolvedSchema.schema, ...toOmit);
     }
     if (resolvedSchema) {
         return resolvedSchema; // error

@@ -1,7 +1,9 @@
 /**
  * @draft 06, 2019-09
  */
-import { JsonSchema, JsonValidator, SchemaNode } from "../types";
+import { JsonSchema } from "../types";
+import { JsonValidator } from "../validation/type";
+import { SchemaNode } from "../schemaNode";
 /**
  * @todo add support for dependentRequired (draft 2019-09)
  * returns dependencies as an object json schema. does not merge with input

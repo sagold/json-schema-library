@@ -4,7 +4,8 @@ import getTypeOf from "./getTypeOf";
 import merge from "./utils/merge";
 import copy from "./utils/copy";
 import settings from "./config/settings";
-import { isJsonError, createNode, isSchemaNode } from "./types";
+import { isJsonError } from "./types";
+import { isSchemaNode } from "./schemaNode";
 import { isEmpty } from "./utils/isEmpty";
 import { resolveIfSchema } from "./features/if";
 import { mergeAllOfSchema, resolveSchema } from "./features/allOf";
@@ -29,7 +30,7 @@ function resolveRef(draft, schema, pointer) {
     cache[pointer] = cache[pointer] || {};
     cache[pointer][$ref] = cache[pointer][$ref] || 0;
     cache[pointer][$ref] += 1;
-    return draft.resolveRef(createNode(draft, schema, pointer)).schema;
+    return draft.createNode(schema, pointer).resolveRef().schema;
 }
 function convertValue(type, value) {
     if (type === "string") {
@@ -91,7 +92,7 @@ function createTemplateSchema(draft, schema, data, pointer, opts) {
             const allOf = [];
             let extendedData = copy(data);
             for (let i = 0; i < schema.allOf.length; i += 1) {
-                const allNode = createNode(draft, schema.allOf[i], pointer);
+                const allNode = draft.createNode(schema.allOf[i], pointer);
                 allOf.push(resolveSchema(allNode, extendedData).schema);
                 extendedData = getTemplate(draft, extendedData, { type: schema.type, ...allOf[i] }, `${pointer}/allOf/${i}`, opts);
             }
@@ -141,7 +142,7 @@ function getTemplate(draft, data, _schema, pointer, opts) {
         }
         else {
             // find correct schema for data
-            const oneNode = createNode(draft, schema, pointer);
+            const oneNode = draft.createNode(schema, pointer);
             const resolvedNode = resolveOneOfFuzzy(oneNode, data);
             if (isJsonError(resolvedNode)) {
                 if (data != null && opts.removeInvalidData !== true) {
@@ -228,7 +229,7 @@ const TYPE = {
         }
         // @feature dependencies
         // has to be done after resolving properties so dependency may trigger
-        const dNode = createNode(draft, schema, pointer);
+        const dNode = draft.createNode(schema, pointer);
         let dependenciesSchema = resolveDependencies(dNode, d);
         if (dependenciesSchema) {
             dependenciesSchema = mergeSchema(schema, dependenciesSchema);
@@ -257,7 +258,7 @@ const TYPE = {
             }
         }
         // @feature if-then-else
-        const node = createNode(draft, schema, pointer);
+        const node = draft.createNode(schema, pointer);
         const ifSchema = resolveIfSchema(node, d);
         if (isSchemaNode(ifSchema)) {
             const additionalData = getTemplate(draft, d, { type: "object", ...ifSchema.schema }, pointer, opts);
@@ -305,7 +306,7 @@ const TYPE = {
             const itemCount = Math.max(minItems, d.length);
             for (let i = 0; i < itemCount; i += 1) {
                 let value = d[i] == null ? template[i] : d[i];
-                const oneNode = createNode(draft, templateSchema, pointer);
+                const oneNode = draft.createNode(templateSchema, pointer);
                 let one = resolveOneOfFuzzy(oneNode, value);
                 if (one == null || isJsonError(one)) {
                     // schema could not be resolved or data is invalid

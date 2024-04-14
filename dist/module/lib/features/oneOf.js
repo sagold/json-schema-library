@@ -38,9 +38,8 @@ export function resolveOneOf(node, data) {
             });
         }
         for (let i = 0; i < schema.oneOf.length; i += 1) {
-            const oneNode = draft.resolveRef(node.next(schema.oneOf[i]));
-            const one = oneNode.schema;
-            const resultNode = draft.step(oneOfProperty, one, data, pointer);
+            const oneNode = node.next(schema.oneOf[i]).resolveRef();
+            const resultNode = draft.step(oneNode, oneOfProperty, data);
             if (isJsonError(resultNode)) {
                 return resultNode;
             }
@@ -50,7 +49,7 @@ export function resolveOneOf(node, data) {
                 errors.push(...result);
             }
             else {
-                const nextSchema = createOneOfSchemaResult(schema, one, i); // return resolved schema
+                const nextSchema = createOneOfSchemaResult(schema, oneNode.schema, i); // return resolved schema
                 return resultNode.next(nextSchema);
             }
         }

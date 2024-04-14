@@ -1,5 +1,5 @@
 import addRemoteSchema from "../addRemoteSchema";
-import compileSchema from "../compileSchema";
+import compileSchema from "../compile";
 import createSchemaOf from "../createSchemaOf";
 import getChildSchemaSelection from "../getChildSchemaSelection";
 import getSchema, { GetSchemaOptions } from "../getSchema";
@@ -11,7 +11,9 @@ import validate from "../validate";
 import { CreateError } from "../utils/createCustomError";
 import { each, EachCallback } from "../each";
 import { eachSchema, EachSchemaCallback } from "../eachSchema";
-import { JsonSchema, JsonPointer, JsonValidator, JsonTypeValidator, JsonError, SchemaNode } from "../types";
+import { JsonSchema, JsonPointer, JsonError } from "../types";
+import { createNode, SchemaNode } from "../schemaNode";
+import { JsonValidator, JsonTypeValidator } from "../validation/type";
 import { resolveAllOf } from "../features/allOf";
 import { resolveAnyOf } from "../features/anyOf";
 import { resolveOneOf } from "../features/oneOf";
@@ -27,6 +29,7 @@ export type DraftConfig = {
     /** format validators  */
     validateFormat: Record<string, JsonValidator>;
     templateDefaultOptions?: TemplateOptions;
+    createNode: typeof createNode;
     addRemoteSchema: typeof addRemoteSchema;
     compileSchema: typeof compileSchema;
     createSchemaOf: typeof createSchemaOf;
@@ -80,7 +83,7 @@ export declare class Draft {
      */
     each(data: any, callback: EachCallback, schema?: JsonSchema, pointer?: JsonPointer): void;
     eachSchema(callback: EachSchemaCallback, schema?: JsonSchema): void;
-    getChildSchemaSelection(property: string | number, schema?: JsonSchema): JsonSchema[] | JsonError;
+    getChildSchemaSelection(property: string | number, schema?: JsonSchema): JsonError | JsonSchema[];
     /**
      * Returns the json-schema of a data-json-pointer.
      *
@@ -104,6 +107,7 @@ export declare class Draft {
      * @return resolved json-schema object of requested json-pointer location
      */
     getSchema(options?: GetSchemaOptions): JsonSchema | JsonError | undefined;
+    getSchemaNode(options?: GetSchemaOptions): SchemaNode | JsonError | undefined;
     /**
      * Create data object matching the given schema
      *
@@ -113,12 +117,12 @@ export declare class Draft {
      */
     getTemplate(data?: unknown, schema?: JsonSchema, opts?: TemplateOptions): any;
     isValid(data: unknown, schema?: JsonSchema, pointer?: JsonPointer): boolean;
-    resolveAnyOf(data: any, schema: JsonSchema, pointer?: JsonPointer): SchemaNode | JsonError;
-    resolveAllOf(data: any, schema: JsonSchema): SchemaNode | JsonError;
+    createNode(schema: JsonSchema, pointer?: string): SchemaNode;
+    resolveAnyOf(node: SchemaNode, data: unknown): SchemaNode | JsonError;
+    resolveAllOf(node: SchemaNode, data: unknown): SchemaNode | JsonError;
     resolveRef(node: SchemaNode): SchemaNode;
     resolveOneOf(node: SchemaNode, data: unknown): SchemaNode | JsonError;
     setSchema(schema: JsonSchema): void;
-    step(node: SchemaNode, key: string | number, data: any): SchemaNode | JsonError;
     /**
      * Returns the json-schema of the given object property or array item.
      * e.g. it steps by one key into the data
@@ -132,7 +136,7 @@ export declare class Draft {
      * @param  [pointer] - pointer to schema and data (parent of key)
      * @return Schema or Error if failed resolving key
      */
-    step(key: string | number, schema: JsonSchema, data: any, pointer?: JsonPointer): SchemaNode | JsonError;
+    step(node: SchemaNode, key: string | number, data: any): SchemaNode | JsonError;
     /**
      * Validate data by a json schema
      *

@@ -12,7 +12,7 @@ import { isObject } from "../utils/isObject";
  */
 export function resolveDependencies(node, data) {
     var _a;
-    const { schema, draft } = node;
+    const { schema } = node;
     // @draft >= 2019-09 dependentSchemas
     const dependencies = (_a = schema.dependencies) !== null && _a !== void 0 ? _a : schema.dependentSchemas;
     if (!isObject(dependencies) || !isObject(data)) {
@@ -36,8 +36,8 @@ export function resolveDependencies(node, data) {
         // dependency schema
         if (isObject(dependency)) {
             updated = true;
-            const dNode = node.next(dependency);
-            resolvedSchema = mergeSchema(resolvedSchema, draft.resolveRef(dNode).schema);
+            const dNode = node.next(dependency).resolveRef();
+            resolvedSchema = mergeSchema(resolvedSchema, dNode.schema);
             return;
         }
     });

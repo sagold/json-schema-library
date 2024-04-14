@@ -1,4 +1,5 @@
-import { JsonError, SchemaNode } from "./types";
+import { JsonError } from "./types";
+import { SchemaNode } from "./schemaNode";
 import { JsonData } from "@sagold/json-pointer";
 export declare function isDynamicSchema(schema: JsonData): boolean;
 /**
@@ -17,6 +18,4 @@ export declare function isDynamicSchema(schema: JsonData): boolean;
  * @returns static schema from resolved dynamic schema definitions for this
  *  specific input data
  */
-export declare function resolveDynamicSchema(schemaNode: SchemaNode, data: unknown): SchemaNode | JsonError<import("./types").ErrorData<{
-    [p: string]: unknown;
-}>>;
+export declare function resolveDynamicSchema(schemaNode: SchemaNode, data: unknown): SchemaNode | JsonError;

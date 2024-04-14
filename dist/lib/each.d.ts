@@ -1,4 +1,5 @@
-import { JsonSchema, JsonPointer, SchemaNode } from "./types";
+import { JsonSchema, JsonPointer } from "./types";
+import { SchemaNode } from "./schemaNode";
 export type EachCallback = (schema: JsonSchema, data: unknown, pointer: JsonPointer) => void;
 /**
  * Iterates over data, retrieving its schema

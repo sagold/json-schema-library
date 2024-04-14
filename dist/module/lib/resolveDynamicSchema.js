@@ -1,4 +1,5 @@
-import { isJsonError, isSchemaNode } from "./types";
+import { isJsonError } from "./types";
+import { isSchemaNode } from "./schemaNode";
 import { mergeSchema } from "./mergeSchema";
 import { resolveIfSchema } from "./features/if";
 import { resolveDependencies } from "./features/dependencies";

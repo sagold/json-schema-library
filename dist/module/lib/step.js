@@ -150,16 +150,11 @@ export default function step(node, key, data) {
     }
     const stepFunction = stepType[schemaType];
     if (stepFunction) {
-        const schemaResult = stepFunction(node, `${key}`, data);
-        if (schemaResult === undefined) {
-            return draft.errors.schemaWarning({
-                pointer,
-                value: data,
-                schema,
-                key
-            });
+        const childNode = stepFunction(node, `${key}`, data);
+        if (childNode === undefined) {
+            return draft.errors.schemaWarning({ pointer, value: data, schema, key });
         }
-        return schemaResult;
+        return childNode;
     }
     return new Error(`Unsupported schema type ${schema.type} for key ${key}`);
 }

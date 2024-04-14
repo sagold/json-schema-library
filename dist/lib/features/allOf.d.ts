@@ -1,8 +1,10 @@
 /**
  * @draft-04
  */
-import { JsonSchema, JsonValidator, JsonError, SchemaNode } from "../types";
+import { SchemaNode } from "../schemaNode";
+import { JsonSchema, JsonError } from "../types";
 import { Draft } from "../draft";
+import { JsonValidator } from "../validation/type";
 /**
  * resolves schema
  * when complete this will have much duplication to step.object etc

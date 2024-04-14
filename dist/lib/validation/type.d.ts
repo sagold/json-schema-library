@@ -1,4 +1,11 @@
-import { JsonTypeValidator } from "../types";
+import { SchemaNode } from "../schemaNode";
+import { JsonError } from "../types";
+export interface JsonTypeValidator {
+    (node: SchemaNode, value: unknown): Array<void | undefined | JsonError | JsonError[] | JsonError[][]>;
+}
+export interface JsonValidator {
+    (node: SchemaNode, value: unknown): void | undefined | JsonError | JsonError[] | JsonError[][];
+}
 /**
  * @todo: type is also a keyword, as is properties, items, etc
  *

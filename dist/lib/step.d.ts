@@ -1,4 +1,5 @@
-import { JsonError, SchemaNode } from "./types";
+import { JsonError } from "./types";
+import { SchemaNode } from "./schemaNode";
 /**
  * Returns the json-schema of the given object property or array item.
  * e.g. it steps by one key into the data

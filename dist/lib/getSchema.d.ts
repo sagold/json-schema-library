@@ -1,4 +1,5 @@
-import { JsonSchema, JsonPointer, JsonError, SchemaNode } from "./types";
+import { JsonSchema, JsonPointer } from "./types";
+import { SchemaNode } from "./schemaNode";
 import { Draft } from "./draft";
 export type GetSchemaOptions = {
     pointer?: JsonPointer;
@@ -28,4 +29,4 @@ export type GetSchemaOptions = {
  * @param [options.withSchemaWarning] - if true returns an error instead of `undefined` for valid properties missing a schema definition
  * @return resolved json-schema object of requested json-pointer location or json-error
  */
-export default function getSchema(draft: Draft, options?: GetSchemaOptions): SchemaNode | JsonError;
+export default function getSchema(draft: Draft, options?: GetSchemaOptions): SchemaNode | import("./types").JsonError;

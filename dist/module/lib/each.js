@@ -1,5 +1,5 @@
 import getTypeOf from "./getTypeOf";
-import { isSchemaNode } from "./types";
+import { isSchemaNode } from "./schemaNode";
 /**
  * Iterates over data, retrieving its schema
  *
@@ -10,7 +10,7 @@ import { isSchemaNode } from "./types";
  * @param [pointer] - pointer to current data. Default to rootPointer
  */
 export function each(schemaNode, data, callback) {
-    const node = schemaNode.draft.resolveRef(schemaNode);
+    const node = schemaNode.resolveRef();
     const { draft, schema, pointer } = node;
     callback(schema, data, pointer);
     const dataType = getTypeOf(data);

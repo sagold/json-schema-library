@@ -2,8 +2,8 @@ import { createError, createCustomError } from "./lib/utils/createCustomError";
 import getTypeOf from "./lib/getTypeOf";
 import { resolveOneOf, resolveOneOfFuzzy } from "./lib/features/oneOf";
 import { resolveAllOf } from "./lib/features/allOf";
-import resolveRef from "./lib/resolveRef.strict";
-import resolveRefMerge from "./lib/resolveRef.merge";
+import resolveRefStrict from "./lib/resolveRef.strict";
+import resolveRef from "./lib/resolveRef";
 import settings from "./lib/config/settings";
 import validateAsync from "./lib/validateAsync";
 import { reduceSchema } from "./lib/reduceSchema";
@@ -17,10 +17,12 @@ import { Draft07, draft07Config } from "./lib/draft07";
 import { Draft2019, draft2019Config } from "./lib/draft2019";
 import { JsonEditor, draftJsonEditorConfig } from "./lib/jsoneditor";
 import { isJsonError } from "./lib/types";
+import { SchemaNode, isSchemaNode, createNode } from "./lib/schemaNode";
 declare const config: {
     strings: Record<string, string>;
 };
-export { config, createCustomError, createError, Draft, Draft04, // core implementing draft04 specs
+export { config, createCustomError, createError, createNode, // v10
+Draft, Draft04, // core implementing draft04 specs
 draft04Config, // config implementing draft04 specs
 Draft06, // core implementing draft06 specs
 draft06Config, // config implementing draft06 specs
@@ -30,17 +32,19 @@ Draft2019, // core implementing draft2019-09 specs
 draft2019Config, // config implementing draft2019-09 specs
 draftJsonEditorConfig, // adjusted config of draft04 to better support the json-editor
 getTypeOf, // returns the javascript datatype
-isDynamicSchema, // NEW
-isJsonError, JsonEditor, // adjusted core of draft07 to better support the json-editor
-mergeSchema, // NEW
-reduceSchema, // NEW
-render, resolveAllOf, resolveDynamicSchema, // NEW
-resolveOneOf, resolveOneOfFuzzy, resolveRef, resolveRefMerge, settings, validateAsync };
+isDynamicSchema, // v8
+isJsonError, isSchemaNode, // v10
+JsonEditor, // adjusted core of draft07 to better support the json-editor
+mergeSchema, // v8
+reduceSchema, // v8
+render, resolveAllOf, resolveDynamicSchema, // v8
+resolveOneOf, resolveOneOfFuzzy, resolveRefStrict, resolveRef, settings, validateAsync };
 import { DraftConfig } from "./lib/draft";
 import { EachCallback } from "./lib/each";
 import { EachSchemaCallback } from "./lib/eachSchema";
 import { CreateError } from "./lib/utils/createCustomError";
 import { GetSchemaOptions } from "./lib/getSchema";
-import { JsonSchema, JsonPointer, JsonError, JsonValidator, JsonTypeValidator, ErrorData } from "./lib/types";
+import { JsonSchema, JsonPointer, JsonError, ErrorData } from "./lib/types";
+import { JsonValidator, JsonTypeValidator } from "./lib/validation/type";
 import { JSType } from "./lib/getTypeOf";
-export type { CreateError, DraftConfig, EachCallback, EachSchemaCallback, ErrorData, GetSchemaOptions, JsonError, JsonPointer, JsonSchema, JsonTypeValidator, JsonValidator, JSType };
+export type { CreateError, DraftConfig, EachCallback, EachSchemaCallback, ErrorData, GetSchemaOptions, JsonError, JsonPointer, JsonSchema, JsonTypeValidator, JsonValidator, JSType, SchemaNode };

@@ -1,5 +1,5 @@
 import copy from "../utils/copy";
-import { createNode, isSchemaNode } from "../types";
+import { isSchemaNode } from "../schemaNode";
 export class Draft {
     constructor(config, schema) {
         /** cache for remote schemas */
@@ -55,7 +55,7 @@ export class Draft {
      * @param [pointer] - pointer to current data. Default to rootPointer
      */
     each(data, callback, schema, pointer) {
-        const node = createNode(this, schema !== null && schema !== void 0 ? schema : this.rootSchema, pointer);
+        const node = this.createNode(schema !== null && schema !== void 0 ? schema : this.rootSchema, pointer);
         return this.config.each(node, data, callback);
     }
     eachSchema(callback, schema = this.rootSchema) {
@@ -87,7 +87,14 @@ export class Draft {
      * @return resolved json-schema object of requested json-pointer location
      */
     getSchema(options) {
-        return this.config.getSchema(this, options).schema;
+        const result = this.getSchemaNode(options);
+        if (isSchemaNode(result)) {
+            return result.schema;
+        }
+        return result;
+    }
+    getSchemaNode(options) {
+        return this.config.getSchema(this, options);
     }
     /**
      * Create data object matching the given schema
@@ -102,12 +109,13 @@ export class Draft {
     isValid(data, schema, pointer) {
         return this.config.isValid(this, data, schema, pointer);
     }
-    resolveAnyOf(data, schema, pointer) {
-        const node = createNode(this, schema, pointer);
+    createNode(schema, pointer = "#") {
+        return this.config.createNode(this, schema, pointer);
+    }
+    resolveAnyOf(node, data) {
         return this.config.resolveAnyOf(node, data);
     }
-    resolveAllOf(data, schema) {
-        const node = createNode(this, schema, data);
+    resolveAllOf(node, data) {
         return this.config.resolveAllOf(node, data);
     }
     resolveRef(node) {
@@ -119,11 +127,20 @@ export class Draft {
     setSchema(schema) {
         this.rootSchema = schema;
     }
-    step(key, schema, data, pointer) {
-        if (isSchemaNode(key)) {
-            return this.config.step(key, schema, data);
-        }
-        const node = createNode(this, schema !== null && schema !== void 0 ? schema : this.rootSchema, pointer);
+    /**
+     * Returns the json-schema of the given object property or array item.
+     * e.g. it steps by one key into the data
+     *
+     *  This helper determines the location of the property within the schema (additional properties, oneOf, ...) and
+     *  returns the correct schema.
+     *
+     * @param  key       - property-name or array-index
+     * @param  schema    - json schema of current data
+     * @param  data      - parent of key
+     * @param  [pointer] - pointer to schema and data (parent of key)
+     * @return Schema or Error if failed resolving key
+     */
+    step(node, key, data) {
         return this.config.step(node, key, data);
     }
     validate(data, schema = this.rootSchema, pointer) {
@@ -132,7 +149,7 @@ export class Draft {
             const inuptNode = data;
             return this.config.validate(inuptNode, inputData);
         }
-        const node = createNode(this, schema, pointer);
+        const node = this.createNode(schema, pointer);
         return this.config.validate(node, data);
     }
 }

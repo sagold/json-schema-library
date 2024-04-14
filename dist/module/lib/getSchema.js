@@ -1,5 +1,5 @@
 import gp from "@sagold/json-pointer";
-import { isJsonError, createNode } from "./types";
+import { isJsonError } from "./types";
 const emptyObject = {};
 /**
  * Returns the json-schema of a data-json-pointer.
@@ -26,7 +26,7 @@ const emptyObject = {};
 export default function getSchema(draft, options = emptyObject) {
     const { pointer = "#", data, schema = draft.rootSchema, withSchemaWarning = false } = options;
     const path = gp.split(pointer);
-    const node = draft.resolveRef(createNode(draft, schema));
+    const node = draft.createNode(schema).resolveRef();
     const result = _getSchema(node, path, data);
     if (!withSchemaWarning && isJsonError(result) && result.code === "schema-warning") {
         return undefined;
@@ -35,10 +35,10 @@ export default function getSchema(draft, options = emptyObject) {
 }
 function _getSchema(node, path, data = emptyObject) {
     if (path.length === 0) {
-        return node.draft.resolveRef(node);
+        return node.resolveRef();
     }
     const key = path.shift(); // step key
-    const nextNode = node.draft.step(key, node.schema, data, node.pointer); // step schema
+    const nextNode = node.draft.step(node, key, data); // step schema
     if (isJsonError(nextNode)) {
         return nextNode;
     }

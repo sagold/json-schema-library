@@ -1,4 +1,5 @@
-import { JsonError, SchemaNode } from "./types";
+import { JsonError } from "./types";
+import { SchemaNode } from "./schemaNode";
 /**
  * Validates data with json schema
  *
