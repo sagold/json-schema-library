@@ -8,5 +8,6 @@
  * @return if schema does match given value
  */
 export default function isValid(draft, value, schema = draft.rootSchema, pointer = "#") {
-    return draft.validate(value, schema, pointer).length === 0;
+    const node = draft.createNode(schema, pointer);
+    return draft.validate(node, value).length === 0;
 }

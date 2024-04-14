@@ -28,7 +28,7 @@ function createErrorNotification(onError) {
  */
 export default function validateAsync(draft, value, options) {
     const { schema, pointer, onError } = { schema: draft.rootSchema, pointer: "#", ...options };
-    let errors = draft.validate(value, schema, pointer);
+    let errors = draft.validate(draft.createNode(schema, pointer), value);
     if (onError) {
         errors = flattenArray(errors);
         const notifyError = createErrorNotification(onError);

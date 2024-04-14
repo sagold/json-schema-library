@@ -31,7 +31,7 @@ function isPropertyEvaluated(schemaNode, propertyName, value) {
     // ADDITIONAL-PROPERTIES
     if (isObject(schema.additionalProperties)) {
         const nextSchema = schema.additionalProperties;
-        return node.draft.validate(value, nextSchema);
+        return node.draft.validate(node.next(nextSchema), value);
     }
     return false;
 }
@@ -168,8 +168,6 @@ const KeywordValidation = {
                     });
                 }
             });
-            // const errors = draft.validate(value, { ...schema, unevaluatedItems: undefined }, pointer);
-            // return errors.map(e => draft.errors.unevaluatedItemsError({ ...e.data }));
         }
         const errors = [];
         value.forEach((item, index) => {

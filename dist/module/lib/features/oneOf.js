@@ -43,7 +43,7 @@ export function resolveOneOf(node, data) {
             if (isJsonError(resultNode)) {
                 return resultNode;
             }
-            let result = flattenArray(draft.validate(oneOfValue, resultNode.schema, pointer));
+            let result = flattenArray(draft.validate(resultNode, oneOfValue));
             result = result.filter(errorOrPromise);
             if (result.length > 0) {
                 errors.push(...result);

@@ -1,4 +1,5 @@
 import copy from "../utils/copy";
+import { isJsonError } from "../types";
 import { isSchemaNode } from "../schemaNode";
 export class Draft {
     constructor(config, schema) {
@@ -131,14 +132,13 @@ export class Draft {
      * Returns the json-schema of the given object property or array item.
      * e.g. it steps by one key into the data
      *
-     *  This helper determines the location of the property within the schema (additional properties, oneOf, ...) and
-     *  returns the correct schema.
+     * This helper determines the location of the property within the schema (additional properties, oneOf, ...) and
+     * returns the correct schema.
      *
+     * @param  node
      * @param  key       - property-name or array-index
-     * @param  schema    - json schema of current data
      * @param  data      - parent of key
-     * @param  [pointer] - pointer to schema and data (parent of key)
-     * @return Schema or Error if failed resolving key
+     * @return schema-node containing child schema or error if failed resolving key
      */
     step(node, key, data) {
         return this.config.step(node, key, data);
@@ -148,6 +148,9 @@ export class Draft {
             const inputData = schema;
             const inuptNode = data;
             return this.config.validate(inuptNode, inputData);
+        }
+        if (isJsonError(data)) {
+            return [data];
         }
         const node = this.createNode(schema, pointer);
         return this.config.validate(node, data);
