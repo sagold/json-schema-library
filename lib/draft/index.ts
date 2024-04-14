@@ -12,7 +12,7 @@ import validate from "../validate";
 import { CreateError } from "../utils/createCustomError";
 import { each, EachCallback } from "../each";
 import { eachSchema, EachSchemaCallback } from "../eachSchema";
-import { JsonSchema, JsonPointer, JsonError } from "../types";
+import { JsonSchema, JsonPointer, JsonError, isJsonError } from "../types";
 import { createNode, SchemaNode, isSchemaNode } from "../schemaNode";
 import { JsonValidator, JsonTypeValidator } from "../validation/type";
 import { resolveAllOf } from "../features/allOf";
@@ -235,7 +235,9 @@ export class Draft {
             const inuptNode = data;
             return this.config.validate(inuptNode, inputData);
         }
-
+        if (isJsonError(data)) {
+            return [data];
+        }
         const node = this.createNode(schema, pointer);
         return this.config.validate(node, data);
     }
