@@ -207,7 +207,7 @@ const myData = jsonSchema.getTemplate({ name: "input-data" });
 
 ```ts
 import { settings } from "json-schema-library";
-settings..GET_TEMPLATE_RECURSION_LIMIT = 5;
+settings.GET_TEMPLATE_RECURSION_LIMIT = 5;
 ```
 
 <details><summary>Example</summary>
@@ -1000,7 +1000,14 @@ const error: JsonError = createError("EnumError", { data: { pointer: "#/location
 
 ### v10.0.0
 
-- with version `v10.0.0` draft 2019-09 is supported and can be used with `import { Draft2019 } from "json-schema-library";`
+With version `v10.0.0` _draft 2019-09_ is supported and can be used with `import { Draft2019 } from "json-schema-library";` Note that older drafts are now resolving all official test cases, especially remaining ref-resolution issues.
+
+**breaking changes**:
+
+_Draft 2019-09_ requires collection of previous resolved sub-schemas. Thus, an additional type `SchemaNode` had to be introduced, which is used in almost all draft methods defined for draft-configs. The api in draft-instances mostly stayed the same with the following exceptions:
+
+- `step` and resolvers work on and return a `schemaNode`, containing the requested schema
+
 
 ### v9.0.0
 
@@ -1012,6 +1019,7 @@ const error: JsonError = createError("EnumError", { data: { pointer: "#/location
 **updates**
 
 -   _getSchema_ consistently returns errors and can return errors for empty schema using `withSchemaWarning` option
+
 
 ### v8.0.0
 
@@ -1032,6 +1040,7 @@ With version `v8.0.0`, _getTemplate_ was improved to better support optional pro
 
 </details>
 
+
 ### v7.0.0
 
 With version `v7.0.0`, library export and Draft API has changed heavily. The API is now more consistent across draft-versions and offers a simple and consistent configuration interface for existing and custom drafts. In addition, most standalone functions are no longer exposed separately, but under its current _draftConfigs_ and mainly on each draft-instance. This will help to reduce confusion when consuming this API.
@@ -1051,13 +1060,16 @@ The above documentation reflects all these changes. Just reach out if you have t
 
 </details>
 
+
 ### v6.0.0
 
 With version `v6.0.0` supported json schema drafts are exported directly as `Draft04`, `Draft06`, `Draft07`. Example use: `import { Draft07 } from "json-schema-library"`.
 
+
 ### v5.0.0
 
 With version `v5.0.0` the API has changed to es6 modules, where there is no `default` export, only named exports. Additionally all code has been rewritten in TypeScript. When directly accessing files, switch to `dist/module/*.js`-files for plain js-modules.
+
 
 ### v4.0.0
 
