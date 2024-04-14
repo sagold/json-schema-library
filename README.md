@@ -546,11 +546,13 @@ expect(schemas).to.deep.equal([{ type: "string" }, { type: "number" }]);
 
 `step` retrieves the json-schema of a child property or index. Using `step` it is possible to incrementally go through the data, retrieving the schema for each next item.
 
+@todo talk about `schemaNode`
+
 ```ts
-const jsonSchema = new Draft2019(mySchema);
+const draft = new Draft2019(mySchema);
 const localSchema = { type: "object", properties: { title: { type: "string" } } };
 const localData = { title: "value" };
-const schemaOfTitle = jsonSchema.step("title", localSchema, localData);
+const { schema } = draft.step(draft.createNode(localSchema), "title", localData);
 ```
 
 <details><summary>Example</summary>
@@ -558,7 +560,7 @@ const schemaOfTitle = jsonSchema.step("title", localSchema, localData);
 ```ts
 import { Draft2019, JsonSchema } from "json-schema-library";
 
-const jsonSchema = new Draft2019(mySchema);
+const draft = new Draft2019(mySchema);
 const localSchema: JsonSchema = {
     oneOf: [
         {
@@ -572,9 +574,9 @@ const localSchema: JsonSchema = {
     ]
 };
 const localData = { title: 4 };
-const schemaOfTitle = jsonSchema.step("title", localSchema, localData);
+const { schema } = draft.step(draft.createNode(localSchema), "title", localData);
 
-expect(res).to.deep.eq({ type: "number" });
+expect(schema).to.deep.eq({ type: "number" });
 ```
 
 </details>
