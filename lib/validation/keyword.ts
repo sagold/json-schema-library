@@ -147,7 +147,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         for (let i = 0; i < value.length; i += 1) {
             const itemData = value[i];
             // @todo reevaluate: incomplete schema is created here
-            const itemNode = draft.step(i, schema, value, pointer);
+            const itemNode = draft.step(node.next(schema), i, value);
             if (isJsonError(itemNode)) {
                 return [itemNode];
             }
@@ -459,10 +459,8 @@ const KeywordValidation: Record<string, JsonValidator> = {
             if (value[key] === undefined) {
                 errors.push(draft.errors.requiredPropertyError({ key, pointer, schema, value }));
             } else {
-
-                const itemNode = draft.step(key, schema, value, pointer);
+                const itemNode = draft.step(node, key, value);
                 const keyErrors = draft.validate(itemNode, value[key]);
-
                 errors.push(...keyErrors);
             }
         }

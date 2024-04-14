@@ -45,9 +45,8 @@ export function resolveOneOf(node: SchemaNode, data: any): SchemaNode | JsonErro
         }
 
         for (let i = 0; i < schema.oneOf.length; i += 1) {
-            const oneNode = draft.resolveRef(node.next(schema.oneOf[i] as JsonSchema));
-            const one = oneNode.schema;
-            const resultNode = draft.step(oneOfProperty, one, data, pointer);
+            const oneNode = node.next(schema.oneOf[i] as JsonSchema).resolveRef();
+            const resultNode = draft.step(oneNode, oneOfProperty, data);
 
             if (isJsonError(resultNode)) {
                 return resultNode;
@@ -59,7 +58,7 @@ export function resolveOneOf(node: SchemaNode, data: any): SchemaNode | JsonErro
             if (result.length > 0) {
                 errors.push(...result);
             } else {
-                const nextSchema = createOneOfSchemaResult(schema, one, i); // return resolved schema
+                const nextSchema = createOneOfSchemaResult(schema, oneNode.schema, i); // return resolved schema
                 return resultNode.next(nextSchema);
             }
         }

@@ -22,8 +22,7 @@ export default function getChildSchemaSelection(
     if (schema.items?.oneOf) {
         return schema.items.oneOf.map((item: JsonSchema) => draft.createNode(item).resolveRef().schema);
     }
-
-    const node = draft.step(property, schema, {}, "#");
+    const node = draft.step(draft.createNode(schema), property, {});
     if (isJsonError(node)) {
         return node;
     }

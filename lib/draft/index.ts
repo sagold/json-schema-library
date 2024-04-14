@@ -203,7 +203,6 @@ export class Draft {
         this.rootSchema = schema;
     }
 
-    step(node: SchemaNode, key: string | number, data: any): SchemaNode | JsonError;
     /**
      * Returns the json-schema of the given object property or array item.
      * e.g. it steps by one key into the data
@@ -217,12 +216,7 @@ export class Draft {
      * @param  [pointer] - pointer to schema and data (parent of key)
      * @return Schema or Error if failed resolving key
      */
-    step(key: string | number, schema: JsonSchema, data: any, pointer?: JsonPointer): SchemaNode | JsonError;
-    step(key: string | number | SchemaNode, schema: any, data: any, pointer?: JsonPointer): SchemaNode | JsonError {
-        if (isSchemaNode(key)) {
-            return this.config.step(key, schema, data);
-        }
-        const node = this.createNode(schema ?? this.rootSchema, pointer);
+    step(node: SchemaNode, key: string | number, data: any): SchemaNode | JsonError {
         return this.config.step(node, key, data);
     }
 
