@@ -52,7 +52,7 @@ export function resolveOneOf(node: SchemaNode, data: any): SchemaNode | JsonErro
                 return resultNode;
             }
 
-            let result = flattenArray(draft.validate(oneOfValue, resultNode.schema, pointer));
+            let result = flattenArray(draft.validate(resultNode, oneOfValue));
             result = result.filter(errorOrPromise);
 
             if (result.length > 0) {

@@ -46,7 +46,7 @@ export default function validateAsync(
 ): Promise<Array<JsonError>> {
     const { schema, pointer, onError } = { schema: draft.rootSchema, pointer: "#", ...options };
 
-    let errors: Array<JsonError> = draft.validate(value, schema, pointer);
+    let errors: Array<JsonError> = draft.validate(draft.createNode(schema, pointer), value);
     if (onError) {
         errors = flattenArray(errors);
         const notifyError = createErrorNotification(onError);

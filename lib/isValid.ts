@@ -16,5 +16,6 @@ export default function isValid(
     schema: JsonSchema = draft.rootSchema,
     pointer: JsonPointer = "#"
 ): boolean {
-    return draft.validate(value, schema, pointer).length === 0;
+    const node = draft.createNode(schema, pointer);
+    return draft.validate(node, value).length === 0;
 }
