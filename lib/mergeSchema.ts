@@ -19,14 +19,7 @@ export function mergeSchema<T extends JsonSchema>(a: T, b: T, ...omit: string[])
     for (let i = 0; i < omit.length; i += 1) {
         delete schema[omit[i]];
     }
-    if (!isObject(schema)) {
-        return schema;
-    }
 
-    const originalOrigin = b.getOneOfOrigin ?? a.getOneOfOrigin;
-    if (originalOrigin) {
-        Object.defineProperty(schema, "getOneOfOrigin", { enumerable: false, value: originalOrigin });
-    }
     return schema;
 }
 

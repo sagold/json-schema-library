@@ -1,7 +1,6 @@
 import getTypeOf from "./getTypeOf";
 import { isObject } from "./utils/isObject";
 export function mergeSchema(a, b, ...omit) {
-    var _a;
     if ((b === null || b === void 0 ? void 0 : b.type) === "error") {
         return b;
     }
@@ -16,13 +15,6 @@ export function mergeSchema(a, b, ...omit) {
     const schema = mergeSchema2(a, b);
     for (let i = 0; i < omit.length; i += 1) {
         delete schema[omit[i]];
-    }
-    if (!isObject(schema)) {
-        return schema;
-    }
-    const originalOrigin = (_a = b.getOneOfOrigin) !== null && _a !== void 0 ? _a : a.getOneOfOrigin;
-    if (originalOrigin) {
-        Object.defineProperty(schema, "getOneOfOrigin", { enumerable: false, value: originalOrigin });
     }
     return schema;
 }

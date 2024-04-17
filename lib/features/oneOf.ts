@@ -3,7 +3,6 @@
  */
 import flattenArray from "../utils/flattenArray";
 import settings from "../config/settings";
-import { createOneOfSchemaResult } from "../schema/createOneOfSchemaResult";
 import { errorOrPromise } from "../utils/filter";
 import { JsonSchema, JsonError, isJsonError } from "../types";
 import { isObject } from "../utils/isObject";
@@ -58,8 +57,7 @@ export function resolveOneOf(node: SchemaNode, data: any): SchemaNode | JsonErro
             if (result.length > 0) {
                 errors.push(...result);
             } else {
-                const nextSchema = createOneOfSchemaResult(schema, oneNode.schema, i); // return resolved schema
-                return resultNode.next(nextSchema);
+                return resultNode.next(oneNode.schema);
             }
         }
 
@@ -87,8 +85,7 @@ export function resolveOneOf(node: SchemaNode, data: any): SchemaNode | JsonErro
     }
 
     if (matches.length === 1) {
-        const nextSchema = createOneOfSchemaResult(schema, matches[0].schema, matches[0].index); // return resolved schema
-        return node.next(nextSchema);
+        return node.next(matches[0].schema);
     }
     if (matches.length > 1) {
         return draft.errors.multipleOneOfError({
@@ -185,8 +182,7 @@ export function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | Jso
             if (result.length > 0) {
                 errors.push(...result);
             } else {
-                const nextSchema = createOneOfSchemaResult(schema, oneNode.schema, i);
-                return resultNode.next(nextSchema);
+                return resultNode.next(oneNode.schema);
             }
         }
 
@@ -210,8 +206,7 @@ export function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | Jso
     }
 
     if (matches.length === 1) {
-        const nextSchema = createOneOfSchemaResult(schema, matches[0].schema, matches[0].index);
-        return node.next(nextSchema);
+        return node.next(matches[0].schema);
     }
 
     // fuzzy match oneOf
@@ -240,8 +235,7 @@ export function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | Jso
             });
         }
 
-        const nextSchema = createOneOfSchemaResult(schema, schemaOfItem, schemaOfIndex);
-        return node.next(nextSchema);
+        return node.next(schemaOfItem);
     }
 
     if (matches.length > 1) {

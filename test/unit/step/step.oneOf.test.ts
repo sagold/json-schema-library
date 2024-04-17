@@ -41,28 +41,6 @@ describe("step.oneof", () => {
         expect(res).to.deep.eq({ type: "number", title: "Zahl" });
     });
 
-    it("should return index of matching schema", () => {
-        const res = step(
-            draft,
-            "title",
-            {
-                type: "object",
-                properties: {
-                    title: {
-                        oneOf: [
-                            { type: "string", title: "Zeichenkette" },
-                            { type: "number", title: "Zahl" }
-                        ]
-                    }
-                }
-            },
-            { title: 111 }
-        );
-
-        expect(typeof res.getOneOfOrigin).to.eq("function");
-        expect(res.getOneOfOrigin().index).to.eq(1);
-    });
-
     // PR #35 https://github.com/sagold/json-schema-library/pull/35/commits/8b6477113bdfce522081473bb0dd8fd6fe680391
     it("should maintain references from a remote schema when resolving oneOf with $ref", () => {
         draft.addRemoteSchema("https://my-other-schema.com/schema.json", {

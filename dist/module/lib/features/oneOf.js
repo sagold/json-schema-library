@@ -3,7 +3,6 @@
  */
 import flattenArray from "../utils/flattenArray";
 import settings from "../config/settings";
-import { createOneOfSchemaResult } from "../schema/createOneOfSchemaResult";
 import { errorOrPromise } from "../utils/filter";
 import { isJsonError } from "../types";
 import { isObject } from "../utils/isObject";
@@ -49,8 +48,7 @@ export function resolveOneOf(node, data) {
                 errors.push(...result);
             }
             else {
-                const nextSchema = createOneOfSchemaResult(schema, oneNode.schema, i); // return resolved schema
-                return resultNode.next(nextSchema);
+                return resultNode.next(oneNode.schema);
             }
         }
         return draft.errors.oneOfPropertyError({
@@ -75,8 +73,7 @@ export function resolveOneOf(node, data) {
         }
     }
     if (matches.length === 1) {
-        const nextSchema = createOneOfSchemaResult(schema, matches[0].schema, matches[0].index); // return resolved schema
-        return node.next(nextSchema);
+        return node.next(matches[0].schema);
     }
     if (matches.length > 1) {
         return draft.errors.multipleOneOfError({
@@ -165,8 +162,7 @@ export function resolveOneOfFuzzy(node, data) {
                 errors.push(...result);
             }
             else {
-                const nextSchema = createOneOfSchemaResult(schema, oneNode.schema, i);
-                return resultNode.next(nextSchema);
+                return resultNode.next(oneNode.schema);
             }
         }
         return draft.errors.oneOfPropertyError({
@@ -187,8 +183,7 @@ export function resolveOneOfFuzzy(node, data) {
         }
     }
     if (matches.length === 1) {
-        const nextSchema = createOneOfSchemaResult(schema, matches[0].schema, matches[0].index);
-        return node.next(nextSchema);
+        return node.next(matches[0].schema);
     }
     // fuzzy match oneOf
     if (isObject(data)) {
@@ -212,8 +207,7 @@ export function resolveOneOfFuzzy(node, data) {
                 oneOf: schema.oneOf
             });
         }
-        const nextSchema = createOneOfSchemaResult(schema, schemaOfItem, schemaOfIndex);
-        return node.next(nextSchema);
+        return node.next(schemaOfItem);
     }
     if (matches.length > 1) {
         return draft.errors.multipleOneOfError({ matches, pointer, schema, value: data });
