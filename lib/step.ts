@@ -108,7 +108,17 @@ const stepType: Record<string, StepFunction> = {
             if (targetSchema && Array.isArray(targetSchema.oneOf)) {
                 // @special case: this is a mix of a schema and optional definitions
                 // we resolve the schema here and add the original schema to `oneOfSchema`
-                return draft.resolveOneOf(data[key], targetSchema, `${pointer}/${key}`);
+                const resolvedSchema = draft.resolveOneOf(
+                    data[key],
+                    targetSchema,
+                    `${pointer}/${key}`
+                );
+                for (const p in targetSchema) {
+                    if (p !== "oneOf" && resolvedSchema[p] === undefined) {
+                        resolvedSchema[p] = targetSchema[p];
+                    }
+                }
+                return resolvedSchema;
             }
 
             // resolved schema or error
