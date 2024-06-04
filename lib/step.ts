@@ -3,8 +3,13 @@ import createSchemaOf from "./createSchemaOf";
 import { JsonSchema, JsonError, isJsonError } from "./types";
 import { SchemaNode } from "./schemaNode";
 import { reduceSchema } from "./reduceSchema";
+import { mergeSchema } from "./mergeSchema";
 
-type StepFunction = (node: SchemaNode, key: string, data: any) => SchemaNode | JsonError | undefined;
+type StepFunction = (
+    node: SchemaNode,
+    key: string,
+    data: any
+) => SchemaNode | JsonError | undefined;
 
 const stepType: Record<string, StepFunction> = {
     array: (node, key, data) => {
@@ -101,7 +106,12 @@ const stepType: Record<string, StepFunction> = {
             if (nextPropertyNode && Array.isArray(nextPropertyNode.schema.oneOf)) {
                 // @special case: this is a mix of a schema and optional definitions
                 // we resolve the schema here and add the original schema to `oneOfSchema`
-                return draft.resolveOneOf(node.next(nextPropertyNode.schema, key), data[key]);
+                const nextNode = node.next(nextPropertyNode.schema, key);
+                const result = draft.resolveOneOf(nextNode, data[key]);
+                if (isJsonError(result)) {
+                    return result;
+                }
+                return nextNode.merge(result.schema, "oneOf");
             }
             if (nextPropertyNode) {
                 return nextPropertyNode;
@@ -155,7 +165,11 @@ const stepType: Record<string, StepFunction> = {
  * @param  [pointer] - pointer to schema and data (parent of key)
  * @return Schema or Error if failed resolving key
  */
-export default function step(node: SchemaNode, key: string | number, data?: any): SchemaNode | JsonError {
+export default function step(
+    node: SchemaNode,
+    key: string | number,
+    data?: any
+): SchemaNode | JsonError {
     const { draft, schema, pointer } = node;
     const typeOfData = getTypeOf(data);
     let schemaType = schema.type ?? typeOfData;
