@@ -20,30 +20,33 @@ const cache = new Draft2019();
     draft2019MetaFormat,
     draft2019MetaMetaData,
     draft2019MetaValidation
-].forEach(schema => { cache.addRemoteSchema(schema.$id, schema); })
+].forEach((schema) => {
+    cache.addRemoteSchema(schema.$id, schema);
+});
 addRemotes(cache);
 
-const supportedTestCases = (t: FeatureTest) => ![
-    // TODO CORE FEATURES
-    // "recursiveRef",
-    "vocabulary",
-    // OPTIONAL FEATURES
-    "cross-draft", // feature
-    "ecmascript-regex", // should
-    "float-overflow",
-    "dependencies-compatibility",  // should
-    "format-date-time", // MUST
-    "format-time", // MUST
-    "format-iri",
-    "format-iri-reference",
-    "format-idn-hostname",
-    "format-uuid",
-    "non-bmp-regex", // should
-    "patterns always use unicode semantics with patternProperties"
-].includes(t.name)
+const supportedTestCases = (t: FeatureTest) =>
+    ![
+        // TODO CORE FEATURES
+        "vocabulary",
+        // OPTIONAL FEATURES
+        "cross-draft", // feature
+        "ecmascript-regex", // should
+        "float-overflow",
+        "dependencies-compatibility", // should
+        "format-date-time", // MUST
+        // "format-time", // MUST
+        "format-iri",
+        "format-iri-reference",
+        "format-idn-hostname",
+        "format-uuid",
+        "non-bmp-regex", // should
+        "patterns always use unicode semantics with patternProperties"
+    ].includes(t.name);
+
 const draftFeatureTests = getDraftTests("2019-09")
-    // .filter(testcase => testcase.name === "recursiveRef")
-    // .filter(testcase => testcase.name === "defs")
+    // .filter((testcase) => testcase.name === "dependencies-compatibility")
+    // .filter((testcase) => testcase.name === "format-time")
     .filter(supportedTestCases);
 
 /*
@@ -96,7 +99,6 @@ const draftFeatureTests = getDraftTests("2019-09")
 ✖ vocabulary - skipped evaluation of meta-schema
 */
 
-
 const postponedTestcases = [
     // @todo when recursiveRef is implemented
     "unevaluatedProperties with $recursiveRef",
@@ -118,7 +120,6 @@ const postponedTestcases = [
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-
             // if (testCase.description !== "$recursiveRef with nesting") { return; }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }
 

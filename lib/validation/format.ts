@@ -18,8 +18,10 @@ const isValidIPV6 =
 const isValidHostname =
     /^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\.?$/;
 const matchDate = /^(\d\d\d\d)-(\d\d)-(\d\d)$/;
+
 // const matchTime = /^(\d\d):(\d\d):(\d\d)(\.\d+)?(z|[+-]\d\d(?::?\d\d)?)?$/i;
-const matchTime = /^(?:[0-2]\d:[0-5]\d:[0-5]\d|23:59:60)(?:\.\d+)?(?:z|[+-]\d\d(?::?\d\d)?)?$/i;
+const matchTime =
+    /^(?<time>(?:([0-1]\d|2[0-3]):[0-5]\d:(?<second>[0-5]\d|60)))(?:\.\d+)?(?<offset>(?:z|[+-]([0-1]\d|2[0-3])(?::?[0-5]\d)?))$/i;
 const DAYS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 const isValidJsonPointer = /^(?:\/(?:[^~/]|~0|~1)*)*$/;
@@ -31,14 +33,10 @@ const isValidURITemplate =
     /^(?:(?:[^\x00-\x20"'<>%\\^`{|}]|%[0-9a-f]{2})|\{[+#./;?&=,!@|]?(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?(?:,(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?)*\})*$/i;
 const isValidDurationString = /^P(?!$)(\d+Y)?(\d+M)?(\d+W)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+S)?)?$/;
 
-
 // Default Json-Schema formats: date-time, email, hostname, ipv4, ipv6, uri, uriref
 const formatValidators: Record<
     string,
-    (
-        node: SchemaNode,
-        value: unknown
-    ) => undefined | JsonError | JsonError[]
+    (node: SchemaNode, value: unknown) => undefined | JsonError | JsonError[]
 > = {
     date: (node, value) => {
         const { draft, schema, pointer } = node;
@@ -90,8 +88,15 @@ const formatValidators: Record<
         // weeks cannot be combined with other units
         const isInvalidDurationString = /(\d+M)(\d+W)|(\d+Y)(\d+W)/;
 
-        if (!isValidDurationString.test(value as string) || isInvalidDurationString.test(value as string)) {
-            return node.draft.errors.formatDurationError({ value, pointer: node.pointer, schema: node.schema });
+        if (
+            !isValidDurationString.test(value as string) ||
+            isInvalidDurationString.test(value as string)
+        ) {
+            return node.draft.errors.formatDurationError({
+                value,
+                pointer: node.pointer,
+                schema: node.schema
+            });
         }
     },
     email: (node, value) => {
@@ -217,31 +222,50 @@ const formatValidators: Record<
     },
 
     // hh:mm:ss.sTZD
-    // https://opis.io/json-schema/2.x/formats.html
-    // regex https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch04s07.html
+    // RFC 3339 https://datatracker.ietf.org/doc/html/rfc3339#section-4
     time: (node, value) => {
         const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
+
         // https://github.com/cfworker/cfworker/blob/main/packages/json-schema/src/format.ts
         const matches = value.match(matchTime);
-        return matches ? undefined : draft.errors.formatDateTimeError({ value, pointer, schema });
-        // if (!matches) {
-        //     return errors.formatDateTimeError({ value, pointer, schema });
-        // }
-        // const hour = +matches[1];
-        // const minute = +matches[2];
-        // const second = +matches[3];
-        // const timeZone = !!matches[5];
-        // if (
-        //     ((hour <= 23 && minute <= 59 && second <= 59) ||
-        //         (hour == 23 && minute == 59 && second == 60)) &&
-        //     timeZone
-        // ) {
-        //     return undefined;
-        // }
-        // return errors.formatTimeError({ value, pointer, schema });
+        if (!matches) {
+            return draft.errors.formatDateTimeError({ value, pointer, schema });
+        }
+
+        // leap second
+        if (matches.groups.second === "60") {
+            // bail early
+            if (/23:59:60(z|\+00:00)/i.test(value)) {
+                return undefined;
+            }
+            // check if sum matches 23:59
+            const minutes = matches.groups.time.match(/(\d+):(\d+):/);
+            const offsetMinutes = matches.groups.offset.match(/(\d+):(\d+)/);
+            if (offsetMinutes) {
+                const hour = parseInt(minutes[1]);
+                const offsetHour = parseInt(offsetMinutes[1]);
+                const min = parseInt(minutes[2]);
+                const offsetMin = parseInt(offsetMinutes[2]);
+                let deltaTime;
+                if (/^-/.test(matches.groups.offset)) {
+                    deltaTime = (hour + offsetHour) * 60 + (min + offsetMin);
+                } else {
+                    deltaTime = (24 + hour - offsetHour) * 60 + (min - offsetMin);
+                }
+                const hours = Math.floor(deltaTime / 60);
+                const actualHour = hours % 24;
+                const actualMinutes = deltaTime - hours * 60;
+                if (actualHour === 23 && actualMinutes === 59) {
+                    return undefined;
+                }
+            }
+            return draft.errors.formatDateTimeError({ value, pointer, schema });
+        }
+
+        return undefined;
     },
 
     uri: (node, value) => {
