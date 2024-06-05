@@ -2,18 +2,14 @@ import { SchemaNode } from "../schemaNode";
 import { JsonError } from "../types";
 
 export interface JsonTypeValidator {
-    (node: SchemaNode, value: unknown): Array<
-        void | undefined | JsonError | JsonError[] | JsonError[][]
-    >;
+    (
+        node: SchemaNode,
+        value: unknown
+    ): Array<void | undefined | JsonError | JsonError[] | JsonError[][]>;
 }
 
 export interface JsonValidator {
-    (node: SchemaNode, value: unknown):
-        | void
-        | undefined
-        | JsonError
-        | JsonError[]
-        | JsonError[][];
+    (node: SchemaNode, value: unknown): void | undefined | JsonError | JsonError[] | JsonError[][];
 }
 
 /**

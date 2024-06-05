@@ -23,7 +23,6 @@ import { resolveAllOf } from "../features/allOf";
 import { resolveAnyOf } from "../features/anyOf";
 import { resolveOneOf } from "../features/oneOf";
 
-
 const draft2019Config: DraftConfig = {
     typeKeywords: {
         array: [
@@ -45,7 +44,7 @@ const draft2019Config: DraftConfig = {
             "additionalProperties",
             "allOf",
             "anyOf",
-            "dependencies",
+            // "dependencies",
             "dependentSchemas",
             "dependentRequired",
             "enum",
