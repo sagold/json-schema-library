@@ -5,8 +5,8 @@ import { validateDependentSchemas, validateDependentRequired } from "../../featu
 /**
  * Get a list of tests to search for a matching pattern to a property
  */
-const getPatternTests = (patternProperties) => isObject(patternProperties) ?
-    Object.keys(patternProperties).map((pattern) => new RegExp(pattern))
+const getPatternTests = (patternProperties) => isObject(patternProperties)
+    ? Object.keys(patternProperties).map((pattern) => new RegExp(pattern))
     : [];
 /** tests if a property is evaluated by the given schema */
 function isPropertyEvaluated(schemaNode, propertyName, value) {
@@ -25,7 +25,7 @@ function isPropertyEvaluated(schemaNode, propertyName, value) {
     }
     // PATTERN-PROPERTIES
     const patterns = getPatternTests(schema.patternProperties);
-    if (patterns.find(pattern => pattern.test(propertyName))) {
+    if (patterns.find((pattern) => pattern.test(propertyName))) {
         return true;
     }
     // ADDITIONAL-PROPERTIES
@@ -36,6 +36,7 @@ function isPropertyEvaluated(schemaNode, propertyName, value) {
     return false;
 }
 const KeywordValidation = {
+    // ...omit(Keywords, "dependencies"),
     ...Keywords,
     dependencies: undefined,
     dependentSchemas: validateDependentSchemas,
@@ -65,17 +66,18 @@ const KeywordValidation = {
             return undefined;
         }
         const testPatterns = getPatternTests(resolvedSchema.patternProperties);
-        unevaluated = unevaluated.filter(key => {
+        unevaluated = unevaluated.filter((key) => {
             var _a;
             if ((_a = resolvedSchema.properties) === null || _a === void 0 ? void 0 : _a[key]) {
                 return false;
             }
             // special case: an evaluation in if statement counts too
             // we have an unevaluated prop only if the if-schema does not match
-            if (isObject(schema.if) && isPropertyEvaluated(node.next({ type: "object", ...schema.if }), key, value[key])) {
+            if (isObject(schema.if) &&
+                isPropertyEvaluated(node.next({ type: "object", ...schema.if }), key, value[key])) {
                 return false;
             }
-            if (testPatterns.find(pattern => pattern.test(key))) {
+            if (testPatterns.find((pattern) => pattern.test(key))) {
                 return false;
             }
             // @todo is this evaluated by additionaProperties per property
@@ -89,7 +91,7 @@ const KeywordValidation = {
         }
         const errors = [];
         if (resolvedSchema.unevaluatedProperties === false) {
-            unevaluated.forEach(key => {
+            unevaluated.forEach((key) => {
                 errors.push(draft.errors.unevaluatedPropertyError({
                     pointer: `${pointer}/${key}`,
                     value: JSON.stringify(value[key]),
@@ -98,7 +100,7 @@ const KeywordValidation = {
             });
             return errors;
         }
-        unevaluated.forEach(key => {
+        unevaluated.forEach((key) => {
             if (isObject(resolvedSchema.unevaluatedProperties)) {
                 // note: only key changes
                 const keyErrors = draft.validate(node.next(resolvedSchema.unevaluatedProperties, key), value[key]);
@@ -116,7 +118,10 @@ const KeywordValidation = {
         var _a;
         const { draft, schema, pointer } = node;
         // if not in items, and not matches additionalItems
-        if (!Array.isArray(value) || value.length === 0 || schema.unevaluatedItems == null || schema.unevaluatedItems === true) {
+        if (!Array.isArray(value) ||
+            value.length === 0 ||
+            schema.unevaluatedItems == null ||
+            schema.unevaluatedItems === true) {
             return undefined;
         }
         // resolve all dynamic schemas
@@ -129,7 +134,8 @@ const KeywordValidation = {
         if (isObject(schema.if)) {
             const nextSchemaNode = { type: "array", ...schema.if };
             if (draft.isValid(value, nextSchemaNode)) {
-                if (Array.isArray(nextSchemaNode.items) && nextSchemaNode.items.length === value.length) {
+                if (Array.isArray(nextSchemaNode.items) &&
+                    nextSchemaNode.items.length === value.length) {
                     return undefined;
                 }
             }
@@ -138,7 +144,7 @@ const KeywordValidation = {
         if (isObject(resolvedSchema.items)) {
             const nextSchemaNode = { ...resolvedSchema, unevaluatedItems: undefined };
             const errors = draft.validate(node.next(nextSchemaNode), value);
-            return errors.map(e => draft.errors.unevaluatedItemsError({ ...e.data }));
+            return errors.map((e) => draft.errors.unevaluatedItemsError({ ...e.data }));
         }
         if (Array.isArray(resolvedSchema.items)) {
             const items = [];
@@ -152,7 +158,7 @@ const KeywordValidation = {
                     items.push({ index: i, value: value[i] });
                 }
             }
-            return items.map(item => draft.errors.unevaluatedItemsError({
+            return items.map((item) => draft.errors.unevaluatedItemsError({
                 pointer: `${pointer}/${item.index}`,
                 value: JSON.stringify(item.value),
                 schema: resolvedSchema.unevaluatedItems

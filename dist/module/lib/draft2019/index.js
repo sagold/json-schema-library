@@ -42,7 +42,7 @@ const draft2019Config = {
             "additionalProperties",
             "allOf",
             "anyOf",
-            "dependencies",
+            // "dependencies",
             "dependentSchemas",
             "dependentRequired",
             "enum",
