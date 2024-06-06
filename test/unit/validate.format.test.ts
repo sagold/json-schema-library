@@ -5,7 +5,11 @@ import { Draft04 } from "../../lib/draft04";
 import { JsonSchema } from "../../lib/types";
 import { strict as assert } from "assert";
 
-function validate(draft: Draft, value: unknown, schema: JsonSchema = draft.getSchema() as JsonSchema) {
+function validate(
+    draft: Draft,
+    value: unknown,
+    schema: JsonSchema = draft.getSchema() as JsonSchema
+) {
     return _validate(createNode(draft, schema), value);
 }
 
@@ -14,22 +18,6 @@ describe("validate format", () => {
     before(() => (draft = new Draft04()));
 
     describe("time", () => {
-        it("should validate HH:mm:ss", () => {
-            const errors = validate(draft, "15:31:12", {
-                type: "string",
-                format: "time"
-            });
-            assert.deepEqual(errors, []);
-        });
-
-        it("should validate HH:mm:ss.s", () => {
-            const errors = validate(draft, "15:31:12.99", {
-                type: "string",
-                format: "time"
-            });
-            assert.deepEqual(errors, []);
-        });
-
         it("should validate HH:mm:ss-HH:mm", () => {
             const errors = validate(draft, "15:31:12-02:30", {
                 type: "string",

@@ -83,7 +83,7 @@ export declare class Draft {
      */
     each(data: any, callback: EachCallback, schema?: JsonSchema, pointer?: JsonPointer): void;
     eachSchema(callback: EachSchemaCallback, schema?: JsonSchema): void;
-    getChildSchemaSelection(property: string | number, schema?: JsonSchema): JsonSchema[] | JsonError;
+    getChildSchemaSelection(property: string | number, schema?: JsonSchema): JsonError | JsonSchema[];
     /**
      * Returns the json-schema of a data-json-pointer.
      *
