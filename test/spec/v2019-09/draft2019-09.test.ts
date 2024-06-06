@@ -34,8 +34,6 @@ const supportedTestCases = (t: FeatureTest) =>
         "ecmascript-regex", // should
         "float-overflow",
         "dependencies-compatibility", // should
-        "format-date-time", // MUST
-        // "format-time", // MUST
         "format-iri",
         "format-iri-reference",
         "format-idn-hostname",
@@ -46,7 +44,7 @@ const supportedTestCases = (t: FeatureTest) =>
 
 const draftFeatureTests = getDraftTests("2019-09")
     // .filter((testcase) => testcase.name === "dependencies-compatibility")
-    // .filter((testcase) => testcase.name === "format-time")
+    // .filter((testcase) => testcase.name === "format-date-time")
     .filter(supportedTestCases);
 
 /*

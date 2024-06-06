@@ -70,11 +70,13 @@ const formatValidators: Record<
         if (typeof value !== "string" || value === "") {
             return undefined;
         }
-        if (value === "" || isValidDateTime.test(value)) {
-            if (new Date(value).toString() === "Invalid Date") {
-                return draft.errors.formatDateTimeError({ value, pointer, schema });
+        const dateAndTime = value.split(/t/i);
+        if (dateAndTime.length === 2) {
+            const dateIsValid = formatValidators.date(node, dateAndTime[0]) === undefined;
+            const timeIsValid = formatValidators.time(node, dateAndTime[1]) === undefined;
+            if (dateIsValid && timeIsValid) {
+                return undefined;
             }
-            return undefined;
         }
         return draft.errors.formatDateTimeError({ value, pointer, schema });
     },
