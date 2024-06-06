@@ -37,14 +37,13 @@ const supportedTestCases = (t: FeatureTest) =>
         "format-iri",
         "format-iri-reference",
         "format-idn-hostname",
-        "format-uuid",
         "non-bmp-regex", // should
         "patterns always use unicode semantics with patternProperties"
     ].includes(t.name);
 
 const draftFeatureTests = getDraftTests("2019-09")
     // .filter((testcase) => testcase.name === "dependencies-compatibility")
-    // .filter((testcase) => testcase.name === "format-date-time")
+    // .filter((testcase) => testcase.name === "format-uuid")
     .filter(supportedTestCases);
 
 /*

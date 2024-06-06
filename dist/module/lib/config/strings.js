@@ -29,6 +29,7 @@ export default {
     FormatURIReferenceError: "Value `{{value}}` at `{{pointer}}` is not a valid uri-reference",
     FormatURITemplateError: "Value `{{value}}` at `{{pointer}}` is not a valid uri-template",
     FormatURLError: "Value `{{value}}` at `{{pointer}}` is not a valid url",
+    FormatUUIDError: "Value `{{value}}` at `{{pointer}}` is not a valid uuid",
     InvalidDataError: "No value may be specified in `{{pointer}}`",
     InvalidPropertyNameError: "Invalid property name `{{property}}` at `{{pointer}}`",
     MaximumError: "Value in `{{pointer}}` is `{{length}}`, but should be `{{maximum}}` at maximum",

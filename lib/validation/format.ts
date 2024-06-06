@@ -300,6 +300,17 @@ const formatValidators: Record<
             return undefined;
         }
         return draft.errors.formatURLError({ value, pointer, schema });
+    },
+
+    uuid: (node, value: string) => {
+        const { draft, schema, pointer } = node;
+        if (typeof value !== "string" || value === "") {
+            return undefined;
+        }
+        if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)) {
+            return undefined;
+        }
+        return draft.errors.formatUUIDError({ value, pointer, schema });
     }
 };
 
