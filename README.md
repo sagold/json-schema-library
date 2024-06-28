@@ -7,11 +7,11 @@
 > footprint or high performance, this package focuses on exposing utilities for browser and node environments and
 > lessens the pain to build custom tools around json-schema.
 
+> ⚠️ This documentation refers to the upcoming release version 10, which can be installed by `npm install json-schema-library@10.0.0-rc1`. For the latest release please refer to the [documentation of version 9.3.5](https://github.com/sagold/json-schema-library/tree/v9.3.5)
+
 <p style="text-align:center">
   <a href="#draft-methods">draft methods</a> | <a href="#draft-extensions">draft extensions</a> | <a href="#draft-customization">draft customization</a> | <a href="#breaking-changes">breaking changes</a>
 </p>
-
-> ⚠️ This documentation refers to the upcoming release version 10, which can be insalled by `npm install json-schema-library@10.0.0-rc1`. For the latest release please refer to the [documentation of version 9.3.5](https://github.com/sagold/json-schema-library/tree/v9.3.5)
 
 **install**
 
