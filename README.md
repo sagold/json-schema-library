@@ -11,6 +11,8 @@
   <a href="#draft-methods">draft methods</a> | <a href="#draft-extensions">draft extensions</a> | <a href="#draft-customization">draft customization</a> | <a href="#breaking-changes">breaking changes</a>
 </p>
 
+> ⚠️ This documentation refers to the upcoming release version 10, which can be insalled by `npm install json-schema-library@10.0.0-rc1`. For the latest release please refer to the [documentation of version 9.3.5](https://github.com/sagold/json-schema-library/tree/v9.3.5)
+
 **install**
 
 `yarn add json-schema-library`
@@ -35,7 +37,6 @@ const errors: JsonError[] = jsonSchema.validate(myData);
 
 What follows is a description of the main draft methods.
 
-
 ## Draft support
 
 `json-schema-library` supports almost all draft features. This sections lists currently unsupported features for each draft
@@ -44,12 +45,11 @@ What follows is a description of the main draft methods.
 
 **Currently unsupported core features:**
 
-- `$vocabulary` - meta-schemas are not parsed for enabled features
-- `unevaluatedItems: uncle-schema` - evaluation of uncle-schemas is not supported. Properties will be return as evaluated
-- `unevaluatedProperties: uncle-schema` - evaluation of uncle-schemas is not supported. Properties will be return as evaluated
+-   `$vocabulary` - meta-schemas are not parsed for enabled features
+-   `unevaluatedItems: uncle-schema` - evaluation of uncle-schemas is not supported. Properties will be return as evaluated
+-   `unevaluatedProperties: uncle-schema` - evaluation of uncle-schemas is not supported. Properties will be return as evaluated
 
 </details>
-
 
 ## Draft methods
 
@@ -308,7 +308,6 @@ expect(myData).to.deep.equal([]);
 ```
 
 </details>
-
 
 ### each
 
@@ -1006,8 +1005,7 @@ With version `v10.0.0` _draft 2019-09_ is supported and can be used with `import
 
 _Draft 2019-09_ requires collection of previous resolved sub-schemas. Thus, an additional type `SchemaNode` had to be introduced, which is used in almost all draft methods defined for draft-configs. The api in draft-instances mostly stayed the same with the following exceptions:
 
-- `step` and resolvers work on and return a `schemaNode`, containing the requested schema
-
+-   `step` and resolvers work on and return a `schemaNode`, containing the requested schema
 
 ### v9.0.0
 
@@ -1019,7 +1017,6 @@ _Draft 2019-09_ requires collection of previous resolved sub-schemas. Thus, an a
 **updates**
 
 -   _getSchema_ consistently returns errors and can return errors for empty schema using `withSchemaWarning` option
-
 
 ### v8.0.0
 
@@ -1040,7 +1037,6 @@ With version `v8.0.0`, _getTemplate_ was improved to better support optional pro
 
 </details>
 
-
 ### v7.0.0
 
 With version `v7.0.0`, library export and Draft API has changed heavily. The API is now more consistent across draft-versions and offers a simple and consistent configuration interface for existing and custom drafts. In addition, most standalone functions are no longer exposed separately, but under its current _draftConfigs_ and mainly on each draft-instance. This will help to reduce confusion when consuming this API.
@@ -1060,16 +1056,13 @@ The above documentation reflects all these changes. Just reach out if you have t
 
 </details>
 
-
 ### v6.0.0
 
 With version `v6.0.0` supported json schema drafts are exported directly as `Draft04`, `Draft06`, `Draft07`. Example use: `import { Draft07 } from "json-schema-library"`.
 
-
 ### v5.0.0
 
 With version `v5.0.0` the API has changed to es6 modules, where there is no `default` export, only named exports. Additionally all code has been rewritten in TypeScript. When directly accessing files, switch to `dist/module/*.js`-files for plain js-modules.
-
 
 ### v4.0.0
 
