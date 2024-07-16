@@ -1,6 +1,6 @@
 # Draft 2019-09 Scope
 
--   [ ] `getSchema` inconsistent return of non-node for root-requests
+-   [✓] `getSchema` inconsistent return of non-node for root-requests
 -   [ ] introduction of scopes reduces jlib performance by ~20-22%. can we do sth about this?
     -   moving this logic to draft 2019 would solve this, but introduce two different apis unless we can hide it
     -   a consistent api might lead to performance impacts of legacy drafts

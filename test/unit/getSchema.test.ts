@@ -1,27 +1,20 @@
 import { strict as assert } from "assert";
 import { expect } from "chai";
-import _getSchema, { GetSchemaOptions } from "../../lib/getSchema";
+import getSchema from "../../lib/getSchema";
 import { JsonEditor as Core } from "../../lib/jsoneditor";
-import { Draft } from "../../lib/draft";
 import { isJsonError } from "../../lib/types";
-
-function getSchema(draft: Draft, options: GetSchemaOptions) {
-    const result = _getSchema(draft, options);
-    if (result == null || isJsonError(result)) {
-        return result;
-    }
-    return result.schema;
-}
+import { isSchemaNode } from "../../lib/schemaNode";
 
 describe("getSchema", () => {
     let draft: Core;
-    before(() => (draft = new Core()));
+    beforeEach(() => (draft = new Core()));
 
     describe("value", () => {
         it("should return schema of any value", () => {
             draft.setSchema({ name: "target", type: "*" });
-            const schema = getSchema(draft, { pointer: "#" });
-            expect(schema).to.deep.include({ name: "target", type: "*" });
+            const result = getSchema(draft, { pointer: "#" });
+            assert(isSchemaNode(result));
+            expect(result.schema).to.deep.include({ name: "target", type: "*" });
         });
 
         it("should resolve property through root $ref", () => {
@@ -36,8 +29,9 @@ describe("getSchema", () => {
                     }
                 }
             });
-            const schema = getSchema(draft, { pointer: "#/value", data: { value: 123 } });
-            expect(schema).to.deep.include({ name: "target", type: "number" });
+            const result = getSchema(draft, { pointer: "#/value", data: { value: 123 } });
+            assert(isSchemaNode(result));
+            expect(result.schema).to.deep.include({ name: "target", type: "number" });
         });
     });
 
@@ -49,26 +43,30 @@ describe("getSchema", () => {
                     title: { name: "title", type: "string" }
                 }
             });
-            const schema = getSchema(draft, { pointer: "#/title" });
-            expect(schema).to.deep.include({ name: "title", type: "string" });
+            const result = getSchema(draft, { pointer: "#/title" });
+            assert(isSchemaNode(result));
+            expect(result.schema).to.deep.include({ name: "title", type: "string" });
         });
 
         it("should return `schema-warning` for unknown, but valid property", () => {
             draft.setSchema({ type: "object" });
-            const schema = getSchema(draft, { pointer: "#/title", withSchemaWarning: true });
-            expect(schema).to.deep.include({ code: "schema-warning", type: "error" });
+            const result = getSchema(draft, { pointer: "#/title", withSchemaWarning: true });
+            assert(isJsonError(result));
+            expect(result).to.deep.include({ code: "schema-warning", type: "error" });
         });
 
         it("should return `undefined` for unknown, but valid property", () => {
             draft.setSchema({ type: "object" });
-            const schema = getSchema(draft, { pointer: "#/title" });
-            expect(schema).to.eq(undefined);
+            const result = getSchema(draft, { pointer: "#/title" });
+            assert(isSchemaNode(result));
+            expect(result.schema).to.eq(undefined);
         });
 
         it("should return schema for unknown property if data is passed", () => {
             draft.setSchema({ type: "object" });
-            const schema = getSchema(draft, { pointer: "#/title", data: { title: "value" } });
-            expect(schema).to.deep.include({ type: "string" });
+            const result = getSchema(draft, { pointer: "#/title", data: { title: "value" } });
+            assert(isSchemaNode(result));
+            expect(result.schema).to.deep.include({ type: "string" });
         });
 
         it("should return an error for invalid properties", () => {
@@ -78,8 +76,12 @@ describe("getSchema", () => {
                 properties: { title: { type: "string" } },
                 additionalProperties: false
             });
-            const schema = getSchema(draft, { pointer: "#/unknown" });
-            expect(schema).to.deep.include({ code: "unknown-property-error", type: "error" });
+            const result = getSchema(draft, { pointer: "#/unknown" });
+            assert(isJsonError(result));
+            expect(result).to.deep.include({
+                code: "unknown-property-error",
+                type: "error"
+            });
         });
 
         it("should return an error for invalid properties, even if value is given", () => {
@@ -89,8 +91,15 @@ describe("getSchema", () => {
                 properties: { title: { type: "string" } },
                 additionalProperties: false
             });
-            const schema = getSchema(draft, { pointer: "#/unknown", data: { unknown: "value" } });
-            expect(schema).to.deep.include({ code: "unknown-property-error", type: "error" });
+            const result = getSchema(draft, {
+                pointer: "#/unknown",
+                data: { unknown: "value" }
+            });
+            assert(isJsonError(result));
+            expect(result).to.deep.include({
+                code: "unknown-property-error",
+                type: "error"
+            });
         });
 
         it("should return schema for property within nested object", () => {
@@ -105,8 +114,9 @@ describe("getSchema", () => {
                     }
                 }
             });
-            const schema = getSchema(draft, { pointer: "#/image/title" });
-            expect(schema).to.deep.include({ name: "title", type: "string" });
+            const result = getSchema(draft, { pointer: "#/image/title" });
+            assert(isSchemaNode(result));
+            expect(result.schema).to.deep.include({ name: "title", type: "string" });
         });
 
         it("should resolve $ref as property", () => {
@@ -123,8 +133,9 @@ describe("getSchema", () => {
                     }
                 }
             });
-            const schema = getSchema(draft, { pointer: "#/image" });
-            expect(schema).to.deep.include({ name: "target" });
+            const result = getSchema(draft, { pointer: "#/image" });
+            assert(isSchemaNode(result));
+            expect(result.schema).to.deep.include({ name: "target" });
         });
 
         it("should return correct 'oneOf' object definition", () => {
@@ -151,8 +162,12 @@ describe("getSchema", () => {
                     }
                 ]
             });
-            const schema = getSchema(draft, { pointer: "#/second", data: { second: "string" } });
-            expect(schema).to.deep.include({ name: "target", type: "string" });
+            const result = getSchema(draft, {
+                pointer: "#/second",
+                data: { second: "string" }
+            });
+            assert(isSchemaNode(result));
+            expect(result.schema).to.deep.include({ name: "target", type: "string" });
         });
 
         it("should return 'one-of-error' if enforced oneOf schema could not be resolved", () => {
@@ -176,7 +191,6 @@ describe("getSchema", () => {
                     }
                 }
             };
-
             draft.setSchema(schema);
             const result = getSchema(draft, { pointer: "#/nested/second" });
             // console.log("result", result);
@@ -201,8 +215,9 @@ describe("getSchema", () => {
                     "^def$": { type: "number" }
                 }
             });
-            const schema = getSchema(draft, { pointer: "#/def" });
-            expect(schema).to.deep.include({ type: "number" });
+            const result = getSchema(draft, { pointer: "#/def" });
+            assert(isSchemaNode(result));
+            expect(result.schema).to.deep.include({ type: "number" });
         });
 
         it("should return an error if schema could not be resolved", () => {
@@ -212,9 +227,9 @@ describe("getSchema", () => {
                 patternProperties: { "^tee$": { type: "string" } },
                 additionalProperties: false
             });
-            const schema = getSchema(draft, { pointer: "#/beer" });
-            assert(isJsonError(schema));
-            expect(schema.name).to.equal("UnknownPropertyError");
+            const result = getSchema(draft, { pointer: "#/beer" });
+            assert(isJsonError(result));
+            expect(result.name).to.equal("UnknownPropertyError");
         });
 
         describe("dependencies", () => {
@@ -232,7 +247,7 @@ describe("getSchema", () => {
             //             }
             //         }
             //     });
-            //     const schema = getSchema(draft, "#/additionalValue");
+            //     const result = getSchema(draft, "#/additionalValue");
             //     expect(schema.type).to.equal("error");
             // });
             it("should return schema from dependencies when dependent property is present", () => {
@@ -249,11 +264,11 @@ describe("getSchema", () => {
                         }
                     }
                 });
-                const schema = getSchema(draft, {
+                const result = getSchema(draft, {
                     pointer: "/additionalValue",
                     data: { test: "is defined" }
                 });
-                expect(schema).to.deep.include({ type: "string" });
+                expect(result.schema).to.deep.include({ type: "string" });
             });
         });
 
@@ -276,11 +291,11 @@ describe("getSchema", () => {
                     }
                 });
 
-                const schema = getSchema(draft, {
+                const result = getSchema(draft, {
                     pointer: "/additionalValue",
                     data: { test: "validates if" }
                 });
-                expect(schema).to.deep.include({ type: "string", description: "added" });
+                expect(result.schema).to.deep.include({ type: "string", description: "added" });
             });
             it("should return else-schema for non-matching if-schema", () => {
                 draft.setSchema({
@@ -305,8 +320,8 @@ describe("getSchema", () => {
                     }
                 });
 
-                const schema = getSchema(draft, { pointer: "/elseValue", data: { test: "" } });
-                expect(schema).to.deep.include({ type: "string", description: "else" });
+                const result = getSchema(draft, { pointer: "/elseValue", data: { test: "" } });
+                expect(result.schema).to.deep.include({ type: "string", description: "else" });
             });
             it("should return correct schema for duplicate property", () => {
                 draft.setSchema({
@@ -331,8 +346,11 @@ describe("getSchema", () => {
                     }
                 });
 
-                const schema = getSchema(draft, { pointer: "/dynamicValue", data: { test: "" } });
-                expect(schema).to.deep.include({ type: "string", description: "else" });
+                const result = getSchema(draft, {
+                    pointer: "/dynamicValue",
+                    data: { test: "" }
+                });
+                expect(result.schema).to.deep.include({ type: "string", description: "else" });
             });
         });
     });
@@ -343,8 +361,8 @@ describe("getSchema", () => {
                 type: "array",
                 items: { name: "title", type: "string" }
             });
-            const schema = getSchema(draft, { pointer: "#/0" });
-            expect(schema).to.deep.include({ name: "title", type: "string" });
+            const result = getSchema(draft, { pointer: "#/0" });
+            expect(result.schema).to.deep.include({ name: "title", type: "string" });
         });
 
         it("should return item schema based on index", () => {
@@ -352,8 +370,8 @@ describe("getSchema", () => {
                 type: "array",
                 items: [{ type: "number" }, { name: "target", type: "string" }, { type: "number" }]
             });
-            const schema = getSchema(draft, { pointer: "#/1" });
-            expect(schema).to.deep.include({ name: "target", type: "string" });
+            const result = getSchema(draft, { pointer: "#/1" });
+            expect(result.schema).to.deep.include({ name: "target", type: "string" });
         });
 
         it("should return schema for matching 'oneOf' item", () => {
@@ -381,11 +399,11 @@ describe("getSchema", () => {
                     ]
                 }
             });
-            const schema = getSchema(draft, {
+            const result = getSchema(draft, {
                 pointer: "#/0/second",
                 data: [{ second: "second" }]
             });
-            expect(schema).to.deep.include({ type: "string", name: "target" });
+            expect(result.schema).to.deep.include({ type: "string", name: "target" });
         });
 
         it("should return error if no matching 'oneOf' item was found", () => {

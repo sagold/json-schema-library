@@ -229,7 +229,11 @@ export class Draft {
      */
     validate(node: SchemaNode, data: unknown): JsonError[];
     validate(data: unknown, schema?: JsonSchema, pointer?: JsonPointer): JsonError[];
-    validate(data: unknown, schema: JsonSchema = this.rootSchema, pointer?: JsonPointer): JsonError[] {
+    validate(
+        data: unknown,
+        schema: JsonSchema = this.rootSchema,
+        pointer?: JsonPointer
+    ): JsonError[] {
         if (isSchemaNode(data)) {
             const inputData = schema;
             const inuptNode = data;
