@@ -6,7 +6,7 @@ import { isJsonError, JsonError, JsonSchema } from "./types";
  * could be added at the given property (e.g. item-index), thus an array of options is returned. In all other cases
  * a list with a single item will be returned
  *
- * @param draft        - draft to use
+ * @param draft       - draft to use
  * @param property    - parent schema of following property
  * @param [schema]    - parent schema of following property
  * @return
@@ -20,12 +20,17 @@ export default function getChildSchemaSelection(
         return schema.oneOf.map((item: JsonSchema) => draft.createNode(item).resolveRef().schema);
     }
     if (schema.items?.oneOf) {
-        return schema.items.oneOf.map((item: JsonSchema) => draft.createNode(item).resolveRef().schema);
+        return schema.items.oneOf.map(
+            (item: JsonSchema) => draft.createNode(item).resolveRef().schema
+        );
+    }
+    if (Array.isArray(schema.items) && schema.items.length <= +property) {
+        return [];
     }
     const node = draft.step(draft.createNode(schema), property, {});
     if (isJsonError(node)) {
-        return node;
+        const error: JsonError = node;
+        return error;
     }
-
     return [node.schema];
 }

@@ -1,9 +1,7 @@
 import { expect } from "chai";
 import createSchemaOf from "../../lib/createSchemaOf";
 
-
 describe("createSchemaOf", () => {
-
     it("should add type 'object' of data to schema", () => {
         const res = createSchemaOf({});
         expect(res.type).to.eq("object");

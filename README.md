@@ -46,8 +46,8 @@ What follows is a description of the main draft methods.
 **Currently unsupported core features:**
 
 -   `$vocabulary` - meta-schemas are not parsed for enabled features
--   `unevaluatedItems: uncle-schema` - evaluation of uncle-schemas is not supported. Properties will be return as evaluated
--   `unevaluatedProperties: uncle-schema` - evaluation of uncle-schemas is not supported. Properties will be return as evaluated
+-   `unevaluatedItems: uncle-schema` - evaluation of uncle-schemas is not supported. Properties will be returned as evaluated
+-   `unevaluatedProperties: uncle-schema` - evaluation of uncle-schemas is not supported. Properties will be returned as evaluated
 
 For further details see [draft2019-09 tests](https://github.com/sagold/json-schema-library/blob/main/test/spec/v2019-09/draft2019-09.test.ts)
 
