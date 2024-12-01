@@ -1,4 +1,3 @@
-
 import { expect } from "chai";
 import _step from "../../../lib/step";
 import { Draft04 } from "../../../lib/draft04";
@@ -6,7 +5,13 @@ import { Draft } from "../../../lib/draft";
 import { JsonSchema } from "../../../lib/types";
 import { createNode, isSchemaNode } from "../../../lib/schemaNode";
 
-function step(draft: Draft, key: string | number, schema: JsonSchema, data?: unknown, pointer = '#') {
+function step(
+    draft: Draft,
+    key: string | number,
+    schema: JsonSchema,
+    data?: unknown,
+    pointer = "#"
+) {
     const res = _step(createNode(draft, schema, pointer), key, data);
     return isSchemaNode(res) ? res.schema : res;
 }
@@ -38,7 +43,7 @@ describe("step.oneof", () => {
         delete res.oneOfSchema;
         delete res.variableSchema;
         delete res.oneOfIndex;
-        expect(res).to.deep.eq({ type: "number", title: "Zahl" });
+        expect(res).to.deep.eq({ __oneOfIndex: 1, type: "number", title: "Zahl" });
     });
 
     // PR #35 https://github.com/sagold/json-schema-library/pull/35/commits/8b6477113bdfce522081473bb0dd8fd6fe680391

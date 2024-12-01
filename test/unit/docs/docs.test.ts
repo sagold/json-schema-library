@@ -218,6 +218,7 @@ describe("docs", () => {
             expect(schemaOfItem).to.deep.equal({
                 type: "object",
                 required: ["name"],
+                __oneOfIndex: 0,
                 properties: {
                     name: {
                         type: "string",

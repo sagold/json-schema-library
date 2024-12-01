@@ -5,7 +5,13 @@ import { Draft04 as Core } from "../../../lib/draft04";
 import { expect } from "chai";
 import { JsonSchema } from "../../../lib/types";
 
-function step(draft: Draft, key: string | number, schema: JsonSchema, data?: unknown, pointer = '#') {
+function step(
+    draft: Draft,
+    key: string | number,
+    schema: JsonSchema,
+    data?: unknown,
+    pointer = "#"
+) {
     const res = _step(createNode(draft, schema, pointer), key, data);
     return isSchemaNode(res) ? res.schema : res;
 }
@@ -341,6 +347,7 @@ describe("step", () => {
             );
 
             expect(res).to.deep.eq({
+                __oneOfIndex: 1,
                 type: "object",
                 properties: { title: { type: "number" } }
             });

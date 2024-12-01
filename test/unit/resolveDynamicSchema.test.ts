@@ -356,6 +356,7 @@ describe("resolveDynamicSchema", () => {
                 "#"
             );
             expect(schema).to.deep.equal({
+                __oneOfIndex: 1,
                 properties: {
                     two: {
                         type: "string"
@@ -389,6 +390,7 @@ describe("resolveDynamicSchema", () => {
             );
 
             expect(schema).to.deep.equal({
+                __oneOfIndex: 1,
                 properties: {
                     id: { const: "second" },
                     one: { type: "number" }

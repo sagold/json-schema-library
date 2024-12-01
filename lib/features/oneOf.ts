@@ -6,7 +6,7 @@ import settings from "../config/settings";
 import { errorOrPromise } from "../utils/filter";
 import { JsonSchema, JsonError, isJsonError } from "../types";
 import { isObject } from "../utils/isObject";
-import { JsonValidator } from "../validation/type"
+import { JsonValidator } from "../validation/type";
 import { SchemaNode } from "../schemaNode";
 
 const { DECLARATOR_ONEOF } = settings;
@@ -57,6 +57,8 @@ export function resolveOneOf(node: SchemaNode, data: any): SchemaNode | JsonErro
             if (result.length > 0) {
                 errors.push(...result);
             } else {
+                // @evaluation-info
+                oneNode.schema.__oneOfIndex = i;
                 return resultNode.next(oneNode.schema);
             }
         }
@@ -85,6 +87,8 @@ export function resolveOneOf(node: SchemaNode, data: any): SchemaNode | JsonErro
     }
 
     if (matches.length === 1) {
+        // @evaluation-info
+        matches[0].schema.__oneOfIndex = matches[0].index;
         return node.next(matches[0].schema);
     }
     if (matches.length > 1) {
@@ -146,7 +150,7 @@ function fuzzyObjectValue(node: SchemaNode, data: Record<string, unknown>) {
 export function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | JsonError {
     const { schema, pointer, draft } = node;
     if (!Array.isArray(schema.oneOf)) {
-        throw new Error("not a oneof schema")
+        throw new Error("not a oneof schema");
         return node;
     }
     // !keyword: oneOfProperty
@@ -182,6 +186,8 @@ export function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | Jso
             if (result.length > 0) {
                 errors.push(...result);
             } else {
+                // @evaluation-info
+                oneNode.schema.__oneOfIndex = i;
                 return resultNode.next(oneNode.schema);
             }
         }
@@ -206,6 +212,8 @@ export function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | Jso
     }
 
     if (matches.length === 1) {
+        // @evaluation-info
+        matches[0].schema.__oneOfIndex = matches[0].index;
         return node.next(matches[0].schema);
     }
 
@@ -235,6 +243,8 @@ export function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | Jso
             });
         }
 
+        // @evaluation-info
+        schemaOfItem.__oneOfIndex = schemaOfIndex;
         return node.next(schemaOfItem);
     }
 

@@ -9,7 +9,12 @@ import { resolveOneOf as _resolveOneOf } from "../../lib/features/oneOf";
 
 const { DECLARATOR_ONEOF } = settings;
 
-function resolveOneOf(draft: Draft, data: any, schema: JsonSchema = draft.rootSchema, pointer = "#"): JsonSchema | JsonError {
+function resolveOneOf(
+    draft: Draft,
+    data: any,
+    schema: JsonSchema = draft.rootSchema,
+    pointer = "#"
+): JsonSchema | JsonError {
     const node = createNode(draft, schema, pointer);
     const result = _resolveOneOf(node, data);
     if (result && !isJsonError(result)) {
@@ -18,7 +23,7 @@ function resolveOneOf(draft: Draft, data: any, schema: JsonSchema = draft.rootSc
     return result;
 }
 
-describe("oneOfProperty", () => {
+describe("resolveOneOf.oneOfProperty", () => {
     let draft: Draft07;
     beforeEach(() => (draft = new Draft07()));
 
@@ -56,6 +61,7 @@ describe("oneOfProperty", () => {
 
         expect(res).to.deep.eq({
             type: "object",
+            __oneOfIndex: 1,
             properties: {
                 name: { type: "string", pattern: "^2$" },
                 title: { type: "number" }
@@ -97,6 +103,7 @@ describe("oneOfProperty", () => {
 
         expect(res).to.deep.eq({
             type: "object",
+            __oneOfIndex: 1,
             properties: {
                 name: { type: "string", pattern: "^2$" },
                 title: { type: "number" }

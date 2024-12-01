@@ -9,8 +9,12 @@ import { resolveOneOfFuzzy as _resolveOneOf } from "../../lib/features/oneOf";
 
 const { DECLARATOR_ONEOF } = settings;
 
-
-function resolveOneOf(draft: Draft, data: any, schema: JsonSchema = draft.rootSchema, pointer = "#"): JsonSchema | JsonError {
+function resolveOneOf(
+    draft: Draft,
+    data: any,
+    schema: JsonSchema = draft.rootSchema,
+    pointer = "#"
+): JsonSchema | JsonError {
     const node = createNode(draft, schema, pointer);
     const result = _resolveOneOf(node, data);
     if (result && !isJsonError(result)) {
@@ -18,7 +22,6 @@ function resolveOneOf(draft: Draft, data: any, schema: JsonSchema = draft.rootSc
     }
     return result;
 }
-
 
 describe("resolveOneOf (fuzzy)", () => {
     let draft: Core;
@@ -29,7 +32,7 @@ describe("resolveOneOf (fuzzy)", () => {
             oneOf: [{ type: "string" }, { type: "number" }, { type: "object" }]
         });
 
-        expect(res).to.deep.eq({ type: "number" });
+        expect(res).to.deep.eq({ __oneOfIndex: 1, type: "number" });
     });
 
     it("should return schema with matching pattern", () => {
@@ -40,7 +43,7 @@ describe("resolveOneOf (fuzzy)", () => {
             ]
         });
 
-        expect(res).to.deep.eq({ type: "string", pattern: "asterix" });
+        expect(res).to.deep.eq({ __oneOfIndex: 1, type: "string", pattern: "asterix" });
     });
 
     it("should resolve $ref before schema", () => {
@@ -53,7 +56,7 @@ describe("resolveOneOf (fuzzy)", () => {
         });
         const res = resolveOneOf(draft, "anasterixcame");
 
-        expect(res).to.deep.eq({ type: "string", pattern: "asterix" });
+        expect(res).to.deep.eq({ __oneOfIndex: 1, type: "string", pattern: "asterix" });
     });
 
     describe("object", () => {
@@ -72,6 +75,7 @@ describe("resolveOneOf (fuzzy)", () => {
 
             expect(res).to.deep.eq({
                 type: "object",
+                __oneOfIndex: 1,
                 properties: { description: { type: "string" } }
             });
         });
@@ -88,7 +92,11 @@ describe("resolveOneOf (fuzzy)", () => {
                 }
             );
 
-            expect(res).to.deep.eq({ type: "object", properties: { title: { type: "string" } } });
+            expect(res).to.deep.eq({
+                __oneOfIndex: 1,
+                type: "object",
+                properties: { title: { type: "string" } }
+            });
         });
 
         describe("oneOfProperty", () => {
@@ -126,6 +134,7 @@ describe("resolveOneOf (fuzzy)", () => {
 
                 expect(res).to.deep.eq({
                     type: "object",
+                    __oneOfIndex: 1,
                     properties: {
                         name: { type: "string", pattern: "^2$" },
                         title: { type: "number" }
@@ -167,6 +176,7 @@ describe("resolveOneOf (fuzzy)", () => {
 
                 expect(res).to.deep.eq({
                     type: "object",
+                    __oneOfIndex: 1,
                     properties: {
                         name: { type: "string", pattern: "^2$" },
                         title: { type: "number" }
@@ -255,7 +265,11 @@ describe("resolveOneOf (fuzzy)", () => {
                     }
                 );
 
-                expect(res).to.deep.eq({ type: "object", properties: { a: t, b: t, c: t } });
+                expect(res).to.deep.eq({
+                    __oneOfIndex: 1,
+                    type: "object",
+                    properties: { a: t, b: t, c: t }
+                });
             });
 
             it("should only count properties that match the schema", () => {
@@ -274,6 +288,7 @@ describe("resolveOneOf (fuzzy)", () => {
 
                 expect(res).to.deep.eq({
                     type: "object",
+                    __oneOfIndex: 1,
                     properties: { a: { type: "boolean" }, b: t, d: t }
                 });
             });
@@ -329,6 +344,7 @@ describe("resolveOneOf (fuzzy)", () => {
 
                 expect(res).to.deep.eq({
                     type: "object",
+                    __oneOfIndex: 1,
                     properties: {
                         redirectUrl: {
                             format: "url",
