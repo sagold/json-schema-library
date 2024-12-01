@@ -16,6 +16,7 @@ export function isDynamicSchema(schema) {
 /**
  * @note this utility does not reference draft methods for resolution
  * @todo consider using draft methods
+ * @todo consider exposing separate info-object (oneOf-Index)
  *
  * Resolves all dynamic schema definitions for the given input data and returns
  * the resulting json-schema without any dynamic schema definitions. The result

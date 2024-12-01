@@ -7,6 +7,11 @@ import { errorOrPromise } from "../utils/filter";
 import { isJsonError } from "../types";
 import { isObject } from "../utils/isObject";
 const { DECLARATOR_ONEOF } = settings;
+function setOneOfOrigin(schema, index) {
+    if (isObject(schema)) {
+        schema.__oneOfIndex = index;
+    }
+}
 /**
  * Selects and returns a oneOf schema for the given data
  *
@@ -48,6 +53,8 @@ export function resolveOneOf(node, data) {
                 errors.push(...result);
             }
             else {
+                // @evaluation-info
+                setOneOfOrigin(oneNode.schema, i);
                 return resultNode.next(oneNode.schema);
             }
         }
@@ -73,6 +80,8 @@ export function resolveOneOf(node, data) {
         }
     }
     if (matches.length === 1) {
+        // @evaluation-info
+        setOneOfOrigin(matches[0].schema, matches[0].index);
         return node.next(matches[0].schema);
     }
     if (matches.length > 1) {
@@ -162,6 +171,8 @@ export function resolveOneOfFuzzy(node, data) {
                 errors.push(...result);
             }
             else {
+                // @evaluation-info
+                setOneOfOrigin(oneNode.schema, i);
                 return resultNode.next(oneNode.schema);
             }
         }
@@ -183,6 +194,8 @@ export function resolveOneOfFuzzy(node, data) {
         }
     }
     if (matches.length === 1) {
+        // @evaluation-info
+        setOneOfOrigin(matches[0].schema, matches[0].index);
         return node.next(matches[0].schema);
     }
     // fuzzy match oneOf
@@ -207,6 +220,8 @@ export function resolveOneOfFuzzy(node, data) {
                 oneOf: schema.oneOf
             });
         }
+        // @evaluation-info
+        setOneOfOrigin(schemaOfItem, schemaOfIndex);
         return node.next(schemaOfItem);
     }
     if (matches.length > 1) {

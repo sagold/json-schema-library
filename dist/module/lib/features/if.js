@@ -10,6 +10,8 @@ export function resolveIfSchema(node, data) {
         return undefined;
     }
     if (node.schema.if === false) {
+        // @evaluation-info
+        // schema.__ifelse = true
         return node.next(node.schema.else);
     }
     if (node.schema.if && (node.schema.then || node.schema.else)) {
@@ -17,13 +19,18 @@ export function resolveIfSchema(node, data) {
         const ifErrors = node.draft.validate(ifNode, data);
         if (ifErrors.length === 0 && node.schema.then) {
             const thenNode = node.next(node.schema.then);
+            // @evaluation-info
+            // schema.__ifthen = true
             return node.draft.resolveRef(thenNode);
         }
         if (ifErrors.length !== 0 && node.schema.else) {
             const elseNode = node.next(node.schema.else);
+            // @evaluation-info
+            // schema.__ifelse = true
             return node.draft.resolveRef(elseNode);
         }
     }
+    return undefined;
 }
 /**
  * @returns validation result of it-then-else schema
@@ -31,7 +38,7 @@ export function resolveIfSchema(node, data) {
 const validateIf = (node, value) => {
     const resolvedNode = resolveIfSchema(node, value);
     if (resolvedNode) {
-        // @recursiveRef ok, we not just add per pointer, but any evlauation to dynamic scope / validation path
+        // @recursiveRef ok, we not just add per pointer, but any evluation to dynamic scope / validation path
         return node.draft.validate(resolvedNode, value);
     }
 };
