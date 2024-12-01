@@ -2,8 +2,8 @@
     "compilerOptions": {
         "declaration": false,
         "outDir": "./dist/",
-        "module": "es2015",
-        "target": "es2015",
+        "module": "es2020",
+        "target": "es2018",
         "allowJs": true,
         "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
