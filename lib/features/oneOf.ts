@@ -11,6 +11,12 @@ import { SchemaNode } from "../schemaNode";
 
 const { DECLARATOR_ONEOF } = settings;
 
+function setOneOfOrigin(schema: JsonSchema, index: number) {
+    if (isObject(schema)) {
+        schema.__oneOfIndex = index;
+    }
+}
+
 /**
  * Selects and returns a oneOf schema for the given data
  *
@@ -58,7 +64,7 @@ export function resolveOneOf(node: SchemaNode, data: any): SchemaNode | JsonErro
                 errors.push(...result);
             } else {
                 // @evaluation-info
-                oneNode.schema.__oneOfIndex = i;
+                setOneOfOrigin(oneNode.schema, i);
                 return resultNode.next(oneNode.schema);
             }
         }
@@ -88,7 +94,7 @@ export function resolveOneOf(node: SchemaNode, data: any): SchemaNode | JsonErro
 
     if (matches.length === 1) {
         // @evaluation-info
-        matches[0].schema.__oneOfIndex = matches[0].index;
+        setOneOfOrigin(matches[0].schema, matches[0].index);
         return node.next(matches[0].schema);
     }
     if (matches.length > 1) {
@@ -187,7 +193,7 @@ export function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | Jso
                 errors.push(...result);
             } else {
                 // @evaluation-info
-                oneNode.schema.__oneOfIndex = i;
+                setOneOfOrigin(oneNode.schema, i);
                 return resultNode.next(oneNode.schema);
             }
         }
@@ -213,7 +219,7 @@ export function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | Jso
 
     if (matches.length === 1) {
         // @evaluation-info
-        matches[0].schema.__oneOfIndex = matches[0].index;
+        setOneOfOrigin(matches[0].schema, matches[0].index);
         return node.next(matches[0].schema);
     }
 
@@ -244,7 +250,7 @@ export function resolveOneOfFuzzy(node: SchemaNode, data: any): SchemaNode | Jso
         }
 
         // @evaluation-info
-        schemaOfItem.__oneOfIndex = schemaOfIndex;
+        setOneOfOrigin(schemaOfItem, schemaOfIndex);
         return node.next(schemaOfItem);
     }
 
