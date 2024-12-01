@@ -1,7 +1,7 @@
 /**
  * @draft-07
  */
-import { JsonError, JsonSchema, } from "../types";
+import { JsonError, JsonSchema } from "../types";
 import { JsonValidator } from "../validation/type";
 import { SchemaNode } from "../schemaNode";
 
@@ -12,11 +12,16 @@ import { SchemaNode } from "../schemaNode";
  *
  * @returns json schema defined by if-then-else or undefined
  */
-export function resolveIfSchema(node: SchemaNode, data: unknown): SchemaNode | JsonError | undefined {
+export function resolveIfSchema(
+    node: SchemaNode,
+    data: unknown
+): SchemaNode | JsonError | undefined {
     if (node.schema.if == null) {
         return undefined;
     }
     if (node.schema.if === false) {
+        // @evaluation-info
+        // schema.__ifelse = true
         return node.next(node.schema.else);
     }
 
@@ -26,13 +31,19 @@ export function resolveIfSchema(node: SchemaNode, data: unknown): SchemaNode | J
 
         if (ifErrors.length === 0 && node.schema.then) {
             const thenNode = node.next(node.schema.then as JsonSchema);
+            // @evaluation-info
+            // schema.__ifthen = true
             return node.draft.resolveRef(thenNode);
         }
         if (ifErrors.length !== 0 && node.schema.else) {
             const elseNode = node.next(node.schema.else as JsonSchema);
+            // @evaluation-info
+            // schema.__ifelse = true
             return node.draft.resolveRef(elseNode);
         }
     }
+
+    return undefined;
 }
 
 /**
@@ -41,7 +52,7 @@ export function resolveIfSchema(node: SchemaNode, data: unknown): SchemaNode | J
 const validateIf: JsonValidator = (node, value) => {
     const resolvedNode = resolveIfSchema(node, value);
     if (resolvedNode) {
-        // @recursiveRef ok, we not just add per pointer, but any evlauation to dynamic scope / validation path
+        // @recursiveRef ok, we not just add per pointer, but any evluation to dynamic scope / validation path
         return node.draft.validate(resolvedNode, value);
     }
 };
