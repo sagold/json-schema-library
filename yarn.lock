@@ -1939,7 +1939,7 @@ json-parse-even-better-errors@^2.3.1:
 
 "json-schema-test-suite@https://github.com/json-schema-org/JSON-Schema-Test-Suite#57617f254a6734d5c64fa86fd3b08e8799970b25":
   version "0.1.0"
-  resolved "git+ssh://git@github.com/json-schema-org/JSON-Schema-Test-Suite.git#57617f254a6734d5c64fa86fd3b08e8799970b25"
+  resolved "https://github.com/json-schema-org/JSON-Schema-Test-Suite.git#57617f254a6734d5c64fa86fd3b08e8799970b25"
   integrity sha512-0rrr8Lo3otJ3khoRYJS9qXNxRuNpa+dqD3PmkUX81pTkCQuC+7xhIDawtpa9VBgMXHBKnpN8ohzq1VPzyN4whA==
 
 json-schema-traverse@^0.4.1:
