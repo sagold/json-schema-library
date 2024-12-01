@@ -29,6 +29,15 @@ describe("getChildSchemaSelection", () => {
         expect(result).to.deep.eq([{ type: "string" }]);
     });
 
+    it("should return an empty array if items schema is undefined", () => {
+        const result = getChildSchemaSelection(draft, 2, {
+            type: "array",
+            items: [{ type: "string" }, { type: "number" }]
+        });
+
+        expect(result).to.have.length(0);
+    });
+
     it("should return list of oneOf elements", () => {
         const result = getChildSchemaSelection(draft, "b", {
             type: "array",
