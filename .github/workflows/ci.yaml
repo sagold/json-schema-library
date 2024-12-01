@@ -12,7 +12,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
-            - name: Install Yarn
+            - name: Install yarn (required locally)
               run: npm install --global yarn
             - uses: actions/setup-node@v3
               with:
@@ -40,7 +40,7 @@ jobs:
               with:
                   name: spec 2019-09 test results
                   path: test-result-spec2019-09.json
-            - name: Debug environment variables
+            - uses: dorny/test-reporter@v1.6.0
               with:
                   fail-on-error: false
                   name: spec test results # Name of the check run which will be created
