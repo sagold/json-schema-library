@@ -3,7 +3,6 @@ import createSchemaOf from "./createSchemaOf";
 import { JsonSchema, JsonError, isJsonError } from "./types";
 import { SchemaNode } from "./schemaNode";
 import { reduceSchema } from "./reduceSchema";
-import { mergeSchema } from "./mergeSchema";
 
 type StepFunction = (
     node: SchemaNode,

@@ -1,7 +1,7 @@
 /**
  * @draft-04
  */
-import { SchemaNode, createNode } from "../schemaNode";
+import { SchemaNode } from "../schemaNode";
 import { JsonSchema, JsonError } from "../types";
 import { Draft } from "../draft";
 import { mergeSchema } from "../mergeSchema";

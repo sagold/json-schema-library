@@ -5,7 +5,6 @@ import { reduceSchema } from "../../reduceSchema";
 import { validateDependentSchemas, validateDependentRequired } from "../../features/dependencies";
 import { JsonValidator } from "../../validation/type";
 import { SchemaNode } from "../../schemaNode";
-import { omit } from "../../utils/omit";
 
 /**
  * Get a list of tests to search for a matching pattern to a property
