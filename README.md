@@ -7,7 +7,7 @@
 > footprint or high performance, this package focuses on exposing utilities for browser and node environments and
 > lessens the pain to build custom tools around json-schema.
 
-> ⚠️ This documentation refers to the upcoming release version 10, which can be installed by `npm install json-schema-library@10.0.0-rc2`. For the latest release please refer to the [documentation of version 9.3.5](https://github.com/sagold/json-schema-library/tree/v9.3.5)
+> ⚠️ This documentation refers to the upcoming release version 10, which can be installed by `npm install json-schema-library@10.0.0-rc3`. For the latest release please refer to the [documentation of version 9.3.5](https://github.com/sagold/json-schema-library/tree/v9.3.5)
 
 <p style="text-align:center">
   <a href="#draft-methods">draft methods</a> | <a href="#draft-extensions">draft extensions</a> | <a href="#draft-customization">draft customization</a> | <a href="#breaking-changes">breaking changes</a>
@@ -1008,6 +1008,13 @@ With version `v10.0.0` _draft 2019-09_ is supported and can be used with `import
 _Draft 2019-09_ requires collection of previous resolved sub-schemas. Thus, an additional type `SchemaNode` had to be introduced, which is used in almost all draft methods defined for draft-configs. The api in draft-instances mostly stayed the same with the following exceptions:
 
 -   `step` and resolvers work on and return a `schemaNode`, containing the requested schema
+
+A control property `__oneOfIndex: number` is added to resolved oneOf-schema to retrieve the source of the original schema. If this unwanted behaviour you can disabled this behaviour by:
+
+```ts
+import { settings } from "json-schema-library";
+settings.EXPOSE_ONE_OF_INDEX = false;
+```
 
 ### v9.0.0
 
