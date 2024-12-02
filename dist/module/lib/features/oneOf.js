@@ -6,9 +6,9 @@ import settings from "../config/settings";
 import { errorOrPromise } from "../utils/filter";
 import { isJsonError } from "../types";
 import { isObject } from "../utils/isObject";
-const { DECLARATOR_ONEOF } = settings;
+const { DECLARATOR_ONEOF, EXPOSE_ONE_OF_INDEX } = settings;
 function setOneOfOrigin(schema, index) {
-    if (isObject(schema)) {
+    if (EXPOSE_ONE_OF_INDEX && isObject(schema)) {
         schema.__oneOfIndex = index;
     }
 }
