@@ -9,10 +9,10 @@ import { isObject } from "../utils/isObject";
 import { JsonValidator } from "../validation/type";
 import { SchemaNode } from "../schemaNode";
 
-const { DECLARATOR_ONEOF } = settings;
+const { DECLARATOR_ONEOF, EXPOSE_ONE_OF_INDEX } = settings;
 
 function setOneOfOrigin(schema: JsonSchema, index: number) {
-    if (isObject(schema)) {
+    if (EXPOSE_ONE_OF_INDEX && isObject(schema)) {
         schema.__oneOfIndex = index;
     }
 }
