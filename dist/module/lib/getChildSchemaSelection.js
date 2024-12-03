@@ -1,4 +1,5 @@
 import { isJsonError } from "./types";
+import { isObject } from "./utils/isObject";
 /**
  * Returns a list of possible child-schemas for the given property key. In case of a oneOf selection, multiple schemas
  * could be added at the given property (e.g. item-index), thus an array of options is returned. In all other cases
@@ -17,6 +18,15 @@ export default function getChildSchemaSelection(draft, property, schema = draft.
     if ((_a = schema.items) === null || _a === void 0 ? void 0 : _a.oneOf) {
         return schema.items.oneOf.map((item) => draft.createNode(item).resolveRef().schema);
     }
+    // array.items[] found
+    if (Array.isArray(schema.items) && schema.items.length > +property) {
+        return [draft.step(draft.createNode(schema), property, {}).schema];
+    }
+    // array.items[] exceeded (or undefined), but additionalItems specified
+    if (schema.additionalItems && !isObject(schema.items)) {
+        return [draft.createNode(schema.additionalItems).resolveRef().schema];
+    }
+    // array.items[] exceeded
     if (Array.isArray(schema.items) && schema.items.length <= +property) {
         return [];
     }

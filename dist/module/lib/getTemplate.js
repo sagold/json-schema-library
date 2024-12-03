@@ -134,10 +134,7 @@ function getTemplate(draft, data, _schema, pointer, opts) {
     // @feature oneOf
     if (Array.isArray(schema.oneOf)) {
         if (isEmpty(data)) {
-            const type = schema.oneOf[0].type ||
-                schema.type ||
-                (schema.const && typeof schema.const) ||
-                getTypeOf(data);
+            const type = schema.oneOf[0].type || schema.type || (schema.const && typeof schema.const) || getTypeOf(data);
             schema = { ...schema.oneOf[0], type };
         }
         else {
@@ -169,14 +166,10 @@ function getTemplate(draft, data, _schema, pointer, opts) {
     if (data instanceof File) {
         return data;
     }
-    const type = Array.isArray(schema.type)
-        ? selectType(schema.type, data, schema.default)
-        : schema.type;
+    const type = Array.isArray(schema.type) ? selectType(schema.type, data, schema.default) : schema.type;
     // reset invalid type
     const javascriptTypeOfData = getTypeOf(data);
-    if (data != null &&
-        javascriptTypeOfData !== type &&
-        !(javascriptTypeOfData === "number" && type === "integer")) {
+    if (data != null && javascriptTypeOfData !== type && !(javascriptTypeOfData === "number" && type === "integer")) {
         data = convertValue(type, data);
     }
     if (TYPE[type] == null) {
@@ -216,7 +209,7 @@ const TYPE = {
         var _a;
         const template = schema.default === undefined ? {} : schema.default;
         const d = {}; // do not assign data here, to keep ordering from json-schema
-        const required = (opts.extendDefaults === false && schema.default !== undefined) ? [] : ((_a = schema.required) !== null && _a !== void 0 ? _a : []);
+        const required = opts.extendDefaults === false && schema.default !== undefined ? [] : ((_a = schema.required) !== null && _a !== void 0 ? _a : []);
         if (schema.properties) {
             Object.keys(schema.properties).forEach((key) => {
                 const value = data == null || data[key] == null ? template[key] : data[key];
@@ -239,8 +232,7 @@ const TYPE = {
         }
         if (data) {
             if (opts.removeInvalidData === true &&
-                (schema.additionalProperties === false ||
-                    getTypeOf(schema.additionalProperties) === "object")) {
+                (schema.additionalProperties === false || getTypeOf(schema.additionalProperties) === "object")) {
                 if (getTypeOf(schema.additionalProperties) === "object") {
                     Object.keys(data).forEach((key) => {
                         if (d[key] == null) {
@@ -269,21 +261,35 @@ const TYPE = {
     },
     // build array type of items, ignores additionalItems
     array: (draft, schema, data, pointer, opts) => {
-        var _a, _b;
-        if (schema.items == null) {
-            return data || []; // items are undefined
-        }
+        var _a, _b, _c;
         const template = schema.default === undefined ? [] : schema.default;
         const d = data || template;
-        const minItems = (opts.extendDefaults === false && schema.default !== undefined) ? 0 : (schema.minItems || 0);
+        const minItems = opts.extendDefaults === false && schema.default !== undefined ? 0 : ((_a = schema.minItems) !== null && _a !== void 0 ? _a : 0);
+        if (schema.items == null) {
+            if (schema.additionalItems) {
+                // items-array was processed & this is not an items-schema
+                // => all items are additionalItems
+                const itemCount = Math.max(minItems, d.length);
+                for (let i = 0; i < itemCount; i += 1) {
+                    d[i] = getTemplate(draft, d[i], schema.additionalItems, `${pointer}/additionalItems`, opts);
+                }
+            }
+            return data || []; // items are undefined
+        }
         // build defined set of items
         if (Array.isArray(schema.items)) {
-            for (let i = 0, l = Math.max(minItems !== null && minItems !== void 0 ? minItems : 0, (_b = (_a = schema.items) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0); i < l; i += 1) {
-                d[i] = getTemplate(draft, d[i] == null ? template[i] : d[i], schema.items[i], `${pointer}/items/${i}`, opts);
+            const length = Math.max(minItems !== null && minItems !== void 0 ? minItems : 0, (_c = (_b = schema.items) === null || _b === void 0 ? void 0 : _b.length) !== null && _c !== void 0 ? _c : 0);
+            for (let i = 0; i < length; i += 1) {
+                if (schema.items[i]) {
+                    d[i] = getTemplate(draft, d[i] == null ? template[i] : d[i], schema.items[i], `${pointer}/items/${i}`, opts);
+                }
+                else if (schema.additionalItems) {
+                    d[i] = getTemplate(draft, d[i] == null ? template[i] : d[i], schema.additionalItems, `${pointer}/additionalItems`, opts);
+                }
             }
             return d;
         }
-        // abort if the schema is invalid
+        // no items-schema - return
         if (getTypeOf(schema.items) !== "object") {
             return d;
         }
