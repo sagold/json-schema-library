@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { JsonEditor as Core } from "../../lib/jsoneditor";
 import getChildSchemaSelection from "../../lib/getChildSchemaSelection";
 
-describe("getChildSchemaSelection", () => {
+describe.only("getChildSchemaSelection", () => {
     let draft: Core;
     before(() => (draft = new Core()));
 
@@ -67,5 +67,58 @@ describe("getChildSchemaSelection", () => {
 
         expect(result).to.have.length(2);
         expect(result).to.deep.eq([{ type: "string" }, { type: "number" }]);
+    });
+
+    describe("additionalItems", () => {
+        it("should return additionalItem schema", () => {
+            draft.setSchema({
+                type: "array",
+                additionalItems: { id: "number", type: "number", default: 2 }
+            });
+
+            const result = getChildSchemaSelection(draft, 1, draft.getSchema());
+
+            expect(result).to.have.length(1);
+            expect(result).to.deep.eq([{ id: "number", type: "number", default: 2 }]);
+        });
+
+        it("should return additionalItem schema when items-list is exceeded", () => {
+            draft.setSchema({
+                type: "array",
+                items: [{ type: "string" }],
+                additionalItems: { id: "number", type: "number", default: 2 }
+            });
+
+            const result = getChildSchemaSelection(draft, 1, draft.getSchema());
+
+            expect(result).to.have.length(1);
+            expect(result).to.deep.eq([{ id: "number", type: "number", default: 2 }]);
+        });
+
+        it("should return items-schema instead of additionalItems if item is defined", () => {
+            draft.setSchema({
+                type: "array",
+                items: [{ type: "string" }, { type: "string" }],
+                additionalItems: { id: "number", type: "number", default: 2 }
+            });
+
+            const result = getChildSchemaSelection(draft, 1, draft.getSchema());
+
+            expect(result).to.have.length(1);
+            expect(result).to.deep.eq([{ type: "string" }]);
+        });
+
+        it("should not return additionalItems if item-schema is object", () => {
+            draft.setSchema({
+                type: "array",
+                items: { type: "string" },
+                additionalItems: { id: "number", type: "number", default: 2 }
+            });
+
+            const result = getChildSchemaSelection(draft, 1, draft.getSchema());
+
+            expect(result).to.have.length(1);
+            expect(result).to.deep.eq([{ type: "string" }]);
+        });
     });
 });
