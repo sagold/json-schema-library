@@ -273,12 +273,9 @@ describe("getTemplate", () => {
                     additionalProperties: false
                 });
 
-                const res = getTemplate(
-                    draft,
-                    { first: "first", second: 42, thrid: "third" },
-                    draft.getSchema(),
-                    { removeInvalidData: true }
-                );
+                const res = getTemplate(draft, { first: "first", second: 42, thrid: "third" }, draft.getSchema(), {
+                    removeInvalidData: true
+                });
                 expect(res).to.deep.equal({ first: "first" });
             });
 
@@ -307,6 +304,7 @@ describe("getTemplate", () => {
         });
 
         describe("$ref", () => {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
             const settings = require("../../lib/config/settings");
             const initialValue = settings.GET_TEMPLATE_RECURSION_LIMIT;
             before(() => (settings.GET_TEMPLATE_RECURSION_LIMIT = 1));
@@ -429,6 +427,7 @@ describe("getTemplate", () => {
 
             // should not follow $ref to infinity
             it("should create template of draft04", () => {
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
                 draft.setSchema(require("../../remotes/draft04.json"));
                 const res = draft.getTemplate({});
                 // console.log("RESULT\n", JSON.stringify(res, null, 2));
@@ -641,12 +640,7 @@ describe("getTemplate", () => {
                             }
                         });
 
-                        const res = getTemplate(
-                            draft,
-                            { trigger: "yes" },
-                            draft.getSchema(),
-                            TEMPLATE_OPTIONS
-                        );
+                        const res = getTemplate(draft, { trigger: "yes" }, draft.getSchema(), TEMPLATE_OPTIONS);
                         expect(res).to.deep.equal({ trigger: "yes", dependency: "default" });
                     });
 
@@ -704,12 +698,7 @@ describe("getTemplate", () => {
                             }
                         });
 
-                        const res = getTemplate(
-                            draft,
-                            { trigger: "yes" },
-                            draft.getSchema(),
-                            TEMPLATE_OPTIONS
-                        );
+                        const res = getTemplate(draft, { trigger: "yes" }, draft.getSchema(), TEMPLATE_OPTIONS);
                         expect(res).to.deep.equal({ trigger: "yes", dependency: "default" });
                     });
                 });
@@ -753,12 +742,9 @@ describe("getTemplate", () => {
                             }
                         }
                     });
-                    const res = getTemplate(
-                        draft,
-                        { additionalValue: "input value" },
-                        draft.getSchema(),
-                        { addOptionalProps: true }
-                    );
+                    const res = getTemplate(draft, { additionalValue: "input value" }, draft.getSchema(), {
+                        addOptionalProps: true
+                    });
                     expect(res).to.deep.equal({
                         test: "tested value",
                         additionalValue: "input value"
@@ -1010,6 +996,37 @@ describe("getTemplate", () => {
                 const res = getTemplate(draft, ["43"]);
 
                 expect(res).to.deep.equal([false]);
+            });
+
+            describe("additionalItems", () => {
+                it("should add defaults from additionalItems ", () => {
+                    draft.setSchema({
+                        type: "array",
+                        minItems: 2,
+                        additionalItems: {
+                            type: "number",
+                            default: 2
+                        }
+                    });
+                    const res = getTemplate(draft, ["43"]);
+
+                    expect(res).to.deep.equal([43, 2]);
+                });
+
+                it("should add defaults from additionalItems for unspecified items ", () => {
+                    draft.setSchema({
+                        type: "array",
+                        minItems: 2,
+                        items: [{ type: "boolean" }],
+                        additionalItems: {
+                            type: "number",
+                            default: 2
+                        }
+                    });
+                    const res = getTemplate(draft, ["43"]);
+
+                    expect(res).to.deep.equal([false, 2]);
+                });
             });
         });
 
@@ -1307,9 +1324,7 @@ describe("getTemplate", () => {
             });
         });
 
-
         describe("extendDefaults", () => {
-
             it("should keep array default-value with 'extendDefaults:false'", () => {
                 draft.setSchema({
                     type: "array",
@@ -1406,6 +1421,5 @@ describe("getTemplate", () => {
                 expect(res).to.deep.equal({ title: "" });
             });
         });
-
     });
 });
