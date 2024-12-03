@@ -24,7 +24,9 @@ export default function getChildSchemaSelection(draft, property, schema = draft.
     }
     // array.items[] exceeded (or undefined), but additionalItems specified
     if (schema.additionalItems && !isObject(schema.items)) {
-        return [draft.createNode(schema.additionalItems).resolveRef().schema];
+        // we fallback to a string if no schema is defined - might be subject for configuration
+        const additionalSchema = schema.additionalItems === true ? { type: "string" } : schema.additionalItems;
+        return [draft.createNode(additionalSchema).resolveRef().schema];
     }
     // array.items[] exceeded
     if (Array.isArray(schema.items) && schema.items.length <= +property) {

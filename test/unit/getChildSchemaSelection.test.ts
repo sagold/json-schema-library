@@ -70,6 +70,43 @@ describe("getChildSchemaSelection", () => {
     });
 
     describe("additionalItems", () => {
+        it("should return empty list if additionalItems is false", () => {
+            draft.setSchema({
+                type: "array",
+                items: [{ type: "string" }],
+                additionalItems: false
+            });
+
+            const result = getChildSchemaSelection(draft, 1, draft.getSchema());
+
+            expect(result).to.have.length(0);
+        });
+
+        it("should return empty list if additionalItems is undefined", () => {
+            draft.setSchema({
+                type: "array",
+                items: [{ type: "string" }],
+                additionalItems: undefined
+            });
+
+            const result = getChildSchemaSelection(draft, 1, draft.getSchema());
+
+            expect(result).to.have.length(0);
+        });
+
+        it("should return string-schema if additionalItems is true", () => {
+            draft.setSchema({
+                type: "array",
+                items: [{ type: "string" }],
+                additionalItems: true
+            });
+
+            const result = getChildSchemaSelection(draft, 1, draft.getSchema());
+
+            expect(result).to.have.length(1);
+            expect(result).to.deep.eq([{ type: "string" }]);
+        });
+
         it("should return additionalItem schema", () => {
             draft.setSchema({
                 type: "array",
