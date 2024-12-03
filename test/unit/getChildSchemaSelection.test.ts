@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { JsonEditor as Core } from "../../lib/jsoneditor";
 import getChildSchemaSelection from "../../lib/getChildSchemaSelection";
 
-describe.only("getChildSchemaSelection", () => {
+describe("getChildSchemaSelection", () => {
     let draft: Core;
     before(() => (draft = new Core()));
 
