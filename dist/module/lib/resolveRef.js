@@ -6,20 +6,22 @@ function resolveRecursiveRef(node) {
     // RESTRICT BY CHANGE IN BASE-URL
     let startIndex = 0;
     for (let i = history.length - 1; i >= 0; i--) {
-        if (history[i].$id && /^https?:\/\//.test(history[i].$id) && history[i].$recursiveAnchor !== true) {
+        const step = history[i][1];
+        if (step.$id && /^https?:\/\//.test(step.$id) && step.$recursiveAnchor !== true) {
             startIndex = i;
             break;
         }
     }
     // FROM THERE FIND FIRST OCCURENCE OF ANCHOR
-    const firstAnchor = history.find((s, index) => index >= startIndex && s.$recursiveAnchor === true);
+    const firstAnchor = history.find((s, index) => index >= startIndex && s[1].$recursiveAnchor === true);
     if (firstAnchor) {
-        return node.next(firstAnchor);
+        return node.next(firstAnchor[1]);
     }
     // THEN RETURN LATEST BASE AS TARGET
     for (let i = history.length - 1; i >= 0; i--) {
-        if (history[i].$id) {
-            return node.next(history[i]);
+        const step = history[i][1];
+        if (step.$id) {
+            return node.next(step);
         }
     }
     // OR RETURN ROOT

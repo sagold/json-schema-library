@@ -11,7 +11,7 @@ export type SchemaNode = {
     draft: Draft;
     pointer: string;
     schema: JsonSchema;
-    path: JsonSchema[];
+    path: [string, JsonSchema][];
     next: typeof next;
     merge: typeof merge;
     resolveRef: typeof resolveRef;

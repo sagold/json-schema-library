@@ -8,7 +8,7 @@ function merge(schema, ...omit) {
     }
     const node = this;
     const mergedSchema = mergeSchema(node.schema, schema, ...omit);
-    return { ...node, schema: mergedSchema, path: [...node.path, node.schema] };
+    return { ...node, schema: mergedSchema, path: [...node.path, [node.pointer, node.schema]] };
 }
 function resolveRef() {
     const node = this;
@@ -29,7 +29,7 @@ function next(schema, key) {
         ...node,
         pointer: key ? `${node.pointer}/${key}` : node.pointer,
         schema,
-        path: [...node.path, node.schema]
+        path: [...node.path, [node.pointer, node.schema]]
     };
 }
 export function isSchemaNode(value) {
