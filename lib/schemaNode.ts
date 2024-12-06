@@ -10,7 +10,7 @@ function merge(schema: JsonSchema, ...omit: string[]): SchemaNode {
     }
     const node = this as SchemaNode;
     const mergedSchema = mergeSchema(node.schema, schema, ...omit);
-    return { ...node, schema: mergedSchema, path: [...node.path, node.schema] };
+    return { ...node, schema: mergedSchema, path: [...node.path, [node.pointer, node.schema]] };
 }
 
 function resolveRef() {
@@ -41,7 +41,7 @@ function next(schema: JsonSchema, key?: string | number) {
         ...node,
         pointer: key ? `${node.pointer}/${key}` : node.pointer,
         schema,
-        path: [...node.path, node.schema]
+        path: [...node.path, [node.pointer, node.schema]]
     };
 }
 
@@ -49,11 +49,11 @@ export type SchemaNode = {
     draft: Draft;
     pointer: string;
     schema: JsonSchema;
-    path: JsonSchema[];
+    path: [string, JsonSchema][];
     next: typeof next;
     merge: typeof merge;
     resolveRef: typeof resolveRef;
-}
+};
 
 export function isSchemaNode(value: unknown): value is SchemaNode {
     // @ts-expect-error unknown object
