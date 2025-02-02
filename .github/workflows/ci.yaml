@@ -2,13 +2,12 @@ name: CI
 
 on:
     push:
-        branches: [main]
+        branches: [main, workflow]
     pull_request:
         branches: [main]
 
 jobs:
-    ci:
-        name: install
+    install:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
@@ -20,30 +19,98 @@ jobs:
                   cache: "yarn"
             - name: Install dependencies
               run: yarn install --frozen-lockfile
-            - name: unit tests
+
+    run-unit-tests:
+        runs-on: ubuntu-latest
+        needs: install
+        steps:
+            - uses: actions/checkout@v3
+            - name: Install dependencies
+              run: yarn install --frozen-lockfile
+            - name: Run unit tests
               run: yarn test:unit:ci
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: test-results-unit-tests
+                  path: test-result-unit.json
             - uses: dorny/test-reporter@v1.6.0
               with:
-                  name: unit test results
+                  name: test-results / unit-tests
                   path: test-result-unit.json
                   reporter: mocha-json
+
+    run-spec-v4-tests:
+        runs-on: ubuntu-latest
+        needs: install
+        steps:
+            - uses: actions/checkout@v3
+            - name: Install dependencies
+              run: yarn install --frozen-lockfile
             - name: Test spec v4
               run: yarn test:spec:4:ci
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: test-results-spec-4
+                  path: test-result-spec4.json
+            - uses: dorny/test-reporter@v1.6.0
+              with:
+                  name: test-results / spec-4
+                  path: test-result-spec4.json
+                  reporter: mocha-json
+
+    run-spec-v6-tests:
+        runs-on: ubuntu-latest
+        needs: install
+        steps:
+            - uses: actions/checkout@v3
+            - name: Install dependencies
+              run: yarn install --frozen-lockfile
             - name: Test spec v6
               run: yarn test:spec:6:ci
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: test-results-spec-6
+                  path: test-result-spec6.json
+            - uses: dorny/test-reporter@v1.6.0
+              with:
+                  name: test-results / spec-6
+                  path: test-result-spec6.json
+                  reporter: mocha-json
+
+    run-spec-v7-tests:
+        runs-on: ubuntu-latest
+        needs: install
+        steps:
+            - uses: actions/checkout@v3
+            - name: Install dependencies
+              run: yarn install --frozen-lockfile
             - name: Test spec v7
               run: yarn test:spec:7:ci
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: test-results-spec-7
+                  path: test-result-spec7.json
+            - uses: dorny/test-reporter@v1.6.0
+              with:
+                  name: test-results / spec-7
+                  path: test-result-spec7.json
+                  reporter: mocha-json
+
+    run-spec-2019-09-tests:
+        runs-on: ubuntu-latest
+        needs: install
+        steps:
+            - uses: actions/checkout@v3
+            - name: Install dependencies
+              run: yarn install --frozen-lockfile
             - name: Test spec 2019-09
               run: yarn test:spec:2019:ci
-            - name: Archive code coverage results
-              uses: actions/upload-artifact@v3
+            - uses: actions/upload-artifact@v4
               with:
-                  name: spec 2019-09 test results
+                  name: test-results-spec-2019-09
                   path: test-result-spec2019-09.json
             - uses: dorny/test-reporter@v1.6.0
               with:
-                  fail-on-error: false
-                  name: spec test results # Name of the check run which will be created
-                  path: test-result-spec*.json # Path to test results
-                  reporter: mocha-json # Format of test results
-                  list-suites: "failed"
+                  name: test-results / spec-2019-09
+                  path: test-result-spec2019-09.json
+                  reporter: mocha-json
