@@ -1,6 +1,6 @@
 {
     "name": "json-schema-library",
-    "version": "10.0.0-rc7",
+    "version": "10.0.0-rc8",
     "description": "Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation",
     "module": "dist/module/index.js",
     "types": "dist/index.d.ts",
@@ -31,7 +31,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/sagold/json-schema-library.git"
+        "url": "git+https://github.com/sagold/json-schema-library.git"
     },
     "keywords": [
         "JSON",
