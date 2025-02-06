@@ -107,7 +107,7 @@ export class Draft {
      *
      * @param [data] - optional template data
      * @param [schema] - json schema, defaults to rootSchema
-     * @param [options] - options for getTemplate (addDefault: boolean, extendDefaults: boolean)
+     * @param [options] - partial set of options to override draft-setting templateDefaultOptions
      * @return created template data
      */
     getTemplate(data, schema, opts) {
