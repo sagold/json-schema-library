@@ -1005,6 +1005,18 @@ With version `v10.0.0` _draft 2019-09_ is supported and can be used with `import
 
 **breaking changes**:
 
+-   removed `templateDefaultOptions` from global settings-object. Instead configure getTemplate per draft instead on `draft.templateDefaultOptions`
+
+```ts
+new Draft2019(schema, {
+    templateDefaultOptions: {
+        addOptionalProps: false,
+        removeInvalidData: false,
+        extendDefaults: true
+    })
+});
+```
+
 _Draft 2019-09_ requires collection of previous resolved sub-schemas. Thus, an additional type `SchemaNode` had to be introduced, which is used in almost all draft methods defined for draft-configs. The api in draft-instances mostly stayed the same with the following exceptions:
 
 -   `step` and resolvers work on and return a `schemaNode`, containing the requested schema

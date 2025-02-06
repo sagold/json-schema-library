@@ -6,7 +6,7 @@ import { Draft04 } from "../../lib/draft04";
 // @NOTE OneOf can be used to select required? https://github.com/epoberezkin/ajv/issues/134#issuecomment-190680773
 describe("getTemplate", () => {
     let draft: Draft04;
-    before(() => (draft = new Draft04()));
+    before(() => (draft = new Draft04({ type: "string" })));
 
     it("should set an empty string if no default value is given", () => {
         draft.setSchema({ type: "string" });

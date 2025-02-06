@@ -10,12 +10,11 @@ import isValid from "../isValid";
 import KEYWORDS from "../validation/keyword";
 import merge from "../utils/merge";
 import resolveRef from "../resolveRef.strict";
-import settings from "../config/settings";
 import step from "../step";
 import TYPES from "../validation/type";
 import validate from "../validate";
 import { createNode } from "../schemaNode";
-import { DraftConfig, Draft } from "../draft";
+import { DraftConfig, Draft, templateDefaultOptions } from "../draft";
 import { each } from "../each";
 import { eachSchema } from "../eachSchema";
 import { JsonSchema } from "../types";
@@ -25,17 +24,7 @@ import { resolveOneOf } from "../features/oneOf";
 
 const draft04Config: DraftConfig = {
     typeKeywords: {
-        array: [
-            "allOf",
-            "anyOf",
-            "enum",
-            "items",
-            "maxItems",
-            "minItems",
-            "not",
-            "oneOf",
-            "uniqueItems"
-        ],
+        array: ["allOf", "anyOf", "enum", "items", "maxItems", "minItems", "not", "oneOf", "uniqueItems"],
         boolean: ["enum", "not", "allOf", "anyOf", "oneOf"],
         object: [
             "additionalProperties",
@@ -52,28 +41,8 @@ const draft04Config: DraftConfig = {
             "allOf",
             "anyOf"
         ],
-        string: [
-            "allOf",
-            "anyOf",
-            "enum",
-            "format",
-            "maxLength",
-            "minLength",
-            "not",
-            "oneOf",
-            "pattern"
-        ],
-        number: [
-            "allOf",
-            "anyOf",
-            "enum",
-            "format",
-            "maximum",
-            "minimum",
-            "multipleOf",
-            "not",
-            "oneOf"
-        ],
+        string: ["allOf", "anyOf", "enum", "format", "maxLength", "minLength", "not", "oneOf", "pattern"],
+        number: ["allOf", "anyOf", "enum", "format", "maximum", "minimum", "multipleOf", "not", "oneOf"],
         null: ["allOf", "anyOf", "enum", "format", "not", "oneOf"]
     },
     createNode,
@@ -98,7 +67,7 @@ const draft04Config: DraftConfig = {
     step,
     validate,
 
-    templateDefaultOptions: settings.templateDefaultOptions
+    templateDefaultOptions
 };
 
 class Draft04 extends Draft {

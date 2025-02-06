@@ -10,12 +10,11 @@ import isValid from "../isValid";
 import KEYWORDS from "../draft06/validation/keyword";
 import merge from "../utils/merge";
 import resolveRef from "../resolveRef.strict";
-import settings from "../config/settings";
 import step from "../step";
 import TYPES from "../validation/type";
 import validate from "../validate";
 import { createNode } from "../schemaNode";
-import { DraftConfig, Draft } from "../draft";
+import { DraftConfig, Draft, templateDefaultOptions } from "../draft";
 import { each } from "../each";
 import { eachSchema } from "../eachSchema";
 import { JsonSchema } from "../types";
@@ -56,18 +55,7 @@ const draft07Config: DraftConfig = {
             "propertyNames",
             "required"
         ],
-        string: [
-            "allOf",
-            "anyOf",
-            "enum",
-            "format",
-            "if",
-            "maxLength",
-            "minLength",
-            "not",
-            "oneOf",
-            "pattern"
-        ],
+        string: ["allOf", "anyOf", "enum", "format", "if", "maxLength", "minLength", "not", "oneOf", "pattern"],
         number: [
             "allOf",
             "anyOf",
@@ -106,7 +94,7 @@ const draft07Config: DraftConfig = {
     step,
     validate,
 
-    templateDefaultOptions: settings.templateDefaultOptions
+    templateDefaultOptions
 };
 
 class Draft07 extends Draft {

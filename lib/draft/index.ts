@@ -19,6 +19,12 @@ import { resolveAllOf } from "../features/allOf";
 import { resolveAnyOf } from "../features/anyOf";
 import { resolveOneOf } from "../features/oneOf";
 
+export const templateDefaultOptions: TemplateOptions = {
+    addOptionalProps: false,
+    removeInvalidData: false,
+    extendDefaults: true
+};
+
 export type DraftConfig = {
     /** error creators by id */
     errors: Record<string, CreateError>;
@@ -165,14 +171,12 @@ export class Draft {
      *
      * @param [data] - optional template data
      * @param [schema] - json schema, defaults to rootSchema
+     * @param [options] - options for getTemplate (addDefault: boolean, extendDefaults: boolean)
      * @return created template data
      */
-    getTemplate(
-        data?: unknown,
-        schema?: JsonSchema,
-        opts: TemplateOptions = this.config.templateDefaultOptions
-    ) {
-        return this.config.getTemplate(this, data, schema, opts);
+    getTemplate(data?: unknown, schema?: JsonSchema, opts?: TemplateOptions) {
+        const options = opts ? { ...this.config.templateDefaultOptions, ...opts } : this.config.templateDefaultOptions;
+        return this.config.getTemplate(this, data, schema, options);
     }
 
     isValid(data: unknown, schema?: JsonSchema, pointer?: JsonPointer): boolean {
@@ -229,11 +233,7 @@ export class Draft {
      */
     validate(node: SchemaNode, data: unknown): JsonError[];
     validate(data: unknown, schema?: JsonSchema, pointer?: JsonPointer): JsonError[];
-    validate(
-        data: unknown,
-        schema: JsonSchema = this.rootSchema,
-        pointer?: JsonPointer
-    ): JsonError[] {
+    validate(data: unknown, schema: JsonSchema = this.rootSchema, pointer?: JsonPointer): JsonError[] {
         if (isSchemaNode(data)) {
             const inputData = schema;
             const inuptNode = data;
