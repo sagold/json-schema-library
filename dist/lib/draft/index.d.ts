@@ -17,6 +17,7 @@ import { JsonValidator, JsonTypeValidator } from "../validation/type";
 import { resolveAllOf } from "../features/allOf";
 import { resolveAnyOf } from "../features/anyOf";
 import { resolveOneOf } from "../features/oneOf";
+export declare const templateDefaultOptions: TemplateOptions;
 export type DraftConfig = {
     /** error creators by id */
     errors: Record<string, CreateError>;
@@ -113,6 +114,7 @@ export declare class Draft {
      *
      * @param [data] - optional template data
      * @param [schema] - json schema, defaults to rootSchema
+     * @param [options] - options for getTemplate (addDefault: boolean, extendDefaults: boolean)
      * @return created template data
      */
     getTemplate(data?: unknown, schema?: JsonSchema, opts?: TemplateOptions): any;

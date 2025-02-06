@@ -10,12 +10,11 @@ import isValid from "../isValid";
 import KEYWORDS from "./validation/keyword";
 import merge from "../utils/merge";
 import resolveRef from "../resolveRef";
-import settings from "../config/settings";
 import step from "../step";
 import TYPES from "../validation/type";
 import validate from "../validate";
 import { createNode } from "../schemaNode";
-import { Draft } from "../draft";
+import { Draft, templateDefaultOptions } from "../draft";
 import { each } from "../each";
 import { eachSchema } from "../eachSchema";
 import { resolveAllOf } from "../features/allOf";
@@ -58,18 +57,7 @@ const draft2019Config = {
             "required",
             "unevaluatedProperties" // 2019-09
         ],
-        string: [
-            "allOf",
-            "anyOf",
-            "enum",
-            "format",
-            "if",
-            "maxLength",
-            "minLength",
-            "not",
-            "oneOf",
-            "pattern"
-        ],
+        string: ["allOf", "anyOf", "enum", "format", "if", "maxLength", "minLength", "not", "oneOf", "pattern"],
         number: [
             "allOf",
             "anyOf",
@@ -106,7 +94,7 @@ const draft2019Config = {
     resolveRef,
     step,
     validate,
-    templateDefaultOptions: settings.templateDefaultOptions
+    templateDefaultOptions
 };
 class Draft2019 extends Draft {
     constructor(schema, config = {}) {

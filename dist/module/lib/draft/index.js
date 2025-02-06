@@ -1,6 +1,11 @@
 import copy from "../utils/copy";
 import { isJsonError } from "../types";
 import { isSchemaNode } from "../schemaNode";
+export const templateDefaultOptions = {
+    addOptionalProps: false,
+    removeInvalidData: false,
+    extendDefaults: true
+};
 export class Draft {
     constructor(config, schema) {
         /** cache for remote schemas */
@@ -102,10 +107,12 @@ export class Draft {
      *
      * @param [data] - optional template data
      * @param [schema] - json schema, defaults to rootSchema
+     * @param [options] - options for getTemplate (addDefault: boolean, extendDefaults: boolean)
      * @return created template data
      */
-    getTemplate(data, schema, opts = this.config.templateDefaultOptions) {
-        return this.config.getTemplate(this, data, schema, opts);
+    getTemplate(data, schema, opts) {
+        const options = opts ? { ...this.config.templateDefaultOptions, ...opts } : this.config.templateDefaultOptions;
+        return this.config.getTemplate(this, data, schema, options);
     }
     isValid(data, schema, pointer) {
         return this.config.isValid(this, data, schema, pointer);

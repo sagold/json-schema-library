@@ -4,10 +4,5 @@ declare const _default: {
     EXPOSE_ONE_OF_INDEX: boolean;
     GET_TEMPLATE_RECURSION_LIMIT: number;
     propertyBlacklist: string[];
-    templateDefaultOptions: {
-        addOptionalProps: boolean;
-        removeInvalidData: boolean;
-        extendDefaults: boolean;
-    };
 };
 export default _default;

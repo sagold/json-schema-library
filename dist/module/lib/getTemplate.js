@@ -11,7 +11,6 @@ import { resolveIfSchema } from "./features/if";
 import { mergeAllOfSchema, resolveSchema } from "./features/allOf";
 import { resolveDependencies } from "./features/dependencies";
 import { mergeSchema } from "./mergeSchema";
-const defaultOptions = settings.templateDefaultOptions;
 let cache;
 function shouldResolveRef(schema, pointer) {
     const { $ref } = schema;
@@ -361,8 +360,5 @@ function getDefault(schema, templateValue, initValue) {
 }
 export default (draft, data, schema = draft.rootSchema, opts) => {
     cache = {};
-    if (opts) {
-        return getTemplate(draft, data, schema, "#", { ...defaultOptions, ...opts });
-    }
-    return getTemplate(draft, data, schema, "#", defaultOptions);
+    return getTemplate(draft, data, schema, "#", opts !== null && opts !== void 0 ? opts : {});
 };
