@@ -91,6 +91,7 @@
     },
     "resolutions": {
         "braces": ">=3.0.3",
+        "cross-spawn": ">=7.0.6",
         "json5": ">=2.2.3",
         "lodash": ">=4",
         "merge": ">=2",
