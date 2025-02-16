@@ -1,3 +1,21 @@
+# 06 with poc
+
+> compiled schema results with data only expose the following?
+
+```js
+{
+  properties: {},
+  byPatternOrFallback: [] // pattern, additional
+}
+```
+
+```js
+{
+  items: [],
+  byPatternOrFallback: []  // additional
+}
+```
+
 # 05 flow
 
 ```js

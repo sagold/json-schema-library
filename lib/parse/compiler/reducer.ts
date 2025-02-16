@@ -11,7 +11,7 @@ export function reduceAllOf({ node, data }: JsonSchemaReducerParams) {
     for (let i = 0; i < node.allOf.length; i += 1) {
         const schemaNode = node.allOf[i].reduce({ data });
         const schema = mergeSchema(node.allOf[i].schema, schemaNode.schema);
-        mergedSchema = mergeSchema(mergedSchema, schema);
+        mergedSchema = mergeSchema(mergedSchema, schema, "allOf");
     }
     return node.compileSchema(node.draft, mergedSchema);
 }
@@ -22,12 +22,12 @@ export function reduceIf({ node, data }: JsonSchemaReducerParams) {
         if (node.then) {
             // reduce creates a new node
             const schemaNode = node.then.reduce({ data });
-            const schema = mergeSchema(node.then.schema, schemaNode.schema);
+            const schema = mergeSchema(node.then.schema, schemaNode.schema, "if", "then", "else");
             return node.compileSchema(node.draft, schema);
         }
     } else if (node.else) {
         const schemaNode = node.else.reduce({ data });
-        const schema = mergeSchema(node.else.schema, schemaNode.schema);
+        const schema = mergeSchema(node.else.schema, schemaNode.schema, "if", "then", "else");
         return node.compileSchema(node.draft, schema);
     }
     return undefined;

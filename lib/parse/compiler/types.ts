@@ -7,6 +7,12 @@ export type JsonSchemaReducer = (options: JsonSchemaReducerParams) => SchemaNode
 export type JsonSchemaResolverParams = { key: string | number; data: unknown; node: SchemaNode };
 export type JsonSchemaResolver = (options: JsonSchemaResolverParams) => SchemaNode | undefined;
 
+export type CompiledSchema = {
+    getSchema: () => JsonSchema | undefined;
+    next: (key: string | number) => CompiledSchema | undefined;
+    get: (key: string | number) => JsonSchema | undefined;
+};
+
 export type SchemaNode = {
     draft: Draft;
     /** property name or index */
@@ -17,8 +23,8 @@ export type SchemaNode = {
     reducers: JsonSchemaReducer[];
     resolvers: JsonSchemaResolver[];
     reduce: ({ data }: { data: unknown }) => SchemaNode | undefined;
-    compile: (data: unknown) => { get(key: string | number): JsonSchema | undefined };
-    children?: SchemaNode[];
+    compile: (data?: unknown) => CompiledSchema;
+    properties?: Record<string, SchemaNode>;
     if?: SchemaNode;
     then?: SchemaNode;
     else?: SchemaNode;

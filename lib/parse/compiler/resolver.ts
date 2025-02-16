@@ -1,7 +1,7 @@
 import { isObject } from "../../utils/isObject";
 import { JsonSchemaResolverParams } from "./types";
 
-function getValue(data: unknown, key: string | number) {
+export function getValue(data: unknown, key: string | number) {
     if (isObject(data)) {
         return data[key];
     } else if (Array.isArray(data)) {
@@ -20,8 +20,5 @@ export function additionalPropertyResolver({ node, data, key }: JsonSchemaResolv
 }
 
 export function propertyResolver({ node, key }: JsonSchemaResolverParams) {
-    const schemaNode = node.children.find((child) => child.key === key);
-    if (schemaNode) {
-        return schemaNode;
-    }
+    return node.properties[key];
 }
