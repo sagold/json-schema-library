@@ -13,7 +13,7 @@ export function reduceAllOf({ node, data }: JsonSchemaReducerParams) {
         const schema = mergeSchema(node.allOf[i].schema, schemaNode.schema);
         mergedSchema = mergeSchema(mergedSchema, schema, "allOf");
     }
-    return node.compileSchema(node.draft, mergedSchema);
+    return node.compileSchema(node.draft, mergedSchema, `${node.spointer}/allOf`);
 }
 
 reduceIf.toJSON = () => "reduceIf";
@@ -23,12 +23,12 @@ export function reduceIf({ node, data }: JsonSchemaReducerParams) {
             // reduce creates a new node
             const schemaNode = node.then.reduce({ data });
             const schema = mergeSchema(node.then.schema, schemaNode.schema, "if", "then", "else");
-            return node.compileSchema(node.draft, schema);
+            return node.compileSchema(node.draft, schema, node.then.spointer);
         }
     } else if (node.else) {
         const schemaNode = node.else.reduce({ data });
         const schema = mergeSchema(node.else.schema, schemaNode.schema, "if", "then", "else");
-        return node.compileSchema(node.draft, schema);
+        return node.compileSchema(node.draft, schema, node.else.spointer);
     }
     return undefined;
 }

@@ -57,7 +57,7 @@ describe.only("compiled object schema", () => {
                 }
             });
 
-            const schema = node.compile().get("header");
+            const schema = node.get("header")?.schema;
 
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });
@@ -70,7 +70,7 @@ describe.only("compiled object schema", () => {
                 }
             });
 
-            const schema = node.compile({ header: "huhu" }).get("header");
+            const schema = node.get("header", { header: "huhu" })?.schema;
 
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });
@@ -88,10 +88,7 @@ describe.only("compiled object schema", () => {
                 }
             });
 
-            const schema = node
-                .compile({ header: { title: "huhu" } })
-                .next("header")
-                .get("title");
+            const schema = node.get("header", { header: { title: "huhu" } }).get("title")?.schema;
 
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });
@@ -106,7 +103,7 @@ describe.only("compiled object schema", () => {
                 then: { allOf: [{ required: ["header"], properties: { header: { type: "string", minLength: 1 } } }] }
             });
 
-            const schema = node.compile({ withHeader: false }).get("withHeader");
+            const schema = node.get("withHeader", { withHeader: false })?.schema;
 
             assert.deepEqual(schema, { type: "boolean", default: true });
         });
@@ -119,7 +116,7 @@ describe.only("compiled object schema", () => {
                 additionalProperties: { type: "string", minLength: 1 }
             });
 
-            const schema = node.compile({ header: "huhu" }).get("header");
+            const schema = node.get("header", { header: "huhu" })?.schema;
 
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });
@@ -130,7 +127,7 @@ describe.only("compiled object schema", () => {
                 additionalProperties: false
             });
 
-            const schema = node.compile({ header: "huhu" }).get("header");
+            const schema = node.get("header", { header: "huhu" })?.schema;
 
             assert.deepEqual(schema, undefined);
         });
@@ -141,7 +138,7 @@ describe.only("compiled object schema", () => {
                 additionalProperties: true
             });
 
-            const schema = node.compile({ header: "huhu" }).get("header");
+            const schema = node.get("header", { header: "huhu" })?.schema;
 
             assert.deepEqual(schema, { type: "string" });
         });
@@ -155,7 +152,7 @@ describe.only("compiled object schema", () => {
                 then: { required: ["header"], properties: { header: { type: "string", minLength: 1 } } }
             });
 
-            const schema = node.compile({ withHeader: true, header: "huhu" }).get("header");
+            const schema = node.get("header", { withHeader: true, header: "huhu" })?.schema;
 
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });
@@ -167,7 +164,7 @@ describe.only("compiled object schema", () => {
                 then: { allOf: [{ required: ["header"], properties: { header: { type: "string", minLength: 1 } } }] }
             });
 
-            const schema = node.compile({ withHeader: true, header: "huhu" }).get("header");
+            const schema = node.get("header", { withHeader: true, header: "huhu" })?.schema;
 
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });
@@ -180,7 +177,7 @@ describe.only("compiled object schema", () => {
                 allOf: [{ properties: { header: { type: "string", minLength: 1 } } }]
             });
 
-            const schema = node.compile({ withHeader: true, header: "huhu" }).get("header");
+            const schema = node.get("header", { withHeader: true, header: "huhu" })?.schema;
 
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });
@@ -196,7 +193,7 @@ describe.only("compiled object schema", () => {
                 ]
             });
 
-            const schema = node.compile({ withHeader: true, header: "huhu" }).get("header");
+            const schema = node.get("header", { withHeader: true, header: "huhu" })?.schema;
 
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });

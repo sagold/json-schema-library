@@ -16,14 +16,13 @@ export type CompiledSchema = {
 export type SchemaNode = {
     draft: Draft;
     /** property name or index */
-    key?: string;
-    pattern?: RegExp;
+    spointer: string;
     schema: JsonSchema;
-    compileSchema: (draft: Draft, schema: JsonSchema) => SchemaNode;
+    compileSchema: (draft: Draft, schema: JsonSchema, pointer?: string) => SchemaNode;
     reducers: JsonSchemaReducer[];
     resolvers: JsonSchemaResolver[];
     reduce: ({ data }: { data: unknown }) => SchemaNode | undefined;
-    compile: (data?: unknown) => CompiledSchema;
+    get: (key: string | number, data?: unknown) => SchemaNode;
     properties?: Record<string, SchemaNode>;
     if?: SchemaNode;
     then?: SchemaNode;
