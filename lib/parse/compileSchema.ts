@@ -6,6 +6,7 @@ import { SchemaNode, JsonSchemaReducerParams } from "./compiler/types";
 import { reduceAllOf, reduceIf } from "./compiler/reducer";
 import { propertyResolver, additionalPropertyResolver } from "./compiler/resolver";
 import { isObject } from "../utils/isObject";
+import { omit } from "../utils/omit";
 
 const NODE_METHODS: Pick<SchemaNode, "get" | "reduce" | "toJSON" | "compileSchema"> = {
     compileSchema,
@@ -52,10 +53,12 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "reduce" | "toJSON" | "compileSchem
         if (schema) {
             // recompile to update newly added schema defintions
             schema = mergeSchema(node.schema, schema, "if", "then", "else", "allOf");
+            // console.log("reduced schema", schema);
             return compileSchema(this.draft, schema, this.spointer);
         }
 
-        return node;
+        // remove dynamic properties of node
+        return { ...node, schema: omit(node.schema, "if", "then", "else", "allOf"), reducers: [] };
     },
 
     toJSON() {
