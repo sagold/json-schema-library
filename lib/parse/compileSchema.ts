@@ -98,6 +98,7 @@ export function compileSchema(draft: Draft, schema: JsonSchema, spointer = "#") 
     }
 
     if (Array.isArray(schema.allOf) && schema.allOf.length) {
+        // @todo immediately compile if no resolvers are added
         node.allOf = schema.allOf.map((s, index) => compileSchema(draft, s, `${spointer}/allOf/${index}`));
         node.reducers.push(reduceAllOf);
     }

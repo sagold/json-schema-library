@@ -121,7 +121,7 @@ describe.only("compiled object schema", () => {
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });
 
-        it("should not step into additionalProperties if false", () => {
+        it("should NOT step into additionalProperties if false", () => {
             const node = compileSchema(draft, {
                 type: "object",
                 additionalProperties: false
@@ -142,6 +142,37 @@ describe.only("compiled object schema", () => {
 
             assert.deepEqual(schema, { type: "string" });
         });
+
+        it("should apply additionalProperties from allOf", () => {
+            const node = compileSchema(draft, {
+                type: "object",
+                allOf: [
+                    {
+                        additionalProperties: true
+                    }
+                ]
+            });
+
+            const schema = node.get("header", { header: "huhu" })?.schema;
+
+            assert.deepEqual(schema, { type: "string" });
+        });
+
+        it("should override additionalProperties from allOf", () => {
+            const node = compileSchema(draft, {
+                type: "object",
+                additionalProperties: { type: "number" },
+                allOf: [
+                    {
+                        additionalProperties: { type: "boolean" }
+                    }
+                ]
+            });
+
+            const schema = node.get("header")?.schema;
+
+            assert.deepEqual(schema, { type: "boolean" });
+        });
     });
 
     describe("if-then-else", () => {
@@ -153,6 +184,31 @@ describe.only("compiled object schema", () => {
             });
 
             const schema = node.get("header", { withHeader: true, header: "huhu" })?.schema;
+
+            assert.deepEqual(schema, { type: "string", minLength: 1 });
+        });
+
+        it("should NOT step into if-then-property", () => {
+            const node = compileSchema(draft, {
+                type: "object",
+                if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
+                then: { required: ["header"], properties: { header: { type: "string", minLength: 1 } } },
+                additionalProperties: false
+            });
+
+            const schema = node.get("header", { withHeader: false, header: "huhu" })?.schema;
+
+            assert.deepEqual(schema, undefined);
+        });
+
+        it("should step into if-else-property", () => {
+            const node = compileSchema(draft, {
+                type: "object",
+                if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
+                else: { required: ["header"], properties: { header: { type: "string", minLength: 1 } } }
+            });
+
+            const schema = node.get("header", { withHeader: false, header: "huhu" })?.schema;
 
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });

@@ -12,7 +12,7 @@ export function getValue(data: unknown, key: string | number) {
 export function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParams) {
     const value = getValue(data, key);
     if (node.additionalProperties) {
-        return node.additionalProperties.reduce(value);
+        return node.additionalProperties.reduce({ data: value });
     }
     const schema = node.draft.createSchemaOf(value);
     const temporaryNode = node.compileSchema(node.draft, schema, node.spointer);
