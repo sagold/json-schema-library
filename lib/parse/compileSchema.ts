@@ -69,6 +69,54 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "reduce" | "toJSON" | "compileSchem
     }
 };
 
+const PARSER = [
+    function parseIfThenElse(node: SchemaNode) {
+        const { draft, schema, spointer } = node;
+        if (schema.if && (schema.then || schema.else)) {
+            node.if = compileSchema(draft, schema.if, `${spointer}/if`);
+            node.then = schema.then ? compileSchema(draft, schema.then, `${spointer}/then`) : undefined;
+            node.else = schema.else ? compileSchema(draft, schema.else, `${spointer}/else`) : undefined;
+            node.reducers.push(reduceIf);
+        }
+    },
+    function parseAllOf(node: SchemaNode) {
+        const { draft, schema, spointer } = node;
+        if (Array.isArray(schema.allOf) && schema.allOf.length) {
+            // @todo immediately compile if no resolvers are added
+            node.allOf = schema.allOf.map((s, index) => compileSchema(draft, s, `${spointer}/allOf/${index}`));
+            node.reducers.push(reduceAllOf);
+        }
+    },
+    function parseProperties(node: SchemaNode) {
+        const { draft, schema, spointer } = node;
+        if (schema.properties) {
+            node.properties = {};
+            Object.keys(schema.properties).forEach((propertyName) => {
+                const propertyNode = compileSchema(
+                    draft,
+                    schema.properties[propertyName],
+                    `${spointer}/properties/${propertyName}`
+                );
+                node.properties[propertyName] = propertyNode;
+            });
+            node.resolvers.push(propertyResolver);
+        }
+    },
+    function parseAdditionalProperties(node: SchemaNode) {
+        const { draft, schema, spointer } = node;
+        if (schema.additionalProperties !== false) {
+            if (isObject(schema.additionalProperties)) {
+                node.additionalProperties = compileSchema(
+                    draft,
+                    schema.additionalProperties,
+                    `${spointer}/additionalProperties`
+                );
+            }
+            node.resolvers.push(additionalPropertyResolver);
+        }
+    }
+];
+
 /**
  * @todo How can we do more work upfront?
  *
@@ -85,48 +133,12 @@ export function compileSchema(draft: Draft, schema: JsonSchema, spointer = "#") 
         draft,
         reducers: [],
         resolvers: [],
+        validators: [],
         schema,
         ...NODE_METHODS
     };
 
-    // compile dynamic schema and add reducer
-    if (schema.if && (schema.then || schema.else)) {
-        node.if = compileSchema(draft, schema.if, `${spointer}/if`);
-        node.then = schema.then ? compileSchema(draft, schema.then, `${spointer}/then`) : undefined;
-        node.else = schema.else ? compileSchema(draft, schema.else, `${spointer}/else`) : undefined;
-        node.reducers.push(reduceIf);
-    }
-
-    if (Array.isArray(schema.allOf) && schema.allOf.length) {
-        // @todo immediately compile if no resolvers are added
-        node.allOf = schema.allOf.map((s, index) => compileSchema(draft, s, `${spointer}/allOf/${index}`));
-        node.reducers.push(reduceAllOf);
-    }
-
-    if (schema.properties) {
-        node.properties = {};
-        Object.keys(schema.properties).forEach((propertyName) => {
-            const propertyNode = compileSchema(
-                draft,
-                schema.properties[propertyName],
-                `${spointer}/properties/${propertyName}`
-            );
-            node.properties[propertyName] = propertyNode;
-        });
-        node.resolvers.push(propertyResolver);
-    }
-
-    // compile pattern schema
-    if (schema.additionalProperties !== false) {
-        if (isObject(schema.additionalProperties)) {
-            node.additionalProperties = compileSchema(
-                draft,
-                schema.additionalProperties,
-                `${spointer}/additionalProperties`
-            );
-        }
-        node.resolvers.push(additionalPropertyResolver);
-    }
+    PARSER.forEach((parse) => parse(node));
 
     return node;
 }

@@ -254,4 +254,27 @@ describe.only("compiled object schema", () => {
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });
     });
+
+    it("should should resolve both if-then-else and allOf schema", () => {
+        const node = compileSchema(draft, {
+            type: "object",
+            if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
+            then: {
+                required: ["header"],
+                properties: { header: { type: "string", minLength: 1 } }
+            },
+            allOf: [{ required: ["date"], properties: { date: { type: "string", format: "date" } } }]
+        });
+
+        const schema = node.reduce({ data: { withHeader: true, header: "huhu" } })?.schema;
+
+        assert.deepEqual(schema, {
+            type: "object",
+            required: ["header", "date"],
+            properties: {
+                header: { type: "string", minLength: 1 },
+                date: { type: "string", format: "date" }
+            }
+        });
+    });
 });

@@ -9,6 +9,7 @@ export function getValue(data: unknown, key: string | number) {
     }
 }
 
+additionalPropertyResolver.toJSON = () => "additionalPropertyResolver";
 export function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParams) {
     const value = getValue(data, key);
     if (node.additionalProperties) {
@@ -19,6 +20,7 @@ export function additionalPropertyResolver({ node, data, key }: JsonSchemaResolv
     return temporaryNode;
 }
 
+propertyResolver.toJSON = () => "propertyResolver";
 export function propertyResolver({ node, key }: JsonSchemaResolverParams) {
     return node.properties[key];
 }

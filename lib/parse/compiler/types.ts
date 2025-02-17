@@ -21,6 +21,7 @@ export type SchemaNode = {
     compileSchema: (draft: Draft, schema: JsonSchema, pointer?: string) => SchemaNode;
     reducers: JsonSchemaReducer[];
     resolvers: JsonSchemaResolver[];
+    validators: any[];
     reduce: ({ data }: { data: unknown }) => SchemaNode | undefined;
     get: (key: string | number, data?: unknown) => SchemaNode;
     properties?: Record<string, SchemaNode>;
