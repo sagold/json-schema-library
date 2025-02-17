@@ -1,14 +1,14 @@
 import { strict as assert } from "assert";
 import { Draft } from "../draft";
 import { mergeSchema } from "../mergeSchema";
-import { JsonSchema } from "../types";
-import { SchemaNode, JsonSchemaReducerParams } from "./compiler/types";
+import { JsonError, JsonSchema } from "../types";
+import { SchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams } from "./compiler/types";
 import { reduceAllOf, reduceIf } from "./compiler/reducer";
-import { propertyResolver, additionalPropertyResolver } from "./compiler/resolver";
+import { propertyResolver, additionalPropertyResolver, getValue } from "./compiler/resolver";
 import { isObject } from "../utils/isObject";
 import { omit } from "../utils/omit";
 
-const NODE_METHODS: Pick<SchemaNode, "get" | "reduce" | "toJSON" | "compileSchema"> = {
+const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON" | "compileSchema" | "validate"> = {
     compileSchema,
 
     get(key: string | number, data?: unknown) {
@@ -24,6 +24,15 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "reduce" | "toJSON" | "compileSchem
                 return schemaNode;
             }
         }
+    },
+
+    getTemplate(data?: unknown) {
+        const node = this as SchemaNode;
+        let defaultData = data;
+        for (const getDefaultData of node.getDefaultData) {
+            defaultData = getDefaultData({ data: defaultData, node }) ?? defaultData;
+        }
+        return defaultData;
     },
 
     /*
@@ -61,6 +70,20 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "reduce" | "toJSON" | "compileSchem
         return { ...node, schema: omit(node.schema, "if", "then", "else", "allOf"), reducers: [] };
     },
 
+    validate(data: unknown) {
+        const node = this as SchemaNode;
+        const errors = [];
+        for (const validate of node.validators) {
+            const result = validate({ node, data, pointer: "#" });
+            if (Array.isArray(result)) {
+                errors.push(...result);
+            } else if (result) {
+                errors.push(result);
+            }
+        }
+        return errors;
+    },
+
     toJSON() {
         return {
             ...this,
@@ -69,8 +92,8 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "reduce" | "toJSON" | "compileSchem
     }
 };
 
-const PARSER = [
-    function parseIfThenElse(node: SchemaNode) {
+const PARSER: ((node: SchemaNode) => void)[] = [
+    function parseIfThenElse(node) {
         const { draft, schema, spointer } = node;
         if (schema.if && (schema.then || schema.else)) {
             node.if = compileSchema(draft, schema.if, `${spointer}/if`);
@@ -79,7 +102,7 @@ const PARSER = [
             node.reducers.push(reduceIf);
         }
     },
-    function parseAllOf(node: SchemaNode) {
+    function parseAllOf(node) {
         const { draft, schema, spointer } = node;
         if (Array.isArray(schema.allOf) && schema.allOf.length) {
             // @todo immediately compile if no resolvers are added
@@ -87,7 +110,7 @@ const PARSER = [
             node.reducers.push(reduceAllOf);
         }
     },
-    function parseProperties(node: SchemaNode) {
+    function parseProperties(node) {
         const { draft, schema, spointer } = node;
         if (schema.properties) {
             node.properties = {};
@@ -102,7 +125,8 @@ const PARSER = [
             node.resolvers.push(propertyResolver);
         }
     },
-    function parseAdditionalProperties(node: SchemaNode) {
+    // must come as last resolver
+    function parseAdditionalProperties(node) {
         const { draft, schema, spointer } = node;
         if (schema.additionalProperties !== false) {
             if (isObject(schema.additionalProperties)) {
@@ -113,6 +137,72 @@ const PARSER = [
                 );
             }
             node.resolvers.push(additionalPropertyResolver);
+        }
+    }
+];
+
+const VALIDATORS: ((node: SchemaNode) => void)[] = [
+    function validateProperties(node) {
+        if (node.properties) {
+            // note: this expects PARSER to have compiled properties
+            node.validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
+                // move validation through properties
+                const errors: JsonError[] = [];
+                Object.keys(node.properties).forEach((propertyName) => {
+                    const propertyNode = node.properties[propertyName];
+                    const result = propertyNode.validate(getValue(data, propertyName), `${pointer}/${propertyName}`);
+                    if (Array.isArray(result)) {
+                        errors.push(...result);
+                    } else if (result) {
+                        errors.push(result);
+                    }
+                });
+                return errors;
+            });
+        }
+    },
+
+    function validateMaxProperties(node) {
+        const { schema, draft } = node;
+        if (!isNaN(schema.maxProperties)) {
+            node.validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
+                const { schema } = node;
+                const propertyCount = Object.keys(data).length;
+                if (isNaN(schema.maxProperties) === false && schema.maxProperties < propertyCount) {
+                    return draft.errors.maxPropertiesError({
+                        maxProperties: schema.maxProperties,
+                        length: propertyCount,
+                        pointer,
+                        schema,
+                        value: data
+                    });
+                }
+            });
+        }
+    }
+];
+
+const DEFAULT_DATA: ((node: SchemaNode) => void)[] = [
+    function getObjectData(node) {
+        if (node.schema.type === "object") {
+            node.getDefaultData.push(({ data, node }) => {
+                const templateData: Record<string, any> = node.schema.default ?? data ?? {};
+                if (node.properties) {
+                    Object.keys(node.properties).forEach((propertyName) => {
+                        templateData[propertyName] = node.properties[propertyName].getTemplate(
+                            getValue(templateData, propertyName)
+                        );
+                    });
+                }
+                return templateData;
+            });
+        }
+    },
+    function getStringData(node) {
+        if (node.schema.type === "string") {
+            node.getDefaultData.push(({ data, node }) => {
+                return node.schema.default ?? data;
+            });
         }
     }
 ];
@@ -134,11 +224,14 @@ export function compileSchema(draft: Draft, schema: JsonSchema, spointer = "#") 
         reducers: [],
         resolvers: [],
         validators: [],
+        getDefaultData: [],
         schema,
         ...NODE_METHODS
     };
 
     PARSER.forEach((parse) => parse(node));
+    VALIDATORS.forEach((registerValidator) => registerValidator(node));
+    DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
 
     return node;
 }

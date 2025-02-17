@@ -44,7 +44,7 @@ import { compileSchema } from "./compileSchema";
 //     // - possibly optimize all this once for actual exection (compilation)
 // }
 
-describe.only("compiled object schema", () => {
+describe.only("compiled object schema - get", () => {
     let draft: Draft;
     beforeEach(() => (draft = new Draft2019()));
 
@@ -276,5 +276,58 @@ describe.only("compiled object schema", () => {
                 date: { type: "string", format: "date" }
             }
         });
+    });
+});
+
+describe.only("compiled object schema - validate", () => {
+    let draft: Draft;
+    beforeEach(() => (draft = new Draft2019()));
+
+    it("should return an error if maxProperties is exceeded", () => {
+        const node = compileSchema(draft, {
+            type: "object",
+            maxProperties: 1
+        });
+
+        const errors = node.validate({ a: "1", b: "2" });
+
+        assert.equal(errors.length, 1);
+        assert.deepEqual(errors[0].code, "max-properties-error");
+    });
+
+    it("should return an error if maxProperties of nested properties is exceeded", () => {
+        // tests validation walking through properties
+        const node = compileSchema(draft, {
+            type: "object",
+            properties: {
+                header: {
+                    type: "object",
+                    maxProperties: 1
+                }
+            }
+        });
+
+        const errors = node.validate({ header: { a: "1", b: "2" } });
+
+        assert.equal(errors.length, 1);
+        assert.deepEqual(errors[0].code, "max-properties-error");
+    });
+});
+
+describe.only("compiled object schema - getTemplate", () => {
+    let draft: Draft;
+    beforeEach(() => (draft = new Draft2019()));
+
+    it("should return default value of properties", () => {
+        const node = compileSchema(draft, {
+            type: "object",
+            properties: {
+                header: { type: "string", default: "title" }
+            }
+        });
+
+        const data = node.getTemplate();
+
+        assert.deepEqual(data, { header: "title" });
     });
 });
