@@ -1,4 +1,4 @@
-import { isObject } from "../../utils/isObject";
+import { isObject } from "../../lib/utils/isObject";
 import { JsonSchemaResolverParams } from "./types";
 
 export function getValue(data: unknown, key: string | number) {

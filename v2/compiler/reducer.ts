@@ -1,5 +1,5 @@
 // reducers must not work on `this` (array)
-import { mergeSchema } from "../../mergeSchema";
+import { mergeSchema } from "../../lib/mergeSchema";
 // import { JsonSchema } from "../../types";
 import { JsonSchemaReducerParams } from "./types";
 

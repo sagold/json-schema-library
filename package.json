@@ -11,6 +11,7 @@
         "dist:es6": "tsc --outDir dist/module --target ES2019",
         "test": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/**/*.test.ts'",
         "test:integration": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/integration/**/*.test.ts'",
+        "test:v2": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'v2/**/*.test.ts'",
         "test:unit": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/unit/**/*.test.ts'",
         "test:unit:ci": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R json 'test/unit/**/*.test.ts' > test-result-unit.json; exit 0",
         "test:spec": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/spec/**/*.test.ts'",

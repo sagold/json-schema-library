@@ -1,8 +1,8 @@
 import { SchemaNode, isSchemaNode } from "./compiler/types";
 import { get } from "@sagold/json-pointer";
-import joinScope from "../compile/joinScope";
-import getRef from "../compile/getRef";
-import { mergeSchema } from "../mergeSchema";
+import joinScope from "../lib/compile/joinScope";
+import getRef from "../lib/compile/getRef";
+import { mergeSchema } from "../lib/mergeSchema";
 
 const suffixes = /(#|\/)+$/g;
 

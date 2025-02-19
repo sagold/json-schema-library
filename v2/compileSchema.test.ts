@@ -1,32 +1,32 @@
 import { strict as assert } from "assert";
-import { JsonSchema } from "../types";
-import { Draft2019 } from "../draft2019";
+import { Draft2019 } from "../lib/draft2019";
+import { Draft } from "../lib/draft";
 
 // - processing draft we need to know and support json-schema keywords
 // - Note: meta-schemas are defined flat, combining all properties per type
 // - parsing schemas under draft build functionality available for schema
 // - building up available functionality has to be done for every root schema (if $vocabulary is set)
-import draft2019Root from "../../remotes/draft2019-09.json"; // defines general root-schema
-import draft2019Core from "../../remotes/draft2019-09_meta_core.json"; // $-keywords likle $ref, $id
-import draft2019Applicator from "../../remotes/draft2019-09_meta_applicator.json";
-import { Draft } from "../draft";
-import { mergeSchema } from "../mergeSchema";
+// import draft2019Root from "../../remotes/draft2019-09.json"; // defines general root-schema
+// import draft2019Core from "../../remotes/draft2019-09_meta_core.json"; // $-keywords likle $ref, $id
+// import draft2019Applicator from "../../remotes/draft2019-09_meta_applicator.json";
 
-const simplifiedMetaSchema = {
-    $id: "https://json-schema.org/draft/2019-09/schema",
-    $vocabulary: {
-        "https://json-schema.org/draft/2019-09/vocab/core": true
-    },
-    $recursiveAnchor: true,
-    type: ["object", "boolean"],
-    properties: {
-        properties: {
-            type: "object",
-            additionalProperties: { $recursiveRef: "#" },
-            default: {}
-        }
-    }
-};
+// import { mergeSchema } from "../mergeSchema";
+
+// const simplifiedMetaSchema = {
+//     $id: "https://json-schema.org/draft/2019-09/schema",
+//     $vocabulary: {
+//         "https://json-schema.org/draft/2019-09/vocab/core": true
+//     },
+//     $recursiveAnchor: true,
+//     type: ["object", "boolean"],
+//     properties: {
+//         properties: {
+//             type: "object",
+//             additionalProperties: { $recursiveRef: "#" },
+//             default: {}
+//         }
+//     }
+// };
 
 import { compileSchema } from "./compileSchema";
 

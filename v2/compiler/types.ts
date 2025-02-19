@@ -1,6 +1,6 @@
-import { Draft } from "../../draft";
-import { JsonError, JsonSchema } from "../../types";
-import { isObject } from "../../utils/isObject";
+import { Draft } from "../../lib/draft";
+import { JsonError, JsonSchema } from "../../lib/types";
+import { isObject } from "../../lib/utils/isObject";
 
 export type JsonSchemaReducerParams = { data: unknown; node: SchemaNode };
 export type JsonSchemaReducer = (options: JsonSchemaReducerParams) => SchemaNode | undefined;

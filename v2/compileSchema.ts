@@ -1,12 +1,12 @@
 import { strict as assert } from "assert";
-import { Draft } from "../draft";
-import { mergeSchema } from "../mergeSchema";
-import { JsonError, JsonSchema } from "../types";
+import { Draft } from "../lib/draft";
+import { mergeSchema } from "../lib/mergeSchema";
+import { JsonError, JsonSchema } from "../lib/types";
 import { SchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams } from "./compiler/types";
 import { reduceAllOf, reduceIf } from "./compiler/reducer";
 import { propertyResolver, additionalPropertyResolver, getValue } from "./compiler/resolver";
-import { isObject } from "../utils/isObject";
-import { omit } from "../utils/omit";
+import { isObject } from "../lib/utils/isObject";
+import { omit } from "../lib/utils/omit";
 import resolveRef, { compileRef } from "./ref";
 
 const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON" | "compileSchema" | "validate"> = {
