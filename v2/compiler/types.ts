@@ -9,7 +9,7 @@ export type JsonSchemaResolverParams = { key: string | number; data: unknown; no
 export type JsonSchemaResolver = (options: JsonSchemaResolverParams) => SchemaNode | undefined;
 
 export type JsonSchemaValidatorParams = { pointer?: string; data: unknown; node: SchemaNode };
-export type JsonSchemaValidator = (options: JsonSchemaValidatorParams) => JsonError[];
+export type JsonSchemaValidator = (options: JsonSchemaValidatorParams) => JsonError | JsonError[] | undefined;
 
 export type JsonSchemaDefaultDataResolverParams = { pointer?: string; data: unknown; node: SchemaNode };
 export type JsonSchemaDefaultDataResolver = (options: JsonSchemaDefaultDataResolverParams) => unknown;
@@ -48,10 +48,12 @@ export type SchemaNode = {
     schema: JsonSchema;
     compileSchema: (draft: Draft, schema: JsonSchema, spointer?: string, parentNode?: SchemaNode) => SchemaNode;
     validate: (data: unknown, pointer?: string) => JsonError[];
+
     reducers: JsonSchemaReducer[];
     resolvers: JsonSchemaResolver[];
     getDefaultData: JsonSchemaDefaultDataResolver[];
-    validators: any[];
+    validators: JsonSchemaValidator[];
+
     reduce: ({ data }: { data: unknown }) => SchemaNode | undefined;
     get: (key: string | number, data?: unknown) => SchemaNode;
     getTemplate: (data?: unknown) => unknown;

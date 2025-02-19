@@ -1,13 +1,5 @@
-import { isObject } from "../../lib/utils/isObject";
+import { getValue } from "../getValue";
 import { JsonSchemaResolverParams } from "./types";
-
-export function getValue(data: unknown, key: string | number) {
-    if (isObject(data)) {
-        return data[key];
-    } else if (Array.isArray(data)) {
-        return data[key as number];
-    }
-}
 
 additionalPropertyResolver.toJSON = () => "additionalPropertyResolver";
 export function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParams) {
