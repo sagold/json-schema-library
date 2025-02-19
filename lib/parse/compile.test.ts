@@ -44,7 +44,7 @@ import { compileSchema } from "./compileSchema";
 //     // - possibly optimize all this once for actual exection (compilation)
 // }
 
-describe.only("compiled object schema - get", () => {
+describe("compiled object schema - get", () => {
     let draft: Draft;
     beforeEach(() => (draft = new Draft2019()));
 
@@ -277,9 +277,27 @@ describe.only("compiled object schema - get", () => {
             }
         });
     });
+
+    describe("ref", () => {
+        it("should resolve references in allOf schema", () => {
+            const node = compileSchema(draft, {
+                definitions: {
+                    object: { type: "object" },
+                    additionalNumber: {
+                        additionalProperties: { type: "number", minLength: 2 }
+                    }
+                },
+                allOf: [{ $ref: "#/definitions/object" }, { $ref: "#/definitions/additionalNumber" }]
+            });
+
+            const schema = node.get("title", { title: 4, test: 2 })?.schema;
+
+            assert.deepEqual(schema, { type: "number", minLength: 2 });
+        });
+    });
 });
 
-describe.only("compiled object schema - validate", () => {
+describe("compiled object schema - validate", () => {
     let draft: Draft;
     beforeEach(() => (draft = new Draft2019()));
 
@@ -314,7 +332,7 @@ describe.only("compiled object schema - validate", () => {
     });
 });
 
-describe.only("compiled object schema - getTemplate", () => {
+describe("compiled object schema - getTemplate", () => {
     let draft: Draft;
     beforeEach(() => (draft = new Draft2019()));
 

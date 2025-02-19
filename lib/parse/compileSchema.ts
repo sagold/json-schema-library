@@ -7,12 +7,12 @@ import { reduceAllOf, reduceIf } from "./compiler/reducer";
 import { propertyResolver, additionalPropertyResolver, getValue } from "./compiler/resolver";
 import { isObject } from "../utils/isObject";
 import { omit } from "../utils/omit";
+import resolveRef, { compileRef } from "./ref";
 
 const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON" | "compileSchema" | "validate"> = {
     compileSchema,
 
     get(key: string | number, data?: unknown) {
-        // console.log(`-- get ${key} --`);
         let node = this as SchemaNode;
         if (node.reducers.length) {
             node = node.reduce({ data });
@@ -45,12 +45,14 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON"
         > compile schema (again) with partialy schema
     */
     reduce({ data }: JsonSchemaReducerParams) {
-        const node = this as SchemaNode;
+        // @path
+        const node = { ...(this as SchemaNode) };
+        node.schema = resolveRef(node) ?? node.schema;
         const reducers = node.reducers;
 
         let schema;
         for (let i = 0; i < reducers.length; i += 1) {
-            const result = reducers[i]({ data, node: this });
+            const result = reducers[i]({ data, node });
             if (result) {
                 // compilation result for data of current schema
                 // in order to merge results, we rebuild node from schema
@@ -63,7 +65,7 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON"
             // recompile to update newly added schema defintions
             schema = mergeSchema(node.schema, schema, "if", "then", "else", "allOf");
             // console.log("reduced schema", schema);
-            return compileSchema(this.draft, schema, this.spointer);
+            return compileSchema(this.draft, schema, this.spointer, node);
         }
 
         // remove dynamic properties of node
@@ -96,9 +98,9 @@ const PARSER: ((node: SchemaNode) => void)[] = [
     function parseIfThenElse(node) {
         const { draft, schema, spointer } = node;
         if (schema.if && (schema.then || schema.else)) {
-            node.if = compileSchema(draft, schema.if, `${spointer}/if`);
-            node.then = schema.then ? compileSchema(draft, schema.then, `${spointer}/then`) : undefined;
-            node.else = schema.else ? compileSchema(draft, schema.else, `${spointer}/else`) : undefined;
+            node.if = compileSchema(draft, schema.if, `${spointer}/if`, node);
+            node.then = schema.then ? compileSchema(draft, schema.then, `${spointer}/then`, node) : undefined;
+            node.else = schema.else ? compileSchema(draft, schema.else, `${spointer}/else`, node) : undefined;
             node.reducers.push(reduceIf);
         }
     },
@@ -106,7 +108,7 @@ const PARSER: ((node: SchemaNode) => void)[] = [
         const { draft, schema, spointer } = node;
         if (Array.isArray(schema.allOf) && schema.allOf.length) {
             // @todo immediately compile if no resolvers are added
-            node.allOf = schema.allOf.map((s, index) => compileSchema(draft, s, `${spointer}/allOf/${index}`));
+            node.allOf = schema.allOf.map((s, index) => compileSchema(draft, s, `${spointer}/allOf/${index}`, node));
             node.reducers.push(reduceAllOf);
         }
     },
@@ -118,7 +120,8 @@ const PARSER: ((node: SchemaNode) => void)[] = [
                 const propertyNode = compileSchema(
                     draft,
                     schema.properties[propertyName],
-                    `${spointer}/properties/${propertyName}`
+                    `${spointer}/properties/${propertyName}`,
+                    node
                 );
                 node.properties[propertyName] = propertyNode;
             });
@@ -133,7 +136,8 @@ const PARSER: ((node: SchemaNode) => void)[] = [
                 node.additionalProperties = compileSchema(
                     draft,
                     schema.additionalProperties,
-                    `${spointer}/additionalProperties`
+                    `${spointer}/additionalProperties`,
+                    node
                 );
             }
             node.resolvers.push(additionalPropertyResolver);
@@ -214,11 +218,12 @@ const DEFAULT_DATA: ((node: SchemaNode) => void)[] = [
  * wrapping each schema with utilities and as much preevaluation is possible. Each
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
-export function compileSchema(draft: Draft, schema: JsonSchema, spointer = "#") {
+export function compileSchema(draft: Draft, schema: JsonSchema, spointer = "#", parentNode?: SchemaNode) {
     // console.log("compile schema", spointer);
     assert(schema !== undefined, "schema missing");
     const node: SchemaNode = {
-        // state
+        parent: parentNode,
+        context: parentNode?.context ?? { ids: {}, remotes: {}, anchors: {}, scopes: {}, rootSchema: schema },
         spointer,
         draft,
         reducers: [],
@@ -228,6 +233,8 @@ export function compileSchema(draft: Draft, schema: JsonSchema, spointer = "#") 
         schema,
         ...NODE_METHODS
     };
+
+    compileRef(node);
 
     PARSER.forEach((parse) => parse(node));
     VALIDATORS.forEach((registerValidator) => registerValidator(node));

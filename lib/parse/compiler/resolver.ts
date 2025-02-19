@@ -16,7 +16,7 @@ export function additionalPropertyResolver({ node, data, key }: JsonSchemaResolv
         return node.additionalProperties.reduce({ data: value });
     }
     const schema = node.draft.createSchemaOf(value);
-    const temporaryNode = node.compileSchema(node.draft, schema, node.spointer);
+    const temporaryNode = node.compileSchema(node.draft, schema, node.spointer, node);
     return temporaryNode;
 }
 
