@@ -16,3 +16,13 @@ propertyResolver.toJSON = () => "propertyResolver";
 export function propertyResolver({ node, key }: JsonSchemaResolverParams) {
     return node.properties[key];
 }
+
+itemsListResolver.toJSON = () => "itemsListResolver";
+export function itemsListResolver({ node, key }: JsonSchemaResolverParams) {
+    return node.itemsList[key as number];
+}
+
+itemsObjectResolver.toJSON = () => "itemsObjectResolver";
+export function itemsObjectResolver({ node }: JsonSchemaResolverParams) {
+    return node.itemsObject;
+}

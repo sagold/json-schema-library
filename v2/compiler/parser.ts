@@ -1,6 +1,6 @@
 import { SchemaNode } from "./types";
 import { reduceAllOf, reduceIf } from "./reducer";
-import { propertyResolver, additionalPropertyResolver } from "./resolver";
+import { propertyResolver, additionalPropertyResolver, itemsObjectResolver, itemsListResolver } from "./resolver";
 import { isObject } from "../../lib/utils/isObject";
 
 export const PARSER: ((node: SchemaNode) => void)[] = [
@@ -37,6 +37,19 @@ export const PARSER: ((node: SchemaNode) => void)[] = [
                 node.properties[propertyName] = propertyNode;
             });
             node.resolvers.push(propertyResolver);
+        }
+    },
+    function parseItems(node) {
+        const { draft, schema, spointer } = node;
+        if (isObject(schema.items)) {
+            const propertyNode = node.compileSchema(draft, schema.items, `${spointer}/items`, node);
+            node.itemsObject = propertyNode;
+            node.resolvers.push(itemsObjectResolver);
+        } else if (Array.isArray(schema.items)) {
+            node.itemsList = schema.items.map((itemSchema, index) =>
+                node.compileSchema(draft, itemSchema, `${spointer}/items/${index}`, node)
+            );
+            node.resolvers.push(itemsListResolver);
         }
     },
     // must come as last resolver
