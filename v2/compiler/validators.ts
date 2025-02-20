@@ -40,5 +40,35 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
                 }
             });
         }
+    },
+
+    function validateMinLength(node) {
+        const { schema, draft } = node;
+        if (!isNaN(schema.minLength)) {
+            node.validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
+                if (typeof data !== "string") {
+                    return;
+                }
+
+                const { schema } = node;
+                const length = data?.length;
+                if (schema.minLength === 1) {
+                    return draft.errors.minLengthOneError({
+                        minLength: schema.minLength,
+                        length,
+                        pointer,
+                        schema,
+                        value: data
+                    });
+                }
+                return draft.errors.minLengthError({
+                    minLength: schema.minLength,
+                    length,
+                    pointer,
+                    schema,
+                    value: data
+                });
+            });
+        }
     }
 ];

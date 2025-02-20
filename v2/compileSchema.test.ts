@@ -363,6 +363,20 @@ describe("compiled object schema - validate", () => {
     });
 });
 
+describe("compiled value schema - validate", () => {
+    let draft: Draft;
+    beforeEach(() => (draft = new Draft2019()));
+
+    it("should return error for string shorter than minLength", () => {
+        const node = compileSchema(draft, { type: "string", minLength: 2 });
+
+        const errors = node.validate("a");
+
+        assert.equal(errors.length, 1);
+        assert.deepEqual(errors[0].code, "min-length-error");
+    });
+});
+
 describe("compiled object schema - getTemplate", () => {
     let draft: Draft;
     beforeEach(() => (draft = new Draft2019()));
