@@ -23,10 +23,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
             return undefined;
         }
 
-        if (
-            getTypeOf(schema.patternProperties) === "object" &&
-            schema.additionalProperties === false
-        ) {
+        if (getTypeOf(schema.patternProperties) === "object" && schema.additionalProperties === false) {
             // this is an arrangement with patternProperties. patternProperties validate before additionalProperties:
             // https://spacetelescope.github.io/understanding-json-schema/reference/object.html#index-5
             return undefined;
@@ -40,9 +37,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
 
         if (getTypeOf(schema.patternProperties) === "object") {
             // filter received properties by matching patternProperties
-            const patterns = Object.keys(schema.patternProperties).map(
-                (pattern) => new RegExp(pattern)
-            );
+            const patterns = Object.keys(schema.patternProperties).map((pattern) => new RegExp(pattern));
             receivedProperties = receivedProperties.filter((prop) => {
                 for (let i = 0; i < patterns.length; i += 1) {
                     if (patterns[i].test(prop)) {
@@ -215,6 +210,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         }
         return undefined;
     },
+    // v2
     maxProperties: (node, value) => {
         const { draft, schema, pointer } = node;
         const propertyCount = Object.keys(value).length;
@@ -229,6 +225,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         }
         return undefined;
     },
+    // v2
     minLength: (node, value: string) => {
         const { draft, schema, pointer } = node;
         if (isNaN(schema.minLength)) {
@@ -305,6 +302,7 @@ const KeywordValidation: Record<string, JsonValidator> = {
         }
         return undefined;
     },
+    // v2
     minProperties: (node, value) => {
         const { draft, schema, pointer } = node;
         if (isNaN(schema.minProperties)) {
