@@ -1,0 +1,165 @@
+import { strict as assert } from "assert";
+import { Draft2019 } from "../../lib/draft2019";
+import { Draft } from "../../lib/draft";
+import { compileSchema } from "../compileSchema";
+import { isJsonError } from "../../lib/types";
+
+describe("feature : oneOf : reduce", () => {
+    let draft: Draft;
+    beforeEach(() => (draft = new Draft2019()));
+
+    it("should resolve matching value schema", () => {
+        const node = compileSchema(draft, {
+            oneOf: [
+                { type: "string", title: "A String" },
+                { type: "number", title: "A Number" }
+            ]
+        }).reduce({ data: 111 });
+
+        assert.deepEqual(node.schema, { type: "number", title: "A Number" });
+        // assert.equal(node.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
+    });
+
+    it("should return error if no matching schema could be found", () => {
+        const node = compileSchema(draft, {
+            oneOf: [
+                { type: "string", title: "A String" },
+                { type: "number", title: "A Number" }
+            ]
+        }).reduce({ data: {} });
+
+        assert(isJsonError(node));
+    });
+
+    // v2
+    it("should resolve matching object schema", () => {
+        const node = compileSchema(draft, {
+            oneOf: [
+                {
+                    type: "object",
+                    properties: { title: { type: "string" } }
+                },
+                {
+                    type: "object",
+                    properties: { title: { type: "number" } }
+                }
+            ]
+        }).reduce({ data: { title: 4 } });
+
+        assert.deepEqual(node.schema, {
+            type: "object",
+            properties: { title: { type: "number" } }
+        });
+    });
+
+    // v2
+    it("should return matching oneOf, for objects missing properties", () => {
+        const node = compileSchema(draft, {
+            oneOf: [
+                {
+                    type: "object",
+                    additionalProperties: { type: "string" }
+                },
+                {
+                    type: "object",
+                    additionalProperties: { type: "number" }
+                }
+            ]
+        }).reduce({ data: { title: 4, test: 2 } });
+
+        assert.deepEqual(node.schema, {
+            type: "object",
+            additionalProperties: { type: "number" }
+        });
+    });
+
+    // @todo
+    describe("object", () => {
+        // // PR #35 https://github.com/sagold/json-schema-library/pull/35/commits/8b6477113bdfce522081473bb0dd8fd6fe680391
+        // it("should maintain references from a remote schema when resolving oneOf with $ref", () => {
+        //     draft.addRemoteSchema("https://my-other-schema.com/schema.json", {
+        //         type: "object",
+        //         properties: {
+        //             innerTitle: { $ref: "#/definitions/number" }
+        //         },
+        //         definitions: {
+        //             number: { type: "number", title: "Zahl" }
+        //         }
+        //     });
+        //     const schema = draft.compileSchema({
+        //         type: "object",
+        //         properties: {
+        //             title: {
+        //                 oneOf: [
+        //                     {
+        //                         type: "object",
+        //                         properties: { innerTitle: { type: "string", title: "Zeichenkette" } }
+        //                     },
+        //                     { $ref: "https://my-other-schema.com/schema.json" }
+        //                 ]
+        //             }
+        //         }
+        //     });
+        //     const res = step(draft, "title", schema, { title: { innerTitle: 111 } });
+        //     expect(res.type).to.eq("object");
+        //     const nextRes = step(draft, "innerTitle", res, { innerTitle: 111 });
+        //     expect(nextRes.type).to.eq("number");
+        // });
+        // it("should maintain references from a remote schema when resolving oneOf with $ref", () => {
+        //     draft.addRemoteSchema("https://my-other-schema.com/schema.json", {
+        //         type: "object",
+        //         properties: {
+        //             innerTitle: { $ref: "#/definitions/number" }
+        //         },
+        //         definitions: {
+        //             number: { type: "number", title: "Zahl" }
+        //         }
+        //     });
+        //     const schema = draft.compileSchema({
+        //         type: "object",
+        //         properties: {
+        //             title: {
+        //                 oneOf: [
+        //                     {
+        //                         type: "object",
+        //                         properties: { innerTitle: { type: "string", title: "Zeichenkette" } }
+        //                     },
+        //                     { $ref: "https://my-other-schema.com/schema.json" }
+        //                 ]
+        //             }
+        //         }
+        //     });
+        //     const res = step(draft, "title", schema, { title: { innerTitle: 111 } });
+        //     expect(res.type).to.eq("object");
+        //     const nextRes = step(draft, "innerTitle", res, { innerTitle: 111 });
+        //     expect(nextRes.type).to.eq("number");
+        // });
+    });
+});
+
+describe("feature : oneof : validate", () => {
+    let draft: Draft;
+    beforeEach(() => (draft = new Draft2019()));
+
+    it("should validate matching oneOf", () => {
+        const errors = compileSchema(draft, {
+            oneOf: [
+                { type: "object", properties: { value: { type: "string" } } },
+                { type: "object", properties: { value: { type: "integer" } } }
+            ]
+        }).validate({ value: "a string" });
+        assert.equal(errors.length, 0);
+    });
+
+    it("should return error for non-matching oneOf", () => {
+        const errors = compileSchema(draft, {
+            type: "object",
+            oneOf: [
+                { type: "object", properties: { value: { type: "string" } } },
+                { type: "object", properties: { value: { type: "integer" } } }
+            ]
+        }).validate({ value: [] });
+        assert.equal(errors.length, 1);
+        assert.equal(errors[0].code, "one-of-error");
+    });
+});

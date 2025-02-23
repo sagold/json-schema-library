@@ -19,13 +19,19 @@ describe("feature : additionalItems : validate", () => {
         assert.deepEqual(errors.length, 0);
     });
 
-    it("should NOT allow any additional item when set to 'false", () => {
-        const node = compileSchema(draft, { type: "array", additionalItems: false });
+    it("should NOT allow any additional item when set to 'false' but a schema is given", () => {
+        const node = compileSchema(draft, { type: "array", items: [], additionalItems: false });
         const errors = node.validate(["a"]);
         assert.deepEqual(errors.length, 1);
         assert.deepEqual(errors[0].code, "additional-items-error");
         assert.deepEqual(errors[0].data.pointer, "#/0");
         assert.deepEqual(errors[0].data.key, 0);
+    });
+
+    it("should allow any additional item when set to 'false' and no schema given", () => {
+        const node = compileSchema(draft, { type: "array", additionalItems: false });
+        const errors = node.validate(["a"]);
+        assert.deepEqual(errors.length, 0);
     });
 
     it("should return error for prohibited additional items", () => {

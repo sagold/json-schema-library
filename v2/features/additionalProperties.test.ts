@@ -68,18 +68,26 @@ describe("feature : additionalProperties : validate", () => {
     let draft: Draft;
     beforeEach(() => (draft = new Draft2019()));
 
-    // from v1
-    it("should return AdditionalPropertiesError for an additional property", () => {
+    it("should not return no-additional-properties-error if no schema is given for an additional property", () => {
         const errors = compileSchema(draft, { type: "object", additionalProperties: false }).validate({ a: 1 });
-        assert.deepEqual(errors.length, 1);
-        assert.deepEqual(errors[0].type, "error");
+        assert.deepEqual(errors.length, 0);
+        // assert.deepEqual(errors[0].type, "error");
     });
 
-    it("should return all AdditionalPropertiesErrors", () => {
-        const errors = compileSchema(draft, { type: "object", additionalProperties: false }).validate({ a: 1, b: 2 });
+    it("should return all no-additional-properties-error", () => {
+        const errors = compileSchema(draft, {
+            type: "object",
+            patternProperties: {
+                dummy: false
+            },
+            additionalProperties: false
+        }).validate({
+            a: 1,
+            b: 2
+        });
         assert.deepEqual(errors.length, 2);
-        assert.deepEqual(errors[0].name, "NoAdditionalPropertiesError");
-        assert.deepEqual(errors[1].name, "NoAdditionalPropertiesError");
+        assert.deepEqual(errors[0].code, "no-additional-properties-error");
+        assert.deepEqual(errors[1].code, "no-additional-properties-error");
     });
 
     it("should be valid if 'additionalProperties' is 'true'", () => {
@@ -138,20 +146,16 @@ describe("feature : additionalProperties : validate", () => {
     });
 
     it("should be ignore properties that are matched by patternProperties", () => {
-        const errors = compileSchema(
-            draft,
-
-            {
-                type: "object",
-                properties: { b: { type: "string" } },
-                patternProperties: {
-                    "^.$": { type: "number" }
-                },
-                additionalProperties: {
-                    oneOf: [{ type: "string" }]
-                }
+        const errors = compileSchema(draft, {
+            type: "object",
+            properties: { b: { type: "string" } },
+            patternProperties: {
+                "^.$": { type: "number" }
+            },
+            additionalProperties: {
+                oneOf: [{ type: "string" }]
             }
-        ).validate({ a: 1 });
+        }).validate({ a: 1 });
         assert.deepEqual(errors.length, 0);
     });
 

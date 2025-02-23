@@ -48,6 +48,7 @@ const errors: Record<string, CreateError> = {
     missingArrayItemError: createCustomError("MissingArrayItemError"),
     missingDependencyError: createCustomError("MissingDependencyError"),
     missingOneOfPropertyError: createCustomError("MissingOneOfPropertyError"),
+    missingOneOfDeclaratorError: createCustomError("MissingOneOfDeclaratorError"),
     multipleOfError: createCustomError("MultipleOfError"),
     multipleOneOfError: createCustomError("MultipleOneOfError"),
     noAdditionalPropertiesError: createCustomError("NoAdditionalPropertiesError"),

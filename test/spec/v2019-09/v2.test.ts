@@ -28,21 +28,26 @@ addRemotes(cache);
 
 const supportedTestCases = (t: FeatureTest) =>
     [
-        "ref"
-        // "additionalItems"
-        // "additionalProperties",
-        // "contains"
-        // "items"
-        // "maxContains"
-        // "maxItems",
-        // "maxLength",
-        // "maxProperties",
-        // "minContains"
-        // "minItems",
-        // "minLength",
-        // "minProperties",
-        // "required"
-        // "type"
+        // "ref"
+        "additionalItems",
+        "const",
+        "maximum",
+        "minimum",
+        "oneOf",
+        "additionalProperties",
+        "patternProperties",
+        // "contains",
+        // "items",
+        "maxContains",
+        "maxItems",
+        "maxLength",
+        "maxProperties",
+        "minContains",
+        "minItems",
+        "minLength",
+        "minProperties",
+        "required",
+        "type"
     ].includes(t.name);
 
 const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
@@ -57,11 +62,17 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ minProperties
 ✓ required
 ✓ type
-✖ additionalItems
+✓ additionalItems
+✓ maximum
+✓ minimum
+✓ oneOf
+✓ const
+✖ properties
+✓ patternProperties
 ✖ contains
 ✖ items
-✖ maxContains
-✖ minContains
+✓ maxContains
+✓ minContains
 ✖ ref - except meta-schema evaluation
 
 ✖ not - expect for uncle-schema support
@@ -71,7 +82,6 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✖ anchor
 ✖ anyOf
 ✖ boolean_schema
-✖ const
 ✖ content
 ✖ default
 ✖ dependentRequired
@@ -82,13 +92,8 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✖ format
 ✖ if-then-else
 ✖ infinite-loop-detection
-✖ maximum
-✖ minimum
 ✖ multipleOf
-✖ oneOf
 ✖ pattern
-✖ patternProperties
-✖ properties
 ✖ propertyNames
 ✖ refRemote
 ✖ uniqueItems
@@ -119,7 +124,9 @@ const postponedTestcases = [
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "$recursiveRef with nesting") { return; }
+            // if (testCase.description !== "oneOf with boolean schemas, one true") {
+            //     return;
+            // }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }
 
             const schema = testCase.schema;

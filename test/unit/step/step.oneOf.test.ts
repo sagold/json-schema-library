@@ -1,3 +1,4 @@
+// v2 done
 import { expect } from "chai";
 import _step from "../../../lib/step";
 import { Draft04 } from "../../../lib/draft04";
@@ -5,13 +6,7 @@ import { Draft } from "../../../lib/draft";
 import { JsonSchema } from "../../../lib/types";
 import { createNode, isSchemaNode } from "../../../lib/schemaNode";
 
-function step(
-    draft: Draft,
-    key: string | number,
-    schema: JsonSchema,
-    data?: unknown,
-    pointer = "#"
-) {
+function step(draft: Draft, key: string | number, schema: JsonSchema, data?: unknown, pointer = "#") {
     const res = _step(createNode(draft, schema, pointer), key, data);
     return isSchemaNode(res) ? res.schema : res;
 }
@@ -19,7 +14,7 @@ function step(
 describe("step.oneof", () => {
     let draft: Draft04;
     before(() => (draft = new Draft04()));
-
+    // v2
     it("should return matching schema", () => {
         const res = step(
             draft,
@@ -46,6 +41,7 @@ describe("step.oneof", () => {
         expect(res).to.deep.eq({ __oneOfIndex: 1, type: "number", title: "Zahl" });
     });
 
+    // v2
     // PR #35 https://github.com/sagold/json-schema-library/pull/35/commits/8b6477113bdfce522081473bb0dd8fd6fe680391
     it("should maintain references from a remote schema when resolving oneOf with $ref", () => {
         draft.addRemoteSchema("https://my-other-schema.com/schema.json", {
@@ -79,6 +75,7 @@ describe("step.oneof", () => {
         expect(nextRes.type).to.eq("number");
     });
 
+    // v2
     it("should maintain references from a remote schema when resolving oneOf with $ref", () => {
         draft.addRemoteSchema("https://my-other-schema.com/schema.json", {
             type: "object",

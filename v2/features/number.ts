@@ -1,27 +1,63 @@
-// import getTypeOf from "../../lib/getTypeOf";
-// import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
 
-// export function typeNumberValidator({ schema, validators }: SchemaNode): void {
-//     if (
-//         schema.type !== "number" ||
-//         schema.type !== "integer" ||
-//         (Array.isArray(schema.type) && !schema.type.includes("number") && !schema.type.includes("integer"))
-//     ) {
-//         return;
-//     }
-//     validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
-//         const expected = schema.type.includes("integer") ? "integer" : "number";
-//         const dataType = getTypeOf(data);
-//         console.log("data:", data, dataType, "expected", "number");
-//         if (dataType !== "number") {
-//             // TypeError: "Expected `{{value}}` ({{received}}) in `{{pointer}}` to be of type `{{expected}}`",
-//             return node.draft.errors.typeError({
-//                 value: data,
-//                 received: dataType,
-//                 expected,
-//                 schema,
-//                 pointer
-//             });
-//         }
-//     });
-// }
+export function maximumValidator({ schema, validators }: SchemaNode): void {
+    if (isNaN(schema.maximum)) {
+        return;
+    }
+    validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
+        const { draft, schema } = node;
+        if (isNaN(data as number)) {
+            return undefined;
+        }
+        if (schema.maximum && schema.maximum < data) {
+            return draft.errors.maximumError({
+                maximum: schema.maximum,
+                length: data,
+                value: data,
+                pointer,
+                schema
+            });
+        }
+        if (schema.maximum && schema.exclusiveMaximum === true && schema.maximum === data) {
+            return draft.errors.maximumError({
+                maximum: schema.maximum,
+                length: data,
+                pointer,
+                schema,
+                value: data
+            });
+        }
+        return undefined;
+    });
+}
+
+export function minimumValidator({ schema, validators }: SchemaNode): void {
+    if (isNaN(schema.minimum)) {
+        return;
+    }
+    validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
+        const { draft, schema } = node;
+        if (isNaN(schema.minimum)) {
+            return undefined;
+        }
+        if (schema.minimum > data) {
+            return draft.errors.minimumError({
+                minimum: schema.minimum,
+                length: data,
+                pointer,
+                schema,
+                value: data
+            });
+        }
+        if (schema.exclusiveMinimum === true && schema.minimum === data) {
+            return draft.errors.minimumError({
+                minimum: schema.minimum,
+                length: data,
+                pointer,
+                schema,
+                value: data
+            });
+        }
+        return undefined;
+    });
+}

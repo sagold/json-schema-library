@@ -15,17 +15,18 @@ describe("validate", () => {
     before(() => (draft = new Core()));
 
     describe("integer", () => {
+        // v2
         it("should support type 'integer'", () => {
             const errors = validate(draft, 1, { type: "integer" });
             expect(errors).to.have.length(0);
         });
-
+        // v2
         it("should throw error if type 'integer' received a float", () => {
             const errors = validate(draft, 1.1, { type: "integer" });
             expect(errors).to.have.length(1);
             expect(errors[0].name).to.eq("TypeError");
         });
-
+        // v2
         it("should validate NaN", () => {
             const errors = validate(draft, parseInt("a"), { type: "integer" });
             expect(errors).to.have.length(0);
@@ -181,6 +182,7 @@ describe("validate", () => {
         });
 
         describe("oneOf", () => {
+            // v2
             it("should validate matching oneOf", () => {
                 const errors = validate(
                     draft,
@@ -194,7 +196,7 @@ describe("validate", () => {
                 );
                 expect(errors).to.have.length(0);
             });
-
+            // v2
             it("should return error for non-matching oneOf", () => {
                 const errors = validate(
                     draft,
@@ -212,6 +214,7 @@ describe("validate", () => {
             });
         });
 
+        // v2 done
         describe("additionalProperties", () => {
             // v2
             it("should return AdditionalPropertiesError for an additional property", () => {
@@ -337,7 +340,9 @@ describe("validate", () => {
             });
         });
 
+        // v2 done
         describe("patternProperties", () => {
+            // v2
             it("should return an error for matching pattern and failed validation", () => {
                 const errors = validate(
                     draft,
@@ -352,7 +357,7 @@ describe("validate", () => {
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("TypeError");
             });
-
+            // v2
             it("should validate a correct matching pattern", () => {
                 const errors = validate(
                     draft,
@@ -366,7 +371,7 @@ describe("validate", () => {
                 );
                 expect(errors).to.have.length(0);
             });
-
+            // v2
             it("should return an error for matching regex pattern and failed validation", () => {
                 const errors = validate(
                     draft,
@@ -381,7 +386,7 @@ describe("validate", () => {
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("TypeError");
             });
-
+            // v2
             it("should invalidate defined property", () => {
                 const errors = validate(
                     draft,
@@ -400,7 +405,7 @@ describe("validate", () => {
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("TypeError");
             });
-
+            // v2
             it("should return 'PatternPropertiesError' if additional properties are not allowed", () => {
                 const errors = validate(
                     draft,
@@ -420,7 +425,7 @@ describe("validate", () => {
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("PatternPropertiesError");
             });
-
+            // v2
             it("should return an error if one of the matching patterns does not validate", () => {
                 const errors = validate(
                     draft,
@@ -437,7 +442,7 @@ describe("validate", () => {
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("TypeError");
             });
-
+            // v2
             it("should return no error if additional properties are not allowed but valid in patterns", () => {
                 const errors = validate(
                     draft,
@@ -452,7 +457,7 @@ describe("validate", () => {
                 );
                 expect(errors).to.have.length(0);
             });
-
+            // v2
             it("should return no error if additional properties validate value", () => {
                 const errors = validate(
                     draft,
@@ -468,7 +473,7 @@ describe("validate", () => {
 
                 expect(errors).to.have.length(0);
             });
-
+            // v2
             it("should return an AdditionalPropertiesError if additional properties do not validate", () => {
                 const errors = validate(
                     draft,

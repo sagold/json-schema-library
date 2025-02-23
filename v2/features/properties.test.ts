@@ -2,6 +2,7 @@ import { strict as assert } from "assert";
 import { Draft2019 } from "../../lib/draft2019";
 import { Draft } from "../../lib/draft";
 import { compileSchema } from "../compileSchema";
+import { isJsonError } from "../../lib/types";
 
 describe("feature : properties : get", () => {
     let draft: Draft;
@@ -46,7 +47,9 @@ describe("feature : properties : get", () => {
             }
         });
 
-        const schema = node.get("header", { header: { title: "huhu" } }).get("title")?.schema;
+        const next = node.get("header", { header: { title: "huhu" } });
+        assert(!isJsonError(next));
+        const schema = next.get("title")?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });

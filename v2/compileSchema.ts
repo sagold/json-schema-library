@@ -1,6 +1,6 @@
 import resolveRef, { compileRef } from "./ref";
 import { Draft } from "../lib/draft";
-import { JsonError, JsonSchema } from "../lib/types";
+import { isJsonError, JsonError, JsonSchema } from "../lib/types";
 import { mergeSchema } from "../lib/mergeSchema";
 import { omit } from "../lib/utils/omit";
 import { SchemaNode, JsonSchemaReducerParams } from "./compiler/types";
@@ -9,6 +9,8 @@ import { strict as assert } from "assert";
 import { DEFAULT_DATA } from "./compiler/defaultData";
 import { PARSER } from "./compiler/parser";
 import { VALIDATORS } from "./compiler/validators";
+import sanitizeErrors from "./utils/sanitizeErrors";
+import createSchemaOf from "../lib/createSchemaOf";
 
 const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON" | "compileSchema" | "validate"> = {
     compileSchema,
@@ -16,7 +18,11 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON"
     get(key: string | number, data?: unknown) {
         let node = this as SchemaNode;
         if (node.reducers.length) {
-            node = node.reduce({ data });
+            const result = node.reduce({ data });
+            if (isJsonError(result)) {
+                return result;
+            }
+            node = result;
         }
 
         for (const resolver of node.resolvers) {
@@ -45,15 +51,38 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON"
         > merge all schema with source schema
         > compile schema (again) with partialy schema
     */
-    reduce({ data }: JsonSchemaReducerParams) {
+    reduce({ data, pointer }: JsonSchemaReducerParams) {
         // @path
         const node = { ...(this as SchemaNode) };
         node.schema = resolveRef(node) ?? node.schema;
         const reducers = node.reducers;
 
+        // @ts-expect-error bool schema
+        if (node.schema === false) {
+            return node;
+            // @ts-expect-error bool schema
+        } else if (node.schema === true) {
+            return node.compileSchema(node.draft, createSchemaOf(data), node.spointer, node);
+        }
+
+        // // @ts-expect-error bool schema
+        // if (node.schema === true) {
+        //     return node.compileSchema(node.draft, createSchemaOf(data), node.spointer, node);
+        //     // @ts-expect-error bool schema
+        // } else if (node.schema === false) {
+        //     return node.draft.errors.invalidDataError({
+        //         value: data,
+        //         pointer,
+        //         schema: node.schema
+        //     });
+        // }
+
         let schema;
         for (let i = 0; i < reducers.length; i += 1) {
-            const result = reducers[i]({ data, node });
+            const result = reducers[i]({ data, node, pointer });
+            if (isJsonError(result)) {
+                return result;
+            }
             if (result) {
                 // compilation result for data of current schema
                 // in order to merge results, we rebuild node from schema
@@ -64,13 +93,13 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON"
 
         if (schema) {
             // recompile to update newly added schema defintions
-            schema = mergeSchema(node.schema, schema, "if", "then", "else", "allOf");
+            schema = mergeSchema(node.schema, schema, "if", "then", "else", "allOf", "anyOf", "oneOf");
             // console.log("reduced schema", schema);
-            return compileSchema(this.draft, schema, this.spointer, node);
+            return node.compileSchema(this.draft, schema, this.spointer, node);
         }
 
         // remove dynamic properties of node
-        return { ...node, schema: omit(node.schema, "if", "then", "else", "allOf"), reducers: [] };
+        return { ...node, schema: omit(node.schema, "if", "then", "else", "allOf", "anyOf", "oneOf"), reducers: [] };
     },
 
     validate(data: unknown, pointer = "#") {
@@ -100,11 +129,11 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON"
             }
         }
 
-        return errors.filter((e) => e !== undefined);
+        return sanitizeErrors(errors);
     },
 
     toJSON() {
-        return { ...this, draft: undefined };
+        return { ...this, draft: undefined, parent: this.parent.spointer };
     }
 };
 

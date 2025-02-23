@@ -3,12 +3,10 @@ import { isObject } from "../../lib/utils/isObject";
 import { JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
 import { getValue } from "../getValue";
 
-const isType = (schemaType: string | string[], type: string) => schemaType === type || schemaType?.includes?.(type);
-
 // must come as last resolver
 export function parseAdditionalItems(node: SchemaNode) {
     const { draft, schema, spointer } = node;
-    if (schema.additionalItems === false || !isType(schema.type, "array")) {
+    if (schema.additionalItems === false) {
         // no additional items - no resolver required
         return;
     }
@@ -22,6 +20,9 @@ export function parseAdditionalItems(node: SchemaNode) {
 
 additionalItemsResolver.toJSON = () => "additionalItemsResolver";
 function additionalItemsResolver({ node, data, key }: JsonSchemaResolverParams) {
+    if (!Array.isArray(data)) {
+        return;
+    }
     // @attention: items, etc should already have been tried
     const value = getValue(data, key);
     if (node.additionalItems) {
@@ -46,7 +47,7 @@ export function additionalItemsValidator({ schema, validators }: SchemaNode): vo
             // - schema object catches all items
             return;
         }
-        if (Array.isArray(schema.items) && schema.items.length >= data.length) {
+        if (schema.items == null || (Array.isArray(schema.items) && schema.items.length >= data.length)) {
             // - no additional items
             return;
         }

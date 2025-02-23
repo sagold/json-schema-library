@@ -41,6 +41,7 @@ export default {
     MinItemsOneError: "At least one item is required in `{{pointer}}`",
     MinLengthError: "Value `{{pointer}}` should have a minimum length of `{{minLength}}`, but got `{{length}}`.",
     MinLengthOneError: "A value is required in `{{pointer}}`",
+    MissingOneOfDeclaratorError: "Missing oneOf declarator `{{declarator}}` in `{{pointer}}`",
     MinPropertiesError: "Too few properties in `{{pointer}}`, should be at least `{{minProperties}}`, but got `{{length}}`",
     MissingArrayItemError: "Array at '{{pointer}}' has a missing item at '{{key}}'",
     MissingDependencyError: "The required propery '{{missingProperty}}' in `{{pointer}}` is missing",

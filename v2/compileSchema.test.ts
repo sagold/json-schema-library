@@ -89,3 +89,17 @@ describe("compiled object schema - get", () => {
         });
     });
 });
+
+describe("compiled object schema - reduce", () => {
+    let draft: Draft;
+    beforeEach(() => (draft = new Draft2019()));
+
+    it("should return schema for boolean schema true", () => {
+        // @ts-expect-error boolean schema still untyped
+        const node = compileSchema(draft, true);
+
+        const schema = node.reduce({ data: 123 })?.schema;
+
+        assert.deepEqual(schema, { type: "number" });
+    });
+});

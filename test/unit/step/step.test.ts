@@ -5,13 +5,7 @@ import { Draft04 as Core } from "../../../lib/draft04";
 import { expect } from "chai";
 import { JsonSchema } from "../../../lib/types";
 
-function step(
-    draft: Draft,
-    key: string | number,
-    schema: JsonSchema,
-    data?: unknown,
-    pointer = "#"
-) {
+function step(draft: Draft, key: string | number, schema: JsonSchema, data?: unknown, pointer = "#") {
     const res = _step(createNode(draft, schema, pointer), key, data);
     return isSchemaNode(res) ? res.schema : res;
 }
@@ -109,6 +103,7 @@ describe("step", () => {
             expect(res.type).to.deep.eq("error");
         });
 
+        // v2
         it("should return matching oneOf", () => {
             const res = step(
                 draft,
@@ -131,6 +126,7 @@ describe("step", () => {
             expect(res).to.deep.eq({ type: "number" });
         });
 
+        // v2
         it("should return matching oneOf, for objects missing properties", () => {
             const res = step(
                 draft,
@@ -253,10 +249,7 @@ describe("step", () => {
                         additionalProperties: { type: "number" }
                     }
                 },
-                allOf: [
-                    { $ref: "#/definitions/object" },
-                    { $ref: "#/definitions/additionalNumber" }
-                ]
+                allOf: [{ $ref: "#/definitions/object" }, { $ref: "#/definitions/additionalNumber" }]
             });
 
             const res = step(draft, "title", draft.rootSchema, {

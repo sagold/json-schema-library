@@ -7,6 +7,7 @@ import { parsePatternProperties } from "../features/patternProperties";
 import { parseItems } from "../features/items";
 import { parseAdditionalItems } from "../features/additionalItems";
 import { parseContains } from "../features/contains";
+import { parseOneOf } from "../features/oneOf";
 
 export const PARSER: ((node: SchemaNode) => void)[] = [
     parseAllOf,
@@ -14,6 +15,7 @@ export const PARSER: ((node: SchemaNode) => void)[] = [
     parseIfThenElse,
     parseProperties,
     parsePatternProperties,
+    parseOneOf,
     parseItems,
     parseAdditionalProperties, // @attention has to come after other object-property parser
     parseAdditionalItems // @attention has to come after other object-property parser

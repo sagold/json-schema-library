@@ -9,11 +9,16 @@ import { additionalItemsValidator } from "../features/additionalItems";
 import { maxItemsValidator, minItemsValidator } from "../features/array";
 import { containsValidator } from "../features/contains";
 import { requiredValidator } from "../features/required";
+import { validateOneOf } from "../features/oneOf";
+import { constValidator } from "../features/const";
+import { maximumValidator, minimumValidator } from "../features/number";
+import { patternPropertiesValidator } from "../features/patternProperties";
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalItemsValidator,
     additionalPropertiesValidator,
     containsValidator,
+    constValidator,
     itemsValidator,
     maxItemsValidator,
     maxLengthValidator,
@@ -22,7 +27,11 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     minLengthValidator,
     minPropertiesValidator,
     propertiesValidator,
+    patternPropertiesValidator,
+    minimumValidator,
+    maximumValidator,
     requiredValidator,
+    validateOneOf,
     typeValidator
 ].map((func) => {
     // @ts-expect-error extended function for debugging purposes
