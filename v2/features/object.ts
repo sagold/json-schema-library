@@ -1,7 +1,7 @@
 import getTypeOf from "../../lib/getTypeOf";
 import { isObject } from "../../lib/utils/isObject";
 import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
-import { getValue } from "../getValue";
+import { getValue } from "../utils/getValue";
 
 export function getObjectData(node: SchemaNode) {
     if (node.schema.type === "object") {

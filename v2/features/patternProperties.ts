@@ -1,7 +1,7 @@
 import { JsonError } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
 import { JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
-import { getValue } from "../getValue";
+import { getValue } from "../utils/getValue";
 
 patternPropertyResolver.toJSON = () => "patternPropertyResolver";
 function patternPropertyResolver({ node, key }: JsonSchemaResolverParams) {

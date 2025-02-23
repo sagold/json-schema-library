@@ -1,6 +1,6 @@
 import { JsonError } from "../../lib/types";
 import { SchemaNode } from "../compiler/types";
-import { getValue } from "../getValue";
+import { getValue } from "../utils/getValue";
 import { JsonSchemaResolverParams, JsonSchemaValidatorParams } from "../compiler/types";
 import { isObject } from "../../lib/utils/isObject";
 

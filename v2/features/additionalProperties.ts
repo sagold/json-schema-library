@@ -2,7 +2,7 @@ import settings from "../../lib/config/settings";
 import { isJsonError, JsonError } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
 import { JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
-import { getValue } from "../getValue";
+import { getValue } from "../utils/getValue";
 
 // must come as last resolver
 export function parseAdditionalProperties(node: SchemaNode) {

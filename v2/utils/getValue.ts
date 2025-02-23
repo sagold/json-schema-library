@@ -1,4 +1,4 @@
-import { isObject } from "../lib/utils/isObject";
+import { isObject } from "../../lib/utils/isObject";
 
 export function getValue(data: unknown, key: string | number) {
     if (isObject(data)) {
