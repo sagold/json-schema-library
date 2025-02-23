@@ -1,21 +1,47 @@
-// import getTypeOf from "../../lib/getTypeOf";
-// import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
 
-// export function typeArrayValidator({ schema, validators }: SchemaNode): void {
-//     if (schema.type !== "array" || (Array.isArray(schema.type) && !schema.type.includes("array"))) {
-//         return;
-//     }
-//     validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
-//         const dataType = getTypeOf(data);
-//         if (dataType !== "array") {
-//             // TypeError: "Expected `{{value}}` ({{received}}) in `{{pointer}}` to be of type `{{expected}}`",
-//             return node.draft.errors.typeError({
-//                 value: data,
-//                 received: dataType,
-//                 expected: "array",
-//                 schema,
-//                 pointer
-//             });
-//         }
-//     });
-// }
+export function maxItemsValidator({ schema, validators }: SchemaNode): void {
+    if (isNaN(schema.maxItems)) {
+        return;
+    }
+    validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
+        if (Array.isArray(data) && schema.maxItems < data.length) {
+            return node.draft.errors.maxItemsError({
+                maximum: schema.maxItems,
+                length: data.length,
+                schema,
+                value: data,
+                pointer
+            });
+        }
+    });
+}
+
+export function minItemsValidator({ schema, validators }: SchemaNode): void {
+    if (isNaN(schema.minItems)) {
+        return;
+    }
+    validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
+        if (!Array.isArray(data)) {
+            return;
+        }
+        if (schema.minItems > data.length) {
+            if (schema.minItems === 1) {
+                return node.draft.errors.minItemsOneError({
+                    minItems: schema.minItems,
+                    length: data.length,
+                    pointer,
+                    schema,
+                    value: data
+                });
+            }
+            return node.draft.errors.minItemsError({
+                minItems: schema.minItems,
+                length: data.length,
+                pointer,
+                schema,
+                value: data
+            });
+        }
+    });
+}

@@ -1,6 +1,6 @@
 import resolveRef, { compileRef } from "./ref";
 import { Draft } from "../lib/draft";
-import { JsonSchema } from "../lib/types";
+import { JsonError, JsonSchema } from "../lib/types";
 import { mergeSchema } from "../lib/mergeSchema";
 import { omit } from "../lib/utils/omit";
 import { SchemaNode, JsonSchemaReducerParams } from "./compiler/types";
@@ -73,9 +73,24 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON"
         return { ...node, schema: omit(node.schema, "if", "then", "else", "allOf"), reducers: [] };
     },
 
-    validate(data: unknown) {
+    validate(data: unknown, pointer = "#") {
         const node = this as SchemaNode;
-        const errors = [];
+        const errors: JsonError[] = [];
+        // @ts-expect-error untyped boolean schema
+        if (node.schema === true) {
+            return errors;
+        }
+        // @ts-expect-error untyped boolean schema
+        if (node.schema === false) {
+            return [
+                node.draft.errors.invalidDataError({
+                    value: data,
+                    pointer,
+                    schema: node.schema
+                })
+            ];
+        }
+
         for (const validate of node.validators) {
             const result = validate({ node, data, pointer: "#" });
             if (Array.isArray(result)) {
@@ -84,7 +99,8 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON"
                 errors.push(result);
             }
         }
-        return errors;
+
+        return errors.filter((e) => e !== undefined);
     },
 
     toJSON() {

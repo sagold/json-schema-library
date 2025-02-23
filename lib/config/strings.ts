@@ -42,6 +42,7 @@ export default {
     MinLengthError: "Value `{{pointer}}` should have a minimum length of `{{minLength}}`, but got `{{length}}`.",
     MinLengthOneError: "A value is required in `{{pointer}}`",
     MinPropertiesError: "Too few properties in `{{pointer}}`, should be at least `{{minProperties}}`, but got `{{length}}`",
+    MissingArrayItemError: "Array at '{{pointer}}' has a missing item at '{{key}}'",
     MissingDependencyError: "The required propery '{{missingProperty}}' in `{{pointer}}` is missing",
     MissingOneOfPropertyError: "Value at `{{pointer}}` property: `{{property}}`",
     MultipleOfError: "Expected `{{value}}` in `{{pointer}}` to be multiple of `{{multipleOf}}`",

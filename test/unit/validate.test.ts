@@ -129,6 +129,7 @@ describe("validate", () => {
         });
 
         describe("required", () => {
+            // v2
             it("shoud return errors for missing `required` properties", () => {
                 const errors = validate(
                     draft,
@@ -212,24 +213,25 @@ describe("validate", () => {
         });
 
         describe("additionalProperties", () => {
+            // v2
             it("should return AdditionalPropertiesError for an additional property", () => {
                 const errors = validate(draft, { a: 1 }, { type: "object", additionalProperties: false });
                 expect(errors).to.have.length(1);
                 expect(errors[0].type).to.eq("error");
             });
-
+            // v2
             it("should return all AdditionalPropertiesErrors", () => {
                 const errors = validate(draft, { a: 1, b: 2 }, { type: "object", additionalProperties: false });
                 expect(errors).to.have.length(2);
                 expect(errors[0].name).to.eq("NoAdditionalPropertiesError");
                 expect(errors[1].name).to.eq("NoAdditionalPropertiesError");
             });
-
+            // v2
             it("should be valid if 'additionalProperties' is 'true'", () => {
                 const errors = validate(draft, { a: 1 }, { type: "object", additionalProperties: true });
                 expect(errors).to.have.length(0);
             });
-
+            // v2
             it("should be valid if value matches 'additionalProperties' schema", () => {
                 const errors = validate(
                     draft,
@@ -242,7 +244,7 @@ describe("validate", () => {
                 );
                 expect(errors).to.have.length(0);
             });
-
+            // v2
             it("should only validate existing definition in 'properties'", () => {
                 const errors = validate(
                     draft,
@@ -255,7 +257,7 @@ describe("validate", () => {
                 );
                 expect(errors).to.have.length(0);
             });
-
+            // v2
             it("should return error if value does not match 'additionalProperties' schema", () => {
                 const errors = validate(
                     draft,
@@ -269,7 +271,7 @@ describe("validate", () => {
                 expect(errors).to.have.length(1);
                 expect(errors[0].type).to.eq("error");
             });
-
+            // v2
             it("should be valid if value matches 'additionalProperties' oneOf schema", () => {
                 const errors = validate(
                     draft,
@@ -284,7 +286,7 @@ describe("validate", () => {
                 );
                 expect(errors).to.have.length(0);
             });
-
+            // v2
             it("should be invalid if value does not match 'additionalProperties' in oneOf schema", () => {
                 const errors = validate(
                     draft,
@@ -299,7 +301,7 @@ describe("validate", () => {
                 );
                 expect(errors).to.have.length(1);
             });
-
+            // v2
             it("should be ignore properties that are matched by patternProperties", () => {
                 const errors = validate(
                     draft,
@@ -317,7 +319,7 @@ describe("validate", () => {
                 );
                 expect(errors).to.have.length(0);
             });
-
+            // v2
             it("should be invalid if value does match multiple 'additionalProperties' in oneOf schema", () => {
                 const errors = validate(
                     draft,

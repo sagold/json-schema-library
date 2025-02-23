@@ -32,7 +32,7 @@ export function itemsValidator({ schema, validators }: SchemaNode) {
     }
 
     validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams): JsonError | JsonError[] | undefined => {
-        if (!Array.isArray(data)) {
+        if (!Array.isArray(data) || data.length === 0) {
             return;
         }
 
@@ -45,21 +45,19 @@ export function itemsValidator({ schema, validators }: SchemaNode) {
         }
 
         const errors: JsonError[] = [];
-
         if (node.itemsList) {
-            for (let i = 0; i < node.itemsList.length; i += 1) {
+            // note: schema is valid when data does not have enough elements as defined by array-list
+            for (let i = 0; i < Math.min(node.itemsList.length, data.length); i += 1) {
                 const itemData = data[i];
-                // @todo reevaluate: incomplete schema is created here
+                // @todo v1 reevaluate: incomplete schema is created here?
                 const itemNode = node.itemsList[i];
-                // @todo check mismatch in length
-                // what about additionalItems??
-                // => const itemNode = draft.step(node.next(schema), i, value);
                 const result = itemNode.validate(itemData, `${pointer}/${i}`);
-                if (result) {
-                    errors.push(...result);
-                }
+                errors.push(...result);
             }
-        } else if (node.itemsObject) {
+            return errors;
+        }
+
+        if (node.itemsObject) {
             for (let i = 0; i < data.length; i += 1) {
                 const itemData = data[i];
                 const result = node.itemsObject.validate(itemData, `${pointer}/${i}`);
@@ -67,8 +65,7 @@ export function itemsValidator({ schema, validators }: SchemaNode) {
                     errors.push(...result);
                 }
             }
+            return errors;
         }
-
-        return errors;
     });
 }

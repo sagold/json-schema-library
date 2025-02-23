@@ -28,32 +28,50 @@ addRemotes(cache);
 
 const supportedTestCases = (t: FeatureTest) =>
     [
-        // "type",
-        "items"
-        //"minLength", "maxLength", "additionalProperties", "maxProperties", "minProperties"
+        "ref"
+        // "additionalItems"
+        // "additionalProperties",
+        // "contains"
+        // "items"
+        // "maxContains"
+        // "maxItems",
+        // "maxLength",
+        // "maxProperties",
+        // "minContains"
+        // "minItems",
+        // "minLength",
+        // "minProperties",
+        // "required"
+        // "type"
     ].includes(t.name);
 
 const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 
 /*
-✓ maxProperties
-✓ minProperties
-✓ type
 ✓ additionalProperties
-✓ minLength
+✓ maxItems
 ✓ maxLength
+✓ maxProperties
+✓ minItems
+✓ minLength
+✓ minProperties
+✓ required
+✓ type
+✖ additionalItems
+✖ contains
+✖ items
+✖ maxContains
+✖ minContains
+✖ ref - except meta-schema evaluation
 
 ✖ not - expect for uncle-schema support
-✖ ref - except meta-schema evaluation
 ✖ unevaluatedItems - expect for uncle-schema and recursiveRef support
 ✖ unevaluatedProperties - expect for uncle-schema and recursiveRef support
-✖ additionalItems
 ✖ allOf
 ✖ anchor
 ✖ anyOf
 ✖ boolean_schema
 ✖ const
-✖ contains
 ✖ content
 ✖ default
 ✖ dependentRequired
@@ -64,13 +82,8 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✖ format
 ✖ if-then-else
 ✖ infinite-loop-detection
-✖ items
-✖ maxContains
 ✖ maximum
-✖ maxItems
-✖ minContains
 ✖ minimum
-✖ minItems
 ✖ multipleOf
 ✖ oneOf
 ✖ pattern
@@ -78,7 +91,6 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✖ properties
 ✖ propertyNames
 ✖ refRemote
-✖ required
 ✖ uniqueItems
 ✖ unknownKeyword
 ✖ defs

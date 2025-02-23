@@ -18,7 +18,11 @@ export function typeValidator({ schema, validators }: SchemaNode): void {
     }
     validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
         const dataType = getJsonSchemaType(data, schema.type);
-        if (schema.type === dataType || (Array.isArray(schema.type) && schema.type.includes(dataType))) {
+        if (
+            data === undefined ||
+            schema.type === dataType ||
+            (Array.isArray(schema.type) && schema.type.includes(dataType))
+        ) {
             return;
         }
 

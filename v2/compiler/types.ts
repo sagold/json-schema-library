@@ -62,6 +62,7 @@ export type SchemaNode = {
     itemsList?: SchemaNode[];
     properties?: Record<string, SchemaNode>;
     patternProperties?: { pattern: RegExp; node: SchemaNode }[];
+    contains?: SchemaNode;
     if?: SchemaNode;
     then?: SchemaNode;
     else?: SchemaNode;

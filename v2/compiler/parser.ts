@@ -6,9 +6,11 @@ import { parseIfThenElse } from "../features/ifthenelse";
 import { parsePatternProperties } from "../features/patternProperties";
 import { parseItems } from "../features/items";
 import { parseAdditionalItems } from "../features/additionalItems";
+import { parseContains } from "../features/contains";
 
 export const PARSER: ((node: SchemaNode) => void)[] = [
     parseAllOf,
+    parseContains,
     parseIfThenElse,
     parseProperties,
     parsePatternProperties,

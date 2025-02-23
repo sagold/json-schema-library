@@ -87,107 +87,83 @@ describe("feature : additionalProperties : validate", () => {
         assert.deepEqual(errors.length, 0);
     });
 
-    // it("should be valid if value matches 'additionalProperties' schema", () => {
-    //     const errors = compileSchema(
-    //         draft,
-    //         { a: 1 },
-    //         {
-    //             type: "object",
-    //             properties: { b: { type: "string" } },
-    //             additionalProperties: { type: "number" }
-    //         }
-    //     );
-    //     expect(errors).to.have.length(0);
-    // });
+    it("should be valid if value matches 'additionalProperties' schema", () => {
+        const errors = compileSchema(draft, {
+            type: "object",
+            properties: { b: { type: "string" } },
+            additionalProperties: { type: "number" }
+        }).validate({ a: 1 });
+        assert.deepEqual(errors.length, 0);
+    });
 
-    // it("should only validate existing definition in 'properties'", () => {
-    //     const errors = compileSchema(
-    //         draft,
-    //         { b: "i am valid" },
-    //         {
-    //             type: "object",
-    //             properties: { b: { type: "string" } },
-    //             additionalProperties: { type: "number" }
-    //         }
-    //     );
-    //     expect(errors).to.have.length(0);
-    // });
+    it("should only validate existing definition in 'properties'", () => {
+        const errors = compileSchema(draft, {
+            type: "object",
+            properties: { b: { type: "string" } },
+            additionalProperties: { type: "number" }
+        }).validate({ b: "i am valid" });
+        assert.deepEqual(errors.length, 0);
+    });
 
-    // it("should return error if value does not match 'additionalProperties' schema", () => {
-    //     const errors = compileSchema(
-    //         draft,
-    //         { a: 1 },
-    //         {
-    //             type: "object",
-    //             properties: { b: { type: "string" } },
-    //             additionalProperties: { type: "string" }
-    //         }
-    //     );
-    //     expect(errors).to.have.length(1);
-    //     expect(errors[0].type).to.eq("error");
-    // });
+    it("should return error if value does not match 'additionalProperties' schema", () => {
+        const errors = compileSchema(draft, {
+            type: "object",
+            properties: { b: { type: "string" } },
+            additionalProperties: { type: "string" }
+        }).validate({ a: 1 });
+        assert.deepEqual(errors.length, 1);
+        assert.deepEqual(errors[0].type, "error");
+    });
 
-    // it("should be valid if value matches 'additionalProperties' oneOf schema", () => {
-    //     const errors = compileSchema(
-    //         draft,
-    //         { a: 1 },
-    //         {
-    //             type: "object",
-    //             properties: { b: { type: "string" } },
-    //             additionalProperties: {
-    //                 oneOf: [{ type: "number" }]
-    //             }
-    //         }
-    //     );
-    //     expect(errors).to.have.length(0);
-    // });
+    it("should be valid if value matches 'additionalProperties' oneOf schema", () => {
+        const errors = compileSchema(draft, {
+            type: "object",
+            properties: { b: { type: "string" } },
+            additionalProperties: {
+                oneOf: [{ type: "number" }]
+            }
+        }).validate({ a: 1 });
+        assert.deepEqual(errors.length, 0);
+    });
 
-    // it("should be invalid if value does not match 'additionalProperties' in oneOf schema", () => {
-    //     const errors = compileSchema(
-    //         draft,
-    //         { a: 1 },
-    //         {
-    //             type: "object",
-    //             properties: { b: { type: "string" } },
-    //             additionalProperties: {
-    //                 oneOf: [{ type: "string" }]
-    //             }
-    //         }
-    //     );
-    //     expect(errors).to.have.length(1);
-    // });
+    it("should be invalid if value does not match 'additionalProperties' in oneOf schema", () => {
+        const errors = compileSchema(draft, {
+            type: "object",
+            properties: { b: { type: "string" } },
+            additionalProperties: {
+                oneOf: [{ type: "string" }]
+            }
+        }).validate({ a: 1 });
+        assert.deepEqual(errors.length, 1);
+    });
 
-    // it("should be ignore properties that are matched by patternProperties", () => {
-    //     const errors = compileSchema(
-    //         draft,
-    //         { a: 1 },
-    //         {
-    //             type: "object",
-    //             properties: { b: { type: "string" } },
-    //             patternProperties: {
-    //                 "^.$": { type: "number" }
-    //             },
-    //             additionalProperties: {
-    //                 oneOf: [{ type: "string" }]
-    //             }
-    //         }
-    //     );
-    //     expect(errors).to.have.length(0);
-    // });
+    it("should be ignore properties that are matched by patternProperties", () => {
+        const errors = compileSchema(
+            draft,
 
-    // it("should be invalid if value does match multiple 'additionalProperties' in oneOf schema", () => {
-    //     const errors = compileSchema(
-    //         draft,
-    //         { a: "a string" },
-    //         {
-    //             type: "object",
-    //             properties: { b: { type: "string" } },
-    //             additionalProperties: {
-    //                 oneOf: [{ type: "string" }, { type: "string" }]
-    //             }
-    //         }
-    //     );
-    //     expect(errors).to.have.length(1);
-    //     expect(errors[0].name).to.eq("AdditionalPropertiesError");
-    // });
+            {
+                type: "object",
+                properties: { b: { type: "string" } },
+                patternProperties: {
+                    "^.$": { type: "number" }
+                },
+                additionalProperties: {
+                    oneOf: [{ type: "string" }]
+                }
+            }
+        ).validate({ a: 1 });
+        assert.deepEqual(errors.length, 0);
+    });
+
+    it("should be invalid if value does match multiple 'additionalProperties' in oneOf schema", () => {
+        const errors = compileSchema(draft, {
+            type: "object",
+            properties: { b: { type: "string" } },
+            additionalProperties: {
+                oneOf: [{ type: "string" }, { type: "string" }]
+            }
+        }).validate({ a: "a string" });
+        assert.deepEqual(errors.length, 1);
+        assert.deepEqual(errors[0].code, "additional-properties-error");
+    });
 });
