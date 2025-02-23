@@ -65,18 +65,6 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON"
             return node.compileSchema(node.draft, createSchemaOf(data), node.spointer, node);
         }
 
-        // // @ts-expect-error bool schema
-        // if (node.schema === true) {
-        //     return node.compileSchema(node.draft, createSchemaOf(data), node.spointer, node);
-        //     // @ts-expect-error bool schema
-        // } else if (node.schema === false) {
-        //     return node.draft.errors.invalidDataError({
-        //         value: data,
-        //         pointer,
-        //         schema: node.schema
-        //     });
-        // }
-
         let schema;
         for (let i = 0; i < reducers.length; i += 1) {
             const result = reducers[i]({ data, node, pointer });
@@ -166,7 +154,7 @@ export function compileSchema(draft: Draft, schema: JsonSchema, spointer = "#", 
 
     compileRef(node);
 
-    PARSER.forEach((parse) => parse(node));
+    PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
     VALIDATORS.forEach((registerValidator) => registerValidator(node));
     DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
 

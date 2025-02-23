@@ -38,19 +38,21 @@ export function isSchemaNode(value: unknown): value is SchemaNode {
 }
 
 export type SchemaNode = {
-    compileSchema: (draft: Draft, schema: JsonSchema, spointer?: string, parentNode?: SchemaNode) => SchemaNode;
     context: Context;
     draft: Draft;
-    get: (key: string | number, data?: unknown) => SchemaNode | JsonError;
-    getTemplate: (data?: unknown) => unknown;
     parent?: SchemaNode | undefined;
-    reduce: ({ data, pointer }: { data: unknown; pointer?: string }) => SchemaNode | JsonError | undefined;
     ref?: string;
     schema: JsonSchema;
     spointer: string;
+    oneOfIndex?: number;
+
+    // methods
+    compileSchema: (draft: Draft, schema: JsonSchema, spointer?: string, parentNode?: SchemaNode) => SchemaNode;
+    get: (key: string | number, data?: unknown) => SchemaNode | JsonError;
+    getTemplate: (data?: unknown) => unknown;
+    reduce: ({ data, pointer }: { data: unknown; pointer?: string }) => SchemaNode | JsonError;
     toJSON: () => unknown;
     validate: (data: unknown, pointer?: string) => JsonError[];
-    oneOfIndex?: number;
 
     // logic
     getDefaultData: JsonSchemaDefaultDataResolver[];

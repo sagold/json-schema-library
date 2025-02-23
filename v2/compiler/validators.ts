@@ -11,8 +11,9 @@ import { containsValidator } from "../features/contains";
 import { requiredValidator } from "../features/required";
 import { validateOneOf } from "../features/oneOf";
 import { constValidator } from "../features/const";
-import { maximumValidator, minimumValidator } from "../features/number";
+import { maximumValidator, minimumValidator, multipleOfValidator } from "../features/number";
 import { patternPropertiesValidator } from "../features/patternProperties";
+import { uniqueItemsValidator } from "../features/uniqueItems";
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalItemsValidator,
@@ -26,13 +27,15 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     minItemsValidator,
     minLengthValidator,
     minPropertiesValidator,
+    multipleOfValidator,
     propertiesValidator,
     patternPropertiesValidator,
     minimumValidator,
     maximumValidator,
     requiredValidator,
     validateOneOf,
-    typeValidator
+    typeValidator,
+    uniqueItemsValidator
 ].map((func) => {
     // @ts-expect-error extended function for debugging purposes
     func.toJSON = () => func.name;
