@@ -1,6 +1,7 @@
-import { strict as assert } from "assert";
-import { Draft2019 } from "../lib/draft2019";
+import { compileSchema } from "./compileSchema";
 import { Draft } from "../lib/draft";
+import { Draft2019 } from "../lib/draft2019";
+import { strict as assert } from "assert";
 
 // - processing draft we need to know and support json-schema keywords
 // - Note: meta-schemas are defined flat, combining all properties per type
@@ -27,8 +28,6 @@ import { Draft } from "../lib/draft";
 //         }
 //     }
 // };
-
-import { compileSchema } from "./compileSchema";
 
 // const PARSER: Record<string, object> = {
 //     properties: {}
@@ -101,5 +100,53 @@ describe("compiled object schema - reduce", () => {
         const schema = node.reduce({ data: 123 })?.schema;
 
         assert.deepEqual(schema, { type: "number" });
+    });
+
+    it("should compile schema with current data", () => {
+        const node = compileSchema(draft, {
+            type: "object",
+            if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
+            then: {
+                required: ["header"],
+                properties: { header: { type: "string", minLength: 1 } }
+            }
+        });
+
+        const dataNode = node.reduce({ data: { withHeader: true } });
+
+        assert.deepEqual(dataNode?.schema, {
+            type: "object",
+            required: ["header"],
+            properties: { header: { type: "string", minLength: 1 } }
+        });
+    });
+
+    it.skip("should recursively compile schema with current data", () => {
+        const node = compileSchema(draft, {
+            type: "object",
+            properties: {
+                article: {
+                    type: "object",
+                    if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
+                    then: {
+                        required: ["header"],
+                        properties: { header: { type: "string", minLength: 1 } }
+                    }
+                }
+            }
+        });
+
+        const dataNode = node.reduce({ data: { article: { withHeader: true } } });
+
+        assert.deepEqual(dataNode?.schema, {
+            type: "object",
+            properties: {
+                article: {
+                    type: "object",
+                    required: ["header"],
+                    properties: { header: { type: "string", minLength: 1 } }
+                }
+            }
+        });
     });
 });

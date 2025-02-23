@@ -76,7 +76,7 @@ describe("feature : object : validate", () => {
     });
 });
 
-describe("faeture : object : getTemplate", () => {
+describe("feature : object : getTemplate", () => {
     let draft: Draft;
     beforeEach(() => (draft = new Draft2019()));
 
