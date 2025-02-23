@@ -69,3 +69,53 @@ describe("feature : properties : get", () => {
         assert.deepEqual(schema, { type: "boolean", default: true });
     });
 });
+
+describe("feature : properties : validate", () => {
+    let draft: Draft;
+    beforeEach(() => (draft = new Draft2019()));
+
+    it("should validate matching property type", () => {
+        const errors = compileSchema(draft, {
+            type: "object",
+            properties: {
+                header: { type: "string", minLength: 1 }
+            }
+        }).validate({ header: "123" });
+
+        assert.deepEqual(errors.length, 0);
+    });
+
+    it("should validate boolean schema `true`", () => {
+        const errors = compileSchema(draft, {
+            type: "object",
+            properties: {
+                header: true
+            }
+        }).validate({ header: "123" });
+
+        assert.deepEqual(errors.length, 0);
+    });
+
+    it("should validate boolean schema `false` if property not given", () => {
+        const errors = compileSchema(draft, {
+            type: "object",
+            properties: {
+                header: true,
+                missing: false
+            }
+        }).validate({ header: "123" });
+
+        assert.deepEqual(errors.length, 0);
+    });
+
+    it("should NOT validate boolean schema `false`", () => {
+        const errors = compileSchema(draft, {
+            type: "object",
+            properties: {
+                header: false
+            }
+        }).validate({ header: "123" });
+
+        assert.deepEqual(errors.length, 1);
+    });
+});

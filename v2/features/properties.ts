@@ -2,6 +2,7 @@ import { JsonError } from "../../lib/types";
 import { SchemaNode } from "../compiler/types";
 import { getValue } from "../getValue";
 import { JsonSchemaResolverParams, JsonSchemaValidatorParams } from "../compiler/types";
+import { isObject } from "../../lib/utils/isObject";
 
 propertyResolver.toJSON = () => "propertyResolver";
 function propertyResolver({ node, key }: JsonSchemaResolverParams) {
@@ -30,16 +31,18 @@ export function propertiesValidator({ properties, validators }: SchemaNode) {
     if (properties) {
         // note: this expects PARSER to have compiled properties
         validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
+            if (!isObject(data)) {
+                return;
+            }
             // move validation through properties
             const errors: JsonError[] = [];
-            Object.keys(node.properties).forEach((propertyName) => {
+            Object.keys(data).forEach((propertyName) => {
+                if (node.properties[propertyName] == null) {
+                    return;
+                }
                 const propertyNode = node.properties[propertyName];
                 const result = propertyNode.validate(getValue(data, propertyName), `${pointer}/${propertyName}`);
-                if (Array.isArray(result)) {
-                    errors.push(...result);
-                } else if (result) {
-                    errors.push(result);
-                }
+                errors.push(...result);
             });
             return errors;
         });

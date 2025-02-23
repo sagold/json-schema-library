@@ -46,6 +46,7 @@ const supportedTestCases = (t: FeatureTest) =>
         "minItems",
         "minLength",
         "minProperties",
+        "properties",
         "required",
         "type"
     ].includes(t.name);
@@ -67,10 +68,10 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ minimum
 ✓ oneOf
 ✓ const
-✖ properties
+✓ properties
 ✓ patternProperties
 ✖ contains
-✖ items
+✖ items - ref $defs resolution missing
 ✓ maxContains
 ✓ minContains
 ✖ ref - except meta-schema evaluation
