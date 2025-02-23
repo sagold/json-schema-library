@@ -153,21 +153,13 @@ describe("validate", () => {
             });
 
             it("should return MaxPropertiesError for too many properties", () => {
-                const errors = validate(
-                    draft,
-                    { a: 1, b: 2 },
-                    { type: "object", maxProperties: 1 }
-                );
+                const errors = validate(draft, { a: 1, b: 2 }, { type: "object", maxProperties: 1 });
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("MaxPropertiesError");
             });
 
             it("should be valid if property count is within range", () => {
-                const errors = validate(
-                    draft,
-                    { a: 1 },
-                    { type: "object", maxProperties: 1, minProperties: 1 }
-                );
+                const errors = validate(draft, { a: 1 }, { type: "object", maxProperties: 1, minProperties: 1 });
                 expect(errors).to.have.length(0);
             });
         });
@@ -221,32 +213,20 @@ describe("validate", () => {
 
         describe("additionalProperties", () => {
             it("should return AdditionalPropertiesError for an additional property", () => {
-                const errors = validate(
-                    draft,
-                    { a: 1 },
-                    { type: "object", additionalProperties: false }
-                );
+                const errors = validate(draft, { a: 1 }, { type: "object", additionalProperties: false });
                 expect(errors).to.have.length(1);
                 expect(errors[0].type).to.eq("error");
             });
 
             it("should return all AdditionalPropertiesErrors", () => {
-                const errors = validate(
-                    draft,
-                    { a: 1, b: 2 },
-                    { type: "object", additionalProperties: false }
-                );
+                const errors = validate(draft, { a: 1, b: 2 }, { type: "object", additionalProperties: false });
                 expect(errors).to.have.length(2);
                 expect(errors[0].name).to.eq("NoAdditionalPropertiesError");
                 expect(errors[1].name).to.eq("NoAdditionalPropertiesError");
             });
 
             it("should be valid if 'additionalProperties' is 'true'", () => {
-                const errors = validate(
-                    draft,
-                    { a: 1 },
-                    { type: "object", additionalProperties: true }
-                );
+                const errors = validate(draft, { a: 1 }, { type: "object", additionalProperties: true });
                 expect(errors).to.have.length(0);
             });
 
@@ -673,6 +653,7 @@ describe("validate", () => {
         });
 
         describe("additionalItems", () => {
+            // v2
             it("should return error for prohibited additional items", () => {
                 const errors = validate(draft, ["1", 2, "a"], {
                     type: "array",
@@ -683,7 +664,7 @@ describe("validate", () => {
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("AdditionalItemsError");
             });
-
+            // v2
             it("should be valid if 'additionalItems' is true", () => {
                 const errors = validate(draft, ["1", 2, "a"], {
                     type: "array",
@@ -693,7 +674,7 @@ describe("validate", () => {
 
                 expect(errors).to.have.length(0);
             });
-
+            // v2
             it("should also be valid if 'additionalItems' is undefined", () => {
                 const errors = validate(draft, ["1", 2, "a"], {
                     type: "array",
@@ -702,7 +683,7 @@ describe("validate", () => {
 
                 expect(errors).to.have.length(0);
             });
-
+            // v2
             it("should return error for mismatching 'additionalItems' schema", () => {
                 const errors = validate(draft, ["1", 2, "a"], {
                     type: "array",
@@ -713,7 +694,7 @@ describe("validate", () => {
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("TypeError");
             });
-
+            // v2
             it("should be valid for matching 'additionalItems' schema", () => {
                 const errors = validate(draft, ["1", 2, {}], {
                     type: "array",
@@ -750,11 +731,10 @@ describe("validate", () => {
             });
 
             it("should not validate for duplicated objects", () => {
-                const errors = validate(
-                    draft,
-                    [{ id: "first" }, { id: "second" }, { id: "first" }],
-                    { type: "array", uniqueItems: true }
-                );
+                const errors = validate(draft, [{ id: "first" }, { id: "second" }, { id: "first" }], {
+                    type: "array",
+                    uniqueItems: true
+                });
 
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("UniqueItemsError");
@@ -985,20 +965,12 @@ describe("validate", () => {
             });
 
             it("should validate a matching object within enum", () => {
-                const errors = validate(
-                    draft,
-                    { id: "third" },
-                    { enum: [1, "second", { id: "third" }] }
-                );
+                const errors = validate(draft, { id: "third" }, { enum: [1, "second", { id: "third" }] });
                 expect(errors).to.have.length(0);
             });
 
             it("should return error for non-matching object", () => {
-                const errors = validate(
-                    draft,
-                    { id: "first" },
-                    { enum: [1, "second", { id: "third" }] }
-                );
+                const errors = validate(draft, { id: "first" }, { enum: [1, "second", { id: "third" }] });
                 expect(errors).to.have.length(1);
                 expect(errors[0].name).to.eq("EnumError");
             });

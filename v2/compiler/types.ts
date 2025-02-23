@@ -67,4 +67,5 @@ export type SchemaNode = {
     else?: SchemaNode;
     allOf?: SchemaNode[];
     additionalProperties?: SchemaNode;
+    additionalItems?: SchemaNode;
 };
