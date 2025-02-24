@@ -8,8 +8,10 @@ import { parseItems } from "../features/items";
 import { parseAdditionalItems } from "../features/additionalItems";
 import { parseContains } from "../features/contains";
 import { parseOneOf } from "../features/oneOf";
+import { parseRef } from "../features/ref";
 
 export const PARSER: ((node: SchemaNode) => void)[] = [
+    parseRef,
     parseAllOf,
     parseContains,
     parseIfThenElse,

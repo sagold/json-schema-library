@@ -1,13 +1,15 @@
-import { SchemaNode, isSchemaNode } from "./compiler/types";
+import { SchemaNode } from "../compiler/types";
 import { get } from "@sagold/json-pointer";
-import joinScope from "../lib/compile/joinScope";
-import getRef from "../lib/compile/getRef";
-import { mergeSchema } from "../lib/mergeSchema";
+import joinScope from "../../lib/compile/joinScope";
+import getRef from "../../lib/compile/getRef";
+import { mergeSchema } from "../../lib/mergeSchema";
 
 const suffixes = /(#|\/)+$/g;
 
-export function compileRef(node: SchemaNode) {
+export function parseRef(node: SchemaNode) {
     const { schema, draft, spointer } = node;
+
+    node.resolveRef = resolveRef;
 
     if (schema.id) {
         // if this is a schema being merged on root object, we cannot override
@@ -40,10 +42,8 @@ export function compileRef(node: SchemaNode) {
     }
 }
 
-export default function resolveRef(node: SchemaNode) {
-    if (!isSchemaNode(node)) {
-        throw new Error("expected node");
-    }
+export function resolveRef() {
+    const node = this as SchemaNode;
     if (node.schema == null) {
         return node.schema;
     }

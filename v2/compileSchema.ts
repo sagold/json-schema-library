@@ -1,4 +1,3 @@
-import resolveRef, { compileRef } from "./ref";
 import { Draft } from "../lib/draft";
 import { isJsonError, JsonError, JsonSchema } from "../lib/types";
 import { mergeSchema } from "../lib/mergeSchema";
@@ -12,7 +11,10 @@ import { VALIDATORS } from "./compiler/validators";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import createSchemaOf from "../lib/createSchemaOf";
 
-const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON" | "compileSchema" | "validate"> = {
+const NODE_METHODS: Pick<
+    SchemaNode,
+    "get" | "getTemplate" | "reduce" | "resolveRef" | "toJSON" | "compileSchema" | "validate"
+> = {
     compileSchema,
 
     get(key: string | number, data?: unknown) {
@@ -54,7 +56,7 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON"
     reduce({ data, pointer }: JsonSchemaReducerParams) {
         // @path
         const node = { ...(this as SchemaNode) };
-        node.schema = resolveRef(node) ?? node.schema;
+        node.schema = node.resolveRef();
         const reducers = node.reducers;
 
         // @ts-expect-error bool schema
@@ -120,6 +122,10 @@ const NODE_METHODS: Pick<SchemaNode, "get" | "getTemplate" | "reduce" | "toJSON"
         return sanitizeErrors(errors);
     },
 
+    resolveRef() {
+        throw new Error("required a customized resolveRef function on node");
+    },
+
     toJSON() {
         return { ...this, draft: undefined, parent: this.parent.spointer };
     }
@@ -151,8 +157,6 @@ export function compileSchema(draft: Draft, schema: JsonSchema, spointer = "#", 
     // console.log("compile schema", spointer);
     assert(schema !== undefined, "schema missing");
     const node: SchemaNode = createNode(draft, schema, spointer, parentNode);
-
-    compileRef(node);
 
     PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
     VALIDATORS.forEach((registerValidator) => registerValidator(node));

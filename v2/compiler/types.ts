@@ -45,6 +45,7 @@ export type SchemaNode = {
     schema: JsonSchema;
     spointer: string;
     oneOfIndex?: number;
+    resolveRef: () => JsonSchema;
 
     // methods
     compileSchema: (draft: Draft, schema: JsonSchema, spointer?: string, parentNode?: SchemaNode) => SchemaNode;
