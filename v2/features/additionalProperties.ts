@@ -50,7 +50,6 @@ export function additionalPropertiesValidator({ schema, validators }: SchemaNode
     // note: properties, etc already tested
     validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
         if (!isObject(data)) {
-            console.log("abort additionalProperties");
             return;
         }
 
@@ -75,7 +74,7 @@ export function additionalPropertiesValidator({ schema, validators }: SchemaNode
             });
         }
 
-        if (!isObject(schema.patternProperties) && schema.additionalProperties === false) {
+        if (isObject(schema.patternProperties) && schema.additionalProperties === false) {
             // this is an arrangement with patternProperties. patternProperties validate before additionalProperties:
             // https://spacetelescope.github.io/understanding-json-schema/reference/object.html#index-5
             return undefined;

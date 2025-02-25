@@ -1,7 +1,7 @@
-import { SchemaNode } from "../compiler/types";
+import { isSchemaNode, SchemaNode } from "../compiler/types";
 import { get } from "@sagold/json-pointer";
 import joinScope from "../../lib/compile/joinScope";
-import getRef from "../../lib/compile/getRef";
+import getRef from "./ref/getRef";
 import { mergeSchema } from "../../lib/mergeSchema";
 
 const suffixes = /(#|\/)+$/g;
@@ -45,21 +45,25 @@ export function parseRef(node: SchemaNode) {
 export function resolveRef() {
     const node = this as SchemaNode;
     if (node.schema == null) {
-        return node.schema;
+        return node;
     }
     // if (node.schema.$recursiveRef) {
     //     return resolveRef(resolveRecursiveRef(node));
     // }
     if (node.ref == null) {
-        return node.schema;
+        return node;
     }
-
-    const resolvedSchema = getRef(node.context, node.context.rootSchema, node.ref);
+    let resolvedSchema = getRef(node.context, node.context.rootSchema, node.ref);
+    if (isSchemaNode(resolvedSchema)) {
+        resolvedSchema = resolvedSchema.schema;
+    }
+    // // @ts-expect-error booolean schema
     // if (resolvedSchema === false) {
-    //     return node.next(resolvedSchema as JsonSchema);
+    //     return resolvedSchema;
     // }
     // @draft >= 2019-09 we now merge schemas: in draft <= 7 $ref is treated as reference, not as schema
-    return mergeSchema(resolvedSchema, node.schema, "$ref");
+    const nextSchema = mergeSchema(resolvedSchema, node.schema, "$ref", "definitions", "$defs");
+    return node.compileSchema(node.draft, nextSchema, node.spointer, node);
 }
 
 // 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes

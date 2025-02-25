@@ -20,10 +20,10 @@ export type CompiledSchema = {
     get: (key: string | number) => JsonSchema | JsonError | undefined;
 };
 
-type Context = {
+export type Context = {
     rootSchema: JsonSchema;
     ids: Record<string, string>;
-    remotes: Record<string, JsonSchema>;
+    remotes: Record<string, SchemaNode>;
     anchors: Record<string, string>;
     scopes: Record<string, string>;
 };
@@ -48,6 +48,7 @@ export type SchemaNode = {
     resolveRef: () => JsonSchema;
 
     // methods
+    addRemote: (url: string, schema: JsonSchema) => SchemaNode;
     compileSchema: (draft: Draft, schema: JsonSchema, spointer?: string, parentNode?: SchemaNode) => SchemaNode;
     get: (key: string | number, data?: unknown) => SchemaNode | JsonError;
     getTemplate: (data?: unknown) => unknown;

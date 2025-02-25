@@ -68,10 +68,19 @@ describe("feature : additionalProperties : validate", () => {
     let draft: Draft;
     beforeEach(() => (draft = new Draft2019()));
 
-    it("should not return no-additional-properties-error if no schema is given for an additional property", () => {
+    it("should return no-additional-properties-error if no schema is given for an additional property", () => {
         const errors = compileSchema(draft, { type: "object", additionalProperties: false }).validate({ a: 1 });
-        assert.deepEqual(errors.length, 0);
-        // assert.deepEqual(errors[0].type, "error");
+        assert.deepEqual(errors.length, 1);
+    });
+
+    it("should return error for property not in properties schema", () => {
+        const errors = compileSchema(draft, {
+            $schema: "https://json-schema.org/draft/2019-09/schema",
+            properties: { foo: { $ref: "#" } },
+            additionalProperties: false
+        }).validate({ bar: false });
+
+        assert.deepEqual(errors.length, 1);
     });
 
     it("should return all no-additional-properties-error", () => {

@@ -13,7 +13,7 @@ import createSchemaOf from "../lib/createSchemaOf";
 
 const NODE_METHODS: Pick<
     SchemaNode,
-    "get" | "getTemplate" | "reduce" | "resolveRef" | "toJSON" | "compileSchema" | "validate"
+    "get" | "getTemplate" | "reduce" | "resolveRef" | "toJSON" | "addRemote" | "compileSchema" | "validate"
 > = {
     compileSchema,
 
@@ -55,8 +55,7 @@ const NODE_METHODS: Pick<
     */
     reduce({ data, pointer }: JsonSchemaReducerParams) {
         // @path
-        const node = { ...(this as SchemaNode) };
-        node.schema = node.resolveRef();
+        const node = { ...this.resolveRef() } as SchemaNode;
         const reducers = node.reducers;
 
         // @ts-expect-error bool schema
@@ -93,7 +92,9 @@ const NODE_METHODS: Pick<
     },
 
     validate(data: unknown, pointer = "#") {
-        const node = this as SchemaNode;
+        // before running validation, we need to resolve ref and recompile for any
+        // newly resolved schema properties - but this should be done for refs, etc only
+        const node = { ...this.resolveRef() } as SchemaNode;
         const errors: JsonError[] = [];
         // @ts-expect-error untyped boolean schema
         if (node.schema === true) {
@@ -122,12 +123,20 @@ const NODE_METHODS: Pick<
         return sanitizeErrors(errors);
     },
 
+    addRemote(url: string, schema: JsonSchema) {
+        const node = this as SchemaNode;
+        // @draft >= 6
+        schema.$id = schema.$id || url;
+        node.context.remotes[url] = node.compileSchema(node.draft, schema);
+        return this;
+    },
+
     resolveRef() {
         throw new Error("required a customized resolveRef function on node");
     },
 
     toJSON() {
-        return { ...this, draft: undefined, parent: this.parent.spointer };
+        return { ...this, draft: undefined, context: undefined, parent: this.parent?.spointer };
     }
 };
 
@@ -157,6 +166,10 @@ export function compileSchema(draft: Draft, schema: JsonSchema, spointer = "#", 
     // console.log("compile schema", spointer);
     assert(schema !== undefined, "schema missing");
     const node: SchemaNode = createNode(draft, schema, spointer, parentNode);
+
+    // @note - if we parse a dynamic schema, we skip certain properties that are note yet available
+    // e.g. { $ref: "#" } -> { additionalProperties: false }
+    // node.schema = node.resolveRef();
 
     PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
     VALIDATORS.forEach((registerValidator) => registerValidator(node));

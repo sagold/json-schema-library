@@ -1,7 +1,6 @@
 /* eslint max-len: 0 */
 import { expect } from "chai";
 import { Draft2019 } from "../../../lib/draft2019";
-import { addRemotes } from "../utils/addRemotes";
 import draft2019Meta from "../../../remotes/draft2019-09.json";
 import draft2019MetaApplicator from "../../../remotes/draft2019-09_meta_applicator.json";
 import draft2019MetaContent from "../../../remotes/draft2019-09_meta_content.json";
@@ -11,8 +10,18 @@ import draft2019MetaMetaData from "../../../remotes/draft2019-09_meta_meta-data.
 import draft2019MetaValidation from "../../../remotes/draft2019-09_meta_validation.json";
 import { getDraftTests, FeatureTest } from "../../getDraftTests";
 import { compileSchema } from "../../../v2/compileSchema";
+import { Context, SchemaNode } from "../../../v2/compiler/types";
 
-const cache = new Draft2019();
+const draft = new Draft2019();
+const parentNode = {
+    context: {
+        ids: {},
+        remotes: {},
+        anchors: {},
+        scopes: {}
+    }
+} as unknown as SchemaNode;
+const remotes: Context["remotes"] = {};
 [
     draft2019Meta,
     draft2019MetaApplicator,
@@ -22,35 +31,35 @@ const cache = new Draft2019();
     draft2019MetaMetaData,
     draft2019MetaValidation
 ].forEach((schema) => {
-    cache.addRemoteSchema(schema.$id, schema);
+    parentNode.context.rootSchema = schema;
+    remotes[schema.$id] = compileSchema(draft, schema, "#");
 });
-addRemotes(cache);
 
 const supportedTestCases = (t: FeatureTest) =>
     [
-        // "ref"
-        "additionalItems",
-        // "allOf",
-        "const",
-        "maximum",
-        "minimum",
-        "oneOf",
-        "additionalProperties",
-        "patternProperties",
-        // "contains",
-        // "items",
-        "maxContains",
-        "maxItems",
-        "maxLength",
-        "maxProperties",
-        "minContains",
-        "minItems",
-        "minLength",
-        "minProperties",
-        "multipleOf",
-        "properties",
-        "required",
-        "type"
+        "ref"
+        // "additionalItems",
+        // // "allOf",
+        // "const",
+        // "maximum",
+        // "minimum",
+        // "oneOf",
+        // "additionalProperties",
+        // "patternProperties",
+        // // "contains",
+        // // "items",
+        // "maxContains",
+        // "maxItems",
+        // "maxLength",
+        // "maxProperties",
+        // "minContains",
+        // "minItems",
+        // "minLength",
+        // "minProperties",
+        // "multipleOf",
+        // "properties",
+        // "required",
+        // "type"
         // "uniqueItems"
     ].includes(t.name);
 
@@ -151,9 +160,17 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
 
                     test(testData.description, () => {
                         const validator = new Draft2019();
-                        Object.assign(validator.remotes, cache.remotes);
                         console.log(testData.description, schema, testData.data);
                         const node = compileSchema(validator, schema);
+                        [
+                            draft2019Meta,
+                            draft2019MetaApplicator,
+                            draft2019MetaCore,
+                            draft2019MetaContent,
+                            draft2019MetaFormat,
+                            draft2019MetaMetaData,
+                            draft2019MetaValidation
+                        ].forEach((schema) => node.addRemote(schema.$id, schema));
                         const errors = node.validate(testData.data);
                         expect(errors.length === 0).to.eq(testData.valid);
                     });
