@@ -1,4 +1,4 @@
-import { isSchemaNode, SchemaNode } from "../compiler/types";
+import { SchemaNode } from "../compiler/types";
 import { get } from "@sagold/json-pointer";
 import joinScope from "../../lib/compile/joinScope";
 import getRef from "./ref/getRef";
@@ -53,10 +53,10 @@ export function resolveRef() {
     if (node.ref == null) {
         return node;
     }
-    let resolvedSchema = getRef(node.context, node.context.rootSchema, node.ref);
-    if (isSchemaNode(resolvedSchema)) {
-        resolvedSchema = resolvedSchema.schema;
-    }
+    const resolvedSchema = getRef(node)?.schema;
+    // if (isSchemaNode(resolvedSchema)) {
+    //     resolvedSchema = resolvedSchema.schema;
+    // }
     // // @ts-expect-error booolean schema
     // if (resolvedSchema === false) {
     //     return resolvedSchema;
