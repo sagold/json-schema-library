@@ -21,11 +21,10 @@ export type CompiledSchema = {
 };
 
 export type Context = {
-    rootSchema: JsonSchema;
-    ids: Record<string, string>;
+    rootNode: SchemaNode;
     remotes: Record<string, SchemaNode>;
+    refs: Record<string, SchemaNode>;
     anchors: Record<string, string>;
-    scopes: Record<string, string>;
 };
 
 export function isSchemaNode(value: unknown): value is SchemaNode {
@@ -42,6 +41,7 @@ export type SchemaNode = {
     draft: Draft;
     parent?: SchemaNode | undefined;
     ref?: string;
+    scope?: string;
     schema: JsonSchema;
     spointer: string;
     oneOfIndex?: number;
@@ -49,7 +49,7 @@ export type SchemaNode = {
 
     // methods
     addRemote: (url: string, schema: JsonSchema) => SchemaNode;
-    compileSchema: (draft: Draft, schema: JsonSchema, spointer?: string, parentNode?: SchemaNode) => SchemaNode;
+    compileSchema: (draft: Draft, schema: JsonSchema, spointer?: string) => SchemaNode;
     get: (key: string | number, data?: unknown) => SchemaNode | JsonError;
     getTemplate: (data?: unknown) => unknown;
     reduce: ({ data, pointer }: { data: unknown; pointer?: string }) => SchemaNode | JsonError;

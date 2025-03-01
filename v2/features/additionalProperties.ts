@@ -14,8 +14,7 @@ export function parseAdditionalProperties(node: SchemaNode) {
         node.additionalProperties = node.compileSchema(
             draft,
             schema.additionalProperties,
-            `${spointer}/additionalProperties`,
-            node
+            `${spointer}/additionalProperties`
         );
     }
     node.resolvers.push(additionalPropertyResolver);
@@ -30,7 +29,7 @@ function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParam
     const schema = node.draft.createSchemaOf(value);
     // undefined does not create a schema
     if (schema) {
-        const temporaryNode = node.compileSchema(node.draft, schema, node.spointer, node);
+        const temporaryNode = node.compileSchema(node.draft, schema, node.spointer);
         return temporaryNode;
     }
 }

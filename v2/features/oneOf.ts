@@ -8,7 +8,7 @@ export function parseOneOf(node: SchemaNode) {
     const { draft, schema, spointer } = node;
     if (Array.isArray(schema.oneOf) && schema.oneOf.length) {
         // @todo immediately compile if no resolvers are added
-        node.oneOf = schema.oneOf.map((s, index) => node.compileSchema(draft, s, `${spointer}/oneOf/${index}`, node));
+        node.oneOf = schema.oneOf.map((s, index) => node.compileSchema(draft, s, `${spointer}/oneOf/${index}`));
         node.reducers.push(reduceOneOf);
     }
 }

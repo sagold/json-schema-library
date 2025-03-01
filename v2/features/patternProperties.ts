@@ -24,8 +24,7 @@ export function parsePatternProperties(node: SchemaNode) {
             node: node.compileSchema(
                 draft,
                 schema.patternProperties[pattern],
-                `${node.spointer}/patternProperties/${pattern}`,
-                node
+                `${node.spointer}/patternProperties/${pattern}`
             )
         })
     );

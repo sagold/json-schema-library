@@ -1,97 +1,88 @@
 import { SchemaNode } from "../compiler/types";
-import { get } from "@sagold/json-pointer";
-import joinScope from "../../lib/compile/joinScope";
-import getRef from "./ref/getRef";
+// import { get } from "@sagold/json-pointer";
+import joinScope from "./ref/joinScope";
+// import getRef from "./ref/getRef";
 import { mergeSchema } from "../../lib/mergeSchema";
-
-const suffixes = /(#|\/)+$/g;
+import splitRef from "../../lib/compile/splitRef";
+// import getTypeOf from "../../lib/getTypeOf";
 
 export function parseRef(node: SchemaNode) {
-    const { schema, draft, spointer } = node;
+    // get and store current scope of node - this may be the same as parent scope
+    // if scope is not extended by current schema.$?id
+    const currentScope = joinScope(node.parent?.scope, node.schema?.$id);
+    node.scope = currentScope;
 
+    // add ref resolution method to node
     node.resolveRef = resolveRef;
 
-    if (schema.id) {
-        // if this is a schema being merged on root object, we cannot override
-        // parents locations, but must reuse it
-        if (schema.id.startsWith("http") && /(allOf|anyOf|oneOf)\/\d+$/.test(spointer)) {
-            const parentPointer = spointer.replace(/\/(allOf|anyOf|oneOf)\/\d+$/, "");
-            const parentSchema = get(draft.rootSchema, parentPointer);
-            schema.id = parentSchema.id ?? schema.id;
-        }
-        node.context.ids[schema.id.replace(suffixes, "")] = spointer;
-    }
+    // store this node for retrieval by json-pointer
+    // node.context.refs[node.spointer] = node;
 
-    // build up scopes and add them to $ref-resolution map
-    const pointer = `#${spointer}`.replace(/##+/, "#");
-    const previousPointer = pointer.replace(/\/[^/]+$/, "");
-    const parentPointer = pointer.replace(/\/[^/]+\/[^/]+$/, "");
-    const previousScope = node.context.scopes[previousPointer] || node.context.scopes[parentPointer];
-    const scope = joinScope(previousScope, schema.id);
-    node.context.scopes[pointer] = scope;
-    if (node.context.ids[scope] == null) {
-        node.context.ids[scope] = pointer;
-    }
+    // store this node for retrieval by scope + json-pointer
+    node.context.refs[joinScope(currentScope, node.spointer)] = node;
 
-    if (schema.$anchor) {
-        node.context.anchors[`${scope}#${schema.$anchor}`] = pointer;
-    }
-
-    if (schema.$ref) {
-        node.ref = joinScope(scope, schema.$ref);
+    // precompile reference
+    if (node.schema.$ref) {
+        node.ref = joinScope(currentScope, node.schema.$ref);
     }
 }
 
 export function resolveRef() {
     const node = this as SchemaNode;
-    if (node.schema == null) {
-        return node;
-    }
-    // if (node.schema.$recursiveRef) {
-    //     return resolveRef(resolveRecursiveRef(node));
-    // }
+    // if (node.ref == null || node.schema == null || getTypeOf(node.schema) === "boolean") {
     if (node.ref == null) {
         return node;
     }
-    const resolvedSchema = getRef(node)?.schema;
-    // if (isSchemaNode(resolvedSchema)) {
-    //     resolvedSchema = resolvedSchema.schema;
-    // }
-    // // @ts-expect-error booolean schema
-    // if (resolvedSchema === false) {
-    //     return resolvedSchema;
-    // }
+    const resolvedNode = getRef(node);
+    if (resolvedNode == null) {
+        return undefined;
+    }
     // @draft >= 2019-09 we now merge schemas: in draft <= 7 $ref is treated as reference, not as schema
-    const nextSchema = mergeSchema(resolvedSchema, node.schema, "$ref", "definitions", "$defs");
-    return node.compileSchema(node.draft, nextSchema, node.spointer, node);
+    const nextSchema = mergeSchema(resolvedNode.schema, node.schema, "$ref", "definitions", "$defs");
+    return resolvedNode.compileSchema(node.draft, nextSchema, node.spointer);
 }
 
-// 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
-// function resolveRecursiveRef(node: SchemaNode): SchemaNode {
-//     const history = node.path;
-//     // console.log(...history);
+export default function getRef(node: SchemaNode, $ref = node.ref): SchemaNode | undefined {
+    if ($ref == null) {
+        return node;
+    }
 
-//     // RESTRICT BY CHANGE IN BASE-URL
-//     let startIndex = 0;
-//     for (let i = history.length - 1; i >= 0; i--) {
-//         const step = history[i][1];
-//         if (step.$id && /^https?:\/\//.test(step.$id) && step.$recursiveAnchor !== true) {
-//             startIndex = i;
-//             break;
-//         }
-//     }
-//     // FROM THERE FIND FIRST OCCURENCE OF ANCHOR
-//     const firstAnchor = history.find((s, index) => index >= startIndex && s[1].$recursiveAnchor === true);
-//     if (firstAnchor) {
-//         return node.next(firstAnchor[1]);
-//     }
-//     // THEN RETURN LATEST BASE AS TARGET
-//     for (let i = history.length - 1; i >= 0; i--) {
-//         const step = history[i][1];
-//         if (step.$id) {
-//             return node.next(step);
-//         }
-//     }
-//     // OR RETURN ROOT
-//     return node.next(node.draft.rootSchema);
-// }
+    // resolve $ref by json-spointer
+    if (node.context.refs[$ref]) {
+        return getRef(node.context.refs[$ref]);
+    }
+
+    // check for remote-host + pointer pair to switch rootSchema
+    const fragments = splitRef($ref);
+    if (fragments.length === 0) {
+        return undefined;
+    }
+
+    // resolve $ref as remote-host
+    if (fragments.length === 1) {
+        const $ref = fragments[0];
+        // this is a reference to remote-host root node
+        if (node.context.remotes[$ref]) {
+            const nextRootNode = node.context.remotes[$ref];
+            return getRef(nextRootNode);
+        }
+        // @previously: check if $ref in ids
+        return undefined;
+    }
+
+    if (fragments.length === 2) {
+        const $remoteHostRef = fragments[0];
+        // this is a reference to remote-host root node (and not a self reference)
+        if (node.context.remotes[$remoteHostRef] && node !== node.context.remotes[$remoteHostRef]) {
+            const nextRootNode = node.context.remotes[$remoteHostRef];
+            // resolve full ref on remote schema - we store currently only store ref with domain
+            return getRef(nextRootNode, $ref);
+        }
+        // @previously: check if fragments[1] is within nextRootNode
+        // @previously: check if $remoteHostRef is in current node-context
+        return undefined;
+    }
+
+    // console.log("remotes", Object.keys(node.context.remotes));
+    console.log("could not find", $ref, node.schema, "in", Object.keys(node.context.refs));
+}

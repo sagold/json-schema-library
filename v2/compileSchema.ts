@@ -15,7 +15,33 @@ const NODE_METHODS: Pick<
     SchemaNode,
     "get" | "getTemplate" | "reduce" | "resolveRef" | "toJSON" | "addRemote" | "compileSchema" | "validate"
 > = {
-    compileSchema,
+    compileSchema(draft: Draft, schema: JsonSchema, spointer: string) {
+        // assert(schema !== undefined, "schema missing");
+
+        const parentNode = this as SchemaNode;
+        const node: SchemaNode = {
+            context: parentNode.context,
+            parent: parentNode,
+            spointer,
+            draft,
+            reducers: [],
+            resolvers: [],
+            validators: [],
+            getDefaultData: [],
+            schema,
+            ...NODE_METHODS
+        };
+
+        // @note - if we parse a dynamic schema, we skip certain properties that are note yet available
+        // e.g. { $ref: "#" } -> { additionalProperties: false }
+        // node.schema = node.resolveRef();
+
+        PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
+        VALIDATORS.forEach((registerValidator) => registerValidator(node));
+        DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
+
+        return node;
+    },
 
     get(key: string | number, data?: unknown) {
         let node = this as SchemaNode;
@@ -61,9 +87,10 @@ const NODE_METHODS: Pick<
         // @ts-expect-error bool schema
         if (node.schema === false) {
             return node;
+
             // @ts-expect-error bool schema
         } else if (node.schema === true) {
-            return node.compileSchema(node.draft, createSchemaOf(data), node.spointer, node);
+            return node.compileSchema(node.draft, createSchemaOf(data), node.spointer);
         }
 
         let schema;
@@ -84,7 +111,7 @@ const NODE_METHODS: Pick<
             // recompile to update newly added schema defintions
             schema = mergeSchema(node.schema, schema, "if", "then", "else", "allOf", "anyOf", "oneOf");
             // console.log("reduced schema", schema);
-            return node.compileSchema(this.draft, schema, this.spointer, node);
+            return node.compileSchema(this.draft, schema, this.spointer);
         }
 
         // remove dynamic properties of node
@@ -124,10 +151,31 @@ const NODE_METHODS: Pick<
     },
 
     addRemote(url: string, schema: JsonSchema) {
-        const node = this as SchemaNode;
+        const { context, draft } = this as SchemaNode;
         // @draft >= 6
         schema.$id = schema.$id || url;
-        node.context.remotes[url] = node.compileSchema(node.draft, schema);
+
+        const node: SchemaNode = {
+            spointer: "#",
+            draft,
+            reducers: [],
+            resolvers: [],
+            validators: [],
+            getDefaultData: [],
+            schema,
+            ...NODE_METHODS
+        } as SchemaNode;
+
+        node.context = { ...context, refs: {}, rootNode: node };
+        node.context.remotes[url] = node;
+
+        // @note - if we parse a dynamic schema, we skip certain properties that are note yet available
+        // e.g. { $ref: "#" } -> { additionalProperties: false }
+        // node.schema = node.resolveRef();
+        PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
+        VALIDATORS.forEach((registerValidator) => registerValidator(node));
+        DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
+
         return this;
     },
 
@@ -140,11 +188,16 @@ const NODE_METHODS: Pick<
     }
 };
 
-function createNode(draft: Draft, schema: JsonSchema, spointer = "#", parentNode?: SchemaNode): SchemaNode {
-    return {
-        parent: parentNode,
-        context: parentNode?.context ?? { ids: {}, remotes: {}, anchors: {}, scopes: {}, rootSchema: schema },
-        spointer,
+/**
+ * With compileSchema we replace the schema and all sub-schemas with a schemaNode,
+ * wrapping each schema with utilities and as much preevaluation is possible. Each
+ * node will be reused for each task, but will create a compiledNode for bound data.
+ */
+export function compileSchema(draft: Draft, schema: JsonSchema) {
+    assert(schema !== undefined, "schema missing");
+
+    const node: SchemaNode = {
+        spointer: "#",
         draft,
         reducers: [],
         resolvers: [],
@@ -152,25 +205,18 @@ function createNode(draft: Draft, schema: JsonSchema, spointer = "#", parentNode
         getDefaultData: [],
         schema,
         ...NODE_METHODS
-    };
-}
+    } as SchemaNode;
 
-/**
- * @todo How can we do more work upfront?
- *
- * With compileSchema we replace the schema and all sub-schemas with a schemaNode,
- * wrapping each schema with utilities and as much preevaluation is possible. Each
- * node will be reused for each task, but will create a compiledNode for bound data.
- */
-export function compileSchema(draft: Draft, schema: JsonSchema, spointer = "#", parentNode?: SchemaNode) {
-    // console.log("compile schema", spointer);
-    assert(schema !== undefined, "schema missing");
-    const node: SchemaNode = createNode(draft, schema, spointer, parentNode);
+    node.context = {
+        remotes: {},
+        anchors: {},
+        refs: {},
+        rootNode: node
+    };
 
     // @note - if we parse a dynamic schema, we skip certain properties that are note yet available
     // e.g. { $ref: "#" } -> { additionalProperties: false }
     // node.schema = node.resolveRef();
-
     PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
     VALIDATORS.forEach((registerValidator) => registerValidator(node));
     DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));

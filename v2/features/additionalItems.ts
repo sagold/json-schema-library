@@ -12,7 +12,7 @@ export function parseAdditionalItems(node: SchemaNode) {
     }
     if (isObject(schema.additionalItems)) {
         // precompile additional items schema
-        node.additionalItems = node.compileSchema(draft, schema.additionalItems, `${spointer}/additionalItems`, node);
+        node.additionalItems = node.compileSchema(draft, schema.additionalItems, `${spointer}/additionalItems`);
     }
     // add resolver for get additionalItem
     node.resolvers.push(additionalItemsResolver);
@@ -31,7 +31,7 @@ function additionalItemsResolver({ node, data, key }: JsonSchemaResolverParams) 
     const schema = node.draft.createSchemaOf(value);
     // undefined does not create a schema
     if (schema) {
-        const temporaryNode = node.compileSchema(node.draft, schema, node.spointer, node);
+        const temporaryNode = node.compileSchema(node.draft, schema, node.spointer);
         return temporaryNode;
     }
 }

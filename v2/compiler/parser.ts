@@ -11,7 +11,23 @@ import { parseOneOf } from "../features/oneOf";
 import { parseRef } from "../features/ref";
 
 export const PARSER: ((node: SchemaNode) => void)[] = [
-    parseRef,
+    parseRef, // @attention has to come before compiling any other node
+    function parseDefs(node: SchemaNode) {
+        if (node.schema.$defs) {
+            Object.keys(node.schema.$defs).forEach((property) => {
+                node.compileSchema(node.draft, node.schema.$defs[property], `${node.spointer}/$defs/${property}`);
+            });
+        }
+        if (node.schema.definitions) {
+            Object.keys(node.schema.definitions).forEach((property) => {
+                node.compileSchema(
+                    node.draft,
+                    node.schema.definitions[property],
+                    `${node.spointer}/definitions/${property}`
+                );
+            });
+        }
+    },
     parseAllOf,
     parseContains,
     parseIfThenElse,

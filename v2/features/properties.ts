@@ -17,8 +17,7 @@ export function parseProperties(node: SchemaNode) {
             const propertyNode = node.compileSchema(
                 draft,
                 schema.properties[propertyName],
-                `${spointer}/properties/${propertyName}`,
-                node
+                `${spointer}/properties/${propertyName}`
             );
             node.properties[propertyName] = propertyNode;
         });
