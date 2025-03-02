@@ -27,7 +27,7 @@ export type Context = {
     refs: Record<string, SchemaNode>;
     /** references stored by scope-id */
     ids: Record<string, SchemaNode>;
-    anchors: Record<string, string>;
+    anchors: Record<string, SchemaNode>;
 };
 
 export function isSchemaNode(value: unknown): value is SchemaNode {

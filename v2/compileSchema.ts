@@ -119,10 +119,17 @@ const NODE_METHODS: Pick<
     },
 
     validate(data: unknown, pointer = "#") {
+        const node = this.resolveRef() as SchemaNode;
+        if (node == undefined) {
+            console.log("refs", Object.keys(this.context.refs));
+            throw new Error(`Failed resolving ref: ${this.ref}`);
+        }
+
         // before running validation, we need to resolve ref and recompile for any
         // newly resolved schema properties - but this should be done for refs, etc only
-        const node = { ...this.resolveRef() } as SchemaNode;
+
         const errors: JsonError[] = [];
+        // console.log("validate", pointer, data, node);
         // @ts-expect-error untyped boolean schema
         if (node.schema === true) {
             return errors;

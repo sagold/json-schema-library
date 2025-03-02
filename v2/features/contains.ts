@@ -17,6 +17,9 @@ export function containsValidator({ schema, validators }: SchemaNode): void {
     }
     validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
         const { draft, schema } = node;
+        if (!Array.isArray(data)) {
+            return;
+        }
         if (schema.contains === false) {
             return draft.errors.containsArrayError({ pointer, value: data, schema });
         }

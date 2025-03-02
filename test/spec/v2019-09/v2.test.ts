@@ -13,35 +13,34 @@ import { compileSchema } from "../../../v2/compileSchema";
 
 const supportedTestCases = (t: FeatureTest) =>
     [
-        // "ref",
-        // "exclusiveMaximum",
-        // "exclusiveMinimum"
-        "if-then-else"
-        // "allOf"
-        // "not"
-        // "enum"
         // "additionalItems",
-        // // "allOf",
-        // "const",
-        // "maximum",
-        // "minimum",
-        // "oneOf",
         // "additionalProperties",
-        // "patternProperties",
-        // // "contains",
-        // // "items",
+        // "allOf",
+        // "const",
+        // "contains",
+        // "enum",
+        // "exclusiveMaximum",
+        // "exclusiveMinimum",
+        "if-then-else"
+        // "items",
         // "maxContains",
+        // "maximum",
         // "maxItems",
         // "maxLength",
         // "maxProperties",
         // "minContains",
+        // "minimum",
         // "minItems",
         // "minLength",
         // "minProperties",
         // "multipleOf",
+        // "not",
+        // "oneOf",
+        // "patternProperties",
         // "properties",
+        // "ref",
         // "required",
-        // "type"
+        // "type",
         // "uniqueItems"
     ].includes(t.name);
 
@@ -50,6 +49,7 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 /*
 ✓ additionalItems
 ✓ additionalProperties
+✖ anchor
 ✓ const
 ✓ exclusiveMaximum
 ✓ exclusiveMinimum
@@ -70,17 +70,17 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ properties
 ✓ required
 ✓ type
-✖ if-then-else
-✖ not - expect for uncle-schema support
-✓ allOf - expect anyOf combination
-✖ contains
-✖ items - ref $defs resolution missing
-✖ ref - except meta-schema evaluation
+✓ if-then-else
+~ not - expect for uncle-schema support
+~ allOf - expect anyOf combination
+✓ contains
+✓ items
+✖ refRemote
+~ ref - except anchor evaluation
 ✖ uniqueItems
 
 ✖ unevaluatedItems - expect for uncle-schema and recursiveRef support
 ✖ unevaluatedProperties - expect for uncle-schema and recursiveRef support
-✖ anchor
 ✖ anyOf
 ✖ boolean_schema
 ✖ content
@@ -91,7 +91,6 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✖ infinite-loop-detection
 ✖ pattern
 ✖ propertyNames
-✖ refRemote
 ✖ unknownKeyword
 ✖ defs
 ✖ recursiveRef
@@ -113,13 +112,16 @@ const postponedTestcases = [
     // this tests expects knowledge of a parent-allOf statement we currently do not have the logic for this
     "property is evaluated in an uncle schema to unevaluatedProperties", // unevaluatedProperties
     "item is evaluated in an uncle schema to unevaluatedItems", // unevaluatedItems
-    "collect annotations inside a 'not', even if collection is disabled" // not
+    "collect annotations inside a 'not', even if collection is disabled", // not
+    // @todo anchor support
+    "order of evaluation: $id and $anchor and $ref", // ref
+    "URN base URI with URN and anchor ref" // ref
 ];
 
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "if with boolean schema false") {
+            // if (testCase.description !== "contains keyword with boolean schema false") {
             //     return;
             // }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }

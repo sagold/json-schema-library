@@ -3,10 +3,17 @@ import { JsonSchemaReducerParams, SchemaNode } from "../compiler/types";
 
 export function parseIfThenElse(node: SchemaNode) {
     const { draft, schema, spointer } = node;
-    if (schema.if != null && (schema.then != null || schema.else != null)) {
+    if (schema.if != null) {
         node.if = node.compileSchema(draft, schema.if, `${spointer}/if`);
-        node.then = schema.then ? node.compileSchema(draft, schema.then, `${spointer}/then`) : undefined;
-        node.else = schema.else ? node.compileSchema(draft, schema.else, `${spointer}/else`) : undefined;
+    }
+    if (schema.then != null) {
+        node.then = node.compileSchema(draft, schema.then, `${spointer}/then`);
+    }
+    if (schema.else != null) {
+        node.compileSchema(draft, schema.else, `${spointer}/else`);
+    }
+
+    if (node.if && (node.then != null || node.else != null)) {
         node.reducers.push(reduceIf);
     }
 }

@@ -21,15 +21,22 @@ export function parseRef(node: SchemaNode) {
     }
 
     // store this node for retrieval by scope + json-pointer
+    node.context.refs[joinScope(currentScope, node.spointer)] = node;
+
     // @todo reevaluate and move to joinScope: if there is a nested $defs and this scope is new,
     // we need to make "#"-refs relative to this scope. In the following case we shift a pointer
     // #/properties/foo/$defs/inner to #/$defs/inner for an initial schema:
     // { $id: http://example.com/schema-relative-uri-defs2.json, $ref: "#/$defs/inner" }
     const localPointer = node.spointer.includes("/$defs/")
-        ? `#/$defs/${node.spointer.split("/$defs/")[1]}`
+        ? `#/$defs/${node.spointer.split("/$defs/").pop()}`
         : node.spointer;
+    // console.log(node.spointer, "=>", localPointer);
     node.context.refs[joinScope(currentScope, localPointer)] = node;
-    // console.log("REF-LIST", currentScope, node.spointer, "=>", joinScope(currentScope, node.spointer));
+
+    // store this node for retrieval by scope + anchor
+    if (node.schema.$anchor) {
+        node.context.anchors[`${currentScope}#${node.schema.$anchor}`] = node;
+    }
 
     // precompile reference
     if (node.schema.$ref) {
@@ -44,8 +51,8 @@ export function resolveRef() {
     if (node.ref == null) {
         return node;
     }
-    // console.log("resolve:", node.ref);
     const resolvedNode = getRef(node);
+    // console.log("resolve ref", node.ref, "=>", node.context.refs[node.ref] != null, resolvedNode != null);
     if (resolvedNode == null) {
         // console.log("-- resolve: failed");
         return undefined;
@@ -65,8 +72,9 @@ export default function getRef(node: SchemaNode, $ref = node.ref): SchemaNode | 
 
     // resolve $ref by json-spointer
     if (node.context.refs[$ref]) {
-        // console.log("  getRef:", "return", $ref);
-        return getRef(node.context.refs[$ref]);
+        const final = getRef(node.context.refs[$ref]);
+        console.log("getRef found $ref - reresolve", node.context.refs[$ref].ref, final != null);
+        return final;
     }
 
     // check for remote-host + pointer pair to switch rootSchema
