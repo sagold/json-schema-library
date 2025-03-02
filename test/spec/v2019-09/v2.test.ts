@@ -16,7 +16,7 @@ import { SchemaNode } from "../../../v2/compiler/types";
 
 const supportedTestCases = (t: FeatureTest) =>
     [
-        // "anchor",
+        "anchor",
         "additionalItems",
         "additionalProperties",
         "allOf",
@@ -56,6 +56,7 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 
 /*
 ✓ allOf
+✓ anchor
 ~ not - expect for uncle-schema support
 ✓ additionalItems
 ✓ additionalProperties
@@ -88,7 +89,7 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ required
 ✓ type
 
-✖ anchor
+
 ✖ uniqueItems
 ✖ unevaluatedItems - expect for uncle-schema and recursiveRef support
 ✖ unevaluatedProperties - expect for uncle-schema and recursiveRef support
@@ -157,7 +158,7 @@ function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "Location-independent identifier in remote ref") {
+            // if (testCase.description !== "Location-independent identifier") {
             //     return;
             // }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }
@@ -179,11 +180,11 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
 
                     test(testData.description, () => {
                         const validator = new Draft2019();
-                        // console.log(
-                        //     testData.description,
-                        //     JSON.stringify(schema, null, 2),
-                        //     JSON.stringify(testData.data, null, 2)
-                        // );
+                        console.log(
+                            testData.description,
+                            JSON.stringify(schema, null, 2),
+                            JSON.stringify(testData.data, null, 2)
+                        );
                         const node = compileSchema(validator, schema);
                         addRemotes(node);
                         const errors = node.validate(testData.data);

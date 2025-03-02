@@ -32,7 +32,7 @@ export function parseRef(node: SchemaNode) {
 
     // store this node for retrieval by scope + anchor
     if (node.schema.$anchor) {
-        node.context.anchors[`${currentScope}#${node.schema.$anchor}`] = node;
+        node.context.anchors[`${currentScope.replace(/#$/, "")}#${node.schema.$anchor}`] = node;
     }
 
     // precompile reference
@@ -49,7 +49,7 @@ export function resolveRef() {
         return node;
     }
     const resolvedNode = getRef(node);
-    // console.log("resolve ref", node.ref, "=>", node.context.refs[node.ref] != null, resolvedNode != null);
+    // console.log("resolve ref", node.ref, "=>", Object.keys(node.context.anchors));
     if (resolvedNode == null) {
         // console.log("-- resolve: failed");
         return undefined;
@@ -117,6 +117,6 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
         return undefined;
     }
 
-    console.log("remotes", Object.keys(node.context.remotes));
-    // console.log("could not find", $ref, node.schema, "in", Object.keys(node.context.refs));
+    // console.log("remotes", Object.keys(node.context.remotes));
+    // console.log("could not find", $ref, node.schema, "in", Object.keys(node.context.refs), Object.keys(node.context.anchors));
 }
