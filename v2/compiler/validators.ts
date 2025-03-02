@@ -16,10 +16,12 @@ import { patternPropertiesValidator } from "../features/patternProperties";
 import { uniqueItemsValidator } from "../features/uniqueItems";
 import { enumValidator } from "../features/enum";
 import { notValidator } from "../features/not";
+import { allOfValidator } from "../features/allOf";
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalItemsValidator,
     additionalPropertiesValidator,
+    allOfValidator,
     containsValidator,
     constValidator,
     enumValidator,

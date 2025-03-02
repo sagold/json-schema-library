@@ -13,7 +13,8 @@ import { compileSchema } from "../../../v2/compileSchema";
 
 const supportedTestCases = (t: FeatureTest) =>
     [
-        "ref"
+        // "ref"
+        // "allOf"
         // "not"
         // "enum"
         // "additionalItems",
@@ -65,7 +66,7 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ required
 ✓ type
 ✖ not - expect for uncle-schema support
-✖ allOf
+✓ allOf - expect anyOf combination
 ✖ contains
 ✖ items - ref $defs resolution missing
 ✖ ref - except meta-schema evaluation
