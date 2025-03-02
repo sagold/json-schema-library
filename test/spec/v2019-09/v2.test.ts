@@ -49,6 +49,7 @@ const supportedTestCases = (t: FeatureTest) =>
         "refRemote",
         "infinite-loop-detection",
         "required",
+        "uniqueItems",
         "type"
     ].includes(t.name);
 
@@ -88,9 +89,8 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ refRemote
 ✓ required
 ✓ type
+✓ uniqueItems
 
-
-✖ uniqueItems
 ✖ unevaluatedItems - expect for uncle-schema and recursiveRef support
 ✖ unevaluatedProperties - expect for uncle-schema and recursiveRef support
 ✖ content

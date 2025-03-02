@@ -1,10 +1,9 @@
 import { JsonError } from "../../lib/types";
-import { isObject } from "../../lib/utils/isObject";
 import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
 import deepEqual from "fast-deep-equal";
 
 export function uniqueItemsValidator({ schema, validators }: SchemaNode): void {
-    if (!isObject(schema.uniqueItems)) {
+    if (schema.uniqueItems !== true) {
         return;
     }
     validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
