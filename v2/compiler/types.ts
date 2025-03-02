@@ -74,6 +74,7 @@ export type SchemaNode = {
     itemsObject?: SchemaNode;
     oneOf?: SchemaNode[];
     patternProperties?: { pattern: RegExp; node: SchemaNode }[];
+    $defs?: Record<string, SchemaNode>;
     properties?: Record<string, SchemaNode>;
     then?: SchemaNode;
 };

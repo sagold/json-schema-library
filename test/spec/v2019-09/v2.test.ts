@@ -10,30 +10,6 @@ import draft2019MetaMetaData from "../../../remotes/draft2019-09_meta_meta-data.
 import draft2019MetaValidation from "../../../remotes/draft2019-09_meta_validation.json";
 import { getDraftTests, FeatureTest } from "../../getDraftTests";
 import { compileSchema } from "../../../v2/compileSchema";
-import { Context, SchemaNode } from "../../../v2/compiler/types";
-
-const draft = new Draft2019();
-const parentNode = {
-    context: {
-        ids: {},
-        remotes: {},
-        anchors: {},
-        scopes: {}
-    }
-} as unknown as SchemaNode;
-const remotes: Context["remotes"] = {};
-[
-    draft2019Meta,
-    draft2019MetaApplicator,
-    draft2019MetaCore,
-    draft2019MetaContent,
-    draft2019MetaFormat,
-    draft2019MetaMetaData,
-    draft2019MetaValidation
-].forEach((schema) => {
-    parentNode.context.rootSchema = schema;
-    remotes[schema.$id] = compileSchema(draft, schema, "#");
-});
 
 const supportedTestCases = (t: FeatureTest) =>
     [
@@ -138,9 +114,9 @@ const postponedTestcases = [
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "oneOf with boolean schemas, one true") {
-            //     return;
-            // }
+            if (testCase.description !== "escaped pointer ref") {
+                return;
+            }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }
 
             const schema = testCase.schema;

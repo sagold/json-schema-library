@@ -10,12 +10,24 @@ import { parseContains } from "../features/contains";
 import { parseOneOf } from "../features/oneOf";
 import { parseRef } from "../features/ref";
 
+// @todo this should be done with every added property in spointer
+// @todo this creates a mixed schema, where $defs, etc are not uri-encoded (would be %24defs)
+function urlEncodeJsonPointerProperty(property: string) {
+    property = property.replace(/~/g, "~0");
+    property = property.replace(/\//g, "~1");
+    return encodeURIComponent(property);
+}
+
 export const PARSER: ((node: SchemaNode) => void)[] = [
     parseRef, // @attention has to come before compiling any other node
     function parseDefs(node: SchemaNode) {
         if (node.schema.$defs) {
             Object.keys(node.schema.$defs).forEach((property) => {
-                node.compileSchema(node.draft, node.schema.$defs[property], `${node.spointer}/$defs/${property}`);
+                node.compileSchema(
+                    node.draft,
+                    node.schema.$defs[property],
+                    `${node.spointer}/$defs/${urlEncodeJsonPointerProperty(property)}`
+                );
             });
         }
         if (node.schema.definitions) {
@@ -23,7 +35,7 @@ export const PARSER: ((node: SchemaNode) => void)[] = [
                 node.compileSchema(
                     node.draft,
                     node.schema.definitions[property],
-                    `${node.spointer}/definitions/${property}`
+                    `${node.spointer}/definitions/${urlEncodeJsonPointerProperty(property)}`
                 );
             });
         }

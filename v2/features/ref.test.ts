@@ -88,6 +88,35 @@ describe("feature : ref : resolve", () => {
         assert.deepEqual(node.schema, { $id: "https://root.schema", type: "string", minLength: 1 });
     });
 
+    describe("uri encoded pointer", () => {
+        it("should resolve url encoded property", () => {
+            const node = compileSchema(draft, {
+                $ref: "#/$defs/header%25title",
+                $defs: { "header%title": { type: "string", minLength: 1 } }
+            }).resolveRef();
+
+            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
+        });
+
+        it("should resolve ~0 to ~", () => {
+            const node = compileSchema(draft, {
+                $ref: "#/$defs/tilde~0field",
+                $defs: { "tilde~field": { type: "string", minLength: 1 } }
+            }).resolveRef();
+
+            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
+        });
+
+        it("should resolve ~1 to /", () => {
+            const node = compileSchema(draft, {
+                $ref: "#/$defs/slash~1field",
+                $defs: { "slash/field": { type: "string", minLength: 1 } }
+            }).resolveRef();
+
+            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
+        });
+    });
+
     describe("remoteSchema", () => {
         it("should resolve remoteSchema from $ref", () => {
             const node = compileSchema(draft, {
