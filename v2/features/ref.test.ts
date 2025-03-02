@@ -75,7 +75,7 @@ describe("feature : ref : resolve", () => {
             $defs: { header: { type: "string", minLength: 1 } }
         }).resolveRef();
 
-        assert.deepEqual(node.schema, { $id: "https://root.schema", type: "string", minLength: 1 });
+        assert.deepEqual(node.schema, { /*$id: "https://root.schema",*/ type: "string", minLength: 1 });
     });
 
     it("should resolve locally without domain", () => {
@@ -85,7 +85,7 @@ describe("feature : ref : resolve", () => {
             $defs: { header: { type: "string", minLength: 1 } }
         }).resolveRef();
 
-        assert.deepEqual(node.schema, { $id: "https://root.schema", type: "string", minLength: 1 });
+        assert.deepEqual(node.schema, { /*$id: "https://root.schema",*/ type: "string", minLength: 1 });
     });
 
     describe("uri encoded pointer", () => {
@@ -125,7 +125,7 @@ describe("feature : ref : resolve", () => {
                 .addRemote("https://remote.schema", { type: "object", minProperties: 1 })
                 .resolveRef();
 
-            assert.deepEqual(node.schema, { $id: "https://remote.schema", type: "object", minProperties: 1 });
+            assert.deepEqual(node.schema, { /*$id: "https://remote.schema",*/ type: "object", minProperties: 1 });
         });
 
         it("should resolve $defs in remoteSchema from $ref", () => {
@@ -209,6 +209,79 @@ describe("feature : ref : validate", () => {
             properties: { foo: { $ref: "#" } },
             additionalProperties: false
         }).validate({ foo: { bar: false } });
+
+        assert.equal(errors.length, 1);
+    });
+
+    it("should resolve base URI change - change folder", () => {
+        const node = compileSchema(draft, {
+            $schema: "https://json-schema.org/draft/2019-09/schema",
+            $id: "http://localhost:1234/draft2019-09/scope_change_defs1.json",
+            type: "object",
+            properties: {
+                list: {
+                    $ref: "baseUriChangeFolder/"
+                }
+            },
+            $defs: {
+                baz: {
+                    $id: "baseUriChangeFolder/",
+                    type: "array",
+                    items: {
+                        $ref: "folderInteger.json"
+                    }
+                }
+            }
+        });
+        // console.log("\nADD REMOTE\n");
+        node.addRemote("http://localhost:1234/draft2019-09/baseUriChangeFolder/folderInteger.json", {
+            $schema: "https://json-schema.org/draft/2019-09/schema",
+            type: "integer"
+        });
+        // console.log("\nVALIDATE\n");
+        const errors = node.validate({ list: [1] });
+
+        assert.equal(errors.length, 0);
+    });
+
+    it("should resolve base URI change ref valid", () => {
+        const errors = compileSchema(draft, {
+            $schema: "https://json-schema.org/draft/2019-09/schema",
+            $id: "http://localhost:1234/draft2019-09/",
+            items: {
+                $id: "baseUriChange/",
+                items: {
+                    $ref: "folderInteger.json"
+                }
+            }
+        })
+            .addRemote("http://localhost:1234/draft2019-09/baseUriChange/folderInteger.json", {
+                type: "integer"
+            })
+            .validate([[1]]);
+
+        assert.equal(errors.length, 0);
+    });
+
+    // requires anchor
+    it("should resolve Location-independent identifier in remote ref", () => {
+        const errors = compileSchema(draft, {
+            $schema: "https://json-schema.org/draft/2019-09/schema",
+            $ref: "http://localhost:1234/draft2019-09/locationIndependentIdentifier.json#/$defs/refToInteger"
+        })
+            .addRemote("http://localhost:1234/draft2019-09/locationIndependentIdentifier.json", {
+                $schema: "https://json-schema.org/draft/2019-09/schema",
+                $defs: {
+                    refToInteger: {
+                        $ref: "#foo"
+                    },
+                    A: {
+                        $anchor: "foo",
+                        type: "integer"
+                    }
+                }
+            })
+            .validate("foo");
 
         assert.equal(errors.length, 1);
     });

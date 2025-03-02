@@ -2,6 +2,22 @@ import { strict as assert } from "assert";
 import joinScope from "./joinScope";
 
 describe("joinScope", () => {
+    // console.log(resolveSchemaId());
+    // // Expected: ""
+
+    // console.log(resolveSchemaId(undefined, "https://other.com/schema.json"));
+    // // Expected: "https://other.com/schema.json"
+
+    // console.log(resolveSchemaId("https://example.com/schemas/"));
+    // // Expected: "https://example.com/schemas/"
+
+    // console.log(resolveSchemaId("https://example.com/schemas/", "baseFolderChange/"));
+    // // Expected: "https://example.com/schemas/baseFolderChange/"
+
+    // console.log(resolveSchemaId("https://example.com/schemas/base.json", "#sub"));
+    // // Expected: "https://example.com/schemas/base.json#sub"
+
+    // console.log(resolveSchemaId("https://example.com/schemas/base.json", "../common.json"));
     it("should return initial base", () => {
         const url = joinScope("https://localhost.com/");
 

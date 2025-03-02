@@ -121,7 +121,7 @@ const NODE_METHODS: Pick<
     validate(data: unknown, pointer = "#") {
         const node = this.resolveRef() as SchemaNode;
         if (node == undefined) {
-            console.log("refs", Object.keys(this.context.refs));
+            console.log("refs", Object.keys(this.context.refs), "remotes", Object.keys(this.context.remotes));
             throw new Error(`Failed resolving ref: ${this.ref}`);
         }
 

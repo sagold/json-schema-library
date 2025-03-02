@@ -24,11 +24,13 @@ import { enumValidator } from "../features/enum";
 import { notValidator } from "../features/not";
 import { allOfValidator } from "../features/allOf";
 import { ifThenElseValidator } from "../features/ifthenelse";
+import { anyOfValidator } from "../features/anyOf";
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalItemsValidator,
     additionalPropertiesValidator,
     allOfValidator,
+    anyOfValidator,
     containsValidator,
     constValidator,
     enumValidator,

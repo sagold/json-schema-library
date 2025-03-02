@@ -1,6 +1,4 @@
 /* eslint max-len: 0 */
-import { expect } from "chai";
-import { Draft2019 } from "../../../lib/draft2019";
 import draft2019Meta from "../../../remotes/draft2019-09.json";
 import draft2019MetaApplicator from "../../../remotes/draft2019-09_meta_applicator.json";
 import draft2019MetaContent from "../../../remotes/draft2019-09_meta_content.json";
@@ -8,55 +6,69 @@ import draft2019MetaCore from "../../../remotes/draft2019-09_meta_core.json";
 import draft2019MetaFormat from "../../../remotes/draft2019-09_meta_format.json";
 import draft2019MetaMetaData from "../../../remotes/draft2019-09_meta_meta-data.json";
 import draft2019MetaValidation from "../../../remotes/draft2019-09_meta_validation.json";
-import { getDraftTests, FeatureTest } from "../../getDraftTests";
+import path from "path";
 import { compileSchema } from "../../../v2/compileSchema";
+import { Draft2019 } from "../../../lib/draft2019";
+import { expect } from "chai";
+import { getDraftTests, FeatureTest } from "../../getDraftTests";
+import { globSync } from "glob";
+import { SchemaNode } from "../../../v2/compiler/types";
 
 const supportedTestCases = (t: FeatureTest) =>
     [
-        // "additionalItems",
-        // "additionalProperties",
-        // "allOf",
-        // "anyOf",
-        // "oneOf",
-        // "const",
-        // "contains",
-        // "enum",
-        // "exclusiveMaximum",
-        // "exclusiveMinimum",
-        // "if-then-else",
-        // "items",
-        // "maxContains",
-        // "maximum",
-        // "maxItems",
-        // "maxLength",
-        // "maxProperties",
-        // "minContains",
-        // "minimum",
-        // "minItems",
-        // "minLength",
-        // "minProperties",
-        // "multipleOf",
-        // "not",
-        // "oneOf",
-        // "patternProperties",
-        // "properties",
-        // "ref",
-        "refRemote"
-        // "required",
-        // "type"
+        // "anchor",
+        "additionalItems",
+        "additionalProperties",
+        "allOf",
+        "anyOf",
+        "boolean_schema",
+        "oneOf",
+        "const",
+        "contains",
+        "enum",
+        "exclusiveMaximum",
+        "exclusiveMinimum",
+        "if-then-else",
+        "items",
+        "maxContains",
+        "maximum",
+        "maxItems",
+        "maxLength",
+        "maxProperties",
+        "minContains",
+        "minimum",
+        "minItems",
+        "minLength",
+        "minProperties",
+        "multipleOf",
+        "not",
+        "oneOf",
+        "patternProperties",
+        "properties",
+        "ref",
+        "refRemote",
+        "infinite-loop-detection",
+        "required",
+        "type"
     ].includes(t.name);
 
 const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 
 /*
+✓ allOf
+~ not - expect for uncle-schema support
 ✓ additionalItems
 ✓ additionalProperties
-✖ anchor
 ✓ anyOf
+✓ boolean_schema
 ✓ const
+✓ contains
+✓ enum
 ✓ exclusiveMaximum
 ✓ exclusiveMinimum
-✓ enum
+✓ if-then-else
+✓ infinite-loop-detection
+✓ items
 ✓ maxContains
 ✓ maximum
 ✓ maxItems
@@ -71,26 +83,20 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ oneOf
 ✓ patternProperties
 ✓ properties
+✓ ref
+✓ refRemote
 ✓ required
 ✓ type
-✓ if-then-else
-~ not - expect for uncle-schema support
-~ allOf - expect anyOf combination
-✓ contains
-✓ items
-✖ refRemote
-~ ref - except anchor evaluation
 
+✖ anchor
 ✖ uniqueItems
 ✖ unevaluatedItems - expect for uncle-schema and recursiveRef support
 ✖ unevaluatedProperties - expect for uncle-schema and recursiveRef support
-✖ boolean_schema
 ✖ content
 ✖ default
 ✖ dependentRequired
 ✖ dependentSchemas
 ✖ format
-✖ infinite-loop-detection
 ✖ pattern
 ✖ propertyNames
 ✖ unknownKeyword
@@ -114,18 +120,46 @@ const postponedTestcases = [
     // this tests expects knowledge of a parent-allOf statement we currently do not have the logic for this
     "property is evaluated in an uncle schema to unevaluatedProperties", // unevaluatedProperties
     "item is evaluated in an uncle schema to unevaluatedItems", // unevaluatedItems
-    "collect annotations inside a 'not', even if collection is disabled", // not
-    // @todo anchor support
-    "order of evaluation: $id and $anchor and $ref", // ref
-    "URN base URI with URN and anchor ref" // ref
+    "collect annotations inside a 'not', even if collection is disabled" // not
 ];
+
+function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
+    [
+        draft2019Meta,
+        draft2019MetaApplicator,
+        draft2019MetaCore,
+        draft2019MetaContent,
+        draft2019MetaFormat,
+        draft2019MetaMetaData,
+        draft2019MetaValidation
+    ].forEach((schema) => node.addRemote(schema.$id, schema));
+
+    // setup remote files
+    const remotesPattern = path.join(
+        __dirname,
+        "..",
+        "..",
+        "..",
+        "node_modules",
+        "json-schema-test-suite",
+        "remotes",
+        "**",
+        "*.json"
+    );
+    const remotes = globSync(remotesPattern);
+    remotes.forEach((filepath: string) => {
+        const file = require(filepath); // eslint-disable-line
+        const remoteId = `${baseURI}/${filepath.split("/remotes/").pop()}`;
+        node.addRemote(remoteId, file);
+    });
+}
 
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            if (testCase.description !== "remote HTTP ref with different $id") {
-                return;
-            }
+            // if (testCase.description !== "Location-independent identifier in remote ref") {
+            //     return;
+            // }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }
 
             const schema = testCase.schema;
@@ -145,21 +179,13 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
 
                     test(testData.description, () => {
                         const validator = new Draft2019();
-                        console.log(
-                            testData.description,
-                            JSON.stringify(schema, null, 2),
-                            JSON.stringify(testData.data, null, 2)
-                        );
+                        // console.log(
+                        //     testData.description,
+                        //     JSON.stringify(schema, null, 2),
+                        //     JSON.stringify(testData.data, null, 2)
+                        // );
                         const node = compileSchema(validator, schema);
-                        [
-                            draft2019Meta,
-                            draft2019MetaApplicator,
-                            draft2019MetaCore,
-                            draft2019MetaContent,
-                            draft2019MetaFormat,
-                            draft2019MetaMetaData,
-                            draft2019MetaValidation
-                        ].forEach((schema) => node.addRemote(schema.$id, schema));
+                        addRemotes(node);
                         const errors = node.validate(testData.data);
                         expect(errors.length === 0).to.eq(testData.valid);
                     });

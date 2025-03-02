@@ -37,7 +37,52 @@ function _joinScope(previous?: string, id?: string) {
     return `${previous.replace(trailingFragments, "")}/${id.replace(startingHashAndSlash, "")}`;
 }
 
-export default function joinScope(previous?: string, id?: string) {
+// tryout generated version
+export function joinScope(baseId?: string, childId?: string): string {
+    try {
+        // If neither baseId nor childId is provided, return an empty string
+        if (!baseId && !childId) {
+            return "";
+        }
+
+        // If only childId is provided, return it as an absolute URL (if valid)
+        if (!baseId) {
+            return childId ?? "";
+        }
+
+        // Convert baseId to a valid URL
+        let baseUrl = new URL(baseId);
+
+        // Fix baseId if it lacks a trailing slash and is not a file (heuristic)
+        if (!baseUrl.pathname.endsWith("/") && !baseUrl.pathname.includes(".")) {
+            baseUrl = new URL(baseUrl.href + "/");
+        }
+
+        // If childId is missing, return the baseId unchanged
+        if (!childId) {
+            return baseUrl.href;
+        }
+
+        // If childId is an absolute URL, return it directly
+        if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(childId)) {
+            return childId;
+        }
+
+        // If childId is just a fragment (e.g., "#sub"), append it to the base URL
+        if (childId.startsWith("#")) {
+            return baseUrl.href + childId;
+        }
+
+        // Resolve the childId as a relative URL based on baseId
+        const resolvedUrl = new URL(childId, baseUrl);
+
+        return resolvedUrl.href;
+    } catch (error) {
+        throw new Error(`Invalid $id resolution: baseId=${baseId}, childId=${childId}`);
+    }
+}
+
+export default function __joinScope(previous?: string, id?: string) {
     const scope = _joinScope(previous, id);
     return scope === "" ? "#" : scope;
 }

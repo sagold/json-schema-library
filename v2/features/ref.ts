@@ -1,10 +1,7 @@
 import { SchemaNode } from "../compiler/types";
-// import { get } from "@sagold/json-pointer";
 import joinScope from "./ref/joinScope";
-// import getRef from "./ref/getRef";
 import { mergeSchema } from "../../lib/mergeSchema";
 import splitRef from "../../lib/compile/splitRef";
-// import getTypeOf from "../../lib/getTypeOf";
 
 export function parseRef(node: SchemaNode) {
     // get and store current scope of node - this may be the same as parent scope
@@ -41,7 +38,7 @@ export function parseRef(node: SchemaNode) {
     // precompile reference
     if (node.schema.$ref) {
         node.ref = joinScope(currentScope, node.schema.$ref);
-        // console.log("REF", currentScope, node.schema.$ref, "=>", node.ref);
+        // console.log("REF", currentScope, "+", node.schema.$ref, "=>", node.ref);
     }
 }
 
@@ -59,22 +56,25 @@ export function resolveRef() {
     }
     // console.log("-- resolve: success");
     // @draft >= 2019-09 we now merge schemas: in draft <= 7 $ref is treated as reference, not as schema
-    const nextSchema = mergeSchema(resolvedNode.schema, node.schema, "$ref", "definitions", "$defs");
+    // @important @todo we need to remove any $id here to prevent readding this $id to scope
+    const nextSchema = mergeSchema(resolvedNode.schema, node.schema, "$ref", "definitions", "$defs", "$id");
+    // console.log("\nGETREF COMPILE:", resolvedNode.spointer, node.spointer);
     return resolvedNode.compileSchema(node.draft, nextSchema, node.spointer);
 }
 
-export default function getRef(node: SchemaNode, $ref = node.ref): SchemaNode | undefined {
+export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode | undefined {
     if ($ref == null) {
-        // console.log("  getRef: return node");
         return node;
     }
     // console.log("  getRef:", $ref, Object.keys(node.context.refs));
 
     // resolve $ref by json-spointer
     if (node.context.refs[$ref]) {
-        const final = getRef(node.context.refs[$ref]);
-        console.log("getRef found $ref - reresolve", node.context.refs[$ref].ref, final != null);
-        return final;
+        return getRef(node.context.refs[$ref]);
+    }
+
+    if (node.context.anchors[$ref]) {
+        return getRef(node.context.anchors[$ref]);
     }
 
     // check for remote-host + pointer pair to switch rootSchema
@@ -87,6 +87,7 @@ export default function getRef(node: SchemaNode, $ref = node.ref): SchemaNode | 
     // resolve $ref as remote-host
     if (fragments.length === 1) {
         const $ref = fragments[0];
+        // console.log("search for remote", $ref);
         // this is a reference to remote-host root node
         if (node.context.remotes[$ref]) {
             const nextRootNode = node.context.remotes[$ref];
@@ -98,6 +99,7 @@ export default function getRef(node: SchemaNode, $ref = node.ref): SchemaNode | 
     }
 
     if (fragments.length === 2) {
+        // console.log("search for remote", $ref, "//", fragments[1]);
         // console.log("  getRef fragments:", fragments);
         const $remoteHostRef = fragments[0];
         // this is a reference to remote-host root node (and not a self reference)
