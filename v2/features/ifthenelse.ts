@@ -10,7 +10,7 @@ export function parseIfThenElse(node: SchemaNode) {
         node.then = node.compileSchema(draft, schema.then, `${spointer}/then`);
     }
     if (schema.else != null) {
-        node.compileSchema(draft, schema.else, `${spointer}/else`);
+        node.else = node.compileSchema(draft, schema.else, `${spointer}/else`);
     }
 
     if (node.if && (node.then != null || node.else != null)) {
@@ -41,11 +41,14 @@ export function ifThenElseValidator(node: SchemaNode) {
     }
     node.validators.push(({ node, data, pointer }) => {
         if (node.if.validate(data, pointer).length === 0) {
+            // console.log("if true");
             if (node.then) {
                 return node.then.validate(data, pointer);
             }
         } else if (node.else) {
+            // console.log("if false");
             return node.else.validate(data, pointer);
         }
+        // console.log("fail through ifthenelse", node.if != null, node.then != null, node.else != null);
     });
 }

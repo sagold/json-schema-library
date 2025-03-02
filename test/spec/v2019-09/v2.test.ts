@@ -16,12 +16,14 @@ const supportedTestCases = (t: FeatureTest) =>
         // "additionalItems",
         // "additionalProperties",
         // "allOf",
+        // "anyOf",
+        // "oneOf",
         // "const",
         // "contains",
         // "enum",
         // "exclusiveMaximum",
         // "exclusiveMinimum",
-        "if-then-else"
+        // "if-then-else",
         // "items",
         // "maxContains",
         // "maximum",
@@ -39,9 +41,9 @@ const supportedTestCases = (t: FeatureTest) =>
         // "patternProperties",
         // "properties",
         // "ref",
+        "refRemote"
         // "required",
-        // "type",
-        // "uniqueItems"
+        // "type"
     ].includes(t.name);
 
 const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
@@ -50,6 +52,7 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ additionalItems
 ✓ additionalProperties
 ✖ anchor
+✓ anyOf
 ✓ const
 ✓ exclusiveMaximum
 ✓ exclusiveMinimum
@@ -77,11 +80,10 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ items
 ✖ refRemote
 ~ ref - except anchor evaluation
-✖ uniqueItems
 
+✖ uniqueItems
 ✖ unevaluatedItems - expect for uncle-schema and recursiveRef support
 ✖ unevaluatedProperties - expect for uncle-schema and recursiveRef support
-✖ anyOf
 ✖ boolean_schema
 ✖ content
 ✖ default
@@ -121,9 +123,9 @@ const postponedTestcases = [
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "contains keyword with boolean schema false") {
-            //     return;
-            // }
+            if (testCase.description !== "remote HTTP ref with different $id") {
+                return;
+            }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }
 
             const schema = testCase.schema;

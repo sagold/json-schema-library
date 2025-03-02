@@ -10,6 +10,7 @@ import { parseContains } from "../features/contains";
 import { parseOneOf } from "../features/oneOf";
 import { parseRef } from "../features/ref";
 import { parseNot } from "../features/not";
+import { parseAnyOf } from "../features/anyOf";
 
 // @todo this should be done with every added property in spointer
 // @todo this creates a mixed schema, where $defs, etc are not uri-encoded (would be %24defs)
@@ -42,6 +43,7 @@ export const PARSER: ((node: SchemaNode) => void)[] = [
         }
     },
     parseAllOf,
+    parseAnyOf,
     parseContains,
     parseIfThenElse,
     parseProperties,
