@@ -15,6 +15,7 @@ import { maximumValidator, minimumValidator, multipleOfValidator } from "../feat
 import { patternPropertiesValidator } from "../features/patternProperties";
 import { uniqueItemsValidator } from "../features/uniqueItems";
 import { enumValidator } from "../features/enum";
+import { notValidator } from "../features/not";
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalItemsValidator,
@@ -32,6 +33,7 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     multipleOfValidator,
     propertiesValidator,
     patternPropertiesValidator,
+    notValidator,
     minimumValidator,
     maximumValidator,
     requiredValidator,

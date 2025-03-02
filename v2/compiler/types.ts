@@ -71,6 +71,7 @@ export type SchemaNode = {
     allOf?: SchemaNode[];
     anyOf?: SchemaNode[];
     contains?: SchemaNode;
+    not?: SchemaNode;
     else?: SchemaNode;
     if?: SchemaNode;
     itemsList?: SchemaNode[];

@@ -14,6 +14,7 @@ import { compileSchema } from "../../../v2/compileSchema";
 const supportedTestCases = (t: FeatureTest) =>
     [
         "ref"
+        // "not"
         // "enum"
         // "additionalItems",
         // // "allOf",
@@ -43,33 +44,33 @@ const supportedTestCases = (t: FeatureTest) =>
 const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 
 /*
+✓ additionalItems
 ✓ additionalProperties
-✖ allOf
+✓ const
+✓ enum
+✓ maxContains
+✓ maximum
 ✓ maxItems
 ✓ maxLength
 ✓ maxProperties
+✓ minContains
+✓ minimum
 ✓ minItems
 ✓ minLength
 ✓ minProperties
+✓ multipleOf
+✓ oneOf
+✓ patternProperties
+✓ properties
 ✓ required
 ✓ type
-✓ additionalItems
-✓ maximum
-✓ minimum
-✓ enum
-✓ oneOf
-✓ const
-✓ properties
-✓ patternProperties
+✖ not - expect for uncle-schema support
+✖ allOf
 ✖ contains
 ✖ items - ref $defs resolution missing
-✓ multipleOf
-✓ maxContains
-✓ minContains
-✖ uniqueItems
 ✖ ref - except meta-schema evaluation
+✖ uniqueItems
 
-✖ not - expect for uncle-schema support
 ✖ unevaluatedItems - expect for uncle-schema and recursiveRef support
 ✖ unevaluatedProperties - expect for uncle-schema and recursiveRef support
 ✖ anchor
@@ -114,9 +115,9 @@ const postponedTestcases = [
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            if (testCase.description !== "$id must be resolved against nearest parent, not just immediate parent") {
-                return;
-            }
+            // if (testCase.description !== "$id must be resolved against nearest parent, not just immediate parent") {
+            //     return;
+            // }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }
 
             const schema = testCase.schema;
