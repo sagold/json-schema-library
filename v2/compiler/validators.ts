@@ -25,6 +25,7 @@ import { notValidator } from "../features/not";
 import { allOfValidator } from "../features/allOf";
 import { ifThenElseValidator } from "../features/ifthenelse";
 import { anyOfValidator } from "../features/anyOf";
+import { formatValidator } from "../features/format";
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalItemsValidator,
@@ -34,6 +35,7 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     containsValidator,
     constValidator,
     enumValidator,
+    formatValidator,
     exclusiveMaximumValidator,
     exclusiveMinimumValidator,
     ifThenElseValidator,

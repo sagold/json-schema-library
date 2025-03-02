@@ -30,6 +30,7 @@ const supportedTestCases = (t: FeatureTest) =>
         "exclusiveMinimum",
         "if-then-else",
         "items",
+        "format",
         "maxContains",
         "maximum",
         "maxItems",
@@ -68,6 +69,7 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ enum
 ✓ exclusiveMaximum
 ✓ exclusiveMinimum
+✓ format
 ✓ if-then-else
 ✓ infinite-loop-detection
 ✓ items
@@ -91,13 +93,13 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ type
 ✓ uniqueItems
 
+
 ✖ unevaluatedItems - expect for uncle-schema and recursiveRef support
 ✖ unevaluatedProperties - expect for uncle-schema and recursiveRef support
 ✖ content
 ✖ default
 ✖ dependentRequired
 ✖ dependentSchemas
-✖ format
 ✖ pattern
 ✖ propertyNames
 ✖ unknownKeyword
@@ -180,11 +182,11 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
 
                     test(testData.description, () => {
                         const validator = new Draft2019();
-                        console.log(
-                            testData.description,
-                            JSON.stringify(schema, null, 2),
-                            JSON.stringify(testData.data, null, 2)
-                        );
+                        // console.log(
+                        //     testData.description,
+                        //     JSON.stringify(schema, null, 2),
+                        //     JSON.stringify(testData.data, null, 2)
+                        // );
                         const node = compileSchema(validator, schema);
                         addRemotes(node);
                         const errors = node.validate(testData.data);

@@ -25,10 +25,7 @@ const isValidURITemplate =
 const isValidDurationString = /^P(?!$)(\d+Y)?(\d+M)?(\d+W)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+S)?)?$/;
 
 // Default Json-Schema formats: date-time, email, hostname, ipv4, ipv6, uri, uriref
-const formatValidators: Record<
-    string,
-    (node: SchemaNode, value: unknown) => undefined | JsonError | JsonError[]
-> = {
+const formatValidators: Record<string, (node: SchemaNode, value: unknown) => undefined | JsonError | JsonError[]> = {
     date: (node, value) => {
         const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {
@@ -45,12 +42,7 @@ const formatValidators: Record<
         const day = +matches[3];
         // https://tools.ietf.org/html/rfc3339#appendix-C
         const isLeapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
-        if (
-            month >= 1 &&
-            month <= 12 &&
-            day >= 1 &&
-            day <= (month == 2 && isLeapYear ? 29 : DAYS[month])
-        ) {
+        if (month >= 1 && month <= 12 && day >= 1 && day <= (month == 2 && isLeapYear ? 29 : DAYS[month])) {
             return undefined;
         }
         return draft.errors.formatDateError({ value, pointer, schema });
@@ -81,10 +73,7 @@ const formatValidators: Record<
         // weeks cannot be combined with other units
         const isInvalidDurationString = /(\d+M)(\d+W)|(\d+Y)(\d+W)/;
 
-        if (
-            !isValidDurationString.test(value as string) ||
-            isInvalidDurationString.test(value as string)
-        ) {
+        if (!isValidDurationString.test(value as string) || isInvalidDurationString.test(value as string)) {
             return node.draft.errors.formatDurationError({
                 value,
                 pointer: node.pointer,
@@ -208,7 +197,12 @@ const formatValidators: Record<
             return draft.errors.formatRegExError({ value, pointer, schema });
         }
         // v7 tests, ignore non-regex values
-        if (typeof value === "object" || typeof value === "number" || Array.isArray(value)) {
+        if (
+            typeof value === "object" ||
+            typeof value === "number" ||
+            Array.isArray(value) ||
+            getTypeOf(value) === "boolean"
+        ) {
             return undefined;
         }
         return draft.errors.formatRegExError({ value, pointer, schema });
