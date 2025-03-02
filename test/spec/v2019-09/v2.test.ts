@@ -14,6 +14,7 @@ import { compileSchema } from "../../../v2/compileSchema";
 const supportedTestCases = (t: FeatureTest) =>
     [
         "ref"
+        // "enum"
         // "additionalItems",
         // // "allOf",
         // "const",
@@ -55,6 +56,7 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ additionalItems
 ✓ maximum
 ✓ minimum
+✓ enum
 ✓ oneOf
 ✓ const
 ✓ properties
@@ -77,7 +79,6 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✖ default
 ✖ dependentRequired
 ✖ dependentSchemas
-✖ enum
 ✖ exclusiveMaximum
 ✖ exclusiveMinimum
 ✖ format
@@ -86,7 +87,6 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✖ pattern
 ✖ propertyNames
 ✖ refRemote
-
 ✖ unknownKeyword
 ✖ defs
 ✖ recursiveRef
@@ -114,7 +114,7 @@ const postponedTestcases = [
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            if (testCase.description !== "escaped pointer ref") {
+            if (testCase.description !== "naive replacement of $ref with its destination is not correct") {
                 return;
             }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }
@@ -136,7 +136,11 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
 
                     test(testData.description, () => {
                         const validator = new Draft2019();
-                        console.log(testData.description, schema, testData.data);
+                        console.log(
+                            testData.description,
+                            JSON.stringify(schema, null, 2),
+                            JSON.stringify(testData.data, null, 2)
+                        );
                         const node = compileSchema(validator, schema);
                         [
                             draft2019Meta,

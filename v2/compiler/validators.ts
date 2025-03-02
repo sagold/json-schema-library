@@ -14,12 +14,14 @@ import { constValidator } from "../features/const";
 import { maximumValidator, minimumValidator, multipleOfValidator } from "../features/number";
 import { patternPropertiesValidator } from "../features/patternProperties";
 import { uniqueItemsValidator } from "../features/uniqueItems";
+import { enumValidator } from "../features/enum";
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalItemsValidator,
     additionalPropertiesValidator,
     containsValidator,
     constValidator,
+    enumValidator,
     itemsValidator,
     maxItemsValidator,
     maxLengthValidator,
