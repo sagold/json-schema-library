@@ -14,8 +14,9 @@ import { compileSchema } from "../../../v2/compileSchema";
 const supportedTestCases = (t: FeatureTest) =>
     [
         // "ref",
-        "exclusiveMaximum"
-        // "if-then-else"
+        // "exclusiveMaximum",
+        // "exclusiveMinimum"
+        "if-then-else"
         // "allOf"
         // "not"
         // "enum"
@@ -50,6 +51,8 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ additionalItems
 ✓ additionalProperties
 ✓ const
+✓ exclusiveMaximum
+✓ exclusiveMinimum
 ✓ enum
 ✓ maxContains
 ✓ maximum
@@ -84,8 +87,6 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✖ default
 ✖ dependentRequired
 ✖ dependentSchemas
-✖ exclusiveMaximum
-✖ exclusiveMinimum
 ✖ format
 ✖ infinite-loop-detection
 ✖ pattern
@@ -118,7 +119,7 @@ const postponedTestcases = [
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "validate against correct branch, then vs else") {
+            // if (testCase.description !== "if with boolean schema false") {
             //     return;
             // }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }

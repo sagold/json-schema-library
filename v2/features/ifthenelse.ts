@@ -3,7 +3,7 @@ import { JsonSchemaReducerParams, SchemaNode } from "../compiler/types";
 
 export function parseIfThenElse(node: SchemaNode) {
     const { draft, schema, spointer } = node;
-    if (schema.if && (schema.then || schema.else)) {
+    if (schema.if != null && (schema.then != null || schema.else != null)) {
         node.if = node.compileSchema(draft, schema.if, `${spointer}/if`);
         node.then = schema.then ? node.compileSchema(draft, schema.then, `${spointer}/then`) : undefined;
         node.else = schema.else ? node.compileSchema(draft, schema.else, `${spointer}/else`) : undefined;
@@ -26,4 +26,19 @@ function reduceIf({ node, data, pointer }: JsonSchemaReducerParams) {
         return node.compileSchema(node.draft, schema, node.else.spointer);
     }
     return undefined;
+}
+
+export function ifThenElseValidator(node: SchemaNode) {
+    if (node.if == null) {
+        return;
+    }
+    node.validators.push(({ node, data, pointer }) => {
+        if (node.if.validate(data, pointer).length === 0) {
+            if (node.then) {
+                return node.then.validate(data, pointer);
+            }
+        } else if (node.else) {
+            return node.else.validate(data, pointer);
+        }
+    });
 }
