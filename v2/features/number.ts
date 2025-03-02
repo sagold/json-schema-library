@@ -101,3 +101,43 @@ export function multipleOfValidator({ schema, validators }: SchemaNode): void {
         return undefined;
     });
 }
+
+export function exclusiveMaximumValidator({ schema, validators }: SchemaNode): void {
+    if (isNaN(schema.exclusiveMaximum)) {
+        return undefined;
+    }
+    validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
+        if (typeof data !== "number") {
+            return undefined;
+        }
+        if (schema.exclusiveMaximum <= data) {
+            return node.draft.errors.maximumError({
+                maximum: schema.exclusiveMaximum,
+                length: data,
+                pointer,
+                schema,
+                value: data
+            });
+        }
+    });
+}
+
+export function exclusiveMinimumValidator({ schema, validators }: SchemaNode): void {
+    if (isNaN(schema.exclusiveMinimum)) {
+        return undefined;
+    }
+    validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
+        if (typeof data !== "number") {
+            return undefined;
+        }
+        if (schema.exclusiveMinimum >= data) {
+            return node.draft.errors.minimumError({
+                minimum: schema.exclusiveMinimum,
+                length: data,
+                pointer,
+                schema,
+                value: data
+            });
+        }
+    });
+}

@@ -13,7 +13,9 @@ import { compileSchema } from "../../../v2/compileSchema";
 
 const supportedTestCases = (t: FeatureTest) =>
     [
-        // "ref"
+        // "ref",
+        "exclusiveMaximum"
+        // "if-then-else"
         // "allOf"
         // "not"
         // "enum"
@@ -65,6 +67,7 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ properties
 ✓ required
 ✓ type
+✖ if-then-else
 ✖ not - expect for uncle-schema support
 ✓ allOf - expect anyOf combination
 ✖ contains
@@ -84,7 +87,6 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✖ exclusiveMaximum
 ✖ exclusiveMinimum
 ✖ format
-✖ if-then-else
 ✖ infinite-loop-detection
 ✖ pattern
 ✖ propertyNames
@@ -116,7 +118,7 @@ const postponedTestcases = [
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "$id must be resolved against nearest parent, not just immediate parent") {
+            // if (testCase.description !== "validate against correct branch, then vs else") {
             //     return;
             // }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }

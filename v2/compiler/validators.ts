@@ -11,12 +11,19 @@ import { containsValidator } from "../features/contains";
 import { requiredValidator } from "../features/required";
 import { validateOneOf } from "../features/oneOf";
 import { constValidator } from "../features/const";
-import { maximumValidator, minimumValidator, multipleOfValidator } from "../features/number";
+import {
+    exclusiveMaximumValidator,
+    exclusiveMinimumValidator,
+    maximumValidator,
+    minimumValidator,
+    multipleOfValidator
+} from "../features/number";
 import { patternPropertiesValidator } from "../features/patternProperties";
 import { uniqueItemsValidator } from "../features/uniqueItems";
 import { enumValidator } from "../features/enum";
 import { notValidator } from "../features/not";
 import { allOfValidator } from "../features/allOf";
+import { ifThenElseValidator } from "../features/ifthenelse";
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalItemsValidator,
@@ -25,6 +32,9 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     containsValidator,
     constValidator,
     enumValidator,
+    exclusiveMaximumValidator,
+    exclusiveMinimumValidator,
+    ifThenElseValidator,
     itemsValidator,
     maxItemsValidator,
     maxLengthValidator,
