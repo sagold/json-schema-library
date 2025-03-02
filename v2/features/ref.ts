@@ -15,15 +15,26 @@ export function parseRef(node: SchemaNode) {
     // add ref resolution method to node
     node.resolveRef = resolveRef;
 
-    // store this node for retrieval by json-pointer
-    // node.context.refs[node.spointer] = node;
+    // store this node for retrieval by $id
+    if (node.context.refs[currentScope] == null) {
+        node.context.refs[currentScope] = node;
+    }
 
     // store this node for retrieval by scope + json-pointer
-    node.context.refs[joinScope(currentScope, node.spointer)] = node;
+    // @todo reevaluate and move to joinScope: if there is a nested $defs and this scope is new,
+    // we need to make "#"-refs relative to this scope. In the following case we shift a pointer
+    // #/properties/foo/$defs/inner to #/$defs/inner for an initial schema:
+    // { $id: http://example.com/schema-relative-uri-defs2.json, $ref: "#/$defs/inner" }
+    const localPointer = node.spointer.includes("/$defs/")
+        ? `#/$defs/${node.spointer.split("/$defs/")[1]}`
+        : node.spointer;
+    node.context.refs[joinScope(currentScope, localPointer)] = node;
+    // console.log("REF-LIST", currentScope, node.spointer, "=>", joinScope(currentScope, node.spointer));
 
     // precompile reference
     if (node.schema.$ref) {
         node.ref = joinScope(currentScope, node.schema.$ref);
+        // console.log("REF", currentScope, node.schema.$ref, "=>", node.ref);
     }
 }
 
@@ -33,10 +44,13 @@ export function resolveRef() {
     if (node.ref == null) {
         return node;
     }
+    // console.log("resolve:", node.ref);
     const resolvedNode = getRef(node);
     if (resolvedNode == null) {
+        // console.log("-- resolve: failed");
         return undefined;
     }
+    // console.log("-- resolve: success");
     // @draft >= 2019-09 we now merge schemas: in draft <= 7 $ref is treated as reference, not as schema
     const nextSchema = mergeSchema(resolvedNode.schema, node.schema, "$ref", "definitions", "$defs");
     return resolvedNode.compileSchema(node.draft, nextSchema, node.spointer);
@@ -44,17 +58,21 @@ export function resolveRef() {
 
 export default function getRef(node: SchemaNode, $ref = node.ref): SchemaNode | undefined {
     if ($ref == null) {
+        // console.log("  getRef: return node");
         return node;
     }
+    // console.log("  getRef:", $ref, Object.keys(node.context.refs));
 
     // resolve $ref by json-spointer
     if (node.context.refs[$ref]) {
+        // console.log("  getRef:", "return", $ref);
         return getRef(node.context.refs[$ref]);
     }
 
     // check for remote-host + pointer pair to switch rootSchema
     const fragments = splitRef($ref);
     if (fragments.length === 0) {
+        // console.log("  getRef: no frags");
         return undefined;
     }
 
@@ -67,10 +85,12 @@ export default function getRef(node: SchemaNode, $ref = node.ref): SchemaNode | 
             return getRef(nextRootNode);
         }
         // @previously: check if $ref in ids
+        // console.log("  getRef: failed frag 1");
         return undefined;
     }
 
     if (fragments.length === 2) {
+        // console.log("  getRef fragments:", fragments);
         const $remoteHostRef = fragments[0];
         // this is a reference to remote-host root node (and not a self reference)
         if (node.context.remotes[$remoteHostRef] && node !== node.context.remotes[$remoteHostRef]) {
@@ -78,11 +98,15 @@ export default function getRef(node: SchemaNode, $ref = node.ref): SchemaNode | 
             // resolve full ref on remote schema - we store currently only store ref with domain
             return getRef(nextRootNode, $ref);
         }
+
+        // console.log("find", $remoteHostRef, "in", node.context.remotes[$remoteHostRef]);
+
         // @previously: check if fragments[1] is within nextRootNode
         // @previously: check if $remoteHostRef is in current node-context
+        // console.log("  getRef: failed frag 2");
         return undefined;
     }
 
-    // console.log("remotes", Object.keys(node.context.remotes));
-    console.log("could not find", $ref, node.schema, "in", Object.keys(node.context.refs));
+    console.log("remotes", Object.keys(node.context.remotes));
+    // console.log("could not find", $ref, node.schema, "in", Object.keys(node.context.refs));
 }

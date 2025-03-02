@@ -211,6 +211,7 @@ export function compileSchema(draft: Draft, schema: JsonSchema) {
         remotes: {},
         anchors: {},
         refs: {},
+        ids: {},
         rootNode: node
     };
 

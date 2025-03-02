@@ -114,7 +114,7 @@ const postponedTestcases = [
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            if (testCase.description !== "naive replacement of $ref with its destination is not correct") {
+            if (testCase.description !== "$id must be resolved against nearest parent, not just immediate parent") {
                 return;
             }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }

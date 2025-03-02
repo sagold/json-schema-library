@@ -23,7 +23,10 @@ export type CompiledSchema = {
 export type Context = {
     rootNode: SchemaNode;
     remotes: Record<string, SchemaNode>;
+    /** references stored by host + local-pointer */
     refs: Record<string, SchemaNode>;
+    /** references stored by scope-id */
+    ids: Record<string, SchemaNode>;
     anchors: Record<string, string>;
 };
 
