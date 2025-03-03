@@ -26,6 +26,10 @@ import { allOfValidator } from "../features/allOf";
 import { ifThenElseValidator } from "../features/ifthenelse";
 import { anyOfValidator } from "../features/anyOf";
 import { formatValidator } from "../features/format";
+import { patternValidator } from "../features/pattern";
+import { propertyNamesValidator } from "../features/propertyNames";
+import { dependentRequiredValidator } from "../features/dependentRequired";
+import { dependentSchemasValidator } from "../features/dependentSchemas";
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalItemsValidator,
@@ -34,6 +38,8 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     anyOfValidator,
     containsValidator,
     constValidator,
+    dependentRequiredValidator,
+    dependentSchemasValidator,
     enumValidator,
     formatValidator,
     exclusiveMaximumValidator,
@@ -47,6 +53,8 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     minLengthValidator,
     minPropertiesValidator,
     multipleOfValidator,
+    patternValidator,
+    propertyNamesValidator,
     propertiesValidator,
     patternPropertiesValidator,
     notValidator,

@@ -17,7 +17,6 @@ const NODE_METHODS: Pick<
 > = {
     compileSchema(draft: Draft, schema: JsonSchema, spointer: string) {
         // assert(schema !== undefined, "schema missing");
-
         const parentNode = this as SchemaNode;
         const node: SchemaNode = {
             context: parentNode.context,

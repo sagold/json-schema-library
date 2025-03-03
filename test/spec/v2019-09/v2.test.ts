@@ -25,6 +25,10 @@ const supportedTestCases = (t: FeatureTest) =>
         "oneOf",
         "const",
         "contains",
+        "content",
+        "default",
+        "dependentRequired",
+        "dependentSchemas",
         "enum",
         "exclusiveMaximum",
         "exclusiveMinimum",
@@ -44,13 +48,16 @@ const supportedTestCases = (t: FeatureTest) =>
         "multipleOf",
         "not",
         "oneOf",
+        "pattern",
         "patternProperties",
         "properties",
+        "propertyNames",
         "ref",
         "refRemote",
         "infinite-loop-detection",
         "required",
         "uniqueItems",
+        "unknownKeyword",
         "type"
     ].includes(t.name);
 
@@ -66,6 +73,9 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ boolean_schema
 ✓ const
 ✓ contains
+✓ content
+✓ default
+✓ dependentRequired
 ✓ enum
 ✓ exclusiveMaximum
 ✓ exclusiveMinimum
@@ -85,26 +95,22 @@ const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 ✓ minProperties
 ✓ multipleOf
 ✓ oneOf
+✓ pattern
 ✓ patternProperties
+✓ propertyNames
 ✓ properties
 ✓ ref
 ✓ refRemote
 ✓ required
 ✓ type
 ✓ uniqueItems
+✓ unknownKeyword
 
 
+✖ recursiveRef
+✖ defs - requires recursiveRef
 ✖ unevaluatedItems - expect for uncle-schema and recursiveRef support
 ✖ unevaluatedProperties - expect for uncle-schema and recursiveRef support
-✖ content
-✖ default
-✖ dependentRequired
-✖ dependentSchemas
-✖ pattern
-✖ propertyNames
-✖ unknownKeyword
-✖ defs
-✖ recursiveRef
 ✖ vocabulary - skipped evaluation of meta-schema
 */
 

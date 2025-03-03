@@ -68,6 +68,7 @@ export type SchemaNode = {
     // parsed schema (should be registered by parsers...)
     additionalItems?: SchemaNode;
     additionalProperties?: SchemaNode;
+    dependentSchemas?: Record<string, SchemaNode | boolean>;
     allOf?: SchemaNode[];
     anyOf?: SchemaNode[];
     contains?: SchemaNode;
@@ -76,6 +77,7 @@ export type SchemaNode = {
     if?: SchemaNode;
     itemsList?: SchemaNode[];
     itemsObject?: SchemaNode;
+    propertyNames?: SchemaNode;
     oneOf?: SchemaNode[];
     patternProperties?: { pattern: RegExp; node: SchemaNode }[];
     $defs?: Record<string, SchemaNode>;
