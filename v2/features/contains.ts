@@ -2,12 +2,12 @@ import { isObject } from "../../lib/utils/isObject";
 import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
 
 export function parseContains(node: SchemaNode) {
-    const { draft, schema, spointer } = node;
+    const { schema, spointer } = node;
     if (schema.contains == null) {
         return;
     }
     // @todo immediately compile if no resolvers are added
-    node.contains = node.compileSchema(draft, schema.contains, `${spointer}/contains`);
+    node.contains = node.compileSchema(schema.contains, `${spointer}/contains`);
 }
 
 // @todo this combines multiple validators (maxContains and minContains)

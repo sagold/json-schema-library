@@ -15,14 +15,14 @@ const NODE_METHODS: Pick<
     SchemaNode,
     "get" | "getTemplate" | "reduce" | "resolveRef" | "toJSON" | "addRemote" | "compileSchema" | "validate"
 > = {
-    compileSchema(draft: Draft, schema: JsonSchema, spointer: string) {
+    compileSchema(schema: JsonSchema, spointer: string) {
         // assert(schema !== undefined, "schema missing");
         const parentNode = this as SchemaNode;
         const node: SchemaNode = {
             context: parentNode.context,
             parent: parentNode,
             spointer,
-            draft,
+            draft: parentNode.draft,
             reducers: [],
             resolvers: [],
             validators: [],
@@ -89,7 +89,7 @@ const NODE_METHODS: Pick<
 
             // @ts-expect-error bool schema
         } else if (node.schema === true) {
-            return node.compileSchema(node.draft, createSchemaOf(data), node.spointer);
+            return node.compileSchema(createSchemaOf(data), node.spointer);
         }
 
         let schema;
@@ -110,7 +110,7 @@ const NODE_METHODS: Pick<
             // recompile to update newly added schema defintions
             schema = mergeSchema(node.schema, schema, "if", "then", "else", "allOf", "anyOf", "oneOf");
             // console.log("reduced schema", schema);
-            return node.compileSchema(this.draft, schema, this.spointer);
+            return node.compileSchema(schema, this.spointer);
         }
 
         // remove dynamic properties of node

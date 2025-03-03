@@ -11,11 +11,7 @@ export function parseAdditionalProperties(node: SchemaNode) {
         return;
     }
     if (isObject(schema.additionalProperties)) {
-        node.additionalProperties = node.compileSchema(
-            draft,
-            schema.additionalProperties,
-            `${spointer}/additionalProperties`
-        );
+        node.additionalProperties = node.compileSchema(schema.additionalProperties, `${spointer}/additionalProperties`);
     }
     node.resolvers.push(additionalPropertyResolver);
 }
@@ -29,7 +25,7 @@ function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParam
     const schema = node.draft.createSchemaOf(value);
     // undefined does not create a schema
     if (schema) {
-        const temporaryNode = node.compileSchema(node.draft, schema, node.spointer);
+        const temporaryNode = node.compileSchema(schema, node.spointer);
         return temporaryNode;
     }
 }

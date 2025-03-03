@@ -59,7 +59,7 @@ export function resolveRef() {
     // @important @todo we need to remove any $id here to prevent readding this $id to scope
     const nextSchema = mergeSchema(resolvedNode.schema, node.schema, "$ref", "definitions", "$defs", "$id");
     // console.log("\nGETREF COMPILE:", resolvedNode.spointer, node.spointer);
-    return resolvedNode.compileSchema(node.draft, nextSchema, node.spointer);
+    return resolvedNode.compileSchema(nextSchema, node.spointer);
 }
 
 export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode | undefined {

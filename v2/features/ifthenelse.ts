@@ -2,15 +2,15 @@ import { mergeSchema } from "../../lib/mergeSchema";
 import { JsonSchemaReducerParams, SchemaNode } from "../compiler/types";
 
 export function parseIfThenElse(node: SchemaNode) {
-    const { draft, schema, spointer } = node;
+    const { schema, spointer } = node;
     if (schema.if != null) {
-        node.if = node.compileSchema(draft, schema.if, `${spointer}/if`);
+        node.if = node.compileSchema(schema.if, `${spointer}/if`);
     }
     if (schema.then != null) {
-        node.then = node.compileSchema(draft, schema.then, `${spointer}/then`);
+        node.then = node.compileSchema(schema.then, `${spointer}/then`);
     }
     if (schema.else != null) {
-        node.else = node.compileSchema(draft, schema.else, `${spointer}/else`);
+        node.else = node.compileSchema(schema.else, `${spointer}/else`);
     }
 
     if (node.if && (node.then != null || node.else != null)) {
@@ -25,12 +25,12 @@ function reduceIf({ node, data, pointer }: JsonSchemaReducerParams) {
             // reduce creates a new node
             const schemaNode = node.then.reduce({ data });
             const schema = mergeSchema(node.then.schema, schemaNode.schema, "if", "then", "else");
-            return node.compileSchema(node.draft, schema, node.then.spointer);
+            return node.compileSchema(schema, node.then.spointer);
         }
     } else if (node.else) {
         const schemaNode = node.else.reduce({ data });
         const schema = mergeSchema(node.else.schema, schemaNode.schema, "if", "then", "else");
-        return node.compileSchema(node.draft, schema, node.else.spointer);
+        return node.compileSchema(schema, node.else.spointer);
     }
     return undefined;
 }

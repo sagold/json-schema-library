@@ -13,7 +13,6 @@ export function dependentSchemasValidator(node: SchemaNode): void {
         const schema = dependentSchemas[property];
         if (isObject(schema)) {
             node.dependentSchemas[property] = node.compileSchema(
-                node.draft,
                 schema,
                 `${node.spointer}/dependentSchemas/${property}`
             );

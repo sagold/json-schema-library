@@ -5,10 +5,10 @@ import { JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "
 // const { DECLARATOR_ONEOF, EXPOSE_ONE_OF_INDEX } = settings;
 
 export function parseOneOf(node: SchemaNode) {
-    const { draft, schema, spointer } = node;
+    const { schema, spointer } = node;
     if (Array.isArray(schema.oneOf) && schema.oneOf.length) {
         // @todo immediately compile if no resolvers are added
-        node.oneOf = schema.oneOf.map((s, index) => node.compileSchema(draft, s, `${spointer}/oneOf/${index}`));
+        node.oneOf = schema.oneOf.map((s, index) => node.compileSchema(s, `${spointer}/oneOf/${index}`));
         node.reducers.push(reduceOneOf);
     }
 }

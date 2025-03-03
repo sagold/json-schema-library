@@ -10,12 +10,11 @@ function propertyResolver({ node, key }: JsonSchemaResolverParams) {
 }
 
 export function parseProperties(node: SchemaNode) {
-    const { draft, schema, spointer } = node;
+    const { schema, spointer } = node;
     if (schema.properties) {
         node.properties = {};
         Object.keys(schema.properties).forEach((propertyName) => {
             const propertyNode = node.compileSchema(
-                draft,
                 schema.properties[propertyName],
                 `${spointer}/properties/${propertyName}`
             );

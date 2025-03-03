@@ -2,10 +2,10 @@ import { mergeSchema } from "../../lib/mergeSchema";
 import { JsonSchemaReducerParams, SchemaNode } from "../compiler/types";
 
 export function parseAnyOf(node: SchemaNode) {
-    const { draft, schema, spointer } = node;
+    const { schema, spointer } = node;
     if (Array.isArray(schema.anyOf) && schema.anyOf.length) {
         // @todo immediately compile if no resolvers are added
-        node.anyOf = schema.anyOf.map((s, index) => node.compileSchema(draft, s, `${spointer}/anyOf/${index}`));
+        node.anyOf = schema.anyOf.map((s, index) => node.compileSchema(s, `${spointer}/anyOf/${index}`));
         node.reducers.push(reduceAnyOf);
     }
 }
@@ -20,7 +20,7 @@ function reduceAnyOf({ node, data }: JsonSchemaReducerParams) {
             mergedSchema = mergeSchema(mergedSchema, schema, "anyOf");
         }
     }
-    return node.compileSchema(node.draft, mergedSchema, `${node.spointer}/anyOf`);
+    return node.compileSchema(mergedSchema, `${node.spointer}/anyOf`);
 }
 
 export function anyOfValidator(node: SchemaNode) {

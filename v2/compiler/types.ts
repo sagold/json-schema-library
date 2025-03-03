@@ -52,7 +52,7 @@ export type SchemaNode = {
 
     // methods
     addRemote: (url: string, schema: JsonSchema) => SchemaNode;
-    compileSchema: (draft: Draft, schema: JsonSchema, spointer?: string) => SchemaNode;
+    compileSchema: (schema: JsonSchema, spointer?: string) => SchemaNode;
     get: (key: string | number, data?: unknown) => SchemaNode | JsonError;
     getTemplate: (data?: unknown) => unknown;
     reduce: ({ data, pointer }: { data: unknown; pointer?: string }) => SchemaNode | JsonError;

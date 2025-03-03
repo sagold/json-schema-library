@@ -1,11 +1,11 @@
 import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
 
 export function parseNot(node: SchemaNode) {
-    const { draft, schema, spointer } = node;
+    const { schema, spointer } = node;
     if (schema.not == null) {
         return;
     }
-    node.not = node.compileSchema(draft, schema.not, `${spointer}/not`);
+    node.not = node.compileSchema(schema.not, `${spointer}/not`);
 }
 
 export function notValidator(node: SchemaNode): void {

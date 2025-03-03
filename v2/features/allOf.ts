@@ -6,7 +6,7 @@ export function parseAllOf(node: SchemaNode) {
     const { draft, schema, spointer } = node;
     if (Array.isArray(schema.allOf) && schema.allOf.length) {
         // @todo immediately compile if no resolvers are added
-        node.allOf = schema.allOf.map((s, index) => node.compileSchema(draft, s, `${spointer}/allOf/${index}`));
+        node.allOf = schema.allOf.map((s, index) => node.compileSchema(s, `${spointer}/allOf/${index}`));
         node.reducers.push(reduceAllOf);
     }
 }
@@ -21,7 +21,7 @@ function reduceAllOf({ node, data }: JsonSchemaReducerParams) {
         const schema = mergeSchema(node.allOf[i].schema, schemaNode.schema);
         mergedSchema = mergeSchema(mergedSchema, schema, "allOf");
     }
-    return node.compileSchema(node.draft, mergedSchema, `${node.spointer}/allOf`);
+    return node.compileSchema(mergedSchema, `${node.spointer}/allOf`);
 }
 
 export function allOfValidator(node: SchemaNode) {
