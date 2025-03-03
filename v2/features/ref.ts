@@ -1,24 +1,24 @@
 import { SchemaNode } from "../compiler/types";
-import joinScope from "./ref/joinScope";
+import { joinId } from "./ref/joinId";
 import { mergeSchema } from "../../lib/mergeSchema";
 import splitRef from "../../lib/compile/splitRef";
 
 export function parseRef(node: SchemaNode) {
     // get and store current scope of node - this may be the same as parent scope
     // if scope is not extended by current schema.$?id
-    const currentScope = joinScope(node.parent?.scope, node.schema?.$id);
-    node.scope = currentScope;
+    const currentId = joinId(node.parent?.$id, node.schema?.$id);
+    node.$id = currentId;
 
     // add ref resolution method to node
     node.resolveRef = resolveRef;
 
     // store this node for retrieval by $id
-    if (node.context.refs[currentScope] == null) {
-        node.context.refs[currentScope] = node;
+    if (node.context.refs[currentId] == null) {
+        node.context.refs[currentId] = node;
     }
 
     // store this node for retrieval by scope + json-pointer
-    node.context.refs[joinScope(currentScope, node.spointer)] = node;
+    node.context.refs[joinId(currentId, node.spointer)] = node;
 
     // @todo reevaluate and move to joinScope: if there is a nested $defs and this scope is new,
     // we need to make "#"-refs relative to this scope. In the following case we shift a pointer
@@ -28,16 +28,16 @@ export function parseRef(node: SchemaNode) {
         ? `#/$defs/${node.spointer.split("/$defs/").pop()}`
         : node.spointer;
     // console.log(node.spointer, "=>", localPointer);
-    node.context.refs[joinScope(currentScope, localPointer)] = node;
+    node.context.refs[joinId(currentId, localPointer)] = node;
 
     // store this node for retrieval by scope + anchor
     if (node.schema.$anchor) {
-        node.context.anchors[`${currentScope.replace(/#$/, "")}#${node.schema.$anchor}`] = node;
+        node.context.anchors[`${currentId.replace(/#$/, "")}#${node.schema.$anchor}`] = node;
     }
 
     // precompile reference
     if (node.schema.$ref) {
-        node.ref = joinScope(currentScope, node.schema.$ref);
+        node.ref = joinId(currentId, node.schema.$ref);
         // console.log("REF", currentScope, "+", node.schema.$ref, "=>", node.ref);
     }
 }

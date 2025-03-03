@@ -44,7 +44,7 @@ export type SchemaNode = {
     draft: Draft;
     parent?: SchemaNode | undefined;
     ref?: string;
-    scope?: string;
+    $id?: string;
     schema: JsonSchema;
     spointer: string;
     oneOfIndex?: number;
