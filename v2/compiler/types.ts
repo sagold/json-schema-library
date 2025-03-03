@@ -14,19 +14,22 @@ export type JsonSchemaValidator = (options: JsonSchemaValidatorParams) => JsonEr
 export type JsonSchemaDefaultDataResolverParams = { pointer?: string; data: unknown; node: SchemaNode };
 export type JsonSchemaDefaultDataResolver = (options: JsonSchemaDefaultDataResolverParams) => unknown;
 
-export type CompiledSchema = {
-    getSchema: () => JsonSchema | undefined;
-    next: (key: string | number) => CompiledSchema | undefined;
-    get: (key: string | number) => JsonSchema | JsonError | undefined;
-};
+// export type CompiledSchema = {
+//     getSchema: () => JsonSchema | undefined;
+//     next: (key: string | number) => CompiledSchema | undefined;
+//     get: (key: string | number) => JsonSchema | JsonError | undefined;
+// };
 
 export type Context = {
+    /** root node of this json-schema */
     rootNode: SchemaNode;
+    /** root nodes of registered remote json-schema */
     remotes: Record<string, SchemaNode>;
-    /** references stored by host + local-pointer */
+    /** references stored by fully resolves schema-$id + local-pointer */
     refs: Record<string, SchemaNode>;
-    /** references stored by scope-id */
+    /** references stored by fully resolved schema-$id */
     ids: Record<string, SchemaNode>;
+    /** anchors stored by fully resolved schema-$id + $anchor */
     anchors: Record<string, SchemaNode>;
 };
 
@@ -44,17 +47,25 @@ export type SchemaNode = {
     draft: Draft;
     parent?: SchemaNode | undefined;
     ref?: string;
-    $id?: string;
     schema: JsonSchema;
     spointer: string;
     oneOfIndex?: number;
     resolveRef: () => JsonSchema;
 
     // methods
+
+    /**
+     * Register a json-schema as a remote-schema to be resolved by $ref, $anchor, etc
+     * @returns the current node (not the remote schema-node)
+     */
     addRemote: (url: string, schema: JsonSchema) => SchemaNode;
+    /** Compiles a child-schema of this node to its context */
     compileSchema: (schema: JsonSchema, spointer?: string) => SchemaNode;
+    /** Step into a property or array by name or index and return the schema-node its value */
     get: (key: string | number, data?: unknown) => SchemaNode | JsonError;
+    /** Creates data that is valid to the schema of this node */
     getTemplate: (data?: unknown) => unknown;
+    /** Creates a new node with all dynamic schema properties merged according to the passed in data */
     reduce: ({ data, pointer }: { data: unknown; pointer?: string }) => SchemaNode | JsonError;
     toJSON: () => unknown;
     validate: (data: unknown, pointer?: string) => JsonError[];
@@ -65,22 +76,23 @@ export type SchemaNode = {
     resolvers: JsonSchemaResolver[];
     validators: JsonSchemaValidator[];
 
-    // parsed schema (should be registered by parsers...)
+    // parsed schema (registered by parsers...)
+    $defs?: Record<string, SchemaNode>;
+    $id?: string;
     additionalItems?: SchemaNode;
     additionalProperties?: SchemaNode;
-    dependentSchemas?: Record<string, SchemaNode | boolean>;
     allOf?: SchemaNode[];
     anyOf?: SchemaNode[];
     contains?: SchemaNode;
-    not?: SchemaNode;
+    dependentSchemas?: Record<string, SchemaNode | boolean>;
     else?: SchemaNode;
     if?: SchemaNode;
     itemsList?: SchemaNode[];
     itemsObject?: SchemaNode;
-    propertyNames?: SchemaNode;
+    not?: SchemaNode;
     oneOf?: SchemaNode[];
     patternProperties?: { pattern: RegExp; node: SchemaNode }[];
-    $defs?: Record<string, SchemaNode>;
     properties?: Record<string, SchemaNode>;
+    propertyNames?: SchemaNode;
     then?: SchemaNode;
 };
