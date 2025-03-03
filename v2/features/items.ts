@@ -13,7 +13,7 @@ function itemsObjectResolver({ node }: JsonSchemaResolverParams) {
 }
 
 export function parseItems(node: SchemaNode) {
-    const { draft, schema, spointer } = node;
+    const { schema, spointer } = node;
     if (isObject(schema.items)) {
         const propertyNode = node.compileSchema(schema.items, `${spointer}/items`);
         node.itemsObject = propertyNode;

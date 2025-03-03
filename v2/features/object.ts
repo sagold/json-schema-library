@@ -1,4 +1,3 @@
-import getTypeOf from "../../lib/getTypeOf";
 import { isObject } from "../../lib/utils/isObject";
 import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
 import { getValue } from "../utils/getValue";
@@ -18,25 +17,6 @@ export function getObjectData(node: SchemaNode) {
         });
     }
 }
-
-// export function typeObjectValidator({ schema, validators }: SchemaNode): void {
-//     if (schema.type !== "object" || (Array.isArray(schema.type) && !schema.type.includes("object"))) {
-//         return;
-//     }
-//     validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
-//         const dataType = getTypeOf(data);
-//         if (dataType !== "object") {
-//             // TypeError: "Expected `{{value}}` ({{received}}) in `{{pointer}}` to be of type `{{expected}}`",
-//             return node.draft.errors.typeError({
-//                 value: data,
-//                 received: dataType,
-//                 expected: "object",
-//                 schema,
-//                 pointer
-//             });
-//         }
-//     });
-// }
 
 export function maxPropertiesValidator({ schema, draft, validators }: SchemaNode): void {
     if (isNaN(schema.maxProperties)) {

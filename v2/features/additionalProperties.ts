@@ -6,7 +6,7 @@ import { getValue } from "../utils/getValue";
 
 // must come as last resolver
 export function parseAdditionalProperties(node: SchemaNode) {
-    const { draft, schema, spointer } = node;
+    const { schema, spointer } = node;
     if (schema.additionalProperties === false) {
         return;
     }

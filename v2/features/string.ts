@@ -1,4 +1,3 @@
-import getTypeOf from "../../lib/getTypeOf";
 import ucs2decode from "../../lib/utils/punycode.ucs2decode";
 import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
 
@@ -9,25 +8,6 @@ export function getStringData(node: SchemaNode) {
         });
     }
 }
-
-// export function typeStringValidator({ schema, validators }: SchemaNode): void {
-//     if (schema.type !== "string" || (Array.isArray(schema.type) && !schema.type.includes("string"))) {
-//         return;
-//     }
-//     validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
-//         const dataType = getTypeOf(data);
-//         if (dataType !== "string") {
-//             // TypeError: "Expected `{{value}}` ({{received}}) in `{{pointer}}` to be of type `{{expected}}`",
-//             return node.draft.errors.typeError({
-//                 value: data,
-//                 received: dataType,
-//                 expected: "string",
-//                 schema,
-//                 pointer
-//             });
-//         }
-//     });
-// }
 
 export function maxLengthValidator({ schema, draft, validators }: SchemaNode): void {
     if (isNaN(schema.maxLength)) {

@@ -5,7 +5,7 @@ import { getValue } from "../utils/getValue";
 
 // must come as last resolver
 export function parseAdditionalItems(node: SchemaNode) {
-    const { draft, schema, spointer } = node;
+    const { schema, spointer } = node;
     if (schema.additionalItems === false) {
         // no additional items - no resolver required
         return;

@@ -9,7 +9,7 @@ function patternPropertyResolver({ node, key }: JsonSchemaResolverParams) {
 }
 
 export function parsePatternProperties(node: SchemaNode) {
-    const { draft, schema } = node;
+    const { schema } = node;
     if (!isObject(schema.patternProperties)) {
         return;
     }
@@ -36,7 +36,7 @@ export function patternPropertiesValidator({ schema, validators }: SchemaNode) {
         if (!isObject(data)) {
             return;
         }
-        const { draft, schema } = node;
+        const { draft, schema, patternProperties } = node;
         const properties = schema.properties || {};
         const pp = schema.patternProperties;
 
@@ -47,8 +47,8 @@ export function patternPropertiesValidator({ schema, validators }: SchemaNode) {
             let patternFound = false;
             const itemData = getValue(data, key);
 
-            for (let i = 0, l = node.patternProperties.length; i < l; i += 1) {
-                const { pattern, node: childNode } = node.patternProperties[i];
+            for (let i = 0, l = patternProperties.length; i < l; i += 1) {
+                const { pattern, node: childNode } = patternProperties[i];
 
                 if (pattern.test(key)) {
                     patternFound = true;

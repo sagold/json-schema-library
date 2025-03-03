@@ -15,6 +15,8 @@ import { globSync } from "glob";
 import { SchemaNode } from "../../../v2/compiler/types";
 
 const supportedTestCases = (t: FeatureTest) =>
+    // t.optional === false &&
+    // !["recursiveRef", "defs", "unevaluatedItems", "unevaluatedProperties", "vocabulary"].includes(t.name);
     [
         "anchor",
         "additionalItems",
@@ -60,8 +62,6 @@ const supportedTestCases = (t: FeatureTest) =>
         "unknownKeyword",
         "type"
     ].includes(t.name);
-
-const draftFeatureTests = getDraftTests("2019-09").filter(supportedTestCases);
 
 /*
 ✓ allOf
@@ -206,7 +206,9 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
 
 export default function runAllTestCases(skipTest: string[] = []) {
     describe("draft2019", () => {
-        draftFeatureTests.forEach((testCase) => runTestCase(testCase, skipTest));
+        getDraftTests("2019-09")
+            .filter(supportedTestCases)
+            .forEach((testCase) => runTestCase(testCase, skipTest));
     });
 }
 

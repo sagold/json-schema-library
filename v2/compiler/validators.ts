@@ -6,18 +6,11 @@ import { additionalPropertiesValidator } from "../features/additionalProperties"
 import { typeValidator } from "../features/type";
 import { itemsValidator } from "../features/items";
 import { additionalItemsValidator } from "../features/additionalItems";
-import { maxItemsValidator, minItemsValidator } from "../features/array";
 import { containsValidator } from "../features/contains";
 import { requiredValidator } from "../features/required";
 import { validateOneOf } from "../features/oneOf";
 import { constValidator } from "../features/const";
-import {
-    exclusiveMaximumValidator,
-    exclusiveMinimumValidator,
-    maximumValidator,
-    minimumValidator,
-    multipleOfValidator
-} from "../features/number";
+import { exclusiveMinimumValidator } from "../features/exclusiveMinimum";
 import { patternPropertiesValidator } from "../features/patternProperties";
 import { uniqueItemsValidator } from "../features/uniqueItems";
 import { enumValidator } from "../features/enum";
@@ -30,6 +23,12 @@ import { patternValidator } from "../features/pattern";
 import { propertyNamesValidator } from "../features/propertyNames";
 import { dependentRequiredValidator } from "../features/dependentRequired";
 import { dependentSchemasValidator } from "../features/dependentSchemas";
+import { maximumValidator } from "../features/maximum";
+import { minimumValidator } from "../features/minimum";
+import { multipleOfValidator } from "../features/multipleOf";
+import { exclusiveMaximumValidator } from "../features/exclusiveMaximum";
+import { maxItemsValidator } from "../features/maxItems";
+import { minItemsValidator } from "../features/minItems";
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalItemsValidator,
@@ -41,6 +40,7 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     dependentRequiredValidator,
     dependentSchemasValidator,
     enumValidator,
+    exclusiveMinimumValidator,
     formatValidator,
     exclusiveMaximumValidator,
     exclusiveMinimumValidator,
