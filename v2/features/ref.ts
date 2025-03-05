@@ -1,4 +1,4 @@
-import { SchemaNode } from "../compiler/types";
+import { SchemaNode, ValidationPath } from "../compiler/types";
 import { joinId } from "./ref/joinId";
 import { mergeSchema } from "../../lib/mergeSchema";
 import splitRef from "../../lib/compile/splitRef";
@@ -40,8 +40,49 @@ export function parseRef(node: SchemaNode) {
     }
 }
 
-export function resolveRef() {
-    const node = this as SchemaNode;
+// 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
+function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode {
+    const history = path;
+
+    // RESTRICT BY CHANGE IN BASE-URL
+    let startIndex = 0;
+    for (let i = history.length - 1; i >= 0; i--) {
+        const { node } = history[i];
+        if (node.$id && /^https?:\/\//.test(node.$id) && node.schema.$recursiveAnchor !== true) {
+            startIndex = i;
+            break;
+        }
+    }
+    // FROM THERE FIND FIRST OCCURENCE OF ANCHOR
+    const firstAnchor = history.find((s, index) => index >= startIndex && s.node.schema.$recursiveAnchor === true);
+    if (firstAnchor) {
+        // console.log("return anchor node", node.schema);
+        return firstAnchor.node;
+    }
+    // THEN RETURN LATEST BASE AS TARGET
+    for (let i = history.length - 1; i >= 0; i--) {
+        const { node } = history[i];
+        if (node.schema.$id) {
+            // console.log("return node", node.schema);
+            return node;
+        }
+    }
+    // OR RETURN ROOT
+    // console.log("return root node");
+    return node.context.rootNode;
+}
+
+export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
+    let node = this as SchemaNode;
+    if (node.schema.$recursiveRef) {
+        node = resolveRecursiveRef(node, path);
+        // if (node == null) {
+        //     return getRef(node, joinId(node.$id, node.schema.$recursiveRef));
+        // }
+        // return getRef(node);
+        console.log("recursive ref => ", node.schema);
+        // return nextNode?.resolveRef({ pointer, path });
+    }
     if (node.ref == null) {
         return node;
     }
@@ -52,7 +93,12 @@ export function resolveRef() {
     // @draft >= 2019-09 we now merge schemas: in draft <= 7 $ref is treated as reference, not as schema
     // @important @todo we need to remove any $id here to prevent readding this $id to next $id
     const nextSchema = mergeSchema(resolvedNode.schema, node.schema, "$ref", "definitions", "$defs", "$id");
-    return resolvedNode.compileSchema(nextSchema, node.spointer);
+    const nextNode = resolvedNode.compileSchema(nextSchema, node.spointer);
+    path?.push({
+        pointer,
+        node: nextNode
+    });
+    return nextNode;
 }
 
 export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode | undefined {
@@ -93,10 +139,23 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
         if (node.context.remotes[$remoteHostRef] && node !== node.context.remotes[$remoteHostRef]) {
             const nextRootNode = node.context.remotes[$remoteHostRef];
             // resolve full ref on remote schema - we store currently only store ref with domain
-            return getRef(nextRootNode, $ref);
+            const nextNode = getRef(nextRootNode, $ref);
+            if (nextNode) {
+                return nextNode;
+            }
         }
+
         // @previously: check if fragments[1] is within nextRootNode
+
+        // @todo this is a poc
         // @previously: check if $remoteHostRef is in current node-context
+        const $localRef = fragments[0];
+        if (node.context.refs[$localRef]) {
+            const nextNode = node.context.refs[$localRef];
+            const property = fragments[1].split("$defs/").pop();
+            return getRef(nextNode?.$defs?.[property]);
+        }
+
         return undefined;
     }
 

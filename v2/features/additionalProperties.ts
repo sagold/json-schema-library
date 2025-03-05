@@ -43,7 +43,7 @@ export function additionalPropertiesValidator({ schema, validators }: SchemaNode
 
     // note: additionalProperties already parsed
     // note: properties, etc already tested
-    validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
+    validators.push(({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) => {
         if (!isObject(data)) {
             return;
         }
@@ -81,7 +81,7 @@ export function additionalPropertiesValidator({ schema, validators }: SchemaNode
             const propertyValue = getValue(data, property);
             if (expectedProperties.indexOf(property) === -1) {
                 if (isObject(node.additionalProperties)) {
-                    const additionalNode = node.additionalProperties.reduce({ data: propertyValue });
+                    const additionalNode = node.additionalProperties.reduce({ data: propertyValue, path });
                     if (isJsonError(additionalNode)) {
                         errors.push(
                             draft.errors.additionalPropertiesError({
@@ -95,7 +95,7 @@ export function additionalPropertiesValidator({ schema, validators }: SchemaNode
                             })
                         );
                     } else {
-                        const validationErrors = additionalNode.validate(propertyValue);
+                        const validationErrors = additionalNode.validate(propertyValue, pointer, path);
                         errors.push(...validationErrors);
                     }
                 } else {

@@ -10,16 +10,18 @@ function urlEncodeJsonPointerProperty(property: string) {
 
 export function parseDefs(node: SchemaNode) {
     if (node.schema.$defs) {
+        node.$defs = node.$defs ?? {};
         Object.keys(node.schema.$defs).forEach((property) => {
-            node.compileSchema(
+            node.$defs[property] = node.compileSchema(
                 node.schema.$defs[property],
                 `${node.spointer}/$defs/${urlEncodeJsonPointerProperty(property)}`
             );
         });
     }
     if (node.schema.definitions) {
+        node.$defs = node.$defs ?? {};
         Object.keys(node.schema.definitions).forEach((property) => {
-            node.compileSchema(
+            node.$defs[property] = node.compileSchema(
                 node.schema.definitions[property],
                 `${node.spointer}/definitions/${urlEncodeJsonPointerProperty(property)}`
             );

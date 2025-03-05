@@ -78,9 +78,9 @@ const NODE_METHODS: Pick<
         > merge all schema with source schema
         > compile schema (again) with partialy schema
     */
-    reduce({ data, pointer }: JsonSchemaReducerParams) {
+    reduce({ data, pointer, path }: JsonSchemaReducerParams) {
         // @path
-        const node = { ...this.resolveRef() } as SchemaNode;
+        const node = { ...this.resolveRef({ pointer, path }) } as SchemaNode;
         const reducers = node.reducers;
 
         // @ts-expect-error bool schema
@@ -89,7 +89,12 @@ const NODE_METHODS: Pick<
 
             // @ts-expect-error bool schema
         } else if (node.schema === true) {
-            return node.compileSchema(createSchemaOf(data), node.spointer);
+            const nextNode = node.compileSchema(createSchemaOf(data), node.spointer);
+            path.push({
+                pointer,
+                node
+            });
+            return nextNode;
         }
 
         let schema;
@@ -110,17 +115,28 @@ const NODE_METHODS: Pick<
             // recompile to update newly added schema defintions
             schema = mergeSchema(node.schema, schema, "if", "then", "else", "allOf", "anyOf", "oneOf");
             // console.log("reduced schema", schema);
-            return node.compileSchema(schema, this.spointer);
+            const nextNode = node.compileSchema(schema, this.spointer);
+            path?.push({
+                pointer,
+                node
+            });
+            return nextNode;
         }
 
         // remove dynamic properties of node
         return { ...node, schema: omit(node.schema, "if", "then", "else", "allOf", "anyOf", "oneOf"), reducers: [] };
     },
 
-    validate(data: unknown, pointer = "#") {
+    validate(data: unknown, pointer = "#", path = []) {
         // before running validation, we need to resolve ref and recompile for any
         // newly resolved schema properties - but this should be done for refs, etc only
-        const node = this.resolveRef() as SchemaNode;
+        path.push({
+            pointer,
+            node: this as SchemaNode
+        });
+
+        const node = this.resolveRef({ pointer, path }) as SchemaNode;
+
         if (node == undefined) {
             console.log("refs", Object.keys(this.context.refs), "remotes", Object.keys(this.context.remotes));
             throw new Error(`Failed resolving ref: ${this.ref}`);
@@ -143,7 +159,7 @@ const NODE_METHODS: Pick<
         }
 
         for (const validate of node.validators) {
-            const result = validate({ node, data, pointer: "#" });
+            const result = validate({ node, data, pointer: "#", path });
             if (Array.isArray(result)) {
                 errors.push(...result);
             } else if (result) {

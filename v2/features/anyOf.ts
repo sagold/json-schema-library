@@ -27,9 +27,9 @@ export function anyOfValidator(node: SchemaNode) {
     if (node.anyOf == null || node.anyOf.length === 0) {
         return;
     }
-    node.validators.push(({ node, data, pointer }) => {
+    node.validators.push(({ node, data, pointer, path }) => {
         for (let i = 0; i < node.anyOf.length; i += 1) {
-            if (node.anyOf[i].validate(data, pointer).length === 0) {
+            if (node.anyOf[i].validate(data, pointer, path).length === 0) {
                 return undefined;
             }
         }

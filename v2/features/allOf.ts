@@ -28,13 +28,13 @@ export function allOfValidator(node: SchemaNode) {
     if (node.allOf == null) {
         return;
     }
-    node.validators.push(({ node, data, pointer }) => {
+    node.validators.push(({ node, data, pointer, path }) => {
         if (!Array.isArray(node.allOf) || node.allOf.length === 0) {
             return;
         }
         const errors: JsonError[] = [];
         node.allOf.forEach((allOfNode) => {
-            errors.push(...allOfNode.validate(data, pointer));
+            errors.push(...allOfNode.validate(data, pointer, path));
         });
         return errors;
     });

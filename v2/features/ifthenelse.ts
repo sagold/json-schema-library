@@ -39,15 +39,15 @@ export function ifThenElseValidator(node: SchemaNode) {
     if (node.if == null) {
         return;
     }
-    node.validators.push(({ node, data, pointer }) => {
-        if (node.if.validate(data, pointer).length === 0) {
+    node.validators.push(({ node, data, pointer, path }) => {
+        if (node.if.validate(data, pointer, path).length === 0) {
             // console.log("if true");
             if (node.then) {
-                return node.then.validate(data, pointer);
+                return node.then.validate(data, pointer, path);
             }
         } else if (node.else) {
             // console.log("if false");
-            return node.else.validate(data, pointer);
+            return node.else.validate(data, pointer, path);
         }
         // console.log("fail through ifthenelse", node.if != null, node.then != null, node.else != null);
     });

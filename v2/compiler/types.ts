@@ -2,13 +2,13 @@ import { Draft } from "../../lib/draft";
 import { JsonError, JsonSchema } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
 
-export type JsonSchemaReducerParams = { data: unknown; node: SchemaNode; pointer?: string };
+export type JsonSchemaReducerParams = { data: unknown; node: SchemaNode; pointer?: string; path?: ValidationPath };
 export type JsonSchemaReducer = (options: JsonSchemaReducerParams) => SchemaNode | JsonError | undefined;
 
 export type JsonSchemaResolverParams = { key: string | number; data: unknown; node: SchemaNode };
 export type JsonSchemaResolver = (options: JsonSchemaResolverParams) => SchemaNode | JsonError | undefined;
 
-export type JsonSchemaValidatorParams = { pointer?: string; data: unknown; node: SchemaNode };
+export type JsonSchemaValidatorParams = { pointer?: string; data: unknown; node: SchemaNode; path?: ValidationPath };
 export type JsonSchemaValidator = (options: JsonSchemaValidatorParams) => JsonError | JsonError[] | undefined;
 
 export type JsonSchemaDefaultDataResolverParams = { pointer?: string; data: unknown; node: SchemaNode };
@@ -42,6 +42,11 @@ export function isSchemaNode(value: unknown): value is SchemaNode {
     );
 }
 
+export type ValidationPath = {
+    pointer: string;
+    node: SchemaNode;
+}[];
+
 export type SchemaNode = {
     context: Context;
     draft: Draft;
@@ -50,10 +55,10 @@ export type SchemaNode = {
     schema: JsonSchema;
     spointer: string;
     oneOfIndex?: number;
-    resolveRef: () => JsonSchema;
 
     // methods
 
+    resolveRef: (args?: { pointer?: string; path?: ValidationPath }) => JsonSchema;
     /**
      * Register a json-schema as a remote-schema to be resolved by $ref, $anchor, etc
      * @returns the current node (not the remote schema-node)
@@ -66,9 +71,17 @@ export type SchemaNode = {
     /** Creates data that is valid to the schema of this node */
     getTemplate: (data?: unknown) => unknown;
     /** Creates a new node with all dynamic schema properties merged according to the passed in data */
-    reduce: ({ data, pointer }: { data: unknown; pointer?: string }) => SchemaNode | JsonError;
+    reduce: ({
+        data,
+        pointer,
+        path
+    }: {
+        data: unknown;
+        pointer?: string;
+        path?: ValidationPath;
+    }) => SchemaNode | JsonError;
     toJSON: () => unknown;
-    validate: (data: unknown, pointer?: string) => JsonError[];
+    validate: (data: unknown, pointer?: string, path?: ValidationPath) => JsonError[];
 
     // logic
     getDefaultData: JsonSchemaDefaultDataResolver[];
