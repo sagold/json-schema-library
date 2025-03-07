@@ -18,6 +18,7 @@ const supportedTestCases = (t: FeatureTest) =>
     // t.optional === false &&
     // !["recursiveRef", "defs", "unevaluatedItems", "unevaluatedProperties", "vocabulary"].includes(t.name);
     [
+        "defs",
         "additionalItems",
         "additionalProperties",
         "allOf",
@@ -65,11 +66,11 @@ const supportedTestCases = (t: FeatureTest) =>
     ].includes(t.name);
 
 /*
-✓ allOf
-✓ anchor
 ~ not - expect for uncle-schema support
 ✓ additionalItems
 ✓ additionalProperties
+✓ allOf
+✓ anchor
 ✓ anyOf
 ✓ boolean_schema
 ✓ const
@@ -98,18 +99,17 @@ const supportedTestCases = (t: FeatureTest) =>
 ✓ oneOf
 ✓ pattern
 ✓ patternProperties
-✓ propertyNames
 ✓ properties
+✓ propertyNames
+✓ recursiveRef
 ✓ ref
 ✓ refRemote
 ✓ required
 ✓ type
 ✓ uniqueItems
 ✓ unknownKeyword
+✓ defs
 
-
-✖ recursiveRef
-✖ defs - requires recursiveRef
 ✖ unevaluatedItems - expect for uncle-schema and recursiveRef support
 ✖ unevaluatedProperties - expect for uncle-schema and recursiveRef support
 ✖ vocabulary - skipped evaluation of meta-schema

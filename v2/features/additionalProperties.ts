@@ -1,5 +1,5 @@
 import settings from "../../lib/config/settings";
-import { isJsonError, JsonError } from "../../lib/types";
+import { JsonError } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
 import { JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
 import { getValue } from "../utils/getValue";
@@ -81,24 +81,9 @@ export function additionalPropertiesValidator({ schema, validators }: SchemaNode
             const propertyValue = getValue(data, property);
             if (expectedProperties.indexOf(property) === -1) {
                 if (isObject(node.additionalProperties)) {
-                    // const additionalNode = node.additionalProperties.reduce({ data: propertyValue, path });
-                    const additionalNode = node.additionalProperties;
-                    if (isJsonError(additionalNode)) {
-                        errors.push(
-                            draft.errors.additionalPropertiesError({
-                                pointer,
-                                schema: schema.additionalProperties,
-                                value: propertyValue,
-                                property,
-                                properties: expectedProperties,
-                                // pass all validation errors
-                                errors: additionalNode.data.errors
-                            })
-                        );
-                    } else {
-                        const validationErrors = additionalNode.validate(propertyValue, pointer, path);
-                        errors.push(...validationErrors);
-                    }
+                    const validationErrors = node.additionalProperties.validate(propertyValue, pointer, path);
+                    // @note: we pass through specific errors here
+                    errors.push(...validationErrors);
                 } else {
                     errors.push(
                         draft.errors.noAdditionalPropertiesError({

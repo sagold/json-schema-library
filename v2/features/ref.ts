@@ -50,7 +50,7 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     let startIndex = 0;
     for (let i = history.length - 1; i >= 0; i--) {
         if (history[i].node.schema.$recursiveAnchor === false) {
-            console.log("resolve for anchor === false", joinId(node.$id, node.schema.$recursiveRef));
+            // $recursiveRef with $recursiveAnchor: false works like $ref
             return getRef(node, joinId(node.$id, node.schema.$recursiveRef));
         }
         if (/^https?:\/\//.test(history[i].node.schema.$id ?? "") && history[i].node.schema.$recursiveAnchor !== true) {
@@ -63,15 +63,20 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     if (firstAnchor) {
         return firstAnchor.node;
     }
-    // THEN RETURN LATEST BASE AS TARGET
-    for (let i = history.length - 1; i >= 0; i--) {
-        const { node } = history[i];
-        if (node.schema.$id) {
-            return node;
-        }
-    }
-    // OR RETURN ROOT
-    return node.context.rootNode;
+
+    // $recursiveRef with no $recursiveAnchor works like $ref?
+    return getRef(node, joinId(node.$id, node.schema.$recursiveRef));
+
+    // // THEN RETURN LATEST BASE AS TARGET
+    // for (let i = history.length - 1; i >= 0; i--) {
+    //     const { node } = history[i];
+    //     if (node.schema.$id) {
+    //         return node;
+    //     }
+    // }
+
+    // // OR RETURN ROOT
+    // return node.context.rootNode;
 }
 
 export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
