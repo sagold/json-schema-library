@@ -81,7 +81,8 @@ export function additionalPropertiesValidator({ schema, validators }: SchemaNode
             const propertyValue = getValue(data, property);
             if (expectedProperties.indexOf(property) === -1) {
                 if (isObject(node.additionalProperties)) {
-                    const additionalNode = node.additionalProperties.reduce({ data: propertyValue, path });
+                    // const additionalNode = node.additionalProperties.reduce({ data: propertyValue, path });
+                    const additionalNode = node.additionalProperties;
                     if (isJsonError(additionalNode)) {
                         errors.push(
                             draft.errors.additionalPropertiesError({

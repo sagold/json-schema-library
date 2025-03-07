@@ -120,12 +120,43 @@ export function validateOneOf({ schema, validators }: SchemaNode): void {
     if (!Array.isArray(schema.oneOf) || !schema.oneOf.length) {
         return;
     }
-    validators.push(({ node, data, pointer, path }: JsonSchemaValidatorParams) => {
-        if (!node.oneOf) {
+    validators.push(({ node, data, pointer = "#", path }) => {
+        const { draft, oneOf } = node;
+        if (!oneOf) {
             return;
         }
-        // we reduce to a single schema, if this fails (none or multiple found) we return error
-        const reducedNode = node.reduce({ data, pointer, path });
-        return isJsonError(reducedNode) ? reducedNode : undefined;
+        const matches = [];
+        const errors = [];
+        for (let i = 0; i < oneOf.length; i += 1) {
+            const validationResult = oneOf[i].validate(data, pointer, path);
+            if (validationResult.length > 0) {
+                errors.push(...validationResult);
+            } else {
+                matches.push({ index: i, node: oneOf[i] });
+            }
+        }
+
+        if (matches.length === 1) {
+            const { node, index } = matches[0];
+            node.oneOfIndex = index; // @evaluation-info
+            return undefined;
+        }
+
+        if (matches.length > 1) {
+            return draft.errors.multipleOneOfError({
+                value: data,
+                pointer,
+                schema,
+                matches
+            });
+        }
+
+        return draft.errors.oneOfError({
+            value: JSON.stringify(data),
+            pointer,
+            schema,
+            oneOf: schema.oneOf,
+            errors
+        });
     });
 }
