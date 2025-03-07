@@ -45,43 +45,41 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     const history = path;
 
     // RESTRICT BY CHANGE IN BASE-URL
+    // go back in history until we have a domain definition and use this as start node
+    // to search for an anchor
     let startIndex = 0;
     for (let i = history.length - 1; i >= 0; i--) {
-        const { node } = history[i];
-        if (node.$id && /^https?:\/\//.test(node.$id) && node.schema.$recursiveAnchor !== true) {
+        if (history[i].node.schema.$recursiveAnchor === false) {
+            console.log("resolve for anchor === false", joinId(node.$id, node.schema.$recursiveRef));
+            return getRef(node, joinId(node.$id, node.schema.$recursiveRef));
+        }
+        if (/^https?:\/\//.test(history[i].node.schema.$id ?? "") && history[i].node.schema.$recursiveAnchor !== true) {
             startIndex = i;
             break;
         }
     }
-    // FROM THERE FIND FIRST OCCURENCE OF ANCHOR
+    // FROM THERE FIND FIRST OCCURENCE OF AN ANCHOR
     const firstAnchor = history.find((s, index) => index >= startIndex && s.node.schema.$recursiveAnchor === true);
     if (firstAnchor) {
-        // console.log("return anchor node", node.schema);
         return firstAnchor.node;
     }
     // THEN RETURN LATEST BASE AS TARGET
     for (let i = history.length - 1; i >= 0; i--) {
         const { node } = history[i];
         if (node.schema.$id) {
-            // console.log("return node", node.schema);
             return node;
         }
     }
     // OR RETURN ROOT
-    // console.log("return root node");
     return node.context.rootNode;
 }
 
 export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
     let node = this as SchemaNode;
+    // console.log("resolve", node.ref, node.schema.$recursiveRef, node.schema);
     if (node.schema.$recursiveRef) {
-        node = resolveRecursiveRef(node, path);
-        // if (node == null) {
-        //     return getRef(node, joinId(node.$id, node.schema.$recursiveRef));
-        // }
-        // return getRef(node);
-        console.log("recursive ref => ", node.schema);
-        // return nextNode?.resolveRef({ pointer, path });
+        const nextNode = resolveRecursiveRef(node, path);
+        node = nextNode;
     }
     if (node.ref == null) {
         return node;

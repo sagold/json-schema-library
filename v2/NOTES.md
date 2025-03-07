@@ -1,0 +1,8 @@
+-   do not use reduce in validation, this messes up recursive resolution
+-   since we currently do not use get in validation, spec does not test this. This also means we have duplicate logic for the same functionality
+-   all functionality is (probably) based on:
+    -- validate
+    -- reduce (uses validate)
+    -- getTemplate (uses reduce)
+    -- getSchema (uses validate and reduce) and
+    -- the node-tree

@@ -90,10 +90,7 @@ const NODE_METHODS: Pick<
             // @ts-expect-error bool schema
         } else if (node.schema === true) {
             const nextNode = node.compileSchema(createSchemaOf(data), node.spointer);
-            path.push({
-                pointer,
-                node
-            });
+            path?.push({ pointer, node });
             return nextNode;
         }
 
@@ -104,9 +101,8 @@ const NODE_METHODS: Pick<
                 return result;
             }
             if (result) {
-                // compilation result for data of current schema
-                // in order to merge results, we rebuild node from schema
-                // alternatively we would need to merge by node-property
+                // compilation result for data of current schemain order to merge results, we rebuild
+                // node from schema alternatively we would need to merge by node-property
                 schema = mergeSchema(schema ?? {}, result.schema);
             }
         }
@@ -114,12 +110,8 @@ const NODE_METHODS: Pick<
         if (schema) {
             // recompile to update newly added schema defintions
             schema = mergeSchema(node.schema, schema, "if", "then", "else", "allOf", "anyOf", "oneOf");
-            // console.log("reduced schema", schema);
             const nextNode = node.compileSchema(schema, this.spointer);
-            path?.push({
-                pointer,
-                node
-            });
+            path?.push({ pointer, node });
             return nextNode;
         }
 
@@ -135,10 +127,14 @@ const NODE_METHODS: Pick<
             node: this as SchemaNode
         });
 
+        // console.log("validate", data, this.schema);
         const node = this.resolveRef({ pointer, path }) as SchemaNode;
+        // if (node !== this) {
+        //     console.log("resolved node to", node.schema);
+        // }
 
         if (node == undefined) {
-            console.log("refs", Object.keys(this.context.refs), "remotes", Object.keys(this.context.remotes));
+            // console.log("refs", Object.keys(this.context.refs), "remotes", Object.keys(this.context.remotes));
             throw new Error(`Failed resolving ref: ${this.ref}`);
         }
 
@@ -166,7 +162,7 @@ const NODE_METHODS: Pick<
                 errors.push(result);
             }
         }
-
+        // console.log("ERRORS", errors);
         return sanitizeErrors(errors);
     },
 

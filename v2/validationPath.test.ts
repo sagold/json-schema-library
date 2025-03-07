@@ -8,7 +8,7 @@ describe("validate - path", () => {
     let draft: Draft;
     beforeEach(() => (draft = new Draft2019()));
 
-    it.only("should should resolve both if-then-else and allOf schema", () => {
+    it("should should resolve both if-then-else and allOf schema", () => {
         const node = compileSchema(draft, {
             type: "object",
             properties: { withHeader: { type: "boolean" } },
