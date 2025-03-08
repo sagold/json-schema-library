@@ -58,7 +58,7 @@ export type SchemaNode = {
 
     // methods
 
-    resolveRef: (args?: { pointer?: string; path?: ValidationPath }) => JsonSchema;
+    resolveRef: (args?: { pointer?: string; path?: ValidationPath }) => SchemaNode;
     /**
      * Register a json-schema as a remote-schema to be resolved by $ref, $anchor, etc
      * @returns the current node (not the remote schema-node)

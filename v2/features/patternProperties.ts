@@ -1,6 +1,13 @@
-import { JsonError } from "../../lib/types";
+import { mergeSchema } from "../../lib/mergeSchema";
+import { JsonError, JsonSchema } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
-import { JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import merge from "../../lib/utils/merge";
+import {
+    JsonSchemaReducerParams,
+    JsonSchemaResolverParams,
+    JsonSchemaValidatorParams,
+    SchemaNode
+} from "../compiler/types";
 import { getValue } from "../utils/getValue";
 
 patternPropertyResolver.toJSON = () => "patternPropertyResolver";
@@ -25,6 +32,39 @@ export function parsePatternProperties(node: SchemaNode) {
         })
     );
     node.resolvers.push(patternPropertyResolver);
+    node.reducers.push(reducePatternProperties);
+}
+
+reducePatternProperties.toJSON = () => "reducePatternProperties";
+function reducePatternProperties({ node, data }: JsonSchemaReducerParams) {
+    if (!isObject(data)) {
+        return;
+    }
+    const { patternProperties } = node;
+    let mergedSchema: JsonSchema;
+    Object.keys(data).forEach((propertyName) => {
+        // build schema of property
+        let patternFound = false;
+        let propertySchema = node.schema.properties?.[propertyName] ?? {};
+        for (let i = 0, l = patternProperties.length; i < l; i += 1) {
+            const { pattern } = patternProperties[i];
+            if (pattern.test(propertyName)) {
+                patternFound = true;
+                propertySchema = mergeSchema(propertySchema, node.schema);
+            }
+        }
+        if (patternFound) {
+            mergedSchema = mergedSchema ?? { properties: {} };
+            mergedSchema.properties[propertyName] = propertySchema;
+        }
+    });
+
+    if (mergedSchema == null) {
+        return node;
+    }
+
+    mergedSchema = mergeSchema(node.schema, mergedSchema, "patternProperties");
+    return node.compileSchema(mergedSchema, node.spointer);
 }
 
 export function patternPropertiesValidator({ schema, validators }: SchemaNode) {
