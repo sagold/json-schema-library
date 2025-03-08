@@ -1,5 +1,4 @@
-import { isJsonError } from "../../lib/types";
-import { JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaReducerParams, SchemaNode } from "../compiler/types";
 // import { JsonValidator } from "../../lib/validation/type";
 // import { SchemaNode } from "../../lib/schemaNode";
 // const { DECLARATOR_ONEOF, EXPOSE_ONE_OF_INDEX } = settings;
@@ -15,7 +14,6 @@ export function parseOneOf(node: SchemaNode) {
 
 reduceOneOf.toJSON = () => "reduceOneOf";
 function reduceOneOf({ node, data, pointer }: JsonSchemaReducerParams) {
-    const { schema, draft } = node;
     // !keyword: oneOfProperty
     // an additional <DECLARATOR_ONEOF> (default `oneOfProperty`) on the schema will exactly determine the
     // oneOf value (if set in data)
@@ -78,42 +76,23 @@ function reduceOneOf({ node, data, pointer }: JsonSchemaReducerParams) {
     // }
 
     const matches = [];
-    const errors = [];
     for (let i = 0; i < node.oneOf.length; i += 1) {
-        const oneOfNode = node.oneOf[i].reduce({ data, pointer });
-        if (isJsonError(oneOfNode)) {
-            return oneOfNode;
-        }
-        const validationResult = oneOfNode.validate(data);
-        if (validationResult.length > 0) {
-            errors.push(...validationResult);
-        } else {
-            matches.push({ index: i, node: oneOfNode });
+        if (node.oneOf[i].validate(data).length === 0) {
+            matches.push({ index: i, node: node.oneOf[i] });
         }
     }
 
     if (matches.length === 1) {
         const { node, index } = matches[0];
         node.oneOfIndex = index; // @evaluation-info
-        return node;
+        const reducedNode = node.reduce({ data, pointer });
+        // console.log("reduce ONEOF success", reducedNode.schema);
+        return reducedNode;
     }
 
-    if (matches.length > 1) {
-        return draft.errors.multipleOneOfError({
-            value: data,
-            pointer,
-            schema,
-            matches
-        });
-    }
-
-    return draft.errors.oneOfError({
-        value: JSON.stringify(data),
-        pointer,
-        schema,
-        oneOf: schema.oneOf,
-        errors
-    });
+    // console.log("reduce ONEOF false - matches", matches.length);
+    // @ts-expect-error boolean schema;
+    return node.compileSchema(false, node.spointer);
 }
 
 export function validateOneOf({ schema, validators }: SchemaNode): void {

@@ -2,7 +2,6 @@ import { strict as assert } from "assert";
 import { Draft2019 } from "../../lib/draft2019";
 import { Draft } from "../../lib/draft";
 import { compileSchema } from "../compileSchema";
-import { isJsonError } from "../../lib/types";
 import { isSchemaNode } from "../compiler/types";
 
 describe("feature : oneOf : reduce", () => {
