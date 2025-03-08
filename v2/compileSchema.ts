@@ -101,14 +101,26 @@ const NODE_METHODS: Pick<
                 return result;
             }
             if (result) {
-                // compilation result for data of current schemain order to merge results, we rebuild
-                // node from schema alternatively we would need to merge by node-property
-                schema = mergeSchema(schema ?? {}, result.schema);
+                // @ts-expect-error bool schema - for undefined & false schema return false schema
+                if ((schema || result.schema) === false) {
+                    schema = false;
+                } else {
+                    // compilation result for data of current schemain order to merge results, we rebuild
+                    // node from schema alternatively we would need to merge by node-property
+                    // @ts-expect-error bool schema
+                    schema = mergeSchema(schema ?? {}, result.schema);
+                }
             }
+        }
+
+        if (schema === false) {
+            // @ts-expect-error bool schema
+            return { ...node, schema: false, reducers: [] } as SchemaNode;
         }
 
         if (schema) {
             // recompile to update newly added schema defintions
+            // @ts-expect-error bool schema
             schema = mergeSchema(node.schema, schema, "if", "then", "else", "allOf", "anyOf", "oneOf");
             const nextNode = node.compileSchema(schema, this.spointer);
             path?.push({ pointer, node });
