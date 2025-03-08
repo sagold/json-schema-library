@@ -119,21 +119,10 @@ const supportedTestCases = (t: FeatureTest) =>
 */
 
 const postponedTestcases = [
-    // @todo when recursiveRef is implemented
-    "unevaluatedProperties with $recursiveRef",
-    "unevaluatedItems with $recursiveRef",
     // @vocabulary
     // @todo evaluate support by meta-schema
     // we need to evaluate meta-schema for supported validation methods we currently do not have the logic for this
     "schema that uses custom metaschema with with no validation vocabulary", // vocabulary
-    "remote ref, containing refs itself", // ref
-    "ref creates new scope when adjacent to keywords", // ref
-    // @todo support uncle-schema
-    // https://stackoverflow.com/questions/66936884/deeply-nested-unevaluatedproperties-and-their-expectations
-    // this tests expects knowledge of a parent-allOf statement we currently do not have the logic for this
-    "property is evaluated in an uncle schema to unevaluatedProperties", // unevaluatedProperties
-    "item is evaluated in an uncle schema to unevaluatedItems", // unevaluatedItems
-    "collect annotations inside a 'not', even if collection is disabled", // not
     // unevaluatedItems - test merges ref over local schema but it should be the other way around
     "unevaluatedItems with $ref", // unevaluatedItems
     "unevaluatedItems before $ref" // unevaluatedItems
