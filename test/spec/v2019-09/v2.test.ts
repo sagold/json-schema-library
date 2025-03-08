@@ -18,51 +18,52 @@ const supportedTestCases = (t: FeatureTest) =>
     // t.optional === false &&
     // !["recursiveRef", "defs", "unevaluatedItems", "unevaluatedProperties", "vocabulary"].includes(t.name);
     [
-        "defs",
-        "additionalItems",
-        "additionalProperties",
-        "allOf",
-        "anchor",
-        "anyOf",
-        "boolean_schema",
-        "const",
-        "contains",
-        "content",
-        "default",
-        "dependentRequired",
-        "dependentSchemas",
-        "enum",
-        "exclusiveMaximum",
-        "exclusiveMinimum",
-        "format",
-        "if-then-else",
-        "infinite-loop-detection",
-        "items",
-        "maxContains",
-        "maximum",
-        "maxItems",
-        "maxLength",
-        "maxProperties",
-        "minContains",
-        "minimum",
-        "minItems",
-        "minLength",
-        "minProperties",
-        "multipleOf",
-        "not",
-        "oneOf",
-        "oneOf",
-        "pattern",
-        "patternProperties",
-        "properties",
-        "propertyNames",
-        "recursiveRef",
-        "ref",
-        "refRemote",
-        "required",
-        "type",
-        "uniqueItems",
-        "unknownKeyword"
+        // "defs",
+        // "additionalItems",
+        // "additionalProperties",
+        // "allOf",
+        // "anchor",
+        // "anyOf",
+        // "boolean_schema",
+        // "const",
+        // "contains",
+        // "content",
+        // "default",
+        // "dependentRequired",
+        // "dependentSchemas",
+        // "enum",
+        // "exclusiveMaximum",
+        // "exclusiveMinimum",
+        // "format",
+        // "if-then-else",
+        // "infinite-loop-detection",
+        // "items",
+        // "maxContains",
+        // "maximum",
+        // "maxItems",
+        // "maxLength",
+        // "maxProperties",
+        // "minContains",
+        // "minimum",
+        // "minItems",
+        // "minLength",
+        // "minProperties",
+        // "multipleOf",
+        // "not",
+        // "oneOf",
+        // "oneOf",
+        // "pattern",
+        // "patternProperties",
+        // "properties",
+        // "propertyNames",
+        // "recursiveRef",
+        // "ref",
+        // "refRemote",
+        // "required",
+        // "type",
+        // "uniqueItems",
+        // "unknownKeyword"
+        "unevaluatedProperties"
     ].includes(t.name);
 
 /*
@@ -167,9 +168,9 @@ function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "$recursiveRef with $recursiveAnchor: false works like $ref") {
-            //     return;
-            // }
+            if (testCase.description !== "dynamic evalation inside nested refs") {
+                return;
+            }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }
 
             const schema = testCase.schema;

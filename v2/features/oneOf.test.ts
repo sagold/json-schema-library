@@ -3,6 +3,7 @@ import { Draft2019 } from "../../lib/draft2019";
 import { Draft } from "../../lib/draft";
 import { compileSchema } from "../compileSchema";
 import { isJsonError } from "../../lib/types";
+import { isSchemaNode } from "../compiler/types";
 
 describe("feature : oneOf : reduce", () => {
     let draft: Draft;
@@ -20,7 +21,7 @@ describe("feature : oneOf : reduce", () => {
         // assert.equal(node.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
 
-    it("should return error if no matching schema could be found", () => {
+    it("should return boolean schema `false` if no matching schema could be found", () => {
         const node = compileSchema(draft, {
             oneOf: [
                 { type: "string", title: "A String" },
@@ -28,7 +29,38 @@ describe("feature : oneOf : reduce", () => {
             ]
         }).reduce({ data: {} });
 
-        assert(isJsonError(node));
+        assert(isSchemaNode(node));
+        assert.equal(node.schema, false);
+    });
+
+    it("should reduce nested oneOf objects using ref", () => {
+        const node = compileSchema(draft, {
+            $defs: {
+                withData: {
+                    oneOf: [{ required: ["b"], properties: { b: { type: "number" } } }]
+                }
+            },
+            oneOf: [{ required: ["a"], properties: { a: { type: "string" } } }, { $ref: "#/$defs/withData" }]
+        }).reduce({ data: { b: 111 } });
+
+        assert(isSchemaNode(node), "should have return schema-node");
+        delete node.schema.$defs;
+        assert.deepEqual(node.schema, { required: ["b"], properties: { b: { type: "number" } } });
+    });
+
+    it("should reduce nested oneOf boolean schema using ref", () => {
+        const node = compileSchema(draft, {
+            $defs: {
+                withData: {
+                    oneOf: [{ required: ["b"], properties: { b: true } }]
+                }
+            },
+            oneOf: [{ required: ["a"], properties: { a: false } }, { $ref: "#/$defs/withData" }]
+        }).reduce({ data: { b: 111 } });
+
+        assert(isSchemaNode(node), "should have return schema-node");
+        delete node.schema.$defs;
+        assert.deepEqual(node.schema, { required: ["b"], properties: { b: true } });
     });
 
     // v2

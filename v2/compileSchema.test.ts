@@ -90,6 +90,41 @@ describe("compiled object schema - get", () => {
     });
 });
 
+describe("compileSchema : spec/unevaluatedProperties", () => {
+    describe("dynamic evalation inside nested refs", () => {
+        let node: SchemaNode;
+        beforeEach(() => {
+            node = compileSchema(new Draft2019(), {
+                $schema: "https://json-schema.org/draft/2019-09/schema",
+                $defs: {
+                    one: {
+                        oneOf: [
+                            { $ref: "#/$defs/two" },
+                            { required: ["b"], properties: { b: true } },
+                            { required: ["xx"], patternProperties: { x: true } },
+                            { required: ["all"], unevaluatedProperties: true }
+                        ]
+                    },
+                    two: {
+                        oneOf: [
+                            { required: ["c"], properties: { c: true } },
+                            { required: ["d"], properties: { d: true } }
+                        ]
+                    }
+                },
+                oneOf: [{ $ref: "#/$defs/one" }, { required: ["a"], properties: { a: true } }],
+                unevaluatedProperties: false
+            });
+        });
+
+        it("should validate a", () => {
+            const errors = node.validate({ a: 1 });
+
+            assert(errors.length === 0);
+        });
+    });
+});
+
 describe("compileSchema : spec/recursiveRef", () => {
     let draft: Draft;
     beforeEach(() => (draft = new Draft2019()));

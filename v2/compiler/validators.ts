@@ -29,6 +29,7 @@ import { multipleOfValidator } from "../features/multipleOf";
 import { exclusiveMaximumValidator } from "../features/exclusiveMaximum";
 import { maxItemsValidator } from "../features/maxItems";
 import { minItemsValidator } from "../features/minItems";
+import { unevaluatedPropertiesValidator } from "../features/unevaluatedProperties";
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalItemsValidator,
@@ -63,6 +64,7 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     requiredValidator,
     validateOneOf,
     typeValidator,
+    unevaluatedPropertiesValidator,
     uniqueItemsValidator
 ].map((func) => {
     // @ts-expect-error extended function for debugging purposes

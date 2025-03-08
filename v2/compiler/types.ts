@@ -108,4 +108,5 @@ export type SchemaNode = {
     properties?: Record<string, SchemaNode>;
     propertyNames?: SchemaNode;
     then?: SchemaNode;
+    unevaluatedProperties?: SchemaNode;
 };
