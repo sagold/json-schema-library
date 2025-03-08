@@ -14,6 +14,7 @@ import { parseAnyOf } from "../features/anyOf";
 import { parseDefs } from "../features/defs";
 import { parseUnevaluatedProperties } from "../features/unevaluatedProperties";
 import { parseDependentSchemas } from "../features/dependentSchemas";
+import { parseUnevaluatedItems } from "../features/unevaluatedItems";
 
 export const PARSER: ((node: SchemaNode) => void)[] = [
     parseRef, // @attention has to come before compiling any other node
@@ -28,6 +29,7 @@ export const PARSER: ((node: SchemaNode) => void)[] = [
     parseNot,
     parseOneOf,
     parseItems,
+    parseUnevaluatedItems,
     parseUnevaluatedProperties,
     parseAdditionalProperties, // @attention has to come after other object-property parser
     parseAdditionalItems // @attention has to come after other object-property parser

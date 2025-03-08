@@ -6,3 +6,5 @@
     -- getTemplate (uses reduce)
     -- getSchema (uses validate and reduce) and
     -- the node-tree
+-   reduce schema currently resolves to schema false if there is an error. This is required in unevaluatedProperties are returning an error is probably the right behaviour for reduce (@see v1 reduceSchema). So, add unevaluatedProperties without reduce?
+-   unevalutatedItems spec test merge order is different as defined (local is overriden by reference schema, but should be the other way)

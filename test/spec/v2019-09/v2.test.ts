@@ -63,12 +63,14 @@ const supportedTestCases = (t: FeatureTest) =>
         "type",
         "uniqueItems",
         "unknownKeyword",
+        "unevaluatedItems",
         "unevaluatedProperties"
     ].includes(t.name);
 
 /*
 ~ not - expect for uncle-schema support
 ~ unevaluatedProperties - expect for uncle-schema and recursiveRef support
+~ unevaluatedItems - expect for ref-merge order, uncle-schema and recursiveRef support
 ✓ additionalItems
 ✓ additionalProperties
 ✓ allOf
@@ -79,6 +81,7 @@ const supportedTestCases = (t: FeatureTest) =>
 ✓ contains
 ✓ content
 ✓ default
+✓ defs
 ✓ dependentRequired
 ✓ enum
 ✓ exclusiveMaximum
@@ -110,9 +113,8 @@ const supportedTestCases = (t: FeatureTest) =>
 ✓ type
 ✓ uniqueItems
 ✓ unknownKeyword
-✓ defs
 
-✖ unevaluatedItems - expect for uncle-schema and recursiveRef support
+
 ✖ vocabulary - skipped evaluation of meta-schema
 */
 
@@ -131,7 +133,10 @@ const postponedTestcases = [
     // this tests expects knowledge of a parent-allOf statement we currently do not have the logic for this
     "property is evaluated in an uncle schema to unevaluatedProperties", // unevaluatedProperties
     "item is evaluated in an uncle schema to unevaluatedItems", // unevaluatedItems
-    "collect annotations inside a 'not', even if collection is disabled" // not
+    "collect annotations inside a 'not', even if collection is disabled", // not
+    // unevaluatedItems - test merges ref over local schema but it should be the other way around
+    "unevaluatedItems with $ref", // unevaluatedItems
+    "unevaluatedItems before $ref" // unevaluatedItems
 ];
 
 function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
@@ -168,7 +173,7 @@ function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "dynamic evalation inside nested refs") {
+            // if (testCase.description !== "unevaluatedItems with $ref") {
             //     return;
             // }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }

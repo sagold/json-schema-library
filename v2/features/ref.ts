@@ -94,6 +94,7 @@ export function resolveRef({ pointer, path }: { pointer?: string; path?: Validat
         return undefined;
     }
     // @draft >= 2019-09 we now merge schemas: in draft <= 7 $ref is treated as reference, not as schema
+    // the ref-schema is overriden by local schema
     // @important @todo we need to remove any $id here to prevent readding this $id to next $id
     const nextSchema = mergeSchema(resolvedNode.schema, node.schema, "$ref", "definitions", "$defs", "$id");
     const nextNode = resolvedNode.compileSchema(nextSchema, node.spointer);

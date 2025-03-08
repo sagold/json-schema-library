@@ -30,6 +30,7 @@ import { exclusiveMaximumValidator } from "../features/exclusiveMaximum";
 import { maxItemsValidator } from "../features/maxItems";
 import { minItemsValidator } from "../features/minItems";
 import { unevaluatedPropertiesValidator } from "../features/unevaluatedProperties";
+import { unevaluatedItemsValidator } from "../features/unevaluatedItems";
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalItemsValidator,
@@ -64,6 +65,7 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     requiredValidator,
     validateOneOf,
     typeValidator,
+    unevaluatedItemsValidator,
     unevaluatedPropertiesValidator,
     uniqueItemsValidator
 ].map((func) => {

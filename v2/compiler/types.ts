@@ -109,4 +109,5 @@ export type SchemaNode = {
     propertyNames?: SchemaNode;
     then?: SchemaNode;
     unevaluatedProperties?: SchemaNode;
+    unevaluatedItems?: SchemaNode;
 };
