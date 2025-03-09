@@ -11,9 +11,7 @@ import { getValue } from "../utils/getValue";
 
 patternPropertyResolver.toJSON = () => "patternPropertyResolver";
 function patternPropertyResolver({ node, key }: JsonSchemaResolverParams) {
-    const nextNode = node.patternProperties.find(({ pattern }) => pattern.test(`${key}`))?.node;
-    // console.log("pattern", key, "to", nextNode?.schema);
-    return nextNode;
+    return node.patternProperties.find(({ pattern }) => pattern.test(`${key}`))?.node;
 }
 
 export function parsePatternProperties(node: SchemaNode) {
@@ -45,16 +43,10 @@ function reducePatternProperties({ node, data }: JsonSchemaReducerParams) {
     let mergedSchema: JsonSchema;
     Object.keys(data).forEach((propertyName) => {
         // build schema of property
-        let patternFound = false;
         let propertySchema = node.schema.properties?.[propertyName] ?? {};
-        for (let i = 0, l = patternProperties.length; i < l; i += 1) {
-            const { pattern } = patternProperties[i];
-            if (pattern.test(propertyName)) {
-                patternFound = true;
-                propertySchema = mergeSchema(propertySchema, patternProperties[i].node.schema);
-            }
-        }
-        if (patternFound) {
+        const matchingPatterns = patternProperties.filter((property) => property.pattern.test(propertyName));
+        matchingPatterns.forEach((pp) => (propertySchema = mergeSchema(propertySchema, pp.node.schema)));
+        if (matchingPatterns.length > 0) {
             mergedSchema = mergedSchema ?? { properties: {} };
             mergedSchema.properties[propertyName] = propertySchema;
         }
@@ -79,38 +71,28 @@ export function patternPropertiesValidator({ schema, validators }: SchemaNode) {
         }
         const { draft, schema, patternProperties } = node;
         const properties = schema.properties || {};
-        const pp = schema.patternProperties;
-
+        const patterns = Object.keys(schema.patternProperties).join(",");
         const errors: JsonError[] = [];
         const keys = Object.keys(data);
 
         keys.forEach((key) => {
-            let patternFound = false;
-            const itemData = getValue(data, key);
-
-            for (let i = 0, l = patternProperties.length; i < l; i += 1) {
-                const { pattern, node: childNode } = patternProperties[i];
-
-                if (pattern.test(key)) {
-                    patternFound = true;
-                    const valErrors = childNode.validate(itemData, `${pointer}/${key}`);
-                    errors.push(...valErrors);
-                }
-            }
+            const value = getValue(data, key);
+            const matchingPatterns = patternProperties.filter((property) => property.pattern.test(key));
+            matchingPatterns.forEach(({ node }) => errors.push(...node.validate(value, `${pointer}/${key}`)));
 
             if (properties[key]) {
                 return;
             }
 
-            if (patternFound === false && schema.additionalProperties === false) {
+            if (matchingPatterns.length === 0 && schema.additionalProperties === false) {
                 // this is an arrangement with additionalProperties
                 errors.push(
                     draft.errors.noAdditionalPropertiesError({
                         key,
                         pointer: `${pointer}/${key}`,
                         schema,
-                        value: itemData,
-                        patterns: Object.keys(pp).join(",")
+                        value,
+                        patterns
                     })
                 );
             }

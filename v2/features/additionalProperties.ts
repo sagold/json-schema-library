@@ -53,12 +53,14 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
     }
 
     const { draft, schema } = node;
+    if (isObject(schema.patternProperties) && schema.additionalProperties === false) {
+        // this is an arrangement with patternProperties. patternProperties validate before additionalProperties:
+        // https://spacetelescope.github.io/understanding-json-schema/reference/object.html#index-5
+        return undefined;
+    }
 
-    // @todo are all checks necessary?
     const errors: JsonError[] = [];
     let receivedProperties = Object.keys(data).filter((prop) => settings.propertyBlacklist.includes(prop) === false);
-    const expectedProperties = node.properties ? Object.keys(node.properties) : [];
-
     if (Array.isArray(node.patternProperties)) {
         // filter received properties by matching patternProperties
         receivedProperties = receivedProperties.filter((prop) => {
@@ -71,17 +73,12 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
         });
     }
 
-    if (isObject(schema.patternProperties) && schema.additionalProperties === false) {
-        // this is an arrangement with patternProperties. patternProperties validate before additionalProperties:
-        // https://spacetelescope.github.io/understanding-json-schema/reference/object.html#index-5
-        return undefined;
-    }
-
     // adds an error for each an unexpected property
-    for (let i = 0, l = receivedProperties.length; i < l; i += 1) {
-        const property = receivedProperties[i];
-        const propertyValue = getValue(data, property);
-        if (expectedProperties.indexOf(property) === -1) {
+    const expectedProperties = node.properties ? Object.keys(node.properties) : [];
+    receivedProperties
+        .filter((property) => expectedProperties.indexOf(property) === -1)
+        .forEach((property) => {
+            const propertyValue = getValue(data, property);
             if (isObject(node.additionalProperties)) {
                 const validationErrors = node.additionalProperties.validate(propertyValue, pointer, path);
                 // @note: we pass through specific errors here
@@ -92,13 +89,12 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
                         pointer,
                         schema,
                         value: data,
-                        property: receivedProperties[i],
+                        property,
                         properties: expectedProperties
                     })
                 );
             }
-        }
-    }
+        });
 
     return errors;
 }

@@ -41,10 +41,7 @@ export function propertyNamesValidator(node: SchemaNode): void {
 
         const errors: JsonError[] = [];
         const properties = Object.keys(data);
-        // const propertySchema: JsonSchema = { ...schema.propertyNames, type: "string" };
         properties.forEach((prop) => {
-            // const nextNode = node.next(propertySchema, prop);
-            // const validationResult = draft.validate(nextNode, prop);
             const validationResult = node.propertyNames.validate(prop);
             if (validationResult.length > 0) {
                 errors.push(

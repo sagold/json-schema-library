@@ -49,7 +49,7 @@ describe("compileSchema : get", () => {
     let draft: Draft;
     beforeEach(() => (draft = new Draft2019()));
 
-    describe.only("behaviour", () => {
+    describe("behaviour", () => {
         it("should return node of property", () => {
             const node = compileSchema(draft, {
                 type: "object",

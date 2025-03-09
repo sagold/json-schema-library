@@ -6,7 +6,6 @@ export function parseContains(node: SchemaNode) {
     if (schema.contains == null) {
         return;
     }
-    // @todo immediately compile if no resolvers are added
     node.contains = node.compileSchema(schema.contains, `${spointer}/contains`);
 }
 

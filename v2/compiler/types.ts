@@ -14,12 +14,6 @@ export type JsonSchemaValidator = (options: JsonSchemaValidatorParams) => JsonEr
 export type JsonSchemaDefaultDataResolverParams = { pointer?: string; data: unknown; node: SchemaNode };
 export type JsonSchemaDefaultDataResolver = (options: JsonSchemaDefaultDataResolverParams) => unknown;
 
-// export type CompiledSchema = {
-//     getSchema: () => JsonSchema | undefined;
-//     next: (key: string | number) => CompiledSchema | undefined;
-//     get: (key: string | number) => JsonSchema | JsonError | undefined;
-// };
-
 export type Context = {
     /** root node of this json-schema */
     rootNode: SchemaNode;
@@ -37,12 +31,7 @@ export type Context = {
 };
 
 export function isSchemaNode(value: unknown): value is SchemaNode {
-    return (
-        isObject(value) &&
-        Array.isArray(value?.reducers) &&
-        Array.isArray(value?.validators) &&
-        Array.isArray(value?.resolvers)
-    );
+    return isObject(value) && Array.isArray(value?.reducers) && Array.isArray(value?.resolvers);
 }
 
 export type ValidationPath = {

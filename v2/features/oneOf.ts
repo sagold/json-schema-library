@@ -1,12 +1,9 @@
 import { JsonSchemaReducerParams, SchemaNode } from "../compiler/types";
-// import { JsonValidator } from "../../lib/validation/type";
-// import { SchemaNode } from "../../lib/schemaNode";
 // const { DECLARATOR_ONEOF, EXPOSE_ONE_OF_INDEX } = settings;
 
 export function parseOneOf(node: SchemaNode) {
     const { schema, spointer } = node;
     if (Array.isArray(schema.oneOf) && schema.oneOf.length) {
-        // @todo immediately compile if no resolvers are added
         node.oneOf = schema.oneOf.map((s, index) => node.compileSchema(s, `${spointer}/oneOf/${index}`));
         node.reducers.push(reduceOneOf);
     }
@@ -90,12 +87,6 @@ function reduceOneOf({ node, data, pointer }: JsonSchemaReducerParams) {
         return reducedNode;
     }
 
-    // console.log(
-    //     "reduce ONEOF false",
-    //     data,
-    //     "matches:",
-    //     matches.map((v) => v.node.schema)
-    // );
     // @ts-expect-error boolean schema;
     return node.compileSchema(false, node.spointer);
 }

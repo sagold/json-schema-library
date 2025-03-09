@@ -157,7 +157,6 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
         }
 
         // @todo this is a poc
-        // @previously: check if $remoteHostRef is in current node-context
         const $localRef = fragments[0];
         if (node.context.refs[$localRef]) {
             const nextNode = node.context.refs[$localRef];
