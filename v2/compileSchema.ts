@@ -31,10 +31,6 @@ const NODE_METHODS: Pick<
             ...NODE_METHODS
         };
 
-        // @note - if we parse a dynamic schema, we skip certain properties that are note yet available
-        // e.g. { $ref: "#" } -> { additionalProperties: false }
-        // node.schema = node.resolveRef();
-
         node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
         node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
         node.context.DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
@@ -77,15 +73,6 @@ const NODE_METHODS: Pick<
         return defaultData;
     },
 
-    /*
-        node
-            - schema
-            - resolver
-        > resolver
-            > schemaNode (containing partial schema)
-        > merge all schema with source schema
-        > compile schema (again) with partialy schema
-    */
     reduce({ data, pointer, path }: JsonSchemaReducerParams) {
         // @path
         const resolvedNode = { ...this.resolveRef({ pointer, path }) } as SchemaNode;
@@ -266,6 +253,7 @@ export function compileSchema(draft: Draft, schema: JsonSchema) {
         DEFAULT_DATA
     };
 
+    node.context.remotes[schema.$id ?? "#"] = node;
     node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
     node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
     node.context.DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));

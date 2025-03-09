@@ -48,7 +48,7 @@ describe("feature : ref : resolve", () => {
         assert.deepEqual(node.schema, { type: "string", minLength: 1 });
     });
 
-    it("should resolve root pointer, merging schema", () => {
+    it("should resolve root pointer, not merging schema", () => {
         const _node = compileSchema(draft, {
             type: "object",
             minProperties: 1,
@@ -57,11 +57,12 @@ describe("feature : ref : resolve", () => {
             }
         }).get("header");
         assert(!isJsonError(_node));
+
         const node = _node.resolveRef();
 
         assert.deepEqual(node.schema, {
             type: "object",
-            minProperties: 2,
+            minProperties: 1,
             properties: {
                 header: { $ref: "#", minProperties: 2 }
             }
@@ -155,6 +156,8 @@ describe("feature : ref : resolve", () => {
             })
                 .addRemote("https://remoteA.schema", { $ref: "https://remoteB.schema#/$defs/header" })
                 .addRemote("https://remoteB.schema", { $defs: { header: { type: "object", minProperties: 1 } } })
+                .resolveRef()
+                .resolveRef()
                 .resolveRef();
 
             assert.deepEqual(node.schema, { type: "object", minProperties: 1 });
@@ -168,20 +171,22 @@ describe("feature : ref : resolve", () => {
                     $ref: "#/$defs/header",
                     $defs: { header: { type: "object", minProperties: 1 } }
                 })
+                .resolveRef()
                 .resolveRef();
 
             assert.deepEqual(node.schema, { type: "object", minProperties: 1 });
         });
 
-        it.skip("should resolve remote $ref to origin schema", () => {
+        it("should resolve remote $ref to origin schema", () => {
             const node = compileSchema(draft, {
-                $id: "https://root.schema/",
+                $id: "https://root.schema",
                 $ref: "https://remote.schema/",
                 $defs: { header: { type: "object", minProperties: 1 } }
             })
-                .addRemote("https://remote.schema/", {
+                .addRemote("https://remote.schema", {
                     $ref: "https://root.schema#/$defs/header"
                 })
+                .resolveRef()
                 .resolveRef();
 
             assert.deepEqual(node.schema, { type: "object", minProperties: 1 });

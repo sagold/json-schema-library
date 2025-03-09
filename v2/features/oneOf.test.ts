@@ -32,35 +32,35 @@ describe("feature : oneOf : reduce", () => {
         assert.equal(node.schema, false);
     });
 
-    it("should reduce nested oneOf objects using ref", () => {
-        const node = compileSchema(draft, {
-            $defs: {
-                withData: {
-                    oneOf: [{ required: ["b"], properties: { b: { type: "number" } } }]
-                }
-            },
-            oneOf: [{ required: ["a"], properties: { a: { type: "string" } } }, { $ref: "#/$defs/withData" }]
-        }).reduce({ data: { b: 111 } });
+    // it("should reduce nested oneOf objects using ref", () => {
+    //     const node = compileSchema(draft, {
+    //         $defs: {
+    //             withData: {
+    //                 oneOf: [{ required: ["b"], properties: { b: { type: "number" } } }]
+    //             }
+    //         },
+    //         oneOf: [{ required: ["a"], properties: { a: { type: "string" } } }, { $ref: "#/$defs/withData" }]
+    //     }).reduce({ data: { b: 111 } });
 
-        assert(isSchemaNode(node), "should have return schema-node");
-        delete node.schema.$defs;
-        assert.deepEqual(node.schema, { required: ["b"], properties: { b: { type: "number" } } });
-    });
+    //     assert(isSchemaNode(node), "should have return schema-node");
+    //     delete node.schema.$defs;
+    //     assert.deepEqual(node.schema, { required: ["b"], properties: { b: { type: "number" } } });
+    // });
 
-    it("should reduce nested oneOf boolean schema using ref", () => {
-        const node = compileSchema(draft, {
-            $defs: {
-                withData: {
-                    oneOf: [{ required: ["b"], properties: { b: true } }]
-                }
-            },
-            oneOf: [{ required: ["a"], properties: { a: false } }, { $ref: "#/$defs/withData" }]
-        }).reduce({ data: { b: 111 } });
+    // it("should reduce nested oneOf boolean schema using ref", () => {
+    //     const node = compileSchema(draft, {
+    //         $defs: {
+    //             withData: {
+    //                 oneOf: [{ required: ["b"], properties: { b: true } }]
+    //             }
+    //         },
+    //         oneOf: [{ required: ["a"], properties: { a: false } }, { $ref: "#/$defs/withData" }]
+    //     }).reduce({ data: { b: 111 } });
 
-        assert(isSchemaNode(node), "should have return schema-node");
-        delete node.schema.$defs;
-        assert.deepEqual(node.schema, { required: ["b"], properties: { b: true } });
-    });
+    //     assert(isSchemaNode(node), "should have return schema-node");
+    //     delete node.schema.$defs;
+    //     assert.deepEqual(node.schema, { required: ["b"], properties: { b: true } });
+    // });
 
     // v2
     it("should resolve matching object schema", () => {

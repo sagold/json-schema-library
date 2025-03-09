@@ -29,7 +29,7 @@ describe("feature : additionalProperties : get", () => {
         assert.deepEqual(schema, undefined);
     });
 
-    it("should create a schema if additionalProperties is true", () => {
+    it("should return undefined if additionalProperties is true", () => {
         const node = compileSchema(draft, {
             type: "object",
             additionalProperties: true
@@ -37,7 +37,7 @@ describe("feature : additionalProperties : get", () => {
 
         const schema = node.get("header", { header: "huhu" })?.schema;
 
-        assert.deepEqual(schema, { type: "string" });
+        assert.deepEqual(schema, undefined);
     });
 
     it("should apply additionalProperties from allOf", () => {
@@ -48,7 +48,7 @@ describe("feature : additionalProperties : get", () => {
 
         const schema = node.get("header", { header: "huhu" })?.schema;
 
-        assert.deepEqual(schema, { type: "string" });
+        assert.deepEqual(schema, undefined);
     });
 
     it("should override additionalProperties from allOf", () => {

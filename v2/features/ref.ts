@@ -3,50 +3,9 @@ import { joinId } from "./ref/joinId";
 import splitRef from "../../lib/compile/splitRef";
 import { omit } from "../../lib/utils/omit";
 import { isObject } from "../../lib/utils/isObject";
-import { JsonError } from "../../lib/types";
-
-export function refValidator({ schema, validators }: SchemaNode) {
-    if (schema.$ref == null && schema.$recursiveRef == null) {
-        return;
-    }
-    validators.push(({ node, data, pointer = "#", path }) => {
-        let currentNode = node;
-        let nextNode = node.resolveRef({ pointer, path });
-        if (nextNode == null) {
-            // @todo evaluate this state - should return node or ref is invalid (or bugged)
-            return;
-        }
-        // console.log(
-        //     "REF VALIDATOR: first resolved",
-        //     node.spointer,
-        //     `ref: ${node.ref}`,
-        //     "to",
-        //     nextNode.spointer,
-        //     nextNode.schema
-        // );
-        const errors: JsonError[] = [];
-
-        while (currentNode !== nextNode && currentNode.spointer !== nextNode?.spointer) {
-            // console.log(
-            //     "REF VALIDATOR: resolved to",
-            //     nextNode.spointer,
-            //     "ref: ",
-            //     nextNode.ref,
-            //     "=>",
-            //     nextNode.schema
-            // );
-            errors.push(...nextNode.validate(data, pointer, path));
-            currentNode = nextNode;
-            nextNode = nextNode.resolveRef({ pointer, path });
-        }
-        // console.log("REF VALIDATOR: currentNode", currentNode?.spointer, nextNode?.spointer);
-        return errors;
-    });
-}
 
 export function parseRef(node: SchemaNode) {
     // get and store current $id of node - this may be the same as parent $id
-    // if $id is not extended by current schema.$?id
     const currentId = joinId(node.parent?.$id, node.schema?.$id);
     node.$id = currentId;
 
@@ -81,19 +40,50 @@ export function parseRef(node: SchemaNode) {
     }
 }
 
+export function refValidator({ schema, validators }: SchemaNode) {
+    if (schema.$ref == null && schema.$recursiveRef == null) {
+        return;
+    }
+    validators.push(({ node, data, pointer = "#", path }) => {
+        const nextNode = node.resolveRef({ pointer, path });
+        if (nextNode == null) {
+            // @todo evaluate this state - should return node or ref is invalid (or bugged)
+            return undefined;
+        }
+        // recursively resolveRef and validate
+        return nextNode.validate(data, pointer, path);
+    });
+}
+
+export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
+    const node = this as SchemaNode;
+    if (node.schema.$recursiveRef) {
+        const nextNode = resolveRecursiveRef(node, path);
+        path?.push({ pointer, node: nextNode });
+        return nextNode;
+    }
+    if (node.ref == null) {
+        return node;
+    }
+    const resolvedNode = getRef(node);
+    // console.log("RESOLVE REF", node.schema, "resolved ref", node.ref, "=>", resolvedNode.schema);
+    if (resolvedNode != null) {
+        path?.push({ pointer, node: resolvedNode });
+    }
+    return resolvedNode;
+}
+
 // 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
 function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode {
     const history = path;
 
     // RESTRICT BY CHANGE IN BASE-URL
-    // go back in history until we have a domain definition and use this as start node
-    // to search for an anchor
+    // go back in history until we have a domain definition and use this as start node to search for an anchor
     let startIndex = 0;
     for (let i = history.length - 1; i >= 0; i--) {
         if (history[i].node.schema.$recursiveAnchor === false) {
             // $recursiveRef with $recursiveAnchor: false works like $ref
             const nextNode = getRef(node, joinId(node.$id, node.schema.$recursiveRef));
-            console.log("recursive ref resolution", nextNode.schema);
             return nextNode;
         }
         if (/^https?:\/\//.test(history[i].node.schema.$id ?? "") && history[i].node.schema.$recursiveAnchor !== true) {
@@ -105,68 +95,19 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     // FROM THERE FIND FIRST OCCURENCE OF AN ANCHOR
     const firstAnchor = history.find((s, index) => index >= startIndex && s.node.schema.$recursiveAnchor === true);
     if (firstAnchor) {
-        console.log("recursive resolved to", firstAnchor.node.schema);
         return firstAnchor.node;
     }
 
     // $recursiveRef with no $recursiveAnchor works like $ref?
     const nextNode = getRef(node, joinId(node.$id, node.schema.$recursiveRef));
-    console.log("recursive ref failed from", node?.schema, "to", nextNode.schema);
-    console.log(JSON.stringify(path, null, 2));
     return nextNode;
 }
 
-export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
-    const node = this as SchemaNode;
-    // console.log("resolve", node.ref, node.schema.$recursiveRef, node.schema);
-    if (node.schema.$recursiveRef) {
-        const nextNode = resolveRecursiveRef(node, path);
-        path?.push({
-            pointer,
-            node: nextNode
-        });
-        return nextNode;
-    }
-    if (node.ref == null) {
-        return node;
-    }
-    const resolvedNode = getRef(node);
-    if (resolvedNode == null) {
-        return undefined;
-    }
-
-    path?.push({
-        pointer,
-        node: resolvedNode
-    });
-
-    // @ts-expect-error bool schema
-    if (resolvedNode.schema === false || resolvedNode.schema === true) {
-        return resolvedNode;
-    }
-
-    // @draft >= 2019-09
-    // we now merge schemas: in draft <= 7 $ref is treated as reference, not as schema
-    // https://json-schema.org/draft/2019-09/release-notes:
-    // > "Other keywords are now allowed alongside of it"
-    // https://json-schema.org/draft/2019-09/json-schema-core#rfc.section.8.2.4:
-    // > "Its [$ref] results are the results of the referenced schema."
-
-    // @important @todo we need to remove any $id here to prevent readding this $id to next $id
-    // @todo replace this merge by recursively validating $ref
-    // const nextSchema = mergeSchema(node.schema, resolvedNode.schema, "$ref", "definitions", "$defs", "$id");
-    // const nextNode = resolvedNode.compileSchema(nextSchema, resolvedNode.spointer);
-    // const nextSchema = omit(resolvedNode.schema, "$ref", "definitions", "$defs", "$id");
-    // const nextNode = resolvedNode.compileSchema(nextSchema, resolvedNode.spointer);
-
-    return resolvedNode;
-}
-
-function compileNext(referencedNode: SchemaNode) {
+function compileNext(referencedNode: SchemaNode, spointer = referencedNode.spointer) {
     const referencedSchema = isObject(referencedNode.schema)
         ? omit(referencedNode.schema, "$id")
         : referencedNode.schema;
-    return referencedNode.compileSchema(referencedSchema, `${referencedNode.spointer}/$ref`);
+    return referencedNode.compileSchema(referencedSchema, `${spointer}/$ref`);
 }
 
 export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode | undefined {
@@ -176,16 +117,19 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
 
     // resolve $ref by json-spointer
     if (node.context.refs[$ref]) {
-        return compileNext(node.context.refs[$ref]);
+        // console.log(`ref resolve ${$ref} from refs`, node.context.refs[$ref].ref);
+        return compileNext(node.context.refs[$ref], node.spointer);
     }
 
     if (node.context.anchors[$ref]) {
-        return compileNext(node.context.anchors[$ref]);
+        // console.log(`ref resolve ${$ref} from anchors`, node.context.anchors[$ref].ref);
+        return compileNext(node.context.anchors[$ref], node.spointer);
     }
 
     // check for remote-host + pointer pair to switch rootSchema
     const fragments = splitRef($ref);
     if (fragments.length === 0) {
+        console.error("REF: INVALID", $ref);
         return undefined;
     }
 
@@ -194,9 +138,9 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
         const $ref = fragments[0];
         // this is a reference to remote-host root node
         if (node.context.remotes[$ref]) {
-            return compileNext(node.context.remotes[$ref]);
+            return compileNext(node.context.remotes[$ref], node.spointer);
         }
-        console.error("REF: UNFOUND", $ref);
+        console.error("REF: UNFOUND 1", $ref);
         return undefined;
     }
 
@@ -221,6 +165,9 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
             return getRef(nextNode?.$defs?.[property]);
         }
 
+        console.error("REF: UNFOUND 2", $ref);
         return undefined;
     }
+
+    console.error("REF: UNHANDLED", $ref);
 }
