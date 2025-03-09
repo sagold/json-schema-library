@@ -15,8 +15,7 @@ import { globSync } from "glob";
 import { SchemaNode } from "../../../v2/compiler/types";
 
 const supportedTestCases = (t: FeatureTest) =>
-    // t.optional === false &&
-    // !["recursiveRef", "defs", "unevaluatedItems", "unevaluatedProperties", "vocabulary"].includes(t.name);
+    // t.optional === false
     [
         "defs",
         "additionalItems",
@@ -114,7 +113,6 @@ const supportedTestCases = (t: FeatureTest) =>
 ✓ uniqueItems
 ✓ unknownKeyword
 
-
 ✖ vocabulary - skipped evaluation of meta-schema
 */
 
@@ -123,9 +121,11 @@ const postponedTestcases = [
     // @todo evaluate support by meta-schema
     // we need to evaluate meta-schema for supported validation methods we currently do not have the logic for this
     "schema that uses custom metaschema with with no validation vocabulary", // vocabulary
-    // unevaluatedItems - test merges ref over local schema but it should be the other way around
-    "unevaluatedItems with $ref", // unevaluatedItems
-    "unevaluatedItems before $ref" // unevaluatedItems
+    // @todo
+    "unevaluatedProperties with $recursiveRef",
+    "unevaluatedItems with $recursiveRef",
+    "ref creates new scope when adjacent to keywords",
+    "$ref with $recursiveAnchor"
 ];
 
 function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
@@ -162,7 +162,7 @@ function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "unevaluatedItems with $ref") {
+            // if (testCase.description !== "$ref to boolean schema false") {
             //     return;
             // }
             // if (testCase.description !== "remote ref, containing refs itself") { return; }

@@ -93,10 +93,21 @@ export function resolveRef({ pointer, path }: { pointer?: string; path?: Validat
     if (resolvedNode == null) {
         return undefined;
     }
-    // @draft >= 2019-09 we now merge schemas: in draft <= 7 $ref is treated as reference, not as schema
-    // the ref-schema is overriden by local schema
+
+    // @ts-expect-error bool schema
+    if (resolvedNode.schema === false) {
+        return resolvedNode;
+    }
+
+    // @draft >= 2019-09
+    // we now merge schemas: in draft <= 7 $ref is treated as reference, not as schema
+    // https://json-schema.org/draft/2019-09/release-notes:
+    // > "Other keywords are now allowed alongside of it"
+    // https://json-schema.org/draft/2019-09/json-schema-core#rfc.section.8.2.4:
+    // > "Its [$ref] results are the results of the referenced schema."
+
     // @important @todo we need to remove any $id here to prevent readding this $id to next $id
-    const nextSchema = mergeSchema(resolvedNode.schema, node.schema, "$ref", "definitions", "$defs", "$id");
+    const nextSchema = mergeSchema(node.schema, resolvedNode.schema, "$ref", "definitions", "$defs", "$id");
     const nextNode = resolvedNode.compileSchema(nextSchema, node.spointer);
     path?.push({
         pointer,
