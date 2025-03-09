@@ -2,7 +2,8 @@ import { compileSchema } from "./compileSchema";
 import { Draft } from "../lib/draft";
 import { Draft2019 } from "../lib/draft2019";
 import { strict as assert } from "assert";
-import { SchemaNode } from "./compiler/types";
+import { SchemaNode, isSchemaNode } from "./compiler/types";
+import { isJsonError } from "../lib/types";
 
 // - processing draft we need to know and support json-schema keywords
 // - Note: meta-schemas are defined flat, combining all properties per type
@@ -44,11 +45,62 @@ import { SchemaNode } from "./compiler/types";
 //     // - possibly optimize all this once for actual exection (compilation)
 // }
 
-describe("compiled object schema - get", () => {
+describe("compileSchema : get", () => {
     let draft: Draft;
     beforeEach(() => (draft = new Draft2019()));
 
-    it("should should resolve both if-then-else and allOf schema", () => {
+    describe.only("behaviour", () => {
+        it("should return node of property", () => {
+            const node = compileSchema(draft, {
+                type: "object",
+                properties: {
+                    title: { type: "string", minLength: 1 }
+                }
+            }).get("title", { title: "abc" });
+
+            assert(isSchemaNode(node), "should have returned a valid schema node");
+
+            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
+        });
+
+        it("should return node of property even it type differs", () => {
+            const node = compileSchema(draft, {
+                type: "object",
+                properties: {
+                    title: { type: "string", minLength: 1 }
+                }
+            }).get("title", { title: 123 });
+
+            assert(isSchemaNode(node), "should have returned a valid schema node");
+
+            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
+        });
+
+        it("should return undefined if property is not defined, but allowed", () => {
+            const node = compileSchema(draft, {
+                type: "object",
+                properties: {
+                    title: { type: "string", minLength: 1 }
+                }
+            }).get("body", { body: "abc" });
+
+            assert.deepEqual(node, undefined);
+        });
+
+        it("should return an error when the property is not allowed", () => {
+            const node = compileSchema(draft, {
+                type: "object",
+                properties: {
+                    title: { type: "string", minLength: 1 }
+                },
+                additionalProperties: false
+            }).get("body", { body: "abc" });
+
+            assert(isJsonError(node), "should have return an error");
+        });
+    });
+
+    it("should resolve both if-then-else and allOf schema", () => {
         const node = compileSchema(draft, {
             type: "object",
             if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
@@ -86,6 +138,70 @@ describe("compiled object schema - get", () => {
             const schema = node.get("title", { title: 4, test: 2 })?.schema;
 
             assert.deepEqual(schema, { type: "number", minLength: 2 });
+        });
+    });
+});
+
+describe("compileSchema : reduce", () => {
+    let draft: Draft;
+    beforeEach(() => (draft = new Draft2019()));
+
+    describe("behaviour", () => {});
+
+    it("should return schema for boolean schema true", () => {
+        // @ts-expect-error boolean schema still untyped
+        const node = compileSchema(draft, true);
+
+        const schema = node.reduce({ data: 123 })?.schema;
+
+        assert.deepEqual(schema, { type: "number" });
+    });
+
+    it("should compile schema with current data", () => {
+        const node = compileSchema(draft, {
+            type: "object",
+            if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
+            then: {
+                required: ["header"],
+                properties: { header: { type: "string", minLength: 1 } }
+            }
+        });
+
+        const dataNode = node.reduce({ data: { withHeader: true } });
+
+        assert.deepEqual(dataNode?.schema, {
+            type: "object",
+            required: ["header"],
+            properties: { header: { type: "string", minLength: 1 } }
+        });
+    });
+
+    it.skip("should recursively compile schema with current data", () => {
+        const node = compileSchema(draft, {
+            type: "object",
+            properties: {
+                article: {
+                    type: "object",
+                    if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
+                    then: {
+                        required: ["header"],
+                        properties: { header: { type: "string", minLength: 1 } }
+                    }
+                }
+            }
+        });
+
+        const dataNode = node.reduce({ data: { article: { withHeader: true } } });
+
+        assert.deepEqual(dataNode?.schema, {
+            type: "object",
+            properties: {
+                article: {
+                    type: "object",
+                    required: ["header"],
+                    properties: { header: { type: "string", minLength: 1 } }
+                }
+            }
         });
     });
 });
@@ -204,68 +320,6 @@ describe("compileSchema : spec/recursiveRef", () => {
         it("integer does not match as a property value", () => {
             const errors = node.validate({ foo: 1 });
             assert(errors.length > 0, "should have returned error for integer");
-        });
-    });
-});
-
-describe("compiled object schema - reduce", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
-    it("should return schema for boolean schema true", () => {
-        // @ts-expect-error boolean schema still untyped
-        const node = compileSchema(draft, true);
-
-        const schema = node.reduce({ data: 123 })?.schema;
-
-        assert.deepEqual(schema, { type: "number" });
-    });
-
-    it("should compile schema with current data", () => {
-        const node = compileSchema(draft, {
-            type: "object",
-            if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
-            then: {
-                required: ["header"],
-                properties: { header: { type: "string", minLength: 1 } }
-            }
-        });
-
-        const dataNode = node.reduce({ data: { withHeader: true } });
-
-        assert.deepEqual(dataNode?.schema, {
-            type: "object",
-            required: ["header"],
-            properties: { header: { type: "string", minLength: 1 } }
-        });
-    });
-
-    it.skip("should recursively compile schema with current data", () => {
-        const node = compileSchema(draft, {
-            type: "object",
-            properties: {
-                article: {
-                    type: "object",
-                    if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
-                    then: {
-                        required: ["header"],
-                        properties: { header: { type: "string", minLength: 1 } }
-                    }
-                }
-            }
-        });
-
-        const dataNode = node.reduce({ data: { article: { withHeader: true } } });
-
-        assert.deepEqual(dataNode?.schema, {
-            type: "object",
-            properties: {
-                article: {
-                    type: "object",
-                    required: ["header"],
-                    properties: { header: { type: "string", minLength: 1 } }
-                }
-            }
         });
     });
 });
