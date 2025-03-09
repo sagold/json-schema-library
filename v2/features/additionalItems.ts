@@ -10,7 +10,7 @@ export function parseAdditionalItems(node: SchemaNode) {
         // no additional items - no resolver required
         return;
     }
-    if (isObject(schema.additionalItems)) {
+    if (isObject(schema.additionalItems) || schema.additionalItems === true) {
         // precompile additional items schema
         node.additionalItems = node.compileSchema(schema.additionalItems, `${spointer}/additionalItems`);
     }
@@ -19,20 +19,29 @@ export function parseAdditionalItems(node: SchemaNode) {
 }
 
 additionalItemsResolver.toJSON = () => "additionalItemsResolver";
-function additionalItemsResolver({ node, data, key }: JsonSchemaResolverParams) {
+function additionalItemsResolver({ node, key, data }: JsonSchemaResolverParams) {
+    console.log("resolve additional");
     if (!Array.isArray(data)) {
+        console.log(data, "not an array");
         return;
     }
+
     // @attention: items, etc should already have been tried
     const value = getValue(data, key);
     if (node.additionalItems) {
+        console.log("addditional: reduce");
         return node.additionalItems.reduce({ data: value });
     }
-    const schema = node.draft.createSchemaOf(value);
-    // undefined does not create a schema
-    if (schema) {
-        const temporaryNode = node.compileSchema(schema, node.spointer);
-        return temporaryNode;
+
+    // @todo should we keep this to resolve unevaluatedItems validator?
+    // This solves the case where unevaluatedItems=true is nested in allOf
+    // @note this could be a json-schema-feature for custom getSchema method
+    if (node.schema.unevaluatedItems === true) {
+        const schema = node.draft.createSchemaOf(value);
+        if (schema) {
+            const temporaryNode = node.compileSchema(schema, node.spointer);
+            return temporaryNode;
+        }
     }
 }
 

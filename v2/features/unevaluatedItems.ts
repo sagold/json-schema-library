@@ -1,4 +1,4 @@
-import { isJsonError, JsonError } from "../../lib/types";
+import { JsonError } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
 import { isSchemaNode, JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
 import sanitizeErrors from "../utils/sanitizeErrors";
@@ -34,78 +34,52 @@ export function unevaluatedItemsValidator({ schema, validators }: SchemaNode): v
             return undefined;
         }
 
-        // resolve all dynamic schemas
-        const resolvedNode = node.reduce({ data, pointer });
-        if (isJsonError(resolvedNode)) {
-            return resolvedNode;
-        }
-
-        const resolvedSchema = resolvedNode.schema;
-        // console.log("unevaluatedItems", JSON.stringify(resolvedSchema, null, 2), value);
-        if (resolvedSchema.unevaluatedItems === true || resolvedSchema.additionalItems === true) {
+        if (node.schema.unevaluatedItems === true || node.schema.additionalItems === true) {
             return undefined;
         }
 
-        if (resolvedNode.if) {
-            if (resolvedNode.if.validate(data).length === 0) {
-                if (
-                    Array.isArray(resolvedNode.if.schema.items) &&
-                    resolvedNode.if.schema.items.length === data.length
-                ) {
-                    return undefined;
+        const validIf = node.if && node.if.validate(data).length === 0;
+        const errors: JsonError[] = [];
+        // "unevaluatedItems with nested items"
+        for (let i = 0; i < data.length; i += 1) {
+            const value = data[i];
+            const child = node.get(i, data);
+            if (isSchemaNode(child)) {
+                // when a single node is invalid
+                if (child.validate(value).length > 0) {
+                    // nothing should validate, so we validate unevaluated items only
+                    if (node.unevaluatedItems) {
+                        return sanitizeErrors(data.map((value, index) => node.unevaluatedItems.validate(value)));
+                    }
+                    if (node.schema.unevaluatedItems === false) {
+                        return draft.errors.unevaluatedItemsError({
+                            pointer: `${pointer}/${i}`,
+                            value: JSON.stringify(value),
+                            schema
+                        });
+                    }
                 }
             }
-            // need to test remaining items?
-        }
-
-        if (resolvedNode.itemsObject) {
-            const errors = sanitizeErrors(data.map((item) => resolvedNode.itemsObject.validate(item)));
-            return errors.map((e) => draft.errors.unevaluatedItemsError({ ...e.data }));
-        }
-
-        if (resolvedNode.itemsList) {
-            const items: { index: number; value: unknown }[] = [];
-            for (let i = resolvedNode.itemsList.length; i < data.length; i += 1) {
-                if (i < resolvedNode.itemsList.length) {
-                    if (resolvedNode.itemsList[i].validate(data[i]).length > 0) {
-                        items.push({ index: i, value: data[i] });
+            // "unevaluatedItems false"
+            if (child === undefined) {
+                if (validIf && node.if.itemsList && node.if.itemsList.length > i) {
+                    // evaluated by if -- skip
+                } else if (node.unevaluatedItems) {
+                    const result = node.unevaluatedItems.validate(value);
+                    if (result.length > 0) {
+                        errors.push(...result);
                     }
                 } else {
-                    items.push({ index: i, value: data[i] });
+                    errors.push(
+                        draft.errors.unevaluatedItemsError({
+                            pointer: `${pointer}/${i}`,
+                            value: JSON.stringify(value),
+                            schema
+                        })
+                    );
                 }
             }
-            return items.map((item) =>
-                draft.errors.unevaluatedItemsError({
-                    pointer: `${pointer}/${item.index}`,
-                    value: JSON.stringify(item.value),
-                    schema: resolvedSchema.unevaluatedItems
-                })
-            );
         }
-
-        if (isSchemaNode(resolvedNode.unevaluatedItems)) {
-            console.log("test all items if they are unevaluatedItems");
-            return data.map((item, index) => {
-                if (resolvedNode.unevaluatedItems.validate(item, `${pointer}/${index}`).length > 0) {
-                    return draft.errors.unevaluatedItemsError({
-                        pointer: `${pointer}/${index}`,
-                        value: JSON.stringify(item),
-                        schema: resolvedSchema.unevaluatedItems
-                    });
-                }
-            });
-        }
-
-        const errors: JsonError[] = [];
-        data.forEach((item, index) => {
-            errors.push(
-                draft.errors.unevaluatedItemsError({
-                    pointer: `${pointer}/${index}`,
-                    value: JSON.stringify(item),
-                    schema
-                })
-            );
-        });
 
         return errors;
     });

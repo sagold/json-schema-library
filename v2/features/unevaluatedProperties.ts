@@ -30,6 +30,8 @@ export function unevaluatedPropertiesValidator({ schema, validators }: SchemaNod
         }
 
         // @note: we do not iterate over reduced schema, so doing this within validate is ok
+        // @todo resolvedNode is not required here: spec test with nested unevaluatedProperties in allOf
+        // is true, basically evaluating all nodes @see "unevaluatedProperties with nested unevaluatedProperties"
         const resolvedNode = node.reduce({ data, pointer });
         if (isJsonError(resolvedNode)) {
             return resolvedNode;

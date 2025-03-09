@@ -22,12 +22,12 @@ function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParam
     if (node.additionalProperties) {
         return node.additionalProperties.reduce({ data: value });
     }
-    const schema = node.draft.createSchemaOf(value);
-    // undefined does not create a schema
-    if (schema) {
-        const temporaryNode = node.compileSchema(schema, node.spointer);
-        return temporaryNode;
-    }
+    // const schema = node.draft.createSchemaOf(value);
+    // // undefined does not create a schema
+    // if (schema) {
+    //     const temporaryNode = node.compileSchema(schema, node.spointer);
+    //     return temporaryNode;
+    // }
 }
 
 export function additionalPropertiesValidator({ schema, validators }: SchemaNode): void {
