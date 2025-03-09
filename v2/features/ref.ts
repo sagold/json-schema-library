@@ -3,6 +3,46 @@ import { joinId } from "./ref/joinId";
 import splitRef from "../../lib/compile/splitRef";
 import { omit } from "../../lib/utils/omit";
 import { isObject } from "../../lib/utils/isObject";
+import { JsonError } from "../../lib/types";
+
+export function refValidator({ schema, validators }: SchemaNode) {
+    if (schema.$ref == null && schema.$recursiveRef == null) {
+        return;
+    }
+    validators.push(({ node, data, pointer = "#", path }) => {
+        let currentNode = node;
+        let nextNode = node.resolveRef({ pointer, path });
+        if (nextNode == null) {
+            // @todo evaluate this state - should return node or ref is invalid (or bugged)
+            return;
+        }
+        // console.log(
+        //     "REF VALIDATOR: first resolved",
+        //     node.spointer,
+        //     `ref: ${node.ref}`,
+        //     "to",
+        //     nextNode.spointer,
+        //     nextNode.schema
+        // );
+        const errors: JsonError[] = [];
+
+        while (currentNode !== nextNode && currentNode.spointer !== nextNode?.spointer) {
+            // console.log(
+            //     "REF VALIDATOR: resolved to",
+            //     nextNode.spointer,
+            //     "ref: ",
+            //     nextNode.ref,
+            //     "=>",
+            //     nextNode.schema
+            // );
+            errors.push(...nextNode.validate(data, pointer, path));
+            currentNode = nextNode;
+            nextNode = nextNode.resolveRef({ pointer, path });
+        }
+        // console.log("REF VALIDATOR: currentNode", currentNode?.spointer, nextNode?.spointer);
+        return errors;
+    });
+}
 
 export function parseRef(node: SchemaNode) {
     // get and store current $id of node - this may be the same as parent $id

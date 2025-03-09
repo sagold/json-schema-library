@@ -121,9 +121,6 @@ const postponedTestcases = [
     // @todo evaluate support by meta-schema
     // we need to evaluate meta-schema for supported validation methods we currently do not have the logic for this
     "schema that uses custom metaschema with with no validation vocabulary" // vocabulary
-    // @todo tricky evaluation
-    // "unevaluatedProperties with $recursiveRef",
-    // "unevaluatedItems with $recursiveRef"
 ];
 
 function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
