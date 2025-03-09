@@ -22,7 +22,7 @@ export function unevaluatedItemsValidator({ schema, validators }: SchemaNode): v
     if (schema.unevaluatedItems == null) {
         return;
     }
-    validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
+    validators.push(({ node, data, pointer, path }: JsonSchemaValidatorParams) => {
         const { draft, schema } = node;
         // if not in items, and not matches additionalItems
         if (
@@ -38,19 +38,21 @@ export function unevaluatedItemsValidator({ schema, validators }: SchemaNode): v
             return undefined;
         }
 
-        const validIf = node.if != null && node.if.validate(data).length === 0;
+        const validIf = node.if != null && node.if.validate(data, pointer, path).length === 0;
         const errors: JsonError[] = [];
         // "unevaluatedItems with nested items"
         for (let i = 0; i < data.length; i += 1) {
             const value = data[i];
             const child = node.get(i, data);
-            console.log(i, value, "child:", child?.schema);
+
             if (isSchemaNode(child)) {
                 // when a single node is invalid
-                if (child.validate(value).length > 0) {
+                if (child.validate(value, `${pointer}/${i}`, path).length > 0) {
                     // nothing should validate, so we validate unevaluated items only
                     if (node.unevaluatedItems) {
-                        return sanitizeErrors(data.map((value, index) => node.unevaluatedItems.validate(value)));
+                        return sanitizeErrors(
+                            data.map((value, index) => node.unevaluatedItems.validate(value, `${pointer}/${i}`, path))
+                        );
                     }
                     if (node.schema.unevaluatedItems === false) {
                         return draft.errors.unevaluatedItemsError({
@@ -66,7 +68,7 @@ export function unevaluatedItemsValidator({ schema, validators }: SchemaNode): v
                 if (validIf && node.if.itemsList && node.if.itemsList.length > i) {
                     // evaluated by if -- skip
                 } else if (node.unevaluatedItems) {
-                    const result = node.unevaluatedItems.validate(value);
+                    const result = node.unevaluatedItems.validate(value, `${pointer}/${i}`, path);
                     if (result.length > 0) {
                         errors.push(...result);
                     }

@@ -12,7 +12,9 @@ import { getValue } from "../utils/getValue";
 
 patternPropertyResolver.toJSON = () => "patternPropertyResolver";
 function patternPropertyResolver({ node, key }: JsonSchemaResolverParams) {
-    return node.patternProperties.find(({ pattern }) => pattern.test(`${key}`))?.node;
+    const nextNode = node.patternProperties.find(({ pattern }) => pattern.test(`${key}`))?.node;
+    // console.log("pattern", key, "to", nextNode?.schema);
+    return nextNode;
 }
 
 export function parsePatternProperties(node: SchemaNode) {
@@ -50,7 +52,7 @@ function reducePatternProperties({ node, data }: JsonSchemaReducerParams) {
             const { pattern } = patternProperties[i];
             if (pattern.test(propertyName)) {
                 patternFound = true;
-                propertySchema = mergeSchema(propertySchema, node.schema);
+                propertySchema = mergeSchema(propertySchema, patternProperties[i].node.schema);
             }
         }
         if (patternFound) {

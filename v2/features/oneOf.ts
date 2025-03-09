@@ -86,11 +86,16 @@ function reduceOneOf({ node, data, pointer }: JsonSchemaReducerParams) {
         const { node, index } = matches[0];
         node.oneOfIndex = index; // @evaluation-info
         const reducedNode = node.reduce({ data, pointer });
-        // console.log("reduce ONEOF success", reducedNode.schema);
+        // console.log("reduce ONEOF success", data, reducedNode.schema);
         return reducedNode;
     }
 
-    // console.log("reduce ONEOF false - matches", matches.length);
+    // console.log(
+    //     "reduce ONEOF false",
+    //     data,
+    //     "matches:",
+    //     matches.map((v) => v.node.schema)
+    // );
     // @ts-expect-error boolean schema;
     return node.compileSchema(false, node.spointer);
 }

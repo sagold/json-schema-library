@@ -121,15 +121,9 @@ const postponedTestcases = [
     // @todo evaluate support by meta-schema
     // we need to evaluate meta-schema for supported validation methods we currently do not have the logic for this
     "schema that uses custom metaschema with with no validation vocabulary", // vocabulary
-    // @todo
+    // @todo tricky evaluation
     "unevaluatedProperties with $recursiveRef",
-    // unsure if test is correct, would also require schema to be evaluated before resolving $ref in order to identify unevaluatedItems
-    "unevaluatedItems with $recursiveRef",
-    "unevaluatedProperties before $ref",
-    "unevaluatedProperties with $ref",
-    // "unevaluatedItems with $recursiveRef",
-    "ref creates new scope when adjacent to keywords",
-    "$ref with $recursiveAnchor"
+    "unevaluatedItems with $recursiveRef"
 ];
 
 function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
@@ -166,7 +160,7 @@ function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "unevaluatedItems before $ref") {
+            // if (testCase.description !== "unevaluatedProperties before $ref") {
             //     return;
             // }
 

@@ -21,7 +21,7 @@ export function parseAdditionalItems(node: SchemaNode) {
 additionalItemsResolver.toJSON = () => "additionalItemsResolver";
 function additionalItemsResolver({ node, key, data }: JsonSchemaResolverParams) {
     if (!Array.isArray(data)) {
-        console.log(data, "not an array");
+        // console.log(data, "not an array");
         return;
     }
 

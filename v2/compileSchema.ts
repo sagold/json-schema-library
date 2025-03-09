@@ -47,6 +47,7 @@ const NODE_METHODS: Pick<
         if (node.reducers.length) {
             const result = node.reduce({ data });
             if (isJsonError(result)) {
+                // console.log("get", key, "error");
                 return result;
             }
             node = result;
@@ -55,13 +56,16 @@ const NODE_METHODS: Pick<
         for (const resolver of node.resolvers) {
             const schemaNode = resolver({ data, key, node });
             if (schemaNode) {
+                // console.log("get", key, resolver.name, schemaNode?.schema);
                 return schemaNode;
             }
         }
 
         const referencedNode = node.resolveRef({ path: [] });
         if (referencedNode !== node) {
-            return referencedNode.get(key, data);
+            const ref = referencedNode.get(key, data);
+            // console.log("get ref", key, ref?.schema);
+            return ref;
         }
     },
 
@@ -85,7 +89,10 @@ const NODE_METHODS: Pick<
     */
     reduce({ data, pointer, path }: JsonSchemaReducerParams) {
         // @path
-        const node = { ...this.resolveRef({ pointer, path }) } as SchemaNode;
+        const resolvedNode = { ...this.resolveRef({ pointer, path }) } as SchemaNode;
+        const resolvedSchema = mergeSchema(this.schema, resolvedNode?.schema);
+        const node = (this as SchemaNode).compileSchema(resolvedSchema, this.spointer);
+
         const reducers = node.reducers;
 
         // @ts-expect-error bool schema
@@ -162,8 +169,6 @@ const NODE_METHODS: Pick<
             ];
         }
 
-        // console.log(pointer, "validate", data, "by", node.spointer, ":", node.schema, "ref:", node.ref);
-
         for (const validate of node.validators) {
             const result = validate({ node, data, pointer: "#", path });
             if (Array.isArray(result)) {
@@ -173,7 +178,6 @@ const NODE_METHODS: Pick<
             }
         }
 
-        // console.log("ERRORS", errors);
         return sanitizeErrors(errors);
     },
 

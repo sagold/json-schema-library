@@ -6,7 +6,7 @@ import { isObject } from "../../lib/utils/isObject";
 
 propertyResolver.toJSON = () => "propertyResolver";
 function propertyResolver({ node, key }: JsonSchemaResolverParams) {
-    return node.properties[key];
+    return node.properties?.[key];
 }
 
 export function parseProperties(node: SchemaNode) {
