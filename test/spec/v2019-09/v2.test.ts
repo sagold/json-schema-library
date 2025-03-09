@@ -125,8 +125,6 @@ const postponedTestcases = [
     "unevaluatedProperties with $recursiveRef",
     // unsure if test is correct, would also require schema to be evaluated before resolving $ref in order to identify unevaluatedItems
     "unevaluatedItems with $recursiveRef",
-    "unevaluatedItems with $ref",
-    "unevaluatedItems before $ref",
     "unevaluatedProperties before $ref",
     "unevaluatedProperties with $ref",
     // "unevaluatedItems with $recursiveRef",
@@ -168,7 +166,7 @@ function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "base URI change - change folder") {
+            // if (testCase.description !== "unevaluatedItems before $ref") {
             //     return;
             // }
 

@@ -38,12 +38,13 @@ export function unevaluatedItemsValidator({ schema, validators }: SchemaNode): v
             return undefined;
         }
 
-        const validIf = node.if && node.if.validate(data).length === 0;
+        const validIf = node.if != null && node.if.validate(data).length === 0;
         const errors: JsonError[] = [];
         // "unevaluatedItems with nested items"
         for (let i = 0; i < data.length; i += 1) {
             const value = data[i];
             const child = node.get(i, data);
+            console.log(i, value, "child:", child?.schema);
             if (isSchemaNode(child)) {
                 // when a single node is invalid
                 if (child.validate(value).length > 0) {

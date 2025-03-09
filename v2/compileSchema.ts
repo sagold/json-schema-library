@@ -58,6 +58,11 @@ const NODE_METHODS: Pick<
                 return schemaNode;
             }
         }
+
+        const referencedNode = node.resolveRef({ path: [] });
+        if (referencedNode !== node) {
+            return referencedNode.get(key, data);
+        }
     },
 
     getTemplate(data?: unknown) {
