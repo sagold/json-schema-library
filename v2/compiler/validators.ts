@@ -1,7 +1,6 @@
 import { propertiesValidator } from "../features/properties";
 import { SchemaNode } from "./types";
 import { minLengthValidator, maxLengthValidator } from "../features/string";
-import { maxPropertiesValidator, minPropertiesValidator } from "../features/object";
 import { additionalPropertiesValidator } from "../features/additionalProperties";
 import { typeValidator } from "../features/type";
 import { itemsValidator } from "../features/items";
@@ -31,6 +30,8 @@ import { maxItemsValidator } from "../features/maxItems";
 import { minItemsValidator } from "../features/minItems";
 import { unevaluatedPropertiesValidator } from "../features/unevaluatedProperties";
 import { unevaluatedItemsValidator } from "../features/unevaluatedItems";
+import { maxPropertiesValidator } from "../features/maxProperties";
+import { minPropertiesValidator } from "../features/minProperties";
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalItemsValidator,

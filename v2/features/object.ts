@@ -1,5 +1,4 @@
-import { isObject } from "../../lib/utils/isObject";
-import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { SchemaNode } from "../compiler/types";
 import { getValue } from "../utils/getValue";
 
 export function getObjectData(node: SchemaNode) {
@@ -16,48 +15,4 @@ export function getObjectData(node: SchemaNode) {
             return templateData;
         });
     }
-}
-
-export function maxPropertiesValidator({ schema, draft, validators }: SchemaNode): void {
-    if (isNaN(schema.maxProperties)) {
-        return;
-    }
-    validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
-        if (!isObject(data)) {
-            return;
-        }
-
-        const { schema } = node;
-        const propertyCount = Object.keys(data).length;
-        if (isNaN(schema.maxProperties) === false && schema.maxProperties < propertyCount) {
-            return draft.errors.maxPropertiesError({
-                maxProperties: schema.maxProperties,
-                length: propertyCount,
-                pointer,
-                schema,
-                value: data
-            });
-        }
-    });
-}
-
-export function minPropertiesValidator({ draft, schema, validators }: SchemaNode): void {
-    if (isNaN(schema.minProperties)) {
-        return;
-    }
-    validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
-        if (!isObject(data)) {
-            return;
-        }
-        const propertyCount = Object.keys(data).length;
-        if (node.schema.minProperties > propertyCount) {
-            return draft.errors.minPropertiesError({
-                minProperties: schema.minProperties,
-                length: propertyCount,
-                pointer,
-                schema,
-                value: data
-            });
-        }
-    });
 }
