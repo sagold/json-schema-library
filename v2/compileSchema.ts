@@ -139,16 +139,7 @@ const NODE_METHODS: Pick<
             node: this as SchemaNode
         });
 
-        // console.log("validate", data, this.schema);
-        const node = this.resolveRef({ pointer, path }) as SchemaNode;
-        // if (node !== this) {
-        //     console.log("resolved node to", node.schema);
-        // }
-
-        if (node == undefined) {
-            // console.log("refs", Object.keys(this.context.refs), "remotes", Object.keys(this.context.remotes));
-            throw new Error(`Failed resolving ref: ${this.ref}`);
-        }
+        const node = this as SchemaNode;
 
         const errors: JsonError[] = [];
         // @ts-expect-error untyped boolean schema
@@ -166,6 +157,8 @@ const NODE_METHODS: Pick<
             ];
         }
 
+        // console.log(pointer, "validate", data, "by", node.spointer, ":", node.schema, "ref:", node.ref);
+
         for (const validate of node.validators) {
             const result = validate({ node, data, pointer: "#", path });
             if (Array.isArray(result)) {
@@ -174,6 +167,7 @@ const NODE_METHODS: Pick<
                 errors.push(result);
             }
         }
+
         // console.log("ERRORS", errors);
         return sanitizeErrors(errors);
     },

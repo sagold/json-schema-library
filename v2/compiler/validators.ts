@@ -32,6 +32,7 @@ import { unevaluatedPropertiesValidator } from "../features/unevaluatedPropertie
 import { unevaluatedItemsValidator } from "../features/unevaluatedItems";
 import { maxPropertiesValidator } from "../features/maxProperties";
 import { minPropertiesValidator } from "../features/minProperties";
+import { JsonError } from "../../lib/types";
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalItemsValidator,
@@ -68,7 +69,45 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     typeValidator,
     unevaluatedItemsValidator,
     unevaluatedPropertiesValidator,
-    uniqueItemsValidator
+    uniqueItemsValidator,
+    ({ schema, validators }: SchemaNode) => {
+        if (schema.$ref == null && schema.$recursiveRef == null) {
+            return;
+        }
+        validators.push(({ node, data, pointer = "#", path }) => {
+            let currentNode = node;
+            let nextNode = node.resolveRef({ pointer, path });
+            if (nextNode == null) {
+                // @todo evaluate this state - should return node or ref is invalid (or bugged)
+                return;
+            }
+            // console.log(
+            //     "REF VALIDATOR: first resolved",
+            //     node.spointer,
+            //     `ref: ${node.ref}`,
+            //     "to",
+            //     nextNode.spointer,
+            //     nextNode.schema
+            // );
+            const errors: JsonError[] = [];
+
+            while (currentNode !== nextNode && currentNode.spointer !== nextNode?.spointer) {
+                // console.log(
+                //     "REF VALIDATOR: resolved to",
+                //     nextNode.spointer,
+                //     "ref: ",
+                //     nextNode.ref,
+                //     "=>",
+                //     nextNode.schema
+                // );
+                errors.push(...nextNode.validate(data, pointer, path));
+                currentNode = nextNode;
+                nextNode = nextNode.resolveRef({ pointer, path });
+            }
+            // console.log("REF VALIDATOR: currentNode", currentNode?.spointer, nextNode?.spointer);
+            return errors;
+        });
+    }
 ].map((func) => {
     // @ts-expect-error extended function for debugging purposes
     func.toJSON = () => func.name;

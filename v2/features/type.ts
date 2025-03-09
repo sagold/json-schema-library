@@ -25,8 +25,6 @@ export function typeValidator({ schema, validators }: SchemaNode): void {
         ) {
             return;
         }
-
-        // TypeError: "Expected `{{value}}` ({{received}}) in `{{pointer}}` to be of type `{{expected}}`",
         return node.draft.errors.typeError({
             value: data,
             received: dataType,

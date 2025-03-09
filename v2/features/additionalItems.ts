@@ -20,7 +20,6 @@ export function parseAdditionalItems(node: SchemaNode) {
 
 additionalItemsResolver.toJSON = () => "additionalItemsResolver";
 function additionalItemsResolver({ node, key, data }: JsonSchemaResolverParams) {
-    console.log("resolve additional");
     if (!Array.isArray(data)) {
         console.log(data, "not an array");
         return;
@@ -29,7 +28,7 @@ function additionalItemsResolver({ node, key, data }: JsonSchemaResolverParams) 
     // @attention: items, etc should already have been tried
     const value = getValue(data, key);
     if (node.additionalItems) {
-        console.log("addditional: reduce");
+        // console.log("addditional: reduce");
         return node.additionalItems.reduce({ data: value });
     }
 

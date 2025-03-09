@@ -1,7 +1,8 @@
 import { SchemaNode, ValidationPath } from "../compiler/types";
 import { joinId } from "./ref/joinId";
-import { mergeSchema } from "../../lib/mergeSchema";
 import splitRef from "../../lib/compile/splitRef";
+import { omit } from "../../lib/utils/omit";
+import { isObject } from "../../lib/utils/isObject";
 
 export function parseRef(node: SchemaNode) {
     // get and store current $id of node - this may be the same as parent $id
@@ -58,33 +59,24 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
             break;
         }
     }
+
     // FROM THERE FIND FIRST OCCURENCE OF AN ANCHOR
     const firstAnchor = history.find((s, index) => index >= startIndex && s.node.schema.$recursiveAnchor === true);
     if (firstAnchor) {
+        // console.log("recursive resolved to", firstAnchorIndex, firstAnchor.node.schema);
         return firstAnchor.node;
     }
 
     // $recursiveRef with no $recursiveAnchor works like $ref?
     return getRef(node, joinId(node.$id, node.schema.$recursiveRef));
-
-    // // THEN RETURN LATEST BASE AS TARGET
-    // for (let i = history.length - 1; i >= 0; i--) {
-    //     const { node } = history[i];
-    //     if (node.schema.$id) {
-    //         return node;
-    //     }
-    // }
-
-    // // OR RETURN ROOT
-    // return node.context.rootNode;
 }
 
 export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
-    let node = this as SchemaNode;
+    const node = this as SchemaNode;
     // console.log("resolve", node.ref, node.schema.$recursiveRef, node.schema);
     if (node.schema.$recursiveRef) {
         const nextNode = resolveRecursiveRef(node, path);
-        node = nextNode;
+        return nextNode;
     }
     if (node.ref == null) {
         return node;
@@ -94,8 +86,13 @@ export function resolveRef({ pointer, path }: { pointer?: string; path?: Validat
         return undefined;
     }
 
+    path?.push({
+        pointer,
+        node: resolvedNode
+    });
+
     // @ts-expect-error bool schema
-    if (resolvedNode.schema === false) {
+    if (resolvedNode.schema === false || resolvedNode.schema === true) {
         return resolvedNode;
     }
 
@@ -107,13 +104,24 @@ export function resolveRef({ pointer, path }: { pointer?: string; path?: Validat
     // > "Its [$ref] results are the results of the referenced schema."
 
     // @important @todo we need to remove any $id here to prevent readding this $id to next $id
-    const nextSchema = mergeSchema(node.schema, resolvedNode.schema, "$ref", "definitions", "$defs", "$id");
-    const nextNode = resolvedNode.compileSchema(nextSchema, node.spointer);
+    // @todo replace this merge by recursively validating $ref
+    // const nextSchema = mergeSchema(node.schema, resolvedNode.schema, "$ref", "definitions", "$defs", "$id");
+    // const nextNode = resolvedNode.compileSchema(nextSchema, resolvedNode.spointer);
+    // const nextSchema = omit(resolvedNode.schema, "$ref", "definitions", "$defs", "$id");
+    // const nextNode = resolvedNode.compileSchema(nextSchema, resolvedNode.spointer);
+
     path?.push({
         pointer,
-        node: nextNode
+        node: resolvedNode
     });
-    return nextNode;
+    return resolvedNode;
+}
+
+function compileNext(referencedNode: SchemaNode) {
+    const referencedSchema = isObject(referencedNode.schema)
+        ? omit(referencedNode.schema, "$id")
+        : referencedNode.schema;
+    return referencedNode.compileSchema(referencedSchema, `${referencedNode.spointer}/$ref`);
 }
 
 export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode | undefined {
@@ -123,11 +131,11 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
 
     // resolve $ref by json-spointer
     if (node.context.refs[$ref]) {
-        return getRef(node.context.refs[$ref]);
+        return compileNext(node.context.refs[$ref]);
     }
 
     if (node.context.anchors[$ref]) {
-        return getRef(node.context.anchors[$ref]);
+        return compileNext(node.context.anchors[$ref]);
     }
 
     // check for remote-host + pointer pair to switch rootSchema
@@ -141,10 +149,9 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
         const $ref = fragments[0];
         // this is a reference to remote-host root node
         if (node.context.remotes[$ref]) {
-            const nextRootNode = node.context.remotes[$ref];
-            return getRef(nextRootNode);
+            return compileNext(node.context.remotes[$ref]);
         }
-        // @previously: check if $ref in ids
+        console.error("REF: UNFOUND", $ref);
         return undefined;
     }
 
@@ -152,15 +159,13 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
         const $remoteHostRef = fragments[0];
         // this is a reference to remote-host root node (and not a self reference)
         if (node.context.remotes[$remoteHostRef] && node !== node.context.remotes[$remoteHostRef]) {
-            const nextRootNode = node.context.remotes[$remoteHostRef];
+            const referencedNode = node.context.remotes[$remoteHostRef];
             // resolve full ref on remote schema - we store currently only store ref with domain
-            const nextNode = getRef(nextRootNode, $ref);
+            const nextNode = getRef(referencedNode, $ref);
             if (nextNode) {
                 return nextNode;
             }
         }
-
-        // @previously: check if fragments[1] is within nextRootNode
 
         // @todo this is a poc
         // @previously: check if $remoteHostRef is in current node-context
@@ -173,7 +178,4 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
 
         return undefined;
     }
-
-    // console.log("remotes", Object.keys(node.context.remotes));
-    // console.log("could not find", $ref, node.schema, "in", Object.keys(node.context.refs), Object.keys(node.context.anchors));
 }
