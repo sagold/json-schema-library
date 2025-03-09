@@ -52,7 +52,9 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     for (let i = history.length - 1; i >= 0; i--) {
         if (history[i].node.schema.$recursiveAnchor === false) {
             // $recursiveRef with $recursiveAnchor: false works like $ref
-            return getRef(node, joinId(node.$id, node.schema.$recursiveRef));
+            const nextNode = getRef(node, joinId(node.$id, node.schema.$recursiveRef));
+            console.log("recursive ref resolution", nextNode.schema);
+            return nextNode;
         }
         if (/^https?:\/\//.test(history[i].node.schema.$id ?? "") && history[i].node.schema.$recursiveAnchor !== true) {
             startIndex = i;
@@ -63,12 +65,15 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     // FROM THERE FIND FIRST OCCURENCE OF AN ANCHOR
     const firstAnchor = history.find((s, index) => index >= startIndex && s.node.schema.$recursiveAnchor === true);
     if (firstAnchor) {
-        // console.log("recursive resolved to", firstAnchorIndex, firstAnchor.node.schema);
+        console.log("recursive resolved to", firstAnchor.node.schema);
         return firstAnchor.node;
     }
 
     // $recursiveRef with no $recursiveAnchor works like $ref?
-    return getRef(node, joinId(node.$id, node.schema.$recursiveRef));
+    const nextNode = getRef(node, joinId(node.$id, node.schema.$recursiveRef));
+    console.log("recursive ref failed from", node?.schema, "to", nextNode.schema);
+    console.log(JSON.stringify(path, null, 2));
+    return nextNode;
 }
 
 export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
@@ -76,6 +81,10 @@ export function resolveRef({ pointer, path }: { pointer?: string; path?: Validat
     // console.log("resolve", node.ref, node.schema.$recursiveRef, node.schema);
     if (node.schema.$recursiveRef) {
         const nextNode = resolveRecursiveRef(node, path);
+        path?.push({
+            pointer,
+            node: nextNode
+        });
         return nextNode;
     }
     if (node.ref == null) {
@@ -110,10 +119,6 @@ export function resolveRef({ pointer, path }: { pointer?: string; path?: Validat
     // const nextSchema = omit(resolvedNode.schema, "$ref", "definitions", "$defs", "$id");
     // const nextNode = resolvedNode.compileSchema(nextSchema, resolvedNode.spointer);
 
-    path?.push({
-        pointer,
-        node: resolvedNode
-    });
     return resolvedNode;
 }
 

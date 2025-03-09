@@ -67,7 +67,7 @@ export type SchemaNode = {
     /** Compiles a child-schema of this node to its context */
     compileSchema: (schema: JsonSchema, spointer?: string) => SchemaNode;
     /** Step into a property or array by name or index and return the schema-node its value */
-    get: (key: string | number, data?: unknown) => SchemaNode | JsonError;
+    get: (key: string | number, data?: unknown, valiadtionPath?: ValidationPath) => SchemaNode | JsonError;
     /** Creates data that is valid to the schema of this node */
     getTemplate: (data?: unknown) => unknown;
     /** Creates a new node with all dynamic schema properties merged according to the passed in data */

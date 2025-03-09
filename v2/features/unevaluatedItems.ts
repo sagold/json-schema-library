@@ -34,16 +34,24 @@ export function unevaluatedItemsValidator({ schema, validators }: SchemaNode): v
             return undefined;
         }
 
-        if (node.schema.unevaluatedItems === true || node.schema.additionalItems === true) {
+        console.log("uneva", JSON.stringify(path, null, 2));
+
+        // const reducedNode = node;
+        let reducedNode = node.reduce({ data, pointer, path });
+        reducedNode = isSchemaNode(reducedNode) ? reducedNode : node;
+        if (reducedNode.schema.unevaluatedItems === true || reducedNode.schema.additionalItems === true) {
             return undefined;
         }
+
+        // console.log("EVAL", reducedNode.schema);
 
         const validIf = node.if != null && node.if.validate(data, pointer, path).length === 0;
         const errors: JsonError[] = [];
         // "unevaluatedItems with nested items"
         for (let i = 0; i < data.length; i += 1) {
             const value = data[i];
-            const child = node.get(i, data);
+            const child = node.get(i, data, path);
+            // console.log(`CHILD '${i}':`, data[i], "=>", child?.schema);
 
             if (isSchemaNode(child)) {
                 // when a single node is invalid

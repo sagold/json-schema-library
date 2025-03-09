@@ -2,7 +2,7 @@ import { Draft } from "../lib/draft";
 import { isJsonError, JsonError, JsonSchema } from "../lib/types";
 import { mergeSchema } from "../lib/mergeSchema";
 import { omit } from "../lib/utils/omit";
-import { SchemaNode, JsonSchemaReducerParams } from "./compiler/types";
+import { SchemaNode, JsonSchemaReducerParams, ValidationPath } from "./compiler/types";
 import { strict as assert } from "assert";
 
 import { DEFAULT_DATA } from "./compiler/defaultData";
@@ -42,12 +42,11 @@ const NODE_METHODS: Pick<
         return node;
     },
 
-    get(key: string | number, data?: unknown) {
+    get(key: string | number, data?: unknown, path?: ValidationPath) {
         let node = this as SchemaNode;
         if (node.reducers.length) {
-            const result = node.reduce({ data });
+            const result = node.reduce({ data, path });
             if (isJsonError(result)) {
-                // console.log("get", key, "error");
                 return result;
             }
             node = result;
@@ -61,10 +60,10 @@ const NODE_METHODS: Pick<
             }
         }
 
-        const referencedNode = node.resolveRef({ path: [] });
+        const referencedNode = node.resolveRef({ path });
         if (referencedNode !== node) {
-            const ref = referencedNode.get(key, data);
-            // console.log("get ref", key, ref?.schema);
+            const ref = referencedNode.get(key, data, path);
+            console.log("get ref", key, ref?.schema);
             return ref;
         }
     },

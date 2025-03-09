@@ -31,6 +31,7 @@ export function unevaluatedPropertiesValidator({ schema, validators }: SchemaNod
             return undefined;
         }
         reducedNode = isSchemaNode(reducedNode) ? reducedNode : node;
+        // console.log("EVAL", reducedNode.schema);
 
         const unevaluated = Object.keys(data);
         if (unevaluated.length === 0) {
@@ -40,7 +41,7 @@ export function unevaluatedPropertiesValidator({ schema, validators }: SchemaNod
         const errors: JsonError[] = [];
         for (let i = 0; i < unevaluated.length; i += 1) {
             const propertyName = unevaluated[i];
-            const child = node.get(propertyName, data);
+            const child = node.get(propertyName, data, path);
             // console.log(`CHILD '${propertyName}':`, data[propertyName], "=>", child?.schema);
             if (isSchemaNode(child)) {
                 if (child.validate(data[propertyName], `${pointer}/${propertyName}`, path).length > 0) {

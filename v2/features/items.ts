@@ -54,7 +54,7 @@ export function itemsValidator({ schema, validators }: SchemaNode) {
                     const itemData = data[i];
                     // @todo v1 reevaluate: incomplete schema is created here?
                     const itemNode = node.itemsList[i];
-                    const result = itemNode.validate(itemData, `${pointer}/${i}`);
+                    const result = itemNode.validate(itemData, `${pointer}/${i}`, path);
                     errors.push(...result);
                 }
                 return errors;
@@ -63,7 +63,7 @@ export function itemsValidator({ schema, validators }: SchemaNode) {
             if (node.itemsObject) {
                 for (let i = 0; i < data.length; i += 1) {
                     const itemData = data[i];
-                    const result = node.itemsObject.validate(itemData, `${pointer}/${i}`);
+                    const result = node.itemsObject.validate(itemData, `${pointer}/${i}`, path);
                     if (result) {
                         errors.push(...result);
                     }
