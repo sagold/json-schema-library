@@ -31,6 +31,9 @@ export type Context = {
     ids: Record<string, SchemaNode>;
     /** anchors stored by fully resolved schema-$id + $anchor */
     anchors: Record<string, SchemaNode>;
+    PARSER: ((node: SchemaNode) => void)[];
+    VALIDATORS: ((node: SchemaNode) => void)[];
+    DEFAULT_DATA: ((node: SchemaNode) => void)[];
 };
 
 export function isSchemaNode(value: unknown): value is SchemaNode {

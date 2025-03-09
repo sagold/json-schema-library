@@ -64,6 +64,7 @@ const supportedTestCases = (t: FeatureTest) =>
         "unknownKeyword",
         "unevaluatedProperties",
         "unevaluatedItems"
+        // "vocabulary"
     ].includes(t.name);
 
 /*
@@ -116,12 +117,7 @@ const supportedTestCases = (t: FeatureTest) =>
 ✖ vocabulary - skipped evaluation of meta-schema
 */
 
-const postponedTestcases = [
-    // @vocabulary
-    // @todo evaluate support by meta-schema
-    // we need to evaluate meta-schema for supported validation methods we currently do not have the logic for this
-    "schema that uses custom metaschema with with no validation vocabulary" // vocabulary
-];
+const postponedTestcases: string[] = [];
 
 function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
     [
@@ -179,13 +175,13 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
                     }
 
                     test(testData.description, () => {
-                        const validator = new Draft2019();
+                        const draft = new Draft2019();
                         // console.log(
                         //     testData.description,
                         //     JSON.stringify(schema, null, 2),
                         //     JSON.stringify(testData.data, null, 2)
                         // );
-                        const node = compileSchema(validator, schema);
+                        const node = compileSchema(draft, schema);
                         addRemotes(node);
                         const errors = node.validate(testData.data);
                         expect(errors.length === 0).to.eq(testData.valid);

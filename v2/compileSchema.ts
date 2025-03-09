@@ -35,9 +35,9 @@ const NODE_METHODS: Pick<
         // e.g. { $ref: "#" } -> { additionalProperties: false }
         // node.schema = node.resolveRef();
 
-        PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
-        VALIDATORS.forEach((registerValidator) => registerValidator(node));
-        DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
+        node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
+        node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
+        node.context.DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
 
         return node;
     },
@@ -196,15 +196,11 @@ const NODE_METHODS: Pick<
             ...NODE_METHODS
         } as SchemaNode;
 
-        node.context = { ...context, refs: {}, rootNode: node };
+        node.context = { ...context, refs: {}, rootNode: node, PARSER, VALIDATORS, DEFAULT_DATA };
         node.context.remotes[url] = node;
-
-        // @note - if we parse a dynamic schema, we skip certain properties that are note yet available
-        // e.g. { $ref: "#" } -> { additionalProperties: false }
-        // node.schema = node.resolveRef();
-        PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
-        VALIDATORS.forEach((registerValidator) => registerValidator(node));
-        DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
+        node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
+        node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
+        node.context.DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
 
         return this;
     },
@@ -226,6 +222,28 @@ const NODE_METHODS: Pick<
 export function compileSchema(draft: Draft, schema: JsonSchema) {
     assert(schema !== undefined, "schema missing");
 
+    // # $vocabulary
+    // - declares which JSON Schema features (vocabularies) are supported by this meta-schema
+    // - each vocabulary is referenced by a URL, and its boolean value indicates whether it is required (true) or optional (false).
+
+    // # allOf
+    // - allOf actually includes the rules and constraints from the referenced schemas
+    // - allOf pulls in the relevant meta-schema definitions to actually apply them
+
+    // ✅ For validation purposes, you can ignore $vocabulary and rely on allOf to load the necessary meta-schemas.
+    // ⚠️ However, if your validator is designed to support multiple versions or optimize processing, $vocabulary provides useful metadata.
+    // - Determining Supported Features: Example: A validator could warn or error out if it encounters a vocabulary it does not support.
+    // - Selective Parsing or Optimization: Example: If "unevaluatedProperties" is not in a supported vocabulary, your validator should not enforce it.
+    // - Future-Proofing for Extensions: Future versions of JSON Schema may add optional vocabularies that aren't explicitly included in allOf.
+
+    if (schema.$vocabulary) {
+        console.log("handle vocabulary", schema.$vocabulary);
+        // compile referenced meta schema
+        // 1. could validate passed in schema
+        // 2. could return a sanitized schema based on validation
+        // then add parsers and validators based on meta-schema
+    }
+
     const node: SchemaNode = {
         spointer: "#",
         draft,
@@ -242,15 +260,15 @@ export function compileSchema(draft: Draft, schema: JsonSchema) {
         anchors: {},
         refs: {},
         ids: {},
-        rootNode: node
+        rootNode: node,
+        PARSER,
+        VALIDATORS,
+        DEFAULT_DATA
     };
 
-    // @note - if we parse a dynamic schema, we skip certain properties that are note yet available
-    // e.g. { $ref: "#" } -> { additionalProperties: false }
-    // node.schema = node.resolveRef();
-    PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
-    VALIDATORS.forEach((registerValidator) => registerValidator(node));
-    DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
+    node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
+    node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
+    node.context.DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
 
     return node;
 }
