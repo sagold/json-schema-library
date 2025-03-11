@@ -1,5 +1,5 @@
 import { SchemaNode, ValidationPath } from "../types";
-import { joinId } from "./ref/joinId";
+import { joinId } from "../utils/joinId";
 import splitRef from "../../lib/compile/splitRef";
 import { omit } from "../../lib/utils/omit";
 import { isObject } from "../../lib/utils/isObject";
