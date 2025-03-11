@@ -1,5 +1,5 @@
 import { JsonError } from "../../lib/types";
-import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaValidatorParams, SchemaNode } from "../types";
 import deepEqual from "fast-deep-equal";
 
 export function uniqueItemsValidator({ schema, validators }: SchemaNode): void {

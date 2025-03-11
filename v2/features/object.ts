@@ -1,4 +1,4 @@
-import { SchemaNode } from "../compiler/types";
+import { SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 
 export function getObjectData(node: SchemaNode) {

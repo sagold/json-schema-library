@@ -1,6 +1,6 @@
 import { JsonError } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
-import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaValidatorParams, SchemaNode } from "../types";
 
 export function dependentRequiredValidator(node: SchemaNode): void {
     if (!isObject(node.schema.dependentRequired)) {

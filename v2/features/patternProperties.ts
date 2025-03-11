@@ -1,12 +1,7 @@
 import { mergeSchema } from "../../lib/mergeSchema";
 import { JsonError, JsonSchema } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
-import {
-    JsonSchemaReducerParams,
-    JsonSchemaResolverParams,
-    JsonSchemaValidatorParams,
-    SchemaNode
-} from "../compiler/types";
+import { JsonSchemaReducerParams, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 
 patternPropertyResolver.toJSON = () => "patternPropertyResolver";

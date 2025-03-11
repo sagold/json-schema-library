@@ -1,5 +1,5 @@
 import { mergeSchema } from "../../lib/mergeSchema";
-import { JsonSchemaReducerParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaReducerParams, SchemaNode } from "../types";
 
 export function parseAnyOf(node: SchemaNode) {
     const { schema, spointer } = node;

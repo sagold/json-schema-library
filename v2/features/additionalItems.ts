@@ -1,6 +1,6 @@
 import { JsonError } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
-import { JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 
 // must come as last resolver

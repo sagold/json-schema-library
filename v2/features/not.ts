@@ -1,4 +1,4 @@
-import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaValidatorParams, SchemaNode } from "../types";
 
 export function parseNot(node: SchemaNode) {
     const { schema, spointer } = node;

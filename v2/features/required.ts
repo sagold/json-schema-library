@@ -1,5 +1,5 @@
 import { isObject } from "../../lib/utils/isObject";
-import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaValidatorParams, SchemaNode } from "../types";
 import { hasProperty } from "../utils/hasProperty";
 
 export function requiredValidator({ schema, validators }: SchemaNode): void {

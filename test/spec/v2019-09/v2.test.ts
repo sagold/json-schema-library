@@ -12,7 +12,7 @@ import { Draft2019 } from "../../../lib/draft2019";
 import { expect } from "chai";
 import { getDraftTests, FeatureTest } from "../../getDraftTests";
 import { globSync } from "glob";
-import { SchemaNode } from "../../../v2/compiler/types";
+import { SchemaNode } from "../../../v2/types";
 
 const supportedTestCases = (t: FeatureTest) =>
     // t.optional === false

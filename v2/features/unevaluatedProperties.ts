@@ -1,7 +1,7 @@
 import { reduceSchema } from "../../lib/reduceSchema";
 import { isJsonError, JsonError } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
-import { isSchemaNode, JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { isSchemaNode, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 
 export function parseUnevaluatedProperties(node: SchemaNode) {

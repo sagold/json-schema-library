@@ -1,4 +1,4 @@
-import { SchemaNode } from "../compiler/types";
+import { SchemaNode } from "../types";
 
 // @todo this should be done with every added property in spointer
 // @todo this creates a mixed schema, where $defs, etc are not uri-encoded (would be %24defs)

@@ -2,7 +2,7 @@ import { compileSchema } from "./compileSchema";
 import { Draft } from "../lib/draft";
 import { Draft2019 } from "../lib/draft2019";
 import { strict as assert } from "assert";
-import { ValidationPath } from "./compiler/types";
+import { ValidationPath } from "./types";
 
 describe("validate - path", () => {
     let draft: Draft;

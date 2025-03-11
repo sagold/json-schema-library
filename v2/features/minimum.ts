@@ -1,4 +1,4 @@
-import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaValidatorParams, SchemaNode } from "../types";
 
 export function minimumValidator({ schema, validators }: SchemaNode): void {
     if (isNaN(schema.minimum)) {

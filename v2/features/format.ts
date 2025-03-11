@@ -1,4 +1,4 @@
-import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaValidatorParams, SchemaNode } from "../types";
 import formatValidators from "../../lib/validation/format";
 
 export function formatValidator({ schema, validators }: SchemaNode): void {

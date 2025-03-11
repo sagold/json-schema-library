@@ -1,7 +1,7 @@
 import { mergeSchema } from "../../lib/mergeSchema";
 import { JsonError, JsonSchema } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
-import { isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
 
 export function parseDependentSchemas(node: SchemaNode) {
     if (!isObject(node.schema.dependentSchemas)) {

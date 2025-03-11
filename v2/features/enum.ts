@@ -1,4 +1,4 @@
-import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaValidatorParams, SchemaNode } from "../types";
 import getTypeOf from "../../lib/getTypeOf";
 
 export function enumValidator({ schema, validators }: SchemaNode): void {

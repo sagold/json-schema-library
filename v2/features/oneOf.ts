@@ -1,4 +1,4 @@
-import { JsonSchemaReducerParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaReducerParams, SchemaNode } from "../types";
 // const { DECLARATOR_ONEOF, EXPOSE_ONE_OF_INDEX } = settings;
 
 export function parseOneOf(node: SchemaNode) {

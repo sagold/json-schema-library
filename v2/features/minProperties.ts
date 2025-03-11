@@ -1,5 +1,5 @@
 import { isObject } from "../../lib/utils/isObject";
-import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaValidatorParams, SchemaNode } from "../types";
 
 export function minPropertiesValidator({ draft, schema, validators }: SchemaNode): void {
     if (isNaN(schema.minProperties)) {

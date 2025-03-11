@@ -1,4 +1,4 @@
-import { SchemaNode } from "../compiler/types";
+import { SchemaNode } from "../types";
 
 export function minItemsValidator({ schema, validators }: SchemaNode): void {
     if (isNaN(schema.minItems)) {

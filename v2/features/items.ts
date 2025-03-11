@@ -1,4 +1,4 @@
-import { JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import { isObject } from "../../lib/utils/isObject";
 import { JsonError } from "../../lib/types";
 

@@ -1,7 +1,7 @@
 import { JsonError } from "../../lib/types";
-import { SchemaNode } from "../compiler/types";
+import { SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
-import { JsonSchemaResolverParams, JsonSchemaValidatorParams } from "../compiler/types";
+import { JsonSchemaResolverParams, JsonSchemaValidatorParams } from "../types";
 import { isObject } from "../../lib/utils/isObject";
 
 propertyResolver.toJSON = () => "propertyResolver";

@@ -1,5 +1,5 @@
 import { getPrecision } from "../../lib/utils/getPrecision";
-import { SchemaNode } from "../compiler/types";
+import { SchemaNode } from "../types";
 
 export function multipleOfValidator({ schema, validators }: SchemaNode): void {
     if (isNaN(schema.multipleOf)) {

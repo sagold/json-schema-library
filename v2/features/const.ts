@@ -1,4 +1,4 @@
-import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaValidatorParams, SchemaNode } from "../types";
 import equal from "fast-deep-equal";
 
 export function constValidator({ schema, validators }: SchemaNode): void {

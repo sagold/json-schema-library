@@ -2,7 +2,7 @@ import { compileSchema } from "./compileSchema";
 import { Draft } from "../lib/draft";
 import { Draft2019 } from "../lib/draft2019";
 import { strict as assert } from "assert";
-import { SchemaNode, isSchemaNode } from "./compiler/types";
+import { SchemaNode, isSchemaNode } from "./types";
 import { isJsonError } from "../lib/types";
 
 // - processing draft we need to know and support json-schema keywords

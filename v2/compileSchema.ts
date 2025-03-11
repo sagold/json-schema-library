@@ -2,12 +2,9 @@ import { Draft } from "../lib/draft";
 import { isJsonError, JsonError, JsonSchema } from "../lib/types";
 import { mergeSchema } from "../lib/mergeSchema";
 import { omit } from "../lib/utils/omit";
-import { SchemaNode, JsonSchemaReducerParams, ValidationPath } from "./compiler/types";
+import { SchemaNode, JsonSchemaReducerParams, ValidationPath } from "./types";
 import { strict as assert } from "assert";
-
-import { DEFAULT_DATA } from "./compiler/defaultData";
-import { PARSER } from "./compiler/parser";
-import { VALIDATORS } from "./compiler/validators";
+import { PARSER, VALIDATORS, DEFAULT_DATA } from "./draft2019";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import createSchemaOf from "../lib/createSchemaOf";
 

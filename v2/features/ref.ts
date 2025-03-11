@@ -1,4 +1,4 @@
-import { SchemaNode, ValidationPath } from "../compiler/types";
+import { SchemaNode, ValidationPath } from "../types";
 import { joinId } from "./ref/joinId";
 import splitRef from "../../lib/compile/splitRef";
 import { omit } from "../../lib/utils/omit";

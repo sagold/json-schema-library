@@ -1,5 +1,5 @@
 import ucs2decode from "../../lib/utils/punycode.ucs2decode";
-import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaValidatorParams, SchemaNode } from "../types";
 
 export function getStringData(node: SchemaNode) {
     if (node.schema.type === "string") {

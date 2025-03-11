@@ -1,6 +1,6 @@
 import { JsonError } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
-import { isSchemaNode, JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { isSchemaNode, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import sanitizeErrors from "../utils/sanitizeErrors";
 
 export function parseUnevaluatedItems(node: SchemaNode) {

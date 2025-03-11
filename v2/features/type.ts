@@ -1,5 +1,5 @@
 import getTypeOf, { JSType } from "../../lib/getTypeOf";
-import { JsonSchemaValidatorParams, SchemaNode } from "../compiler/types";
+import { JsonSchemaValidatorParams, SchemaNode } from "../types";
 
 function getJsonSchemaType(value: unknown, expectedType: string | string[]): JSType | "integer" {
     const jsType = getTypeOf(value);
