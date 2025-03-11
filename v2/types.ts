@@ -19,14 +19,17 @@ export type Context = {
     rootNode: SchemaNode;
     /** root nodes of registered remote json-schema */
     remotes: Record<string, SchemaNode>;
-    /** references stored by fully resolves schema-$id + local-pointer */
+    /** references stored by fully resolved schema-$id + local-pointer */
     refs: Record<string, SchemaNode>;
     /** references stored by fully resolved schema-$id */
     ids: Record<string, SchemaNode>;
     /** anchors stored by fully resolved schema-$id + $anchor */
     anchors: Record<string, SchemaNode>;
+    /** json-schema parser for this json-schema (root-schema and its child nodes) */
     PARSER: ((node: SchemaNode) => void)[];
+    /** json-schema validation for this json-schema (root-schema and its child nodes) */
     VALIDATORS: ((node: SchemaNode) => void)[];
+    /** json-schema default-data resolver for this json-schema (root-schema and its child nodes) */
     DEFAULT_DATA: ((node: SchemaNode) => void)[];
 };
 

@@ -237,17 +237,7 @@ export function compileSchema(schema: JsonSchema) {
         ...NODE_METHODS
     } as SchemaNode;
 
-    node.context = {
-        remotes: {},
-        anchors: {},
-        refs: {},
-        ids: {},
-        rootNode: node,
-        PARSER,
-        VALIDATORS,
-        DEFAULT_DATA
-    };
-
+    node.context = { remotes: {}, anchors: {}, refs: {}, ids: {}, rootNode: node, PARSER, VALIDATORS, DEFAULT_DATA };
     node.context.remotes[schema.$id ?? "#"] = node;
     node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
     node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
