@@ -1,5 +1,5 @@
-import { Draft } from "../lib/draft";
 import { JsonError, JsonSchema } from "../lib/types";
+import { CreateError } from "../lib/utils/createCustomError";
 import { isObject } from "../lib/utils/isObject";
 
 export type JsonSchemaReducerParams = { data: unknown; node: SchemaNode; pointer?: string; path?: ValidationPath };
@@ -41,7 +41,7 @@ export type ValidationPath = {
 
 export type SchemaNode = {
     context: Context;
-    draft: Draft;
+    errors: Record<string, CreateError>;
     parent?: SchemaNode | undefined;
     ref?: string;
     schema: JsonSchema;
@@ -49,7 +49,6 @@ export type SchemaNode = {
     oneOfIndex?: number;
 
     // methods
-
     resolveRef: (args?: { pointer?: string; path?: ValidationPath }) => SchemaNode;
     /**
      * Register a json-schema as a remote-schema to be resolved by $ref, $anchor, etc

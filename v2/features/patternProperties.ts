@@ -64,7 +64,7 @@ export function patternPropertiesValidator({ schema, validators }: SchemaNode) {
         if (!isObject(data)) {
             return;
         }
-        const { draft, schema, patternProperties } = node;
+        const { schema, patternProperties } = node;
         const properties = schema.properties || {};
         const patterns = Object.keys(schema.patternProperties).join(",");
         const errors: JsonError[] = [];
@@ -82,7 +82,7 @@ export function patternPropertiesValidator({ schema, validators }: SchemaNode) {
             if (matchingPatterns.length === 0 && schema.additionalProperties === false) {
                 // this is an arrangement with additionalProperties
                 errors.push(
-                    draft.errors.noAdditionalPropertiesError({
+                    node.errors.noAdditionalPropertiesError({
                         key,
                         pointer: `${pointer}/${key}`,
                         schema,

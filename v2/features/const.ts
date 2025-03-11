@@ -7,7 +7,7 @@ export function constValidator({ schema, validators }: SchemaNode): void {
     }
     validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
         if (!equal(data, node.schema.const)) {
-            return [node.draft.errors.constError({ pointer, schema, value: data, expected: node.schema.const })];
+            return [node.errors.constError({ pointer, schema, value: data, expected: node.schema.const })];
         }
     });
 }

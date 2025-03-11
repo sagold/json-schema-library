@@ -44,7 +44,7 @@ export function itemsValidator({ schema, validators }: SchemaNode) {
                 if (Array.isArray(data) && data.length === 0) {
                     return undefined;
                 }
-                return node.draft.errors.invalidDataError({ pointer, value: data, schema });
+                return node.errors.invalidDataError({ pointer, value: data, schema });
             }
 
             const errors: JsonError[] = [];

@@ -1,15 +1,11 @@
 import { strict as assert } from "assert";
-import { Draft2019 } from "../../lib/draft2019";
-import { Draft } from "../../lib/draft";
+
 import { compileSchema } from "../compileSchema";
 import { isSchemaNode } from "../types";
 
 describe("feature : oneOf : reduce", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     it("should resolve matching value schema", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             oneOf: [
                 { type: "string", title: "A String" },
                 { type: "number", title: "A Number" }
@@ -21,7 +17,7 @@ describe("feature : oneOf : reduce", () => {
     });
 
     it("should return boolean schema `false` if no matching schema could be found", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             oneOf: [
                 { type: "string", title: "A String" },
                 { type: "number", title: "A Number" }
@@ -33,7 +29,7 @@ describe("feature : oneOf : reduce", () => {
     });
 
     // it("should reduce nested oneOf objects using ref", () => {
-    //     const node = compileSchema(draft, {
+    //     const node = compileSchema({
     //         $defs: {
     //             withData: {
     //                 oneOf: [{ required: ["b"], properties: { b: { type: "number" } } }]
@@ -48,7 +44,7 @@ describe("feature : oneOf : reduce", () => {
     // });
 
     // it("should reduce nested oneOf boolean schema using ref", () => {
-    //     const node = compileSchema(draft, {
+    //     const node = compileSchema({
     //         $defs: {
     //             withData: {
     //                 oneOf: [{ required: ["b"], properties: { b: true } }]
@@ -64,7 +60,7 @@ describe("feature : oneOf : reduce", () => {
 
     // v2
     it("should resolve matching object schema", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             oneOf: [
                 {
                     type: "object",
@@ -85,7 +81,7 @@ describe("feature : oneOf : reduce", () => {
 
     // v2
     it("should return matching oneOf, for objects missing properties", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             oneOf: [
                 {
                     type: "object",
@@ -131,9 +127,9 @@ describe("feature : oneOf : reduce", () => {
         //             }
         //         }
         //     });
-        //     const res = step(draft, "title", schema, { title: { innerTitle: 111 } });
+        //     const res = step("title", schema, { title: { innerTitle: 111 } });
         //     expect(res.type).to.eq("object");
-        //     const nextRes = step(draft, "innerTitle", res, { innerTitle: 111 });
+        //     const nextRes = step("innerTitle", res, { innerTitle: 111 });
         //     expect(nextRes.type).to.eq("number");
         // });
         // it("should maintain references from a remote schema when resolving oneOf with $ref", () => {
@@ -160,20 +156,17 @@ describe("feature : oneOf : reduce", () => {
         //             }
         //         }
         //     });
-        //     const res = step(draft, "title", schema, { title: { innerTitle: 111 } });
+        //     const res = step("title", schema, { title: { innerTitle: 111 } });
         //     expect(res.type).to.eq("object");
-        //     const nextRes = step(draft, "innerTitle", res, { innerTitle: 111 });
+        //     const nextRes = step("innerTitle", res, { innerTitle: 111 });
         //     expect(nextRes.type).to.eq("number");
         // });
     });
 });
 
 describe("feature : oneof : validate", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     it("should validate matching oneOf", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             oneOf: [
                 { type: "object", properties: { value: { type: "string" } } },
                 { type: "object", properties: { value: { type: "integer" } } }
@@ -183,7 +176,7 @@ describe("feature : oneof : validate", () => {
     });
 
     it("should return error for non-matching oneOf", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             oneOf: [
                 { type: "object", properties: { value: { type: "string" } } },

@@ -24,7 +24,7 @@ function reduceOneOf({ node, data, pointer }: JsonSchemaReducerParams) {
     //     const oneOfValue = getValue(data, oneOfProperty);
 
     //     if (oneOfValue === undefined) {
-    //         return draft.errors.missingOneOfPropertyError({
+    //         return node.errors.missingOneOfPropertyError({
     //             property: oneOfProperty,
     //             pointer,
     //             schema,
@@ -40,7 +40,7 @@ function reduceOneOf({ node, data, pointer }: JsonSchemaReducerParams) {
     //         // }
     //         const resultNode = node.oneOf[i].get(oneOfProperty, data);
     //         if (resultNode === undefined) {
-    //             return draft.errors.missingOneOfDeclaratorError({
+    //             return node.errors.missingOneOfDeclaratorError({
     //                 declarator: DECLARATOR_ONEOF,
     //                 oneOfProperty,
     //                 schemaPointer: `${node.spointer}/oneOf/${i}`,
@@ -63,7 +63,7 @@ function reduceOneOf({ node, data, pointer }: JsonSchemaReducerParams) {
     //         }
     //     }
 
-    //     return draft.errors.oneOfPropertyError({
+    //     return node.errors.oneOfPropertyError({
     //         property: oneOfProperty,
     //         value: oneOfValue,
     //         pointer,
@@ -96,7 +96,7 @@ export function validateOneOf({ schema, validators }: SchemaNode): void {
         return;
     }
     validators.push(({ node, data, pointer = "#", path }) => {
-        const { draft, oneOf } = node;
+        const { oneOf } = node;
         if (!oneOf) {
             return;
         }
@@ -118,7 +118,7 @@ export function validateOneOf({ schema, validators }: SchemaNode): void {
         }
 
         if (matches.length > 1) {
-            return draft.errors.multipleOneOfError({
+            return node.errors.multipleOneOfError({
                 value: data,
                 pointer,
                 schema,
@@ -126,7 +126,7 @@ export function validateOneOf({ schema, validators }: SchemaNode): void {
             });
         }
 
-        return draft.errors.oneOfError({
+        return node.errors.oneOfError({
             value: JSON.stringify(data),
             pointer,
             schema,

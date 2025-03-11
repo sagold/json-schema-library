@@ -9,12 +9,12 @@ export function multipleOfValidator({ schema, validators }: SchemaNode): void {
         if (typeof data !== "number") {
             return undefined;
         }
-        const { draft, schema } = node;
+        const { schema } = node;
         const valuePrecision = getPrecision(data);
         const multiplePrecision = getPrecision(schema.multipleOf);
         if (valuePrecision > multiplePrecision) {
             // value with higher precision then multipleOf-precision can never be multiple
-            return draft.errors.multipleOfError({
+            return node.errors.multipleOfError({
                 multipleOf: schema.multipleOf,
                 value: data,
                 pointer,
@@ -26,7 +26,7 @@ export function multipleOfValidator({ schema, validators }: SchemaNode): void {
         const val = Math.round(data * precision);
         const multiple = Math.round(schema.multipleOf * precision);
         if ((val % multiple) / precision !== 0) {
-            return draft.errors.multipleOfError({
+            return node.errors.multipleOfError({
                 multipleOf: schema.multipleOf,
                 value: data,
                 pointer,

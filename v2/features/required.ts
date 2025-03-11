@@ -7,14 +7,14 @@ export function requiredValidator({ schema, validators }: SchemaNode): void {
         return;
     }
     validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
-        const { draft, schema } = node;
+        const { schema } = node;
         if (!Array.isArray(schema.required) || !isObject(data)) {
             return undefined;
         }
 
         return schema.required.map((property: string) => {
             if (!hasProperty(data, property)) {
-                return draft.errors.requiredPropertyError({
+                return node.errors.requiredPropertyError({
                     key: property,
                     pointer,
                     schema,

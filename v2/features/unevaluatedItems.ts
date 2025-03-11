@@ -23,7 +23,7 @@ export function unevaluatedItemsValidator({ schema, validators }: SchemaNode): v
         return;
     }
     validators.push(({ node, data, pointer, path }: JsonSchemaValidatorParams) => {
-        const { draft, schema } = node;
+        const { schema } = node;
         // if not in items, and not matches additionalItems
         if (
             !Array.isArray(data) ||
@@ -63,7 +63,7 @@ export function unevaluatedItemsValidator({ schema, validators }: SchemaNode): v
                         );
                     }
                     if (node.schema.unevaluatedItems === false) {
-                        return draft.errors.unevaluatedItemsError({
+                        return node.errors.unevaluatedItemsError({
                             pointer: `${pointer}/${i}`,
                             value: JSON.stringify(value),
                             schema
@@ -82,7 +82,7 @@ export function unevaluatedItemsValidator({ schema, validators }: SchemaNode): v
                     }
                 } else {
                     errors.push(
-                        draft.errors.unevaluatedItemsError({
+                        node.errors.unevaluatedItemsError({
                             pointer: `${pointer}/${i}`,
                             value: JSON.stringify(value),
                             schema

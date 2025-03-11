@@ -33,6 +33,6 @@ export function anyOfValidator(node: SchemaNode) {
                 return undefined;
             }
         }
-        return node.draft.errors.anyOfError({ pointer, schema: node.schema, value: data, anyOf: node.schema.anyOf });
+        return node.errors.anyOfError({ pointer, schema: node.schema, value: data, anyOf: node.schema.anyOf });
     });
 }

@@ -8,7 +8,7 @@ export function formatValidator({ schema, validators }: SchemaNode): void {
     validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
         if (formatValidators[schema.format]) {
             // @ts-expect-error type mismatch
-            return formatValidators[schema.format]({ draft: node.draft, schema: node.schema, pointer }, data);
+            return formatValidators[schema.format]({ node, data, pointer }, data);
         }
     });
 }

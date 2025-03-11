@@ -6,7 +6,7 @@ export function enumValidator({ schema, validators }: SchemaNode): void {
         return;
     }
     validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
-        const { draft, schema } = node;
+        const { schema } = node;
         if (!Array.isArray(schema.enum)) {
             return undefined;
         }
@@ -23,7 +23,7 @@ export function enumValidator({ schema, validators }: SchemaNode): void {
             return undefined;
         }
 
-        return draft.errors.enumError({
+        return node.errors.enumError({
             pointer,
             schema,
             value: data

@@ -13,9 +13,9 @@ export function notValidator(node: SchemaNode): void {
         return;
     }
     node.validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
-        const { draft, schema } = node;
+        const { schema } = node;
         if (node.not.validate(data, pointer).length === 0) {
-            return draft.errors.notError({ value: data, not: schema.not, pointer, schema });
+            return node.errors.notError({ value: data, not: schema.not, pointer, schema });
         }
     });
 }

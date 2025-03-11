@@ -1,7 +1,7 @@
 import { isObject } from "../../lib/utils/isObject";
 import { JsonSchemaValidatorParams, SchemaNode } from "../types";
 
-export function minPropertiesValidator({ draft, schema, validators }: SchemaNode): void {
+export function minPropertiesValidator({ schema, validators }: SchemaNode): void {
     if (isNaN(schema.minProperties)) {
         return;
     }
@@ -11,7 +11,7 @@ export function minPropertiesValidator({ draft, schema, validators }: SchemaNode
         }
         const propertyCount = Object.keys(data).length;
         if (node.schema.minProperties > propertyCount) {
-            return draft.errors.minPropertiesError({
+            return node.errors.minPropertiesError({
                 minProperties: schema.minProperties,
                 length: propertyCount,
                 pointer,

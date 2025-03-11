@@ -9,7 +9,7 @@ export function exclusiveMaximumValidator({ schema, validators }: SchemaNode): v
             return undefined;
         }
         if (schema.exclusiveMaximum <= data) {
-            return node.draft.errors.maximumError({
+            return node.errors.maximumError({
                 maximum: schema.exclusiveMaximum,
                 length: data,
                 pointer,

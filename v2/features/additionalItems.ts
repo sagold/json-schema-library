@@ -55,7 +55,7 @@ export function additionalItemsValidator({ schema, validators }: SchemaNode): vo
                 errors.push(...validationResult);
             } else if (schema.additionalItems === false) {
                 errors.push(
-                    node.draft.errors.additionalItemsError({
+                    node.errors.additionalItemsError({
                         key: i,
                         pointer: `${pointer}/${i}`,
                         value: data,

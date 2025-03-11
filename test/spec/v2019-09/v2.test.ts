@@ -8,7 +8,6 @@ import draft2019MetaMetaData from "../../../remotes/draft2019-09_meta_meta-data.
 import draft2019MetaValidation from "../../../remotes/draft2019-09_meta_validation.json";
 import path from "path";
 import { compileSchema } from "../../../v2/compileSchema";
-import { Draft2019 } from "../../../lib/draft2019";
 import { expect } from "chai";
 import { getDraftTests, FeatureTest } from "../../getDraftTests";
 import { globSync } from "glob";
@@ -175,13 +174,12 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
                     }
 
                     test(testData.description, () => {
-                        const draft = new Draft2019();
                         // console.log(
                         //     testData.description,
                         //     JSON.stringify(schema, null, 2),
                         //     JSON.stringify(testData.data, null, 2)
                         // );
-                        const node = compileSchema(draft, schema);
+                        const node = compileSchema(schema);
                         addRemotes(node);
                         const errors = node.validate(testData.data);
                         expect(errors.length === 0).to.eq(testData.valid);

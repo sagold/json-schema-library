@@ -5,12 +5,12 @@ export function minimumValidator({ schema, validators }: SchemaNode): void {
         return;
     }
     validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
-        const { draft, schema } = node;
+        const { schema } = node;
         if (isNaN(schema.minimum)) {
             return undefined;
         }
         if (schema.minimum > data) {
-            return draft.errors.minimumError({
+            return node.errors.minimumError({
                 minimum: schema.minimum,
                 length: data,
                 pointer,
@@ -19,7 +19,7 @@ export function minimumValidator({ schema, validators }: SchemaNode): void {
             });
         }
         if (schema.exclusiveMinimum === true && schema.minimum === data) {
-            return draft.errors.minimumError({
+            return node.errors.minimumError({
                 minimum: schema.minimum,
                 length: data,
                 pointer,

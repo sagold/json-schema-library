@@ -10,14 +10,14 @@ export function uniqueItemsValidator({ schema, validators }: SchemaNode): void {
         if (!Array.isArray(data)) {
             return undefined;
         }
-        const { draft, schema } = node;
+        const { schema } = node;
         const duplicates: number[] = [];
         const errors: JsonError[] = [];
         data.forEach((item, index) => {
             for (let i = index + 1; i < data.length; i += 1) {
                 if (deepEqual(item, data[i]) && !duplicates.includes(i)) {
                     errors.push(
-                        draft.errors.uniqueItemsError({
+                        node.errors.uniqueItemsError({
                             pointer: `${pointer}/${i}`,
                             duplicatePointer: `${pointer}/${index}`,
                             arrayPointer: pointer,

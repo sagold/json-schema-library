@@ -15,17 +15,17 @@ export function containsValidator({ schema, validators }: SchemaNode): void {
         return;
     }
     validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
-        const { draft, schema } = node;
+        const { schema } = node;
         if (!Array.isArray(data)) {
             return;
         }
         if (schema.contains === false) {
-            return draft.errors.containsArrayError({ pointer, value: data, schema });
+            return node.errors.containsArrayError({ pointer, value: data, schema });
         }
 
         if (schema.contains === true) {
             if (Array.isArray(data) && data.length === 0) {
-                return draft.errors.containsAnyError({ pointer, value: data, schema });
+                return node.errors.containsAnyError({ pointer, value: data, schema });
             }
             return undefined;
         }
@@ -50,11 +50,11 @@ export function containsValidator({ schema, validators }: SchemaNode): void {
             return undefined;
         }
         if (max < count) {
-            return draft.errors.containsMaxError({ pointer, schema, delta: count - max, value: data });
+            return node.errors.containsMaxError({ pointer, schema, delta: count - max, value: data });
         }
         if (min > count) {
-            return draft.errors.containsMinError({ pointer, schema, delta: min - count, value: data });
+            return node.errors.containsMinError({ pointer, schema, delta: min - count, value: data });
         }
-        return draft.errors.containsError({ pointer, schema, value: data });
+        return node.errors.containsError({ pointer, schema, value: data });
     });
 }

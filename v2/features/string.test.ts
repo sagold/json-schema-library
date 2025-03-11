@@ -1,14 +1,9 @@
-import { Draft } from "../../lib/draft";
-import { Draft2019 } from "../../lib/draft2019";
 import { compileSchema } from "../compileSchema";
 import { strict as assert } from "assert";
 
 describe("feature : string : validation", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     it("should return error for string shorter than minLength", () => {
-        const node = compileSchema(draft, { type: "string", minLength: 2 });
+        const node = compileSchema({ type: "string", minLength: 2 });
 
         const errors = node.validate("a");
 
@@ -17,7 +12,7 @@ describe("feature : string : validation", () => {
     });
 
     it("should NOT return error for string matching minLength", () => {
-        const node = compileSchema(draft, { type: "string", minLength: 2 });
+        const node = compileSchema({ type: "string", minLength: 2 });
 
         const errors = node.validate("ab");
 
@@ -25,7 +20,7 @@ describe("feature : string : validation", () => {
     });
 
     it("should return error for string larger than maxLength", () => {
-        const node = compileSchema(draft, { type: "string", maxLength: 2 });
+        const node = compileSchema({ type: "string", maxLength: 2 });
 
         const errors = node.validate("abc");
 
@@ -34,7 +29,7 @@ describe("feature : string : validation", () => {
     });
 
     it("should NOT return error for string matching maxLength", () => {
-        const node = compileSchema(draft, { type: "string", maxLength: 2 });
+        const node = compileSchema({ type: "string", maxLength: 2 });
 
         const errors = node.validate("ab");
 
@@ -43,11 +38,8 @@ describe("feature : string : validation", () => {
 });
 
 describe("feature : string : default data", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     it("should return default value if string is undefined", () => {
-        const node = compileSchema(draft, { type: "string", default: "abc" });
+        const node = compileSchema({ type: "string", default: "abc" });
 
         const data = node.getTemplate();
 
@@ -55,7 +47,7 @@ describe("feature : string : default data", () => {
     });
 
     it("should NOT return default value if string is undefined", () => {
-        const node = compileSchema(draft, { type: "string", default: "abc" });
+        const node = compileSchema({ type: "string", default: "abc" });
 
         const data = node.getTemplate("123");
 

@@ -11,7 +11,7 @@ export function propertyNamesValidator(node: SchemaNode): void {
         node.propertyNames = node.compileSchema(propertyNames, `${node.spointer}/propertyNames`);
     }
     node.validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
-        const { draft, schema } = node;
+        const { schema } = node;
         if (!isObject(data)) {
             return undefined;
         }
@@ -22,7 +22,7 @@ export function propertyNamesValidator(node: SchemaNode): void {
             if (Object.keys(data).length === 0) {
                 return undefined;
             }
-            return draft.errors.invalidPropertyNameError({
+            return node.errors.invalidPropertyNameError({
                 property: Object.keys(data),
                 pointer,
                 value: data,
@@ -45,7 +45,7 @@ export function propertyNamesValidator(node: SchemaNode): void {
             const validationResult = node.propertyNames.validate(prop);
             if (validationResult.length > 0) {
                 errors.push(
-                    draft.errors.invalidPropertyNameError({
+                    node.errors.invalidPropertyNameError({
                         property: prop,
                         pointer,
                         validationError: validationResult[0],

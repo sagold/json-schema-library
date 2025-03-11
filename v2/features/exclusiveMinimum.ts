@@ -9,7 +9,7 @@ export function exclusiveMinimumValidator({ schema, validators }: SchemaNode): v
             return undefined;
         }
         if (schema.exclusiveMinimum >= data) {
-            return node.draft.errors.minimumError({
+            return node.errors.minimumError({
                 minimum: schema.exclusiveMinimum,
                 length: data,
                 pointer,

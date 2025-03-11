@@ -1,14 +1,10 @@
 import { strict as assert } from "assert";
-import { Draft2019 } from "../../lib/draft2019";
-import { Draft } from "../../lib/draft";
+
 import { compileSchema } from "../compileSchema";
 
 describe("feature : allOf : get", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     it("should step into allOf-property", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             allOf: [{ properties: { header: { type: "string", minLength: 1 } } }]
         });
@@ -19,7 +15,7 @@ describe("feature : allOf : get", () => {
     });
 
     it("should recursively resolve allOf schema", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             allOf: [
                 {

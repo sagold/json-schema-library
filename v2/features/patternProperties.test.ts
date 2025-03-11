@@ -1,14 +1,10 @@
 import { strict as assert } from "assert";
-import { Draft2019 } from "../../lib/draft2019";
-import { Draft } from "../../lib/draft";
+
 import { compileSchema } from "../compileSchema";
 
 describe("feature : patternProperties : get", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     it("should step into patternProperties", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 1 } }
         });
@@ -19,7 +15,7 @@ describe("feature : patternProperties : get", () => {
     });
 
     it("should NOT step into patternProperties", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 1 } }
         });
@@ -30,7 +26,7 @@ describe("feature : patternProperties : get", () => {
     });
 
     it("should return an error for matching pattern and failed validation", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             patternProperties: { test: { type: "number" } }
         }).validate({ test: "invalid type" });
@@ -40,7 +36,7 @@ describe("feature : patternProperties : get", () => {
     });
 
     it("should validate a correct matching pattern", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             patternProperties: { test: { type: "number" } }
         }).validate({ test: 10 });
@@ -49,7 +45,7 @@ describe("feature : patternProperties : get", () => {
     });
 
     it("should return an error for matching regex pattern and failed validation", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             patternProperties: { "^.est?": { type: "number" } }
         }).validate({ test: "invalid type" });
@@ -59,7 +55,7 @@ describe("feature : patternProperties : get", () => {
     });
 
     it("should invalidate defined property", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             properties: {
                 test: { type: "string" }
@@ -74,7 +70,7 @@ describe("feature : patternProperties : get", () => {
     });
 
     it("should return 'no-additional-properties-error' if additional properties are not allowed", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             properties: {
                 test: { type: "string" }
@@ -90,7 +86,7 @@ describe("feature : patternProperties : get", () => {
     });
 
     it("should return an error if one of the matching patterns does not validate", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             patternProperties: {
                 "^.est?$": { type: "number" },
@@ -104,7 +100,7 @@ describe("feature : patternProperties : get", () => {
     });
 
     it("should return no error if additional properties are not allowed but valid in patterns", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             patternProperties: {
                 "^.est?$": { type: "number" }
@@ -116,7 +112,7 @@ describe("feature : patternProperties : get", () => {
     });
 
     it("should return no error if additional properties validate value", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             patternProperties: {
                 "^.est?$": { type: "number" }
@@ -128,7 +124,7 @@ describe("feature : patternProperties : get", () => {
     });
 
     it("should return an AdditionalPropertiesError if additional properties do not validate", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             patternProperties: {
                 "^.est?$": { type: "number" }

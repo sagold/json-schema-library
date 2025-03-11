@@ -1,9 +1,10 @@
 /* eslint-disable max-len, no-control-regex */
-import { JsonError } from "../types";
+import { JsonError, JsonSchema } from "../types";
 import validUrl from "valid-url";
 import { parse as parseIdnEmail } from "smtp-address-parser";
 import getTypeOf from "../getTypeOf";
 import { SchemaNode } from "../schemaNode";
+import { CreateError } from "../utils/createCustomError";
 
 const isValidIPV4 = /^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$/;
 const isValidIPV6 =
@@ -25,7 +26,14 @@ const isValidURITemplate =
 const isValidDurationString = /^P(?!$)(\d+Y)?(\d+M)?(\d+W)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+S)?)?$/;
 
 // Default Json-Schema formats: date-time, email, hostname, ipv4, ipv6, uri, uriref
-const formatValidators: Record<string, (node: SchemaNode, value: unknown) => undefined | JsonError | JsonError[]> = {
+type TempNode = {
+    schema: JsonSchema;
+    draft: {
+        errors: Record<string, CreateError>;
+    };
+    pointer: string;
+};
+const formatValidators: Record<string, (node: TempNode, value: unknown) => undefined | JsonError | JsonError[]> = {
     date: (node, value) => {
         const { draft, schema, pointer } = node;
         if (typeof value !== "string" || value === "") {

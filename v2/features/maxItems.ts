@@ -6,7 +6,7 @@ export function maxItemsValidator({ schema, validators }: SchemaNode): void {
     }
     validators.push(({ node, data, pointer }) => {
         if (Array.isArray(data) && schema.maxItems < data.length) {
-            return node.draft.errors.maxItemsError({
+            return node.errors.maxItemsError({
                 maximum: schema.maxItems,
                 length: data.length,
                 schema,

@@ -1,14 +1,10 @@
 import { strict as assert } from "assert";
-import { Draft2019 } from "../../lib/draft2019";
-import { Draft } from "../../lib/draft";
+
 import { compileSchema } from "../compileSchema";
 
 describe("feature : properties : get", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     it("shoud return errors for missing `required` properties", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             required: ["id", "a", "aa", "aaa"]
         }).validate({ id: "first", a: "correct", b: "ignored" });

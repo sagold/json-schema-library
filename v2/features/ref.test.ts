@@ -1,15 +1,11 @@
 import { strict as assert } from "assert";
-import { Draft2019 } from "../../lib/draft2019";
-import { Draft } from "../../lib/draft";
+
 import { compileSchema } from "../compileSchema";
 import { isJsonError } from "../../lib/types";
 
 describe("feature : ref : resolve", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     it("should return undefined for missing reference", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             $ref: "#/$defs/header",
             minLength: 1
         }).resolveRef();
@@ -18,7 +14,7 @@ describe("feature : ref : resolve", () => {
     });
 
     it("should resolve $ref from definitions", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             $ref: "#/definitions/header",
             definitions: { header: { type: "string", minLength: 1 } }
         }).resolveRef();
@@ -27,7 +23,7 @@ describe("feature : ref : resolve", () => {
     });
 
     it("should resolve $ref from $defs", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             $ref: "#/$defs/header",
             $defs: { header: { type: "string", minLength: 1 } }
         }).resolveRef();
@@ -36,7 +32,7 @@ describe("feature : ref : resolve", () => {
     });
 
     it("should resolve nested $ref from $defs", () => {
-        const _node = compileSchema(draft, {
+        const _node = compileSchema({
             properties: {
                 header: { $ref: "#/$defs/header" }
             },
@@ -49,7 +45,7 @@ describe("feature : ref : resolve", () => {
     });
 
     it("should resolve root pointer, not merging schema", () => {
-        const _node = compileSchema(draft, {
+        const _node = compileSchema({
             type: "object",
             minProperties: 1,
             properties: {
@@ -70,7 +66,7 @@ describe("feature : ref : resolve", () => {
     });
 
     it("should resolve with full domain", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             $id: "https://root.schema",
             $ref: "https://root.schema#/$defs/header",
             $defs: { header: { type: "string", minLength: 1 } }
@@ -80,7 +76,7 @@ describe("feature : ref : resolve", () => {
     });
 
     it("should resolve locally without domain", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             $id: "https://root.schema",
             $ref: "#/$defs/header",
             $defs: { header: { type: "string", minLength: 1 } }
@@ -91,7 +87,7 @@ describe("feature : ref : resolve", () => {
 
     describe("uri encoded pointer", () => {
         it("should resolve url encoded property", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 $ref: "#/$defs/header%25title",
                 $defs: { "header%title": { type: "string", minLength: 1 } }
             }).resolveRef();
@@ -100,7 +96,7 @@ describe("feature : ref : resolve", () => {
         });
 
         it("should resolve ~0 to ~", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 $ref: "#/$defs/tilde~0field",
                 $defs: { "tilde~field": { type: "string", minLength: 1 } }
             }).resolveRef();
@@ -109,7 +105,7 @@ describe("feature : ref : resolve", () => {
         });
 
         it("should resolve ~1 to /", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 $ref: "#/$defs/slash~1field",
                 $defs: { "slash/field": { type: "string", minLength: 1 } }
             }).resolveRef();
@@ -120,7 +116,7 @@ describe("feature : ref : resolve", () => {
 
     describe("remoteSchema", () => {
         it("should resolve remoteSchema from $ref", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 $ref: "https://remote.schema"
             })
                 .addRemote("https://remote.schema", { type: "object", minProperties: 1 })
@@ -130,7 +126,7 @@ describe("feature : ref : resolve", () => {
         });
 
         it("should resolve $defs in remoteSchema from $ref", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 $ref: "https://remote.schema#/$defs/header"
             })
                 .addRemote("https://remote.schema", { $defs: { header: { type: "object", minProperties: 1 } } })
@@ -140,7 +136,7 @@ describe("feature : ref : resolve", () => {
         });
 
         it("should resolve $defs in correct remoteSchema from $ref", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 $ref: "https://remoteB.schema#/$defs/header"
             })
                 .addRemote("https://remoteA.schema", { $defs: { header: { type: "string", minLength: 1 } } })
@@ -151,7 +147,7 @@ describe("feature : ref : resolve", () => {
         });
 
         it("should resolve $ref to through multiple remoteSchema", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 $ref: "https://remoteA.schema"
             })
                 .addRemote("https://remoteA.schema", { $ref: "https://remoteB.schema#/$defs/header" })
@@ -164,7 +160,7 @@ describe("feature : ref : resolve", () => {
         });
 
         it("should resolve local $ref from remoteSchema in remoteSchema", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 $ref: "https://remote.schema"
             })
                 .addRemote("https://remote.schema", {
@@ -178,7 +174,7 @@ describe("feature : ref : resolve", () => {
         });
 
         it("should resolve remote $ref to origin schema", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 $id: "https://root.schema",
                 $ref: "https://remote.schema/",
                 $defs: { header: { type: "object", minProperties: 1 } }
@@ -195,11 +191,8 @@ describe("feature : ref : resolve", () => {
 });
 
 describe("feature : ref : validate", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     it("should return error", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             $schema: "https://json-schema.org/draft/2019-09/schema",
             properties: { foo: { $ref: "#" } },
             additionalProperties: false
@@ -209,7 +202,7 @@ describe("feature : ref : validate", () => {
     });
 
     it("should return error for recursive mismatch", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             $schema: "https://json-schema.org/draft/2019-09/schema",
             properties: { foo: { $ref: "#" } },
             additionalProperties: false
@@ -219,7 +212,7 @@ describe("feature : ref : validate", () => {
     });
 
     it("should resolve base URI change - change folder", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             $schema: "https://json-schema.org/draft/2019-09/schema",
             $id: "http://localhost:1234/draft2019-09/scope_change_defs1.json",
             type: "object",
@@ -250,7 +243,7 @@ describe("feature : ref : validate", () => {
     });
 
     it("should resolve base URI change ref valid", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             $schema: "https://json-schema.org/draft/2019-09/schema",
             $id: "http://localhost:1234/draft2019-09/",
             items: {
@@ -270,7 +263,7 @@ describe("feature : ref : validate", () => {
 
     // requires anchor
     it("should resolve Location-independent identifier in remote ref", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             $schema: "https://json-schema.org/draft/2019-09/schema",
             $ref: "http://localhost:1234/draft2019-09/locationIndependentIdentifier.json#/$defs/refToInteger"
         })

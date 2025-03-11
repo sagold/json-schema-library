@@ -20,7 +20,7 @@ function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParam
         return node.additionalProperties.reduce({ data: value });
     }
     if (node.schema.additionalProperties === false) {
-        return node.draft.errors.noAdditionalPropertiesError({
+        return node.errors.noAdditionalPropertiesError({
             pointer: `${key}`,
             schema: node.schema,
             value: getValue(data, key),
@@ -52,7 +52,7 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
         return;
     }
 
-    const { draft, schema } = node;
+    const { schema } = node;
     if (isObject(schema.patternProperties) && schema.additionalProperties === false) {
         // this is an arrangement with patternProperties. patternProperties validate before additionalProperties:
         // https://spacetelescope.github.io/understanding-json-schema/reference/object.html#index-5
@@ -85,7 +85,7 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
                 errors.push(...validationErrors);
             } else {
                 errors.push(
-                    draft.errors.noAdditionalPropertiesError({
+                    node.errors.noAdditionalPropertiesError({
                         pointer,
                         schema,
                         value: data,

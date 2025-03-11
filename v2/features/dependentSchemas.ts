@@ -65,7 +65,7 @@ export function dependentSchemasValidator(node: SchemaNode): void {
     }
 
     node.validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
-        const { draft, schema, dependentSchemas } = node;
+        const { schema, dependentSchemas } = node;
         if (!isObject(data)) {
             return undefined;
         }
@@ -77,7 +77,7 @@ export function dependentSchemasValidator(node: SchemaNode): void {
                 return;
             }
             if (dependencies === false) {
-                errors.push(draft.errors.missingDependencyError({ pointer, schema, value: data }));
+                errors.push(node.errors.missingDependencyError({ pointer, schema, value: data }));
                 return;
             }
             if (isSchemaNode(dependencies)) {

@@ -1,15 +1,11 @@
 import { strict as assert } from "assert";
-import { Draft2019 } from "../../lib/draft2019";
-import { Draft } from "../../lib/draft";
+
 import { compileSchema } from "../compileSchema";
 
 describe("feature : object : validate", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     describe("maxProperties", () => {
         it("should return an error if maxProperties is exceeded", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 type: "object",
                 maxProperties: 1
             });
@@ -21,7 +17,7 @@ describe("feature : object : validate", () => {
         });
 
         it("should NOT return an error if property count is equal to maxProperties", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 type: "object",
                 maxProperties: 2
             });
@@ -33,7 +29,7 @@ describe("feature : object : validate", () => {
 
         it("should return an error if maxProperties of nested properties is exceeded", () => {
             // tests validation walking through properties
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 type: "object",
                 properties: {
                     header: {
@@ -52,7 +48,7 @@ describe("feature : object : validate", () => {
 
     describe("minProperties", () => {
         it("should return an error if property count is below minProperties ", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 type: "object",
                 minProperties: 2
             });
@@ -64,7 +60,7 @@ describe("feature : object : validate", () => {
         });
 
         it("should NOT return an error if property count is equal to minProperties ", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 type: "object",
                 minProperties: 2
             });
@@ -77,11 +73,8 @@ describe("feature : object : validate", () => {
 });
 
 describe("feature : object : getTemplate", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     it("should return default value of properties", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             properties: {
                 header: { type: "string", default: "title" }

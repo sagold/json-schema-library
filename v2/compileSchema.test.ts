@@ -1,6 +1,4 @@
 import { compileSchema } from "./compileSchema";
-import { Draft } from "../lib/draft";
-import { Draft2019 } from "../lib/draft2019";
 import { strict as assert } from "assert";
 import { SchemaNode, isSchemaNode } from "./types";
 import { isJsonError } from "../lib/types";
@@ -46,12 +44,9 @@ import { isJsonError } from "../lib/types";
 // }
 
 describe("compileSchema : get", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     describe("behaviour", () => {
         it("should return node of property", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 type: "object",
                 properties: {
                     title: { type: "string", minLength: 1 }
@@ -64,7 +59,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should return node of property even it type differs", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 type: "object",
                 properties: {
                     title: { type: "string", minLength: 1 }
@@ -77,7 +72,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should return undefined if property is not defined, but allowed", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 type: "object",
                 properties: {
                     title: { type: "string", minLength: 1 }
@@ -88,7 +83,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should return an error when the property is not allowed", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 type: "object",
                 properties: {
                     title: { type: "string", minLength: 1 }
@@ -101,7 +96,7 @@ describe("compileSchema : get", () => {
     });
 
     it("should resolve both if-then-else and allOf schema", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
             then: {
@@ -125,7 +120,7 @@ describe("compileSchema : get", () => {
 
     describe("ref", () => {
         it("should resolve references in allOf schema", () => {
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 definitions: {
                     object: { type: "object" },
                     additionalNumber: {
@@ -143,14 +138,11 @@ describe("compileSchema : get", () => {
 });
 
 describe("compileSchema : reduce", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     describe("behaviour", () => {});
 
     it("should return schema for boolean schema true", () => {
         // @ts-expect-error boolean schema still untyped
-        const node = compileSchema(draft, true);
+        const node = compileSchema(true);
 
         const schema = node.reduce({ data: 123 })?.schema;
 
@@ -158,7 +150,7 @@ describe("compileSchema : reduce", () => {
     });
 
     it("should compile schema with current data", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
             then: {
@@ -177,7 +169,7 @@ describe("compileSchema : reduce", () => {
     });
 
     it.skip("should recursively compile schema with current data", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             properties: {
                 article: {
@@ -210,7 +202,7 @@ describe("compileSchema : spec/unevaluatedProperties", () => {
     describe("dynamic evalation inside nested refs", () => {
         let node: SchemaNode;
         beforeEach(() => {
-            node = compileSchema(new Draft2019(), {
+            node = compileSchema({
                 $schema: "https://json-schema.org/draft/2019-09/schema",
                 $defs: {
                     one: {
@@ -242,9 +234,6 @@ describe("compileSchema : spec/unevaluatedProperties", () => {
 });
 
 describe("compileSchema : spec/recursiveRef", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     describe("$recursiveRef without using nesting", () => {
         it("integer does not match as a property value", () => {
             // how it should resolve
@@ -255,7 +244,7 @@ describe("compileSchema : spec/recursiveRef", () => {
             //          3. { foo } » myObject:anyof:additionalProperties => recursiveRef
             //          => recursiveAnchor = myObject
             //          4. 1 » anyOf: [false, false] => error
-            const node = compileSchema(draft, {
+            const node = compileSchema({
                 $schema: "https://json-schema.org/draft/2019-09/schema",
                 $id: "http://localhost:4242/draft2019-09/recursiveRef2/schema.json",
                 $defs: {
@@ -283,7 +272,7 @@ describe("compileSchema : spec/recursiveRef", () => {
     describe("$recursiveRef with $recursiveAnchor: false works like $ref", () => {
         let node: SchemaNode;
         beforeEach(() => {
-            node = compileSchema(draft, {
+            node = compileSchema({
                 $schema: "https://json-schema.org/draft/2019-09/schema",
                 $id: "http://localhost:4242/draft2019-09/recursiveRef4/schema.json",
                 $recursiveAnchor: false,

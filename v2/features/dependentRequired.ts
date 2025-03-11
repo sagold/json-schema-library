@@ -8,7 +8,7 @@ export function dependentRequiredValidator(node: SchemaNode): void {
     }
 
     node.validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
-        const { draft, schema } = node;
+        const { schema } = node;
         const dependentRequired = schema.dependentRequired;
         if (!isObject(data)) {
             return undefined;
@@ -21,7 +21,7 @@ export function dependentRequiredValidator(node: SchemaNode): void {
                 return;
             }
             if (dependencies === false) {
-                errors.push(draft.errors.missingDependencyError({ pointer, schema, value: data }));
+                errors.push(node.errors.missingDependencyError({ pointer, schema, value: data }));
                 return;
             }
             if (!Array.isArray(dependencies)) {
@@ -30,7 +30,7 @@ export function dependentRequiredValidator(node: SchemaNode): void {
             for (let i = 0, l = dependencies.length; i < l; i += 1) {
                 if (data[dependencies[i]] === undefined) {
                     errors.push(
-                        draft.errors.missingDependencyError({
+                        node.errors.missingDependencyError({
                             missingProperty: dependencies[i],
                             pointer,
                             schema,

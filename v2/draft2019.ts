@@ -36,6 +36,9 @@ import { typeValidator } from "./features/type";
 import { uniqueItemsValidator } from "./features/uniqueItems";
 import { getObjectData } from "./features/object";
 import { getStringData } from "./features/string";
+import ERRORS from "../lib/validation/errors";
+
+export { ERRORS };
 
 export const PARSER: ((node: SchemaNode) => void)[] = [
     parseRef, // @attention has to come before compiling any other node

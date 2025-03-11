@@ -1,17 +1,18 @@
-import { Draft } from "../lib/draft";
 import { isJsonError, JsonError, JsonSchema } from "../lib/types";
 import { mergeSchema } from "../lib/mergeSchema";
 import { omit } from "../lib/utils/omit";
 import { SchemaNode, JsonSchemaReducerParams, ValidationPath } from "./types";
 import { strict as assert } from "assert";
-import { PARSER, VALIDATORS, DEFAULT_DATA } from "./draft2019";
+import { PARSER, VALIDATORS, DEFAULT_DATA, ERRORS } from "./draft2019";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import createSchemaOf from "../lib/createSchemaOf";
 
 const NODE_METHODS: Pick<
     SchemaNode,
-    "get" | "getTemplate" | "reduce" | "resolveRef" | "toJSON" | "addRemote" | "compileSchema" | "validate"
+    "get" | "getTemplate" | "reduce" | "resolveRef" | "toJSON" | "addRemote" | "compileSchema" | "validate" | "errors"
 > = {
+    errors: ERRORS,
+
     compileSchema(schema: JsonSchema, spointer: string) {
         // assert(schema !== undefined, "schema missing");
         const parentNode = this as SchemaNode;
@@ -19,7 +20,6 @@ const NODE_METHODS: Pick<
             context: parentNode.context,
             parent: parentNode,
             spointer,
-            draft: parentNode.draft,
             reducers: [],
             resolvers: [],
             validators: [],
@@ -144,7 +144,7 @@ const NODE_METHODS: Pick<
         // @ts-expect-error untyped boolean schema
         if (node.schema === false) {
             return [
-                node.draft.errors.invalidDataError({
+                node.errors.invalidDataError({
                     value: data,
                     pointer,
                     schema: node.schema
@@ -165,13 +165,12 @@ const NODE_METHODS: Pick<
     },
 
     addRemote(url: string, schema: JsonSchema) {
-        const { context, draft } = this as SchemaNode;
+        const { context } = this as SchemaNode;
         // @draft >= 6
         schema.$id = schema.$id || url;
 
         const node: SchemaNode = {
             spointer: "#",
-            draft,
             reducers: [],
             resolvers: [],
             validators: [],
@@ -194,7 +193,7 @@ const NODE_METHODS: Pick<
     },
 
     toJSON() {
-        return { ...this, draft: undefined, context: undefined, parent: this.parent?.spointer };
+        return { ...this, context: undefined, errors: undefined, parent: this.parent?.spointer };
     }
 };
 
@@ -203,7 +202,7 @@ const NODE_METHODS: Pick<
  * wrapping each schema with utilities and as much preevaluation is possible. Each
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
-export function compileSchema(draft: Draft, schema: JsonSchema) {
+export function compileSchema(schema: JsonSchema) {
     assert(schema !== undefined, "schema missing");
 
     // # $vocabulary
@@ -230,7 +229,6 @@ export function compileSchema(draft: Draft, schema: JsonSchema) {
 
     const node: SchemaNode = {
         spointer: "#",
-        draft,
         reducers: [],
         resolvers: [],
         validators: [],

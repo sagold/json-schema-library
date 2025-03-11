@@ -5,12 +5,12 @@ export function maximumValidator({ schema, validators }: SchemaNode): void {
         return;
     }
     validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
-        const { draft, schema } = node;
+        const { schema } = node;
         if (isNaN(data as number)) {
             return undefined;
         }
         if (schema.maximum && schema.maximum < data) {
-            return draft.errors.maximumError({
+            return node.errors.maximumError({
                 maximum: schema.maximum,
                 length: data,
                 value: data,
@@ -19,7 +19,7 @@ export function maximumValidator({ schema, validators }: SchemaNode): void {
             });
         }
         if (schema.maximum && schema.exclusiveMaximum === true && schema.maximum === data) {
-            return draft.errors.maximumError({
+            return node.errors.maximumError({
                 maximum: schema.maximum,
                 length: data,
                 pointer,

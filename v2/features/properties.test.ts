@@ -1,15 +1,11 @@
 import { strict as assert } from "assert";
-import { Draft2019 } from "../../lib/draft2019";
-import { Draft } from "../../lib/draft";
+
 import { compileSchema } from "../compileSchema";
 import { isJsonError } from "../../lib/types";
 
 describe("feature : properties : get", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     it("should step into properties without data", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             properties: {
                 header: { type: "string", minLength: 1 }
@@ -22,7 +18,7 @@ describe("feature : properties : get", () => {
     });
 
     it("should step into properties", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             properties: {
                 header: { type: "string", minLength: 1 }
@@ -35,7 +31,7 @@ describe("feature : properties : get", () => {
     });
 
     it("should step into nested properties", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             properties: {
                 header: {
@@ -55,7 +51,7 @@ describe("feature : properties : get", () => {
     });
 
     it("should step into properties with if-then present", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             properties: {
                 withHeader: { type: "boolean", default: true }
@@ -71,11 +67,8 @@ describe("feature : properties : get", () => {
 });
 
 describe("feature : properties : validate", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     it("should validate matching property type", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             properties: {
                 header: { type: "string", minLength: 1 }
@@ -86,7 +79,7 @@ describe("feature : properties : validate", () => {
     });
 
     it("should validate boolean schema `true`", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             properties: {
                 header: true
@@ -97,7 +90,7 @@ describe("feature : properties : validate", () => {
     });
 
     it("should validate boolean schema `false` if property not given", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             properties: {
                 header: true,
@@ -109,7 +102,7 @@ describe("feature : properties : validate", () => {
     });
 
     it("should NOT validate boolean schema `false`", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             properties: {
                 header: false

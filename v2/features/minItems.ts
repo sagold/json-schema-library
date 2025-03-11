@@ -10,7 +10,7 @@ export function minItemsValidator({ schema, validators }: SchemaNode): void {
         }
         if (schema.minItems > data.length) {
             if (schema.minItems === 1) {
-                return node.draft.errors.minItemsOneError({
+                return node.errors.minItemsOneError({
                     minItems: schema.minItems,
                     length: data.length,
                     pointer,
@@ -18,7 +18,7 @@ export function minItemsValidator({ schema, validators }: SchemaNode): void {
                     value: data
                 });
             }
-            return node.draft.errors.minItemsError({
+            return node.errors.minItemsError({
                 minItems: schema.minItems,
                 length: data.length,
                 pointer,

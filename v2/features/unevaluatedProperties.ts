@@ -1,4 +1,3 @@
-import { reduceSchema } from "../../lib/reduceSchema";
 import { isJsonError, JsonError } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
 import { isSchemaNode, JsonSchemaValidatorParams, SchemaNode } from "../types";
@@ -46,7 +45,7 @@ export function unevaluatedPropertiesValidator({ schema, validators }: SchemaNod
             if (isSchemaNode(child)) {
                 if (child.validate(data[propertyName], `${pointer}/${propertyName}`, path).length > 0) {
                     errors.push(
-                        node.draft.errors.unevaluatedPropertyError({
+                        node.errors.unevaluatedPropertyError({
                             pointer: `${pointer}/${propertyName}`,
                             value: JSON.stringify(data[propertyName]),
                             schema: node.schema
@@ -69,7 +68,7 @@ export function unevaluatedPropertiesValidator({ schema, validators }: SchemaNod
                     errors.push(...validationResult);
                 } else if (reducedNode.schema.unevaluatedProperties === false) {
                     errors.push(
-                        node.draft.errors.unevaluatedPropertyError({
+                        node.errors.unevaluatedPropertyError({
                             pointer: `${pointer}/${propertyName}`,
                             value: JSON.stringify(data[propertyName]),
                             schema: node.schema
@@ -118,7 +117,7 @@ export function unevaluatedPropertiesValidator({ schema, validators }: SchemaNod
         // if (resolvedSchema.unevaluatedProperties === false) {
         //     unevaluated.forEach((key) => {
         //         errors.push(
-        //             draft.errors.unevaluatedPropertyError({
+        //             node.errors.unevaluatedPropertyError({
         //                 pointer: `${pointer}/${key}`,
         //                 value: JSON.stringify(data[key]),
         //                 schema

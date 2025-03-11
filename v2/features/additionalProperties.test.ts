@@ -1,14 +1,10 @@
 import { strict as assert } from "assert";
-import { Draft2019 } from "../../lib/draft2019";
-import { Draft } from "../../lib/draft";
+
 import { compileSchema } from "../compileSchema";
 
 describe("feature : additionalProperties : get", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     it("should step into additionalProperties", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             additionalProperties: { type: "string", minLength: 1 }
         });
@@ -19,7 +15,7 @@ describe("feature : additionalProperties : get", () => {
     });
 
     it("should NOT step into additionalProperties if false", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             additionalProperties: false
         });
@@ -30,7 +26,7 @@ describe("feature : additionalProperties : get", () => {
     });
 
     it("should return undefined if additionalProperties is true", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             additionalProperties: true
         });
@@ -41,7 +37,7 @@ describe("feature : additionalProperties : get", () => {
     });
 
     it("should apply additionalProperties from allOf", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             allOf: [{ additionalProperties: true }]
         });
@@ -52,7 +48,7 @@ describe("feature : additionalProperties : get", () => {
     });
 
     it("should override additionalProperties from allOf", () => {
-        const node = compileSchema(draft, {
+        const node = compileSchema({
             type: "object",
             additionalProperties: { type: "number" },
             allOf: [{ additionalProperties: { type: "boolean" } }]
@@ -65,16 +61,13 @@ describe("feature : additionalProperties : get", () => {
 });
 
 describe("feature : additionalProperties : validate", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft2019()));
-
     it("should return no-additional-properties-error if no schema is given for an additional property", () => {
-        const errors = compileSchema(draft, { type: "object", additionalProperties: false }).validate({ a: 1 });
+        const errors = compileSchema({ type: "object", additionalProperties: false }).validate({ a: 1 });
         assert.deepEqual(errors.length, 1);
     });
 
     it("should return error for property not in properties schema", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             $schema: "https://json-schema.org/draft/2019-09/schema",
             properties: { foo: { $ref: "#" } },
             additionalProperties: false
@@ -84,7 +77,7 @@ describe("feature : additionalProperties : validate", () => {
     });
 
     it("should return all no-additional-properties-error", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             patternProperties: {
                 dummy: false
@@ -100,12 +93,12 @@ describe("feature : additionalProperties : validate", () => {
     });
 
     it("should be valid if 'additionalProperties' is 'true'", () => {
-        const errors = compileSchema(draft, { type: "object", additionalProperties: true }).validate({ a: 1 });
+        const errors = compileSchema({ type: "object", additionalProperties: true }).validate({ a: 1 });
         assert.deepEqual(errors.length, 0);
     });
 
     it("should be valid if value matches 'additionalProperties' schema", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             properties: { b: { type: "string" } },
             additionalProperties: { type: "number" }
@@ -114,7 +107,7 @@ describe("feature : additionalProperties : validate", () => {
     });
 
     it("should only validate existing definition in 'properties'", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             properties: { b: { type: "string" } },
             additionalProperties: { type: "number" }
@@ -123,7 +116,7 @@ describe("feature : additionalProperties : validate", () => {
     });
 
     it("should return error if value does not match 'additionalProperties' schema", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             properties: { b: { type: "string" } },
             additionalProperties: { type: "string" }
@@ -133,7 +126,7 @@ describe("feature : additionalProperties : validate", () => {
     });
 
     it("should be valid if value matches 'additionalProperties' oneOf schema", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             properties: { b: { type: "string" } },
             additionalProperties: {
@@ -144,7 +137,7 @@ describe("feature : additionalProperties : validate", () => {
     });
 
     it("should be invalid if value does not match 'additionalProperties' in oneOf schema", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             properties: { b: { type: "string" } },
             additionalProperties: {
@@ -155,7 +148,7 @@ describe("feature : additionalProperties : validate", () => {
     });
 
     it("should be ignore properties that are matched by patternProperties", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             properties: { b: { type: "string" } },
             patternProperties: {
@@ -169,7 +162,7 @@ describe("feature : additionalProperties : validate", () => {
     });
 
     it("should be invalid if value does match multiple 'additionalProperties' in oneOf schema", () => {
-        const errors = compileSchema(draft, {
+        const errors = compileSchema({
             type: "object",
             properties: { b: { type: "string" } },
             additionalProperties: {

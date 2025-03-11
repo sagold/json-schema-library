@@ -9,7 +9,7 @@ export function getStringData(node: SchemaNode) {
     }
 }
 
-export function maxLengthValidator({ schema, draft, validators }: SchemaNode): void {
+export function maxLengthValidator({ schema, validators }: SchemaNode): void {
     if (isNaN(schema.maxLength)) {
         return;
     }
@@ -21,7 +21,7 @@ export function maxLengthValidator({ schema, draft, validators }: SchemaNode): v
         const { schema } = node;
         const length = ucs2decode(data).length;
         if (schema.maxLength < length) {
-            return draft.errors.maxLengthError({
+            return node.errors.maxLengthError({
                 maxLength: schema.maxLength,
                 length,
                 pointer,
@@ -32,7 +32,7 @@ export function maxLengthValidator({ schema, draft, validators }: SchemaNode): v
     });
 }
 
-export function minLengthValidator({ schema, draft, validators }: SchemaNode): void {
+export function minLengthValidator({ schema, validators }: SchemaNode): void {
     if (isNaN(schema.minLength)) {
         return;
     }
@@ -46,7 +46,7 @@ export function minLengthValidator({ schema, draft, validators }: SchemaNode): v
             return;
         }
         if (schema.minLength === 1) {
-            return draft.errors.minLengthOneError({
+            return node.errors.minLengthOneError({
                 minLength: schema.minLength,
                 length,
                 pointer,
@@ -54,7 +54,7 @@ export function minLengthValidator({ schema, draft, validators }: SchemaNode): v
                 value: data
             });
         }
-        return draft.errors.minLengthError({
+        return node.errors.minLengthError({
             minLength: schema.minLength,
             length,
             pointer,
