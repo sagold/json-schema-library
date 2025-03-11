@@ -17,7 +17,7 @@ export type JsonSchemaDefaultDataResolver = (options: JsonSchemaDefaultDataResol
 export type Context = {
     /** root node of this json-schema */
     rootNode: SchemaNode;
-    /** root nodes of registered remote json-schema */
+    /** root nodes of registered remote json-schema, stored by id/url */
     remotes: Record<string, SchemaNode>;
     /** references stored by fully resolved schema-$id + local-pointer */
     refs: Record<string, SchemaNode>;

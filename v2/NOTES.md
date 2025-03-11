@@ -14,14 +14,16 @@
 
 **context binds all json-schema:**
 
+```yaml
 context:
-
--   remotes: RootNode[]
+    - remotes: RootNode[]
+```
 
 **context is RootNode specific:**
 
+```yaml
 context:
-
--   rootNode: JsonSchemaRootNode
--   PARSERS: JsonSchemaSpec Parser of this json-schema spec
--   VALIDATORA: JsonSchemaSpec Validators of this json-schema spec
+    - rootNode: JsonSchemaRootNode
+    - PARSERS: JsonSchemaSpec Parser of this json-schema spec
+    - VALIDATORA: JsonSchemaSpec Validators of this json-schema spec
+```

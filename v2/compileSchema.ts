@@ -3,15 +3,17 @@ import { mergeSchema } from "../lib/mergeSchema";
 import { omit } from "../lib/utils/omit";
 import { SchemaNode, JsonSchemaReducerParams, ValidationPath } from "./types";
 import { strict as assert } from "assert";
-import { PARSER, VALIDATORS, DEFAULT_DATA, ERRORS } from "./draft2019";
+import * as draft2019 from "./draft2019";
+import * as draft07 from "./draft07";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import createSchemaOf from "../lib/createSchemaOf";
+import { joinId } from "./utils/joinId";
 
 const NODE_METHODS: Pick<
     SchemaNode,
     "get" | "getTemplate" | "reduce" | "resolveRef" | "toJSON" | "addRemote" | "compileSchema" | "validate" | "errors"
 > = {
-    errors: ERRORS,
+    errors: draft2019.ERRORS,
 
     compileSchema(schema: JsonSchema, spointer: string) {
         // assert(schema !== undefined, "schema missing");
@@ -167,7 +169,7 @@ const NODE_METHODS: Pick<
     addRemote(url: string, schema: JsonSchema) {
         const { context } = this as SchemaNode;
         // @draft >= 6
-        schema.$id = schema.$id || url;
+        schema.$id = joinId(schema.$id || url);
 
         const node: SchemaNode = {
             spointer: "#",
@@ -179,7 +181,27 @@ const NODE_METHODS: Pick<
             ...NODE_METHODS
         } as SchemaNode;
 
-        node.context = { ...context, refs: {}, rootNode: node, PARSER, VALIDATORS, DEFAULT_DATA };
+        let draft;
+        const $schema = schema.$schema ?? this.context.rootNode.$schema;
+        if ($schema?.includes("/draft-07/schema")) {
+            draft = draft07;
+            schema.$schema = "http://json-schema.org/draft-07/schema";
+        } else if ($schema?.includes("/draft/2019-09/schema")) {
+            draft = draft2019;
+            schema.$schema = "https://json-schema.org/draft/2019-09/schema";
+        } else {
+            draft = draft2019;
+            schema.$schema = "https://json-schema.org/draft/2019-09/schema";
+        }
+
+        node.context = {
+            ...context,
+            refs: {},
+            rootNode: node,
+            PARSER: draft.PARSER,
+            VALIDATORS: draft.VALIDATORS,
+            DEFAULT_DATA: draft.DEFAULT_DATA
+        };
         node.context.remotes[url] = node;
         node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
         node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
@@ -237,7 +259,25 @@ export function compileSchema(schema: JsonSchema) {
         ...NODE_METHODS
     } as SchemaNode;
 
-    node.context = { remotes: {}, anchors: {}, refs: {}, ids: {}, rootNode: node, PARSER, VALIDATORS, DEFAULT_DATA };
+    let draft;
+    if (schema.$schema?.includes("/draft-07/schema")) {
+        draft = draft07;
+    } else if (schema.$schema?.includes("/draft/2019-09/schema")) {
+        draft = draft2019;
+    } else {
+        draft = draft2019;
+    }
+
+    node.context = {
+        remotes: {},
+        anchors: {},
+        refs: {},
+        ids: {},
+        rootNode: node,
+        PARSER: draft.PARSER,
+        VALIDATORS: draft.VALIDATORS,
+        DEFAULT_DATA: draft.DEFAULT_DATA
+    };
     node.context.remotes[schema.$id ?? "#"] = node;
     node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
     node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));

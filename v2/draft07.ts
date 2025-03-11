@@ -4,8 +4,6 @@ import { allOfValidator, parseAllOf } from "./features/allOf";
 import { anyOfValidator, parseAnyOf } from "./features/anyOf";
 import { constValidator } from "./features/const";
 import { containsValidator, parseContains } from "./features/contains";
-import { dependentRequiredValidator } from "./features/dependentRequired";
-import { dependentSchemasValidator, parseDependentSchemas } from "./features/dependentSchemas";
 import { enumValidator } from "./features/enum";
 import { exclusiveMaximumValidator } from "./features/exclusiveMaximum";
 import { exclusiveMinimumValidator } from "./features/exclusiveMinimum";
@@ -37,22 +35,20 @@ import { uniqueItemsValidator } from "./features/uniqueItems";
 import { getObjectData } from "./features/object";
 import { getStringData } from "./features/string";
 import ERRORS from "../lib/validation/errors";
+import { dependenciesValidator } from "./features/draft07/dependencies";
 
 export { ERRORS };
 
 /**
- * @draft-2019 https://json-schema.org/draft/2019-09/release-notes
+ * @draft-07 https://json-schema.org/draft-07/json-schema-release-notes
  *
  * new
- * - $anchor
- * - $recursiveAnchor and $recursiveRef
- * - $vocabulary
- *
- * changed
- * - $defs (renamed from definitions)
- * - $id
- * - $ref
- * - dependencies has been split into dependentSchemas and dependentRequired
+ * - "$comment"
+ * - "if", "then", "else"
+ * - "readOnly"
+ * - "writeOnly"
+ * - "contentMediaType"
+ * - "contentEncoding"
  */
 
 export const PARSER: ((node: SchemaNode) => void)[] = [
@@ -61,7 +57,6 @@ export const PARSER: ((node: SchemaNode) => void)[] = [
     parseAnyOf,
     parseContains,
     parseDefs,
-    parseDependentSchemas, // @draft-2019: new
     parseIfThenElse,
     parseItems,
     parseNot,
@@ -85,8 +80,7 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     anyOfValidator,
     containsValidator,
     constValidator,
-    dependentRequiredValidator, // draft-2019: new
-    dependentSchemasValidator, // draft-2019: new
+    dependenciesValidator,
     enumValidator,
     exclusiveMinimumValidator,
     formatValidator,

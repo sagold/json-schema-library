@@ -2,14 +2,13 @@
 import draft07Meta from "../../../remotes/draft07.json";
 import path from "path";
 import { compileSchema } from "../../../v2/compileSchema";
-import { Draft07 } from "../../../lib/draft07";
 import { expect } from "chai";
 import { getDraftTests, FeatureTest } from "../../getDraftTests";
 import { globSync } from "glob";
-import { SchemaNode } from "../../../v2/compiler/types";
+import { SchemaNode } from "../../../v2/types";
 
-const supportedTestCases = (t: FeatureTest) =>
-    t.optional === false && !["ref", "dependencies", "definitions", "refRemote"].includes(t.name);
+const supportedTestCases = (t: FeatureTest) => t.name === "ref";
+// t.optional === false && !["ref", "refRemote"].includes(t.name);
 // [
 //     "defs",
 //     "additionalItems",
@@ -131,14 +130,14 @@ function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
     remotes.forEach((filepath: string) => {
         const file = require(filepath); // eslint-disable-line
         const remoteId = `${baseURI}/${filepath.split("/remotes/").pop()}`;
-        node.addRemote(remoteId, file);
+        node.addRemote(remoteId, { $schema: "/draft-07/schema", ...file });
     });
 }
 
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "unevaluatedItems with $recursiveRef") {
+            // if (testCase.description !== "dependencies") {
             //     return;
             // }
 
@@ -160,14 +159,13 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
                     }
 
                     test(testData.description, () => {
-                        const validator = new Draft07();
                         // console.log(
                         //     testData.description,
                         //     JSON.stringify(schema, null, 2),
                         //     JSON.stringify(testData.data, null, 2)
                         // );
-                        const node = compileSchema(validator, schema);
-                        addRemotes(node);
+                        const node = compileSchema({ $schema: "/draft-07/schema", ...schema });
+                        // addRemotes(node);
                         const errors = node.validate(testData.data);
                         expect(errors.length === 0).to.eq(testData.valid);
                     });

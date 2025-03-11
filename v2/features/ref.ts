@@ -24,6 +24,7 @@ export function parseRef(node: SchemaNode) {
     // we need to make "#"-refs relative to this $id. In the following case we shift a pointer
     // #/properties/foo/$defs/inner to #/$defs/inner for an initial schema:
     // { $id: http://example.com/schema-relative-uri-defs2.json, $ref: "#/$defs/inner" }
+
     const localPointer = node.spointer.includes("/$defs/")
         ? `#/$defs/${node.spointer.split("/$defs/").pop()}`
         : node.spointer;
