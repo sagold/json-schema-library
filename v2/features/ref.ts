@@ -8,6 +8,7 @@ export function parseRef(node: SchemaNode) {
     // get and store current $id of node - this may be the same as parent $id
     const currentId = joinId(node.parent?.$id, node.schema?.$id);
     node.$id = currentId;
+    node.lastIdPointer = node.parent?.lastIdPointer ?? "#";
 
     // add ref resolution method to node
     node.resolveRef = resolveRef;
@@ -17,18 +18,19 @@ export function parseRef(node: SchemaNode) {
         node.context.refs[currentId] = node;
     }
 
-    // store this node for retrieval by $id + json-pointer
-    node.context.refs[joinId(currentId, node.spointer)] = node;
+    const idChanged = currentId !== node.parent?.$id;
+    if (idChanged && node.spointer !== "#") {
+        node.lastIdPointer = node.spointer;
+    }
 
-    // @todo reevaluate and move to joinId: if there is a nested $defs and this $id is new,
-    // we need to make "#"-refs relative to this $id. In the following case we shift a pointer
-    // #/properties/foo/$defs/inner to #/$defs/inner for an initial schema:
-    // { $id: http://example.com/schema-relative-uri-defs2.json, $ref: "#/$defs/inner" }
-
-    const localPointer = node.spointer.includes("/$defs/")
-        ? `#/$defs/${node.spointer.split("/$defs/").pop()}`
-        : node.spointer;
+    let localPointer = node.spointer;
+    if (node.lastIdPointer !== "#" && node.spointer.startsWith(node.lastIdPointer)) {
+        localPointer = `#${node.spointer.replace(node.lastIdPointer, "")}`;
+    }
+    // store this node for retrieval by $id + json-pointer from $id
     node.context.refs[joinId(currentId, localPointer)] = node;
+    // store this node for retrieval by $id + json-pointer from root
+    // node.context.refs[joinId(currentId, node.spointer)] = node;
 
     // store this node for retrieval by $id + anchor
     if (node.schema.$anchor) {
@@ -70,6 +72,9 @@ export function resolveRef({ pointer, path }: { pointer?: string; path?: Validat
     // console.log("RESOLVE REF", node.schema, "resolved ref", node.ref, "=>", resolvedNode.schema);
     if (resolvedNode != null) {
         path?.push({ pointer, node: resolvedNode });
+        console.log("resolve ref", node.ref, "=>", resolvedNode.schema, Object.keys(node.context.refs));
+    } else {
+        console.log("failed resolving", node.ref, "from", Object.keys(node.context.refs));
     }
     return resolvedNode;
 }

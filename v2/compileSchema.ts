@@ -19,6 +19,7 @@ const NODE_METHODS: Pick<
         // assert(schema !== undefined, "schema missing");
         const parentNode = this as SchemaNode;
         const node: SchemaNode = {
+            lastIdPointer: parentNode.lastIdPointer, // ref helper
             context: parentNode.context,
             parent: parentNode,
             spointer,
@@ -173,6 +174,7 @@ const NODE_METHODS: Pick<
 
         const node: SchemaNode = {
             spointer: "#",
+            lastIdPointer: "#",
             reducers: [],
             resolvers: [],
             validators: [],
@@ -251,6 +253,7 @@ export function compileSchema(schema: JsonSchema) {
 
     const node: SchemaNode = {
         spointer: "#",
+        lastIdPointer: "#",
         reducers: [],
         resolvers: [],
         validators: [],

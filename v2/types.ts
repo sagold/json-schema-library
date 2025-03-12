@@ -49,6 +49,11 @@ export type SchemaNode = {
     ref?: string;
     schema: JsonSchema;
     spointer: string;
+    /**
+     * @todo this is a ref specific property as is $id
+     * json-pointer from last $id ~~to this location~~ to resolve $refs to $id#/idLocalPointer
+     * */
+    lastIdPointer: string;
     oneOfIndex?: number;
 
     // methods
