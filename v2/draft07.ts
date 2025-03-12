@@ -23,7 +23,7 @@ import { parseDefs } from "./features/defs";
 import { parseOneOf, validateOneOf } from "./features/oneOf";
 import { parsePatternProperties, patternPropertiesValidator } from "./features/patternProperties";
 import { parseProperties, propertiesValidator } from "./features/properties";
-import { refValidator, parseRef } from "./features/draft07/ref";
+import { refValidator, parseRef } from "./features/draft06/ref";
 import { parseUnevaluatedItems, unevaluatedItemsValidator } from "./features/unevaluatedItems";
 import { parseUnevaluatedProperties, unevaluatedPropertiesValidator } from "./features/unevaluatedProperties";
 import { patternValidator } from "./features/pattern";
@@ -35,9 +35,10 @@ import { uniqueItemsValidator } from "./features/uniqueItems";
 import { getObjectData } from "./features/object";
 import { getStringData } from "./features/string";
 import ERRORS from "../lib/validation/errors";
-import { dependenciesValidator } from "./features/draft07/dependencies";
+import { dependenciesValidator } from "./features/draft06/dependencies";
 
-export { ERRORS };
+const VERSION = "draft-07";
+export { ERRORS, VERSION };
 
 /**
  * @draft-07 https://json-schema.org/draft-07/json-schema-release-notes

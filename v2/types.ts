@@ -15,6 +15,8 @@ export type JsonSchemaDefaultDataResolverParams = { pointer?: string; data: unkn
 export type JsonSchemaDefaultDataResolver = (options: JsonSchemaDefaultDataResolverParams) => unknown;
 
 export type Context = {
+    /** draft-version */
+    VERSION: string;
     /** root node of this json-schema */
     rootNode: SchemaNode;
     /** root nodes of registered remote json-schema, stored by id/url */

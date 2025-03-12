@@ -5,9 +5,22 @@ import { SchemaNode, JsonSchemaReducerParams, ValidationPath } from "./types";
 import { strict as assert } from "assert";
 import * as draft2019 from "./draft2019";
 import * as draft07 from "./draft07";
+import * as draft06 from "./draft06";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import createSchemaOf from "../lib/createSchemaOf";
 import { joinId } from "./utils/joinId";
+
+const DYNAMIC_PROPERTIES = [
+    "if",
+    "then",
+    "else",
+    "allOf",
+    "anyOf",
+    "oneOf",
+    "dependentSchemas",
+    "dependentRequired",
+    "dependencies"
+];
 
 const NODE_METHODS: Pick<
     SchemaNode,
@@ -15,7 +28,7 @@ const NODE_METHODS: Pick<
 > = {
     errors: draft2019.ERRORS,
 
-    compileSchema(schema: JsonSchema, spointer: string) {
+    compileSchema(schema: JsonSchema, spointer: string = this.spointer) {
         // assert(schema !== undefined, "schema missing");
         const parentNode = this as SchemaNode;
         const node: SchemaNode = {
@@ -126,7 +139,7 @@ const NODE_METHODS: Pick<
         }
 
         // remove dynamic properties of node
-        return { ...node, schema: omit(node.schema, "if", "then", "else", "allOf", "anyOf", "oneOf"), reducers: [] };
+        return node.compileSchema(omit(node.schema, ...DYNAMIC_PROPERTIES));
     },
 
     validate(data: unknown, pointer = "#", path = []) {
@@ -185,10 +198,13 @@ const NODE_METHODS: Pick<
 
         let draft;
         const $schema = schema.$schema ?? this.context.rootNode.$schema;
-        if ($schema?.includes("/draft-07/schema")) {
+        if ($schema?.includes("draft-06")) {
+            draft = draft06;
+            schema.$schema = "http://json-schema.org/draft-06/schema";
+        } else if ($schema?.includes("draft-07")) {
             draft = draft07;
             schema.$schema = "http://json-schema.org/draft-07/schema";
-        } else if ($schema?.includes("/draft/2019-09/schema")) {
+        } else if ($schema?.includes("2019-09")) {
             draft = draft2019;
             schema.$schema = "https://json-schema.org/draft/2019-09/schema";
         } else {
@@ -200,6 +216,7 @@ const NODE_METHODS: Pick<
             ...context,
             refs: {},
             rootNode: node,
+            VERSION: draft.VERSION,
             PARSER: draft.PARSER,
             VALIDATORS: draft.VALIDATORS,
             DEFAULT_DATA: draft.DEFAULT_DATA
@@ -263,9 +280,11 @@ export function compileSchema(schema: JsonSchema) {
     } as SchemaNode;
 
     let draft;
-    if (schema.$schema?.includes("/draft-07/schema")) {
+    if (schema.$schema?.includes("draft-06")) {
+        draft = draft06;
+    } else if (schema.$schema?.includes("draft-07")) {
         draft = draft07;
-    } else if (schema.$schema?.includes("/draft/2019-09/schema")) {
+    } else if (schema.$schema?.includes("2019-09")) {
         draft = draft2019;
     } else {
         draft = draft2019;
@@ -277,6 +296,7 @@ export function compileSchema(schema: JsonSchema) {
         refs: {},
         ids: {},
         rootNode: node,
+        VERSION: draft.VERSION,
         PARSER: draft.PARSER,
         VALIDATORS: draft.VALIDATORS,
         DEFAULT_DATA: draft.DEFAULT_DATA
