@@ -23,7 +23,7 @@ import { parseDefs } from "./features/defs";
 import { parseOneOf, validateOneOf } from "./features/oneOf";
 import { parsePatternProperties, patternPropertiesValidator } from "./features/patternProperties";
 import { parseProperties, propertiesValidator } from "./features/properties";
-import { parseRef, refValidator } from "./features/ref";
+import { refValidator, parseRef } from "./features/draft07/ref";
 import { parseUnevaluatedItems, unevaluatedItemsValidator } from "./features/unevaluatedItems";
 import { parseUnevaluatedProperties, unevaluatedPropertiesValidator } from "./features/unevaluatedProperties";
 import { patternValidator } from "./features/pattern";
@@ -110,9 +110,14 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     uniqueItemsValidator,
     refValidator
 ].map((func) => {
-    // @ts-expect-error extended function for debugging purposes
-    func.toJSON = () => func.name;
-    return func;
+    const skipIfRef = (node: SchemaNode) => {
+        // @todo find a nicer solution to ignore any keywords on a schenma with a $ref
+        if (node.schema?.$ref == null || func.name === "refValidator") {
+            func(node);
+        }
+    };
+    skipIfRef.toJSON = () => func.name;
+    return skipIfRef;
 });
 
 export const DEFAULT_DATA: ((node: SchemaNode) => void)[] = [getObjectData, getStringData].map((func) => {

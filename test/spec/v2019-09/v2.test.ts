@@ -152,10 +152,9 @@ function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "unevaluatedItems with $recursiveRef") {
+            // if (testCase.description !== "ref overrides any sibling keywords") {
             //     return;
             // }
-
             // if (testCase.description !== "remote ref, containing refs itself") { return; }
 
             const schema = testCase.schema;

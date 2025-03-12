@@ -6,109 +6,9 @@ import { expect } from "chai";
 import { getDraftTests, FeatureTest } from "../../getDraftTests";
 import { globSync } from "glob";
 import { SchemaNode } from "../../../v2/types";
+import { isObject } from "../../../lib/utils/isObject";
 
-const supportedTestCases = (t: FeatureTest) => t.name === "ref";
-// t.optional === false && !["ref", "refRemote"].includes(t.name);
-// [
-//     "defs",
-//     "additionalItems",
-//     "additionalProperties",
-//     "allOf",
-//     "anchor",
-//     "anyOf",
-//     "boolean_schema",
-//     "const",
-//     "contains",
-//     "content",
-//     "default",
-//     "dependentRequired",
-//     "dependentSchemas",
-//     "enum",
-//     "exclusiveMaximum",
-//     "exclusiveMinimum",
-//     "format",
-//     "if-then-else",
-//     "infinite-loop-detection",
-//     "items",
-//     "maxContains",
-//     "maximum",
-//     "maxItems",
-//     "maxLength",
-//     "maxProperties",
-//     "minContains",
-//     "minimum",
-//     "minItems",
-//     "minLength",
-//     "minProperties",
-//     "multipleOf",
-//     "not",
-//     "oneOf",
-//     "oneOf",
-//     "pattern",
-//     "patternProperties",
-//     "properties",
-//     "propertyNames",
-//     "recursiveRef",
-//     "ref",
-//     "refRemote",
-//     "required",
-//     "type",
-//     "uniqueItems",
-//     "unknownKeyword",
-//     "unevaluatedProperties",
-//     "unevaluatedItems"
-// ].includes(t.name);
-
-/*
-~ not - expect for uncle-schema support
-~ unevaluatedProperties - expect for uncle-schema and recursiveRef support
-~ unevaluatedItems - expect for ref-merge order, uncle-schema and recursiveRef support
-✓ additionalItems
-✓ additionalProperties
-✓ allOf
-✓ anchor
-✓ anyOf
-✓ boolean_schema
-✓ const
-✓ contains
-✓ content
-✓ default
-✓ defs
-✓ dependentRequired
-✓ enum
-✓ exclusiveMaximum
-✓ exclusiveMinimum
-✓ format
-✓ if-then-else
-✓ infinite-loop-detection
-✓ items
-✓ maxContains
-✓ maximum
-✓ maxItems
-✓ maxLength
-✓ maxProperties
-✓ minContains
-✓ minimum
-✓ minItems
-✓ minLength
-✓ minProperties
-✓ multipleOf
-✓ oneOf
-✓ pattern
-✓ patternProperties
-✓ properties
-✓ propertyNames
-✓ recursiveRef
-✓ ref
-✓ refRemote
-✓ required
-✓ type
-✓ uniqueItems
-✓ unknownKeyword
-
-✖ vocabulary - skipped evaluation of meta-schema
-*/
-
+const supportedTestCases = (t: FeatureTest) => t.optional === false;
 const postponedTestcases: string[] = [];
 
 function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
@@ -137,11 +37,9 @@ function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
-            // if (testCase.description !== "dependencies") {
+            // if (testCase.description !== "base URI change - change folder") {
             //     return;
             // }
-
-            // if (testCase.description !== "remote ref, containing refs itself") { return; }
 
             const schema = testCase.schema;
             if (skipTest.includes(testCase.description)) {
@@ -164,8 +62,9 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
                         //     JSON.stringify(schema, null, 2),
                         //     JSON.stringify(testData.data, null, 2)
                         // );
-                        const node = compileSchema({ $schema: "/draft-07/schema", ...schema });
-                        // addRemotes(node);
+                        const testSchema = isObject(schema) ? { $schema: "/draft-07/schema", ...schema } : schema;
+                        const node = compileSchema(testSchema);
+                        addRemotes(node);
                         const errors = node.validate(testData.data);
                         expect(errors.length === 0).to.eq(testData.valid);
                     });

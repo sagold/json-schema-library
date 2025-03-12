@@ -23,14 +23,15 @@ export function parseRef(node: SchemaNode) {
         node.lastIdPointer = node.spointer;
     }
 
-    let localPointer = node.spointer;
-    if (node.lastIdPointer !== "#" && node.spointer.startsWith(node.lastIdPointer)) {
-        localPointer = `#${node.spointer.replace(node.lastIdPointer, "")}`;
-    }
     // store this node for retrieval by $id + json-pointer from $id
-    node.context.refs[joinId(currentId, localPointer)] = node;
-    // store this node for retrieval by $id + json-pointer from root
-    // node.context.refs[joinId(currentId, node.spointer)] = node;
+    if (node.lastIdPointer !== "#" && node.spointer.startsWith(node.lastIdPointer)) {
+        const localPointer = `#${node.spointer.replace(node.lastIdPointer, "")}`;
+        node.context.refs[joinId(currentId, localPointer)] = node;
+    } else {
+        node.context.refs[joinId(currentId, node.spointer)] = node;
+    }
+    // store $rootId + json-pointer to this node
+    node.context.refs[joinId(node.context.rootNode.$id, node.spointer)] = node;
 
     // store this node for retrieval by $id + anchor
     if (node.schema.$anchor) {
@@ -72,7 +73,7 @@ export function resolveRef({ pointer, path }: { pointer?: string; path?: Validat
     // console.log("RESOLVE REF", node.schema, "resolved ref", node.ref, "=>", resolvedNode.schema);
     if (resolvedNode != null) {
         path?.push({ pointer, node: resolvedNode });
-        console.log("resolve ref", node.ref, "=>", resolvedNode.schema, Object.keys(node.context.refs));
+        // console.log("resolve ref", node.ref, "=>", resolvedNode.schema, Object.keys(node.context.refs));
     } else {
         console.log("failed resolving", node.ref, "from", Object.keys(node.context.refs));
     }
@@ -160,6 +161,11 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
             if (nextNode) {
                 return nextNode;
             }
+            // @note currently solved by additionally stored $rootId + json-schema-path
+            // nextNode = getRef(referencedNode, fragments[1]);
+            // if (nextNode) {
+            //     return nextNode;
+            // }
         }
 
         // @todo this is a poc
