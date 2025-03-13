@@ -1,42 +1,40 @@
-import { SchemaNode, ValidationPath } from "../types";
-import { joinId } from "../utils/joinId";
-import splitRef from "../../lib/compile/splitRef";
-import { omit } from "../../lib/utils/omit";
-import { isObject } from "../../lib/utils/isObject";
+import { SchemaNode, ValidationPath } from "../../types";
+import { joinId } from "../../utils/joinId";
+import { isObject } from "../../../lib/utils/isObject";
+import { omit } from "../../../lib/utils/omit";
+import splitRef from "../../../lib/compile/splitRef";
 
 export function parseRef(node: SchemaNode) {
-    // get and store current $id of node - this may be the same as parent $id
-    const currentId = joinId(node.parent?.$id, node.schema?.$id);
+    // get and store current id of node - this may be the same as parent id
+    let currentId = node.parent?.$id;
+    if (node.schema?.$ref == null && node.schema?.id) {
+        currentId = joinId(node.parent?.$id, node.schema.id);
+        // console.log("create id", node.spointer, ":", node.parent?.$id, node.schema?.id, "=>", currentId);
+    }
     node.$id = currentId;
     node.lastIdPointer = node.parent?.lastIdPointer ?? "#";
 
     // add ref resolution method to node
     node.resolveRef = resolveRef;
 
-    // store this node for retrieval by $id
+    // store this node for retrieval by id
     if (node.context.refs[currentId] == null) {
         node.context.refs[currentId] = node;
     }
 
     const idChanged = currentId !== node.parent?.$id;
-    if (idChanged && node.spointer !== "#") {
+    if (idChanged) {
         node.lastIdPointer = node.spointer;
     }
 
-    // store this node for retrieval by $id + json-pointer from $id
+    // store this node for retrieval by id + json-pointer from id
     if (node.lastIdPointer !== "#" && node.spointer.startsWith(node.lastIdPointer)) {
         const localPointer = `#${node.spointer.replace(node.lastIdPointer, "")}`;
         node.context.refs[joinId(currentId, localPointer)] = node;
     } else {
         node.context.refs[joinId(currentId, node.spointer)] = node;
     }
-    // store $rootId + json-pointer to this node
     node.context.refs[joinId(node.context.rootNode.$id, node.spointer)] = node;
-
-    // store this node for retrieval by $id + anchor
-    if (node.schema.$anchor) {
-        node.context.anchors[`${currentId.replace(/#$/, "")}#${node.schema.$anchor}`] = node;
-    }
 
     // precompile reference
     if (node.schema.$ref) {
@@ -44,28 +42,8 @@ export function parseRef(node: SchemaNode) {
     }
 }
 
-export function refValidator({ schema, validators }: SchemaNode) {
-    if (schema.$ref == null && schema.$recursiveRef == null) {
-        return;
-    }
-    validators.push(({ node, data, pointer = "#", path }) => {
-        const nextNode = node.resolveRef({ pointer, path });
-        if (nextNode == null) {
-            // @todo evaluate this state - should return node or ref is invalid (or bugged)
-            return undefined;
-        }
-        // recursively resolveRef and validate
-        return nextNode.validate(data, pointer, path);
-    });
-}
-
 export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
     const node = this as SchemaNode;
-    if (node.schema.$recursiveRef) {
-        const nextNode = resolveRecursiveRef(node, path);
-        path?.push({ pointer, node: nextNode });
-        return nextNode;
-    }
     if (node.ref == null) {
         return node;
     }
@@ -80,39 +58,9 @@ export function resolveRef({ pointer, path }: { pointer?: string; path?: Validat
     return resolvedNode;
 }
 
-// 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
-function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode {
-    const history = path;
-
-    // RESTRICT BY CHANGE IN BASE-URL
-    // go back in history until we have a domain definition and use this as start node to search for an anchor
-    let startIndex = 0;
-    for (let i = history.length - 1; i >= 0; i--) {
-        if (history[i].node.schema.$recursiveAnchor === false) {
-            // $recursiveRef with $recursiveAnchor: false works like $ref
-            const nextNode = getRef(node, joinId(node.$id, node.schema.$recursiveRef));
-            return nextNode;
-        }
-        if (/^https?:\/\//.test(history[i].node.schema.$id ?? "") && history[i].node.schema.$recursiveAnchor !== true) {
-            startIndex = i;
-            break;
-        }
-    }
-
-    // FROM THERE FIND FIRST OCCURENCE OF AN ANCHOR
-    const firstAnchor = history.find((s, index) => index >= startIndex && s.node.schema.$recursiveAnchor === true);
-    if (firstAnchor) {
-        return firstAnchor.node;
-    }
-
-    // $recursiveRef with no $recursiveAnchor works like $ref?
-    const nextNode = getRef(node, joinId(node.$id, node.schema.$recursiveRef));
-    return nextNode;
-}
-
 function compileNext(referencedNode: SchemaNode, spointer = referencedNode.spointer) {
     const referencedSchema = isObject(referencedNode.schema)
-        ? omit(referencedNode.schema, "$id")
+        ? omit(referencedNode.schema, "id")
         : referencedNode.schema;
     return referencedNode.compileSchema(referencedSchema, `${spointer}/$ref`);
 }

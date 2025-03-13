@@ -1,14 +1,15 @@
+import * as draft04 from "./draft04";
+import * as draft06 from "./draft06";
+import * as draft07 from "./draft07";
+import * as draft2019 from "./draft2019";
+import createSchemaOf from "../lib/createSchemaOf";
+import sanitizeErrors from "./utils/sanitizeErrors";
 import { isJsonError, JsonError, JsonSchema } from "../lib/types";
+import { joinId } from "./utils/joinId";
 import { mergeSchema } from "../lib/mergeSchema";
 import { omit } from "../lib/utils/omit";
 import { SchemaNode, JsonSchemaReducerParams, ValidationPath } from "./types";
 import { strict as assert } from "assert";
-import * as draft2019 from "./draft2019";
-import * as draft07 from "./draft07";
-import * as draft06 from "./draft06";
-import sanitizeErrors from "./utils/sanitizeErrors";
-import createSchemaOf from "../lib/createSchemaOf";
-import { joinId } from "./utils/joinId";
 
 const DYNAMIC_PROPERTIES = [
     "if",
@@ -198,7 +199,10 @@ const NODE_METHODS: Pick<
 
         let draft;
         const $schema = schema.$schema ?? this.context.rootNode.$schema;
-        if ($schema?.includes("draft-06")) {
+        if ($schema?.includes("draft-04")) {
+            draft = draft04;
+            schema.$schema = "http://json-schema.org/draft-04/schema";
+        } else if ($schema?.includes("draft-06")) {
             draft = draft06;
             schema.$schema = "http://json-schema.org/draft-06/schema";
         } else if ($schema?.includes("draft-07")) {
@@ -221,7 +225,7 @@ const NODE_METHODS: Pick<
             VALIDATORS: draft.VALIDATORS,
             DEFAULT_DATA: draft.DEFAULT_DATA
         };
-        node.context.remotes[url] = node;
+        node.context.remotes[joinId(url)] = node;
         node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
         node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
         node.context.DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
@@ -280,7 +284,9 @@ export function compileSchema(schema: JsonSchema) {
     } as SchemaNode;
 
     let draft;
-    if (schema.$schema?.includes("draft-06")) {
+    if (schema.$schema?.includes("draft-04")) {
+        draft = draft04;
+    } else if (schema.$schema?.includes("draft-06")) {
         draft = draft06;
     } else if (schema.$schema?.includes("draft-07")) {
         draft = draft07;

@@ -13,6 +13,7 @@
         "test:integration": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/integration/**/*.test.ts'",
         "test:v2": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'v2/**/*.test.ts'",
         "test:v2:spec": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/**/v2019-09/v2.test.ts'",
+        "test:v2:spec:04": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/**/v4/v2.test.ts'",
         "test:v2:spec:06": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/**/v6/v2.test.ts'",
         "test:v2:spec:07": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/**/v7/v2.test.ts'",
         "test:unit": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'test/unit/**/*.test.ts'",

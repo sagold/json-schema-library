@@ -2,11 +2,9 @@ import { additionalItemsValidator, parseAdditionalItems } from "./features/addit
 import { additionalPropertiesValidator, parseAdditionalProperties } from "./features/additionalProperties";
 import { allOfValidator, parseAllOf } from "./features/allOf";
 import { anyOfValidator, parseAnyOf } from "./features/anyOf";
-import { constValidator } from "./features/const";
-import { containsValidator, parseContains } from "./features/contains";
 import { enumValidator } from "./features/enum";
-import { exclusiveMaximumValidator } from "./features/exclusiveMaximum";
-import { exclusiveMinimumValidator } from "./features/exclusiveMinimum";
+import { exclusiveMaximumValidator } from "./features/draft04/exclusiveMaximum";
+import { exclusiveMinimumValidator } from "./features/draft04/exclusiveMinimum";
 import { formatValidator } from "./features/format";
 import { itemsValidator, parseItems } from "./features/items";
 import { maximumValidator } from "./features/maximum";
@@ -22,11 +20,11 @@ import { parseDefs } from "./features/defs";
 import { parseOneOf, validateOneOf } from "./features/oneOf";
 import { parsePatternProperties, patternPropertiesValidator } from "./features/patternProperties";
 import { parseProperties, propertiesValidator } from "./features/properties";
-import { refValidator, parseRef } from "./features/draft06/ref";
+import { parseRef } from "./features/draft04/ref";
+import { refValidator } from "./features/draft06/ref";
 import { parseUnevaluatedItems, unevaluatedItemsValidator } from "./features/unevaluatedItems";
 import { parseUnevaluatedProperties, unevaluatedPropertiesValidator } from "./features/unevaluatedProperties";
 import { patternValidator } from "./features/pattern";
-import { propertyNamesValidator } from "./features/propertyNames";
 import { requiredValidator } from "./features/required";
 import { SchemaNode } from "./types";
 import { typeValidator } from "./features/type";
@@ -36,13 +34,13 @@ import { getStringData } from "./features/string";
 import ERRORS from "../lib/validation/errors";
 import { dependenciesValidator } from "./features/draft06/dependencies";
 
-const VERSION = "draft-06";
+const VERSION = "draft-04";
 export { ERRORS, VERSION };
 
 /**
- * @draft-06 https://json-schema.org/draft-06/json-schema-release-notes
+ * @draft-04
  *
- * new
+ * remove from draft06
  * - booleans as schemas allowable anywhere, not just "additionalProperties" and "additionalItems"
  * - propertyNames
  * - contains
@@ -52,7 +50,7 @@ export { ERRORS, VERSION };
  * - format: json-pointer
  * - examples: array of examples with no validation effect; the value of "default" is usable as an example without repeating it under this keyword
  *
- * changes
+ * revert from draft06
  * - $id replaces id
  * - $ref only allowed where a schema is expected
  * - "exclusiveMinimum" and exclusiveMaximum changed from a boolean to a number to be consistent with the principle of keyword independence
@@ -65,7 +63,6 @@ export const PARSER: ((node: SchemaNode) => void)[] = [
     parseRef, // @attention has to come before compiling any other node, @draft-2019: changed
     parseAllOf,
     parseAnyOf,
-    parseContains,
     parseDefs,
     parseItems,
     parseNot,
@@ -87,8 +84,6 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     additionalPropertiesValidator,
     allOfValidator,
     anyOfValidator,
-    containsValidator,
-    constValidator,
     dependenciesValidator,
     enumValidator,
     exclusiveMinimumValidator,
@@ -104,7 +99,6 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     minPropertiesValidator,
     multipleOfValidator,
     patternValidator,
-    propertyNamesValidator,
     propertiesValidator,
     patternPropertiesValidator,
     notValidator,
