@@ -34,8 +34,6 @@ export function unevaluatedItemsValidator({ schema, validators }: SchemaNode): v
             return undefined;
         }
 
-        console.log("uneva", JSON.stringify(path, null, 2));
-
         // const reducedNode = node;
         let reducedNode = node.reduce({ data, pointer, path });
         reducedNode = isSchemaNode(reducedNode) ? reducedNode : node;

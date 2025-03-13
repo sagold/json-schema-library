@@ -1,6 +1,7 @@
 import { globSync } from "glob";
 import path from "path";
 import fs from "fs";
+import { JsonSchema } from "../lib/types";
 
 type JsonSchemaTestFileContents = {
     description: string;
@@ -21,7 +22,7 @@ function readTestFile(filepath: string): TestCase[] {
 function getFilenameAttributes(filename: string) {
     let relative = filename.split(/draft[^/]+\//).pop();
     if (relative == null) {
-        throw new Error(`Error in spec generation. Failed parsing filename '${filename}'`)
+        throw new Error(`Error in spec generation. Failed parsing filename '${filename}'`);
     }
     relative = relative.replace(".json", "").replace(/^\//, "");
     const attributes = relative.replace(".json", "").split("/");
@@ -33,7 +34,7 @@ function getFilenameAttributes(filename: string) {
     return { optional, name: attributes.join("-") };
 }
 
-type Draft = "4" | "6" | "7" | "2019-09" | "2020-12";
+export type DraftVersion = "4" | "6" | "7" | "2019-09" | "2020-12";
 
 export type FeatureTest = {
     /** name of feature being tests, e.g. additionalItems */
@@ -56,7 +57,16 @@ export type Test = {
     valid: boolean;
 };
 
-export function getDraftTests(draft: Draft): FeatureTest[] {
+export type Setup = {
+    logSchema: boolean;
+    only?: { name: string; description?: string };
+    skipTestCase: (t: FeatureTest) => boolean;
+    /** $schema string identifying draft, like https://json-schema.org/draft/2019-09/schema */
+    metaSchema: JsonSchema;
+    metaSchemaList?: JsonSchema[];
+};
+
+export function getDraftTests(draft: DraftVersion): FeatureTest[] {
     const source = path.resolve(`./node_modules/json-schema-test-suite/tests/draft${draft}`);
     const filenames = globSync(`${source}/**/*.json`);
     const testCases: FeatureTest[] = filenames.map((filename) => {

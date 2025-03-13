@@ -89,32 +89,63 @@ describe("compileSchema : get", () => {
                     title: { type: "string", minLength: 1 }
                 },
                 additionalProperties: false
-            }).get("body", { body: "abc" });
+            }).get("body", { title: "abc" });
 
             assert(isJsonError(node), "should have return an error");
         });
-    });
 
-    it("should resolve both if-then-else and allOf schema", () => {
-        const node = compileSchema({
-            type: "object",
-            if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
-            then: {
-                required: ["header"],
-                properties: { header: { type: "string", minLength: 1 } }
-            },
-            allOf: [{ required: ["date"], properties: { date: { type: "string", format: "date" } } }]
+        it("should return the original schema of the property", () => {
+            const node = compileSchema({
+                type: "object",
+                properties: {
+                    title: { type: "string", allOf: [{ minLength: 1 }] }
+                }
+            }).get("title", { body: "abc" });
+
+            assert.deepEqual(node.schema, { type: "string", allOf: [{ minLength: 1 }] });
         });
 
-        const schema = node.reduce({ data: { withHeader: true, header: "huhu" } })?.schema;
+        it("should reduce parent schema for returned property", () => {
+            const node = compileSchema({
+                type: "object",
+                properties: {
+                    title: { type: "string" }
+                },
+                allOf: [
+                    {
+                        properties: {
+                            title: { minLength: 1 }
+                        }
+                    }
+                ]
+            }).get("title", { body: "abc" });
 
-        assert.deepEqual(schema, {
-            type: "object",
-            required: ["date", "header"],
-            properties: {
-                header: { type: "string", minLength: 1 },
-                date: { type: "string", format: "date" }
-            }
+            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
+        });
+    });
+
+    describe("reduce", () => {
+        it("should resolve both if-then-else and allOf schema", () => {
+            const node = compileSchema({
+                type: "object",
+                if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
+                then: {
+                    required: ["header"],
+                    properties: { header: { type: "string", minLength: 1 } }
+                },
+                allOf: [{ required: ["date"], properties: { date: { type: "string", format: "date" } } }]
+            });
+
+            const schema = node.reduce({ data: { withHeader: true, header: "huhu" } })?.schema;
+
+            assert.deepEqual(schema, {
+                type: "object",
+                required: ["date", "header"],
+                properties: {
+                    header: { type: "string", minLength: 1 },
+                    date: { type: "string", format: "date" }
+                }
+            });
         });
     });
 
