@@ -37,6 +37,7 @@ import { uniqueItemsValidator } from "./features/uniqueItems";
 import { getObjectData } from "./features/object";
 import { getStringData } from "./features/string";
 import ERRORS from "../lib/validation/errors";
+import { dependenciesValidator } from "./features/draft06/dependencies";
 
 const VERSION = "draft-2019-09";
 export { ERRORS, VERSION };
@@ -86,6 +87,7 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     anyOfValidator,
     containsValidator,
     constValidator,
+    dependenciesValidator, // optional support for old draft-version
     dependentRequiredValidator, // draft-2019: new
     dependentSchemasValidator, // draft-2019: new
     enumValidator,

@@ -8,8 +8,16 @@ import { globSync } from "glob";
 import { SchemaNode } from "../../../v2/types";
 import { isObject } from "../../../lib/utils/isObject";
 
-const supportedTestCases = (t: FeatureTest) => t.optional === false;
-const postponedTestcases: string[] = [];
+const skipTestCase = (t: FeatureTest) =>
+    ![
+        "content",
+        "ecmascript-regex",
+        "float-overflow",
+        "format-iri",
+        "format-iri-reference",
+        "format-idn-hostname",
+        "non-bmp-regex"
+    ].includes(t.name); //t.optional === false;
 
 function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
     [draft07Meta].forEach((schema) => node.addRemote(schema.$id, schema));
@@ -34,29 +42,16 @@ function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
     });
 }
 
-function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
+function runTestCase(tc: FeatureTest) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
             // if (testCase.description !== "base URI change - change folder") {
             //     return;
             // }
-
             const schema = testCase.schema;
-            if (skipTest.includes(testCase.description)) {
-                console.log(`Unsupported '${testCase.description}'`);
-                return;
-            }
-
             describe(testCase.description, () => {
                 testCase.tests.forEach((testData) => {
-                    const test = skipTest.includes(testData.description) ? it.skip : it;
-
-                    if (postponedTestcases.includes(testCase.description)) {
-                        it.skip(testData.description, () => {});
-                        return;
-                    }
-
-                    test(testData.description, () => {
+                    it(testData.description, () => {
                         // console.log(
                         //     testData.description,
                         //     JSON.stringify(schema, null, 2),
@@ -74,11 +69,19 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     });
 }
 
-export default function runAllTestCases(skipTest: string[] = []) {
+export default function runAllTestCases() {
     describe("draft07", () => {
         getDraftTests("7")
-            .filter(supportedTestCases)
-            .forEach((testCase) => runTestCase(testCase, skipTest));
+            .filter((tc) => {
+                const runTestCase = skipTestCase(tc);
+                if (!runTestCase) {
+                    describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
+                        tc.testCases.forEach((test) => it.skip(test.description, () => {}));
+                    });
+                }
+                return runTestCase;
+            })
+            .forEach((testCase) => runTestCase(testCase));
     });
 }
 

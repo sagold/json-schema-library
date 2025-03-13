@@ -13,57 +13,18 @@ import { getDraftTests, FeatureTest } from "../../getDraftTests";
 import { globSync } from "glob";
 import { SchemaNode } from "../../../v2/types";
 
-const supportedTestCases = (t: FeatureTest) =>
-    // t.optional === false
-    [
-        "defs",
-        "additionalItems",
-        "additionalProperties",
-        "allOf",
-        "anchor",
-        "anyOf",
-        "boolean_schema",
-        "const",
-        "contains",
-        "content",
-        "default",
-        "dependentRequired",
-        "dependentSchemas",
-        "enum",
-        "exclusiveMaximum",
-        "exclusiveMinimum",
-        "format",
-        "if-then-else",
-        "infinite-loop-detection",
-        "items",
-        "maxContains",
-        "maximum",
-        "maxItems",
-        "maxLength",
-        "maxProperties",
-        "minContains",
-        "minimum",
-        "minItems",
-        "minLength",
-        "minProperties",
-        "multipleOf",
-        "not",
-        "oneOf",
-        "oneOf",
-        "pattern",
-        "patternProperties",
-        "properties",
-        "propertyNames",
-        "recursiveRef",
-        "ref",
-        "refRemote",
-        "required",
-        "type",
-        "uniqueItems",
-        "unknownKeyword",
-        "unevaluatedProperties",
-        "unevaluatedItems"
-        // "vocabulary"
+const skipTestCase = (t: FeatureTest) =>
+    ![
+        "vocabulary", // must
+        // optionals
+        "cross-draft", // should
+        "ecmascript-regex", // should
+        "float-overflow",
+        "format-idn-hostname",
+        "format-iri",
+        "format-iri-reference",
+        "non-bmp-regex", // should
+        "refOfUnknownKeyword"
     ].includes(t.name);
 
 /*
@@ -116,8 +77,6 @@ const supportedTestCases = (t: FeatureTest) =>
 ✖ vocabulary - skipped evaluation of meta-schema
 */
 
-const postponedTestcases: string[] = [];
-
 function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
     [
         draft2019Meta,
@@ -149,30 +108,16 @@ function addRemotes(node: SchemaNode, baseURI = "http://localhost:1234") {
     });
 }
 
-function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
+function runTestCase(tc: FeatureTest) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
             // if (testCase.description !== "ref overrides any sibling keywords") {
             //     return;
             // }
-            // if (testCase.description !== "remote ref, containing refs itself") { return; }
-
             const schema = testCase.schema;
-            if (skipTest.includes(testCase.description)) {
-                console.log(`Unsupported '${testCase.description}'`);
-                return;
-            }
-
             describe(testCase.description, () => {
                 testCase.tests.forEach((testData) => {
-                    const test = skipTest.includes(testData.description) ? it.skip : it;
-
-                    if (postponedTestcases.includes(testCase.description)) {
-                        it.skip(testData.description, () => {});
-                        return;
-                    }
-
-                    test(testData.description, () => {
+                    it(testData.description, () => {
                         // console.log(
                         //     testData.description,
                         //     JSON.stringify(schema, null, 2),
@@ -189,11 +134,19 @@ function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     });
 }
 
-export default function runAllTestCases(skipTest: string[] = []) {
+export default function runAllTestCases() {
     describe("draft2019", () => {
         getDraftTests("2019-09")
-            .filter(supportedTestCases)
-            .forEach((testCase) => runTestCase(testCase, skipTest));
+            .filter((tc) => {
+                const runTestCase = skipTestCase(tc);
+                if (!runTestCase) {
+                    describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
+                        tc.testCases.forEach((test) => it.skip(test.description, () => {}));
+                    });
+                }
+                return runTestCase;
+            })
+            .forEach(runTestCase);
     });
 }
 

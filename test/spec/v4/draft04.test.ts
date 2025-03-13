@@ -9,24 +9,14 @@ const cache = new Draft04();
 cache.addRemoteSchema("http://json-schema.org/draft-04/schema", draft04Remote);
 addRemotes(cache);
 
-/*
-ref relative refs with absolute uris and defs invalid on inner field:
-RangeError: Maximum call stack size exceeded
- */
-
 const supportedTestCases = (t: FeatureTest) =>
     t.optional
-        ? ![
-              "ecmascript-regex",
-              "format-date-time",
-              "non-bmp-regex",
-              "zeroTerminatedFloats",
-              "float-overflow"
-          ].includes(t.name)
+        ? !["ecmascript-regex", "format-date-time", "non-bmp-regex", "zeroTerminatedFloats", "float-overflow"].includes(
+              t.name
+          )
         : true;
-const draftFeatureTests = getDraftTests("4")
-    // .filter(testcase => testcase.name === "float-overflow")
-    .filter(supportedTestCases);
+
+const draftFeatureTests = getDraftTests("4").filter(supportedTestCases);
 
 function runTestCase(tc: FeatureTest, skipTest: string[] = []) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
