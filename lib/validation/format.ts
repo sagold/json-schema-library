@@ -136,7 +136,7 @@ const formatValidators: Record<string, (node: TempNode, value: unknown) => undef
         if (typeof value !== "string") {
             return undefined;
         }
-        if (value === "" || isValidHostname.test(value)) {
+        if (isValidHostname.test(value)) {
             return undefined;
         }
         return draft.errors.formatHostnameError({ value, pointer, schema });
