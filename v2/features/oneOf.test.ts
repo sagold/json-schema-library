@@ -2,6 +2,7 @@ import { strict as assert } from "assert";
 
 import { compileSchema } from "../compileSchema";
 import { isSchemaNode } from "../types";
+import { isJsonError } from "../../lib/types";
 
 describe("feature : oneOf : reduce", () => {
     it("should resolve matching value schema", () => {
@@ -16,16 +17,26 @@ describe("feature : oneOf : reduce", () => {
         // assert.equal(node.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
 
-    it("should return boolean schema `false` if no matching schema could be found", () => {
+    it("should return error if no matching schema could be found", () => {
         const node = compileSchema({
             oneOf: [
                 { type: "string", title: "A String" },
                 { type: "number", title: "A Number" }
             ]
-        }).reduce({ data: {} });
+        }).reduce({ data: true });
 
-        assert(isSchemaNode(node));
-        assert.equal(node.schema, false);
+        assert(isJsonError(node));
+    });
+
+    it("should return error if multiple schema match", () => {
+        const node = compileSchema({
+            oneOf: [
+                { type: "string", minLength: 1 },
+                { type: "string", maxLength: 3 }
+            ]
+        }).reduce({ data: "12" });
+
+        assert(isJsonError(node));
     });
 
     // it("should reduce nested oneOf objects using ref", () => {

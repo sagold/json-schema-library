@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
-
 import { compileSchema } from "../compileSchema";
+import { isSchemaNode } from "../types";
 
 describe("feature : patternProperties : get", () => {
     it("should step into patternProperties", () => {
@@ -9,7 +9,8 @@ describe("feature : patternProperties : get", () => {
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 1 } }
         });
 
-        const schema = node.get("007")?.schema;
+        // @todo evaluate if we should pass this property to reduce to identify schema without data
+        const schema = node.get("007", { "007": undefined })?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
@@ -24,7 +25,9 @@ describe("feature : patternProperties : get", () => {
 
         assert.deepEqual(schema, undefined);
     });
+});
 
+describe("feature : patternProperties : validate", () => {
     it("should return an error for matching pattern and failed validation", () => {
         const errors = compileSchema({
             type: "object",
@@ -134,5 +137,62 @@ describe("feature : patternProperties : get", () => {
 
         assert.equal(errors.length, 1);
         assert.equal(errors[0].code, "type-error");
+    });
+});
+
+describe("feature : patternProperties : reduce", () => {
+    it("should return schema of matching property", () => {
+        const node = compileSchema({
+            properties: { label: { type: "string", maxLength: 99 } },
+            patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
+        }).reduce({
+            data: {
+                "007": "match",
+                title: "no match"
+            }
+        });
+
+        assert(isSchemaNode(node), "should have returned a valid SchemaNode");
+
+        assert.deepEqual(node.schema, {
+            properties: {
+                label: { type: "string", maxLength: 99 },
+                "007": { type: "string", minLength: 2 }
+            }
+        });
+    });
+
+    it("should merge schema with matching property schema", () => {
+        const node = compileSchema({
+            properties: { "007": { type: "string", maxLength: 99 } },
+            patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
+        }).reduce({
+            data: {
+                "007": "match"
+            }
+        });
+
+        assert(isSchemaNode(node), "should have returned a valid SchemaNode");
+
+        assert.deepEqual(node.schema, {
+            properties: {
+                "007": { type: "string", minLength: 2, maxLength: 99 }
+            }
+        });
+    });
+
+    it("should add patterns to properties per default", () => {
+        const node = compileSchema({
+            properties: { "007": { type: "string", maxLength: 99 } },
+            patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
+        }).reduce({ data: {} });
+
+        assert(isSchemaNode(node), "should have returned a valid SchemaNode");
+
+        assert.deepEqual(node.schema, {
+            properties: {
+                "007": { type: "string", minLength: 2, maxLength: 99 }
+            }
+        });
     });
 });

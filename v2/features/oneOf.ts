@@ -1,3 +1,4 @@
+import { JsonError } from "../../lib/types";
 import { JsonSchemaReducerParams, SchemaNode } from "../types";
 // const { DECLARATOR_ONEOF, EXPOSE_ONE_OF_INDEX } = settings;
 
@@ -73,9 +74,13 @@ function reduceOneOf({ node, data, pointer }: JsonSchemaReducerParams) {
     // }
 
     const matches = [];
+    const errors: JsonError[] = [];
     for (let i = 0; i < node.oneOf.length; i += 1) {
-        if (node.oneOf[i].validate(data).length === 0) {
+        const validationErrors = node.oneOf[i].validate(data);
+        if (validationErrors.length === 0) {
             matches.push({ index: i, node: node.oneOf[i] });
+        } else {
+            errors.push(...validationErrors);
         }
     }
 
@@ -86,6 +91,24 @@ function reduceOneOf({ node, data, pointer }: JsonSchemaReducerParams) {
         // console.log("reduce ONEOF success", data, reducedNode.schema);
         return reducedNode;
     }
+
+    if (matches.length === 0) {
+        return node.errors.oneOfError({
+            value: JSON.stringify(data),
+            pointer,
+            schema: node.schema,
+            oneOf: node.schema.oneOf,
+            errors
+        });
+    }
+
+    return node.errors.oneOfError({
+        value: JSON.stringify(data),
+        pointer,
+        schema: node.schema,
+        oneOf: node.schema.oneOf,
+        errors
+    });
 
     // @ts-expect-error boolean schema;
     return node.compileSchema(false, node.spointer);

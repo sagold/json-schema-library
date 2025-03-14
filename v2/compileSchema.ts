@@ -20,7 +20,8 @@ const DYNAMIC_PROPERTIES = [
     "oneOf",
     "dependentSchemas",
     "dependentRequired",
-    "dependencies"
+    "dependencies",
+    "patternProperties"
 ];
 
 const NODE_METHODS: Pick<
@@ -133,7 +134,7 @@ const NODE_METHODS: Pick<
         if (schema) {
             // recompile to update newly added schema defintions
             // @ts-expect-error bool schema
-            schema = mergeSchema(node.schema, schema, "if", "then", "else", "allOf", "anyOf", "oneOf");
+            schema = mergeSchema(node.schema, schema, ...DYNAMIC_PROPERTIES);
             const nextNode = node.compileSchema(schema, this.spointer);
             path?.push({ pointer, node });
             return nextNode;

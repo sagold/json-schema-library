@@ -10,6 +10,7 @@
         "test:4": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'v2/tests/spec/draft04.spec.ts'",
         "test:6": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'v2/tests/spec/draft06.spec.ts'",
         "test:7": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'v2/tests/spec/draft07.spec.ts'",
+        "test:spec": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'v2/tests/spec/*.spec.ts' > test-result-spec.json;",
         "test:unit": "TS_NODE_PROJECT=./test/tsconfig.json mocha -r ts-node/register -R spec 'v2/**/*.test.ts'",
         "dist": "rm -rf dist; yarn dist:es5 && yarn dist:es6",
         "dist:es5": "NODE_ENV=production webpack",

@@ -31,12 +31,21 @@ export function parsePatternProperties(node: SchemaNode) {
 
 reducePatternProperties.toJSON = () => "reducePatternProperties";
 function reducePatternProperties({ node, data }: JsonSchemaReducerParams) {
-    if (!isObject(data)) {
+    if (!isObject(data) && data != null) {
         return;
     }
     const { patternProperties } = node;
     let mergedSchema: JsonSchema;
-    Object.keys(data).forEach((propertyName) => {
+
+    const dataProperties = Object.keys(data ?? {});
+    dataProperties.push(...Object.keys(node.schema.properties ?? {}));
+    dataProperties.forEach((propertyName, index, list) => {
+        if (list.indexOf(propertyName) !== index) {
+            // duplicate
+            return;
+        }
+
+        console.log(propertyName, "parse");
         // build schema of property
         let propertySchema = node.schema.properties?.[propertyName] ?? {};
         const matchingPatterns = patternProperties.filter((property) => property.pattern.test(propertyName));

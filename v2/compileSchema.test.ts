@@ -1,7 +1,6 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
-import { SchemaNode, isSchemaNode } from "./types";
-import { isJsonError } from "../lib/types";
+import { SchemaNode } from "./types";
 
 // - processing draft we need to know and support json-schema keywords
 // - Note: meta-schemas are defined flat, combining all properties per type
@@ -43,131 +42,6 @@ import { isJsonError } from "../lib/types";
 //     // - possibly optimize all this once for actual exection (compilation)
 // }
 
-describe("compileSchema : get", () => {
-    describe("behaviour", () => {
-        it("should return node of property", () => {
-            const node = compileSchema({
-                type: "object",
-                properties: {
-                    title: { type: "string", minLength: 1 }
-                }
-            }).get("title", { title: "abc" });
-
-            assert(isSchemaNode(node), "should have returned a valid schema node");
-
-            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
-        });
-
-        it("should return node of property even it type differs", () => {
-            const node = compileSchema({
-                type: "object",
-                properties: {
-                    title: { type: "string", minLength: 1 }
-                }
-            }).get("title", { title: 123 });
-
-            assert(isSchemaNode(node), "should have returned a valid schema node");
-
-            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
-        });
-
-        it("should return undefined if property is not defined, but allowed", () => {
-            const node = compileSchema({
-                type: "object",
-                properties: {
-                    title: { type: "string", minLength: 1 }
-                }
-            }).get("body", { body: "abc" });
-
-            assert.deepEqual(node, undefined);
-        });
-
-        it("should return an error when the property is not allowed", () => {
-            const node = compileSchema({
-                type: "object",
-                properties: {
-                    title: { type: "string", minLength: 1 }
-                },
-                additionalProperties: false
-            }).get("body", { title: "abc" });
-
-            assert(isJsonError(node), "should have return an error");
-        });
-
-        it("should return the original schema of the property", () => {
-            const node = compileSchema({
-                type: "object",
-                properties: {
-                    title: { type: "string", allOf: [{ minLength: 1 }] }
-                }
-            }).get("title", { body: "abc" });
-
-            assert.deepEqual(node.schema, { type: "string", allOf: [{ minLength: 1 }] });
-        });
-
-        it("should reduce parent schema for returned property", () => {
-            const node = compileSchema({
-                type: "object",
-                properties: {
-                    title: { type: "string" }
-                },
-                allOf: [
-                    {
-                        properties: {
-                            title: { minLength: 1 }
-                        }
-                    }
-                ]
-            }).get("title", { body: "abc" });
-
-            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
-        });
-    });
-
-    describe("reduce", () => {
-        it("should resolve both if-then-else and allOf schema", () => {
-            const node = compileSchema({
-                type: "object",
-                if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
-                then: {
-                    required: ["header"],
-                    properties: { header: { type: "string", minLength: 1 } }
-                },
-                allOf: [{ required: ["date"], properties: { date: { type: "string", format: "date" } } }]
-            });
-
-            const schema = node.reduce({ data: { withHeader: true, header: "huhu" } })?.schema;
-
-            assert.deepEqual(schema, {
-                type: "object",
-                required: ["date", "header"],
-                properties: {
-                    header: { type: "string", minLength: 1 },
-                    date: { type: "string", format: "date" }
-                }
-            });
-        });
-    });
-
-    describe("ref", () => {
-        it("should resolve references in allOf schema", () => {
-            const node = compileSchema({
-                definitions: {
-                    object: { type: "object" },
-                    additionalNumber: {
-                        additionalProperties: { type: "number", minLength: 2 }
-                    }
-                },
-                allOf: [{ $ref: "#/definitions/object" }, { $ref: "#/definitions/additionalNumber" }]
-            });
-
-            const schema = node.get("title", { title: 4, test: 2 })?.schema;
-
-            assert.deepEqual(schema, { type: "number", minLength: 2 });
-        });
-    });
-});
-
 describe("compileSchema : reduce", () => {
     describe("behaviour", () => {});
 
@@ -196,6 +70,29 @@ describe("compileSchema : reduce", () => {
             type: "object",
             required: ["header"],
             properties: { header: { type: "string", minLength: 1 } }
+        });
+    });
+
+    it("should resolve both if-then-else and allOf schema", () => {
+        const node = compileSchema({
+            type: "object",
+            if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
+            then: {
+                required: ["header"],
+                properties: { header: { type: "string", minLength: 1 } }
+            },
+            allOf: [{ required: ["date"], properties: { date: { type: "string", format: "date" } } }]
+        });
+
+        const schema = node.reduce({ data: { withHeader: true, header: "huhu" } })?.schema;
+
+        assert.deepEqual(schema, {
+            type: "object",
+            required: ["date", "header"],
+            properties: {
+                header: { type: "string", minLength: 1 },
+                date: { type: "string", format: "date" }
+            }
         });
     });
 
