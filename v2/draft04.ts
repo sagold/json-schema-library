@@ -32,7 +32,7 @@ import { uniqueItemsValidator } from "./features/uniqueItems";
 import { getObjectData } from "./features/object";
 import { getStringData } from "./features/string";
 import ERRORS from "../lib/validation/errors";
-import { dependenciesValidator } from "./features/draft06/dependencies";
+import { dependenciesValidator, parseDependencies } from "./features/dependencies";
 
 const VERSION = "draft-04";
 export { ERRORS, VERSION };
@@ -71,6 +71,7 @@ export const PARSER: ((node: SchemaNode) => void)[] = [
     parseProperties,
     parseUnevaluatedItems,
     parseUnevaluatedProperties,
+    parseDependencies,
     parseAdditionalProperties, // @attention has to come after other object-property parser
     parseAdditionalItems // @attention has to come after other object-property parser
 ].map((func) => {

@@ -35,7 +35,7 @@ import { uniqueItemsValidator } from "./features/uniqueItems";
 import { getObjectData } from "./features/object";
 import { getStringData } from "./features/string";
 import ERRORS from "../lib/validation/errors";
-import { dependenciesValidator } from "./features/draft06/dependencies";
+import { dependenciesValidator, parseDependencies } from "./features/dependencies";
 
 const VERSION = "draft-07";
 export { ERRORS, VERSION };
@@ -58,6 +58,7 @@ export const PARSER: ((node: SchemaNode) => void)[] = [
     parseAnyOf,
     parseContains,
     parseDefs,
+    parseDependencies,
     parseIfThenElse,
     parseItems,
     parseNot,
