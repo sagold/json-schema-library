@@ -32,7 +32,7 @@ import { patternValidator } from "./features/pattern";
 import { propertyNamesValidator } from "./features/propertyNames";
 import { requiredValidator } from "./features/required";
 import { SchemaNode } from "./types";
-import { typeValidator } from "./features/type";
+import { parseType, typeValidator } from "./features/type";
 import { uniqueItemsValidator } from "./features/uniqueItems";
 import { getObjectData } from "./features/object";
 import { getStringData } from "./features/string";
@@ -74,7 +74,8 @@ export const PARSER: ((node: SchemaNode) => void)[] = [
     parseUnevaluatedItems,
     parseUnevaluatedProperties,
     parseAdditionalProperties, // @attention has to come after other object-property parser
-    parseAdditionalItems // @attention has to come after other object-property parser
+    parseAdditionalItems, // @attention has to come after other object-property parser
+    parseType
 ].map((func) => {
     // @ts-expect-error extended function for debugging purposes
     func.toJSON = () => func.name;

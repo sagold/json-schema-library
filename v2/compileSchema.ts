@@ -74,7 +74,6 @@ const NODE_METHODS: Pick<
         const referencedNode = node.resolveRef({ path });
         if (referencedNode !== node) {
             const ref = referencedNode.get(key, data, path);
-            console.log("get ref", key, ref?.schema);
             return ref;
         }
     },

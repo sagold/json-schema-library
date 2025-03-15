@@ -1,5 +1,20 @@
 import getTypeOf, { JSType } from "../../lib/getTypeOf";
-import { JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+
+export function parseType(node: SchemaNode) {
+    if (Array.isArray(node.schema.type)) {
+        node.reducers.push(reduceType);
+    }
+}
+
+reduceType.toJSON = () => "reduceType";
+function reduceType({ node, data }: JsonSchemaReducerParams): undefined | SchemaNode {
+    const dataType = getJsonSchemaType(data, node.schema.type);
+    if (dataType !== "undefined" && Array.isArray(node.schema.type) && node.schema.type.includes(dataType)) {
+        return node.compileSchema({ ...node.schema, type: dataType }, node.spointer);
+    }
+    return undefined;
+}
 
 function getJsonSchemaType(value: unknown, expectedType: string | string[]): JSType | "integer" {
     const jsType = getTypeOf(value);

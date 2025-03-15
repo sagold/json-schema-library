@@ -11,8 +11,8 @@ import runAllTestCases from "../utils/runTestCases";
 
 const setup: Setup = {
     // only: {
-    //     name: "unevaluatedProperties",
-    //     description: "unevaluatedProperties can see annotations from if without then and else"
+    //     name: "ref",
+    //     description: "$ref with $recursiveAnchor"
     // },
     logSchema: false,
     skipTestCase: (t) =>
