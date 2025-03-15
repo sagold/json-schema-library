@@ -1,6 +1,6 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
-import { SchemaNode } from "./types";
+import { isSchemaNode, SchemaNode } from "./types";
 
 // - processing draft we need to know and support json-schema keywords
 // - Note: meta-schemas are defined flat, combining all properties per type
@@ -164,6 +164,43 @@ describe("compileSchema : reduce", () => {
             const schema = node.reduce({ data: 123 })?.schema;
 
             assert.deepEqual(schema, { type: "number", minimum: 1 });
+        });
+
+        it("should iteratively resolve allOf before merging (issue#44)", () => {
+            const node = compileSchema({
+                type: "object",
+                properties: { trigger: { type: "boolean" } },
+                allOf: [
+                    {
+                        if: {
+                            not: {
+                                properties: { trigger: { type: "boolean", const: true } }
+                            }
+                        },
+                        then: {
+                            properties: { trigger: { type: "boolean", const: false } }
+                        }
+                    },
+                    {
+                        if: {
+                            not: {
+                                properties: { trigger: { type: "boolean", const: false } }
+                            }
+                        },
+                        then: {
+                            properties: { trigger: { const: true } }
+                        }
+                    }
+                ]
+            }).reduce({ data: { trigger: true } });
+
+            assert(isSchemaNode(node));
+            assert.deepEqual(node.schema, {
+                type: "object",
+                properties: {
+                    trigger: { type: "boolean", const: true }
+                }
+            });
         });
     });
 });
