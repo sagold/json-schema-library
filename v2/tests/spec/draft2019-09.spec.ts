@@ -11,8 +11,8 @@ import runAllTestCases from "../utils/runTestCases";
 
 const setup: Setup = {
     // only: {
-    //     name: "vocabulary",
-    //     description: "schema that uses custom metaschema with with no validation vocabulary"
+    //     name: "unevaluatedProperties",
+    //     description: "unevaluatedProperties can see annotations from if without then and else"
     // },
     logSchema: false,
     skipTestCase: (t) =>

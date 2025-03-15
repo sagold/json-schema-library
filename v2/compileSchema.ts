@@ -94,8 +94,6 @@ const NODE_METHODS: Pick<
         const resolvedSchema = mergeSchema(this.schema, resolvedNode?.schema);
         const node = (this as SchemaNode).compileSchema(resolvedSchema, this.spointer);
 
-        const reducers = node.reducers;
-
         // @ts-expect-error bool schema
         if (node.schema === false) {
             return node;
@@ -108,6 +106,7 @@ const NODE_METHODS: Pick<
         }
 
         let schema;
+        const reducers = node.reducers;
         for (let i = 0; i < reducers.length; i += 1) {
             const result = reducers[i]({ data, node, pointer });
             if (isJsonError(result)) {
@@ -137,6 +136,7 @@ const NODE_METHODS: Pick<
             schema = mergeSchema(node.schema, schema, ...DYNAMIC_PROPERTIES);
             const nextNode = node.compileSchema(schema, this.spointer);
             path?.push({ pointer, node });
+            // reduce again?
             return nextNode;
         }
 

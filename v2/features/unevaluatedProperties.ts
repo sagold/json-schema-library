@@ -57,7 +57,7 @@ export function unevaluatedPropertiesValidator({ schema, validators }: SchemaNod
 
             if (child === undefined) {
                 // console.log(propertyName, "is unevaluated", node.schema);
-                if (node.if && isPropertyEvaluated(node.if, propertyName, getValue(data, propertyName))) {
+                if (node.if && isPropertyEvaluated(node.if, propertyName, data)) {
                     // skip
                 } else if (reducedNode.unevaluatedProperties) {
                     const validationResult = node.unevaluatedProperties.validate(
@@ -139,10 +139,10 @@ export function unevaluatedPropertiesValidator({ schema, validators }: SchemaNod
 }
 
 /** tests if a property is evaluated by the given schema */
-function isPropertyEvaluated(schemaNode: SchemaNode, propertyName: string, value: unknown) {
-    const node = schemaNode.get(propertyName);
+function isPropertyEvaluated(schemaNode: SchemaNode, propertyName: string, data: unknown) {
+    const node = schemaNode.get(propertyName, data);
     if (node == null || isJsonError(node)) {
         return false;
     }
-    return node.validate(value).length === 0;
+    return node.validate(getValue(data, propertyName)).length === 0;
 }

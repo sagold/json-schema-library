@@ -3,44 +3,47 @@ import { Draft07 as Draft } from "../../../lib/draft07";
 
 describe("issue#57 - resolveAllOf mutates data", () => {
     let draft: Draft;
-    beforeEach(() => (draft = new Draft({
-        "id": "animals",
-        "$schema": "http://json-schema.org/draft-04/schema#",
-        "type": "object",
-        "properties": {
-            "horse": {
-                "type": "string"
-            },
-            "dog": {
-                "type": "string"
-            },
-            "lizards": {
-                "minItems": 3,
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            }
-        },
-        "allOf": [
-            {
-                "if": {
-                    "properties": {
-                        "horse": {
-                            "const": ""
+    beforeEach(
+        () =>
+            (draft = new Draft({
+                id: "animals",
+                $schema: "http://json-schema.org/draft-04/schema#",
+                type: "object",
+                properties: {
+                    horse: {
+                        type: "string"
+                    },
+                    dog: {
+                        type: "string"
+                    },
+                    lizards: {
+                        minItems: 3,
+                        type: "array",
+                        items: {
+                            type: "string"
                         }
                     }
                 },
-                "then": {
-                    "properties": {
-                        "dog": {
-                            "minLength": 1
+                allOf: [
+                    {
+                        if: {
+                            properties: {
+                                horse: {
+                                    const: ""
+                                }
+                            }
+                        },
+                        then: {
+                            properties: {
+                                dog: {
+                                    minLength: 1
+                                }
+                            }
                         }
                     }
-                }
-            }
-        ]
-    })));
+                ]
+            }))
+    );
 
     it("should not modify input data", () => {
         const inputData: { lizards: string[] } = { lizards: [] };
@@ -56,8 +59,3 @@ describe("issue#57 - resolveAllOf mutates data", () => {
         expect(inputData).to.deep.equal({ lizards: [] });
     });
 });
-
-
-
-
-

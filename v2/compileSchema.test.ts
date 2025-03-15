@@ -124,6 +124,48 @@ describe("compileSchema : reduce", () => {
             }
         });
     });
+
+    describe("object - merge all reduced dynamic schema", () => {
+        it("should reduce patternProperties and allOf", () => {
+            const node = compileSchema({
+                allOf: [{ properties: { "107": { type: "string", maxLength: 99 } } }],
+                patternProperties: { "[0-1][0-1]7": { type: "string", minLength: 1 } }
+            });
+
+            const schema = node.reduce({ data: { "107": undefined } })?.schema;
+
+            assert.deepEqual(schema, { properties: { "107": { type: "string", minLength: 1, maxLength: 99 } } });
+        });
+    });
+
+    describe("object - recursively resolve dynamic properties", () => {
+        it("should reduce allOf and oneOf", () => {
+            const node = compileSchema({
+                allOf: [
+                    {
+                        oneOf: [
+                            { type: "string", minLength: 1 },
+                            { type: "number", minimum: 1 }
+                        ]
+                    }
+                ]
+            });
+
+            const schema = node.reduce({ data: 123 })?.schema;
+
+            assert.deepEqual(schema, { type: "number", minimum: 1 });
+        });
+
+        it("should reduce oneOf and allOf", () => {
+            const node = compileSchema({
+                oneOf: [{ allOf: [{ type: "string", minLength: 1 }] }, { allOf: [{ type: "number", minimum: 1 }] }]
+            });
+
+            const schema = node.reduce({ data: 123 })?.schema;
+
+            assert.deepEqual(schema, { type: "number", minimum: 1 });
+        });
+    });
 });
 
 describe("compileSchema : spec/unevaluatedProperties", () => {

@@ -44,8 +44,6 @@ function reducePatternProperties({ node, data }: JsonSchemaReducerParams) {
             // duplicate
             return;
         }
-
-        console.log(propertyName, "parse");
         // build schema of property
         let propertySchema = node.schema.properties?.[propertyName] ?? {};
         const matchingPatterns = patternProperties.filter((property) => property.pattern.test(propertyName));
