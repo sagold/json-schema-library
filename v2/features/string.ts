@@ -1,14 +1,6 @@
 import ucs2decode from "../../lib/utils/punycode.ucs2decode";
 import { JsonSchemaValidatorParams, SchemaNode } from "../types";
 
-export function getStringData(node: SchemaNode) {
-    if (node.schema.type === "string") {
-        node.getDefaultData.push(({ data, node }) => {
-            return data ?? node.schema.default;
-        });
-    }
-}
-
 export function maxLengthValidator({ schema, validators }: SchemaNode): void {
     if (isNaN(schema.maxLength)) {
         return;

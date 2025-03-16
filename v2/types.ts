@@ -1,6 +1,7 @@
 import { JsonError, JsonSchema } from "../lib/types";
 import { CreateError } from "../lib/utils/createCustomError";
 import { isObject } from "../lib/utils/isObject";
+import { TemplateOptions } from "./getTemplate";
 
 export type JsonSchemaReducerParams = { data: unknown; node: SchemaNode; pointer?: string; path?: ValidationPath };
 export type JsonSchemaReducer = (options: JsonSchemaReducerParams) => SchemaNode | JsonError | undefined;
@@ -11,7 +12,12 @@ export type JsonSchemaResolver = (options: JsonSchemaResolverParams) => SchemaNo
 export type JsonSchemaValidatorParams = { pointer?: string; data: unknown; node: SchemaNode; path?: ValidationPath };
 export type JsonSchemaValidator = (options: JsonSchemaValidatorParams) => JsonError | JsonError[] | undefined;
 
-export type JsonSchemaDefaultDataResolverParams = { pointer?: string; data: unknown; node: SchemaNode };
+export type JsonSchemaDefaultDataResolverParams = {
+    pointer?: string;
+    data?: unknown;
+    node: SchemaNode;
+    options?: TemplateOptions;
+};
 export type JsonSchemaDefaultDataResolver = (options: JsonSchemaDefaultDataResolverParams) => unknown;
 
 export type Context = {
@@ -51,6 +57,8 @@ export type SchemaNode = {
     ref?: string;
     schema: JsonSchema;
     spointer: string;
+    /** local path within json-schema (not extended by resolving ref) */
+    localPointer: string;
     /**
      * @todo this is a ref specific property as is $id
      * json-pointer from last $id ~~to this location~~ to resolve $refs to $id#/idLocalPointer
@@ -70,7 +78,7 @@ export type SchemaNode = {
     /** Step into a property or array by name or index and return the schema-node its value */
     get: (key: string | number, data?: unknown, valiadtionPath?: ValidationPath) => SchemaNode | JsonError;
     /** Creates data that is valid to the schema of this node */
-    getTemplate: (data?: unknown) => unknown;
+    getTemplate: (data?: unknown, options?: TemplateOptions) => unknown;
     /** Creates a new node with all dynamic schema properties merged according to the passed in data */
     reduce: ({
         data,

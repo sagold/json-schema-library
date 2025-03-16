@@ -10,6 +10,7 @@ import { mergeSchema } from "../lib/mergeSchema";
 import { omit } from "../lib/utils/omit";
 import { SchemaNode, JsonSchemaReducerParams, ValidationPath } from "./types";
 import { strict as assert } from "assert";
+import { getTemplate } from "./getTemplate";
 
 const DYNAMIC_PROPERTIES = [
     "if",
@@ -38,6 +39,7 @@ const NODE_METHODS: Pick<
             context: parentNode.context,
             parent: parentNode,
             spointer,
+            localPointer: "#",
             reducers: [],
             resolvers: [],
             validators: [],
@@ -78,13 +80,18 @@ const NODE_METHODS: Pick<
         }
     },
 
-    getTemplate(data?: unknown) {
+    getTemplate(data?, options?) {
+        const { cache, recursionLimit } = options ?? {};
+        const opts = { ...(options ?? {}), cache: cache ?? {}, recursionLimit: recursionLimit ?? 1 };
+
         const node = this as SchemaNode;
         let defaultData = data;
+        // collects default data of current node
+        // return matching enum[0], oneOf, anyOf[0], allOf, depdendentSchema, etc
         for (const getDefaultData of node.getDefaultData) {
-            defaultData = getDefaultData({ data: defaultData, node }) ?? defaultData;
+            defaultData = getDefaultData({ data: defaultData, node, options: opts }) ?? defaultData;
         }
-        return defaultData;
+        return getTemplate(node, defaultData, opts);
     },
 
     reduce({ data, pointer, path }: JsonSchemaReducerParams) {
@@ -275,6 +282,7 @@ export function compileSchema(schema: JsonSchema) {
     const node: SchemaNode = {
         spointer: "#",
         lastIdPointer: "#",
+        localPointer: "#",
         reducers: [],
         resolvers: [],
         validators: [],

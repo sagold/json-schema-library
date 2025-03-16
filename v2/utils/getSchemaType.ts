@@ -1,0 +1,104 @@
+import getTypeOf from "../../lib/getTypeOf";
+import { isObject } from "../../lib/utils/isObject";
+import { SchemaNode } from "../types";
+
+export const SCHEMA_TYPES = ["string", "number", "integer", "boolean", "null", "array", "object"];
+const OBJECT_PROPERTIES = [
+    "additionalProperties",
+    // "allOf",
+    // "anyOf",
+    "dependencies",
+    "dependentSchemas",
+    "dependentRequired",
+    // "enum",
+    // "format",
+    // "if",
+    "maxProperties",
+    "minProperties",
+    // "not",
+    // "oneOf",
+    "patternProperties",
+    "properties",
+    "propertyNames",
+    "required",
+    "unevaluatedProperties" // 2019-09
+];
+const ARRAY_PROPERTIES = [
+    // "allOf",
+    // "anyOf",
+    "contains",
+    // "enum",
+    // "if",
+    "items",
+    "maxItems",
+    "minItems",
+    // "not",
+    // "oneOf",
+    "unevaluatedItems",
+    "uniqueItems"
+];
+
+/**
+ * @helper for getTemplate
+ * returns schema type, which might be an educated guess based on defined schema
+ * properties if an exact type cannot be retried from type.
+ */
+export function getSchemaType(node: SchemaNode, data: unknown): keyof typeof SCHEMA_TYPES | undefined {
+    const dataType = getTypeOf(data);
+    // @ts-expect-error boolean schema true
+    if (node.schema === true) {
+        return SCHEMA_TYPES.includes(dataType) ? (dataType as keyof typeof SCHEMA_TYPES) : undefined;
+    }
+    // boolean schema false or invalid schema
+    if (!isObject(node.schema)) {
+        return undefined;
+    }
+    const schemaType = node.schema.type;
+
+    // type: []
+    if (Array.isArray(schemaType)) {
+        if (schemaType.includes(dataType)) {
+            return dataType as keyof typeof SCHEMA_TYPES;
+        }
+        const defaultType = getTypeOf(node.schema.default);
+        if (schemaType.includes(defaultType)) {
+            return defaultType as keyof typeof SCHEMA_TYPES;
+        }
+        return schemaType[0];
+    }
+
+    // type: ""
+    if (schemaType) {
+        return schemaType as keyof typeof SCHEMA_TYPES;
+    }
+
+    // type: undefined, enum: []
+    if (Array.isArray(node.schema.enum)) {
+        const schemaEnum: unknown[] = node.schema.enum;
+        const enumSchemaType = schemaEnum.map((value) => getTypeOf(value)).filter((p, i, l) => l.indexOf(p) === i);
+        if (enumSchemaType.includes(dataType)) {
+            return dataType as keyof typeof SCHEMA_TYPES;
+        }
+        const defaultType = getTypeOf(node.schema.default);
+        if (enumSchemaType.includes(defaultType)) {
+            return defaultType as keyof typeof SCHEMA_TYPES;
+        }
+        return enumSchemaType[0] as keyof typeof SCHEMA_TYPES;
+    }
+
+    // type: undefined, enum: undefined -- define type by schema-properties
+    // @attenation this is prone to wrong results
+    const schemaProperties = Object.keys(node.schema);
+    const objectProperties = schemaProperties.filter((p) => OBJECT_PROPERTIES.includes(p));
+    const arrayProperties = schemaProperties.filter((p) => ARRAY_PROPERTIES.includes(p));
+
+    if (objectProperties.length > 0 && objectProperties.length > arrayProperties.length) {
+        return "object" as keyof typeof SCHEMA_TYPES;
+    }
+
+    if (arrayProperties.length > 0 && arrayProperties.length > objectProperties.length) {
+        return "array" as keyof typeof SCHEMA_TYPES;
+    }
+
+    return undefined;
+}

@@ -34,8 +34,8 @@ import { requiredValidator } from "./features/required";
 import { SchemaNode } from "./types";
 import { parseType, typeValidator } from "./features/type";
 import { uniqueItemsValidator } from "./features/uniqueItems";
-import { getObjectData } from "./features/object";
-import { getStringData } from "./features/string";
+// import { getObjectData } from "./features/object";
+// import { getNumberData, getStringData } from "./features/default";
 import ERRORS from "../lib/validation/errors";
 import { dependenciesValidator, parseDependencies } from "./features/dependencies";
 
@@ -126,7 +126,46 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     return func;
 });
 
-export const DEFAULT_DATA: ((node: SchemaNode) => void)[] = [getObjectData, getStringData].map((func) => {
+// !! order matters
+export const DEFAULT_DATA: ((node: SchemaNode) => void)[] = [
+    // return minItems
+    // (node: SchemaNode) => {
+    //     if (isNaN(node.schema.minItems)) {
+    //         return;
+    //     }
+    //     node.getDefaultData.push(({ node, data, options }) => {
+    //         data = data ?? [];
+    //         if (Array.isArray(data) && node.schema.minItems > data.length) {
+    //             const templateData = [...data];
+    //             for (let i = data.length; i < node.schema.minItems; i += 1) {
+    //                 templateData.push(node.itemsObject.getTemplate(undefined, options));
+    //             }
+    //             console.log("add minItems", templateData);
+    //             return templateData;
+    //         }
+    //     });
+    // },
+    // return enum
+    (node: SchemaNode) => {
+        if (Array.isArray(node.schema.enum) && node.schema.enum.length > 0) {
+            node.getDefaultData.push(({ node, data }) => {
+                if (data === undefined) {
+                    return node.schema.enum[0];
+                }
+            });
+        }
+    },
+    // return default
+    (node: SchemaNode) => {
+        if (node.schema.default !== undefined) {
+            node.getDefaultData.push(({ node, data }) => {
+                if (data === undefined) {
+                    return node.schema.default;
+                }
+            });
+        }
+    }
+].map((func) => {
     // @ts-expect-error extended function for debugging purposes
     func.toJSON = () => func.name;
     return func;

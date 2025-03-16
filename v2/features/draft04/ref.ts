@@ -43,6 +43,7 @@ export function parseRef(node: SchemaNode) {
 }
 
 export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
+    // throw new Error("resolving ref");
     const node = this as SchemaNode;
     if (node.ref == null) {
         return node;
@@ -55,6 +56,11 @@ export function resolveRef({ pointer, path }: { pointer?: string; path?: Validat
     } else {
         console.log("failed resolving", node.ref, "from", Object.keys(node.context.refs));
     }
+
+    if (resolvedNode) {
+        return resolvedNode.compileSchema(omit(resolvedNode.schema, "$ref"), resolvedNode.spointer);
+    }
+
     return resolvedNode;
 }
 

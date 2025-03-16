@@ -12,6 +12,9 @@ export function parseRef(node: SchemaNode) {
 
     // add ref resolution method to node
     node.resolveRef = resolveRef;
+    // @todo properly
+    node.localPointer = node.spointer.split("/$ref")[0];
+    console.log("local", node.localPointer);
 
     // store this node for retrieval by $id
     if (node.context.refs[currentId] == null) {
@@ -60,6 +63,7 @@ export function refValidator({ schema, validators }: SchemaNode) {
 }
 
 export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
+    // throw new Error("resolveRef " + pointer);
     const node = this as SchemaNode;
     if (node.schema.$recursiveRef) {
         const nextNode = resolveRecursiveRef(node, path);

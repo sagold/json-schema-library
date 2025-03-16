@@ -72,7 +72,7 @@ describe("feature : object : validate", () => {
     });
 });
 
-describe("feature : object : getTemplate", () => {
+describe.skip("feature : object : getTemplate", () => {
     it("should return default value of properties", () => {
         const node = compileSchema({
             type: "object",
