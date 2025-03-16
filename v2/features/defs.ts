@@ -14,7 +14,8 @@ export function parseDefs(node: SchemaNode) {
         Object.keys(node.schema.$defs).forEach((property) => {
             node.$defs[property] = node.compileSchema(
                 node.schema.$defs[property],
-                `${node.spointer}/$defs/${urlEncodeJsonPointerProperty(property)}`
+                `${node.spointer}/$defs/${urlEncodeJsonPointerProperty(property)}`,
+                `${node.schemaId}/$defs/${property}`
             );
         });
     }
@@ -23,7 +24,8 @@ export function parseDefs(node: SchemaNode) {
         Object.keys(node.schema.definitions).forEach((property) => {
             node.$defs[property] = node.compileSchema(
                 node.schema.definitions[property],
-                `${node.spointer}/definitions/${urlEncodeJsonPointerProperty(property)}`
+                `${node.spointer}/definitions/${urlEncodeJsonPointerProperty(property)}`,
+                `${node.schemaId}/definitions/${urlEncodeJsonPointerProperty(property)}`
             );
         });
     }

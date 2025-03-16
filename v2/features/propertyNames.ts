@@ -8,7 +8,11 @@ export function propertyNamesValidator(node: SchemaNode): void {
     }
     const { propertyNames } = node.schema;
     if (isObject(propertyNames)) {
-        node.propertyNames = node.compileSchema(propertyNames, `${node.spointer}/propertyNames`);
+        node.propertyNames = node.compileSchema(
+            propertyNames,
+            `${node.spointer}/propertyNames`,
+            `${node.schemaId}/propertyNames`
+        );
     }
     node.validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
         const { schema } = node;

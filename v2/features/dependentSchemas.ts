@@ -16,7 +16,8 @@ export function parseDependentSchemas(node: SchemaNode) {
         if (isObject(schema)) {
             node.dependentSchemas[property] = node.compileSchema(
                 schema,
-                `${node.spointer}/dependentSchemas/${property}`
+                `${node.spointer}/dependentSchemas/${property}`,
+                `${node.schemaId}/dependentSchemas/${property}`
             );
         } else if (typeof schema === "boolean") {
             node.dependentSchemas[property] = schema;
@@ -56,7 +57,7 @@ export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) 
     }
 
     mergedSchema = mergeSchema(node.schema, mergedSchema, "dependentSchemas");
-    return node.compileSchema(mergedSchema, node.spointer);
+    return node.compileSchema(mergedSchema, node.spointer, node.schemaId);
 }
 
 export function dependentSchemasValidator(node: SchemaNode): void {

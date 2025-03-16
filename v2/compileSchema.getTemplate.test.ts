@@ -24,7 +24,7 @@ import { strict as assert } from "assert";
 //     }
 // ];
 
-describe.only("compileSchema.getTemplate", () => {
+describe("compileSchema.getTemplate", () => {
     describe("values", () => {
         it("should return default value missing input and type", () => {
             const data = compileSchema({ default: 123 }).getTemplate();
@@ -462,7 +462,7 @@ describe.only("compileSchema.getTemplate", () => {
             assert.deepEqual(data, [{ first: "john" }, {}]);
         });
 
-        it("should follow $ref once", () => {
+        it.only("should follow $ref once", () => {
             const data = compileSchema({
                 type: "object",
                 required: ["value", "nodes"],

@@ -20,7 +20,7 @@ function reduceAllOf({ node, data }: JsonSchemaReducerParams) {
         const schema = mergeSchema(node.allOf[i].schema, schemaNode.schema);
         mergedSchema = mergeSchema(mergedSchema, schema, "allOf");
     }
-    return node.compileSchema(mergedSchema, `${node.spointer}/allOf`);
+    return node.compileSchema(mergedSchema, `${node.spointer}/allOf`, `${node.schemaId}/allOf`);
 }
 
 export function allOfValidator(node: SchemaNode) {

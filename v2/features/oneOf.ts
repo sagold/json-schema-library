@@ -3,9 +3,11 @@ import { JsonSchemaReducerParams, SchemaNode } from "../types";
 // const { DECLARATOR_ONEOF, EXPOSE_ONE_OF_INDEX } = settings;
 
 export function parseOneOf(node: SchemaNode) {
-    const { schema, spointer } = node;
+    const { schema, spointer, schemaId } = node;
     if (Array.isArray(schema.oneOf) && schema.oneOf.length) {
-        node.oneOf = schema.oneOf.map((s, index) => node.compileSchema(s, `${spointer}/oneOf/${index}`));
+        node.oneOf = schema.oneOf.map((s, index) =>
+            node.compileSchema(s, `${spointer}/oneOf/${index}`, `${schemaId}/oneOf/${index}`)
+        );
         node.reducers.push(reduceOneOf);
     }
 }

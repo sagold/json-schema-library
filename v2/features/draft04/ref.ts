@@ -68,7 +68,7 @@ function compileNext(referencedNode: SchemaNode, spointer = referencedNode.spoin
     const referencedSchema = isObject(referencedNode.schema)
         ? omit(referencedNode.schema, "id")
         : referencedNode.schema;
-    return referencedNode.compileSchema(referencedSchema, `${spointer}/$ref`);
+    return referencedNode.compileSchema(referencedSchema, `${spointer}/$ref`, referencedSchema.schemaId);
 }
 
 export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode | undefined {

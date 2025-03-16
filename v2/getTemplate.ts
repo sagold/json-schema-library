@@ -37,14 +37,13 @@ function safeResolveRef(node: SchemaNode, options: TemplateOptions) {
     }
     const { cache, recursionLimit = 1 } = options;
 
-    const nodeId = node.localPointer;
+    const nodeId = node.schemaId;
     cache[nodeId] = cache[nodeId] ?? {};
     cache[nodeId][node.ref] = cache[nodeId][node.ref] ?? 0;
     const value = cache[nodeId][node.ref];
     if (value >= recursionLimit && options.disableRecusionLimit !== true) {
         return false;
     }
-
     options.disableRecusionLimit = false;
     cache[nodeId][node.ref] += 1;
 
@@ -55,6 +54,11 @@ function safeResolveRef(node: SchemaNode, options: TemplateOptions) {
     }
 
     return undefined;
+}
+
+function canResolveRef(node: SchemaNode, options: TemplateOptions) {
+    const counter = options.cache?.[node.schemaId]?.[node.ref] ?? -1;
+    return counter < options.recursionLimit;
 }
 
 // only convert values where we do not lose original data
@@ -84,7 +88,6 @@ export function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOpt
     if (opts?.cache == null) {
         throw new Error("Missing options");
     }
-    // console.log("getTemplate", node.spointer);
 
     // @ts-expect-error boolean schema
     if (node.schema === false || node.schema === true) {
@@ -140,7 +143,6 @@ export function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOpt
 
     const resolvedNode = safeResolveRef(currentNode, opts);
     if (resolvedNode === false) {
-        console.log("abort on", currentNode.schema, "=>", data);
         return defaultData;
     }
 
@@ -213,12 +215,6 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
                         if (d[key] == null) {
                             // merge valid missing data (additionals) to resulting object
                             const value = getValue(data, key);
-                            console.log(
-                                "validate",
-                                node.additionalProperties.schema,
-                                value,
-                                node.additionalProperties.validate(value)
-                            );
                             if (node.additionalProperties.validate(value).length === 0) {
                                 d[key] = value;
                             }
@@ -321,10 +317,10 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
         //     }
 
         // build data from items-definition
-        if (node.itemsObject) {
+        if (node.itemsObject && canResolveRef(node, opts)) {
             for (let i = 0, l = Math.max(minItems, d.length); i < l; i += 1) {
-                // @attention if getTemplate aborts recursion it currently returns undefined
-                const options = { ...opts, disableRecusionLimit: i > 0 };
+                // @attention if getTemplate aborts recursion it currently returns undefined)
+                const options = { ...opts, disableRecusionLimit: d[i] !== undefined || i > 0 };
                 const result = node.itemsObject.getTemplate(d[i] == null ? template[i] : d[i], options);
                 if (result === undefined) {
                     return d;

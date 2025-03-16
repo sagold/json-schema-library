@@ -11,6 +11,7 @@ import { omit } from "../lib/utils/omit";
 import { SchemaNode, JsonSchemaReducerParams, ValidationPath } from "./types";
 import { strict as assert } from "assert";
 import { getTemplate } from "./getTemplate";
+import { join } from "@sagold/json-pointer";
 
 const DYNAMIC_PROPERTIES = [
     "if",
@@ -31,7 +32,9 @@ const NODE_METHODS: Pick<
 > = {
     errors: draft2019.ERRORS,
 
-    compileSchema(schema: JsonSchema, spointer: string = this.spointer) {
+    compileSchema(schema: JsonSchema, spointer: string = this.spointer, schemaId?: string) {
+        const nextFragment = spointer.split("/$ref")[0];
+
         // assert(schema !== undefined, "schema missing");
         const parentNode = this as SchemaNode;
         const node: SchemaNode = {
@@ -39,7 +42,7 @@ const NODE_METHODS: Pick<
             context: parentNode.context,
             parent: parentNode,
             spointer,
-            localPointer: "#",
+            schemaId: schemaId ?? join(parentNode.schemaId, nextFragment),
             reducers: [],
             resolvers: [],
             validators: [],
@@ -84,6 +87,11 @@ const NODE_METHODS: Pick<
         const { cache, recursionLimit } = options ?? {};
         const opts = { ...(options ?? {}), cache: cache ?? {}, recursionLimit: recursionLimit ?? 1 };
 
+        if (this.schemaId == "#/properties/nodes/properties/nodes/items") {
+            console.log(this.schemaId);
+            throw new Error("compi");
+        }
+
         const node = this as SchemaNode;
         let defaultData = data;
         // collects default data of current node
@@ -98,7 +106,7 @@ const NODE_METHODS: Pick<
         // @path
         const resolvedNode = { ...this.resolveRef({ pointer, path }) } as SchemaNode;
         const resolvedSchema = mergeSchema(this.schema, resolvedNode?.schema);
-        const node = (this as SchemaNode).compileSchema(resolvedSchema, this.spointer);
+        const node = (this as SchemaNode).compileSchema(resolvedSchema, this.spointer, resolvedSchema.schemaId);
 
         // @ts-expect-error bool schema
         if (node.schema === false) {
@@ -106,7 +114,7 @@ const NODE_METHODS: Pick<
 
             // @ts-expect-error bool schema
         } else if (node.schema === true) {
-            const nextNode = node.compileSchema(createSchemaOf(data), node.spointer);
+            const nextNode = node.compileSchema(createSchemaOf(data), node.spointer, node.schemaId);
             path?.push({ pointer, node });
             return nextNode;
         }
@@ -140,14 +148,14 @@ const NODE_METHODS: Pick<
             // recompile to update newly added schema defintions
             // @ts-expect-error bool schema
             schema = mergeSchema(node.schema, schema, ...DYNAMIC_PROPERTIES);
-            const nextNode = node.compileSchema(schema, this.spointer);
+            const nextNode = node.compileSchema(schema, this.spointer, node.schemaId);
             path?.push({ pointer, node });
             // reduce again?
             return nextNode;
         }
 
         // remove dynamic properties of node
-        return node.compileSchema(omit(node.schema, ...DYNAMIC_PROPERTIES));
+        return node.compileSchema(omit(node.schema, ...DYNAMIC_PROPERTIES), node.schemaId);
     },
 
     validate(data: unknown, pointer = "#", path = []) {
@@ -196,6 +204,7 @@ const NODE_METHODS: Pick<
         const node: SchemaNode = {
             spointer: "#",
             lastIdPointer: "#",
+            schemaId: "#",
             reducers: [],
             resolvers: [],
             validators: [],
@@ -282,7 +291,7 @@ export function compileSchema(schema: JsonSchema) {
     const node: SchemaNode = {
         spointer: "#",
         lastIdPointer: "#",
-        localPointer: "#",
+        schemaId: "#",
         reducers: [],
         resolvers: [],
         validators: [],

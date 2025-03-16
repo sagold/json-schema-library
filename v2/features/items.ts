@@ -17,12 +17,12 @@ function itemsObjectResolver({ node }: JsonSchemaResolverParams) {
 export function parseItems(node: SchemaNode) {
     const { schema, spointer } = node;
     if (isObject(schema.items)) {
-        const propertyNode = node.compileSchema(schema.items, `${spointer}/items`);
+        const propertyNode = node.compileSchema(schema.items, `${spointer}/items`, `${node.schemaId}/items`);
         node.itemsObject = propertyNode;
         node.resolvers.push(itemsObjectResolver);
     } else if (Array.isArray(schema.items)) {
         node.itemsList = schema.items.map((itemSchema, index) =>
-            node.compileSchema(itemSchema, `${spointer}/items/${index}`)
+            node.compileSchema(itemSchema, `${spointer}/items/${index}`, `${node.schemaId}/items/${index}`)
         );
         node.resolvers.push(itemsListResolver);
     }

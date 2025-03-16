@@ -20,7 +20,7 @@ function reduceAnyOf({ node, data }: JsonSchemaReducerParams) {
             mergedSchema = mergeSchema(mergedSchema, schema, "anyOf");
         }
     }
-    return node.compileSchema(mergedSchema, `${node.spointer}/anyOf`);
+    return node.compileSchema(mergedSchema, `${node.spointer}/anyOf`, `${node.schemaId}/anyOf`);
 }
 
 export function anyOfValidator(node: SchemaNode) {

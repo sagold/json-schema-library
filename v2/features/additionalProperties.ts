@@ -6,9 +6,13 @@ import { getValue } from "../utils/getValue";
 
 // must come as last resolver
 export function parseAdditionalProperties(node: SchemaNode) {
-    const { schema, spointer } = node;
+    const { schema, spointer, schemaId } = node;
     if (isObject(schema.additionalProperties)) {
-        node.additionalProperties = node.compileSchema(schema.additionalProperties, `${spointer}/additionalProperties`);
+        node.additionalProperties = node.compileSchema(
+            schema.additionalProperties,
+            `${spointer}/additionalProperties`,
+            `${schemaId}/additionalProperties`
+        );
     }
     node.resolvers.push(additionalPropertyResolver);
 }

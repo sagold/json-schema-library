@@ -22,7 +22,11 @@ export function parsePatternProperties(node: SchemaNode) {
     patterns.map((pattern) =>
         node.patternProperties.push({
             pattern: new RegExp(pattern),
-            node: node.compileSchema(schema.patternProperties[pattern], `${node.spointer}/patternProperties/${pattern}`)
+            node: node.compileSchema(
+                schema.patternProperties[pattern],
+                `${node.spointer}/patternProperties/${pattern}`,
+                `${node.schemaId}/patternProperties/${pattern}`
+            )
         })
     );
     node.resolvers.push(patternPropertyResolver);

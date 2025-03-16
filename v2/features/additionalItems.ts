@@ -5,14 +5,18 @@ import { getValue } from "../utils/getValue";
 
 // must come as last resolver
 export function parseAdditionalItems(node: SchemaNode) {
-    const { schema, spointer } = node;
+    const { schema, spointer, schemaId } = node;
     if (schema.additionalItems === false) {
         // no additional items - no resolver required
         return;
     }
     if (isObject(schema.additionalItems) || schema.additionalItems === true) {
         // precompile additional items schema
-        node.additionalItems = node.compileSchema(schema.additionalItems, `${spointer}/additionalItems`);
+        node.additionalItems = node.compileSchema(
+            schema.additionalItems,
+            `${spointer}/additionalItems`,
+            `${schemaId}/additionalItems`
+        );
     }
     // add resolver for get additionalItem
     node.resolvers.push(additionalItemsResolver);

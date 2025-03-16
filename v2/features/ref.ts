@@ -4,6 +4,12 @@ import splitRef from "../../lib/compile/splitRef";
 import { omit } from "../../lib/utils/omit";
 import { isObject } from "../../lib/utils/isObject";
 
+function register(node: SchemaNode, path: string) {
+    if (node.context.refs[path] == null) {
+        node.context.refs[path] = node;
+    }
+}
+
 export function parseRef(node: SchemaNode) {
     // get and store current $id of node - this may be the same as parent $id
     const currentId = joinId(node.parent?.$id, node.schema?.$id);
@@ -12,9 +18,6 @@ export function parseRef(node: SchemaNode) {
 
     // add ref resolution method to node
     node.resolveRef = resolveRef;
-    // @todo properly
-    node.localPointer = node.spointer.split("/$ref")[0];
-    console.log("local", node.localPointer);
 
     // store this node for retrieval by $id
     if (node.context.refs[currentId] == null) {
@@ -29,12 +32,12 @@ export function parseRef(node: SchemaNode) {
     // store this node for retrieval by $id + json-pointer from $id
     if (node.lastIdPointer !== "#" && node.spointer.startsWith(node.lastIdPointer)) {
         const localPointer = `#${node.spointer.replace(node.lastIdPointer, "")}`;
-        node.context.refs[joinId(currentId, localPointer)] = node;
+        register(node, joinId(currentId, localPointer));
     } else {
-        node.context.refs[joinId(currentId, node.spointer)] = node;
+        register(node, joinId(currentId, node.spointer));
     }
     // store $rootId + json-pointer to this node
-    node.context.refs[joinId(node.context.rootNode.$id, node.spointer)] = node;
+    register(node, joinId(node.context.rootNode.$id, node.spointer));
 
     // store this node for retrieval by $id + anchor
     if (node.schema.$anchor) {
@@ -118,7 +121,8 @@ function compileNext(referencedNode: SchemaNode, spointer = referencedNode.spoin
     const referencedSchema = isObject(referencedNode.schema)
         ? omit(referencedNode.schema, "$id")
         : referencedNode.schema;
-    return referencedNode.compileSchema(referencedSchema, `${spointer}/$ref`);
+
+    return referencedNode.compileSchema(referencedSchema, `${spointer}/$ref`, referencedNode.schemaId);
 }
 
 export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode | undefined {

@@ -42,6 +42,44 @@ import { isSchemaNode, SchemaNode } from "./types";
 //     // - possibly optimize all this once for actual exection (compilation)
 // }
 
+describe("compileSchema `schemaId`", () => {
+    it("should store path from rootSchema as schemaId", () => {
+        const node = compileSchema({
+            if: { type: "string" },
+            then: { type: "string" },
+            properties: { title: { type: "string" } },
+            $defs: { asset: { type: "string" } }
+        });
+
+        assert.deepEqual(node.schemaId, "#");
+        assert.deepEqual(node.if.schemaId, "#/if");
+        assert.deepEqual(node.then.schemaId, "#/then");
+        assert.deepEqual(node.properties.title.schemaId, "#/properties/title");
+        assert.deepEqual(node.$defs.asset.schemaId, "#/%24defs/asset");
+    });
+
+    it("should maintain schemaId when resolved by ref", () => {
+        const node = compileSchema({
+            properties: { title: { $ref: "#/$defs/asset" } },
+            $defs: { asset: { type: "string" } }
+        }).get("title");
+        assert(isSchemaNode(node));
+        // @todo should have returned already resolved node?
+        const result = node.resolveRef();
+        assert.deepEqual(result.schemaId, "#/%24defs/asset");
+    });
+
+    it.only("should maintain schemaId when resolved by root-ref", () => {
+        const node = compileSchema({
+            properties: { title: { $ref: "#" } }
+        }).get("title");
+        assert(isSchemaNode(node));
+        // @todo should have returned already resolved node?
+        const result = node.resolveRef();
+        assert.deepEqual(result.schemaId, "#");
+    });
+});
+
 describe("compileSchema : reduce", () => {
     describe("behaviour", () => {});
 

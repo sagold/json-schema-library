@@ -16,7 +16,11 @@ export function parseDependencies(node: SchemaNode) {
     schemas.forEach((property) => {
         const schema = dependencies[property];
         if (isObject(schema)) {
-            node.dependentSchemas[property] = node.compileSchema(schema, `${node.spointer}/dependencies/${property}`);
+            node.dependentSchemas[property] = node.compileSchema(
+                schema,
+                `${node.spointer}/dependencies/${property}`,
+                `${node.schemaId}/dependencies/${property}`
+            );
         } else if (typeof schema === "boolean") {
             node.dependentSchemas[property] = schema;
         }

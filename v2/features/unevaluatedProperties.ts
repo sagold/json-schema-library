@@ -9,7 +9,8 @@ export function parseUnevaluatedProperties(node: SchemaNode) {
     }
     node.unevaluatedProperties = node.compileSchema(
         node.schema.unevaluatedProperties,
-        `${node.schema.unevaluatedProperties}/unevaluatedProperties`
+        `${node.spointer}/unevaluatedProperties`,
+        `${node.schemaId}/unevaluatedProperties`
     );
 }
 

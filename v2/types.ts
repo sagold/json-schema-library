@@ -58,7 +58,7 @@ export type SchemaNode = {
     schema: JsonSchema;
     spointer: string;
     /** local path within json-schema (not extended by resolving ref) */
-    localPointer: string;
+    schemaId: string;
     /**
      * @todo this is a ref specific property as is $id
      * json-pointer from last $id ~~to this location~~ to resolve $refs to $id#/idLocalPointer
@@ -74,7 +74,7 @@ export type SchemaNode = {
      */
     addRemote: (url: string, schema: JsonSchema) => SchemaNode;
     /** Compiles a child-schema of this node to its context */
-    compileSchema: (schema: JsonSchema, spointer?: string) => SchemaNode;
+    compileSchema: (schema: JsonSchema, spointer?: string, schemaId?: string) => SchemaNode;
     /** Step into a property or array by name or index and return the schema-node its value */
     get: (key: string | number, data?: unknown, valiadtionPath?: ValidationPath) => SchemaNode | JsonError;
     /** Creates data that is valid to the schema of this node */
