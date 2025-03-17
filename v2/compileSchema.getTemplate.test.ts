@@ -1,4 +1,3 @@
-import { isObject } from "../lib/utils/isObject";
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
 
@@ -58,6 +57,7 @@ describe("compileSchema.getTemplate", () => {
                 assert.deepEqual(data, "input");
             });
         });
+
         describe("number", () => {
             it("should return 0 for missing default value", () => {
                 const data = compileSchema({ type: "number" }).getTemplate();
@@ -74,9 +74,11 @@ describe("compileSchema.getTemplate", () => {
                 assert.deepEqual(data, 123);
             });
         });
+
         describe("integer", () => {});
+
         describe("boolean", () => {
-            it("should return false for missing default value", () => {
+            it("should return `false` for missing default value", () => {
                 const data = compileSchema({ type: "boolean", default: false }).getTemplate();
                 assert.deepEqual(data, false);
             });
@@ -86,21 +88,85 @@ describe("compileSchema.getTemplate", () => {
                 assert.deepEqual(data, false);
             });
 
-            it("should not override given boolean if it is 'false'", () => {
+            it("should not override given boolean if it is `false`", () => {
                 const data = compileSchema({ type: "boolean", default: true }).getTemplate(false);
                 assert.deepEqual(data, false);
             });
 
-            it("should not override given boolean if it is 'true'", () => {
+            it("should not override given boolean if it is `true`", () => {
                 const data = compileSchema({ type: "boolean", default: false }).getTemplate(true);
                 assert.deepEqual(data, true);
             });
         });
-        describe("null", () => {});
+
+        describe("null", () => {
+            it("should return `null` for missing default value", () => {
+                const data = compileSchema({ type: "null" }).getTemplate();
+                assert.deepEqual(data, null);
+            });
+
+            it("should return `null` when first type in type-array", () => {
+                const node = compileSchema({ type: ["null", "string"] });
+                const res = node.getTemplate();
+
+                assert.deepEqual(res, null);
+            });
+
+            it("should return default value of null", () => {
+                const data = compileSchema({ type: "null", default: null }).getTemplate();
+                assert.deepEqual(data, null);
+            });
+
+            it("should return default value of null even for wrong typye", () => {
+                const data = compileSchema({ type: "number", default: null }).getTemplate();
+                assert.deepEqual(data, null);
+            });
+
+            it("should support `null` type properties", () => {
+                const data = compileSchema({
+                    type: "object",
+                    required: ["nullType"],
+                    properties: { nullType: { type: "null" } }
+                }).getTemplate();
+                assert.deepEqual(data, { nullType: null });
+            });
+
+            it("should return `null` input for strings", () => {
+                const data = compileSchema({ type: "string" }).getTemplate(null);
+                assert.deepEqual(data, null);
+            });
+
+            it("should return `null` input for value-property", () => {
+                const data = compileSchema({
+                    type: "object",
+                    required: ["title"],
+                    properties: { title: { type: "number" } }
+                }).getTemplate({ title: null });
+                assert.deepEqual(data, { title: null });
+            });
+        });
+
         describe("enum", () => {
             it("should set the first enum option for a missing default", () => {
                 const data = compileSchema({ enum: ["first", "second"] }).getTemplate();
                 assert.deepEqual(data, "first");
+            });
+        });
+
+        describe("file", () => {
+            it("should not modify file-instance", () => {
+                const file = new File([], "testfile.pdf");
+                const data = compileSchema({ type: ["string", "object"], format: "file" }).getTemplate(file);
+                assert.deepEqual(data, file);
+            });
+
+            it("should not modify file-instance on object", () => {
+                const file = new File([], "testfile.pdf");
+                const data = compileSchema({
+                    type: "object",
+                    properties: { file: { type: ["string", "object"], format: "file" } }
+                }).getTemplate({ file });
+                assert.deepEqual(data, { file });
             });
         });
     });
@@ -186,9 +252,72 @@ describe("compileSchema.getTemplate", () => {
             });
         });
 
+        describe("additionalProperties & option: removeInvalidData", () => {
+            it("should NOT remove additional properties `additionalProperties=undefined`", () => {
+                const data = compileSchema({
+                    type: "object",
+                    required: ["first", "second"],
+                    properties: { first: { type: "string" } }
+                }).getTemplate({ first: "first", second: 42 });
+                assert.deepEqual(data, { first: "first", second: 42 });
+            });
+
+            it("should NOT remove additional properties `additionalProperties=true`", () => {
+                const data = compileSchema({
+                    type: "object",
+                    required: ["first", "second"],
+                    properties: { first: { type: "string" } },
+                    additionalProperties: true
+                }).getTemplate({ first: "first", second: 42 });
+                assert.deepEqual(data, { first: "first", second: 42 });
+            });
+
+            it("should NOT remove non matching properties with `additionalProperties={schema}`", () => {
+                const data = compileSchema({
+                    type: "object",
+                    required: ["first", "second"],
+                    properties: { first: { type: "string" } },
+                    additionalProperties: { type: "string" }
+                }).getTemplate({ first: "first", second: 42 });
+                assert.deepEqual(data, { first: "first", second: 42 });
+            });
+
+            it("should NOT remove additional properties with `additionalProperties=false`", () => {
+                const data = compileSchema({
+                    type: "object",
+                    required: ["first", "second"],
+                    properties: { first: { type: "string" } },
+                    additionalProperties: false
+                }).getTemplate({ first: "first", second: 42 });
+                assert.deepEqual(data, { first: "first", second: 42 });
+            });
+
+            it("should remove unmatched properties with option `removeInvalidData=true`", () => {
+                const data = compileSchema({
+                    type: "object",
+                    required: ["first", "second"],
+                    properties: { first: { type: "string" } },
+                    additionalProperties: false
+                }).getTemplate({ first: "first", second: 42, thrid: "third" }, { removeInvalidData: true });
+                assert.deepEqual(data, { first: "first" });
+            });
+
+            it("should remove invalid properties with option `removeInvalidData=true`", () => {
+                const data = compileSchema({
+                    type: "object",
+                    required: ["first", "second"],
+                    properties: { first: { type: "string" } },
+                    additionalProperties: { type: "number" }
+                }).getTemplate(
+                    { first: "first", second: 42, third: "third", fourth: false },
+                    { removeInvalidData: true }
+                );
+                assert.deepEqual(data, { first: "first", second: 42 });
+            });
+        });
+
         // patternNames
         // patternProperties
-        // additionalProperties
         // dependentSchemas
         // dependentRequired
         // (unevaluatedPoperties)
@@ -322,7 +451,7 @@ describe("compileSchema.getTemplate", () => {
                 assert.deepEqual(data, [true, ""]);
             });
 
-            it("should not override input items with wrong type", () => {
+            it("should not override wrong input items", () => {
                 const data = compileSchema({
                     type: "array",
                     items: [
@@ -388,7 +517,7 @@ describe("compileSchema.getTemplate", () => {
                 assert.deepEqual(data, ["43"]);
             });
 
-            it("should add defaults from additionalItems ", () => {
+            it("should add defaults from `additionalItems`", () => {
                 const data = compileSchema({
                     type: "array",
                     minItems: 2,
@@ -400,7 +529,7 @@ describe("compileSchema.getTemplate", () => {
                 assert.deepEqual(data, [43, 2]);
             });
 
-            it.skip("should add defaults from additionalItems for unspecified items ", () => {
+            it.skip("should add defaults from `additionalItems` for unspecified items ", () => {
                 const data = compileSchema({
                     type: "array",
                     minItems: 2,
@@ -563,27 +692,7 @@ describe("compileSchema.getTemplate", () => {
     });
 
     // @NOTE OneOf can be used to select required? https://github.com/epoberezkin/ajv/issues/134#issuecomment-190680773
-    describe("compileSchema.getTemplate (v1 tests)", () => {
-        it("should support null types", () => {
-            const node = compileSchema({ type: "null" });
-            const res = node.getTemplate();
-
-            assert.deepEqual(res, null);
-        });
-
-        it("should support null type properties", () => {
-            const node = compileSchema({
-                type: "object",
-                required: ["nullType"],
-                properties: {
-                    nullType: { type: "null" }
-                }
-            });
-            const res = node.getTemplate();
-
-            assert.deepEqual(res, { nullType: null });
-        });
-
+    describe.skip("compileSchema.getTemplate (v1 tests)", () => {
         it("should not modify input schema", () => {
             const schema = {
                 type: "object",
@@ -621,105 +730,6 @@ describe("compileSchema.getTemplate", () => {
         });
 
         describe("object", () => {
-            describe("additionalProperties", () => {
-                it("should not remove additional properties `additionalProperties=undefined`", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        required: ["first", "second"],
-                        properties: {
-                            first: { type: "string" }
-                        }
-                    });
-
-                    const res = node.getTemplate({ first: "first", second: 42 });
-                    assert.deepEqual(res, { first: "first", second: 42 });
-                });
-
-                it("should not remove additional properties `additionalProperties=true`", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        required: ["first", "second"],
-                        properties: {
-                            first: { type: "string" }
-                        },
-                        additionalProperties: true
-                    });
-
-                    const res = node.getTemplate({ first: "first", second: 42 });
-                    assert.deepEqual(res, { first: "first", second: 42 });
-                });
-
-                it("should not remove non matching properties", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        required: ["first", "second"],
-                        properties: {
-                            first: { type: "string" }
-                        },
-                        additionalProperties: {
-                            type: "string"
-                        }
-                    });
-
-                    const res = node.getTemplate({ first: "first", second: 42 });
-                    assert.deepEqual(res, { first: "first", second: 42 });
-                });
-
-                it("should not remove additional properties with `additionalProperties=false`", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        required: ["first", "second"],
-                        properties: {
-                            first: { type: "string" }
-                        },
-                        additionalProperties: false
-                    });
-
-                    const res = node.getTemplate({ first: "first", second: 42 });
-                    assert.deepEqual(res, { first: "first", second: 42 });
-                });
-
-                it("should remove unmatched properties with option `removeInvalidData=true`", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        required: ["first", "second"],
-                        properties: {
-                            first: { type: "string" }
-                        },
-                        additionalProperties: false
-                    });
-
-                    const res = node.getTemplate(
-                        { first: "first", second: 42, thrid: "third" },
-                        {
-                            removeInvalidData: true
-                        }
-                    );
-                    assert.deepEqual(res, { first: "first" });
-                });
-
-                it("should remove invalid properties with option `removeInvalidData=true`", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        required: ["first", "second"],
-                        properties: {
-                            first: { type: "string" }
-                        },
-                        additionalProperties: {
-                            type: "number"
-                        }
-                    });
-
-                    const res = node.getTemplate(
-                        { first: "first", second: 42, third: "third", fourth: false },
-                        {
-                            removeInvalidData: true
-                        }
-                    );
-                    assert.deepEqual(res, { first: "first", second: 42 });
-                });
-            });
-
             describe("oneOf", () => {
                 it("should return template of first oneOf schema", () => {
                     const node = compileSchema({
@@ -1311,33 +1321,6 @@ describe("compileSchema.getTemplate", () => {
                 );
 
                 assert.deepEqual({ list: [], author: "jane" }, template);
-            });
-
-            describe("file", () => {
-                it("should not modify file-instance", () => {
-                    const file = new File([], "testfile.pdf");
-                    const node = compileSchema({
-                        type: ["string", "object"],
-                        format: "file"
-                    });
-                    const res = node.getTemplate(file);
-                    assert.deepEqual(res, file);
-                });
-
-                it("should not modify file-instance on object", () => {
-                    const file = new File([], "testfile.pdf");
-                    const node = compileSchema({
-                        type: "object",
-                        properties: {
-                            file: {
-                                type: ["string", "object"],
-                                format: "file"
-                            }
-                        }
-                    });
-                    const res = node.getTemplate({ file });
-                    assert.deepEqual(res, { file });
-                });
             });
 
             describe("extendDefaults", () => {

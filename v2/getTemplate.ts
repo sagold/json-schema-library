@@ -1,13 +1,8 @@
-import { JsonPointer } from "@sagold/json-pointer";
 import { isSchemaNode, SchemaNode } from "./types";
 import getTypeOf from "../lib/getTypeOf";
 import { getValue } from "./utils/getValue";
 import { isObject } from "../lib/utils/isObject";
-import { JsonSchema } from "../lib/types";
-import copy from "fast-copy";
-import { isEmpty } from "../lib/utils/isEmpty";
-import merge from "../lib/utils/merge";
-import { getSchemaType, SCHEMA_TYPES } from "./utils/getSchemaType";
+import { getSchemaType } from "./utils/getSchemaType";
 
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
@@ -106,7 +101,7 @@ export function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOpt
 
     // @feature allOf
     if (currentNode.allOf?.length) {
-        currentNode.allOf.forEach((partialNode, index) => {
+        currentNode.allOf.forEach((partialNode) => {
             defaultData = partialNode.getTemplate(defaultData, opts) ?? defaultData;
         });
     }
@@ -163,9 +158,8 @@ export function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOpt
     // currentNode = isSchemaNode(reduced) ? reduced : currentNode;
 
     const type = getSchemaType(currentNode, defaultData);
-    defaultData = TYPE[type as string]?.(currentNode, defaultData, opts) ?? defaultData;
-
-    return defaultData;
+    const templateData = TYPE[type as string]?.(currentNode, defaultData, opts);
+    return templateData === undefined ? defaultData : templateData;
 }
 
 const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptions) => unknown> = {
@@ -186,7 +180,8 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
                 const propertyNode = node.properties[propertyName];
                 const isRequired = required.includes(propertyName);
                 const input = getValue(data, propertyName);
-                const value = data == null || input == null ? getValue(template, propertyName) : input;
+                const value = data === undefined || input === undefined ? getValue(template, propertyName) : input;
+                console.log(`property value ${input}`, "=>", value);
                 // Omit adding a property if it is not required or optional props should be added
                 if (value != null || isRequired || opts.addOptionalProps) {
                     d[propertyName] = propertyNode.getTemplate(value, opts);
@@ -340,7 +335,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
 };
 
 function getDefault({ schema }: SchemaNode, templateValue: any, initValue: any) {
-    if (templateValue != null) {
+    if (templateValue !== undefined) {
         return convertValue(schema.type, templateValue);
     } else if (schema.const) {
         return schema.const;

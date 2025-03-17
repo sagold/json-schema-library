@@ -87,11 +87,6 @@ const NODE_METHODS: Pick<
         const { cache, recursionLimit } = options ?? {};
         const opts = { ...(options ?? {}), cache: cache ?? {}, recursionLimit: recursionLimit ?? 1 };
 
-        if (this.schemaId == "#/properties/nodes/properties/nodes/items") {
-            console.log(this.schemaId);
-            throw new Error("compi");
-        }
-
         const node = this as SchemaNode;
         let defaultData = data;
         // collects default data of current node
