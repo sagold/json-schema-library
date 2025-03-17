@@ -181,7 +181,6 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
                 const isRequired = required.includes(propertyName);
                 const input = getValue(data, propertyName);
                 const value = data === undefined || input === undefined ? getValue(template, propertyName) : input;
-                console.log(`property value ${input}`, "=>", value);
                 // Omit adding a property if it is not required or optional props should be added
                 if (value != null || isRequired || opts.addOptionalProps) {
                     d[propertyName] = propertyNode.getTemplate(value, opts);

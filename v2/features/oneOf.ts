@@ -1,6 +1,11 @@
 import { JsonError } from "../../lib/types";
-import { JsonSchemaReducerParams, SchemaNode } from "../types";
-// const { DECLARATOR_ONEOF, EXPOSE_ONE_OF_INDEX } = settings;
+import { isSchemaNode, JsonSchemaReducerParams, SchemaNode } from "../types";
+import settings from "../../lib/config/settings";
+import { getValue } from "../utils/getValue";
+import sanitizeErrors from "../utils/sanitizeErrors";
+import { isObject } from "../../lib/utils/isObject";
+
+const { DECLARATOR_ONEOF } = settings;
 
 export function parseOneOf(node: SchemaNode) {
     const { schema, spointer, schemaId } = node;
@@ -13,67 +18,13 @@ export function parseOneOf(node: SchemaNode) {
 }
 
 reduceOneOf.toJSON = () => "reduceOneOf";
-function reduceOneOf({ node, data, pointer }: JsonSchemaReducerParams) {
+function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     // !keyword: oneOfProperty
     // an additional <DECLARATOR_ONEOF> (default `oneOfProperty`) on the schema will exactly determine the
     // oneOf value (if set in data)
-
-    // @fixme
-    // abort if no data is given an DECLARATOR_ONEOF is set (used by getChildSchemaSelection)
-    // this case (data != null) should not be necessary
-    // if (data != null && schema[DECLARATOR_ONEOF]) {
-    //     const errors = [];
-    //     const oneOfProperty = schema[DECLARATOR_ONEOF];
-    //     const oneOfValue = getValue(data, oneOfProperty);
-
-    //     if (oneOfValue === undefined) {
-    //         return node.errors.missingOneOfPropertyError({
-    //             property: oneOfProperty,
-    //             pointer,
-    //             schema,
-    //             value: data
-    //         });
-    //     }
-
-    //     for (let i = 0; i < schema.oneOf.length; i += 1) {
-    //         // const oneNode = node.next(schema.oneOf[i] as JsonSchema).resolveRef();
-    //         // const resultNode = draft.step(oneNode, oneOfProperty, data);
-    //         // if (isJsonError(resultNode)) {
-    //         //     return resultNode;
-    //         // }
-    //         const resultNode = node.oneOf[i].get(oneOfProperty, data);
-    //         if (resultNode === undefined) {
-    //             return node.errors.missingOneOfDeclaratorError({
-    //                 declarator: DECLARATOR_ONEOF,
-    //                 oneOfProperty,
-    //                 schemaPointer: `${node.spointer}/oneOf/${i}`,
-    //                 pointer,
-    //                 schema,
-    //                 value: data
-    //             });
-    //         }
-
-    //         let result = flattenArray(draft.validate(resultNode, oneOfValue));
-    //         result = result.filter(errorOrPromise);
-
-    //         if (result.length > 0) {
-    //             errors.push(...result);
-    //         } else {
-    //             // @evaluation-info
-    //             setOneOfOrigin(node.oneOf[i].schema, i);
-    //             // return resultNode.next(oneNode.schema);
-    //             return node.oneOf[i];
-    //         }
-    //     }
-
-    //     return node.errors.oneOfPropertyError({
-    //         property: oneOfProperty,
-    //         value: oneOfValue,
-    //         pointer,
-    //         schema,
-    //         errors
-    //     });
-    // }
+    if (data != null && node.schema[DECLARATOR_ONEOF]) {
+        return reduceOneOfDeclarator({ node, data, pointer, path });
+    }
 
     const matches = [];
     const errors: JsonError[] = [];
@@ -89,8 +40,7 @@ function reduceOneOf({ node, data, pointer }: JsonSchemaReducerParams) {
     if (matches.length === 1) {
         const { node, index } = matches[0];
         node.oneOfIndex = index; // @evaluation-info
-        const reducedNode = node.reduce({ data, pointer });
-        // console.log("reduce ONEOF success", data, reducedNode.schema);
+        const reducedNode = node.reduce({ data, pointer, path });
         return reducedNode;
     }
 
@@ -111,6 +61,128 @@ function reduceOneOf({ node, data, pointer }: JsonSchemaReducerParams) {
         oneOf: node.schema.oneOf,
         errors
     });
+}
+
+export function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaReducerParams) {
+    const errors = [];
+    const oneOfProperty = node.schema[DECLARATOR_ONEOF];
+    const oneOfValue = getValue(data, oneOfProperty);
+
+    if (oneOfValue === undefined) {
+        return node.errors.missingOneOfPropertyError({
+            property: oneOfProperty,
+            pointer,
+            schema: node.schema,
+            value: data
+        });
+    }
+
+    for (let i = 0; i < node.oneOf.length; i += 1) {
+        const resultNode = node.oneOf[i].get(oneOfProperty, data);
+        if (!isSchemaNode(resultNode)) {
+            return node.errors.missingOneOfDeclaratorError({
+                declarator: DECLARATOR_ONEOF,
+                oneOfProperty,
+                schemaPointer: node.oneOf[i].schemaId,
+                pointer,
+                schema: node.schema,
+                value: data
+            });
+        }
+
+        const result = sanitizeErrors(resultNode.validate(oneOfValue));
+        // result = result.filter(errorOrPromise);
+        if (result.length > 0) {
+            errors.push(...result);
+        } else {
+            const reducedNode = node.oneOf[i].reduce({ data, pointer, path });
+            reducedNode.oneOfIndex = i; // @evaluation-info
+            return reducedNode;
+        }
+    }
+
+    return node.errors.oneOfPropertyError({
+        property: oneOfProperty,
+        value: oneOfValue,
+        pointer,
+        schema: node.schema,
+        errors
+    });
+}
+
+/**
+ * Returns a ranking for the data and given schema
+ *
+ * @param draft
+ * @param - json schema type: object
+ * @param data
+ * @param [pointer]
+ * @return ranking value (higher is better)
+ */
+function fuzzyObjectValue(node: SchemaNode, data: Record<string, unknown>) {
+    if (data == null || node.properties == null) {
+        return -1;
+    }
+    let value = 0;
+    const keys = Object.keys(node.properties ?? {});
+    for (let i = 0; i < keys.length; i += 1) {
+        const key = keys[i];
+        if (data[key]) {
+            if (node.properties[key].validate(data[key]).length === 0) {
+                value += 1;
+            }
+        }
+    }
+    return value;
+}
+
+/**
+ * Selects and returns a oneOf schema for the given data
+ *
+ * @param draft
+ * @param data
+ * @param [schema] - current json schema containing property oneOf
+ * @param [pointer] - json pointer to data
+ * @return oneOf schema or an error
+ */
+export function reduceOneOfFuzzy({ node, data, pointer, path }: JsonSchemaReducerParams) {
+    const oneOfResult = reduceOneOf({ node, data, pointer, path });
+    if (isSchemaNode(oneOfResult)) {
+        return oneOfResult;
+    }
+
+    // fuzzy match oneOf
+    if (isObject(data)) {
+        let nodeOfItem;
+        let schemaOfIndex = -1;
+        let fuzzyGreatest = 0;
+
+        for (let i = 0; i < node.oneOf.length; i += 1) {
+            const oneNode = node.oneOf[i];
+            const fuzzyValue = fuzzyObjectValue(oneNode, data);
+
+            if (fuzzyGreatest < fuzzyValue) {
+                fuzzyGreatest = fuzzyValue;
+                nodeOfItem = oneNode;
+                schemaOfIndex = i;
+            }
+        }
+
+        if (nodeOfItem === undefined) {
+            return node.errors.oneOfError({
+                value: JSON.stringify(data),
+                pointer,
+                schema: node.schema,
+                oneOf: node.schema.oneOf
+            });
+        }
+
+        const reducedNode = nodeOfItem.reduce({ data, pointer, path });
+        reducedNode.oneOfIndex = schemaOfIndex; // @evaluation-info
+        return reducedNode;
+    }
+
+    return oneOfResult;
 }
 
 export function validateOneOf({ schema, validators }: SchemaNode): void {

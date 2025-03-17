@@ -14,6 +14,8 @@ import { getTemplate } from "./getTemplate";
 import { join } from "@sagold/json-pointer";
 
 const DYNAMIC_PROPERTIES = [
+    "$ref",
+    "$defs",
     "if",
     "then",
     "else",
@@ -22,6 +24,7 @@ const DYNAMIC_PROPERTIES = [
     "oneOf",
     "dependentSchemas",
     "dependentRequired",
+    "definitions",
     "dependencies",
     "patternProperties"
 ];
