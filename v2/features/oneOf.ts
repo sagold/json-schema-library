@@ -111,9 +111,6 @@ function reduceOneOf({ node, data, pointer }: JsonSchemaReducerParams) {
         oneOf: node.schema.oneOf,
         errors
     });
-
-    // @ts-expect-error boolean schema;
-    return node.compileSchema(false, node.spointer);
 }
 
 export function validateOneOf({ schema, validators }: SchemaNode): void {

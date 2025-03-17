@@ -37,17 +37,16 @@ function safeResolveRef(node: SchemaNode, options: TemplateOptions) {
     }
     const { cache, recursionLimit = 1 } = options;
 
-    const nodeId = node.schemaId;
-    cache[nodeId] = cache[nodeId] ?? {};
-    cache[nodeId][node.ref] = cache[nodeId][node.ref] ?? 0;
-    const value = cache[nodeId][node.ref];
+    const origin = node.schemaId;
+    cache[origin] = cache[origin] ?? {};
+    cache[origin][node.ref] = cache[origin][node.ref] ?? 0;
+    const value = cache[origin][node.ref];
     if (value >= recursionLimit && options.disableRecusionLimit !== true) {
         return false;
     }
+    // console.log("resolveRef", node.schemaId, value);
     options.disableRecusionLimit = false;
-    cache[nodeId][node.ref] += 1;
-
-    // console.log("resolve", nodeId, node.ref, cache[nodeId][node.ref]);
+    cache[origin][node.ref] += 1;
     const resolvedNode = node.resolveRef();
     if (resolvedNode && resolvedNode !== node) {
         return resolvedNode;
@@ -107,7 +106,7 @@ export function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOpt
 
     // @feature allOf
     if (currentNode.allOf?.length) {
-        currentNode.allOf.forEach((partialNode) => {
+        currentNode.allOf.forEach((partialNode, index) => {
             defaultData = partialNode.getTemplate(defaultData, opts) ?? defaultData;
         });
     }
@@ -165,6 +164,7 @@ export function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOpt
 
     const type = getSchemaType(currentNode, defaultData);
     defaultData = TYPE[type as string]?.(currentNode, defaultData, opts) ?? defaultData;
+
     return defaultData;
 }
 
@@ -231,10 +231,10 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
         if (node.if) {
             const errors = node.if.validate(d);
             if (errors.length === 0 && node.then) {
-                const templateData = node.then.getTemplate(data, opts);
+                const templateData = node.then.getTemplate(d, opts);
                 Object.assign(d, templateData);
             } else if (errors.length > 0 && node.else) {
-                const templateData = node.else.getTemplate(data, opts);
+                const templateData = node.else.getTemplate(d, opts);
                 Object.assign(d, templateData);
             }
         }
@@ -246,7 +246,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
     array: (node, data, opts) => {
         const schema = node.schema;
         const template = schema.default === undefined ? [] : schema.default;
-        const d: unknown[] = data ?? template;
+        const d: unknown[] = Array.isArray(data) ? [...data] : template;
         const minItems = opts.extendDefaults === false && schema.default !== undefined ? 0 : (schema.minItems ?? 0);
 
         // when there are no array-items are defined
@@ -263,13 +263,17 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
 
         // when items are defined per index
         if (node.itemsList) {
+            const input = Array.isArray(data) ? data : [];
+
             // build defined set of items
             const length = Math.max(minItems ?? 0, node.itemsList.length);
             for (let i = 0; i < length; i += 1) {
-                if (node.itemsList[i]) {
-                    d[i] = node.itemsList[i].getTemplate(d[i] == null ? template[i] : d[i], opts);
-                } else if (node.additionalItems) {
-                    d[i] = node.additionalItems.getTemplate(d[i] == null ? template[i] : d[i], opts);
+                const childNode = node.itemsList[i] ?? node.additionalItems;
+                if ((childNode && canResolveRef(childNode, opts)) || input[i] !== undefined) {
+                    const result = childNode.getTemplate(d[i] == null ? template[i] : d[i], opts);
+                    if (result !== undefined) {
+                        d[i] = result;
+                    }
                 }
             }
             return d;
@@ -317,10 +321,11 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
         //     }
 
         // build data from items-definition
-        if (node.itemsObject && canResolveRef(node, opts)) {
+        // @ts-expect-error asd
+        if ((node.itemsObject && canResolveRef(node.itemsObject, opts)) || data?.length > 0) {
             for (let i = 0, l = Math.max(minItems, d.length); i < l; i += 1) {
                 // @attention if getTemplate aborts recursion it currently returns undefined)
-                const options = { ...opts, disableRecusionLimit: d[i] !== undefined || i > 0 };
+                const options = { ...opts, disableRecusionLimit: true };
                 const result = node.itemsObject.getTemplate(d[i] == null ? template[i] : d[i], options);
                 if (result === undefined) {
                     return d;

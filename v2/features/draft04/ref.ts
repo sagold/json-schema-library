@@ -4,6 +4,12 @@ import { isObject } from "../../../lib/utils/isObject";
 import { omit } from "../../../lib/utils/omit";
 import splitRef from "../../../lib/compile/splitRef";
 
+function register(node: SchemaNode, path: string) {
+    if (node.context.refs[path] == null) {
+        node.context.refs[path] = node;
+    }
+}
+
 export function parseRef(node: SchemaNode) {
     // get and store current id of node - this may be the same as parent id
     let currentId = node.parent?.$id;
@@ -30,11 +36,11 @@ export function parseRef(node: SchemaNode) {
     // store this node for retrieval by id + json-pointer from id
     if (node.lastIdPointer !== "#" && node.spointer.startsWith(node.lastIdPointer)) {
         const localPointer = `#${node.spointer.replace(node.lastIdPointer, "")}`;
-        node.context.refs[joinId(currentId, localPointer)] = node;
+        register(node, joinId(currentId, localPointer));
     } else {
-        node.context.refs[joinId(currentId, node.spointer)] = node;
+        register(node, joinId(currentId, node.spointer));
     }
-    node.context.refs[joinId(node.context.rootNode.$id, node.spointer)] = node;
+    register(node, joinId(node.context.rootNode.$id, node.spointer));
 
     // precompile reference
     if (node.schema.$ref) {
@@ -55,10 +61,6 @@ export function resolveRef({ pointer, path }: { pointer?: string; path?: Validat
         // console.log("resolve ref", node.ref, "=>", resolvedNode.schema, Object.keys(node.context.refs));
     } else {
         console.log("failed resolving", node.ref, "from", Object.keys(node.context.refs));
-    }
-
-    if (resolvedNode) {
-        return resolvedNode.compileSchema(omit(resolvedNode.schema, "$ref"), resolvedNode.spointer);
     }
 
     return resolvedNode;

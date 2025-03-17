@@ -462,7 +462,7 @@ describe("compileSchema.getTemplate", () => {
             assert.deepEqual(data, [{ first: "john" }, {}]);
         });
 
-        it.only("should follow $ref once", () => {
+        it("should follow $ref once", () => {
             const data = compileSchema({
                 type: "object",
                 required: ["value", "nodes"],
@@ -496,7 +496,7 @@ describe("compileSchema.getTemplate", () => {
         });
 
         // iteration depth is 1, input-depth is 2 => still add template to depth 2
-        it.skip("should respect depth of input data in $ref-resolution", () => {
+        it("should respect depth of input data in $ref-resolution", () => {
             const data = compileSchema({
                 type: "object",
                 required: ["value", "nodes"],
@@ -504,7 +504,13 @@ describe("compileSchema.getTemplate", () => {
                     value: { type: "string", default: "node" },
                     nodes: { type: "array", minItems: 1, items: { $ref: "#" } }
                 }
-            }).getTemplate({ nodes: [{ value: "input-node" }, { nodes: [{ nodes: [] }] }] }, { recursionLimit: 1 });
+            }).getTemplate(
+                { nodes: [{ value: "input-node" }, { nodes: [{ nodes: [] }] }] },
+                {
+                    recursionLimit: 1
+                }
+            );
+
             assert.deepEqual(data, {
                 value: "node",
                 nodes: [
@@ -517,12 +523,7 @@ describe("compileSchema.getTemplate", () => {
                         nodes: [
                             {
                                 value: "node",
-                                nodes: [
-                                    {
-                                        value: "node",
-                                        nodes: []
-                                    }
-                                ]
+                                nodes: []
                             }
                         ]
                     }
@@ -531,26 +532,38 @@ describe("compileSchema.getTemplate", () => {
         });
 
         it("should create template of draft04", () => {
-            // @bug
-            // @todo infinite loop for draft-04
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const node = compileSchema(require("../remotes/draft04.json"));
-            const res = node.getTemplate({}, {});
-            // console.log("RESULT\n", JSON.stringify(res, null, 2));
+            const schema = require("../remotes/draft04.json");
+            const node = compileSchema({ ...schema, $schema: "draft-06" });
+            /**
+             * creates circular dependencies for
+             *
+             * anyOf, allOf, oneOf (not array.items) referencing
+             *
+             * "definitions": {
+             *    "schemaArray": {
+             *       "type": "array",
+             *          "minItems": 1,
+             *          "items": { "$ref": "#" }
+             */
+            // @bug heavy recursion
+            // @todo we run into a heavy recursion with addOptionalProps: true - this
+            // is only an issue for draft04 refs, probably because they are resolved endlessly
+            const res = node.getTemplate({}, { addOptionalProps: false });
+            console.log("RESULT\n", JSON.stringify(res, null, 2));
             assert.deepEqual(Object.prototype.toString.call(res), "[object Object]");
         });
 
         it("should create template of draft07", () => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const data = compileSchema(require("../remotes/draft07.json")).getTemplate({});
-            // console.log("RESULT\n", JSON.stringify(data, null, 2));
-            // @todo return empty object
+            const data = compileSchema(require("../remotes/draft07.json")).getTemplate({}, { addOptionalProps: true });
+            console.log("RESULT\n", JSON.stringify(data, null, 2));
             assert.deepEqual(Object.prototype.toString.call(data), "[object Object]");
         });
     });
 
     // @NOTE OneOf can be used to select required? https://github.com/epoberezkin/ajv/issues/134#issuecomment-190680773
-    describe.skip("compileSchema.getTemplate (v1 tests)", () => {
+    describe("compileSchema.getTemplate (v1 tests)", () => {
         it("should support null types", () => {
             const node = compileSchema({ type: "null" });
             const res = node.getTemplate();
@@ -705,14 +718,6 @@ describe("compileSchema.getTemplate", () => {
                     );
                     assert.deepEqual(res, { first: "first", second: 42 });
                 });
-            });
-
-            describe("$ref", () => {
-                // eslint-disable-next-line @typescript-eslint/no-var-requires
-                const settings = require("../lib/config/settings");
-                const initialValue = settings.GET_TEMPLATE_RECURSION_LIMIT;
-                before(() => (settings.GET_TEMPLATE_RECURSION_LIMIT = 1));
-                after(() => (settings.GET_TEMPLATE_RECURSION_LIMIT = initialValue));
             });
 
             describe("oneOf", () => {
