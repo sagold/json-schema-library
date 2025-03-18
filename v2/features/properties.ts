@@ -29,21 +29,24 @@ propertiesValidator.toJSON = () => "propertiesValidator";
 export function propertiesValidator({ properties, validators }: SchemaNode) {
     if (properties) {
         // note: this expects PARSER to have compiled properties
-        validators.push(({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) => {
-            if (!isObject(data)) {
-                return;
-            }
-            // move validation through properties
-            const errors: JsonError[] = [];
-            Object.keys(data).forEach((propertyName) => {
-                if (node.properties[propertyName] == null) {
-                    return;
-                }
-                const propertyNode = node.properties[propertyName];
-                const result = propertyNode.validate(getValue(data, propertyName), `${pointer}/${propertyName}`, path);
-                errors.push(...result);
-            });
-            return errors;
-        });
+        validators.push(validateProperties);
     }
+}
+
+validateProperties.toJSON = () => "properties";
+function validateProperties({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
+    if (!isObject(data)) {
+        return;
+    }
+    // move validation through properties
+    const errors: JsonError[] = [];
+    Object.keys(data).forEach((propertyName) => {
+        if (node.properties[propertyName] == null) {
+            return;
+        }
+        const propertyNode = node.properties[propertyName];
+        const result = propertyNode.validate(getValue(data, propertyName), `${pointer}/${propertyName}`, path);
+        errors.push(...result);
+    });
+    return errors;
 }

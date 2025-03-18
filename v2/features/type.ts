@@ -31,21 +31,25 @@ export function typeValidator({ schema, validators }: SchemaNode): void {
     if (schema.type == null) {
         return;
     }
-    validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
-        const dataType = getJsonSchemaType(data, schema.type);
-        if (
-            data === undefined ||
-            schema.type === dataType ||
-            (Array.isArray(schema.type) && schema.type.includes(dataType))
-        ) {
-            return;
-        }
-        return node.errors.typeError({
-            value: data,
-            received: dataType,
-            expected: schema.type,
-            schema,
-            pointer
-        });
+    validators.push(validateType);
+}
+
+validateType.toJSON = () => "type";
+function validateType({ node, data, pointer }: JsonSchemaValidatorParams) {
+    const schema = node.schema;
+    const dataType = getJsonSchemaType(data, schema.type);
+    if (
+        data === undefined ||
+        schema.type === dataType ||
+        (Array.isArray(schema.type) && schema.type.includes(dataType))
+    ) {
+        return;
+    }
+    return node.errors.typeError({
+        value: data,
+        received: dataType,
+        expected: schema.type,
+        schema,
+        pointer
     });
 }
