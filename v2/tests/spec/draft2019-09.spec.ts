@@ -6,15 +6,14 @@ import draft2019MetaCore from "../../../remotes/draft2019-09_meta_core.json";
 import draft2019MetaFormat from "../../../remotes/draft2019-09_meta_format.json";
 import draft2019MetaMetaData from "../../../remotes/draft2019-09_meta_meta-data.json";
 import draft2019MetaValidation from "../../../remotes/draft2019-09_meta_validation.json";
-import { Setup } from "../../../test/getDraftTests";
 import runAllTestCases from "../utils/runTestCases";
 
-const setup: Setup = {
+runAllTestCases({
     // only: {
-    //     name: "ref",
-    //     description: "$ref with $recursiveAnchor"
+    //     name: "unevaluatedProperties",
+    //     description: "unevaluatedProperties with nested unevaluatedProperties"
     // },
-    logSchema: false,
+    // logSchema: false,
     skipTestCase: (t) =>
         ![
             "vocabulary", // must
@@ -86,6 +85,4 @@ const setup: Setup = {
         draft2019MetaMetaData,
         draft2019MetaValidation
     ]
-};
-
-runAllTestCases(setup);
+});

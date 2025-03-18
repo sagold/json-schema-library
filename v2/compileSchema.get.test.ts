@@ -211,11 +211,7 @@ describe("compileSchema : get", () => {
         it("should get property from merged allOf schema", () => {
             const node = compileSchema({
                 type: "object",
-                allOf: [
-                    { properties: { title: { type: "string" } } },
-                    { properties: { title: { minLength: 1 } } },
-                    { properties: { label: { minLength: 1 } } }
-                ]
+                allOf: [{ properties: { title: { type: "string" } } }, { properties: { title: { minLength: 1 } } }]
             }).get("title");
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");

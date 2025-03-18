@@ -6,14 +6,14 @@ import createSchemaOf from "../lib/createSchemaOf";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import { isJsonError, JsonError, JsonSchema } from "../lib/types";
 import { joinId } from "./utils/joinId";
-import { mergeSchema } from "../lib/mergeSchema";
 import { omit } from "../lib/utils/omit";
 import { SchemaNode, JsonSchemaReducerParams, ValidationPath } from "./types";
 import { strict as assert } from "assert";
 import { getTemplate } from "./getTemplate";
 import { join } from "@sagold/json-pointer";
+import { mergeNode } from "./mergeNode";
 
-const DYNAMIC_PROPERTIES = [
+const DYNAMIC_PROPERTIES: string[] = [
     "$ref",
     "$defs",
     "if",
@@ -74,7 +74,6 @@ const NODE_METHODS: Pick<
         for (const resolver of node.resolvers) {
             const schemaNode = resolver({ data, key, node });
             if (schemaNode) {
-                // console.log("get", key, resolver.name, schemaNode?.schema);
                 return schemaNode;
             }
         }
@@ -101,15 +100,14 @@ const NODE_METHODS: Pick<
     },
 
     reduce({ data, pointer, path }: JsonSchemaReducerParams) {
-        // @path
         const resolvedNode = { ...this.resolveRef({ pointer, path }) } as SchemaNode;
-        const resolvedSchema = mergeSchema(this.schema, resolvedNode?.schema);
-        const node = (this as SchemaNode).compileSchema(resolvedSchema, this.spointer, resolvedSchema.schemaId);
+        // const resolvedSchema = mergeSchema(this.schema, resolvedNode?.schema);
+        // const node = (this as SchemaNode).compileSchema(resolvedSchema, this.spointer, resolvedSchema.schemaId);
+        const node = mergeNode(this, resolvedNode);
 
         // @ts-expect-error bool schema
         if (node.schema === false) {
             return node;
-
             // @ts-expect-error bool schema
         } else if (node.schema === true) {
             const nextNode = node.compileSchema(createSchemaOf(data), node.spointer, node.schemaId);
@@ -118,6 +116,7 @@ const NODE_METHODS: Pick<
         }
 
         let schema;
+        let workingNode = node;
         const reducers = node.reducers;
         for (let i = 0; i < reducers.length; i += 1) {
             const result = reducers[i]({ data, node, pointer });
@@ -126,14 +125,16 @@ const NODE_METHODS: Pick<
             }
             if (result) {
                 // @ts-expect-error bool schema - for undefined & false schema return false schema
-                if ((schema || result.schema) === false) {
+                if (result.schema === false) {
                     schema = false;
-                } else {
-                    // compilation result for data of current schemain order to merge results, we rebuild
-                    // node from schema alternatively we would need to merge by node-property
-                    // @ts-expect-error bool schema
-                    schema = mergeSchema(schema ?? {}, result.schema);
+                    break;
                 }
+
+                // compilation result for data of current schemain order to merge results, we rebuild
+                // node from schema alternatively we would need to merge by node-property
+                // // @ts-expect-error bool schema
+                // schema = mergeSchema(schema ?? {}, result.schema);
+                workingNode = mergeNode(workingNode, result);
             }
         }
 
@@ -142,18 +143,15 @@ const NODE_METHODS: Pick<
             return { ...node, schema: false, reducers: [] } as SchemaNode;
         }
 
-        if (schema) {
-            // recompile to update newly added schema defintions
-            // @ts-expect-error bool schema
-            schema = mergeSchema(node.schema, schema, ...DYNAMIC_PROPERTIES);
-            const nextNode = node.compileSchema(schema, this.spointer, node.schemaId);
+        if (workingNode !== node) {
             path?.push({ pointer, node });
-            // reduce again?
-            return nextNode;
         }
 
         // remove dynamic properties of node
-        return node.compileSchema(omit(node.schema, ...DYNAMIC_PROPERTIES), node.schemaId);
+        workingNode.schema = omit(workingNode.schema, ...DYNAMIC_PROPERTIES);
+        // @ts-expect-error string accessing schema props
+        DYNAMIC_PROPERTIES.forEach((prop) => (workingNode[prop] = undefined));
+        return workingNode;
     },
 
     validate(data: unknown, pointer = "#", path = []) {

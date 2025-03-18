@@ -58,7 +58,7 @@ export type Test = {
 };
 
 export type Setup = {
-    logSchema: boolean;
+    logSchema?: boolean;
     only?: { name: string; description?: string };
     skipTestCase: (t: FeatureTest) => boolean;
     /** $schema string identifying draft, like https://json-schema.org/draft/2019-09/schema */

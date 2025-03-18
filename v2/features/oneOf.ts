@@ -1,5 +1,5 @@
 import { JsonError } from "../../lib/types";
-import { isSchemaNode, JsonSchemaReducerParams, SchemaNode } from "../types";
+import { isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import settings from "../../lib/config/settings";
 import { getValue } from "../utils/getValue";
 import sanitizeErrors from "../utils/sanitizeErrors";
@@ -189,43 +189,46 @@ export function validateOneOf({ schema, validators }: SchemaNode): void {
     if (!Array.isArray(schema.oneOf) || !schema.oneOf.length) {
         return;
     }
-    validators.push(({ node, data, pointer = "#", path }) => {
-        const { oneOf } = node;
-        if (!oneOf) {
-            return;
-        }
-        const matches = [];
-        const errors = [];
-        for (let i = 0; i < oneOf.length; i += 1) {
-            const validationResult = oneOf[i].validate(data, pointer, path);
-            if (validationResult.length > 0) {
-                errors.push(...validationResult);
-            } else {
-                matches.push({ index: i, node: oneOf[i] });
-            }
-        }
+    validators.push(oneOfValidator);
+}
 
-        if (matches.length === 1) {
-            const { node, index } = matches[0];
-            node.oneOfIndex = index; // @evaluation-info
-            return undefined;
+oneOfValidator.toJSON = () => "oneOf";
+function oneOfValidator({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
+    const { oneOf, schema } = node;
+    if (!oneOf) {
+        return;
+    }
+    const matches = [];
+    const errors = [];
+    for (let i = 0; i < oneOf.length; i += 1) {
+        const validationResult = oneOf[i].validate(data, pointer, path);
+        if (validationResult.length > 0) {
+            errors.push(...validationResult);
+        } else {
+            matches.push({ index: i, node: oneOf[i] });
         }
+    }
 
-        if (matches.length > 1) {
-            return node.errors.multipleOneOfError({
-                value: data,
-                pointer,
-                schema,
-                matches
-            });
-        }
+    if (matches.length === 1) {
+        const { node, index } = matches[0];
+        node.oneOfIndex = index; // @evaluation-info
+        return undefined;
+    }
 
-        return node.errors.oneOfError({
-            value: JSON.stringify(data),
+    if (matches.length > 1) {
+        return node.errors.multipleOneOfError({
+            value: data,
             pointer,
             schema,
-            oneOf: schema.oneOf,
-            errors
+            matches
         });
+    }
+
+    return node.errors.oneOfError({
+        value: JSON.stringify(data),
+        pointer,
+        schema,
+        oneOf: schema.oneOf,
+        errors
     });
 }

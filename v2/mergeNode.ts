@@ -55,6 +55,8 @@ export function mergeNode(a: SchemaNode, b?: SchemaNode): SchemaNode | undefined
     }
 
     // we have no node-type if (atype !== b.type) {return a; }
+
+    // note: {x: b.x ?? a.x} is already done by {...a, ...b}
     const mergedNode: SchemaNode = {
         ...a,
         ...b,
@@ -79,15 +81,15 @@ export function mergeNode(a: SchemaNode, b?: SchemaNode): SchemaNode | undefined
         // $defs?: Record<string, SchemaNode>;
         $defs: mergeObjects(a.$defs, b.$defs),
         // allOf?: SchemaNode[];
-        allOf: mergeArray(a.allOf, b.allOf),
+        // allOf: b.allOf ?? a.allOf, // mergeArray(a.allOf, b.allOf),
         // anyOf?: SchemaNode[];
-        anyOf: mergeArray(a.anyOf, b.anyOf),
+        // anyOf: b.anyOf ?? a.anyOf, // mergeArray(a.anyOf, b.anyOf),
         // dependentSchemas?: Record<string, SchemaNode | boolean>;
-        // dependentSchemas: mergeObjects(a.dependentSchemas, b.dependentSchemas),
+        // dependentSchemas: mergeNode(a.dependentSchemas, b.dependentSchemas),
         // oneOf?: SchemaNode[];
-        oneOf: mergeArray(a.oneOf, b.oneOf),
+        // oneOf: b.oneOf ?? a.oneOf,
         // patternProperties?: { pattern: RegExp; node: SchemaNode }[];
-        // patternProperties: mergeArray(a.patternProperties, b.patternProperties),
+        patternProperties: mergeArray(a.patternProperties, b.patternProperties), // b.patternProperties ?? a.patternProperties,
         // properties?: Record<string, SchemaNode>;
         properties: mergeObjects(a.properties, b.properties)
     };

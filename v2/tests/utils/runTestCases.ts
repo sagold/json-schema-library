@@ -18,7 +18,7 @@ function runTestCase(setup: Setup, tc: FeatureTest) {
                 }
                 testCase.tests.forEach((testData) => {
                     it(testData.description, () => {
-                        if (setup.logSchema === true) {
+                        if (setup.logSchema === true || (setup.logSchema == null && setup.only)) {
                             console.log(
                                 testData.description,
                                 JSON.stringify(schema, null, 2),

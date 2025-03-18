@@ -6,7 +6,7 @@ import { getValue } from "../utils/getValue";
 
 patternPropertyResolver.toJSON = () => "patternPropertyResolver";
 function patternPropertyResolver({ node, key }: JsonSchemaResolverParams) {
-    return node.patternProperties.find(({ pattern }) => pattern.test(`${key}`))?.node;
+    return node.patternProperties?.find(({ pattern }) => pattern.test(`${key}`))?.node;
 }
 
 export function parsePatternProperties(node: SchemaNode) {
@@ -67,43 +67,44 @@ function reducePatternProperties({ node, data }: JsonSchemaReducerParams) {
 }
 
 export function patternPropertiesValidator({ schema, validators }: SchemaNode) {
-    if (!isObject(schema.patternProperties)) {
+    if (isObject(schema.patternProperties)) {
+        validators.push(validatePatternProperties);
+    }
+}
+
+validatePatternProperties.toJSON = () => "patternProperties";
+function validatePatternProperties({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
+    if (!isObject(data)) {
         return;
     }
+    const { schema, patternProperties } = node;
+    const properties = schema.properties || {};
+    const patterns = Object.keys(schema.patternProperties).join(",");
+    const errors: JsonError[] = [];
+    const keys = Object.keys(data);
 
-    validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
-        if (!isObject(data)) {
+    keys.forEach((key) => {
+        const value = getValue(data, key);
+        const matchingPatterns = patternProperties.filter((property) => property.pattern.test(key));
+        matchingPatterns.forEach(({ node }) => errors.push(...node.validate(value, `${pointer}/${key}`)));
+
+        if (properties[key]) {
             return;
         }
-        const { schema, patternProperties } = node;
-        const properties = schema.properties || {};
-        const patterns = Object.keys(schema.patternProperties).join(",");
-        const errors: JsonError[] = [];
-        const keys = Object.keys(data);
 
-        keys.forEach((key) => {
-            const value = getValue(data, key);
-            const matchingPatterns = patternProperties.filter((property) => property.pattern.test(key));
-            matchingPatterns.forEach(({ node }) => errors.push(...node.validate(value, `${pointer}/${key}`)));
-
-            if (properties[key]) {
-                return;
-            }
-
-            if (matchingPatterns.length === 0 && schema.additionalProperties === false) {
-                // this is an arrangement with additionalProperties
-                errors.push(
-                    node.errors.noAdditionalPropertiesError({
-                        key,
-                        pointer: `${pointer}/${key}`,
-                        schema,
-                        value,
-                        patterns
-                    })
-                );
-            }
-        });
-
-        return errors;
+        if (matchingPatterns.length === 0 && schema.additionalProperties === false) {
+            // this is an arrangement with additionalProperties
+            errors.push(
+                node.errors.noAdditionalPropertiesError({
+                    key,
+                    pointer: `${pointer}/${key}`,
+                    schema,
+                    value,
+                    patterns
+                })
+            );
+        }
     });
+
+    return errors;
 }
