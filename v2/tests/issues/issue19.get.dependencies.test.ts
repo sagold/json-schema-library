@@ -76,7 +76,6 @@ describe("issue#19 - getSchema from dependencies", () => {
         // draft.resolveOneOf = function resolveOneOf(node: SchemaNode, data) {
         //     return resolveOneOfFuzzy(node, data);
         // };
-
         const node = rootNode.get("customField", {
             name: "issue #19",
             generation: "Display Custom Field"

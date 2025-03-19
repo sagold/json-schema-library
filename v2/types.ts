@@ -3,7 +3,14 @@ import { CreateError } from "../lib/utils/createCustomError";
 import { isObject } from "../lib/utils/isObject";
 import { TemplateOptions } from "./getTemplate";
 
-export type JsonSchemaReducerParams = { data: unknown; node: SchemaNode; pointer?: string; path?: ValidationPath };
+export type JsonSchemaReducerParams = {
+    data: unknown;
+    /** optional key to used to resolve by property without having data */
+    key?: string | number;
+    node: SchemaNode;
+    pointer?: string;
+    path?: ValidationPath;
+};
 export type JsonSchemaReducer = (options: JsonSchemaReducerParams) => SchemaNode | JsonError | undefined;
 
 export type JsonSchemaResolverParams = { key: string | number; data: unknown; node: SchemaNode };
@@ -83,9 +90,11 @@ export type SchemaNode = {
     reduce: ({
         data,
         pointer,
+        key,
         path
     }: {
         data: unknown;
+        key?: string | number;
         pointer?: string;
         path?: ValidationPath;
     }) => SchemaNode | JsonError;

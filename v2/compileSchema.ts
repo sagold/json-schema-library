@@ -7,7 +7,7 @@ import sanitizeErrors from "./utils/sanitizeErrors";
 import { isJsonError, JsonError, JsonSchema } from "../lib/types";
 import { joinId } from "./utils/joinId";
 import { omit } from "../lib/utils/omit";
-import { SchemaNode, JsonSchemaReducerParams, ValidationPath } from "./types";
+import { SchemaNode, JsonSchemaReducerParams, ValidationPath, isSchemaNode } from "./types";
 import { strict as assert } from "assert";
 import { getTemplate } from "./getTemplate";
 import { join } from "@sagold/json-pointer";
@@ -64,11 +64,13 @@ const NODE_METHODS: Pick<
     get(key: string | number, data?: unknown, path?: ValidationPath) {
         let node = this as SchemaNode;
         if (node.reducers.length) {
-            const result = node.reduce({ data, path });
+            const result = node.reduce({ data, key, path });
             if (isJsonError(result)) {
                 return result;
             }
-            node = result;
+            if (isSchemaNode(result)) {
+                node = result;
+            }
         }
 
         for (const resolver of node.resolvers) {
@@ -99,7 +101,7 @@ const NODE_METHODS: Pick<
         return getTemplate(node, defaultData, opts);
     },
 
-    reduce({ data, pointer, path }: JsonSchemaReducerParams) {
+    reduce({ data, pointer, key, path }: JsonSchemaReducerParams) {
         const resolvedNode = { ...this.resolveRef({ pointer, path }) } as SchemaNode;
         // const resolvedSchema = mergeSchema(this.schema, resolvedNode?.schema);
         // const node = (this as SchemaNode).compileSchema(resolvedSchema, this.spointer, resolvedSchema.schemaId);
@@ -119,7 +121,7 @@ const NODE_METHODS: Pick<
         let workingNode = node;
         const reducers = node.reducers;
         for (let i = 0; i < reducers.length; i += 1) {
-            const result = reducers[i]({ data, node, pointer });
+            const result = reducers[i]({ data, key, node, pointer });
             if (isJsonError(result)) {
                 return result;
             }

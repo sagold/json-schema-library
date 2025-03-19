@@ -4,11 +4,6 @@ import { isObject } from "../../lib/utils/isObject";
 import { JsonSchemaReducerParams, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 
-patternPropertyResolver.toJSON = () => "patternPropertyResolver";
-function patternPropertyResolver({ node, key }: JsonSchemaResolverParams) {
-    return node.patternProperties?.find(({ pattern }) => pattern.test(`${key}`))?.node;
-}
-
 export function parsePatternProperties(node: SchemaNode) {
     const { schema } = node;
     if (!isObject(schema.patternProperties)) {
@@ -33,15 +28,25 @@ export function parsePatternProperties(node: SchemaNode) {
     node.reducers.push(reducePatternProperties);
 }
 
+patternPropertyResolver.toJSON = () => "patternProperty";
+function patternPropertyResolver({ node, key }: JsonSchemaResolverParams) {
+    return node.patternProperties?.find(({ pattern }) => {
+        return pattern.test(`${key}`);
+    })?.node;
+}
+
 reducePatternProperties.toJSON = () => "reducePatternProperties";
-function reducePatternProperties({ node, data }: JsonSchemaReducerParams) {
-    if (!isObject(data) && data != null) {
+function reducePatternProperties({ node, data, key }: JsonSchemaReducerParams) {
+    if (!isObject(data) && data != null && key === undefined) {
         return;
     }
     const { patternProperties } = node;
     let mergedSchema: JsonSchema;
 
     const dataProperties = Object.keys(data ?? {});
+    if (key) {
+        dataProperties.push(`${key}`);
+    }
     dataProperties.push(...Object.keys(node.schema.properties ?? {}));
     dataProperties.forEach((propertyName, index, list) => {
         if (list.indexOf(propertyName) !== index) {
