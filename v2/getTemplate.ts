@@ -38,7 +38,6 @@ function safeResolveRef(node: SchemaNode, options: TemplateOptions) {
     cache[origin][node.ref] = cache[origin][node.ref] ?? 0;
     const value = cache[origin][node.ref];
     if (value >= recursionLimit && options.disableRecusionLimit !== true) {
-        console.log("abort", node.ref, value);
         return false;
     }
     options.disableRecusionLimit = false;

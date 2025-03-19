@@ -1,10 +1,11 @@
-import { expect } from "chai";
-import { Draft04 } from "../../../lib/draft04";
+import { strict as assert } from "assert";
+import { compileSchema } from "../../compileSchema";
+import { SchemaNode } from "../../types";
 
 describe("issue#32 - getTemplate ignored input data for integer", () => {
-    let draft: Draft04;
+    let node: SchemaNode;
     beforeEach(() => {
-        draft = new Draft04({
+        node = compileSchema({
             type: "object",
             properties: {
                 id: {
@@ -32,7 +33,7 @@ describe("issue#32 - getTemplate ignored input data for integer", () => {
     });
 
     it("should not override input data", () => {
-        const result = draft.getTemplate({
+        const result = node.getTemplate({
             id: "4235809c-bdc7-46c5-be3d-b1b679bb1c13",
             title: "JavaScript Data Structures 101",
             students: [
@@ -47,7 +48,7 @@ describe("issue#32 - getTemplate ignored input data for integer", () => {
             ]
         });
 
-        expect(result).to.deep.equal({
+        assert.deepEqual(result, {
             id: "4235809c-bdc7-46c5-be3d-b1b679bb1c13",
             title: "JavaScript Data Structures 101",
             students: [
