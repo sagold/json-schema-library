@@ -139,6 +139,7 @@ const NODE_METHODS: Pick<
         }
 
         if (schema === false) {
+            console.log("BOOLEAN SCHEMA RETURN");
             // @ts-expect-error bool schema
             return { ...node, schema: false, reducers: [] } as SchemaNode;
         }

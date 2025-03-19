@@ -4,6 +4,10 @@ import { getValue } from "./utils/getValue";
 import { isObject } from "../lib/utils/isObject";
 import { getSchemaType } from "./utils/getSchemaType";
 import copy from "fast-copy";
+import { isEmpty } from "../lib/utils/isEmpty";
+import { mergeNode } from "./mergeNode";
+import { reduceOneOfFuzzy } from "./features/oneOf";
+import { isJsonError } from "../lib/types";
 
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
@@ -106,34 +110,30 @@ export function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOpt
         });
     }
 
+    // @feature anyOf
     if (currentNode.anyOf?.length > 0) {
         defaultData = currentNode.anyOf[0].getTemplate(defaultData, opts) ?? defaultData;
     }
 
     // @feature oneOf
-    // if (node.oneOf) {
-    //     if (isEmpty(data)) {
-    //         const type =
-    //             schema.oneOf[0].type || schema.type || (schema.const && typeof schema.const) || getTypeOf(data);
-    //         schema = { ...schema.oneOf[0], type };
-    //     } else {
-    //         // find correct schema for data
-    //         const oneNode = draft.createNode(schema, pointer);
-    //         const resolvedNode = resolveOneOfFuzzy(oneNode, data);
-    //         if (isJsonError(resolvedNode)) {
-    //             if (data != null && opts.removeInvalidData !== true) {
-    //                 return data;
-    //             }
-    //             // override
-    //             schema = schema.oneOf[0];
-    //             data = undefined;
-    //         } else {
-    //             const resolvedSchema = resolvedNode.schema;
-    //             resolvedSchema.type = resolvedSchema.type ?? schema.type;
-    //             schema = resolvedSchema;
-    //         }
-    //     }
-    // }
+    if (currentNode.oneOf?.length > 0) {
+        if (isEmpty(defaultData)) {
+            currentNode = mergeNode(currentNode, currentNode.oneOf[0]);
+        } else {
+            // find correct schema for data
+            const resolvedNode = reduceOneOfFuzzy({ node: currentNode, data: defaultData });
+            if (isJsonError(resolvedNode)) {
+                if (defaultData != null && opts.removeInvalidData !== true) {
+                    return defaultData;
+                }
+                // override
+                currentNode = currentNode.oneOf[0];
+                defaultData = undefined;
+            } else {
+                currentNode = mergeNode(currentNode, resolvedNode);
+            }
+        }
+    }
 
     const resolvedNode = safeResolveRef(currentNode, opts);
     if (resolvedNode === false) {
@@ -153,9 +153,6 @@ export function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOpt
     //     }
     //     return data;
     // }
-
-    // const reduced = currentNode.reduce({ data });
-    // currentNode = isSchemaNode(reduced) ? reduced : currentNode;
 
     const type = getSchemaType(currentNode, defaultData);
     const templateData = TYPE[type as string]?.(currentNode, defaultData, opts);
@@ -188,15 +185,31 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
             });
         }
 
-        // @feature dependencies
-        // has to be done after resolving properties so dependency may trigger
+        if (isObject(node.schema.dependencies)) {
+            Object.keys(node.schema.dependencies).forEach((propertyName) => {
+                const dependencies = node.schema.dependencies[propertyName];
+                if (getValue(d, propertyName) !== undefined && Array.isArray(dependencies)) {
+                    dependencies.forEach((addProperty) => {
+                        const propertyNode = node.get(addProperty, d);
+                        if (isSchemaNode(propertyNode)) {
+                            d[addProperty] = propertyNode.getTemplate(getValue(d, addProperty), opts);
+                        }
+                    });
+                }
+                // if false and removeInvalidData => remove from data
+            });
+        }
 
-        // if (node.dependentSchemas) {
-        //     dependenciesSchema = mergeSchema(schema, dependenciesSchema);
-        //     delete dependenciesSchema.dependencies;
-        //     const dependencyData = getTemplate(draft, data, dependenciesSchema, `${pointer}/dependencies`, opts);
-        //     Object.assign(d, dependencyData);
-        // }
+        // @feature dependencies - has to be done after resolving properties so dependency may trigger
+        if (node.dependentSchemas) {
+            Object.keys(node.dependentSchemas).forEach((prop) => {
+                if (d[prop] !== undefined && isObject(node.dependentSchemas[prop])) {
+                    const dependencyData = node.dependentSchemas[prop].getTemplate(data ?? d, opts);
+                    Object.assign(d, dependencyData);
+                }
+                // if false and removeInvalidData => remove from data
+            });
+        }
 
         // console.log("getTemplate object", data, opts);
         if (data) {
@@ -270,7 +283,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
                     }
                 }
             }
-            return d;
+            return d || [];
         }
 
         // this has to be defined as we checked all other cases

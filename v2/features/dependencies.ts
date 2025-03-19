@@ -4,6 +4,7 @@ import { isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidator } from "../t
 import { getValue } from "../utils/getValue";
 import { SchemaNode } from "../types";
 import { mergeSchema } from "../../lib/mergeSchema";
+import { validateDependentRequired } from "./dependentRequired";
 
 export function parseDependencies(node: SchemaNode) {
     if (!isObject(node.schema.dependencies)) {
@@ -11,26 +12,33 @@ export function parseDependencies(node: SchemaNode) {
     }
 
     const { dependencies } = node.schema;
-    node.dependentSchemas = {};
-    const schemas = Object.keys(dependencies);
-    schemas.forEach((property) => {
-        const schema = dependencies[property];
-        if (isObject(schema)) {
-            node.dependentSchemas[property] = node.compileSchema(
-                schema,
-                `${node.spointer}/dependencies/${property}`,
-                `${node.schemaId}/dependencies/${property}`
-            );
-        } else if (typeof schema === "boolean") {
-            node.dependentSchemas[property] = schema;
-        }
-    });
 
-    if (schemas.length === 0) {
+    if (isObject(dependencies)) {
+        node.dependentSchemas = {};
+        const schemas = Object.keys(dependencies);
+        schemas.forEach((property) => {
+            const schema = dependencies[property];
+            if (isObject(schema)) {
+                node.dependentSchemas[property] = node.compileSchema(
+                    schema,
+                    `${node.spointer}/dependencies/${property}`,
+                    `${node.schemaId}/dependencies/${property}`
+                );
+            } else if (typeof schema === "boolean") {
+                node.dependentSchemas[property] = schema;
+            }
+        });
+
+        if (schemas.length > 0) {
+            node.reducers.push(reduceDependentSchemas);
+        }
+
         return;
     }
 
-    node.reducers.push(reduceDependentSchemas);
+    if (Array.isArray(dependencies)) {
+        node.validators.push(validateDependentRequired);
+    }
 }
 
 reduceDependentSchemas.toJSON = () => "reduceDependentSchemas";
