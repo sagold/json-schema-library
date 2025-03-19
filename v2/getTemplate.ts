@@ -3,6 +3,7 @@ import getTypeOf from "../lib/getTypeOf";
 import { getValue } from "./utils/getValue";
 import { isObject } from "../lib/utils/isObject";
 import { getSchemaType } from "./utils/getSchemaType";
+import copy from "fast-copy";
 
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
@@ -37,9 +38,9 @@ function safeResolveRef(node: SchemaNode, options: TemplateOptions) {
     cache[origin][node.ref] = cache[origin][node.ref] ?? 0;
     const value = cache[origin][node.ref];
     if (value >= recursionLimit && options.disableRecusionLimit !== true) {
+        console.log("abort", node.ref, value);
         return false;
     }
-    // console.log("resolveRef", node.schemaId, value);
     options.disableRecusionLimit = false;
     cache[origin][node.ref] += 1;
     const resolvedNode = node.resolveRef();
@@ -317,10 +318,15 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
         // build data from items-definition
         // @ts-expect-error asd
         if ((node.itemsObject && canResolveRef(node.itemsObject, opts)) || data?.length > 0) {
+            // @attention this should disable cache or break intended behaviour as we reset it after loop
+            // @todo test recursion of itemsObject
+            // intention: reset cache after each property. last call will add counters
+            const cache = { ...opts.cache };
             for (let i = 0, l = Math.max(minItems, d.length); i < l; i += 1) {
-                // @attention if getTemplate aborts recursion it currently returns undefined)
+                opts.cache = copy(cache);
                 const options = { ...opts, disableRecusionLimit: true };
                 const result = node.itemsObject.getTemplate(d[i] == null ? template[i] : d[i], options);
+                // @attention if getTemplate aborts recursion it currently returns undefined)
                 if (result === undefined) {
                     return d;
                 } else {

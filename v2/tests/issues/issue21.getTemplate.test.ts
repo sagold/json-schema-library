@@ -1,14 +1,11 @@
-import { expect } from "chai";
-import settings from "../../../lib/config/settings";
-import { Draft07 } from "../../../lib/draft07";
-
-const INITIAL_RECURSION = settings.GET_TEMPLATE_RECURSION_LIMIT;
+import { strict as assert } from "assert";
+import { compileSchema } from "../../compileSchema";
+import { SchemaNode } from "../../types";
 
 describe("issue#21 - getTemplate containing refs", () => {
-    let draft: Draft07;
+    let node: SchemaNode;
     beforeEach(() => {
-        settings.GET_TEMPLATE_RECURSION_LIMIT = 2;
-        draft = new Draft07({
+        node = compileSchema({
             $schema: "http://json-schema.org/draft/2019-09/schema",
             type: "object",
             additionalProperties: false,
@@ -57,19 +54,19 @@ describe("issue#21 - getTemplate containing refs", () => {
         });
     });
 
-    afterEach(() => {
-        settings.GET_TEMPLATE_RECURSION_LIMIT = INITIAL_RECURSION;
-    });
-
     it("should append property 'runner' on partial objects", () => {
-        const data = draft.getTemplate({
-            jobs: [{ name: "job-1" }, { name: "job-2" }]
-        });
+        const data = node.getTemplate(
+            {
+                jobs: [{ name: "job-1" }, { name: "job-2" }, { name: "job-3" }]
+            },
+            { recursionLimit: 1 }
+        );
 
-        expect(data).to.deep.equal({
+        assert.deepEqual(data, {
             jobs: [
                 { name: "job-1", runner: { cluster: "cluster-a" } },
-                { name: "job-2", runner: { cluster: "cluster-a" } }
+                { name: "job-2", runner: { cluster: "cluster-a" } },
+                { name: "job-3", runner: { cluster: "cluster-a" } }
             ]
         });
     });
