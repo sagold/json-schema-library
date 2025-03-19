@@ -14,6 +14,7 @@ export function parseAllOf(node: SchemaNode) {
 
 reduceAllOf.toJSON = () => "reduceAllOf";
 function reduceAllOf({ node, data }: JsonSchemaReducerParams) {
+    console.log("reduce ALL-OF", node.schema);
     // note: parts of schemas could be merged, e.g. if they do not include
     // dynamic schema parts
     let mergedSchema = {};
@@ -22,6 +23,7 @@ function reduceAllOf({ node, data }: JsonSchemaReducerParams) {
         const schema = mergeSchema(node.allOf[i].schema, schemaNode.schema);
         mergedSchema = mergeSchema(mergedSchema, schema, "allOf");
     }
+    console.log("ALL-OF =>", mergedSchema);
     return node.compileSchema(mergedSchema, `${node.spointer}/allOf`, node.schemaId);
 }
 

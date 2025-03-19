@@ -20,16 +20,19 @@ export function parseIfThenElse(node: SchemaNode) {
 
 reduceIf.toJSON = () => "reduceIf";
 function reduceIf({ node, data, pointer }: JsonSchemaReducerParams) {
+    console.log("reduce IF", node.schema);
     if (node.if.validate(data, pointer).length === 0) {
         if (node.then) {
             // reduce creates a new node
             const schemaNode = node.then.reduce({ data });
             const schema = mergeSchema(node.then.schema, schemaNode.schema, "if", "then", "else");
+            console.log("THEN => ", schema);
             return node.compileSchema(schema, node.then.spointer);
         }
     } else if (node.else) {
         const schemaNode = node.else.reduce({ data });
         const schema = mergeSchema(node.else.schema, schemaNode.schema, "if", "then", "else");
+        console.log("ELSE => ", schema);
         return node.compileSchema(schema, node.else.spointer);
     }
     return undefined;

@@ -100,5 +100,37 @@ export function getSchemaType(node: SchemaNode, data: unknown): keyof typeof SCH
         return "array" as keyof typeof SCHEMA_TYPES;
     }
 
+    // nothing found yet check dynamic properties for a type
+    if (node.if) {
+        return getSchemaType(node.if, data);
+    }
+
+    if (node.allOf) {
+        for (let i = 0; i < node.allOf.length; i += 1) {
+            const type = getSchemaType(node.allOf[i], data);
+            if (type) {
+                return type;
+            }
+        }
+    }
+
+    if (node.oneOf) {
+        for (let i = 0; i < node.oneOf.length; i += 1) {
+            const type = getSchemaType(node.oneOf[i], data);
+            if (type) {
+                return type;
+            }
+        }
+    }
+
+    if (node.anyOf) {
+        for (let i = 0; i < node.anyOf.length; i += 1) {
+            const type = getSchemaType(node.anyOf[i], data);
+            if (type) {
+                return type;
+            }
+        }
+    }
+
     return undefined;
 }
