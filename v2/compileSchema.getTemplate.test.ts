@@ -664,29 +664,15 @@ describe("compileSchema.getTemplate", () => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             const schema = require("../remotes/draft04.json");
             const node = compileSchema({ ...schema, $schema: "draft-06" });
-            /**
-             * creates circular dependencies for
-             *
-             * anyOf, allOf, oneOf (not array.items) referencing
-             *
-             * "definitions": {
-             *    "schemaArray": {
-             *       "type": "array",
-             *          "minItems": 1,
-             *          "items": { "$ref": "#" }
-             */
-            // @bug heavy recursion
-            // @todo we run into a heavy recursion with addOptionalProps: true - this
-            // is only an issue for draft04 refs, probably because they are resolved endlessly
-            const res = node.getTemplate({}, { addOptionalProps: false });
-            console.log("RESULT\n", JSON.stringify(res, null, 2));
+            const res = node.getTemplate({}, { addOptionalProps: true });
+            // console.log("RESULT\n", JSON.stringify(res, null, 2));
             assert.deepEqual(Object.prototype.toString.call(res), "[object Object]");
         });
 
         it("should create template of draft07", () => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             const data = compileSchema(require("../remotes/draft07.json")).getTemplate({}, { addOptionalProps: true });
-            console.log("RESULT\n", JSON.stringify(data, null, 2));
+            // console.log("RESULT\n", JSON.stringify(data, null, 2));
             assert.deepEqual(Object.prototype.toString.call(data), "[object Object]");
         });
     });
