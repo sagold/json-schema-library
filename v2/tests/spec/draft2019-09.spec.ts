@@ -1,4 +1,3 @@
-/* eslint max-len: 0 */
 import draft2019Meta from "../../../remotes/draft2019-09.json";
 import draft2019MetaApplicator from "../../../remotes/draft2019-09_meta_applicator.json";
 import draft2019MetaContent from "../../../remotes/draft2019-09_meta_content.json";

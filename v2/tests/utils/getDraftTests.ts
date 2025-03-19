@@ -1,7 +1,7 @@
 import { globSync } from "glob";
 import path from "path";
 import fs from "fs";
-import { JsonSchema } from "../lib/types";
+import { JsonSchema } from "../../../lib/types";
 
 type JsonSchemaTestFileContents = {
     description: string;

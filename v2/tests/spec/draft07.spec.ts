@@ -1,8 +1,7 @@
 import draft07Meta from "../../../remotes/draft07.json";
-import { Setup } from "../../../test/getDraftTests";
 import runAllTestCases from "../utils/runTestCases";
 
-const setup: Setup = {
+runAllTestCases({
     // only: {
     //     name: "vocabulary",
     //     description: "schema that uses custom metaschema with with no validation vocabulary"
@@ -19,6 +18,4 @@ const setup: Setup = {
             "non-bmp-regex"
         ].includes(t.name),
     metaSchema: draft07Meta
-};
-
-runAllTestCases(setup);
+});
