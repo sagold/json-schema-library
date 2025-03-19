@@ -1,5 +1,4 @@
 import { strict as assert } from "assert";
-// import { resolveOneOfFuzzy } from "../../../lib/features/oneOf";
 import { compileSchema } from "../../compileSchema";
 import { isSchemaNode, SchemaNode } from "../../types";
 

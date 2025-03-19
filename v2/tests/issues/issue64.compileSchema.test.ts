@@ -1,14 +1,10 @@
 import { strict as assert } from "assert";
-import { Draft07 } from "../../../lib/draft07";
-import { Draft2019 } from "../../../lib/draft2019";
+import { compileSchema } from "../../compileSchema";
 import { JsonSchema } from "../../../lib/types";
-import compileSchema from "../../../lib/compile";
 
 describe("issue#64 - should not fail compiling schema", () => {
-    let draft: Draft07;
     let schema: JsonSchema;
     beforeEach(() => {
-        draft = new Draft07();
         schema = {
             $ref: "#/definitions/test",
             definitions: {
@@ -59,21 +55,29 @@ describe("issue#64 - should not fail compiling schema", () => {
         };
     });
 
-    it("should not fail compiling schema from draft", () => {
-        const result = draft.compileSchema(schema);
-        assert(typeof result.$schema === "string");
-        assert.equal(result.$schema, schema.$schema);
+    it("should not fail compiling schema using latest draft", () => {
+        const node = compileSchema(schema);
+        assert(typeof node.schema.$schema === "string");
+        assert.deepEqual(node.schema, schema);
     });
 
-    it("should not fail compiling schema", () => {
-        const result = compileSchema(new Draft07(), schema);
-        assert(typeof result.$schema === "string");
-        assert.equal(result.$schema, schema.$schema);
+    it("should not fail compiling schema using draft-07", () => {
+        const d7 = {
+            ...schema,
+            $schema: "draft-07"
+        };
+        const node = compileSchema(d7);
+        assert.equal(node.context.VERSION, "draft-07");
+        assert.deepEqual(node.schema, d7);
     });
 
-    it("should not fail compiling schema for draft2019", () => {
-        const result = compileSchema(new Draft2019(), schema);
-        assert(typeof result.$schema === "string");
-        assert.equal(result.$schema, schema.$schema);
+    it("should not fail compiling schema for draft-04", () => {
+        const d4 = {
+            ...schema,
+            $schema: "draft-04"
+        };
+        const node = compileSchema(d4);
+        assert.equal(node.context.VERSION, "draft-04");
+        assert.deepEqual(node.schema, d4);
     });
 });

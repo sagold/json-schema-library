@@ -1,10 +1,11 @@
-import { expect } from "chai";
-import { Draft07 as Draft } from "../../../lib/draft07";
+import { strict as assert } from "assert";
+import { compileSchema } from "../../compileSchema";
+import { SchemaNode } from "../../types";
 
 describe("issue#38 - getTemplate anyOf should not modify valid default value", () => {
-    let draft: Draft;
+    let node: SchemaNode;
     beforeEach(() => {
-        draft = new Draft({
+        node = compileSchema({
             type: "object",
             required: ["someList"],
             properties: {
@@ -19,9 +20,8 @@ describe("issue#38 - getTemplate anyOf should not modify valid default value", (
     });
 
     it("should return valid default value", () => {
-        const result = draft.getTemplate();
-
-        expect(result).to.deep.equal({
+        const result = node.getTemplate();
+        assert.deepEqual(result, {
             someList: [{ a: 1 }, { b: "schfifty-five" }, { c: "foo" }]
         });
     });

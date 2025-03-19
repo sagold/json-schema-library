@@ -1,28 +1,26 @@
 import { strict as assert } from "assert";
-import { Draft07 as Draft } from "../../../lib/draft07";
+import { compileSchema } from "../../compileSchema";
+import { isSchemaNode, SchemaNode } from "../../types";
 
 describe("issue#58 - oneOf should invalid type error", () => {
-    let draft: Draft;
-    beforeEach(() => (draft = new Draft()));
-
     it("should return one-of-error for invalid type", () => {
-        draft.setSchema({
+        const node = compileSchema({
             oneOf: [{ type: "null" }, { type: "number" }]
         });
-        const errors = draft.validate("string");
+        const errors = node.validate("string");
         assert(errors.length > 0);
     });
 
     it("should validate correct type defined in one-of statement", () => {
-        draft.setSchema({
+        const node = compileSchema({
             oneOf: [{ type: "null" }, { type: "number" }]
         });
-        const errors = draft.validate(123);
+        const errors = node.validate(123);
         assert(errors.length === 0);
     });
 
     it("should return type-error for non-integer value", () => {
-        draft.setSchema({
+        const node = compileSchema({
             properties: {
                 foo: {
                     properties: {
@@ -33,12 +31,12 @@ describe("issue#58 - oneOf should invalid type error", () => {
                 }
             }
         });
-        const errors = draft.validate({ foo: { number: "not an integer" } });
+        const errors = node.validate({ foo: { number: "not an integer" } });
         assert(errors.length > 0);
     });
 
     it("should return type-error for non-integer value in combination with oneOf", () => {
-        draft.setSchema({
+        const node = compileSchema({
             properties: {
                 foo: {
                     properties: {
@@ -57,7 +55,7 @@ describe("issue#58 - oneOf should invalid type error", () => {
                 }
             }
         });
-        const errors = draft.validate({ foo: { number: "not an integer" } });
+        const errors = node.validate({ foo: { number: "not an integer" } });
         assert(errors.length > 0);
     });
 
@@ -100,8 +98,8 @@ describe("issue#58 - oneOf should invalid type error", () => {
             }
         };
 
-        draft.setSchema(schema);
-        const errors = draft.validate(inputData);
+        const node = compileSchema(schema);
+        const errors = node.validate(inputData);
         assert.equal(errors.length, 1);
         assert.equal(errors[0].code, "type-error");
     });
@@ -143,8 +141,8 @@ describe("issue#58 - oneOf should invalid type error", () => {
             }
         };
 
-        draft.setSchema(schema);
-        const errors = draft.validate(inputData);
+        const node = compileSchema(schema);
+        const errors = node.validate(inputData);
         assert.equal(errors.length, 0);
     });
 });
