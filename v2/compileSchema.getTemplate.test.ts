@@ -41,6 +41,15 @@ describe("compileSchema.getTemplate", () => {
             assert.deepEqual(data, "const");
         });
 
+        it("should prefer const over default", () => {
+            const data = compileSchema({
+                type: "string",
+                const: "static",
+                default: "should be overwritten"
+            }).getTemplate();
+            assert.deepEqual(data, "static");
+        });
+
         describe("string", () => {
             it("should return empty string for missing default value", () => {
                 const data = compileSchema({ type: "string" }).getTemplate();
@@ -677,11 +686,675 @@ describe("compileSchema.getTemplate", () => {
         });
     });
 
-    // @NOTE OneOf can be used to select required? https://github.com/epoberezkin/ajv/issues/134#issuecomment-190680773
-    describe.skip("compileSchema.getTemplate (v1 tests)", () => {
-        it("should not modify input schema", () => {
+    describe("if-then-else", () => {
+        it("should return template of then-schema for valid if-schema", () => {
+            const data = compileSchema({
+                type: "object",
+                required: ["test"],
+                properties: { test: { type: "string", default: "with value" } },
+                if: { properties: { test: { type: "string", minLength: 4 } } },
+                then: { required: ["dynamic"], properties: { dynamic: { type: "string", default: "from then" } } }
+            }).getTemplate();
+            assert.deepEqual(data, {
+                test: "with value",
+                dynamic: "from then"
+            });
+        });
+
+        it("should NOT create data for then-schema if it is not required", () => {
+            const data = compileSchema({
+                type: "object",
+                required: ["test"],
+                properties: { test: { type: "string", default: "with value" } },
+                if: { properties: { test: { type: "string", minLength: 4 } } },
+                then: { properties: { dynamic: { type: "string", default: "from then" } } }
+            }).getTemplate(undefined, { addOptionalProps: false });
+            assert.deepEqual(data, { test: "with value" });
+        });
+
+        it("should NOT return template of then-schema for invalid if-schema", () => {
+            const data = compileSchema({
+                type: "object",
+                required: ["test"],
+                properties: { test: { type: "string", default: "too short" } },
+                if: { properties: { test: { type: "string", minLength: 40 } } },
+                then: { properties: { dynamic: { type: "string", default: "from then" } } }
+            }).getTemplate();
+            assert.deepEqual(data, { test: "too short" });
+        });
+
+        it("should return template of else-schema for invalid if-schema", () => {
+            const data = compileSchema({
+                type: "object",
+                required: ["test"],
+                properties: { test: { type: "string", default: "with test" } },
+                if: { properties: { test: { type: "string", minLength: 40 } } },
+                then: { required: ["dynamic"], properties: { dynamic: { type: "string", default: "from then" } } },
+                else: { required: ["dynamic"], properties: { dynamic: { type: "string", default: "from else" } } }
+            }).getTemplate();
+            assert.deepEqual(data, { test: "with test", dynamic: "from else" });
+        });
+
+        it("should incrementally resolve multiple 'then'-schema", () => {
+            const data = compileSchema({
+                type: "object",
+                required: ["trigger"],
+                properties: { trigger: { type: "boolean" } },
+                allOf: [
+                    {
+                        if: { properties: { trigger: { const: true } } },
+                        then: {
+                            required: ["additionalSchema"],
+                            properties: { additionalSchema: { type: "string", default: "additional" } }
+                        }
+                    },
+                    {
+                        if: { required: ["additionalSchema"], properties: { additionalSchema: { minLength: 5 } } },
+                        then: {
+                            required: ["anotherSchema"],
+                            properties: { anotherSchema: { type: "string", default: "another" } }
+                        }
+                    }
+                ]
+            }).getTemplate({ trigger: true });
+            assert.deepEqual(data, { trigger: true, additionalSchema: "additional", anotherSchema: "another" });
+        });
+    });
+});
+
+// @NOTE OneOf can be used to select required? https://github.com/epoberezkin/ajv/issues/134#issuecomment-190680773
+describe.skip("compileSchema.getTemplate (v1 tests)", () => {
+    it("should not modify input schema", () => {
+        const schema = {
+            type: "object",
+            properties: {
+                title: { type: "string", default: "title" },
+                list: {
+                    type: "array",
+                    items: {
+                        allOf: [
+                            { type: "object" },
+                            {
+                                properties: {
+                                    index: { type: "number", default: 4 }
+                                }
+                            }
+                        ]
+                    }
+                },
+                author: {
+                    anyOf: [
+                        { type: "string", default: "jane" },
+                        { type: "string", default: "john" }
+                    ]
+                },
+                source: {
+                    type: "string",
+                    enum: ["dpa", "getty"]
+                }
+            }
+        };
+        const originalSchema = JSON.stringify(schema);
+        const node = compileSchema(schema);
+        node.getTemplate({});
+        assert.deepEqual(JSON.stringify(schema), originalSchema);
+    });
+
+    describe("object", () => {
+        describe("oneOf", () => {
+            it("should return template of first oneOf schema", () => {
+                const node = compileSchema({
+                    type: "object",
+                    oneOf: [
+                        {
+                            type: "object",
+                            required: ["title"],
+                            properties: {
+                                title: { type: "string", default: "jane" }
+                            }
+                        },
+                        {
+                            type: "object",
+                            required: ["value"],
+                            properties: { value: { type: "number" } }
+                        }
+                    ]
+                });
+                const res = node.getTemplate();
+
+                assert.deepEqual(res, { title: "jane" });
+            });
+
+            it("should extend empty object with first oneOf schema", () => {
+                const node = compileSchema({
+                    type: "object",
+                    oneOf: [
+                        {
+                            type: "object",
+                            required: ["title"],
+                            properties: {
+                                title: { type: "string", default: "jane" }
+                            }
+                        },
+                        {
+                            type: "object",
+                            required: ["value"],
+                            properties: { value: { type: "number" } }
+                        }
+                    ]
+                });
+                const res = node.getTemplate({});
+
+                assert.deepEqual(res, { title: "jane" });
+            });
+
+            it("should return template of matching oneOf schema", () => {
+                const node = compileSchema({
+                    type: "object",
+                    oneOf: [
+                        {
+                            type: "object",
+                            required: ["value"],
+                            properties: {
+                                value: { type: "string", default: "jane" }
+                            }
+                        },
+                        {
+                            type: "object",
+                            required: ["value", "test"],
+                            properties: {
+                                value: { type: "number" },
+                                test: { type: "string", default: "test" }
+                            }
+                        }
+                    ]
+                });
+                const res = node.getTemplate({ value: 111 });
+
+                assert.deepEqual(res, { value: 111, test: "test" });
+            });
+
+            it("should return input value if no oneOf-schema matches ", () => {
+                const node = compileSchema({
+                    type: "object",
+                    oneOf: [
+                        {
+                            type: "object",
+                            properties: {
+                                value: { type: "string", default: "jane" }
+                            }
+                        },
+                        {
+                            type: "object",
+                            properties: {
+                                value: { type: "number" },
+                                test: { type: "string", default: "test" }
+                            }
+                        }
+                    ]
+                });
+                const res = node.getTemplate({ value: ["keep-me"] });
+
+                assert.deepEqual(res, { value: ["keep-me"] });
+            });
+
+            it("should not require object type definition in oneOf schemas", () => {
+                const node = compileSchema({
+                    type: "object",
+                    oneOf: [
+                        {
+                            required: ["type"],
+                            properties: {
+                                type: { const: "header" }
+                            }
+                        },
+                        {
+                            required: ["type"],
+                            properties: {
+                                type: { const: "paragraph" }
+                            }
+                        }
+                    ]
+                });
+
+                const res = node.getTemplate({ type: "paragraph" });
+                assert.deepEqual(res, { type: "paragraph" });
+            });
+        });
+
+        describe("anyOf", () => {
+            it("should create template for first anyOf schema", () => {
+                const node = compileSchema({
+                    type: "object",
+                    anyOf: [
+                        {
+                            required: ["name", "stage"],
+                            properties: {
+                                name: { type: "string", default: "jane" },
+                                stage: { type: "string", default: "develop" }
+                            }
+                        },
+                        {
+                            required: ["stage"],
+                            properties: {
+                                stage: { type: "number", default: 0 }
+                            }
+                        }
+                    ]
+                });
+                const res = node.getTemplate({ name: "john" });
+
+                assert.deepEqual(res, { name: "john", stage: "develop" });
+            });
+        });
+
+        // draft07 (backwards compatible)
+        describe("dependencies", () => {
+            describe("option: `additionalProps: false`", () => {
+                const TEMPLATE_OPTIONS = { addOptionalProps: false };
+                describe("dependency required", () => {
+                    it("should not add dependency if it is not required", () => {
+                        const node = compileSchema({
+                            type: "object",
+                            properties: {
+                                trigger: { type: "string" },
+                                dependency: { type: "string", default: "default" }
+                            },
+                            dependencies: {
+                                trigger: ["dependency"]
+                            }
+                        });
+
+                        const res = node.getTemplate({}, TEMPLATE_OPTIONS);
+                        assert.deepEqual(res, {});
+                    });
+
+                    it("should add dependency if triggered as required", () => {
+                        const node = compileSchema({
+                            type: "object",
+                            properties: {
+                                trigger: { type: "string" },
+                                dependency: { type: "string", default: "default" }
+                            },
+                            dependencies: {
+                                trigger: ["dependency"]
+                            }
+                        });
+
+                        const res = node.getTemplate({ trigger: "yes" }, TEMPLATE_OPTIONS);
+                        assert.deepEqual(res, { trigger: "yes", dependency: "default" });
+                    });
+
+                    it("should add dependency if initially triggered as required", () => {
+                        const node = compileSchema({
+                            type: "object",
+                            required: ["trigger"],
+                            properties: {
+                                trigger: { type: "string" },
+                                dependency: { type: "string", default: "default" }
+                            },
+                            dependencies: {
+                                trigger: ["dependency"]
+                            }
+                        });
+
+                        const res = node.getTemplate({}, TEMPLATE_OPTIONS);
+                        assert.deepEqual(res, { trigger: "", dependency: "default" });
+                    });
+                });
+
+                describe("dependency schema", () => {
+                    it("should not add dependency from schema if it is not required", () => {
+                        const node = compileSchema({
+                            type: "object",
+                            properties: {
+                                trigger: { type: "string" }
+                            },
+                            dependencies: {
+                                trigger: {
+                                    properties: {
+                                        dependency: { type: "string", default: "default" }
+                                    }
+                                }
+                            }
+                        });
+
+                        const res = node.getTemplate({}, TEMPLATE_OPTIONS);
+                        assert.deepEqual(res, {});
+                    });
+
+                    it("should add dependency from schema if triggered as required", () => {
+                        const node = compileSchema({
+                            type: "object",
+                            properties: {
+                                trigger: { type: "string" }
+                            },
+                            dependencies: {
+                                trigger: {
+                                    required: ["dependency"],
+                                    properties: {
+                                        dependency: { type: "string", default: "default" }
+                                    }
+                                }
+                            }
+                        });
+
+                        const res = node.getTemplate({ trigger: "yes" }, TEMPLATE_OPTIONS);
+                        assert.deepEqual(res, { trigger: "yes", dependency: "default" });
+                    });
+                });
+            });
+
+            describe("option: `additionalProps: true`", () => {
+                it("should create template for valid dependency", () => {
+                    const node = compileSchema({
+                        type: "object",
+                        properties: {
+                            test: { type: "string", default: "tested value" }
+                        },
+                        dependencies: {
+                            test: {
+                                properties: {
+                                    additionalValue: { type: "string", default: "additional" }
+                                }
+                            }
+                        }
+                    });
+                    const res = node.getTemplate(undefined, {
+                        addOptionalProps: true
+                    });
+                    assert.deepEqual(res, {
+                        test: "tested value",
+                        additionalValue: "additional"
+                    });
+                });
+
+                it("should not change passed value of dependency", () => {
+                    const node = compileSchema({
+                        type: "object",
+                        properties: {
+                            test: { type: "string", default: "tested value" }
+                        },
+                        dependencies: {
+                            test: {
+                                properties: {
+                                    additionalValue: { type: "string", default: "additional" }
+                                }
+                            }
+                        }
+                    });
+                    const res = node.getTemplate(
+                        { additionalValue: "input value" },
+                        {
+                            addOptionalProps: true
+                        }
+                    );
+                    assert.deepEqual(res, {
+                        test: "tested value",
+                        additionalValue: "input value"
+                    });
+                });
+
+                it("should not create data for non matching dependency", () => {
+                    const node = compileSchema({
+                        type: "object",
+                        properties: {
+                            test: { type: "string", default: "tested value" }
+                        },
+                        dependencies: {
+                            unknown: {
+                                properties: {
+                                    additionalValue: { type: "string", default: "additional" }
+                                }
+                            }
+                        }
+                    });
+                    const res = node.getTemplate(undefined, {
+                        addOptionalProps: true
+                    });
+                    assert.deepEqual(res, { test: "tested value" });
+                });
+            });
+        });
+    });
+
+    describe("array", () => {
+        describe("items.oneOf", () => {
+            it("should return template of first oneOf schema", () => {
+                const node = compileSchema({
+                    type: "array",
+                    minItems: 1,
+                    items: {
+                        oneOf: [
+                            { type: "string", default: "target" },
+                            { type: "number", default: 9 }
+                        ]
+                    }
+                });
+                const res = node.getTemplate();
+
+                assert(Array.isArray(res));
+                assert.deepEqual(res.length, 1);
+                assert.deepEqual(res, ["target"]);
+            });
+
+            it("should merge with input data", () => {
+                const node = compileSchema({
+                    type: "array",
+                    minItems: 1,
+                    items: {
+                        oneOf: [
+                            {
+                                type: "object",
+                                required: ["notitle"],
+                                properties: {
+                                    notitle: {
+                                        type: "string",
+                                        default: "nottitle"
+                                    }
+                                }
+                            },
+                            {
+                                type: "object",
+                                required: ["title", "subtitle"],
+                                properties: {
+                                    title: {
+                                        type: "string",
+                                        default: "Standardtitel"
+                                    },
+                                    subtitle: {
+                                        type: "string",
+                                        default: "do not replace with"
+                                    }
+                                }
+                            },
+                            { type: "number", default: 9 }
+                        ]
+                    }
+                });
+
+                const res = node.getTemplate([{ subtitle: "Subtitel" }]);
+
+                assert(Array.isArray(res));
+                assert.deepEqual(res.length, 1);
+                assert.deepEqual(res, [{ title: "Standardtitel", subtitle: "Subtitel" }]);
+            });
+
+            it("should not remove invalid oneOf schema if 'removeInvalidData' is unset", () => {
+                const node = compileSchema({
+                    type: "object",
+                    properties: {
+                        filter: {
+                            $ref: "#/definitions/filter"
+                        }
+                    },
+                    definitions: {
+                        filter: {
+                            type: "array",
+                            items: {
+                                oneOf: [
+                                    {
+                                        type: "object",
+                                        properties: {
+                                            op: {
+                                                const: "in"
+                                            },
+                                            property: { type: "string", minLength: 1 }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                });
+                const res = node.getTemplate({ filter: [{ op: "möp" }] });
+                assert.deepEqual(res, { filter: [{ op: "möp" }] });
+            });
+        });
+
+        describe("items.allOf", () => {
+            it("should create template for merged allOf schema", () => {
+                const node = compileSchema({
+                    type: "array",
+                    minItems: 2,
+                    items: {
+                        type: "object",
+                        allOf: [
+                            {
+                                required: ["title"],
+                                properties: {
+                                    title: { type: "string", default: "title" }
+                                }
+                            },
+                            {
+                                required: ["caption"],
+                                properties: {
+                                    caption: {
+                                        type: "string",
+                                        default: "caption"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                });
+
+                const res = node.getTemplate([{ title: "given-title" }]);
+                assert.deepEqual(res, [
+                    { title: "given-title", caption: "caption" },
+                    { title: "title", caption: "caption" }
+                ]);
+            });
+        });
+
+        describe("items.anyOf", () => {
+            it("should create template for first anyOf schema", () => {
+                const node = compileSchema({
+                    type: "array",
+                    minItems: 2,
+                    items: {
+                        type: "object",
+                        anyOf: [
+                            {
+                                required: ["title"],
+                                properties: {
+                                    title: { type: "string", default: "title" }
+                                }
+                            },
+                            {
+                                required: ["properties"],
+                                properties: {
+                                    caption: {
+                                        type: "string",
+                                        default: "caption"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                });
+
+                const res = node.getTemplate([{ title: "given-title" }]);
+                assert.deepEqual(res, [{ title: "given-title" }, { title: "title" }]);
+            });
+        });
+    });
+
+    describe("oneOf", () => {
+        it("should return first schema for mixed types", () => {
+            const node = compileSchema({
+                oneOf: [{ type: "string", default: "jane" }, { type: "number" }]
+            });
+            const res = node.getTemplate();
+
+            assert.deepEqual(res, "jane");
+        });
+    });
+
+    describe("list of types", () => {
+        it("should return first type of list for template", () => {
+            const node = compileSchema({
+                type: ["string", "object"]
+            });
+            const res = node.getTemplate();
+
+            assert.deepEqual(res, "");
+        });
+
+        it("should return input data", () => {
+            const node = compileSchema({
+                type: ["string", "object"]
+            });
+            const res = node.getTemplate("title");
+
+            assert.deepEqual(res, "title");
+        });
+
+        it("should return type of default value if data is not given", () => {
+            const node = compileSchema({
+                type: ["string", "array", "object"],
+                default: []
+            });
+            const res = node.getTemplate();
+
+            assert.deepEqual(res, []);
+        });
+    });
+
+    describe("templateOptions", () => {
+        it("should remove invalid oneOf schema if 'removeInvalidData=true'", () => {
+            const node = compileSchema({
+                type: "object",
+                oneOf: [
+                    {
+                        type: "object",
+                        properties: {
+                            value: { type: "string", default: "jane" }
+                        }
+                    },
+                    {
+                        type: "object",
+                        properties: {
+                            value: { type: "number" },
+                            test: { type: "string", default: "test" }
+                        }
+                    }
+                ]
+            });
+            const res = node.getTemplate(
+                { value: ["keep-me"] },
+                {
+                    removeInvalidData: true
+                }
+            );
+
+            assert.deepEqual(res, {});
+        });
+
+        it("should not add optional properties", () => {
             const schema = {
                 type: "object",
+                required: ["list", "author"],
                 properties: {
                     title: { type: "string", default: "title" },
                     list: {
@@ -709,702 +1382,113 @@ describe("compileSchema.getTemplate", () => {
                     }
                 }
             };
-            const originalSchema = JSON.stringify(schema);
             const node = compileSchema(schema);
-            node.getTemplate({});
-            assert.deepEqual(JSON.stringify(schema), originalSchema);
+
+            const template = node.getTemplate(
+                {},
+                {
+                    addOptionalProps: false
+                }
+            );
+
+            assert.deepEqual({ list: [], author: "jane" }, template);
         });
 
-        describe("object", () => {
-            describe("oneOf", () => {
-                it("should return template of first oneOf schema", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        oneOf: [
-                            {
-                                type: "object",
-                                required: ["title"],
-                                properties: {
-                                    title: { type: "string", default: "jane" }
-                                }
-                            },
-                            {
-                                type: "object",
-                                required: ["value"],
-                                properties: { value: { type: "number" } }
-                            }
-                        ]
-                    });
-                    const res = node.getTemplate();
-
-                    assert.deepEqual(res, { title: "jane" });
-                });
-
-                it("should extend empty object with first oneOf schema", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        oneOf: [
-                            {
-                                type: "object",
-                                required: ["title"],
-                                properties: {
-                                    title: { type: "string", default: "jane" }
-                                }
-                            },
-                            {
-                                type: "object",
-                                required: ["value"],
-                                properties: { value: { type: "number" } }
-                            }
-                        ]
-                    });
-                    const res = node.getTemplate({});
-
-                    assert.deepEqual(res, { title: "jane" });
-                });
-
-                it("should return template of matching oneOf schema", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        oneOf: [
-                            {
-                                type: "object",
-                                required: ["value"],
-                                properties: {
-                                    value: { type: "string", default: "jane" }
-                                }
-                            },
-                            {
-                                type: "object",
-                                required: ["value", "test"],
-                                properties: {
-                                    value: { type: "number" },
-                                    test: { type: "string", default: "test" }
-                                }
-                            }
-                        ]
-                    });
-                    const res = node.getTemplate({ value: 111 });
-
-                    assert.deepEqual(res, { value: 111, test: "test" });
-                });
-
-                it("should return input value if no oneOf-schema matches ", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        oneOf: [
-                            {
-                                type: "object",
-                                properties: {
-                                    value: { type: "string", default: "jane" }
-                                }
-                            },
-                            {
-                                type: "object",
-                                properties: {
-                                    value: { type: "number" },
-                                    test: { type: "string", default: "test" }
-                                }
-                            }
-                        ]
-                    });
-                    const res = node.getTemplate({ value: ["keep-me"] });
-
-                    assert.deepEqual(res, { value: ["keep-me"] });
-                });
-
-                it("should not require object type definition in oneOf schemas", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        oneOf: [
-                            {
-                                required: ["type"],
-                                properties: {
-                                    type: { const: "header" }
-                                }
-                            },
-                            {
-                                required: ["type"],
-                                properties: {
-                                    type: { const: "paragraph" }
-                                }
-                            }
-                        ]
-                    });
-
-                    const res = node.getTemplate({ type: "paragraph" });
-                    assert.deepEqual(res, { type: "paragraph" });
-                });
-            });
-
-            describe("anyOf", () => {
-                it("should create template for first anyOf schema", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        anyOf: [
-                            {
-                                required: ["name", "stage"],
-                                properties: {
-                                    name: { type: "string", default: "jane" },
-                                    stage: { type: "string", default: "develop" }
-                                }
-                            },
-                            {
-                                required: ["stage"],
-                                properties: {
-                                    stage: { type: "number", default: 0 }
-                                }
-                            }
-                        ]
-                    });
-                    const res = node.getTemplate({ name: "john" });
-
-                    assert.deepEqual(res, { name: "john", stage: "develop" });
-                });
-            });
-
-            // draft07 (backwards compatible)
-            describe("dependencies", () => {
-                describe("option: `additionalProps: false`", () => {
-                    const TEMPLATE_OPTIONS = { addOptionalProps: false };
-                    describe("dependency required", () => {
-                        it("should not add dependency if it is not required", () => {
-                            const node = compileSchema({
-                                type: "object",
-                                properties: {
-                                    trigger: { type: "string" },
-                                    dependency: { type: "string", default: "default" }
-                                },
-                                dependencies: {
-                                    trigger: ["dependency"]
-                                }
-                            });
-
-                            const res = node.getTemplate({}, TEMPLATE_OPTIONS);
-                            assert.deepEqual(res, {});
-                        });
-
-                        it("should add dependency if triggered as required", () => {
-                            const node = compileSchema({
-                                type: "object",
-                                properties: {
-                                    trigger: { type: "string" },
-                                    dependency: { type: "string", default: "default" }
-                                },
-                                dependencies: {
-                                    trigger: ["dependency"]
-                                }
-                            });
-
-                            const res = node.getTemplate({ trigger: "yes" }, TEMPLATE_OPTIONS);
-                            assert.deepEqual(res, { trigger: "yes", dependency: "default" });
-                        });
-
-                        it("should add dependency if initially triggered as required", () => {
-                            const node = compileSchema({
-                                type: "object",
-                                required: ["trigger"],
-                                properties: {
-                                    trigger: { type: "string" },
-                                    dependency: { type: "string", default: "default" }
-                                },
-                                dependencies: {
-                                    trigger: ["dependency"]
-                                }
-                            });
-
-                            const res = node.getTemplate({}, TEMPLATE_OPTIONS);
-                            assert.deepEqual(res, { trigger: "", dependency: "default" });
-                        });
-                    });
-
-                    describe("dependency schema", () => {
-                        it("should not add dependency from schema if it is not required", () => {
-                            const node = compileSchema({
-                                type: "object",
-                                properties: {
-                                    trigger: { type: "string" }
-                                },
-                                dependencies: {
-                                    trigger: {
-                                        properties: {
-                                            dependency: { type: "string", default: "default" }
-                                        }
-                                    }
-                                }
-                            });
-
-                            const res = node.getTemplate({}, TEMPLATE_OPTIONS);
-                            assert.deepEqual(res, {});
-                        });
-
-                        it("should add dependency from schema if triggered as required", () => {
-                            const node = compileSchema({
-                                type: "object",
-                                properties: {
-                                    trigger: { type: "string" }
-                                },
-                                dependencies: {
-                                    trigger: {
-                                        required: ["dependency"],
-                                        properties: {
-                                            dependency: { type: "string", default: "default" }
-                                        }
-                                    }
-                                }
-                            });
-
-                            const res = node.getTemplate({ trigger: "yes" }, TEMPLATE_OPTIONS);
-                            assert.deepEqual(res, { trigger: "yes", dependency: "default" });
-                        });
-                    });
-                });
-
-                describe("option: `additionalProps: true`", () => {
-                    it("should create template for valid dependency", () => {
-                        const node = compileSchema({
-                            type: "object",
-                            properties: {
-                                test: { type: "string", default: "tested value" }
-                            },
-                            dependencies: {
-                                test: {
-                                    properties: {
-                                        additionalValue: { type: "string", default: "additional" }
-                                    }
-                                }
-                            }
-                        });
-                        const res = node.getTemplate(undefined, {
-                            addOptionalProps: true
-                        });
-                        assert.deepEqual(res, {
-                            test: "tested value",
-                            additionalValue: "additional"
-                        });
-                    });
-
-                    it("should not change passed value of dependency", () => {
-                        const node = compileSchema({
-                            type: "object",
-                            properties: {
-                                test: { type: "string", default: "tested value" }
-                            },
-                            dependencies: {
-                                test: {
-                                    properties: {
-                                        additionalValue: { type: "string", default: "additional" }
-                                    }
-                                }
-                            }
-                        });
-                        const res = node.getTemplate(
-                            { additionalValue: "input value" },
-                            {
-                                addOptionalProps: true
-                            }
-                        );
-                        assert.deepEqual(res, {
-                            test: "tested value",
-                            additionalValue: "input value"
-                        });
-                    });
-
-                    it("should not create data for non matching dependency", () => {
-                        const node = compileSchema({
-                            type: "object",
-                            properties: {
-                                test: { type: "string", default: "tested value" }
-                            },
-                            dependencies: {
-                                unknown: {
-                                    properties: {
-                                        additionalValue: { type: "string", default: "additional" }
-                                    }
-                                }
-                            }
-                        });
-                        const res = node.getTemplate(undefined, {
-                            addOptionalProps: true
-                        });
-                        assert.deepEqual(res, { test: "tested value" });
-                    });
-                });
-            });
-        });
-
-        describe("array", () => {
-            describe("items.oneOf", () => {
-                it("should return template of first oneOf schema", () => {
-                    const node = compileSchema({
-                        type: "array",
-                        minItems: 1,
-                        items: {
-                            oneOf: [
-                                { type: "string", default: "target" },
-                                { type: "number", default: 9 }
-                            ]
-                        }
-                    });
-                    const res = node.getTemplate();
-
-                    assert(Array.isArray(res));
-                    assert.deepEqual(res.length, 1);
-                    assert.deepEqual(res, ["target"]);
-                });
-
-                it("should merge with input data", () => {
-                    const node = compileSchema({
-                        type: "array",
-                        minItems: 1,
-                        items: {
-                            oneOf: [
-                                {
-                                    type: "object",
-                                    required: ["notitle"],
-                                    properties: {
-                                        notitle: {
-                                            type: "string",
-                                            default: "nottitle"
-                                        }
-                                    }
-                                },
-                                {
-                                    type: "object",
-                                    required: ["title", "subtitle"],
-                                    properties: {
-                                        title: {
-                                            type: "string",
-                                            default: "Standardtitel"
-                                        },
-                                        subtitle: {
-                                            type: "string",
-                                            default: "do not replace with"
-                                        }
-                                    }
-                                },
-                                { type: "number", default: 9 }
-                            ]
-                        }
-                    });
-
-                    const res = node.getTemplate([{ subtitle: "Subtitel" }]);
-
-                    assert(Array.isArray(res));
-                    assert.deepEqual(res.length, 1);
-                    assert.deepEqual(res, [{ title: "Standardtitel", subtitle: "Subtitel" }]);
-                });
-
-                it("should not remove invalid oneOf schema if 'removeInvalidData' is unset", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        properties: {
-                            filter: {
-                                $ref: "#/definitions/filter"
-                            }
-                        },
-                        definitions: {
-                            filter: {
-                                type: "array",
-                                items: {
-                                    oneOf: [
-                                        {
-                                            type: "object",
-                                            properties: {
-                                                op: {
-                                                    const: "in"
-                                                },
-                                                property: { type: "string", minLength: 1 }
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    });
-                    const res = node.getTemplate({ filter: [{ op: "möp" }] });
-                    assert.deepEqual(res, { filter: [{ op: "möp" }] });
-                });
-            });
-
-            describe("items.allOf", () => {
-                it("should create template for merged allOf schema", () => {
-                    const node = compileSchema({
-                        type: "array",
-                        minItems: 2,
-                        items: {
-                            type: "object",
-                            allOf: [
-                                {
-                                    required: ["title"],
-                                    properties: {
-                                        title: { type: "string", default: "title" }
-                                    }
-                                },
-                                {
-                                    required: ["caption"],
-                                    properties: {
-                                        caption: {
-                                            type: "string",
-                                            default: "caption"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    });
-
-                    const res = node.getTemplate([{ title: "given-title" }]);
-                    assert.deepEqual(res, [
-                        { title: "given-title", caption: "caption" },
-                        { title: "title", caption: "caption" }
-                    ]);
-                });
-            });
-
-            describe("items.anyOf", () => {
-                it("should create template for first anyOf schema", () => {
-                    const node = compileSchema({
-                        type: "array",
-                        minItems: 2,
-                        items: {
-                            type: "object",
-                            anyOf: [
-                                {
-                                    required: ["title"],
-                                    properties: {
-                                        title: { type: "string", default: "title" }
-                                    }
-                                },
-                                {
-                                    required: ["properties"],
-                                    properties: {
-                                        caption: {
-                                            type: "string",
-                                            default: "caption"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    });
-
-                    const res = node.getTemplate([{ title: "given-title" }]);
-                    assert.deepEqual(res, [{ title: "given-title" }, { title: "title" }]);
-                });
-            });
-        });
-
-        describe("oneOf", () => {
-            it("should return first schema for mixed types", () => {
+        describe("extendDefaults", () => {
+            it("should keep array default-value with 'extendDefaults:false'", () => {
                 const node = compileSchema({
-                    oneOf: [{ type: "string", default: "jane" }, { type: "number" }]
+                    type: "array",
+                    default: [],
+                    items: {
+                        type: "string",
+                        enum: ["one", "two"]
+                    },
+                    minItems: 1 // usually adds an enty, but default states: []
                 });
-                const res = node.getTemplate();
-
-                assert.deepEqual(res, "jane");
-            });
-        });
-
-        describe("list of types", () => {
-            it("should return first type of list for template", () => {
-                const node = compileSchema({
-                    type: ["string", "object"]
+                const res = node.getTemplate(undefined, {
+                    extendDefaults: false
                 });
-                const res = node.getTemplate();
-
-                assert.deepEqual(res, "");
-            });
-
-            it("should return input data", () => {
-                const node = compileSchema({
-                    type: ["string", "object"]
-                });
-                const res = node.getTemplate("title");
-
-                assert.deepEqual(res, "title");
-            });
-
-            it("should return type of default value if data is not given", () => {
-                const node = compileSchema({
-                    type: ["string", "array", "object"],
-                    default: []
-                });
-                const res = node.getTemplate();
 
                 assert.deepEqual(res, []);
             });
-        });
 
-        describe("templateOptions", () => {
-            it("should remove invalid oneOf schema if 'removeInvalidData=true'", () => {
+            it("should add items to array with no default-value given and 'extendDefaults:false'", () => {
+                const node = compileSchema({
+                    type: "array",
+                    items: {
+                        type: "string",
+                        enum: ["one", "two"]
+                    },
+                    minItems: 1 // usually adds an enty, but default states: []
+                });
+                const res = node.getTemplate(undefined, {
+                    extendDefaults: false
+                });
+
+                assert.deepEqual(res, ["one"]);
+            });
+
+            it("should add items to default-array with 'extendDefaults:true'", () => {
+                const node = compileSchema({
+                    type: "array",
+                    default: [],
+                    items: {
+                        type: "string",
+                        enum: ["one", "two"]
+                    },
+                    minItems: 1 // usually adds an enty, but default states: []
+                });
+                const res = node.getTemplate(undefined, {
+                    extendDefaults: true
+                });
+
+                assert.deepEqual(res, ["one"]);
+            });
+
+            it("should not add required items to object with default-value given and 'extendDefaults:false'", () => {
                 const node = compileSchema({
                     type: "object",
-                    oneOf: [
-                        {
-                            type: "object",
-                            properties: {
-                                value: { type: "string", default: "jane" }
-                            }
-                        },
-                        {
-                            type: "object",
-                            properties: {
-                                value: { type: "number" },
-                                test: { type: "string", default: "test" }
-                            }
-                        }
-                    ]
-                });
-                const res = node.getTemplate(
-                    { value: ["keep-me"] },
-                    {
-                        removeInvalidData: true
+                    required: ["title"],
+                    default: {},
+                    properties: {
+                        title: { type: "string" }
                     }
-                );
+                });
+                const res = node.getTemplate(undefined, {
+                    extendDefaults: false
+                });
 
                 assert.deepEqual(res, {});
             });
 
-            it("should not add optional properties", () => {
-                const schema = {
+            it("should extend object by required property with no default-value given and 'extendDefaults:false'", () => {
+                const node = compileSchema({
                     type: "object",
-                    required: ["list", "author"],
+                    required: ["title"],
                     properties: {
-                        title: { type: "string", default: "title" },
-                        list: {
-                            type: "array",
-                            items: {
-                                allOf: [
-                                    { type: "object" },
-                                    {
-                                        properties: {
-                                            index: { type: "number", default: 4 }
-                                        }
-                                    }
-                                ]
-                            }
-                        },
-                        author: {
-                            anyOf: [
-                                { type: "string", default: "jane" },
-                                { type: "string", default: "john" }
-                            ]
-                        },
-                        source: {
-                            type: "string",
-                            enum: ["dpa", "getty"]
-                        }
+                        title: { type: "string" }
                     }
-                };
-                const node = compileSchema(schema);
+                });
+                const res = node.getTemplate(undefined, {
+                    extendDefaults: false
+                });
 
-                const template = node.getTemplate(
-                    {},
-                    {
-                        addOptionalProps: false
-                    }
-                );
-
-                assert.deepEqual({ list: [], author: "jane" }, template);
+                assert.deepEqual(res, { title: "" });
             });
-
-            describe("extendDefaults", () => {
-                it("should keep array default-value with 'extendDefaults:false'", () => {
-                    const node = compileSchema({
-                        type: "array",
-                        default: [],
-                        items: {
-                            type: "string",
-                            enum: ["one", "two"]
-                        },
-                        minItems: 1 // usually adds an enty, but default states: []
-                    });
-                    const res = node.getTemplate(undefined, {
-                        extendDefaults: false
-                    });
-
-                    assert.deepEqual(res, []);
+            it("should extend default-object with 'extendDefaults:true'", () => {
+                const node = compileSchema({
+                    type: "object",
+                    required: ["title"],
+                    default: {},
+                    properties: {
+                        title: { type: "string" }
+                    }
+                });
+                const res = node.getTemplate(undefined, {
+                    extendDefaults: true
                 });
 
-                it("should add items to array with no default-value given and 'extendDefaults:false'", () => {
-                    const node = compileSchema({
-                        type: "array",
-                        items: {
-                            type: "string",
-                            enum: ["one", "two"]
-                        },
-                        minItems: 1 // usually adds an enty, but default states: []
-                    });
-                    const res = node.getTemplate(undefined, {
-                        extendDefaults: false
-                    });
-
-                    assert.deepEqual(res, ["one"]);
-                });
-
-                it("should add items to default-array with 'extendDefaults:true'", () => {
-                    const node = compileSchema({
-                        type: "array",
-                        default: [],
-                        items: {
-                            type: "string",
-                            enum: ["one", "two"]
-                        },
-                        minItems: 1 // usually adds an enty, but default states: []
-                    });
-                    const res = node.getTemplate(undefined, {
-                        extendDefaults: true
-                    });
-
-                    assert.deepEqual(res, ["one"]);
-                });
-
-                it("should not add required items to object with default-value given and 'extendDefaults:false'", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        required: ["title"],
-                        default: {},
-                        properties: {
-                            title: { type: "string" }
-                        }
-                    });
-                    const res = node.getTemplate(undefined, {
-                        extendDefaults: false
-                    });
-
-                    assert.deepEqual(res, {});
-                });
-
-                it("should extend object by required property with no default-value given and 'extendDefaults:false'", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        required: ["title"],
-                        properties: {
-                            title: { type: "string" }
-                        }
-                    });
-                    const res = node.getTemplate(undefined, {
-                        extendDefaults: false
-                    });
-
-                    assert.deepEqual(res, { title: "" });
-                });
-                it("should extend default-object with 'extendDefaults:true'", () => {
-                    const node = compileSchema({
-                        type: "object",
-                        required: ["title"],
-                        default: {},
-                        properties: {
-                            title: { type: "string" }
-                        }
-                    });
-                    const res = node.getTemplate(undefined, {
-                        extendDefaults: true
-                    });
-
-                    assert.deepEqual(res, { title: "" });
-                });
+                assert.deepEqual(res, { title: "" });
             });
         });
     });
