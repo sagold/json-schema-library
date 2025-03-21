@@ -12,6 +12,8 @@ export default {
     ContainsMinError: "The array at `{{pointer}}` contains {{delta}} too few items matching `{{schema}}`",
     ContainsMaxError: "The array at `{{pointer}}` contains {{delta}} too many items matching `{{schema}}`",
     EnumError: "Expected given value `{{value}}` in `{{pointer}}` to be one of `{{values}}`",
+    ExclusiveMaximumError: "Value in `{{pointer}}` is `{{length}}`, but should be at most `{{maximum}}`",
+    ExclusiveMinimumError: "Value in `{{pointer}}` is `{{length}}`, but should be at minimum `{{minimum}}`",
     ForbiddenPropertyError: "Property name `{{property}}` at `{{pointer}}` is not allowed",
     FormatDateError: "Value `{{value}}` at `{{pointer}}` is not a valid date",
     FormatDateTimeError: "Value `{{value}}` at `{{pointer}}` is not a valid date-time",

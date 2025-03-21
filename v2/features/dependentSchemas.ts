@@ -64,28 +64,29 @@ export function dependentSchemasValidator(node: SchemaNode): void {
     if (!isObject(node.dependentSchemas)) {
         return undefined;
     }
+    node.validators.push(validateDependentSchemas);
+}
 
-    node.validators.push(({ node, data, pointer = "#" }: JsonSchemaValidatorParams) => {
-        const { schema, dependentSchemas } = node;
-        if (!isObject(data)) {
-            return undefined;
+export function validateDependentSchemas({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
+    const { schema, dependentSchemas } = node;
+    if (!isObject(data)) {
+        return undefined;
+    }
+    const errors: JsonError[] = [];
+    Object.keys(data).forEach((property) => {
+        const dependencies = dependentSchemas[property];
+        // @draft >= 6 boolean schema
+        if (dependencies === true) {
+            return;
         }
-        const errors: JsonError[] = [];
-        Object.keys(data).forEach((property) => {
-            const dependencies = dependentSchemas[property];
-            // @draft >= 6 boolean schema
-            if (dependencies === true) {
-                return;
-            }
-            if (dependencies === false) {
-                errors.push(node.errors.missingDependencyError({ pointer, schema, value: data }));
-                return;
-            }
-            if (isSchemaNode(dependencies)) {
-                errors.push(...dependencies.validate(data, pointer));
-                return;
-            }
-        });
-        return errors;
+        if (dependencies === false) {
+            errors.push(node.errors.missingDependencyError({ pointer, schema, value: data }));
+            return;
+        }
+        if (isSchemaNode(dependencies)) {
+            errors.push(...dependencies.validate(data, pointer));
+            return;
+        }
     });
+    return errors;
 }

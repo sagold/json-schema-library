@@ -93,7 +93,6 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     constValidator,
     dependenciesValidator,
     enumValidator,
-    exclusiveMinimumValidator,
     formatValidator,
     exclusiveMaximumValidator,
     exclusiveMinimumValidator,

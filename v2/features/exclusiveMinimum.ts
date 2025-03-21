@@ -1,21 +1,24 @@
-import { SchemaNode } from "../types";
+import { JsonSchemaValidatorParams, SchemaNode } from "../types";
 
-export function exclusiveMinimumValidator({ schema, validators }: SchemaNode): void {
-    if (isNaN(schema.exclusiveMinimum)) {
+export function exclusiveMinimumValidator(node: SchemaNode): void {
+    if (node.schema.exclusiveMinimum == null || isNaN(parseInt(node.schema.exclusiveMinimum))) {
         return undefined;
     }
-    validators.push(({ node, data, pointer }) => {
-        if (typeof data !== "number") {
-            return undefined;
-        }
-        if (schema.exclusiveMinimum >= data) {
-            return node.errors.minimumError({
-                minimum: schema.exclusiveMinimum,
-                length: data,
-                pointer,
-                schema,
-                value: data
-            });
-        }
-    });
+    node.validators.push(validateExclusiveMinimum);
+}
+
+validateExclusiveMinimum.toJSON = () => "exclusiveMinimum";
+function validateExclusiveMinimum({ node, data, pointer }: JsonSchemaValidatorParams) {
+    if (typeof data !== "number") {
+        return undefined;
+    }
+    if (node.schema.exclusiveMinimum >= data) {
+        return node.errors.exclusiveMinimumError({
+            minimum: node.schema.exclusiveMinimum,
+            length: data,
+            pointer,
+            schema: node.schema,
+            value: data
+        });
+    }
 }

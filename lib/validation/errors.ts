@@ -13,6 +13,8 @@ const errors: Record<string, CreateError> = {
     containsMaxError: createCustomError("ContainsMaxError"),
     containsMinError: createCustomError("ContainsMinError"),
     enumError: createCustomError("EnumError"),
+    exclusiveMaximumError: createCustomError("ExclusiveMaximumError"),
+    exclusiveMinimumError: createCustomError("ExclusiveMinimumError"),
     forbiddenPropertyError: createCustomError("ForbiddenPropertyError"),
     formatDateError: createCustomError("FormatDateError"),
     formatDateTimeError: createCustomError("FormatDateTimeError"),

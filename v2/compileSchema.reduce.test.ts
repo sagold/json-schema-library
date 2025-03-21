@@ -98,6 +98,480 @@ describe("compileSchema : reduce", () => {
         });
     });
 
+    describe("dependencies", () => {
+        it.skip("should correctly merge dependencies", () => {
+            const node = compileSchema({
+                $ref: "#/$defs/schema",
+                $defs: {
+                    schema: {
+                        type: "object",
+                        required: ["one"],
+                        properties: { one: { type: "string" }, two: { type: "string" } },
+                        dependencies: { one: ["two"], two: { $ref: "/$defs/two" } }
+                    },
+                    two: { required: ["three"], properties: { three: { type: "number" } } }
+                }
+            }).reduce({ data: { one: "" } });
+            assert.deepEqual(node.schema, {
+                required: ["two", "three"],
+                properties: {
+                    three: { type: "number" }
+                }
+            });
+        });
+        it.skip("should return undefined if dynamic schema is not triggered", () => {
+            const node = compileSchema({
+                $ref: "#/$defs/schema",
+                $defs: {
+                    schema: {
+                        type: "object",
+                        required: [],
+                        properties: { one: { type: "string" }, two: { type: "string" } },
+                        dependencies: { one: ["two"] }
+                    }
+                }
+            }).reduce({ data: {} });
+            assert.deepEqual(node.schema, undefined);
+        });
+        it.skip("should resolve nested dependencies schema", () => {
+            const node = compileSchema({
+                $ref: "#/$defs/schema",
+                $defs: {
+                    schema: {
+                        type: "object",
+                        required: ["one"],
+                        properties: { one: { type: "string" }, two: { type: "string" } },
+                        dependencies: { one: ["two"], two: { $ref: "/$defs/two" } }
+                    },
+                    two: {
+                        required: ["three"],
+                        properties: { three: { type: "number" } },
+                        dependencies: { two: { properties: { four: { type: "boolean" } } } }
+                    }
+                }
+            }).reduce({ data: { one: "" } });
+            assert.deepEqual(node.schema, {
+                required: ["two", "three"],
+                properties: { three: { type: "number" }, four: { type: "boolean" } }
+            });
+        });
+    });
+
+    describe("if-then-else", () => {
+        it.skip("should select if-then-else schema", () => {
+            const node = compileSchema({
+                $ref: "#/$defs/schema",
+                $defs: {
+                    schema: {
+                        type: "object",
+                        required: ["one"],
+                        properties: { one: { type: "string" } },
+                        if: { minProperties: 1 },
+                        then: { $ref: "/$defs/then" }
+                    },
+                    then: { required: ["two"], properties: { two: { type: "string" } } }
+                }
+            }).reduce({ data: { one: "" } });
+            assert.deepEqual(node.schema, { required: ["two"], properties: { two: { type: "string" } } });
+        });
+
+        it.skip("should resolve nested if-then-else schema", () => {
+            const node = compileSchema({
+                $ref: "#/$defs/schema",
+                $defs: {
+                    schema: {
+                        type: "object",
+                        required: ["one"],
+                        properties: { one: { type: "string" } },
+                        if: { minProperties: 1 },
+                        then: { $ref: "/$defs/then" }
+                    },
+                    then: {
+                        if: { minProperties: 1 },
+                        then: { required: ["two"], properties: { two: { type: "string" } } }
+                    }
+                }
+            }).reduce({ data: { one: "" } });
+            assert.deepEqual(node.schema, {
+                required: ["two"],
+                properties: {
+                    two: { type: "string" }
+                }
+            });
+        });
+    });
+
+    describe("allOf", () => {
+        it.skip("should return merged allOf schema", () => {
+            const node = compileSchema({
+                $ref: "/$defs/schema",
+                $defs: {
+                    schema: {
+                        type: "object",
+                        required: ["one"],
+                        properties: { one: { type: "string" } },
+                        allOf: [{ $ref: "/$defs/one" }, { $ref: "/$defs/two" }]
+                    },
+                    one: { required: ["one"] },
+                    two: { required: ["two"], properties: { two: { type: "number" } } }
+                }
+            }).reduce({ data: {} });
+            assert.deepEqual(node.schema, {
+                required: ["one", "two"],
+                properties: {
+                    two: { type: "number" }
+                }
+            });
+        });
+
+        it("should return undefined if allOf is empty", () => {
+            const node = compileSchema({
+                type: "object",
+                required: ["one"],
+                properties: { one: { type: "string" } },
+                allOf: []
+            }).reduce({ data: {} });
+            assert.deepEqual(node.schema, {
+                type: "object",
+                required: ["one"],
+                properties: { one: { type: "string" } }
+            });
+        });
+
+        it.skip("should resolve nested allOf schema", () => {
+            const node = compileSchema({
+                $ref: "/$defs/schema",
+                $defs: {
+                    schema: {
+                        type: "object",
+                        required: ["one"],
+                        properties: { one: { type: "string" } },
+                        allOf: [{ $ref: "/$defs/one" }, { $ref: "/$defs/two" }]
+                    },
+                    one: { required: ["one"] },
+                    two: { required: ["two"], allOf: [{ properties: { two: { type: "number" } } }] }
+                }
+            }).reduce({ data: {} });
+            assert.deepEqual(node.schema, { required: ["one", "two"], properties: { two: { type: "number" } } });
+        });
+    });
+
+    describe("oneOf", () => {
+        it("should select oneOf schema", () => {
+            const node = compileSchema({
+                type: "object",
+                oneOf: [{ properties: { one: { type: "number" } } }, { properties: { two: { type: "string" } } }]
+            }).reduce({ data: { one: "string" } });
+            assert.deepEqual(node.schema, { type: "object", properties: { two: { type: "string" } } });
+        });
+
+        it("should select correct oneOf schema from oneOfProperty", () => {
+            const node = compileSchema({
+                type: "object",
+                oneOfProperty: "id",
+                oneOf: [
+                    { properties: { id: { const: "first" }, one: { type: "number" } } },
+                    { properties: { id: { const: "second" }, one: { type: "number" } } }
+                ]
+            }).reduce({ data: { id: "second" } });
+            assert.deepEqual(node.schema, {
+                type: "object",
+                oneOfProperty: "id",
+                properties: { id: { const: "second" }, one: { type: "number" } }
+            });
+        });
+    });
+
+    describe("anyOf", () => {
+        it.skip("should return undefined if anyOf is empty", () => {
+            const node = compileSchema({ type: "object" }).reduce({ data: { id: "second" } });
+            assert.deepEqual(node.schema, undefined);
+        });
+
+        it.skip("should return undefined if no anyOf matches input data", () => {
+            const node = compileSchema({
+                type: "object",
+                anyOf: [{ properties: { id: { const: "first" } } }]
+            }).reduce({ data: { id: "second" } });
+
+            assert.deepEqual(node.schema, undefined);
+        });
+
+        it("should return matching oneOf schema", () => {
+            const node = compileSchema({ type: "object", anyOf: [{ properties: { id: { const: "second" } } }] }).reduce(
+                { data: { id: "second" } }
+            );
+            assert.deepEqual(node.schema, { type: "object", properties: { id: { const: "second" } } });
+        });
+
+        it("should return all matching oneOf schema as merged schema", () => {
+            const node = compileSchema({
+                type: "object",
+                anyOf: [
+                    { properties: { id: { const: "second" } } },
+                    { properties: { id: { minLength: 4 } } },
+                    { properties: { id: { maxLength: 4 } } }
+                ]
+            }).reduce({ data: { id: "second" } });
+
+            assert.deepEqual(node.schema, { type: "object", properties: { id: { const: "second", minLength: 4 } } });
+        });
+    });
+
+    describe("allOf", () => {
+        it("should return merged schema of type string", () => {
+            const node = compileSchema({
+                type: "string",
+                allOf: [{ minLength: 10 }, { pattern: /a-.*/ }]
+            }).reduce({ data: "a-value" });
+            assert.deepEqual(node.schema, {
+                type: "string",
+                minLength: 10,
+                pattern: /a-.*/
+            });
+        });
+
+        it.skip("should return merged schema while resolving $ref", () => {
+            const node = compileSchema({
+                type: "string",
+                allOf: [{ $ref: "/$defs/min" }, { $ref: "/$defs/pattern" }],
+                $defs: {
+                    min: { minLength: 10 },
+                    pattern: { format: "html" }
+                }
+            }).reduce({ data: "a-value" });
+            assert.deepEqual(node.schema, {
+                type: "string",
+                minLength: 10,
+                format: "html"
+            });
+        });
+
+        it("should return merged properties and attributes", () => {
+            const node = compileSchema({
+                type: "object",
+                properties: {
+                    trigger: { type: "boolean" }
+                },
+                allOf: [
+                    {
+                        properties: {
+                            title: { type: "string" }
+                        }
+                    },
+                    {
+                        minProperties: 2,
+                        properties: {
+                            time: { type: "number" }
+                        }
+                    }
+                ]
+            }).reduce({ data: "a-value" });
+            assert.deepEqual(node.schema, {
+                type: "object",
+                minProperties: 2,
+                properties: {
+                    trigger: { type: "boolean" },
+                    title: { type: "string" },
+                    time: { type: "number" }
+                }
+            });
+        });
+
+        it("should return merged required-list of type object", () => {
+            const node = compileSchema({
+                type: "object",
+                required: ["trigger"],
+                properties: {
+                    trigger: { type: "boolean" }
+                },
+                allOf: [
+                    {
+                        required: ["title"],
+                        properties: {
+                            title: { type: "string" }
+                        }
+                    },
+                    {
+                        required: [],
+                        properties: {
+                            time: { type: "number" }
+                        }
+                    }
+                ]
+            }).reduce({ data: "a-value" });
+            assert.deepEqual(node.schema, {
+                type: "object",
+                required: ["trigger", "title"],
+                properties: {
+                    trigger: { type: "boolean" },
+                    title: { type: "string" },
+                    time: { type: "number" }
+                }
+            });
+        });
+
+        it("should return unique merged required-list of type object", () => {
+            const node = compileSchema({
+                type: "object",
+                required: ["trigger"],
+                properties: {
+                    trigger: { type: "boolean" }
+                },
+                allOf: [
+                    {
+                        required: ["trigger", "title"],
+                        properties: {
+                            title: { type: "string" }
+                        }
+                    }
+                ]
+            }).reduce({ data: "a-value" });
+            assert.deepEqual(node.schema, {
+                type: "object",
+                required: ["trigger", "title"],
+                properties: {
+                    trigger: { type: "boolean" },
+                    title: { type: "string" }
+                }
+            });
+        });
+
+        describe("if-then-else", () => {
+            it("should not return 'then'-schema when 'if' does not match", () => {
+                const node = compileSchema({
+                    type: "object",
+                    required: ["trigger"],
+                    properties: { trigger: { type: "boolean" } },
+                    allOf: [
+                        {
+                            if: { properties: { trigger: { const: true } } },
+                            then: { properties: { additionalSchema: { type: "string", default: "additional" } } }
+                        }
+                    ]
+                }).reduce({ data: { trigger: false } });
+                assert.deepEqual(node.schema, {
+                    type: "object",
+                    required: ["trigger"],
+                    properties: {
+                        trigger: { type: "boolean" }
+                    }
+                });
+            });
+
+            it("should return 'then'-schema when 'if' does match", () => {
+                const node = compileSchema({
+                    type: "object",
+                    required: ["trigger"],
+                    properties: { trigger: { type: "boolean" } },
+                    allOf: [
+                        {
+                            if: { properties: { trigger: { const: true } } },
+                            then: { properties: { additionalSchema: { type: "string", default: "additional" } } }
+                        }
+                    ]
+                }).reduce({ data: { trigger: true } });
+                assert.deepEqual(node.schema, {
+                    type: "object",
+                    required: ["trigger"],
+                    properties: {
+                        trigger: { type: "boolean" },
+                        additionalSchema: { type: "string", default: "additional" }
+                    }
+                });
+            });
+
+            it("should merge multiple 'then'-schema", () => {
+                const node = compileSchema({
+                    type: "object",
+                    required: ["trigger"],
+                    properties: { trigger: { type: "boolean" } },
+                    allOf: [
+                        {
+                            if: { properties: { trigger: { const: true } } },
+                            then: { properties: { additionalSchema: { type: "string", default: "additional" } } }
+                        },
+                        {
+                            if: { properties: { trigger: { const: true } } },
+                            then: { properties: { anotherSchema: { type: "string", default: "another" } } }
+                        }
+                    ]
+                }).reduce({ data: { trigger: true } });
+                assert.deepEqual(node.schema, {
+                    type: "object",
+                    required: ["trigger"],
+                    properties: {
+                        trigger: { type: "boolean" },
+                        additionalSchema: { type: "string", default: "additional" },
+                        anotherSchema: { type: "string", default: "another" }
+                    }
+                });
+            });
+
+            it("should merge only matching 'if'-schema", () => {
+                const node = compileSchema({
+                    type: "object",
+                    required: ["trigger"],
+                    properties: { trigger: { type: "boolean" } },
+                    allOf: [
+                        {
+                            if: { properties: { trigger: { const: true } } },
+                            then: { properties: { additionalSchema: { type: "string", default: "additional" } } }
+                        },
+                        {
+                            if: {
+                                required: ["additionalSchema"],
+                                properties: { additionalSchema: { type: "string", minLength: 50 } }
+                            },
+                            then: { properties: { anotherSchema: { type: "string", default: "another" } } }
+                        }
+                    ]
+                }).reduce({ data: { trigger: true } });
+                assert.deepEqual(node.schema, {
+                    type: "object",
+                    required: ["trigger"],
+                    properties: {
+                        trigger: { type: "boolean" },
+                        additionalSchema: { type: "string", default: "additional" }
+                    }
+                });
+            });
+
+            it("should incrementally resolve multiple 'then'-schema", () => {
+                const node = compileSchema({
+                    type: "object",
+                    required: ["trigger"],
+                    properties: { trigger: { type: "boolean" } },
+                    allOf: [
+                        {
+                            if: { properties: { trigger: { const: true } } },
+                            then: {
+                                required: ["additionalSchema"],
+                                properties: { additionalSchema: { type: "string", default: "additional" } }
+                            }
+                        },
+                        {
+                            if: { required: ["additionalSchema"], properties: { additionalSchema: { minLength: 5 } } },
+                            then: {
+                                required: ["anotherSchema"],
+                                properties: { anotherSchema: { type: "string", default: "another" } }
+                            }
+                        }
+                    ]
+                }).reduce({ data: { trigger: true, additionalSchema: "12345" } });
+                assert.deepEqual(node.schema, {
+                    type: "object",
+                    required: ["trigger", "additionalSchema", "anotherSchema"],
+                    properties: {
+                        trigger: { type: "boolean" },
+                        additionalSchema: { type: "string", default: "additional" },
+                        anotherSchema: { type: "string", default: "another" }
+                    }
+                });
+            });
+        });
+    });
+
     describe("object - recursively resolve dynamic properties", () => {
         it("should reduce allOf and oneOf", () => {
             const node = compileSchema({

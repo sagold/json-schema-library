@@ -115,6 +115,7 @@ export type SchemaNode = {
     allOf?: SchemaNode[];
     anyOf?: SchemaNode[];
     contains?: SchemaNode;
+    dependencies?: Record<string, SchemaNode | boolean | string[]>;
     dependentSchemas?: Record<string, SchemaNode | boolean>;
     else?: SchemaNode;
     if?: SchemaNode;

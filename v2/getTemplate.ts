@@ -185,16 +185,20 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
             });
         }
 
-        if (isObject(node.schema.dependencies)) {
-            Object.keys(node.schema.dependencies).forEach((propertyName) => {
-                const dependencies = node.schema.dependencies[propertyName];
-                if (getValue(d, propertyName) !== undefined && Array.isArray(dependencies)) {
-                    dependencies.forEach((addProperty) => {
+        if (isObject(node.dependencies)) {
+            Object.keys(node.dependencies).forEach((propertyName) => {
+                const propertyValue = node.dependencies[propertyName];
+                const hasValue = getValue(d, propertyName) !== undefined;
+                if (hasValue && Array.isArray(propertyValue)) {
+                    propertyValue.forEach((addProperty) => {
                         const propertyNode = node.get(addProperty, d);
                         if (isSchemaNode(propertyNode)) {
                             d[addProperty] = propertyNode.getTemplate(getValue(d, addProperty), opts);
                         }
                     });
+                } else if (d[propertyName] !== undefined && isSchemaNode(propertyValue)) {
+                    const dependencyData = propertyValue.getTemplate(data ?? d, opts);
+                    Object.assign(d, dependencyData);
                 }
                 // if false and removeInvalidData => remove from data
             });
