@@ -7,7 +7,7 @@ import sanitizeErrors from "./utils/sanitizeErrors";
 import { isJsonError, JsonError, JsonSchema } from "../lib/types";
 import { joinId } from "./utils/joinId";
 import { omit } from "../lib/utils/omit";
-import { SchemaNode, JsonSchemaReducerParams, isSchemaNode } from "./types";
+import { SchemaNode, JsonSchemaReducerParams, isSchemaNode, Context } from "./types";
 import { strict as assert } from "assert";
 import { getTemplate } from "./getTemplate";
 import { join, split } from "@sagold/json-pointer";
@@ -199,18 +199,15 @@ const NODE_METHODS: Pick<
     validate(data: unknown, pointer = "#", path = []) {
         // before running validation, we need to resolve ref and recompile for any
         // newly resolved schema properties - but this should be done for refs, etc only
-        path.push({
-            pointer,
-            node: this as SchemaNode
-        });
-
         const node = this as SchemaNode;
+        path.push({ pointer, node });
 
         const errors: JsonError[] = [];
         // @ts-expect-error untyped boolean schema
         if (node.schema === true) {
             return errors;
         }
+
         // @ts-expect-error untyped boolean schema
         if (node.schema === false) {
             return [
@@ -302,7 +299,7 @@ const NODE_METHODS: Pick<
  * wrapping each schema with utilities and as much preevaluation is possible. Each
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
-export function compileSchema(schema: JsonSchema) {
+export function compileSchema(schema: JsonSchema, remoteContext?: Context) {
     assert(schema !== undefined, "schema missing");
 
     // # $vocabulary
@@ -355,8 +352,9 @@ export function compileSchema(schema: JsonSchema) {
     node.context = {
         remotes: {},
         anchors: {},
-        refs: {},
         ids: {},
+        ...(remoteContext ?? {}),
+        refs: {},
         rootNode: node,
         VERSION: draft.VERSION,
         PARSER: draft.PARSER,

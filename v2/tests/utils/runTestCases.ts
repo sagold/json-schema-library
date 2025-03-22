@@ -3,15 +3,22 @@ import { DraftVersion, FeatureTest, getDraftTests, Setup } from "./getDraftTests
 import { addRemotes } from "./addRemotes";
 import { compileSchema } from "../../compileSchema";
 import { isObject } from "../../../lib/utils/isObject";
+import { SchemaNode } from "../../types";
 
 let measurements = {
     start: 0,
     compileDuration: 0,
     validationDuration: 0,
-    end: 0
+    testCount: 0,
+    end: 0,
+    max: {
+        duration: 0,
+        title: "",
+        schema: {}
+    }
 };
 
-function runTestCase(setup: Setup, tc: FeatureTest) {
+function runTestCase(setup: Setup, tc: FeatureTest, remotes: SchemaNode) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
             const $schema = setup.metaSchema.$id ?? setup.metaSchema.id;
@@ -33,13 +40,20 @@ function runTestCase(setup: Setup, tc: FeatureTest) {
                             );
                         }
                         const startCompileTime = Date.now();
-                        const node = compileSchema(schema);
-                        addRemotes(node, [setup.metaSchema, ...(setup.metaSchemaList ?? [])], $schema);
+                        const node = compileSchema(schema, remotes.context);
+                        // addRemotes(node, [setup.metaSchema, ...(setup.metaSchemaList ?? [])], $schema);
                         measurements.compileDuration += Date.now() - startCompileTime;
                         const startTime = Date.now();
                         const errors = node.validate(testData.data);
                         expect(errors.length === 0).to.eq(testData.valid);
-                        measurements.validationDuration += Date.now() - startTime;
+                        const duration = Date.now() - startTime;
+                        measurements.validationDuration += duration;
+                        if (measurements.max.duration < duration) {
+                            measurements.max.duration = duration;
+                            measurements.max.title = testData.description;
+                            measurements.max.schema = schema;
+                        }
+                        measurements.testCount++;
                     });
                 });
             });
@@ -48,11 +62,21 @@ function runTestCase(setup: Setup, tc: FeatureTest) {
 }
 
 export default function runAllTestCases(setup: Setup) {
+    const remotes = compileSchema({});
+    const $schema = setup.metaSchema.$id ?? setup.metaSchema.id;
+    addRemotes(remotes, [setup.metaSchema, ...(setup.metaSchemaList ?? [])], $schema);
+
     measurements = {
         start: Date.now(),
         validationDuration: 0,
         compileDuration: 0,
-        end: 0
+        testCount: 0,
+        end: 0,
+        max: {
+            duration: 0,
+            title: "",
+            schema: {}
+        }
     };
 
     // retrieve draft name from metaschema id
@@ -77,7 +101,7 @@ export default function runAllTestCases(setup: Setup) {
                 }
                 return runTestCase;
             })
-            .forEach((tc) => runTestCase(setup, tc));
+            .forEach((tc) => runTestCase(setup, tc, remotes));
 
         after(() => {
             measurements.end = Date.now();
@@ -91,8 +115,11 @@ export default function runAllTestCases(setup: Setup) {
                 "ms",
                 "time validations:",
                 measurements.validationDuration,
-                "ms"
+                "ms",
+                "average validation time:",
+                measurements.validationDuration / measurements.testCount
             );
+            console.log("max time:", measurements.max);
         });
     });
 }
