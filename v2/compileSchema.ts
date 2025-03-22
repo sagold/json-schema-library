@@ -120,8 +120,11 @@ const NODE_METHODS: Pick<
 
         const referencedNode = node.resolveRef({ path });
         if (referencedNode !== node) {
-            const ref = referencedNode.get(key, data, options);
-            return ref;
+            return referencedNode.get(key, data, options);
+        }
+
+        if (options.withSchemaWarning === true) {
+            return node.errors.schemaWarning({ pointer, value: data, schema: node.schema, key });
         }
     },
 

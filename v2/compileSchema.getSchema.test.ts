@@ -42,11 +42,11 @@ describe("compileSchema : getSchema", () => {
             assert.deepEqual(result.schema, { name: "title", type: "string" });
         });
 
-        it.skip("should return `schema-warning` for unknown, but valid property", () => {
-            // const node = compileSchema({ type: "object" });
-            // const result = node.getSchema("#/title", undefined, { withSchemaWarning: true });
-            // assert(isJsonError(result));
-            // assert.deepEqual(result, { code: "schema-warning", type: "error" });
+        it("should return `schema-warning` for unknown, but valid property", () => {
+            const node = compileSchema({ type: "object" });
+            const result = node.getSchema("#/title", undefined, { withSchemaWarning: true });
+            assert(isJsonError(result));
+            assert.deepEqual(pick(result, "code", "type"), { code: "schema-warning", type: "error" });
         });
 
         it("should return `undefined` for unknown, but valid property", () => {
@@ -365,7 +365,7 @@ describe("compileSchema : getSchema", () => {
             assert.deepEqual(result.schema, { name: "target", type: "string" });
         });
 
-        it.skip("should return schema for matching 'oneOf' item", () => {
+        it("should return schema for matching 'oneOf' item", () => {
             const node = compileSchema({
                 type: "array",
                 items: {

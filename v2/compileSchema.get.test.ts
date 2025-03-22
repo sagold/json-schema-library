@@ -1,6 +1,6 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
-import { isSchemaNode, ValidationPath } from "./types";
+import { isSchemaNode } from "./types";
 import { isJsonError } from "../lib/types";
 
 describe("compileSchema : get", () => {
