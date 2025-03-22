@@ -49,7 +49,7 @@ export function unevaluatedItemsValidator({ schema, validators }: SchemaNode): v
         // "unevaluatedItems with nested items"
         for (let i = 0; i < data.length; i += 1) {
             const value = data[i];
-            const child = node.get(i, data, path);
+            const child = node.get(i, data, { path });
             // console.log(`CHILD '${i}':`, data[i], "=>", child?.schema);
 
             if (isSchemaNode(child)) {

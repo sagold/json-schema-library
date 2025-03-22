@@ -162,13 +162,12 @@ describe("compileSchema : get", () => {
         });
 
         it("should return matching oneOf schema with `additionalProperties=false`", () => {
-            const path: ValidationPath = [];
             const node = compileSchema({
                 oneOf: [
                     { properties: { title: { type: "string" } }, additionalProperties: false },
                     { properties: { title: { type: "number" } }, additionalProperties: false }
                 ]
-            }).get("title", { title: "" }, path);
+            }).get("title", { title: "" });
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
             assert.deepEqual(node.schema, { type: "string" });

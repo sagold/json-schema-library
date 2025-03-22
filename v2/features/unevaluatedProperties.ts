@@ -43,7 +43,7 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
     const errors: JsonError[] = [];
     for (let i = 0; i < unevaluated.length; i += 1) {
         const propertyName = unevaluated[i];
-        const child = node.get(propertyName, data, path);
+        const child = node.get(propertyName, data, { path });
 
         if (isSchemaNode(child)) {
             if (child.validate(data[propertyName], `${pointer}/${propertyName}`, path).length > 0) {

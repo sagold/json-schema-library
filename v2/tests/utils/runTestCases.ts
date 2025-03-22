@@ -4,6 +4,13 @@ import { addRemotes } from "./addRemotes";
 import { compileSchema } from "../../compileSchema";
 import { isObject } from "../../../lib/utils/isObject";
 
+let measurements = {
+    start: 0,
+    compileDuration: 0,
+    validationDuration: 0,
+    end: 0
+};
+
 function runTestCase(setup: Setup, tc: FeatureTest) {
     describe(`${tc.name}${tc.optional ? " (optional)" : ""}`, () => {
         tc.testCases.forEach((testCase) => {
@@ -25,10 +32,14 @@ function runTestCase(setup: Setup, tc: FeatureTest) {
                                 JSON.stringify(testData.data, null, 2)
                             );
                         }
+                        const startCompileTime = Date.now();
                         const node = compileSchema(schema);
                         addRemotes(node, [setup.metaSchema, ...(setup.metaSchemaList ?? [])], $schema);
+                        measurements.compileDuration += Date.now() - startCompileTime;
+                        const startTime = Date.now();
                         const errors = node.validate(testData.data);
                         expect(errors.length === 0).to.eq(testData.valid);
+                        measurements.validationDuration += Date.now() - startTime;
                     });
                 });
             });
@@ -37,6 +48,13 @@ function runTestCase(setup: Setup, tc: FeatureTest) {
 }
 
 export default function runAllTestCases(setup: Setup) {
+    measurements = {
+        start: Date.now(),
+        validationDuration: 0,
+        compileDuration: 0,
+        end: 0
+    };
+
     // retrieve draft name from metaschema id
     const draftName = (setup.metaSchema.$id ?? setup.metaSchema.id)
         .match(/draft[-/][^/]*/)
@@ -60,5 +78,21 @@ export default function runAllTestCases(setup: Setup) {
                 return runTestCase;
             })
             .forEach((tc) => runTestCase(setup, tc));
+
+        after(() => {
+            measurements.end = Date.now();
+            console.log(
+                "\n",
+                "time overall:",
+                measurements.end - measurements.start,
+                "ms",
+                "time compile (with remotes):",
+                measurements.compileDuration,
+                "ms",
+                "time validations:",
+                measurements.validationDuration,
+                "ms"
+            );
+        });
     });
 }

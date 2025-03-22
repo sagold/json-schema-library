@@ -7,7 +7,7 @@ import sanitizeErrors from "./utils/sanitizeErrors";
 import { isJsonError, JsonError, JsonSchema } from "../lib/types";
 import { joinId } from "./utils/joinId";
 import { omit } from "../lib/utils/omit";
-import { SchemaNode, JsonSchemaReducerParams, ValidationPath, isSchemaNode } from "./types";
+import { SchemaNode, JsonSchemaReducerParams, isSchemaNode } from "./types";
 import { strict as assert } from "assert";
 import { getTemplate } from "./getTemplate";
 import { join, split } from "@sagold/json-pointer";
@@ -71,27 +71,35 @@ const NODE_METHODS: Pick<
         return node;
     },
 
-    getSchema(pointer: string, data?: unknown, path?: ValidationPath) {
+    getSchema(pointer, data, options = {}) {
+        options.path = options.path ?? [];
+        options.withSchemaWarning = options.withSchemaWarning ?? false;
+        options.pointer = options.pointer ?? "#";
+
         const keys = split(pointer);
         if (keys.length === 0) {
-            return this.resolveRef({ path });
+            return this.resolveRef(options);
         }
         let currentPointer = "#";
         let node = this as SchemaNode;
         for (let i = 0, l = keys.length; i < l; i += 1) {
             currentPointer = `${currentPointer}/${keys[i]}`;
-            const nextNode = node.get(keys[i], data, path, currentPointer);
-            // console.log("get", data, "=>", keys[i], nextNode.schema ?? JSON.stringify(nextNode, null, 2));
+            const nextNode = node.get(keys[i], data, { ...options, pointer: currentPointer });
             if (!isSchemaNode(nextNode)) {
                 return nextNode;
             }
             data = getValue(data, keys[i]);
             node = nextNode;
         }
-        return node.resolveRef({ path });
+        return node.resolveRef(options);
     },
 
-    get(key: string | number, data?: unknown, path?: ValidationPath, pointer?: "#") {
+    get(key, data, options = {}) {
+        options.path = options.path ?? [];
+        options.withSchemaWarning = options.withSchemaWarning ?? false;
+        options.pointer = options.pointer ?? "#";
+        const { path, pointer } = options;
+
         let node = this as SchemaNode;
         if (node.reducers.length) {
             const result = node.reduce({ data, key, path, pointer });
@@ -104,17 +112,15 @@ const NODE_METHODS: Pick<
         }
 
         for (const resolver of node.resolvers) {
-            // console.log("resolve", resolver.name, node.schema);
             const schemaNode = resolver({ data, key, node });
             if (schemaNode) {
-                // console.log("schema node", schemaNode);
                 return schemaNode;
             }
         }
 
         const referencedNode = node.resolveRef({ path });
         if (referencedNode !== node) {
-            const ref = referencedNode.get(key, data, path);
+            const ref = referencedNode.get(key, data, options);
             return ref;
         }
     },
