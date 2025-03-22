@@ -8,10 +8,10 @@ export function parseType(node: SchemaNode) {
 }
 
 reduceType.toJSON = () => "reduceType";
-function reduceType({ node, data }: JsonSchemaReducerParams): undefined | SchemaNode {
+function reduceType({ node, pointer, data }: JsonSchemaReducerParams): undefined | SchemaNode {
     const dataType = getJsonSchemaType(data, node.schema.type);
     if (dataType !== "undefined" && Array.isArray(node.schema.type) && node.schema.type.includes(dataType)) {
-        return node.compileSchema({ ...node.schema, type: dataType }, node.spointer);
+        return node.compileSchema({ ...node.schema, pointer, type: dataType }, node.spointer);
     }
     return undefined;
 }
@@ -45,6 +45,7 @@ function validateType({ node, data, pointer }: JsonSchemaValidatorParams) {
     ) {
         return;
     }
+
     return node.errors.typeError({
         value: data,
         received: dataType,

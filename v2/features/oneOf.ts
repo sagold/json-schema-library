@@ -19,6 +19,10 @@ export function parseOneOf(node: SchemaNode) {
 
 reduceOneOf.toJSON = () => "reduceOneOf";
 function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
+    // if (pointer == null) {
+    //     throw new Error("undefined pointer");
+    // }
+
     // !keyword: oneOfProperty
     // an additional <DECLARATOR_ONEOF> (default `oneOfProperty`) on the schema will exactly determine the
     // oneOf value (if set in data)
@@ -29,7 +33,7 @@ function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     const matches = [];
     const errors: JsonError[] = [];
     for (let i = 0; i < node.oneOf.length; i += 1) {
-        const validationErrors = node.oneOf[i].validate(data);
+        const validationErrors = node.oneOf[i].validate(data, pointer);
         if (validationErrors.length === 0) {
             matches.push({ index: i, node: node.oneOf[i] });
         } else {
@@ -90,7 +94,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaR
             });
         }
 
-        const result = sanitizeErrors(resultNode.validate(oneOfValue));
+        const result = sanitizeErrors(resultNode.validate(oneOfValue, pointer));
         // result = result.filter(errorOrPromise);
         if (result.length > 0) {
             errors.push(...result);

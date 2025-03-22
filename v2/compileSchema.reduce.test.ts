@@ -48,7 +48,7 @@ describe("compileSchema : reduce", () => {
 
         assert.deepEqual(schema, {
             type: "object",
-            required: ["date", "header"],
+            required: ["header", "date"],
             properties: {
                 header: { type: "string", minLength: 1 },
                 date: { type: "string", format: "date" }

@@ -1,8 +1,34 @@
 import { JsonError } from "../../lib/types";
-import { SchemaNode } from "../types";
+import { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 import { JsonSchemaResolverParams, JsonSchemaValidatorParams } from "../types";
 import { isObject } from "../../lib/utils/isObject";
+
+type Feature = {
+    id: string;
+    keyword: string;
+
+    parse?: (node: SchemaNode) => void;
+
+    addResolve?: (node: SchemaNode) => boolean;
+    resolve?: JsonSchemaResolver;
+
+    addValidate?: (node: SchemaNode) => boolean;
+    validate?: JsonSchemaValidator;
+
+    addReduce?: (node: SchemaNode) => boolean;
+    reduce?: JsonSchemaReducer;
+};
+
+export const feature: Feature = {
+    id: "property",
+    keyword: "properties",
+    parse: parseProperties,
+    addResolve: (node: SchemaNode) => node.properties != null,
+    resolve: propertyResolver,
+    addValidate: (node: SchemaNode) => node.properties != null,
+    validate: validateProperties
+};
 
 propertyResolver.toJSON = () => "propertyResolver";
 function propertyResolver({ node, key }: JsonSchemaResolverParams) {
@@ -34,7 +60,7 @@ export function propertiesValidator({ properties, validators }: SchemaNode) {
 }
 
 validateProperties.toJSON = () => "properties";
-function validateProperties({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
+function validateProperties({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     if (!isObject(data)) {
         return;
     }

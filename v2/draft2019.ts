@@ -71,11 +71,11 @@ export const PARSER: ((node: SchemaNode) => void)[] = [
     parseOneOf,
     parsePatternProperties,
     parseProperties,
+    parseType,
     parseUnevaluatedItems,
     parseUnevaluatedProperties,
-    parseAdditionalProperties, // @attention has to come after other object-property parser
     parseAdditionalItems, // @attention has to come after other object-property parser
-    parseType
+    parseAdditionalProperties // @attention has to come after other object-property parser
 ].map((func) => {
     // @ts-expect-error extended function for debugging purposes
     func.toJSON = () => func.name;
@@ -83,42 +83,42 @@ export const PARSER: ((node: SchemaNode) => void)[] = [
 });
 
 export const VALIDATORS: ((node: SchemaNode) => void)[] = [
-    additionalItemsValidator,
-    additionalPropertiesValidator,
     allOfValidator,
     anyOfValidator,
-    containsValidator,
     constValidator,
+    containsValidator,
     dependenciesValidator, // optional support for old draft-version
     dependentRequiredValidator, // draft-2019: new
     dependentSchemasValidator, // draft-2019: new
     enumValidator,
+    exclusiveMaximumValidator,
     exclusiveMinimumValidator,
     formatValidator,
-    exclusiveMaximumValidator,
     ifThenElseValidator,
     itemsValidator,
+    maximumValidator,
     maxItemsValidator,
     maxLengthValidator,
     maxPropertiesValidator,
+    minimumValidator,
     minItemsValidator,
     minLengthValidator,
     minPropertiesValidator,
     multipleOfValidator,
-    patternValidator,
-    propertyNamesValidator,
-    propertiesValidator,
-    patternPropertiesValidator,
     notValidator,
-    minimumValidator,
-    maximumValidator,
+    patternPropertiesValidator,
+    patternValidator,
+    propertiesValidator,
+    propertyNamesValidator,
+    refValidator,
     requiredValidator,
-    validateOneOf,
     typeValidator,
     unevaluatedItemsValidator,
     unevaluatedPropertiesValidator,
     uniqueItemsValidator,
-    refValidator
+    validateOneOf,
+    additionalItemsValidator,
+    additionalPropertiesValidator
 ].map((func) => {
     // @ts-expect-error extended function for debugging purposes
     func.toJSON = () => func.name;

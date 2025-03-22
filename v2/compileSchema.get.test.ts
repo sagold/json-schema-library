@@ -1,6 +1,6 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
-import { isSchemaNode } from "./types";
+import { isSchemaNode, ValidationPath } from "./types";
 import { isJsonError } from "../lib/types";
 
 describe("compileSchema : get", () => {
@@ -159,6 +159,19 @@ describe("compileSchema : get", () => {
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
             assert.deepEqual(node.schema, { type: "string", maxLength: 1 });
+        });
+
+        it("should return matching oneOf schema with `additionalProperties=false`", () => {
+            const path: ValidationPath = [];
+            const node = compileSchema({
+                oneOf: [
+                    { properties: { title: { type: "string" } }, additionalProperties: false },
+                    { properties: { title: { type: "number" } }, additionalProperties: false }
+                ]
+            }).get("title", { title: "" }, path);
+            assert(isSchemaNode(node), "should have returned a valid schema property node");
+
+            assert.deepEqual(node.schema, { type: "string" });
         });
 
         it("should return error when multiple oneOf-items match", () => {

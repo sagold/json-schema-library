@@ -6,6 +6,12 @@ interface SchemaNodeCB {
     (...args: unknown[]): void;
 }
 
+export function sortCb(a: SchemaNodeCB, b: SchemaNodeCB) {
+    const aString = a?.toJSON?.() ?? a.name ?? "";
+    const bString = b?.toJSON?.() ?? b.name ?? "";
+    return bString.localeCompare(aString); // inverted
+}
+
 export function removeDuplicates(fun: SchemaNodeCB, funIndex: number, list: ((...args: unknown[]) => void)[]) {
     if (fun == null || list.indexOf(fun) !== funIndex) {
         return false;
@@ -63,10 +69,11 @@ export function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): Sch
         ...arraySelection,
         schema: mergeSchema(a.schema, b.schema, ...omit),
         parent: a.parent,
-        resolvers: a.resolvers.concat(b.resolvers).filter(removeDuplicates),
-        reducers: a.reducers.concat(b.reducers).filter(removeDuplicates),
-        validators: a.validators.concat(b.validators).filter(removeDuplicates),
-        getDefaultData: a.getDefaultData.concat(b.getDefaultData).filter(removeDuplicates),
+        // @todo sort result
+        resolvers: a.resolvers.concat(b.resolvers).filter(removeDuplicates).sort(sortCb),
+        reducers: a.reducers.concat(b.reducers).filter(removeDuplicates).sort(sortCb),
+        validators: a.validators.concat(b.validators).filter(removeDuplicates).sort(sortCb),
+        getDefaultData: a.getDefaultData.concat(b.getDefaultData).filter(removeDuplicates).sort(sortCb),
 
         additionalItems: mergeNode(a.additionalItems, b.additionalItems),
         additionalProperties: mergeNode(a.additionalProperties, b.additionalProperties),

@@ -10,8 +10,9 @@ import { omit } from "../lib/utils/omit";
 import { SchemaNode, JsonSchemaReducerParams, ValidationPath, isSchemaNode } from "./types";
 import { strict as assert } from "assert";
 import { getTemplate } from "./getTemplate";
-import { join } from "@sagold/json-pointer";
+import { join, split } from "@sagold/json-pointer";
 import { mergeNode } from "./mergeNode";
+import { getValue } from "./utils/getValue";
 
 const DYNAMIC_PROPERTIES: string[] = [
     "$ref",
@@ -31,7 +32,16 @@ const DYNAMIC_PROPERTIES: string[] = [
 
 const NODE_METHODS: Pick<
     SchemaNode,
-    "get" | "getTemplate" | "reduce" | "resolveRef" | "toJSON" | "addRemote" | "compileSchema" | "validate" | "errors"
+    | "get"
+    | "getSchema"
+    | "getTemplate"
+    | "reduce"
+    | "resolveRef"
+    | "toJSON"
+    | "addRemote"
+    | "compileSchema"
+    | "validate"
+    | "errors"
 > = {
     errors: draft2019.ERRORS,
 
@@ -61,10 +71,30 @@ const NODE_METHODS: Pick<
         return node;
     },
 
-    get(key: string | number, data?: unknown, path?: ValidationPath) {
+    getSchema(pointer: string, data?: unknown, path?: ValidationPath) {
+        const keys = split(pointer);
+        if (keys.length === 0) {
+            return this.resolveRef({ path });
+        }
+        let currentPointer = "#";
+        let node = this as SchemaNode;
+        for (let i = 0, l = keys.length; i < l; i += 1) {
+            currentPointer = `${currentPointer}/${keys[i]}`;
+            const nextNode = node.get(keys[i], data, path, currentPointer);
+            // console.log("get", data, "=>", keys[i], nextNode.schema ?? JSON.stringify(nextNode, null, 2));
+            if (!isSchemaNode(nextNode)) {
+                return nextNode;
+            }
+            data = getValue(data, keys[i]);
+            node = nextNode;
+        }
+        return node.resolveRef({ path });
+    },
+
+    get(key: string | number, data?: unknown, path?: ValidationPath, pointer?: "#") {
         let node = this as SchemaNode;
         if (node.reducers.length) {
-            const result = node.reduce({ data, key, path });
+            const result = node.reduce({ data, key, path, pointer });
             if (isJsonError(result)) {
                 return result;
             }
@@ -74,8 +104,10 @@ const NODE_METHODS: Pick<
         }
 
         for (const resolver of node.resolvers) {
+            // console.log("resolve", resolver.name, node.schema);
             const schemaNode = resolver({ data, key, node });
             if (schemaNode) {
+                // console.log("schema node", schemaNode);
                 return schemaNode;
             }
         }
