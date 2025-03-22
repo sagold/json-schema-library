@@ -29,10 +29,8 @@ import { requiredValidator } from "./features/required";
 import { SchemaNode } from "./types";
 import { parseType, typeValidator } from "./features/type";
 import { uniqueItemsValidator } from "./features/uniqueItems";
-import { getObjectData } from "./features/object";
 import ERRORS from "../lib/validation/errors";
 import { dependenciesValidator, parseDependencies } from "./features/dependencies";
-import { getNumberData, getStringData } from "./features/default";
 
 const VERSION = "draft-04";
 export { ERRORS, VERSION };
@@ -122,11 +120,3 @@ export const VALIDATORS: ((node: SchemaNode) => void)[] = [
     skipIfRef.toJSON = () => func.name;
     return skipIfRef;
 });
-
-export const DEFAULT_DATA: ((node: SchemaNode) => void)[] = [getObjectData, getStringData, getNumberData].map(
-    (func) => {
-        // @ts-expect-error extended function for debugging purposes
-        func.toJSON = () => func.name;
-        return func;
-    }
-);

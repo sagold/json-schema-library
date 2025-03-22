@@ -103,6 +103,18 @@ export function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOpt
     let currentNode = node;
     let defaultData = data;
 
+    if (Array.isArray(node.schema.enum) && node.schema.enum.length > 0) {
+        if (data === undefined) {
+            return node.schema.enum[0];
+        }
+    }
+
+    if (node.schema.default !== undefined) {
+        if (defaultData === undefined) {
+            defaultData = node.schema.default;
+        }
+    }
+
     // @feature allOf
     if (currentNode.allOf?.length) {
         currentNode.allOf.forEach((partialNode) => {

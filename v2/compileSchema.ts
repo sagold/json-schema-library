@@ -47,8 +47,6 @@ const NODE_METHODS: Pick<
 
     compileSchema(schema: JsonSchema, spointer: string = this.spointer, schemaId?: string) {
         const nextFragment = spointer.split("/$ref")[0];
-
-        // assert(schema !== undefined, "schema missing");
         const parentNode = this as SchemaNode;
         const node: SchemaNode = {
             lastIdPointer: parentNode.lastIdPointer, // ref helper
@@ -59,14 +57,12 @@ const NODE_METHODS: Pick<
             reducers: [],
             resolvers: [],
             validators: [],
-            getDefaultData: [],
             schema,
             ...NODE_METHODS
         };
 
         node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
         node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
-        node.context.DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
 
         return node;
     },
@@ -131,15 +127,8 @@ const NODE_METHODS: Pick<
     getTemplate(data?, options?) {
         const { cache, recursionLimit } = options ?? {};
         const opts = { ...(options ?? {}), cache: cache ?? {}, recursionLimit: recursionLimit ?? 1 };
-
         const node = this as SchemaNode;
-        let defaultData = data;
-        // collects default data of current node
-        // return matching enum[0], oneOf, anyOf[0], allOf, depdendentSchema, etc
-        for (const getDefaultData of node.getDefaultData) {
-            defaultData = getDefaultData({ data: defaultData, node, options: opts }) ?? defaultData;
-        }
-        return getTemplate(node, defaultData, opts);
+        return getTemplate(node, data, opts);
     },
 
     reduce({ data, pointer, key, path }: JsonSchemaReducerParams) {
@@ -176,8 +165,6 @@ const NODE_METHODS: Pick<
 
                 // compilation result for data of current schemain order to merge results, we rebuild
                 // node from schema alternatively we would need to merge by node-property
-                // // @ts-expect-error bool schema
-                // schema = mergeSchema(schema ?? {}, result.schema);
                 workingNode = mergeNode(workingNode, result);
             }
         }
@@ -247,7 +234,6 @@ const NODE_METHODS: Pick<
             reducers: [],
             resolvers: [],
             validators: [],
-            getDefaultData: [],
             schema,
             ...NODE_METHODS
         } as SchemaNode;
@@ -277,13 +263,11 @@ const NODE_METHODS: Pick<
             rootNode: node,
             VERSION: draft.VERSION,
             PARSER: draft.PARSER,
-            VALIDATORS: draft.VALIDATORS,
-            DEFAULT_DATA: draft.DEFAULT_DATA
+            VALIDATORS: draft.VALIDATORS
         };
         node.context.remotes[joinId(url)] = node;
         node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
         node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
-        node.context.DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
 
         return this;
     },
@@ -334,7 +318,6 @@ export function compileSchema(schema: JsonSchema, remoteContext?: Context) {
         reducers: [],
         resolvers: [],
         validators: [],
-        getDefaultData: [],
         schema,
         ...NODE_METHODS
     } as SchemaNode;
@@ -361,13 +344,11 @@ export function compileSchema(schema: JsonSchema, remoteContext?: Context) {
         rootNode: node,
         VERSION: draft.VERSION,
         PARSER: draft.PARSER,
-        VALIDATORS: draft.VALIDATORS,
-        DEFAULT_DATA: draft.DEFAULT_DATA
+        VALIDATORS: draft.VALIDATORS
     };
     node.context.remotes[schema.$id ?? "#"] = node;
     node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
     node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
-    node.context.DEFAULT_DATA.forEach((registerGetDefaultData) => registerGetDefaultData(node));
 
     return node;
 }

@@ -1,24 +1,8 @@
 import { JsonError } from "../../lib/types";
-import { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, SchemaNode } from "../types";
+import { Feature, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 import { JsonSchemaResolverParams, JsonSchemaValidatorParams } from "../types";
 import { isObject } from "../../lib/utils/isObject";
-
-type Feature = {
-    id: string;
-    keyword: string;
-
-    parse?: (node: SchemaNode) => void;
-
-    addResolve?: (node: SchemaNode) => boolean;
-    resolve?: JsonSchemaResolver;
-
-    addValidate?: (node: SchemaNode) => boolean;
-    validate?: JsonSchemaValidator;
-
-    addReduce?: (node: SchemaNode) => boolean;
-    reduce?: JsonSchemaReducer;
-};
 
 export const feature: Feature = {
     id: "property",

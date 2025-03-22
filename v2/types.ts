@@ -3,6 +3,22 @@ import { CreateError } from "../lib/utils/createCustomError";
 import { isObject } from "../lib/utils/isObject";
 import { TemplateOptions } from "./getTemplate";
 
+export type Feature = {
+    id: string;
+    keyword: string;
+
+    parse?: (node: SchemaNode) => void;
+
+    addResolve?: (node: SchemaNode) => boolean;
+    resolve?: JsonSchemaResolver;
+
+    addValidate?: (node: SchemaNode) => boolean;
+    validate?: JsonSchemaValidator;
+
+    addReduce?: (node: SchemaNode) => boolean;
+    reduce?: JsonSchemaReducer;
+};
+
 export type JsonSchemaReducerParams = {
     data: unknown;
     /** optional key to used to resolve by property without having data */
@@ -44,8 +60,6 @@ export type Context = {
     PARSER: ((node: SchemaNode) => void)[];
     /** json-schema validation for this json-schema (root-schema and its child nodes) */
     VALIDATORS: ((node: SchemaNode) => void)[];
-    /** json-schema default-data resolver for this json-schema (root-schema and its child nodes) */
-    DEFAULT_DATA: ((node: SchemaNode) => void)[];
 };
 
 export function isSchemaNode(value: unknown): value is SchemaNode {
@@ -60,6 +74,14 @@ export type ValidationPath = {
 type GetSchemaOptions = {
     path?: ValidationPath;
     pointer?: string;
+    /**
+     *  Get always returns `undefined` for valid data, but undefined schema.
+     *  Using `withSchemaWarning: true` will return an error instead:
+     *
+     *  ```json
+     *  { type: "error", code: "schema-warning" }
+     *  ```
+     */
     withSchemaWarning?: boolean;
 };
 
@@ -109,7 +131,6 @@ export type SchemaNode = {
     validate: (data: unknown, pointer?: string, path?: ValidationPath) => JsonError[];
 
     // logic
-    getDefaultData: JsonSchemaDefaultDataResolver[];
     reducers: JsonSchemaReducer[];
     resolvers: JsonSchemaResolver[];
     validators: JsonSchemaValidator[];
