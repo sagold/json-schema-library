@@ -9,6 +9,7 @@
 -   reduce schema currently resolves to schema false if there is an error. This is required in unevaluatedProperties are returning an error is probably the right behaviour for reduce (@see v1 reduceSchema). So, add unevaluatedProperties without reduce?
 -   unevalutatedItems spec test merge order is different as defined (local is overriden by reference schema, but should be the other way)
 -   get (getSchema) must return undefined for missing schema (do not create schema based on data only)
+-   we consistently return undefined for allows but not specified schema
 
 ## context
 

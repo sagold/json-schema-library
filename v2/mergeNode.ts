@@ -7,7 +7,7 @@ interface SchemaNodeCB {
 }
 
 export function removeDuplicates(fun: SchemaNodeCB, funIndex: number, list: ((...args: unknown[]) => void)[]) {
-    if (list.indexOf(fun) !== funIndex) {
+    if (fun == null || list.indexOf(fun) !== funIndex) {
         return false;
     }
     const funName = fun.toJSON?.() ?? fun.name;
@@ -35,7 +35,7 @@ function mergeArray<T = unknown[]>(a?: T[], b?: T[]) {
     return a || b ? [...(a ?? []), ...(b ?? [])] : undefined;
 }
 
-export function mergeNode(a: SchemaNode, b?: SchemaNode): SchemaNode | undefined {
+export function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): SchemaNode | undefined {
     if (a == null || b == null) {
         return a || b;
     }
@@ -61,7 +61,7 @@ export function mergeNode(a: SchemaNode, b?: SchemaNode): SchemaNode | undefined
         ...a,
         ...b,
         ...arraySelection,
-        schema: mergeSchema(a.schema, b.schema),
+        schema: mergeSchema(a.schema, b.schema, ...omit),
         parent: a.parent,
         resolvers: a.resolvers.concat(b.resolvers).filter(removeDuplicates),
         reducers: a.reducers.concat(b.reducers).filter(removeDuplicates),

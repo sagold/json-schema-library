@@ -47,6 +47,9 @@ export function parseRef(node: SchemaNode) {
     // precompile reference
     if (node.schema.$ref) {
         node.ref = joinId(currentId, node.schema.$ref);
+        if (node.ref.startsWith("/")) {
+            node.ref = `#${node.ref}`;
+        }
     }
 }
 

@@ -43,18 +43,13 @@ export function reduceDependencies({ node, data, path }: JsonSchemaReducerParams
 
     let mergedSchema: JsonSchema;
     const { dependencies } = node;
-    Object.keys(data).forEach((propertyName) => {
-        if (dependencies[propertyName] == null) {
-            return;
-        }
+    Object.keys(dependencies).forEach((propertyName) => {
         mergedSchema = mergedSchema ?? { properties: {} };
         if (isSchemaNode(dependencies[propertyName])) {
             mergedSchema = mergeSchema(mergedSchema, dependencies[propertyName].schema);
-        } else if (Array.isArray(dependencies[propertyName])) {
+        } else if (Array.isArray(dependencies[propertyName]) && data[propertyName] !== undefined) {
             mergedSchema.required = mergedSchema.required ?? [];
             mergedSchema.required.push(...dependencies[propertyName]);
-        } else {
-            mergedSchema.properties[propertyName] = dependencies[propertyName];
         }
     });
 
@@ -99,10 +94,15 @@ function validateDependencies({ node, data, pointer = "#" }: JsonSchemaValidator
             dependencyErrors = propertyValue
                 .filter((dependency: any) => getValue(data, dependency) === undefined)
                 .map((missingProperty: any) =>
-                    node.errors.missingDependencyError({ missingProperty, pointer, schema: node.schema, value: data })
+                    node.errors.missingDependencyError({
+                        missingProperty,
+                        pointer: `${pointer}/${missingProperty}`,
+                        schema: node.schema,
+                        value: data
+                    })
                 );
         } else if (isSchemaNode(propertyValue)) {
-            dependencyErrors = propertyValue.validate(data);
+            dependencyErrors = propertyValue.validate(data, pointer);
         } else {
             throw new Error(`Invalid dependency definition for ${pointer}/${property}. Must be string[] or schema`);
         }

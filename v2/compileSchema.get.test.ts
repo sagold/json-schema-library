@@ -383,18 +383,17 @@ describe("step", () => {
             assert.equal(res, undefined);
         });
 
-        it.skip("should create schema for `additionalProperties=true`", () => {
+        it("should return undefined for schema matching `additionalProperties=true`", () => {
             const res = compileSchema({
                 type: "object",
                 additionalProperties: true
             }).get("any", { any: "i am valid" });
-
-            assert.deepEqual(res.schema, { type: "string" });
+            assert.deepEqual(res, undefined);
         });
 
-        it.skip("should treat `additionalProperties` as `true` per default", () => {
+        it("should treat `additionalProperties` as `true` per default", () => {
             const res = compileSchema({ type: "object" }).get("any", { any: "i am valid" });
-            assert.deepEqual(res.schema, { type: "string" });
+            assert.deepEqual(res, undefined);
         });
 
         it("should return an error if `additionalProperties=false` and property unknown", () => {

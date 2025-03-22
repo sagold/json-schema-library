@@ -105,7 +105,8 @@ const NODE_METHODS: Pick<
         const resolvedNode = { ...this.resolveRef({ pointer, path }) } as SchemaNode;
         // const resolvedSchema = mergeSchema(this.schema, resolvedNode?.schema);
         // const node = (this as SchemaNode).compileSchema(resolvedSchema, this.spointer, resolvedSchema.schemaId);
-        const node = mergeNode(this, resolvedNode);
+        const node = mergeNode(this, resolvedNode, "$ref");
+        // const node = resolvedNode;
 
         // @ts-expect-error bool schema
         if (node.schema === false) {
@@ -184,7 +185,8 @@ const NODE_METHODS: Pick<
         }
 
         for (const validate of node.validators) {
-            const result = validate({ node, data, pointer: "#", path });
+            // console.log("validator", validate.name);
+            const result = validate({ node, data, pointer, path });
             if (Array.isArray(result)) {
                 errors.push(...result);
             } else if (result) {
