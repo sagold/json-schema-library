@@ -690,3 +690,66 @@ describe("compileSchema.validate", () => {
         });
     });
 });
+
+describe("compileSchema.validate : format", () => {
+    describe("time", () => {
+        it("should validate HH:mm:ss-HH:mm", () => {
+            const errors = compileSchema({
+                type: "string",
+                format: "time"
+            }).validate("15:31:12-02:30");
+            assert.deepEqual(errors, []);
+        });
+
+        it("should validate HH:mm:ssZ", () => {
+            const errors = compileSchema({
+                type: "string",
+                format: "time"
+            }).validate("15:31:12Z");
+            assert.deepEqual(errors, []);
+        });
+
+        it("should not validate minutes above 59", () => {
+            const errors = compileSchema({
+                type: "string",
+                format: "time"
+            }).validate("15:60:12");
+            assert.equal(errors.length, 1);
+        });
+
+        it("should not validate seconds above 59", () => {
+            const errors = compileSchema({
+                type: "string",
+                format: "time"
+            }).validate("15:31:60");
+            assert.equal(errors.length, 1);
+        });
+
+        it("should not validate HH:mm", () => {
+            const errors = compileSchema({
+                type: "string",
+                format: "time"
+            }).validate("15:31");
+            assert.equal(errors.length, 1);
+        });
+    });
+
+    describe("url", () => {
+        it("should validate format url", () => {
+            const errors = compileSchema({
+                type: "string",
+                format: "url"
+            }).validate("https://developer.mozilla.org/en-US/");
+            assert.deepEqual(errors, []);
+        });
+
+        it("should return error UrlFormatError for invalid urls", () => {
+            const errors = compileSchema({
+                type: "string",
+                format: "url"
+            }).validate("123");
+            assert.equal(errors.length, 1);
+            assert.equal(errors[0].code, "format-urlerror");
+        });
+    });
+});
