@@ -6,6 +6,7 @@ interface SchemaNodeCB {
     (...args: unknown[]): void;
 }
 
+// dummy sorting validators in reverse (so that additional* is to the end)
 export function sortCb(a: SchemaNodeCB, b: SchemaNodeCB) {
     const aString = a?.toJSON?.() ?? a.name ?? "";
     const bString = b?.toJSON?.() ?? b.name ?? "";
@@ -69,7 +70,6 @@ export function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): Sch
         ...arraySelection,
         schema: mergeSchema(a.schema, b.schema, ...omit),
         parent: a.parent,
-        // @todo sort result
         resolvers: a.resolvers.concat(b.resolvers).filter(removeDuplicates).sort(sortCb),
         reducers: a.reducers.concat(b.reducers).filter(removeDuplicates).sort(sortCb),
         validators: a.validators.concat(b.validators).filter(removeDuplicates).sort(sortCb),
@@ -84,19 +84,8 @@ export function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): Sch
         propertyNames: mergeNode(a.propertyNames, b.propertyNames),
         unevaluatedProperties: mergeNode(a.unevaluatedProperties, b.unevaluatedProperties),
         unevaluatedItems: mergeNode(a.unevaluatedItems, b.unevaluatedItems),
-        // $defs?: Record<string, SchemaNode>;
         $defs: mergeObjects(a.$defs, b.$defs),
-        // allOf?: SchemaNode[];
-        // allOf: b.allOf ?? a.allOf, // mergeArray(a.allOf, b.allOf),
-        // anyOf?: SchemaNode[];
-        // anyOf: b.anyOf ?? a.anyOf, // mergeArray(a.anyOf, b.anyOf),
-        // dependentSchemas?: Record<string, SchemaNode | boolean>;
-        // dependentSchemas: mergeNode(a.dependentSchemas, b.dependentSchemas),
-        // oneOf?: SchemaNode[];
-        // oneOf: b.oneOf ?? a.oneOf,
-        // patternProperties?: { pattern: RegExp; node: SchemaNode }[];
-        patternProperties: mergeArray(a.patternProperties, b.patternProperties), // b.patternProperties ?? a.patternProperties,
-        // properties?: Record<string, SchemaNode>;
+        patternProperties: mergeArray(a.patternProperties, b.patternProperties),
         properties: mergeObjects(a.properties, b.properties)
     };
 
