@@ -1,10 +1,16 @@
-import { JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+
+export const exclusiveMinimumFeature: Feature = {
+    id: "exclusiveMinimum",
+    keyword: "exclusiveMinimum",
+    addValidate: ({ schema }) => schema.exclusiveMinimum != null && !isNaN(parseInt(schema.exclusiveMinimum)),
+    validate: validateExclusiveMinimum
+};
 
 export function exclusiveMinimumValidator(node: SchemaNode): void {
-    if (node.schema.exclusiveMinimum == null || isNaN(parseInt(node.schema.exclusiveMinimum))) {
-        return undefined;
+    if (exclusiveMinimumFeature.addValidate(node)) {
+        node.validators.push(exclusiveMinimumFeature.validate);
     }
-    node.validators.push(validateExclusiveMinimum);
 }
 
 validateExclusiveMinimum.toJSON = () => "exclusiveMinimum";

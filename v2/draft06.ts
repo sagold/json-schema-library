@@ -14,7 +14,6 @@ import { maxItemsValidator } from "./features/maxItems";
 import { maxPropertiesValidator } from "./features/maxProperties";
 import { minimumValidator } from "./features/minimum";
 import { minItemsValidator } from "./features/minItems";
-import { minLengthValidator, maxLengthValidator } from "./features/string";
 import { minPropertiesValidator } from "./features/minProperties";
 import { multipleOfValidator } from "./features/multipleOf";
 import { notValidator, parseNot } from "./features/not";
@@ -26,13 +25,15 @@ import { refValidator, parseRef } from "./features/draft06/ref";
 import { parseUnevaluatedItems, unevaluatedItemsValidator } from "./features/unevaluatedItems";
 import { parseUnevaluatedProperties, unevaluatedPropertiesValidator } from "./features/unevaluatedProperties";
 import { patternValidator } from "./features/pattern";
-import { propertyNamesValidator } from "./features/propertyNames";
+import { parsePropertyNames, propertyNamesValidator } from "./features/propertyNames";
 import { requiredValidator } from "./features/required";
 import { SchemaNode } from "./types";
 import { parseType, typeValidator } from "./features/type";
 import { uniqueItemsValidator } from "./features/uniqueItems";
 import ERRORS from "../lib/validation/errors";
 import { dependenciesValidator, parseDependencies } from "./features/dependencies";
+import { maxLengthValidator } from "./features/maxLength";
+import { minLengthValidator } from "./features/minLength";
 
 const VERSION = "draft-06";
 export { ERRORS, VERSION };
@@ -71,6 +72,7 @@ export const PARSER: ((node: SchemaNode) => void)[] = [
     parseDependencies,
     parsePatternProperties,
     parseProperties,
+    parsePropertyNames,
     parseUnevaluatedItems,
     parseUnevaluatedProperties,
     parseAdditionalProperties, // @attention has to come after other object-property parser

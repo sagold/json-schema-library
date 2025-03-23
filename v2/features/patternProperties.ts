@@ -1,8 +1,26 @@
 import { mergeSchema } from "../../lib/mergeSchema";
 import { JsonError, JsonSchema } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
-import { JsonSchemaReducerParams, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import {
+    Feature,
+    JsonSchemaReducerParams,
+    JsonSchemaResolverParams,
+    JsonSchemaValidatorParams,
+    SchemaNode
+} from "../types";
 import { getValue } from "../utils/getValue";
+
+export const patternPropertiesFeature: Feature = {
+    id: "patternProperties",
+    keyword: "patternProperties",
+    parse: parsePatternProperties,
+    addReduce: (node) => node.patternProperties != null,
+    reduce: reducePatternProperties,
+    addResolve: (node) => node.patternProperties != null,
+    resolve: patternPropertyResolver,
+    addValidate: (node) => node.patternProperties != null,
+    validate: validatePatternProperties
+};
 
 export function parsePatternProperties(node: SchemaNode) {
     const { schema } = node;
@@ -13,19 +31,21 @@ export function parsePatternProperties(node: SchemaNode) {
     if (patterns.length === 0) {
         return;
     }
-    node.patternProperties = [];
-    patterns.map((pattern) =>
-        node.patternProperties.push({
-            pattern: new RegExp(pattern),
-            node: node.compileSchema(
-                schema.patternProperties[pattern],
-                `${node.spointer}/patternProperties/${pattern}`,
-                `${node.schemaId}/patternProperties/${pattern}`
-            )
-        })
-    );
-    node.resolvers.push(patternPropertyResolver);
-    node.reducers.push(reducePatternProperties);
+    node.patternProperties = patterns.map((pattern) => ({
+        pattern: new RegExp(pattern),
+        node: node.compileSchema(
+            schema.patternProperties[pattern],
+            `${node.spointer}/patternProperties/${pattern}`,
+            `${node.schemaId}/patternProperties/${pattern}`
+        )
+    }));
+
+    if (patternPropertiesFeature.addReduce(node)) {
+        node.reducers.push(patternPropertiesFeature.reduce);
+    }
+    if (patternPropertiesFeature.addResolve(node)) {
+        node.reducers.push(patternPropertiesFeature.resolve);
+    }
 }
 
 patternPropertyResolver.toJSON = () => "patternProperty";
@@ -71,9 +91,9 @@ function reducePatternProperties({ node, data, key }: JsonSchemaReducerParams) {
     return node.compileSchema(mergedSchema, node.spointer);
 }
 
-export function patternPropertiesValidator({ schema, validators }: SchemaNode) {
-    if (isObject(schema.patternProperties)) {
-        validators.push(validatePatternProperties);
+export function patternPropertiesValidator(node: SchemaNode) {
+    if (patternPropertiesFeature.addValidate(node)) {
+        node.validators.push(patternPropertiesFeature.validate);
     }
 }
 

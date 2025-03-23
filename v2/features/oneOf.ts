@@ -1,5 +1,5 @@
 import { JsonError } from "../../lib/types";
-import { isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import settings from "../../lib/config/settings";
 import { getValue } from "../utils/getValue";
 import sanitizeErrors from "../utils/sanitizeErrors";
@@ -7,13 +7,32 @@ import { isObject } from "../../lib/utils/isObject";
 
 const { DECLARATOR_ONEOF } = settings;
 
+export const oneOfFeature: Feature = {
+    id: "oneOf",
+    keyword: "oneOf",
+    parse: parseOneOf,
+    addReduce: (node) => node.oneOf != null,
+    reduce: reduceOneOf,
+    addValidate: (node) => node.oneOf != null,
+    validate: oneOfValidator
+};
+
 export function parseOneOf(node: SchemaNode) {
     const { schema, spointer, schemaId } = node;
     if (Array.isArray(schema.oneOf) && schema.oneOf.length) {
         node.oneOf = schema.oneOf.map((s, index) =>
             node.compileSchema(s, `${spointer}/oneOf/${index}`, `${schemaId}/oneOf/${index}`)
         );
-        node.reducers.push(reduceOneOf);
+    }
+
+    if (oneOfFeature.addReduce(node)) {
+        node.reducers.push(oneOfFeature.reduce);
+    }
+}
+
+export function validateOneOf(node: SchemaNode): void {
+    if (oneOfFeature.addValidate(node)) {
+        node.validators.push(oneOfFeature.validate);
     }
 }
 
@@ -187,13 +206,6 @@ export function reduceOneOfFuzzy({ node, data, pointer, path }: JsonSchemaReduce
     }
 
     return oneOfResult;
-}
-
-export function validateOneOf({ schema, validators }: SchemaNode): void {
-    if (!Array.isArray(schema.oneOf) || !schema.oneOf.length) {
-        return;
-    }
-    validators.push(oneOfValidator);
 }
 
 oneOfValidator.toJSON = () => "oneOf";

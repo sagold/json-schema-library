@@ -12,7 +12,6 @@ import { maxItemsValidator } from "./features/maxItems";
 import { maxPropertiesValidator } from "./features/maxProperties";
 import { minimumValidator } from "./features/minimum";
 import { minItemsValidator } from "./features/minItems";
-import { minLengthValidator, maxLengthValidator } from "./features/string";
 import { minPropertiesValidator } from "./features/minProperties";
 import { multipleOfValidator } from "./features/multipleOf";
 import { notValidator, parseNot } from "./features/not";
@@ -31,6 +30,8 @@ import { parseType, typeValidator } from "./features/type";
 import { uniqueItemsValidator } from "./features/uniqueItems";
 import ERRORS from "../lib/validation/errors";
 import { dependenciesValidator, parseDependencies } from "./features/dependencies";
+import { minLengthValidator } from "./features/minLength";
+import { maxLengthValidator } from "./features/maxLength";
 
 const VERSION = "draft-04";
 export { ERRORS, VERSION };

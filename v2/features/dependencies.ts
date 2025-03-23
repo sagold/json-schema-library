@@ -1,36 +1,47 @@
 import { JsonError, JsonSchema } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
-import { isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams } from "../types";
+import { Feature, isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams } from "../types";
 import { getValue } from "../utils/getValue";
 import { SchemaNode } from "../types";
 import { mergeSchema } from "../../lib/mergeSchema";
 
+export const dependenciesFeature: Feature = {
+    id: "dependencies",
+    keyword: "dependencies",
+    parse: parseDependencies,
+    addReduce: (node) => node.dependencies != null,
+    reduce: reduceDependencies,
+    addValidate: (node) => node.dependencies != null,
+    validate: validateDependencies
+};
+
 export function parseDependencies(node: SchemaNode) {
-    if (!isObject(node.schema.dependencies)) {
+    const { dependencies } = node.schema;
+    if (!isObject(dependencies)) {
         return;
     }
 
-    const { dependencies } = node.schema;
-    if (isObject(dependencies)) {
-        const schemas = Object.keys(dependencies);
-        if (schemas.length === 0) {
-            return;
+    const schemas = Object.keys(dependencies);
+    if (schemas.length === 0) {
+        return;
+    }
+    node.dependencies = {};
+    schemas.forEach((property) => {
+        const schema = dependencies[property];
+        if (isObject(schema) || typeof schema === "boolean") {
+            node.dependencies[property] = node.compileSchema(
+                // @ts-expect-error boolean schema
+                schema,
+                `${node.spointer}/dependencies/${property}`,
+                `${node.schemaId}/dependencies/${property}`
+            );
+        } else if (Array.isArray(schema)) {
+            node.dependencies[property] = schema;
         }
-        node.dependencies = {};
-        schemas.forEach((property) => {
-            const schema = dependencies[property];
-            if (isObject(schema) || typeof schema === "boolean") {
-                node.dependencies[property] = node.compileSchema(
-                    // @ts-expect-error boolean schema
-                    schema,
-                    `${node.spointer}/dependencies/${property}`,
-                    `${node.schemaId}/dependencies/${property}`
-                );
-            } else if (Array.isArray(schema)) {
-                node.dependencies[property] = schema;
-            }
-        });
-        node.reducers.push(reduceDependencies);
+    });
+
+    if (dependenciesFeature.addReduce(node)) {
+        node.reducers.push(dependenciesFeature.reduce);
     }
 }
 
@@ -62,8 +73,8 @@ export function reduceDependencies({ node, data, path }: JsonSchemaReducerParams
 }
 
 export function dependenciesValidator(node: SchemaNode): void {
-    if (isObject(node.dependencies)) {
-        node.validators.push(validateDependencies);
+    if (dependenciesFeature.addValidate(node)) {
+        node.validators.push(dependenciesFeature.validate);
     }
 }
 

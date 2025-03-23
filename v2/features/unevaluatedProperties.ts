@@ -1,7 +1,15 @@
 import { isJsonError, JsonError } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
-import { isSchemaNode, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, isSchemaNode, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
+
+export const unevaluatedPropertiesFeature: Feature = {
+    id: "unevaluatedProperties",
+    keyword: "unevaluatedProperties",
+    parse: parseUnevaluatedProperties,
+    addValidate: ({ schema }) => schema.unevaluatedProperties != null,
+    validate: validateUnevaluatedProperties
+};
 
 export function parseUnevaluatedProperties(node: SchemaNode) {
     if (!isObject(node.schema.unevaluatedProperties)) {
@@ -14,9 +22,9 @@ export function parseUnevaluatedProperties(node: SchemaNode) {
     );
 }
 
-export function unevaluatedPropertiesValidator({ schema, validators }: SchemaNode): void {
-    if (schema.unevaluatedProperties != null) {
-        validators.push(validateUnevaluatedProperties);
+export function unevaluatedPropertiesValidator(node: SchemaNode): void {
+    if (unevaluatedPropertiesFeature.addValidate(node)) {
+        node.validators.push(unevaluatedPropertiesFeature.validate);
     }
 }
 

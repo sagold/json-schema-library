@@ -60,6 +60,7 @@ export type Context = {
     PARSER: ((node: SchemaNode) => void)[];
     /** json-schema validation for this json-schema (root-schema and its child nodes) */
     VALIDATORS: ((node: SchemaNode) => void)[];
+    FEATURES?: Feature[];
 };
 
 export function isSchemaNode(value: unknown): value is SchemaNode {

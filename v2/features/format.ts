@@ -1,14 +1,20 @@
-import { JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import formatValidators from "../../lib/validation/format";
 
-export function formatValidator({ schema, validators }: SchemaNode): void {
-    if (typeof schema.format !== "string") {
-        return;
+export const formatFeature: Feature = {
+    id: "format",
+    keyword: "format",
+    addValidate: ({ schema }) => formatValidators[schema?.format] != null,
+    validate: validateFormat
+};
+
+export function formatValidator(node: SchemaNode): void {
+    if (formatFeature.addValidate(node)) {
+        node.validators.push(formatFeature.validate);
     }
-    validators.push(({ node, data, pointer }: JsonSchemaValidatorParams) => {
-        if (formatValidators[schema.format]) {
-            // @ts-expect-error type mismatch
-            return formatValidators[schema.format]({ draft: node, data, pointer }, data);
-        }
-    });
+}
+
+function validateFormat({ node, data, pointer }: JsonSchemaValidatorParams) {
+    // @ts-expect-error type mismatch
+    return formatValidators[node.schema.format]({ draft: node, data, pointer }, data);
 }

@@ -1,14 +1,25 @@
 import { mergeSchema } from "../../lib/mergeSchema";
-import { JsonSchemaReducerParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+
+export const anyOfFeature: Feature = {
+    id: "anyOf",
+    keyword: "anyOf",
+    parse: parseAnyOf,
+    addReduce: (node) => node.anyOf != null,
+    reduce: reduceAnyOf,
+    addValidate: (node) => node.anyOf != null,
+    validate: validateAnyOf
+};
 
 export function parseAnyOf(node: SchemaNode) {
     const { schema, spointer, schemaId } = node;
     if (Array.isArray(schema.anyOf) && schema.anyOf.length) {
-        // @todo immediately compile if no resolvers are added
         node.anyOf = schema.anyOf.map((s, index) =>
             node.compileSchema(s, `${spointer}/anyOf/${index}`, `${schemaId}/anyOf/${index}`)
         );
-        node.reducers.push(reduceAnyOf);
+    }
+    if (anyOfFeature.addReduce(node)) {
+        node.reducers.push(anyOfFeature.reduce);
     }
 }
 
@@ -26,15 +37,16 @@ function reduceAnyOf({ node, data }: JsonSchemaReducerParams) {
 }
 
 export function anyOfValidator(node: SchemaNode) {
-    if (node.anyOf == null || node.anyOf.length === 0) {
-        return;
+    if (anyOfFeature.addValidate(node)) {
+        node.validators.push(anyOfFeature.validate);
     }
-    node.validators.push(({ node, data, pointer, path }) => {
-        for (let i = 0; i < node.anyOf.length; i += 1) {
-            if (node.anyOf[i].validate(data, pointer, path).length === 0) {
-                return undefined;
-            }
+}
+
+function validateAnyOf({ node, data, pointer, path }: JsonSchemaValidatorParams) {
+    for (let i = 0; i < node.anyOf.length; i += 1) {
+        if (node.anyOf[i].validate(data, pointer, path).length === 0) {
+            return undefined;
         }
-        return node.errors.anyOfError({ pointer, schema: node.schema, value: data, anyOf: node.schema.anyOf });
-    });
+    }
+    return node.errors.anyOfError({ pointer, schema: node.schema, value: data, anyOf: node.schema.anyOf });
 }

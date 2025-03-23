@@ -1,8 +1,16 @@
-import { SchemaNode, ValidationPath } from "../types";
+import { Feature, JsonSchemaValidatorParams, SchemaNode, ValidationPath } from "../types";
 import { joinId } from "../utils/joinId";
 import splitRef from "../../lib/compile/splitRef";
 import { omit } from "../../lib/utils/omit";
 import { isObject } from "../../lib/utils/isObject";
+
+export const refFeature: Feature = {
+    id: "$ref",
+    keyword: "$ref",
+    parse: parseRef,
+    addValidate: ({ schema }) => schema.$ref != null || schema.$recursiveRef != null,
+    validate: validateRef
+};
 
 function register(node: SchemaNode, path: string) {
     if (node.context.refs[path] == null) {
@@ -53,19 +61,20 @@ export function parseRef(node: SchemaNode) {
     }
 }
 
-export function refValidator({ schema, validators }: SchemaNode) {
-    if (schema.$ref == null && schema.$recursiveRef == null) {
-        return;
+export function refValidator(node: SchemaNode) {
+    if (refFeature.addValidate(node)) {
+        node.validators.push(refFeature.validate);
     }
-    validators.push(({ node, data, pointer = "#", path }) => {
-        const nextNode = node.resolveRef({ pointer, path });
-        if (nextNode == null) {
-            // @todo evaluate this state - should return node or ref is invalid (or bugged)
-            return undefined;
-        }
-        // recursively resolveRef and validate
-        return nextNode.validate(data, pointer, path);
-    });
+}
+
+function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
+    const nextNode = node.resolveRef({ pointer, path });
+    if (nextNode == null) {
+        // @todo evaluate this state - should return node or ref is invalid (or bugged)
+        return undefined;
+    }
+    // recursively resolveRef and validate
+    return nextNode.validate(data, pointer, path);
 }
 
 export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {

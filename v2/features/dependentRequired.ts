@@ -1,21 +1,27 @@
 import { JsonError } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
-import { JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+
+export const dependentRequiredFeature: Feature = {
+    id: "dependentRequired",
+    keyword: "dependentRequired",
+    addValidate: (node) => isObject(node.schema.dependentRequired),
+    validate: validateDependentRequired
+};
 
 export function dependentRequiredValidator(node: SchemaNode): void {
-    if (!isObject(node.schema.dependentRequired)) {
-        return undefined;
+    if (dependentRequiredFeature.addValidate(node)) {
+        node.validators.push(dependentRequiredFeature.validate);
     }
-    node.validators.push(validateDependentRequired);
 }
 
 validateDependentRequired.toJSON = () => "dependentRequired";
 export function validateDependentRequired({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
-    const { schema } = node;
-    const dependentRequired = schema.dependentRequired;
     if (!isObject(data)) {
         return undefined;
     }
+    const { schema } = node;
+    const dependentRequired = schema.dependentRequired;
     const errors: JsonError[] = [];
     Object.keys(data).forEach((property) => {
         const dependencies = dependentRequired[property];

@@ -1,4 +1,4 @@
-import { SchemaNode } from "../types";
+import { Feature, SchemaNode } from "../types";
 
 // @todo this should be done with every added property in spointer
 // @todo this creates a mixed schema, where $defs, etc are not uri-encoded (would be %24defs)
@@ -7,6 +7,12 @@ function urlEncodeJsonPointerProperty(property: string) {
     property = property.replace(/\//g, "~1");
     return encodeURIComponent(property);
 }
+
+export const defsFeature: Feature = {
+    id: "$defs",
+    keyword: "$defs",
+    parse: parseDefs
+};
 
 export function parseDefs(node: SchemaNode) {
     if (node.schema.$defs) {

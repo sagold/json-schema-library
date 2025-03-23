@@ -3,62 +3,57 @@ import { isObject } from "../../lib/utils/isObject";
 import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 
-export const feature: Feature = {
+export const additionalItemsFeature: Feature = {
     id: "additionalItems",
     keyword: "additionalItems",
     parse: parseAdditionalItems,
-    addResolve: (node: SchemaNode) => node.properties != null,
+    addResolve: (node: SchemaNode) => node.additionalItems != null,
     resolve: additionalItemsResolver,
-    addValidate: ({ schema }) => !(schema.additionalItems === true || schema.additionalItems == null),
+    addValidate: ({ schema }) =>
+        schema.additionalItems != null &&
+        schema.additionalItems !== true &&
+        schema.items != null &&
+        !isObject(schema.items),
     validate: validateAdditionalItems
 };
 
 // must come as last resolver
 export function parseAdditionalItems(node: SchemaNode) {
     const { schema, spointer, schemaId } = node;
-    if (schema.additionalItems === false) {
-        // no additional items - no resolver required
-        return;
-    }
     if (isObject(schema.additionalItems) || schema.additionalItems === true) {
-        // precompile additional items schema
         node.additionalItems = node.compileSchema(
             schema.additionalItems,
             `${spointer}/additionalItems`,
             `${schemaId}/additionalItems`
         );
     }
-    // add resolver for get additionalItem
-    node.resolvers.push(additionalItemsResolver);
+    if (additionalItemsFeature.addResolve(node)) {
+        node.resolvers.push(additionalItemsResolver);
+    }
+}
+
+export function additionalItemsValidator(node: SchemaNode): void {
+    if (additionalItemsFeature.addValidate(node)) {
+        node.validators.push(additionalItemsFeature.validate);
+    }
 }
 
 additionalItemsResolver.toJSON = () => "additionalItemsResolver";
 function additionalItemsResolver({ node, key, data }: JsonSchemaResolverParams) {
-    if (!Array.isArray(data)) {
-        return;
-    }
-    // @attention: items, etc should already have been tried
-    const value = getValue(data, key);
-    if (node.additionalItems) {
+    if (Array.isArray(data)) {
+        // @attention: items, etc should already have been tried
+        const value = getValue(data, key);
         return node.additionalItems.reduce({ data: value });
     }
 }
 
-export function additionalItemsValidator({ schema, validators }: SchemaNode): void {
-    if (schema.additionalItems === true || schema.additionalItems == null) {
-        return;
-    }
-    validators.push(validateAdditionalItems);
-}
-
 function validateAdditionalItems({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
     const { schema } = node;
-    if (!Array.isArray(data) || data.length === 0 || isObject(schema.items)) {
+    if (!Array.isArray(data) || data.length === 0) {
         // - no items to validate
-        // - schema object catches all items
         return;
     }
-    if (schema.items == null || (Array.isArray(schema.items) && schema.items.length >= data.length)) {
+    if (Array.isArray(schema.items) && schema.items.length >= data.length) {
         // - no additional items
         return;
     }

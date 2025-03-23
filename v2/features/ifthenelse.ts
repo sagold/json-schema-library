@@ -1,5 +1,15 @@
 import { mergeSchema } from "../../lib/mergeSchema";
-import { JsonSchemaReducerParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+
+export const ifFeature: Feature = {
+    id: "if-then-else",
+    keyword: "if",
+    parse: parseIfThenElse,
+    addReduce: (node: SchemaNode) => node.if && (node.then != null || node.else != null),
+    reduce: reduceIf,
+    addValidate: (node) => node.if != null,
+    validate: validateIfThenElse
+};
 
 export function parseIfThenElse(node: SchemaNode) {
     const { schema, spointer } = node;
@@ -13,8 +23,8 @@ export function parseIfThenElse(node: SchemaNode) {
         node.else = node.compileSchema(schema.else, `${spointer}/else`);
     }
 
-    if (node.if && (node.then != null || node.else != null)) {
-        node.reducers.push(reduceIf);
+    if (ifFeature.addReduce(node)) {
+        node.reducers.push(ifFeature.reduce);
     }
 }
 
@@ -40,19 +50,17 @@ function reduceIf({ node, data, pointer }: JsonSchemaReducerParams) {
 }
 
 export function ifThenElseValidator(node: SchemaNode) {
-    if (node.if == null) {
-        return;
+    if (ifFeature.addValidate(node)) {
+        node.validators.push(ifFeature.validate);
     }
-    node.validators.push(({ node, data, pointer, path }) => {
-        if (node.if.validate(data, pointer, path).length === 0) {
-            // console.log("if true");
-            if (node.then) {
-                return node.then.validate(data, pointer, path);
-            }
-        } else if (node.else) {
-            // console.log("if false");
-            return node.else.validate(data, pointer, path);
+}
+
+function validateIfThenElse({ node, data, pointer, path }: JsonSchemaValidatorParams) {
+    if (node.if.validate(data, pointer, path).length === 0) {
+        if (node.then) {
+            return node.then.validate(data, pointer, path);
         }
-        // console.log("fail through ifthenelse", node.if != null, node.then != null, node.else != null);
-    });
+    } else if (node.else) {
+        return node.else.validate(data, pointer, path);
+    }
 }

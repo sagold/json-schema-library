@@ -1,8 +1,23 @@
 import settings from "../../lib/config/settings";
 import { JsonError } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
-import { JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
+
+export const additionalPropertiesFeature: Feature = {
+    id: "additionalProperties",
+    keyword: "additionalProperties",
+    parse: parseAdditionalProperties,
+    addResolve: (node: SchemaNode) => node.properties != null,
+    resolve: additionalPropertyResolver,
+    addValidate: ({ schema }) =>
+        schema.additionalProperties !== true &&
+        schema.additionalProperties != null &&
+        // this is an arrangement with patternProperties. patternProperties validate before additionalProperties:
+        // https://spacetelescope.github.io/understanding-json-schema/reference/object.html#index-5
+        !(schema.additionalProperties === false && isObject(schema.patternProperties)),
+    validate: validateAdditionalProperty
+};
 
 // must come as last resolver
 export function parseAdditionalProperties(node: SchemaNode) {
@@ -35,20 +50,12 @@ function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParam
     }
 }
 
-export function additionalPropertiesValidator({ schema, validators }: SchemaNode): void {
-    if (schema.additionalProperties === true || schema.additionalProperties == null) {
-        return;
+export function additionalPropertiesValidator(node: SchemaNode): void {
+    if (additionalPropertiesFeature.addValidate(node)) {
+        // note: additionalProperties already parsed
+        // note: properties, etc already tested
+        node.validators.push(validateAdditionalProperty);
     }
-
-    if (isObject(schema.patternProperties) && schema.additionalProperties === false) {
-        // this is an arrangement with patternProperties. patternProperties validate before additionalProperties:
-        // https://spacetelescope.github.io/understanding-json-schema/reference/object.html#index-5
-        return undefined;
-    }
-
-    // note: additionalProperties already parsed
-    // note: properties, etc already tested
-    validators.push(validateAdditionalProperty);
 }
 
 function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {

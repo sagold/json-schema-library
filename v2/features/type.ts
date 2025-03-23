@@ -1,9 +1,25 @@
 import getTypeOf, { JSType } from "../../lib/getTypeOf";
-import { JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+
+export const typeFeature: Feature = {
+    id: "type",
+    keyword: "type",
+    parse: parseType,
+    addReduce: (node) => Array.isArray(node.schema.type),
+    reduce: reduceType,
+    addValidate: ({ schema }) => schema.type != null,
+    validate: validateType
+};
 
 export function parseType(node: SchemaNode) {
-    if (Array.isArray(node.schema.type)) {
-        node.reducers.push(reduceType);
+    if (typeFeature.addReduce(node)) {
+        node.reducers.push(typeFeature.reduce);
+    }
+}
+
+export function typeValidator(node: SchemaNode): void {
+    if (typeFeature.addValidate(node)) {
+        node.validators.push(typeFeature.validate);
     }
 }
 
@@ -25,13 +41,6 @@ function getJsonSchemaType(value: unknown, expectedType: string | string[]): JST
         return Number.isInteger(value) || isNaN(value as any) ? "integer" : "number";
     }
     return jsType;
-}
-
-export function typeValidator({ schema, validators }: SchemaNode): void {
-    if (schema.type == null) {
-        return;
-    }
-    validators.push(validateType);
 }
 
 validateType.toJSON = () => "type";

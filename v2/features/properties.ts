@@ -4,7 +4,7 @@ import { getValue } from "../utils/getValue";
 import { JsonSchemaResolverParams, JsonSchemaValidatorParams } from "../types";
 import { isObject } from "../../lib/utils/isObject";
 
-export const feature: Feature = {
+export const propertiesFeature: Feature = {
     id: "property",
     keyword: "properties",
     parse: parseProperties,
@@ -31,15 +31,16 @@ export function parseProperties(node: SchemaNode) {
             );
             node.properties[propertyName] = propertyNode;
         });
+    }
+    if (propertiesFeature.addResolve(node)) {
         node.resolvers.push(propertyResolver);
     }
 }
 
 propertiesValidator.toJSON = () => "propertiesValidator";
-export function propertiesValidator({ properties, validators }: SchemaNode) {
-    if (properties) {
-        // note: this expects PARSER to have compiled properties
-        validators.push(validateProperties);
+export function propertiesValidator(node: SchemaNode) {
+    if (propertiesFeature.addValidate(node)) {
+        node.validators.push(validateProperties);
     }
 }
 

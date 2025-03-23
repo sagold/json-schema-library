@@ -1,17 +1,25 @@
-import { JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import { isObject } from "../../lib/utils/isObject";
 import { JsonError } from "../../lib/types";
 
-itemsListResolver.toJSON = () => "itemsListResolver";
-function itemsListResolver({ node, key }: JsonSchemaResolverParams) {
+export const itemsFeature: Feature = {
+    id: "items",
+    keyword: "items",
+    parse: parseItems,
+    addResolve: (node) => (node.itemsList || node.itemsObject) != null,
+    resolve: itemsResolver,
+    addValidate: ({ schema }) => schema.items != null,
+    validate: validateItems
+};
+
+itemsResolver.toJSON = () => "itemsResolver";
+function itemsResolver({ node, key }: JsonSchemaResolverParams) {
+    if (node.itemsObject) {
+        return node.itemsObject;
+    }
     if (node.itemsList[key as number]) {
         return node.itemsList[key as number];
     }
-}
-
-itemsObjectResolver.toJSON = () => "itemsObjectResolver";
-function itemsObjectResolver({ node }: JsonSchemaResolverParams) {
-    return node.itemsObject;
 }
 
 export function parseItems(node: SchemaNode) {
@@ -19,20 +27,21 @@ export function parseItems(node: SchemaNode) {
     if (isObject(schema.items)) {
         const propertyNode = node.compileSchema(schema.items, `${spointer}/items`, `${node.schemaId}/items`);
         node.itemsObject = propertyNode;
-        node.resolvers.push(itemsObjectResolver);
     } else if (Array.isArray(schema.items)) {
         node.itemsList = schema.items.map((itemSchema, index) =>
             node.compileSchema(itemSchema, `${spointer}/items/${index}`, `${node.schemaId}/items/${index}`)
         );
-        node.resolvers.push(itemsListResolver);
+    }
+
+    if (itemsFeature.addResolve(node)) {
+        node.resolvers.push(itemsFeature.resolve);
     }
 }
 
-export function itemsValidator({ schema, validators }: SchemaNode) {
-    if (schema.items == null) {
-        return;
+export function itemsValidator(node: SchemaNode) {
+    if (itemsFeature.addValidate(node)) {
+        node.validators.push(itemsFeature.validate);
     }
-    validators.push(validateItems);
 }
 
 validateItems.toJSON = () => "validateItems";

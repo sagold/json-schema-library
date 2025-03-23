@@ -1,6 +1,16 @@
 import { mergeSchema } from "../../lib/mergeSchema";
 import { JsonError } from "../../lib/types";
-import { JsonSchemaReducerParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+
+export const allOfFeature: Feature = {
+    id: "allOf",
+    keyword: "allOf",
+    parse: parseAllOf,
+    addReduce: (node: SchemaNode) => node.allOf != null,
+    reduce: reduceAllOf,
+    addValidate: (node) => node.allOf != null,
+    validate: validateAllOf
+};
 
 export function parseAllOf(node: SchemaNode) {
     const { schema, spointer } = node;
@@ -8,7 +18,9 @@ export function parseAllOf(node: SchemaNode) {
         node.allOf = schema.allOf.map((s, index) =>
             node.compileSchema(s, `${spointer}/allOf/${index}`, `${node.schemaId}/allOf/${index}`)
         );
-        node.reducers.push(reduceAllOf);
+    }
+    if (allOfFeature.addReduce(node)) {
+        node.reducers.push(allOfFeature.reduce);
     }
 }
 
@@ -26,17 +38,18 @@ function reduceAllOf({ node, data }: JsonSchemaReducerParams) {
 }
 
 export function allOfValidator(node: SchemaNode) {
-    if (node.allOf == null) {
+    if (allOfFeature.addValidate(node)) {
+        node.validators.push(allOfFeature.validate);
+    }
+}
+
+function validateAllOf({ node, data, pointer, path }: JsonSchemaValidatorParams) {
+    if (!Array.isArray(node.allOf) || node.allOf.length === 0) {
         return;
     }
-    node.validators.push(({ node, data, pointer, path }) => {
-        if (!Array.isArray(node.allOf) || node.allOf.length === 0) {
-            return;
-        }
-        const errors: JsonError[] = [];
-        node.allOf.forEach((allOfNode) => {
-            errors.push(...allOfNode.validate(data, pointer, path));
-        });
-        return errors;
+    const errors: JsonError[] = [];
+    node.allOf.forEach((allOfNode) => {
+        errors.push(...allOfNode.validate(data, pointer, path));
     });
+    return errors;
 }

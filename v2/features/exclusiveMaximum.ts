@@ -1,10 +1,16 @@
-import { JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
 
-export function exclusiveMaximumValidator({ schema, validators }: SchemaNode): void {
-    if (schema.exclusiveMaximum == null || isNaN(parseInt(schema.exclusiveMaximum))) {
-        return undefined;
+export const exclusiveMaximumFeature: Feature = {
+    id: "exclusiveMaximum",
+    keyword: "exclusiveMaximum",
+    addValidate: ({ schema }) => schema.exclusiveMaximum != null && !isNaN(parseInt(schema.exclusiveMaximum)),
+    validate: validateExclusiveMaximum
+};
+
+export function exclusiveMaximumValidator(node: SchemaNode): void {
+    if (exclusiveMaximumFeature.addValidate(node)) {
+        node.validators.push(exclusiveMaximumFeature.validate);
     }
-    validators.push(validateExclusiveMaximum);
 }
 
 validateExclusiveMaximum.toJSON = () => "exclusiveMaximum";

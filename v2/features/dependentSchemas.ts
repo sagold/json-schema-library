@@ -1,16 +1,30 @@
 import { mergeSchema } from "../../lib/mergeSchema";
 import { JsonError, JsonSchema } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
-import { isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+
+export const dependentSchemasFeature: Feature = {
+    id: "dependentSchemas",
+    keyword: "dependentSchemas",
+    parse: parseDependentSchemas,
+    addReduce: (node) => node.dependentSchemas != null,
+    reduce: reduceDependentSchemas,
+    addValidate: (node) => node.dependentSchemas != null,
+    validate: validateDependentSchemas
+};
 
 export function parseDependentSchemas(node: SchemaNode) {
-    if (!isObject(node.schema.dependentSchemas)) {
+    const { dependentSchemas } = node.schema;
+    if (!isObject(dependentSchemas)) {
         return;
     }
 
-    const { dependentSchemas } = node.schema;
-    node.dependentSchemas = {};
     const schemas = Object.keys(dependentSchemas);
+    if (schemas.length === 0) {
+        return;
+    }
+
+    node.dependentSchemas = {};
     schemas.forEach((property) => {
         const schema = dependentSchemas[property];
         if (isObject(schema)) {
@@ -24,11 +38,9 @@ export function parseDependentSchemas(node: SchemaNode) {
         }
     });
 
-    if (schemas.length === 0) {
-        return;
+    if (dependentSchemasFeature.addReduce(node)) {
+        node.reducers.push(dependentSchemasFeature.reduce);
     }
-
-    node.reducers.push(reduceDependentSchemas);
 }
 
 reduceDependentSchemas.toJSON = () => "reduceDependentSchemas";
@@ -61,10 +73,9 @@ export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) 
 }
 
 export function dependentSchemasValidator(node: SchemaNode): void {
-    if (!isObject(node.dependentSchemas)) {
-        return undefined;
+    if (dependentSchemasFeature.addValidate(node)) {
+        node.validators.push(dependentSchemasFeature.validate);
     }
-    node.validators.push(validateDependentSchemas);
 }
 
 export function validateDependentSchemas({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {

@@ -13,6 +13,7 @@ import { getTemplate } from "./getTemplate";
 import { join, split } from "@sagold/json-pointer";
 import { mergeNode } from "./mergeNode";
 import { getValue } from "./utils/getValue";
+import validate from "../lib/validate";
 
 const DYNAMIC_PROPERTIES: string[] = [
     "$ref",
@@ -61,8 +62,26 @@ const NODE_METHODS: Pick<
             ...NODE_METHODS
         };
 
-        node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
-        node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
+        if (node.context.FEATURES) {
+            for (let i = 0, l = node.context.FEATURES.length; i < l; i += 1) {
+                const feature = node.context.FEATURES[i];
+                const validators = [...node.validators];
+                feature.parse?.(node);
+                node.validators = validators;
+                if (feature.addReduce?.(node)) {
+                    node.reducers.push(feature.reduce);
+                }
+                if (feature.addResolve?.(node)) {
+                    node.reducers.push(feature.resolve);
+                }
+                if (feature.addValidate?.(node)) {
+                    node.validators.push(feature.validate);
+                }
+            }
+        } else {
+            node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
+            node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
+        }
 
         return node;
     },
@@ -261,6 +280,8 @@ const NODE_METHODS: Pick<
             ...context,
             refs: {},
             rootNode: node,
+            // @ts-expect-error test
+            FEATURES: draft.FEATURES,
             VERSION: draft.VERSION,
             PARSER: draft.PARSER,
             VALIDATORS: draft.VALIDATORS
@@ -346,9 +367,28 @@ export function compileSchema(schema: JsonSchema, remoteContext?: Context) {
         PARSER: draft.PARSER,
         VALIDATORS: draft.VALIDATORS
     };
+
     node.context.remotes[schema.$id ?? "#"] = node;
-    node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
-    node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
+    if (node.context.FEATURES) {
+        for (let i = 0, l = node.context.FEATURES.length; i < l; i += 1) {
+            const feature = node.context.FEATURES[i];
+            const validators = [...node.validators];
+            feature.parse?.(node);
+            node.validators = validators;
+            if (feature.addReduce?.(node)) {
+                node.reducers.push(feature.reduce);
+            }
+            if (feature.addResolve?.(node)) {
+                node.reducers.push(feature.resolve);
+            }
+            if (feature.addValidate?.(node)) {
+                node.validators.push(feature.validate);
+            }
+        }
+    } else {
+        node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
+        node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
+    }
 
     return node;
 }

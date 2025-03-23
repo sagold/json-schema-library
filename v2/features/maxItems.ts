@@ -1,18 +1,27 @@
-import { SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
 
-export function maxItemsValidator({ schema, validators }: SchemaNode): void {
-    if (isNaN(schema.maxItems)) {
-        return;
+export const maxItemsFeature: Feature = {
+    id: "maxItems",
+    keyword: "maxItems",
+    addValidate: ({ schema }) => !isNaN(schema.maxItems),
+    validate: validateMaxItems
+};
+
+export function maxItemsValidator(node: SchemaNode): void {
+    if (maxItemsFeature.addValidate(node)) {
+        node.validators.push(maxItemsFeature.validate);
     }
-    validators.push(({ node, data, pointer }) => {
-        if (Array.isArray(data) && schema.maxItems < data.length) {
-            return node.errors.maxItemsError({
-                maximum: schema.maxItems,
-                length: data.length,
-                schema,
-                value: data,
-                pointer
-            });
-        }
-    });
+}
+
+function validateMaxItems({ node, data, pointer }: JsonSchemaValidatorParams) {
+    const { schema } = node;
+    if (Array.isArray(data) && schema.maxItems < data.length) {
+        return node.errors.maxItemsError({
+            maximum: schema.maxItems,
+            length: data.length,
+            schema,
+            value: data,
+            pointer
+        });
+    }
 }
