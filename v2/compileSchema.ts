@@ -8,11 +8,113 @@ import { isJsonError, JsonError, JsonSchema } from "../lib/types";
 import { joinId } from "./utils/joinId";
 import { omit } from "../lib/utils/omit";
 import { SchemaNode, JsonSchemaReducerParams, isSchemaNode, Context, Feature } from "./types";
-import { strict as assert } from "assert";
 import { getTemplate } from "./getTemplate";
 import { join, split } from "@sagold/json-pointer";
 import { mergeNode } from "./mergeNode";
 import { getValue } from "./utils/getValue";
+
+/**
+ * With compileSchema we replace the schema and all sub-schemas with a schemaNode,
+ * wrapping each schema with utilities and as much preevaluation is possible. Each
+ * node will be reused for each task, but will create a compiledNode for bound data.
+ */
+export function compileSchema(schema: JsonSchema, remoteContext?: Context) {
+    // # $vocabulary
+    // - declares which JSON Schema features (vocabularies) are supported by this meta-schema
+    // - each vocabulary is referenced by a URL, and its boolean value indicates whether it is required (true) or optional (false).
+
+    // # allOf
+    // - allOf actually includes the rules and constraints from the referenced schemas
+    // - allOf pulls in the relevant meta-schema definitions to actually apply them
+
+    // ✅ For validation purposes, you can ignore $vocabulary and rely on allOf to load the necessary meta-schemas.
+    // ⚠️ However, if your validator is designed to support multiple versions or optimize processing, $vocabulary provides useful metadata.
+    // - Determining Supported Features: Example: A validator could warn or error out if it encounters a vocabulary it does not support.
+    // - Selective Parsing or Optimization: Example: If "unevaluatedProperties" is not in a supported vocabulary, your validator should not enforce it.
+    // - Future-Proofing for Extensions: Future versions of JSON Schema may add optional vocabularies that aren't explicitly included in allOf.
+
+    if (schema.$vocabulary) {
+        console.log("handle vocabulary", schema.$vocabulary);
+        // compile referenced meta schema
+        // 1. could validate passed in schema
+        // 2. could return a sanitized schema based on validation
+        // then add parsers and validators based on meta-schema
+    }
+
+    const node: SchemaNode = {
+        spointer: "#",
+        lastIdPointer: "#",
+        schemaId: "#",
+        reducers: [],
+        resolvers: [],
+        validators: [],
+        schema,
+        ...NODE_METHODS
+    } as SchemaNode;
+
+    let draft;
+    if (schema.$schema?.includes("draft-04")) {
+        draft = draft04;
+    } else if (schema.$schema?.includes("draft-06")) {
+        draft = draft06;
+    } else if (schema.$schema?.includes("draft-07")) {
+        draft = draft07;
+    } else if (schema.$schema?.includes("2019-09")) {
+        draft = draft2019;
+    } else {
+        draft = draft2019;
+    }
+
+    node.context = {
+        remotes: {},
+        anchors: {},
+        ids: {},
+        ...(remoteContext ?? {}),
+        refs: {},
+        rootNode: node,
+        VERSION: draft.VERSION,
+        FEATURES: draft.FEATURES
+    };
+
+    node.context.remotes[schema.$id ?? "#"] = node;
+    addFeatures(node);
+
+    return node;
+}
+
+// - $ref parses node id and has to execute everytime
+// - if is a shortcut for if-then-else and should always parse
+// - $defs contains a shortcut for definitions
+const whitelist = ["$ref", "if", "$defs"];
+const noRefMergeDrafts = ["draft-04", "draft-06", "draft-07"];
+function addFeatures(node: SchemaNode) {
+    if (node.schema.$ref && noRefMergeDrafts.includes(node.context.VERSION)) {
+        // for these draft versions only ref is validated
+        const ref = node.context.FEATURES.find((feature) => feature.keyword === "$ref");
+        if (ref) {
+            execFeature(ref, node);
+        }
+        return;
+    }
+
+    const keys = Object.keys(node.schema);
+    node.context.FEATURES.filter(({ keyword }) => keys.includes(keyword) || whitelist.includes(keyword)).forEach(
+        (feature) => execFeature(feature, node)
+    );
+}
+
+function execFeature(feature: Feature, node: SchemaNode) {
+    feature.parse?.(node);
+    if (feature.addReduce?.(node)) {
+        node.reducers.push(feature.reduce);
+    }
+    if (feature.addResolve?.(node)) {
+        node.resolvers.push(feature.resolve);
+    }
+    if (feature.addValidate?.(node)) {
+        node.validators.push(feature.validate);
+    }
+}
 
 const DYNAMIC_PROPERTIES: string[] = [
     "$ref",
@@ -278,106 +380,3 @@ const NODE_METHODS: Pick<
         return { ...this, context: undefined, errors: undefined, parent: this.parent?.spointer };
     }
 };
-
-/**
- * With compileSchema we replace the schema and all sub-schemas with a schemaNode,
- * wrapping each schema with utilities and as much preevaluation is possible. Each
- * node will be reused for each task, but will create a compiledNode for bound data.
- */
-export function compileSchema(schema: JsonSchema, remoteContext?: Context) {
-    // # $vocabulary
-    // - declares which JSON Schema features (vocabularies) are supported by this meta-schema
-    // - each vocabulary is referenced by a URL, and its boolean value indicates whether it is required (true) or optional (false).
-
-    // # allOf
-    // - allOf actually includes the rules and constraints from the referenced schemas
-    // - allOf pulls in the relevant meta-schema definitions to actually apply them
-
-    // ✅ For validation purposes, you can ignore $vocabulary and rely on allOf to load the necessary meta-schemas.
-    // ⚠️ However, if your validator is designed to support multiple versions or optimize processing, $vocabulary provides useful metadata.
-    // - Determining Supported Features: Example: A validator could warn or error out if it encounters a vocabulary it does not support.
-    // - Selective Parsing or Optimization: Example: If "unevaluatedProperties" is not in a supported vocabulary, your validator should not enforce it.
-    // - Future-Proofing for Extensions: Future versions of JSON Schema may add optional vocabularies that aren't explicitly included in allOf.
-
-    if (schema.$vocabulary) {
-        console.log("handle vocabulary", schema.$vocabulary);
-        // compile referenced meta schema
-        // 1. could validate passed in schema
-        // 2. could return a sanitized schema based on validation
-        // then add parsers and validators based on meta-schema
-    }
-
-    const node: SchemaNode = {
-        spointer: "#",
-        lastIdPointer: "#",
-        schemaId: "#",
-        reducers: [],
-        resolvers: [],
-        validators: [],
-        schema,
-        ...NODE_METHODS
-    } as SchemaNode;
-
-    let draft;
-    if (schema.$schema?.includes("draft-04")) {
-        draft = draft04;
-    } else if (schema.$schema?.includes("draft-06")) {
-        draft = draft06;
-    } else if (schema.$schema?.includes("draft-07")) {
-        draft = draft07;
-    } else if (schema.$schema?.includes("2019-09")) {
-        draft = draft2019;
-    } else {
-        draft = draft2019;
-    }
-
-    node.context = {
-        remotes: {},
-        anchors: {},
-        ids: {},
-        ...(remoteContext ?? {}),
-        refs: {},
-        rootNode: node,
-        VERSION: draft.VERSION,
-        FEATURES: draft.FEATURES
-    };
-
-    node.context.remotes[schema.$id ?? "#"] = node;
-    addFeatures(node);
-
-    return node;
-}
-
-// - $ref parses node id and has to execute everytime
-// - if is a shortcut for if-then-else and should always parse
-// - $defs contains a shortcut for definitions
-const whitelist = ["$ref", "if", "$defs"];
-const noRefMergeDrafts = ["draft-04", "draft-06", "draft-07"];
-function addFeatures(node: SchemaNode) {
-    if (node.schema.$ref && noRefMergeDrafts.includes(node.context.VERSION)) {
-        // for these draft versions only ref is validated
-        const ref = node.context.FEATURES.find((feature) => feature.keyword === "$ref");
-        if (ref) {
-            execFeature(ref, node);
-        }
-        return;
-    }
-
-    const keys = Object.keys(node.schema);
-    node.context.FEATURES.filter(({ keyword }) => keys.includes(keyword) || whitelist.includes(keyword)).forEach(
-        (feature) => execFeature(feature, node)
-    );
-}
-
-function execFeature(feature: Feature, node: SchemaNode) {
-    feature.parse?.(node);
-    if (feature.addReduce?.(node)) {
-        node.reducers.push(feature.reduce);
-    }
-    if (feature.addResolve?.(node)) {
-        node.resolvers.push(feature.resolve);
-    }
-    if (feature.addValidate?.(node)) {
-        node.validators.push(feature.validate);
-    }
-}

@@ -19,21 +19,14 @@ function register(node: SchemaNode, path: string) {
 }
 
 export function parseRef(node: SchemaNode) {
+    // add ref resolution method to node
+    node.resolveRef = resolveRef;
+
     // get and store current $id of node - this may be the same as parent $id
     const currentId = joinId(node.parent?.$id, node.schema?.$id);
     node.$id = currentId;
     node.lastIdPointer = node.parent?.lastIdPointer ?? "#";
-
-    // add ref resolution method to node
-    node.resolveRef = resolveRef;
-
-    // store this node for retrieval by $id
-    if (node.context.refs[currentId] == null) {
-        node.context.refs[currentId] = node;
-    }
-
-    const idChanged = currentId !== node.parent?.$id;
-    if (idChanged && node.spointer !== "#") {
+    if (currentId !== node.parent?.$id && node.spointer !== "#") {
         node.lastIdPointer = node.spointer;
     }
 
@@ -41,12 +34,9 @@ export function parseRef(node: SchemaNode) {
     if (node.lastIdPointer !== "#" && node.spointer.startsWith(node.lastIdPointer)) {
         const localPointer = `#${node.spointer.replace(node.lastIdPointer, "")}`;
         register(node, joinId(currentId, localPointer));
-    } else {
-        register(node, joinId(currentId, node.spointer));
     }
     // store $rootId + json-pointer to this node
     register(node, joinId(node.context.rootNode.$id, node.spointer));
-
     // store this node for retrieval by $id + anchor
     if (node.schema.$anchor) {
         node.context.anchors[`${currentId.replace(/#$/, "")}#${node.schema.$anchor}`] = node;
@@ -61,36 +51,33 @@ export function parseRef(node: SchemaNode) {
     }
 }
 
-function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
-    const nextNode = node.resolveRef({ pointer, path });
-    if (nextNode == null) {
-        // @todo evaluate this state - should return node or ref is invalid (or bugged)
-        return undefined;
-    }
-    // recursively resolveRef and validate
-    return nextNode.validate(data, pointer, path);
-}
-
 export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
-    // throw new Error("resolveRef " + pointer);
     const node = this as SchemaNode;
     if (node.schema.$recursiveRef) {
         const nextNode = resolveRecursiveRef(node, path);
         path?.push({ pointer, node: nextNode });
         return nextNode;
     }
+
     if (node.ref == null) {
         return node;
     }
+
     const resolvedNode = getRef(node);
-    // console.log("RESOLVE REF", node.schema, "resolved ref", node.ref, "=>", resolvedNode.schema);
     if (resolvedNode != null) {
         path?.push({ pointer, node: resolvedNode });
-        // console.log("resolve ref", node.ref, "=>", resolvedNode.schema, Object.keys(node.context.refs));
     } else {
-        console.log("failed resolving", node.ref, "from", Object.keys(node.context.refs));
+        // console.log("failed resolving", node.ref, "from", Object.keys(node.context.refs));
     }
     return resolvedNode;
+}
+
+function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
+    const nextNode = node.resolveRef({ pointer, path });
+    if (nextNode != null) {
+        // recursively resolveRef and validate
+        return nextNode.validate(data, pointer, path);
+    }
 }
 
 // 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
@@ -138,12 +125,10 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
 
     // resolve $ref by json-spointer
     if (node.context.refs[$ref]) {
-        // console.log(`ref resolve ${$ref} from refs`, node.context.refs[$ref].ref);
         return compileNext(node.context.refs[$ref], node.spointer);
     }
-
+    // resolve $ref from $anchor
     if (node.context.anchors[$ref]) {
-        // console.log(`ref resolve ${$ref} from anchors`, node.context.anchors[$ref].ref);
         return compileNext(node.context.anchors[$ref], node.spointer);
     }
 
@@ -181,15 +166,6 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
                 return nextNode;
             }
         }
-
-        // @todo this is a poc
-        const $localRef = fragments[0];
-        if (node.context.refs[$localRef]) {
-            const nextNode = node.context.refs[$localRef];
-            const property = fragments[1].split("$defs/").pop();
-            return getRef(nextNode?.$defs?.[property]);
-        }
-
         console.error("REF: UNFOUND 2", $ref);
         return undefined;
     }
