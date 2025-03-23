@@ -42,6 +42,63 @@ import { isSchemaNode } from "./types";
 //     // - possibly optimize all this once for actual exection (compilation)
 // }
 
+describe("compileSchema templateDefaultOptions", () => {
+    it("should apply `templateDefaultOptions.addOptionalProps` to getTemplate", () => {
+        const schema = {
+            properties: {
+                type: { const: "node" },
+                nodes: { items: { $ref: "#" } }
+            }
+        };
+
+        let data = compileSchema(schema).getTemplate();
+        assert.deepEqual(data, {});
+
+        data = compileSchema(schema, { templateDefaultOptions: { addOptionalProps: true } }).getTemplate();
+        assert.deepEqual(data, {
+            type: "node",
+            nodes: []
+        });
+    });
+
+    it("should apply `templateDefaultOptions.recursiveLimit` to getTemplate", () => {
+        const schema = {
+            required: ["type", "nodes"],
+            properties: {
+                type: { const: "node" },
+                nodes: { items: { $ref: "#" }, minItems: 1 }
+            }
+        };
+
+        let data = compileSchema(schema).getTemplate();
+        assert.deepEqual(data, {
+            type: "node",
+            nodes: [
+                {
+                    type: "node",
+                    nodes: []
+                }
+            ]
+        });
+
+        data = compileSchema(schema, { templateDefaultOptions: { recursionLimit: 2 } }).getTemplate();
+        assert.deepEqual(data, {
+            type: "node",
+            nodes: [
+                {
+                    type: "node",
+                    nodes: [
+                        {
+                            type: "node",
+                            nodes: []
+                        }
+                    ]
+                }
+            ]
+        });
+    });
+});
+
 describe("compileSchema `schemaId`", () => {
     it("should store path from rootSchema as schemaId", () => {
         const node = compileSchema({

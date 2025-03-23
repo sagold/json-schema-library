@@ -1,4 +1,3 @@
-import ERRORS from "../lib/validation/errors";
 import { additionalItemsFeature } from "./features/additionalItems";
 import { additionalPropertiesFeature } from "./features/additionalProperties";
 import { allOfFeature } from "./features/allOf";
@@ -12,7 +11,7 @@ import { dependentSchemasFeature } from "./features/dependentSchemas";
 import { enumFeature } from "./features/enum";
 import { exclusiveMaximumFeature } from "./features/exclusiveMaximum";
 import { exclusiveMinimumFeature } from "./features/exclusiveMinimum";
-import { Feature } from "./types";
+import type { Draft } from "./types";
 import { formatFeature } from "./features/format";
 import { ifFeature } from "./features/ifthenelse";
 import { itemsFeature } from "./features/items";
@@ -38,9 +37,6 @@ import { unevaluatedItemsFeature } from "./features/unevaluatedItems";
 import { unevaluatedPropertiesFeature } from "./features/unevaluatedProperties";
 import { uniqueItemsFeature } from "./features/uniqueItems";
 
-const VERSION = "draft-2019-09";
-export { ERRORS, VERSION };
-
 /**
  * @draft-2019 https://json-schema.org/draft/2019-09/release-notes
  *
@@ -55,57 +51,61 @@ export { ERRORS, VERSION };
  * - $ref
  * - dependencies has been split into dependentSchemas and dependentRequired
  */
-export const FEATURES: Feature[] = [
-    refFeature,
-    allOfFeature,
-    anyOfFeature,
-    constFeature,
-    containsFeature,
-    defsFeature,
-    dependenciesFeature, // optional support for old draft-version
-    dependentRequiredFeature, // draft-2019: new
-    dependentSchemasFeature, // draft-2019: new
-    enumFeature,
-    exclusiveMaximumFeature,
-    exclusiveMinimumFeature,
-    formatFeature,
-    ifFeature,
-    itemsFeature,
-    maximumFeature,
-    maxItemsFeature,
-    maxLengthFeature,
-    maxPropertiesFeature,
-    minimumFeature,
-    minItemsFeature,
-    minLengthFeature,
-    minPropertiesFeature,
-    multipleOfFeature,
-    notFeature,
-    patternPropertiesFeature,
-    patternFeature,
-    propertiesFeature,
-    propertyNamesFeature,
-    requiredFeature,
-    typeFeature,
-    unevaluatedItemsFeature,
-    unevaluatedPropertiesFeature,
-    uniqueItemsFeature,
-    oneOfFeature,
-    additionalItemsFeature,
-    additionalPropertiesFeature
-].map((feature) => {
-    const logKeyword = () => feature.keyword;
-    if (feature.validate) {
-        // @ts-expect-error missing interface
-        feature.validate.toJSON = logKeyword;
-    }
-    if (feature.reduce) {
-        // @ts-expect-error missing interface
-        feature.reduce.toJSON = logKeyword;
-    }
-    if (feature.resolve) {
-        // @ts-expect-error missing interface
-        feature.resolve.toJSON = logKeyword;
-    }
-    return feature;
-});
+export const draft2019: Draft = {
+    version: "draft-2019-09",
+    $schema: "https://json-schema.org/draft/2019-09/schema",
+    features: [
+        refFeature,
+        allOfFeature,
+        anyOfFeature,
+        constFeature,
+        containsFeature,
+        defsFeature,
+        dependenciesFeature, // optional support for old draft-version
+        dependentRequiredFeature, // draft-2019: new
+        dependentSchemasFeature, // draft-2019: new
+        enumFeature,
+        exclusiveMaximumFeature,
+        exclusiveMinimumFeature,
+        formatFeature,
+        ifFeature,
+        itemsFeature,
+        maximumFeature,
+        maxItemsFeature,
+        maxLengthFeature,
+        maxPropertiesFeature,
+        minimumFeature,
+        minItemsFeature,
+        minLengthFeature,
+        minPropertiesFeature,
+        multipleOfFeature,
+        notFeature,
+        patternPropertiesFeature,
+        patternFeature,
+        propertiesFeature,
+        propertyNamesFeature,
+        requiredFeature,
+        typeFeature,
+        unevaluatedItemsFeature,
+        unevaluatedPropertiesFeature,
+        uniqueItemsFeature,
+        oneOfFeature,
+        additionalItemsFeature,
+        additionalPropertiesFeature
+    ].map((feature) => {
+        const logKeyword = () => feature.keyword;
+        if (feature.validate) {
+            // @ts-expect-error missing interface
+            feature.validate.toJSON = logKeyword;
+        }
+        if (feature.reduce) {
+            // @ts-expect-error missing interface
+            feature.reduce.toJSON = logKeyword;
+        }
+        if (feature.resolve) {
+            // @ts-expect-error missing interface
+            feature.resolve.toJSON = logKeyword;
+        }
+        return feature;
+    })
+};

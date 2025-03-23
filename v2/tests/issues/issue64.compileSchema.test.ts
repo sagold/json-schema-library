@@ -67,7 +67,7 @@ describe("issue#64 - should not fail compiling schema", () => {
             $schema: "draft-07"
         };
         const node = compileSchema(d7);
-        assert.equal(node.context.VERSION, "draft-07");
+        assert.equal(node.context.version, "draft-07");
         assert.deepEqual(node.schema, d7);
     });
 
@@ -77,7 +77,7 @@ describe("issue#64 - should not fail compiling schema", () => {
             $schema: "draft-04"
         };
         const node = compileSchema(d4);
-        assert.equal(node.context.VERSION, "draft-04");
+        assert.equal(node.context.version, "draft-04");
         assert.deepEqual(node.schema, d4);
     });
 });

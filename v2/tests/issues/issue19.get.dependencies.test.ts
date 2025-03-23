@@ -1,6 +1,8 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
 import { isSchemaNode, SchemaNode } from "../../types";
+import { draft2019 } from "../../draft2019";
+import { reduceOneOfFuzzy } from "../../features/oneOf";
 
 describe("issue#19 - getSchema from dependencies", () => {
     let rootNode: SchemaNode;
@@ -66,17 +68,32 @@ describe("issue#19 - getSchema from dependencies", () => {
         });
     });
 
-    it.skip("should return correct schema for missing data property 'customField'", () => {
+    it("should return correct schema for missing data property 'customField'", () => {
         // strict oneOf resolution will fail here, so we need to either fuzzy resolve oneOf item or
         // directly set "oneOfProperty" to "generation"
-        // -> validate schema -> no schema is valid (because gneration is missing here)
-        // => tell jlib which schema to resolve or let it retrieve a schema on its own
 
-        // @todo
-        // draft.resolveOneOf = function resolveOneOf(node: SchemaNode, data) {
-        //     return resolveOneOfFuzzy(node, data);
-        // };
-        const node = rootNode.get("customField", {
+        // @todo this is a lot of work
+        const oneOfFeature = draft2019.features.findIndex((feat) => feat.keyword === "oneOf");
+        assert(!isNaN(oneOfFeature));
+        const features = [...draft2019.features];
+        features[oneOfFeature] = {
+            ...features[oneOfFeature],
+            reduce: reduceOneOfFuzzy
+        };
+
+        const modifiedRootNode = compileSchema(rootNode.schema, {
+            drafts: [
+                {
+                    regexp: ".",
+                    draft: {
+                        version: "draft-2019-09",
+                        features
+                    }
+                }
+            ]
+        });
+
+        const node = modifiedRootNode.get("customField", {
             name: "issue #19",
             generation: "Display Custom Field"
         });

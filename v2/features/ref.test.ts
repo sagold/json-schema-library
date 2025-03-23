@@ -122,8 +122,8 @@ describe("feature : ref : resolve", () => {
                 .addRemote("https://remote.schema", { type: "object", minProperties: 1 })
                 .resolveRef();
 
+            assert.deepEqual(node.$id, "https://remote.schema");
             assert.deepEqual(node.schema, {
-                $schema: "https://json-schema.org/draft/2019-09/schema",
                 type: "object",
                 minProperties: 1
             });

@@ -3,6 +3,16 @@ import { CreateError } from "../lib/utils/createCustomError";
 import { isObject } from "../lib/utils/isObject";
 import { TemplateOptions } from "./getTemplate";
 
+export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "latest";
+
+export type Draft = {
+    features: Feature[];
+    version: DraftVersion;
+    $schema?: string;
+};
+
+export type DraftList = { regexp: string; draft: Draft }[];
+
 export type Feature = {
     id: string;
     keyword: string;
@@ -27,6 +37,7 @@ export type JsonSchemaReducerParams = {
     pointer?: string;
     path?: ValidationPath;
 };
+
 export type JsonSchemaReducer = (options: JsonSchemaReducerParams) => SchemaNode | JsonError | undefined;
 
 export type JsonSchemaResolverParams = { key: string | number; data: unknown; node: SchemaNode };
@@ -44,8 +55,6 @@ export type JsonSchemaDefaultDataResolverParams = {
 export type JsonSchemaDefaultDataResolver = (options: JsonSchemaDefaultDataResolverParams) => unknown;
 
 export type Context = {
-    /** draft-version */
-    VERSION: string;
     /** root node of this json-schema */
     rootNode: SchemaNode;
     /** root nodes of registered remote json-schema, stored by id/url */
@@ -56,11 +65,17 @@ export type Context = {
     ids: Record<string, SchemaNode>;
     /** anchors stored by fully resolved schema-$id + $anchor */
     anchors: Record<string, SchemaNode>;
-    /** json-schema parser for this json-schema (root-schema and its child nodes) */
-    // PARSER: ((node: SchemaNode) => void)[];
-    /** json-schema validation for this json-schema (root-schema and its child nodes) */
-    // VALIDATORS: ((node: SchemaNode) => void)[];
-    FEATURES?: Feature[];
+    /** json-schema parser, validator, reducer and resolver for this json-schema (root-schema and its child nodes) */
+    features?: Feature[];
+
+    // runtime configuration
+
+    /** draft-version */
+    version: string;
+    /** available draft configurations */
+    drafts: DraftList;
+    /** getTemplate default options */
+    templateDefaultOptions?: TemplateOptions;
 };
 
 export function isSchemaNode(value: unknown): value is SchemaNode {

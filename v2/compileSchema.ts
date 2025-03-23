@@ -1,24 +1,47 @@
-import * as draft04 from "./draft04";
-import * as draft06 from "./draft06";
-import * as draft07 from "./draft07";
-import * as draft2019 from "./draft2019";
 import createSchemaOf from "../lib/createSchemaOf";
+import errors from "../lib/validation/errors";
 import sanitizeErrors from "./utils/sanitizeErrors";
-import { isJsonError, JsonError, JsonSchema } from "../lib/types";
-import { joinId } from "./utils/joinId";
-import { omit } from "../lib/utils/omit";
-import { SchemaNode, JsonSchemaReducerParams, isSchemaNode, Context, Feature } from "./types";
-import { getTemplate } from "./getTemplate";
-import { join, split } from "@sagold/json-pointer";
-import { mergeNode } from "./mergeNode";
+import { CreateError } from "../lib/utils/createCustomError";
+import { draft04 } from "./draft04";
+import { draft06 } from "./draft06";
+import { draft07 } from "./draft07";
+import { draft2019 } from "./draft2019";
+import { getTemplate, TemplateOptions } from "./getTemplate";
 import { getValue } from "./utils/getValue";
+import { isJsonError, JsonError, JsonSchema } from "../lib/types";
+import { join, split } from "@sagold/json-pointer";
+import { joinId } from "./utils/joinId";
+import { mergeNode } from "./mergeNode";
+import { omit } from "../lib/utils/omit";
+import { SchemaNode, JsonSchemaReducerParams, isSchemaNode, Context, Feature, DraftList } from "./types";
+
+type CompileOptions = {
+    drafts: DraftList;
+    errors: Record<string, CreateError>;
+    remoteContext?: Context;
+    templateDefaultOptions?: TemplateOptions;
+};
+
+const defaultDrafts: DraftList = [
+    { regexp: "draft-04", draft: draft04 },
+    { regexp: "draft-06", draft: draft06 },
+    { regexp: "draft-07", draft: draft07 },
+    { regexp: ".", draft: draft2019 }
+];
+
+function getDraft(drafts: DraftList, $schema: string) {
+    return drafts.find((d) => new RegExp(d.regexp).test($schema))?.draft ?? draft2019;
+}
 
 /**
  * With compileSchema we replace the schema and all sub-schemas with a schemaNode,
  * wrapping each schema with utilities and as much preevaluation is possible. Each
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
-export function compileSchema(schema: JsonSchema, remoteContext?: Context) {
+export function compileSchema(schema: JsonSchema, options: Partial<CompileOptions> = {}) {
+    const drafts = options.drafts ?? defaultDrafts;
+    const draft = getDraft(drafts, schema?.$schema);
+
     // # $vocabulary
     // - declares which JSON Schema features (vocabularies) are supported by this meta-schema
     // - each vocabulary is referenced by a URL, and its boolean value indicates whether it is required (true) or optional (false).
@@ -52,33 +75,21 @@ export function compileSchema(schema: JsonSchema, remoteContext?: Context) {
         ...NODE_METHODS
     } as SchemaNode;
 
-    let draft;
-    if (schema.$schema?.includes("draft-04")) {
-        draft = draft04;
-    } else if (schema.$schema?.includes("draft-06")) {
-        draft = draft06;
-    } else if (schema.$schema?.includes("draft-07")) {
-        draft = draft07;
-    } else if (schema.$schema?.includes("2019-09")) {
-        draft = draft2019;
-    } else {
-        draft = draft2019;
-    }
-
     node.context = {
         remotes: {},
         anchors: {},
         ids: {},
-        ...(remoteContext ?? {}),
+        ...(options.remoteContext ?? {}),
         refs: {},
         rootNode: node,
-        VERSION: draft.VERSION,
-        FEATURES: draft.FEATURES
+        version: draft.version,
+        features: draft.features,
+        templateDefaultOptions: options.templateDefaultOptions,
+        drafts
     };
 
     node.context.remotes[schema.$id ?? "#"] = node;
     addFeatures(node);
-
     return node;
 }
 
@@ -88,22 +99,22 @@ export function compileSchema(schema: JsonSchema, remoteContext?: Context) {
 const whitelist = ["$ref", "if", "$defs"];
 const noRefMergeDrafts = ["draft-04", "draft-06", "draft-07"];
 function addFeatures(node: SchemaNode) {
-    if (node.schema.$ref && noRefMergeDrafts.includes(node.context.VERSION)) {
+    if (node.schema.$ref && noRefMergeDrafts.includes(node.context.version)) {
         // for these draft versions only ref is validated
-        const ref = node.context.FEATURES.find((feature) => feature.keyword === "$ref");
+        const ref = node.context.features.find((feature) => feature.keyword === "$ref");
         if (ref) {
             execFeature(ref, node);
         }
         return;
     }
-
     const keys = Object.keys(node.schema);
-    node.context.FEATURES.filter(({ keyword }) => keys.includes(keyword) || whitelist.includes(keyword)).forEach(
-        (feature) => execFeature(feature, node)
-    );
+    node.context.features
+        .filter(({ keyword }) => keys.includes(keyword) || whitelist.includes(keyword))
+        .forEach((feature) => execFeature(feature, node));
 }
 
 function execFeature(feature: Feature, node: SchemaNode) {
+    // @todo consider first parsing all nodes
     feature.parse?.(node);
     if (feature.addReduce?.(node)) {
         node.reducers.push(feature.reduce);
@@ -145,7 +156,7 @@ const NODE_METHODS: Pick<
     | "validate"
     | "errors"
 > = {
-    errors: draft2019.ERRORS,
+    errors,
 
     compileSchema(schema: JsonSchema, spointer: string = this.spointer, schemaId?: string) {
         const nextFragment = spointer.split("/$ref")[0];
@@ -226,10 +237,13 @@ const NODE_METHODS: Pick<
     },
 
     getTemplate(data?, options?) {
-        const { cache, recursionLimit } = options ?? {};
-        const opts = { ...(options ?? {}), cache: cache ?? {}, recursionLimit: recursionLimit ?? 1 };
-        const node = this as SchemaNode;
-        return getTemplate(node, data, opts);
+        const opts = {
+            recursionLimit: 1,
+            ...this.context.templateDefaultOptions,
+            cache: {},
+            ...(options ?? {})
+        };
+        return getTemplate(this as SchemaNode, data, opts);
     },
 
     reduce({ data, pointer, key, path }: JsonSchemaReducerParams) {
@@ -324,7 +338,6 @@ const NODE_METHODS: Pick<
     },
 
     addRemote(url: string, schema: JsonSchema) {
-        const { context } = this as SchemaNode;
         // @draft >= 6
         schema.$id = joinId(schema.$id || url);
 
@@ -339,31 +352,14 @@ const NODE_METHODS: Pick<
             ...NODE_METHODS
         } as SchemaNode;
 
-        let draft;
-        const $schema = schema.$schema ?? this.context.rootNode.$schema;
-        if ($schema?.includes("draft-04")) {
-            draft = draft04;
-            schema.$schema = "http://json-schema.org/draft-04/schema";
-        } else if ($schema?.includes("draft-06")) {
-            draft = draft06;
-            schema.$schema = "http://json-schema.org/draft-06/schema";
-        } else if ($schema?.includes("draft-07")) {
-            draft = draft07;
-            schema.$schema = "http://json-schema.org/draft-07/schema";
-        } else if ($schema?.includes("2019-09")) {
-            draft = draft2019;
-            schema.$schema = "https://json-schema.org/draft/2019-09/schema";
-        } else {
-            draft = draft2019;
-            schema.$schema = "https://json-schema.org/draft/2019-09/schema";
-        }
-
+        const { context } = this as SchemaNode;
+        const draft = getDraft(context.drafts, schema?.$schema ?? this.context.rootNode.$schema);
         node.context = {
             ...context,
             refs: {},
             rootNode: node,
-            FEATURES: draft.FEATURES,
-            VERSION: draft.VERSION
+            features: draft.features,
+            version: draft.version
         };
 
         node.context.remotes[joinId(url)] = node;

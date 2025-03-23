@@ -71,18 +71,3 @@ describe("feature : object : validate", () => {
         });
     });
 });
-
-describe.skip("feature : object : getTemplate", () => {
-    it("should return default value of properties", () => {
-        const node = compileSchema({
-            type: "object",
-            properties: {
-                header: { type: "string", default: "title" }
-            }
-        });
-
-        const data = node.getTemplate();
-
-        assert.deepEqual(data, { header: "title" });
-    });
-});

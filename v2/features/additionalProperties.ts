@@ -33,7 +33,6 @@ export function parseAdditionalProperties(node: SchemaNode) {
 
 function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParams) {
     const value = getValue(data, key);
-    console.log("resolve additional property", value, node.schema.additionalProperties);
     if (node.additionalProperties) {
         return node.additionalProperties.reduce({ data: value });
     }
