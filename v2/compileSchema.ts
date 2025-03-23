@@ -13,7 +13,6 @@ import { getTemplate } from "./getTemplate";
 import { join, split } from "@sagold/json-pointer";
 import { mergeNode } from "./mergeNode";
 import { getValue } from "./utils/getValue";
-import validate from "../lib/validate";
 
 const DYNAMIC_PROPERTIES: string[] = [
     "$ref",
@@ -62,25 +61,19 @@ const NODE_METHODS: Pick<
             ...NODE_METHODS
         };
 
-        if (node.context.FEATURES) {
-            for (let i = 0, l = node.context.FEATURES.length; i < l; i += 1) {
-                const feature = node.context.FEATURES[i];
-                const validators = [...node.validators];
-                feature.parse?.(node);
-                node.validators = validators;
-                if (feature.addReduce?.(node)) {
-                    node.reducers.push(feature.reduce);
-                }
-                if (feature.addResolve?.(node)) {
-                    node.reducers.push(feature.resolve);
-                }
-                if (feature.addValidate?.(node)) {
-                    node.validators.push(feature.validate);
-                }
+        for (let i = 0, l = node.context.FEATURES.length; i < l; i += 1) {
+            const feature = node.context.FEATURES[i];
+            feature.parse?.(node);
+            // console.log("parse feature", feature.id, feature.addReduce?.(node));
+            if (feature.addReduce?.(node)) {
+                node.reducers.push(feature.reduce);
             }
-        } else {
-            node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
-            node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
+            if (feature.addResolve?.(node)) {
+                node.resolvers.push(feature.resolve);
+            }
+            if (feature.addValidate?.(node)) {
+                node.validators.push(feature.validate);
+            }
         }
 
         return node;
@@ -280,15 +273,26 @@ const NODE_METHODS: Pick<
             ...context,
             refs: {},
             rootNode: node,
-            // @ts-expect-error test
             FEATURES: draft.FEATURES,
-            VERSION: draft.VERSION,
-            PARSER: draft.PARSER,
-            VALIDATORS: draft.VALIDATORS
+            VERSION: draft.VERSION
         };
+
         node.context.remotes[joinId(url)] = node;
-        node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
-        node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
+
+        for (let i = 0, l = node.context.FEATURES.length; i < l; i += 1) {
+            const feature = node.context.FEATURES[i];
+            feature.parse?.(node);
+            // console.log("parse feature", feature.id, feature.addReduce?.(node));
+            if (feature.addReduce?.(node)) {
+                node.reducers.push(feature.reduce);
+            }
+            if (feature.addResolve?.(node)) {
+                node.resolvers.push(feature.resolve);
+            }
+            if (feature.addValidate?.(node)) {
+                node.validators.push(feature.validate);
+            }
+        }
 
         return this;
     },
@@ -364,30 +368,23 @@ export function compileSchema(schema: JsonSchema, remoteContext?: Context) {
         refs: {},
         rootNode: node,
         VERSION: draft.VERSION,
-        PARSER: draft.PARSER,
-        VALIDATORS: draft.VALIDATORS
+        FEATURES: draft.FEATURES
     };
 
     node.context.remotes[schema.$id ?? "#"] = node;
-    if (node.context.FEATURES) {
-        for (let i = 0, l = node.context.FEATURES.length; i < l; i += 1) {
-            const feature = node.context.FEATURES[i];
-            const validators = [...node.validators];
-            feature.parse?.(node);
-            node.validators = validators;
-            if (feature.addReduce?.(node)) {
-                node.reducers.push(feature.reduce);
-            }
-            if (feature.addResolve?.(node)) {
-                node.reducers.push(feature.resolve);
-            }
-            if (feature.addValidate?.(node)) {
-                node.validators.push(feature.validate);
-            }
+    for (let i = 0, l = node.context.FEATURES.length; i < l; i += 1) {
+        const feature = node.context.FEATURES[i];
+        feature.parse?.(node);
+        // console.log("parse feature", feature.id, feature.addReduce?.(node));
+        if (feature.addReduce?.(node)) {
+            node.reducers.push(feature.reduce);
         }
-    } else {
-        node.context.PARSER.forEach((parse) => parse(node)); // parser -> node-attributes, reducer & resolver
-        node.context.VALIDATORS.forEach((registerValidator) => registerValidator(node));
+        if (feature.addResolve?.(node)) {
+            node.resolvers.push(feature.resolve);
+        }
+        if (feature.addValidate?.(node)) {
+            node.validators.push(feature.validate);
+        }
     }
 
     return node;

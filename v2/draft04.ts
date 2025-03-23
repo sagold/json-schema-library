@@ -1,37 +1,36 @@
-import { additionalItemsValidator, parseAdditionalItems } from "./features/additionalItems";
-import { additionalPropertiesValidator, parseAdditionalProperties } from "./features/additionalProperties";
-import { allOfValidator, parseAllOf } from "./features/allOf";
-import { anyOfValidator, parseAnyOf } from "./features/anyOf";
-import { enumValidator } from "./features/enum";
-import { exclusiveMaximumValidator } from "./features/draft04/exclusiveMaximum";
-import { exclusiveMinimumValidator } from "./features/draft04/exclusiveMinimum";
-import { formatValidator } from "./features/format";
-import { itemsValidator, parseItems } from "./features/items";
-import { maximumValidator } from "./features/maximum";
-import { maxItemsValidator } from "./features/maxItems";
-import { maxPropertiesValidator } from "./features/maxProperties";
-import { minimumValidator } from "./features/minimum";
-import { minItemsValidator } from "./features/minItems";
-import { minPropertiesValidator } from "./features/minProperties";
-import { multipleOfValidator } from "./features/multipleOf";
-import { notValidator, parseNot } from "./features/not";
-import { parseDefs } from "./features/defs";
-import { parseOneOf, validateOneOf } from "./features/oneOf";
-import { parsePatternProperties, patternPropertiesValidator } from "./features/patternProperties";
-import { parseProperties, propertiesValidator } from "./features/properties";
-import { parseRef } from "./features/draft04/ref";
-import { refValidator } from "./features/draft06/ref";
-import { parseUnevaluatedItems, unevaluatedItemsValidator } from "./features/unevaluatedItems";
-import { parseUnevaluatedProperties, unevaluatedPropertiesValidator } from "./features/unevaluatedProperties";
-import { patternValidator } from "./features/pattern";
-import { requiredValidator } from "./features/required";
-import { SchemaNode } from "./types";
-import { parseType, typeValidator } from "./features/type";
-import { uniqueItemsValidator } from "./features/uniqueItems";
 import ERRORS from "../lib/validation/errors";
-import { dependenciesValidator, parseDependencies } from "./features/dependencies";
-import { minLengthValidator } from "./features/minLength";
-import { maxLengthValidator } from "./features/maxLength";
+import { additionalItemsFeature } from "./features/additionalItems";
+import { additionalPropertiesFeature } from "./features/additionalProperties";
+import { allOfFeature } from "./features/allOf";
+import { anyOfFeature } from "./features/anyOf";
+import { containsFeature } from "./features/contains";
+import { defsFeature } from "./features/defs";
+import { dependenciesFeature } from "./features/dependencies";
+import { enumFeature } from "./features/enum";
+import { exclusiveMaximumFeature } from "./features/draft04/exclusiveMaximum";
+import { exclusiveMinimumFeature } from "./features/draft04/exclusiveMinimum";
+import { Feature } from "./types";
+import { formatFeature } from "./features/format";
+import { itemsFeature } from "./features/items";
+import { maximumFeature } from "./features/maximum";
+import { maxItemsFeature } from "./features/maxItems";
+import { maxLengthFeature } from "./features/maxLength";
+import { maxPropertiesFeature } from "./features/maxProperties";
+import { minimumFeature } from "./features/minimum";
+import { minItemsFeature } from "./features/minItems";
+import { minLengthFeature } from "./features/minLength";
+import { minPropertiesFeature } from "./features/minProperties";
+import { multipleOfFeature } from "./features/multipleOf";
+import { notFeature } from "./features/not";
+import { oneOfFeature } from "./features/oneOf";
+import { patternFeature } from "./features/pattern";
+import { patternPropertiesFeature } from "./features/patternProperties";
+import { propertiesFeature } from "./features/properties";
+import { propertyNamesFeature } from "./features/propertyNames";
+import { refFeature } from "./features/draft04/ref";
+import { requiredFeature } from "./features/required";
+import { typeFeature } from "./features/type";
+import { uniqueItemsFeature } from "./features/uniqueItems";
 
 const VERSION = "draft-04";
 export { ERRORS, VERSION };
@@ -57,67 +56,43 @@ export { ERRORS, VERSION };
  * - required  allows an empty array
  * - dependencies allows an empty array for property dependencies
  */
+export const FEATURES: Feature[] = [
+    refFeature,
+    allOfFeature,
+    anyOfFeature,
+    containsFeature,
+    defsFeature,
+    dependenciesFeature, // optional support for old draft-version
+    enumFeature,
+    exclusiveMaximumFeature,
+    exclusiveMinimumFeature,
+    formatFeature,
+    itemsFeature,
+    maximumFeature,
+    maxItemsFeature,
+    maxLengthFeature,
+    maxPropertiesFeature,
+    minimumFeature,
+    minItemsFeature,
+    minLengthFeature,
+    minPropertiesFeature,
+    multipleOfFeature,
+    notFeature,
+    patternPropertiesFeature,
+    patternFeature,
+    propertiesFeature,
+    propertyNamesFeature,
+    requiredFeature,
+    typeFeature,
+    uniqueItemsFeature,
+    oneOfFeature,
+    additionalItemsFeature,
+    additionalPropertiesFeature
+];
 
-export const PARSER: ((node: SchemaNode) => void)[] = [
-    parseRef, // @attention has to come before compiling any other node, @draft-2019: changed
-    parseAllOf,
-    parseAnyOf,
-    parseDefs,
-    parseItems,
-    parseNot,
-    parseOneOf,
-    parsePatternProperties,
-    parseProperties,
-    parseUnevaluatedItems,
-    parseUnevaluatedProperties,
-    parseDependencies,
-    parseAdditionalProperties, // @attention has to come after other object-property parser
-    parseAdditionalItems, // @attention has to come after other object-property parser
-    parseType
-].map((func) => {
-    // @ts-expect-error extended function for debugging purposes
-    func.toJSON = () => func.name;
-    return func;
-});
-
-export const VALIDATORS: ((node: SchemaNode) => void)[] = [
-    additionalItemsValidator,
-    additionalPropertiesValidator,
-    allOfValidator,
-    anyOfValidator,
-    dependenciesValidator,
-    enumValidator,
-    exclusiveMinimumValidator,
-    formatValidator,
-    exclusiveMaximumValidator,
-    itemsValidator,
-    maxItemsValidator,
-    maxLengthValidator,
-    maxPropertiesValidator,
-    minItemsValidator,
-    minLengthValidator,
-    minPropertiesValidator,
-    multipleOfValidator,
-    patternValidator,
-    propertiesValidator,
-    patternPropertiesValidator,
-    notValidator,
-    minimumValidator,
-    maximumValidator,
-    requiredValidator,
-    validateOneOf,
-    typeValidator,
-    unevaluatedItemsValidator,
-    unevaluatedPropertiesValidator,
-    uniqueItemsValidator,
-    refValidator
-].map((func) => {
-    const skipIfRef = (node: SchemaNode) => {
-        // @todo find a nicer solution to ignore any keywords on a schenma with a $ref
-        if (node.schema?.$ref == null || func.name === "refValidator") {
-            func(node);
-        }
-    };
-    skipIfRef.toJSON = () => func.name;
-    return skipIfRef;
-});
+// const skipIfRef = (node: SchemaNode) => {
+//     // @todo find a nicer solution to ignore any keywords on a schenma with a $ref
+//     if (node.schema?.$ref == null || func.name === "refValidator") {
+//         func(node);
+//     }
+// };

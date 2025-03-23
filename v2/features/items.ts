@@ -32,10 +32,6 @@ export function parseItems(node: SchemaNode) {
             node.compileSchema(itemSchema, `${spointer}/items/${index}`, `${node.schemaId}/items/${index}`)
         );
     }
-
-    if (itemsFeature.addResolve(node)) {
-        node.resolvers.push(itemsFeature.resolve);
-    }
 }
 
 export function itemsValidator(node: SchemaNode) {

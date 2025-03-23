@@ -57,9 +57,9 @@ export type Context = {
     /** anchors stored by fully resolved schema-$id + $anchor */
     anchors: Record<string, SchemaNode>;
     /** json-schema parser for this json-schema (root-schema and its child nodes) */
-    PARSER: ((node: SchemaNode) => void)[];
+    // PARSER: ((node: SchemaNode) => void)[];
     /** json-schema validation for this json-schema (root-schema and its child nodes) */
-    VALIDATORS: ((node: SchemaNode) => void)[];
+    // VALIDATORS: ((node: SchemaNode) => void)[];
     FEATURES?: Feature[];
 };
 

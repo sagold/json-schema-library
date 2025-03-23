@@ -1,6 +1,14 @@
-import { SchemaNode, ValidationPath } from "../../types";
+import { Feature, JsonSchemaValidatorParams, SchemaNode, ValidationPath } from "../../types";
 import { resolveRef } from "../ref";
 import { joinId } from "../../utils/joinId";
+
+export const refFeature: Feature = {
+    id: "$ref",
+    keyword: "$ref",
+    parse: parseRef,
+    addValidate: ({ schema }) => schema.$ref != null,
+    validate: validateRef
+};
 
 export function parseRef(node: SchemaNode) {
     // get and store current $id of node - this may be the same as parent $id
@@ -39,17 +47,18 @@ export function parseRef(node: SchemaNode) {
     }
 }
 
-export function refValidator({ schema, validators }: SchemaNode) {
-    if (schema.$ref == null) {
-        return;
+export function refValidator(node: SchemaNode) {
+    if (refFeature.addValidate(node)) {
+        node.validators.push(refFeature.validate);
     }
-    validators.push(({ node, data, pointer = "#", path }) => {
-        const nextNode = resolveAllRefs(node, pointer, path);
-        if (nextNode == null) {
-            return undefined;
-        }
-        return nextNode.validate(data, pointer, path);
-    });
+}
+
+export function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
+    const nextNode = resolveAllRefs(node, pointer, path);
+    if (nextNode == null) {
+        return undefined;
+    }
+    return nextNode.validate(data, pointer, path);
 }
 
 function resolveAllRefs(node: SchemaNode, pointer: string, path: ValidationPath) {

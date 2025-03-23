@@ -138,6 +138,7 @@ describe("compileSchema : reduce", () => {
                 properties: { one: { type: "string" }, two: { type: "string" } }
             });
         });
+
         it("should resolve nested dependencies schema", () => {
             const node = compileSchema({
                 $ref: "#/$defs/schema",
