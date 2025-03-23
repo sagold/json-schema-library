@@ -61,20 +61,7 @@ const NODE_METHODS: Pick<
             ...NODE_METHODS
         };
 
-        for (let i = 0, l = node.context.FEATURES.length; i < l; i += 1) {
-            const feature = node.context.FEATURES[i];
-            feature.parse?.(node);
-            // console.log("parse feature", feature.id, feature.addReduce?.(node));
-            if (feature.addReduce?.(node)) {
-                node.reducers.push(feature.reduce);
-            }
-            if (feature.addResolve?.(node)) {
-                node.resolvers.push(feature.resolve);
-            }
-            if (feature.addValidate?.(node)) {
-                node.validators.push(feature.validate);
-            }
-        }
+        addFeatures(node);
 
         return node;
     },
@@ -278,21 +265,7 @@ const NODE_METHODS: Pick<
         };
 
         node.context.remotes[joinId(url)] = node;
-
-        for (let i = 0, l = node.context.FEATURES.length; i < l; i += 1) {
-            const feature = node.context.FEATURES[i];
-            feature.parse?.(node);
-            // console.log("parse feature", feature.id, feature.addReduce?.(node));
-            if (feature.addReduce?.(node)) {
-                node.reducers.push(feature.reduce);
-            }
-            if (feature.addResolve?.(node)) {
-                node.resolvers.push(feature.resolve);
-            }
-            if (feature.addValidate?.(node)) {
-                node.validators.push(feature.validate);
-            }
-        }
+        addFeatures(node);
 
         return this;
     },
@@ -372,20 +345,28 @@ export function compileSchema(schema: JsonSchema, remoteContext?: Context) {
     };
 
     node.context.remotes[schema.$id ?? "#"] = node;
-    for (let i = 0, l = node.context.FEATURES.length; i < l; i += 1) {
-        const feature = node.context.FEATURES[i];
-        feature.parse?.(node);
-        // console.log("parse feature", feature.id, feature.addReduce?.(node));
-        if (feature.addReduce?.(node)) {
-            node.reducers.push(feature.reduce);
-        }
-        if (feature.addResolve?.(node)) {
-            node.resolvers.push(feature.resolve);
-        }
-        if (feature.addValidate?.(node)) {
-            node.validators.push(feature.validate);
-        }
-    }
+    addFeatures(node);
 
     return node;
+}
+
+// - $ref parses node id and has to execute everytime
+// - if is a shortcut for if-then-else and should always parse
+const whitelist = ["$ref", "if"];
+function addFeatures(node: SchemaNode) {
+    const keys = Object.keys(node.schema);
+    node.context.FEATURES.filter(({ keyword }) => keys.includes(keyword) || whitelist.includes(keyword)).forEach(
+        (feature) => {
+            feature.parse?.(node);
+            if (feature.addReduce?.(node)) {
+                node.reducers.push(feature.reduce);
+            }
+            if (feature.addResolve?.(node)) {
+                node.resolvers.push(feature.resolve);
+            }
+            if (feature.addValidate?.(node)) {
+                node.validators.push(feature.validate);
+            }
+        }
+    );
 }
