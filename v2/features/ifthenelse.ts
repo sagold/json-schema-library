@@ -24,7 +24,6 @@ export function parseIfThenElse(node: SchemaNode) {
     }
 }
 
-reduceIf.toJSON = () => "reduceIf";
 function reduceIf({ node, data, pointer }: JsonSchemaReducerParams) {
     if (data === undefined) {
         return undefined;

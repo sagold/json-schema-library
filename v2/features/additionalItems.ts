@@ -35,7 +35,6 @@ export function additionalItemsValidator(node: SchemaNode): void {
     }
 }
 
-additionalItemsResolver.toJSON = () => "additionalItemsResolver";
 function additionalItemsResolver({ node, key, data }: JsonSchemaResolverParams) {
     if (Array.isArray(data)) {
         // @attention: items, etc should already have been tried

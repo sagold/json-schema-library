@@ -41,14 +41,12 @@ export function parsePatternProperties(node: SchemaNode) {
     }));
 }
 
-patternPropertyResolver.toJSON = () => "patternProperty";
 function patternPropertyResolver({ node, key }: JsonSchemaResolverParams) {
     return node.patternProperties?.find(({ pattern }) => {
         return pattern.test(`${key}`);
     })?.node;
 }
 
-reducePatternProperties.toJSON = () => "reducePatternProperties";
 function reducePatternProperties({ node, data, key }: JsonSchemaReducerParams) {
     if (!isObject(data) && data != null && key === undefined) {
         return;
@@ -84,7 +82,6 @@ function reducePatternProperties({ node, data, key }: JsonSchemaReducerParams) {
     return node.compileSchema(mergedSchema, node.spointer);
 }
 
-validatePatternProperties.toJSON = () => "patternProperties";
 function validatePatternProperties({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
     if (!isObject(data)) {
         return;

@@ -285,8 +285,6 @@ const NODE_METHODS: Pick<
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
 export function compileSchema(schema: JsonSchema, remoteContext?: Context) {
-    assert(schema !== undefined, "schema missing");
-
     // # $vocabulary
     // - declares which JSON Schema features (vocabularies) are supported by this meta-schema
     // - each vocabulary is referenced by a URL, and its boolean value indicates whether it is required (true) or optional (false).

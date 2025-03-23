@@ -8,7 +8,6 @@ export const minLengthFeature: Feature = {
     validate: validateMinLength
 };
 
-validateMinLength.toJSON = () => "minLength";
 function validateMinLength({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
     if (typeof data !== "string") {
         return;

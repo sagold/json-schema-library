@@ -9,7 +9,6 @@ export const dependentRequiredFeature: Feature = {
     validate: validateDependentRequired
 };
 
-validateDependentRequired.toJSON = () => "dependentRequired";
 export function validateDependentRequired({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
     if (!isObject(data)) {
         return undefined;

@@ -12,7 +12,6 @@ export const itemsFeature: Feature = {
     validate: validateItems
 };
 
-itemsResolver.toJSON = () => "itemsResolver";
 function itemsResolver({ node, key }: JsonSchemaResolverParams) {
     if (node.itemsObject) {
         return node.itemsObject;
@@ -34,7 +33,6 @@ export function parseItems(node: SchemaNode) {
     }
 }
 
-validateItems.toJSON = () => "validateItems";
 function validateItems({
     node,
     data,

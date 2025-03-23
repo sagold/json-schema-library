@@ -9,7 +9,6 @@ export const requiredFeature: Feature = {
     validate: validateRequired
 };
 
-validateRequired.toJSON = () => "required";
 function validateRequired({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
     const { schema } = node;
     if (!isObject(data)) {

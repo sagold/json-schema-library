@@ -31,7 +31,6 @@ export function parseAdditionalProperties(node: SchemaNode) {
     }
 }
 
-additionalPropertyResolver.toJSON = () => "additionalPropertyResolver";
 function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParams) {
     const value = getValue(data, key);
     console.log("resolve additional property", value, node.schema.additionalProperties);

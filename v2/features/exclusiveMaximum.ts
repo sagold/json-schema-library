@@ -7,7 +7,6 @@ export const exclusiveMaximumFeature: Feature = {
     validate: validateExclusiveMaximum
 };
 
-validateExclusiveMaximum.toJSON = () => "exclusiveMaximum";
 function validateExclusiveMaximum({ node, data, pointer }: JsonSchemaValidatorParams) {
     if (typeof data !== "number") {
         return undefined;

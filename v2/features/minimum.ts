@@ -7,7 +7,6 @@ export const minimumFeature: Feature = {
     validate: validateMinimum
 };
 
-validateMinimum.toJSON = () => "minimum";
 function validateMinimum({ node, data, pointer }: JsonSchemaValidatorParams) {
     if (isNaN(data as number)) {
         return undefined;

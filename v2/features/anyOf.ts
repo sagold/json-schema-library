@@ -20,7 +20,6 @@ export function parseAnyOf(node: SchemaNode) {
     }
 }
 
-reduceAnyOf.toJSON = () => "reduceAnyOf";
 function reduceAnyOf({ node, data }: JsonSchemaReducerParams) {
     let mergedSchema = {};
     for (let i = 0; i < node.anyOf.length; i += 1) {

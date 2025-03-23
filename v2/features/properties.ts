@@ -14,7 +14,6 @@ export const propertiesFeature: Feature = {
     validate: validateProperties
 };
 
-propertyResolver.toJSON = () => "propertyResolver";
 function propertyResolver({ node, key }: JsonSchemaResolverParams) {
     return node.properties?.[key];
 }
@@ -34,7 +33,6 @@ export function parseProperties(node: SchemaNode) {
     }
 }
 
-validateProperties.toJSON = () => "properties";
 function validateProperties({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     if (!isObject(data)) {
         return;

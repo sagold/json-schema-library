@@ -21,7 +21,6 @@ export function parseAllOf(node: SchemaNode) {
     }
 }
 
-reduceAllOf.toJSON = () => "reduceAllOf";
 function reduceAllOf({ node, data }: JsonSchemaReducerParams) {
     // note: parts of schemas could be merged, e.g. if they do not include
     // dynamic schema parts

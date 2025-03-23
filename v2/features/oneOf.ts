@@ -26,7 +26,6 @@ export function parseOneOf(node: SchemaNode) {
     }
 }
 
-reduceOneOf.toJSON = () => "reduceOneOf";
 function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     // !keyword: oneOfProperty
     // an additional <DECLARATOR_ONEOF> (default `oneOfProperty`) on the schema will exactly determine the
@@ -194,7 +193,6 @@ export function reduceOneOfFuzzy({ node, data, pointer, path }: JsonSchemaReduce
     return oneOfResult;
 }
 
-oneOfValidator.toJSON = () => "oneOf";
 function oneOfValidator({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
     const { oneOf, schema } = node;
     if (!oneOf) {

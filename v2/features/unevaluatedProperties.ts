@@ -22,7 +22,6 @@ export function parseUnevaluatedProperties(node: SchemaNode) {
     );
 }
 
-validateUnevaluatedProperties.toJSON = () => "unevaluatedProperties";
 function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     // if not in properties, evaluated by additionalProperties and not matches patternProperties
     // @todo we need to know dynamic parent statements - they should not be counted as evaluated...

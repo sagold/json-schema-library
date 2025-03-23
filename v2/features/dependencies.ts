@@ -41,7 +41,6 @@ export function parseDependencies(node: SchemaNode) {
     });
 }
 
-reduceDependencies.toJSON = () => "reduceDependencies";
 export function reduceDependencies({ node, data, path }: JsonSchemaReducerParams) {
     if (!isObject(data) || node.dependencies == null) {
         // @todo remove dependentSchemas
@@ -68,7 +67,6 @@ export function reduceDependencies({ node, data, path }: JsonSchemaReducerParams
     return node.compileSchema(mergedSchema, node.spointer).reduce({ data, path });
 }
 
-validateDependencies.toJSON = () => "dependencies";
 function validateDependencies({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
     if (!isObject(data)) {
         return undefined;

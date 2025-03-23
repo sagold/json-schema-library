@@ -10,7 +10,6 @@ export const typeFeature: Feature = {
     validate: validateType
 };
 
-reduceType.toJSON = () => "reduceType";
 function reduceType({ node, pointer, data }: JsonSchemaReducerParams): undefined | SchemaNode {
     const dataType = getJsonSchemaType(data, node.schema.type);
     if (dataType !== "undefined" && Array.isArray(node.schema.type) && node.schema.type.includes(dataType)) {
@@ -30,7 +29,6 @@ function getJsonSchemaType(value: unknown, expectedType: string | string[]): JST
     return jsType;
 }
 
-validateType.toJSON = () => "type";
 function validateType({ node, data, pointer }: JsonSchemaValidatorParams) {
     const schema = node.schema;
     const dataType = getJsonSchemaType(data, schema.type);

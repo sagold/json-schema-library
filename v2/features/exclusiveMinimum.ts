@@ -7,7 +7,6 @@ export const exclusiveMinimumFeature: Feature = {
     validate: validateExclusiveMinimum
 };
 
-validateExclusiveMinimum.toJSON = () => "exclusiveMinimum";
 function validateExclusiveMinimum({ node, data, pointer }: JsonSchemaValidatorParams) {
     if (typeof data !== "number") {
         return undefined;

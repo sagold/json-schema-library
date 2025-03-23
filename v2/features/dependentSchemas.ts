@@ -39,7 +39,6 @@ export function parseDependentSchemas(node: SchemaNode) {
     });
 }
 
-reduceDependentSchemas.toJSON = () => "reduceDependentSchemas";
 export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) {
     if (!isObject(data)) {
         // @todo remove dependentSchemas

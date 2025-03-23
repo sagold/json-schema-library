@@ -8,7 +8,6 @@ export const maxLengthFeature: Feature = {
     validate: validateMaxLength
 };
 
-validateMaxLength.toJSON = () => "maxLength";
 function validateMaxLength({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
     if (typeof data !== "string") {
         return;
