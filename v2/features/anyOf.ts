@@ -18,9 +18,6 @@ export function parseAnyOf(node: SchemaNode) {
             node.compileSchema(s, `${spointer}/anyOf/${index}`, `${schemaId}/anyOf/${index}`)
         );
     }
-    if (anyOfFeature.addReduce(node)) {
-        node.reducers.push(anyOfFeature.reduce);
-    }
 }
 
 reduceAnyOf.toJSON = () => "reduceAnyOf";
@@ -34,12 +31,6 @@ function reduceAnyOf({ node, data }: JsonSchemaReducerParams) {
         }
     }
     return node.compileSchema(mergedSchema, `${node.spointer}/anyOf`, node.schemaId);
-}
-
-export function anyOfValidator(node: SchemaNode) {
-    if (anyOfFeature.addValidate(node)) {
-        node.validators.push(anyOfFeature.validate);
-    }
 }
 
 function validateAnyOf({ node, data, pointer, path }: JsonSchemaValidatorParams) {

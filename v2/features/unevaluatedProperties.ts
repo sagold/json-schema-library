@@ -22,12 +22,6 @@ export function parseUnevaluatedProperties(node: SchemaNode) {
     );
 }
 
-export function unevaluatedPropertiesValidator(node: SchemaNode): void {
-    if (unevaluatedPropertiesFeature.addValidate(node)) {
-        node.validators.push(unevaluatedPropertiesFeature.validate);
-    }
-}
-
 validateUnevaluatedProperties.toJSON = () => "unevaluatedProperties";
 function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     // if not in properties, evaluated by additionalProperties and not matches patternProperties

@@ -24,24 +24,10 @@ export function parseOneOf(node: SchemaNode) {
             node.compileSchema(s, `${spointer}/oneOf/${index}`, `${schemaId}/oneOf/${index}`)
         );
     }
-
-    if (oneOfFeature.addReduce(node)) {
-        node.reducers.push(oneOfFeature.reduce);
-    }
-}
-
-export function validateOneOf(node: SchemaNode): void {
-    if (oneOfFeature.addValidate(node)) {
-        node.validators.push(oneOfFeature.validate);
-    }
 }
 
 reduceOneOf.toJSON = () => "reduceOneOf";
 function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
-    // if (pointer == null) {
-    //     throw new Error("undefined pointer");
-    // }
-
     // !keyword: oneOfProperty
     // an additional <DECLARATOR_ONEOF> (default `oneOfProperty`) on the schema will exactly determine the
     // oneOf value (if set in data)

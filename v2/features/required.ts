@@ -1,5 +1,5 @@
 import { isObject } from "../../lib/utils/isObject";
-import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../types";
 import { hasProperty } from "../utils/hasProperty";
 
 export const requiredFeature: Feature = {
@@ -8,12 +8,6 @@ export const requiredFeature: Feature = {
     addValidate: ({ schema }) => Array.isArray(schema.required),
     validate: validateRequired
 };
-
-export function requiredValidator(node: SchemaNode): void {
-    if (requiredFeature.addValidate(node)) {
-        node.validators.push(requiredFeature.validate);
-    }
-}
 
 validateRequired.toJSON = () => "required";
 function validateRequired({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {

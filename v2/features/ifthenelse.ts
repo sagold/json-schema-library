@@ -22,10 +22,6 @@ export function parseIfThenElse(node: SchemaNode) {
     if (schema.else != null) {
         node.else = node.compileSchema(schema.else, `${spointer}/else`);
     }
-
-    if (ifFeature.addReduce(node)) {
-        node.reducers.push(ifFeature.reduce);
-    }
 }
 
 reduceIf.toJSON = () => "reduceIf";
@@ -47,12 +43,6 @@ function reduceIf({ node, data, pointer }: JsonSchemaReducerParams) {
         return node.compileSchema(schema, node.else.spointer);
     }
     return undefined;
-}
-
-export function ifThenElseValidator(node: SchemaNode) {
-    if (ifFeature.addValidate(node)) {
-        node.validators.push(ifFeature.validate);
-    }
 }
 
 function validateIfThenElse({ node, data, pointer, path }: JsonSchemaValidatorParams) {

@@ -8,7 +8,7 @@ export const additionalPropertiesFeature: Feature = {
     id: "additionalProperties",
     keyword: "additionalProperties",
     parse: parseAdditionalProperties,
-    addResolve: (node: SchemaNode) => node.properties != null,
+    addResolve: ({ schema }) => schema.additionalProperties != null,
     resolve: additionalPropertyResolver,
     addValidate: ({ schema }) =>
         schema.additionalProperties !== true &&
@@ -29,12 +29,12 @@ export function parseAdditionalProperties(node: SchemaNode) {
             `${schemaId}/additionalProperties`
         );
     }
-    node.resolvers.push(additionalPropertyResolver);
 }
 
 additionalPropertyResolver.toJSON = () => "additionalPropertyResolver";
 function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParams) {
     const value = getValue(data, key);
+    console.log("resolve additional property", value, node.schema.additionalProperties);
     if (node.additionalProperties) {
         return node.additionalProperties.reduce({ data: value });
     }
@@ -47,14 +47,6 @@ function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParam
             // @todo add pointer to resolver
             // properties: expectedProperties
         });
-    }
-}
-
-export function additionalPropertiesValidator(node: SchemaNode): void {
-    if (additionalPropertiesFeature.addValidate(node)) {
-        // note: additionalProperties already parsed
-        // note: properties, etc already tested
-        node.validators.push(validateAdditionalProperty);
     }
 }
 

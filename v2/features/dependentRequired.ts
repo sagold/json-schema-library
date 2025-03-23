@@ -1,6 +1,6 @@
 import { JsonError } from "../../lib/types";
 import { isObject } from "../../lib/utils/isObject";
-import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../types";
 
 export const dependentRequiredFeature: Feature = {
     id: "dependentRequired",
@@ -8,12 +8,6 @@ export const dependentRequiredFeature: Feature = {
     addValidate: (node) => isObject(node.schema.dependentRequired),
     validate: validateDependentRequired
 };
-
-export function dependentRequiredValidator(node: SchemaNode): void {
-    if (dependentRequiredFeature.addValidate(node)) {
-        node.validators.push(dependentRequiredFeature.validate);
-    }
-}
 
 validateDependentRequired.toJSON = () => "dependentRequired";
 export function validateDependentRequired({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {

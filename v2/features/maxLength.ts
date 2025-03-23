@@ -1,5 +1,5 @@
 import ucs2decode from "../../lib/utils/punycode.ucs2decode";
-import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../types";
 
 export const maxLengthFeature: Feature = {
     id: "maxLength",
@@ -7,12 +7,6 @@ export const maxLengthFeature: Feature = {
     addValidate: ({ schema }) => !isNaN(schema.maxLength),
     validate: validateMaxLength
 };
-
-export function maxLengthValidator(node: SchemaNode): void {
-    if (maxLengthFeature.addValidate(node)) {
-        node.validators.push(maxLengthFeature.validate);
-    }
-}
 
 validateMaxLength.toJSON = () => "maxLength";
 function validateMaxLength({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {

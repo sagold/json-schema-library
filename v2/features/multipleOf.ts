@@ -1,5 +1,5 @@
 import { getPrecision } from "../../lib/utils/getPrecision";
-import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../types";
 
 export const multipleOfFeature: Feature = {
     id: "multipleOf",
@@ -7,12 +7,6 @@ export const multipleOfFeature: Feature = {
     addValidate: ({ schema }) => !isNaN(schema.multipleOf),
     validate: validateMultipleOf
 };
-
-export function multipleOfValidator(node: SchemaNode): void {
-    if (multipleOfFeature.addValidate(node)) {
-        node.validators.push(multipleOfFeature.validate);
-    }
-}
 
 function validateMultipleOf({ node, data, pointer }: JsonSchemaValidatorParams) {
     if (typeof data !== "number") {

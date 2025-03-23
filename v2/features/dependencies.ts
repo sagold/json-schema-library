@@ -39,10 +39,6 @@ export function parseDependencies(node: SchemaNode) {
             node.dependencies[property] = schema;
         }
     });
-
-    if (dependenciesFeature.addReduce(node)) {
-        node.reducers.push(dependenciesFeature.reduce);
-    }
 }
 
 reduceDependencies.toJSON = () => "reduceDependencies";
@@ -70,12 +66,6 @@ export function reduceDependencies({ node, data, path }: JsonSchemaReducerParams
 
     mergedSchema = mergeSchema(node.schema, mergedSchema, "dependencies");
     return node.compileSchema(mergedSchema, node.spointer).reduce({ data, path });
-}
-
-export function dependenciesValidator(node: SchemaNode): void {
-    if (dependenciesFeature.addValidate(node)) {
-        node.validators.push(dependenciesFeature.validate);
-    }
 }
 
 validateDependencies.toJSON = () => "dependencies";

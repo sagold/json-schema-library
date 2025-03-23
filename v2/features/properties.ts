@@ -32,16 +32,6 @@ export function parseProperties(node: SchemaNode) {
             node.properties[propertyName] = propertyNode;
         });
     }
-    if (propertiesFeature.addResolve(node)) {
-        node.resolvers.push(propertyResolver);
-    }
-}
-
-propertiesValidator.toJSON = () => "propertiesValidator";
-export function propertiesValidator(node: SchemaNode) {
-    if (propertiesFeature.addValidate(node)) {
-        node.validators.push(validateProperties);
-    }
 }
 
 validateProperties.toJSON = () => "properties";

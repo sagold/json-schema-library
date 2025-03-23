@@ -10,7 +10,7 @@ export const refFeature: Feature = {
     validate: validateRef
 };
 
-export function parseRef(node: SchemaNode) {
+function parseRef(node: SchemaNode) {
     // get and store current $id of node - this may be the same as parent $id
     let currentId = node.parent?.$id;
     if (node.schema?.$ref == null) {
@@ -47,13 +47,7 @@ export function parseRef(node: SchemaNode) {
     }
 }
 
-export function refValidator(node: SchemaNode) {
-    if (refFeature.addValidate(node)) {
-        node.validators.push(refFeature.validate);
-    }
-}
-
-export function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
+function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
     const nextNode = resolveAllRefs(node, pointer, path);
     if (nextNode == null) {
         return undefined;

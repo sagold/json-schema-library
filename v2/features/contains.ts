@@ -17,13 +17,6 @@ export function parseContains(node: SchemaNode) {
     node.contains = node.compileSchema(schema.contains, `${spointer}/contains`);
 }
 
-// @todo this combines multiple validators (maxContains and minContains)
-export function containsValidator(node: SchemaNode): void {
-    if (containsFeature.addValidate(node)) {
-        node.validators.push(containsFeature.validate);
-    }
-}
-
 function validateContains({ node, data, pointer }: JsonSchemaValidatorParams) {
     const { schema } = node;
     if (!Array.isArray(data)) {

@@ -1,4 +1,4 @@
-import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../types";
 
 export const minimumFeature: Feature = {
     id: "minimum",
@@ -6,12 +6,6 @@ export const minimumFeature: Feature = {
     addValidate: ({ schema }) => !isNaN(schema.minimum),
     validate: validateMinimum
 };
-
-export function minimumValidator(node: SchemaNode): void {
-    if (minimumFeature.addValidate(node)) {
-        node.validators.push(minimumFeature.validate);
-    }
-}
 
 validateMinimum.toJSON = () => "minimum";
 function validateMinimum({ node, data, pointer }: JsonSchemaValidatorParams) {

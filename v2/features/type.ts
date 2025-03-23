@@ -4,24 +4,11 @@ import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode
 export const typeFeature: Feature = {
     id: "type",
     keyword: "type",
-    parse: parseType,
     addReduce: (node) => Array.isArray(node.schema.type),
     reduce: reduceType,
     addValidate: ({ schema }) => schema.type != null,
     validate: validateType
 };
-
-export function parseType(node: SchemaNode) {
-    if (typeFeature.addReduce(node)) {
-        node.reducers.push(typeFeature.reduce);
-    }
-}
-
-export function typeValidator(node: SchemaNode): void {
-    if (typeFeature.addValidate(node)) {
-        node.validators.push(typeFeature.validate);
-    }
-}
 
 reduceType.toJSON = () => "reduceType";
 function reduceType({ node, pointer, data }: JsonSchemaReducerParams): undefined | SchemaNode {

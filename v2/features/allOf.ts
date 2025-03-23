@@ -19,9 +19,6 @@ export function parseAllOf(node: SchemaNode) {
             node.compileSchema(s, `${spointer}/allOf/${index}`, `${node.schemaId}/allOf/${index}`)
         );
     }
-    if (allOfFeature.addReduce(node)) {
-        node.reducers.push(allOfFeature.reduce);
-    }
 }
 
 reduceAllOf.toJSON = () => "reduceAllOf";
@@ -35,12 +32,6 @@ function reduceAllOf({ node, data }: JsonSchemaReducerParams) {
         mergedSchema = mergeSchema(mergedSchema, schema, "allOf");
     }
     return node.compileSchema(mergedSchema, `${node.spointer}/allOf`, node.schemaId);
-}
-
-export function allOfValidator(node: SchemaNode) {
-    if (allOfFeature.addValidate(node)) {
-        node.validators.push(allOfFeature.validate);
-    }
 }
 
 function validateAllOf({ node, data, pointer, path }: JsonSchemaValidatorParams) {

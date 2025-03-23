@@ -27,9 +27,6 @@ export function parseAdditionalItems(node: SchemaNode) {
             `${schemaId}/additionalItems`
         );
     }
-    if (additionalItemsFeature.addResolve(node)) {
-        node.resolvers.push(additionalItemsResolver);
-    }
 }
 
 export function additionalItemsValidator(node: SchemaNode): void {

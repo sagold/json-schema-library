@@ -3,6 +3,11 @@ import { isObject } from "../../lib/utils/isObject";
 import { Feature, isSchemaNode, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import sanitizeErrors from "../utils/sanitizeErrors";
 
+/**
+ * @draft >= 2019-09
+ * Similar to additionalItems, but can "see" into subschemas and across references
+ * https://json-schema.org/draft/2019-09/json-schema-core#rfc.section.9.3.1.3
+ */
 export const unevaluatedItemsFeature: Feature = {
     id: "unevaluatedItems",
     keyword: "unevaluatedItems",
@@ -20,17 +25,6 @@ export function parseUnevaluatedItems(node: SchemaNode) {
         `${node.spointer}/unevaluatedItems`,
         `${node.schemaId}/unevaluatedItems`
     );
-}
-
-/**
- * @draft >= 2019-09
- * Similar to additionalItems, but can "see" into subschemas and across references
- * https://json-schema.org/draft/2019-09/json-schema-core#rfc.section.9.3.1.3
- */
-export function unevaluatedItemsValidator(node: SchemaNode): void {
-    if (unevaluatedItemsFeature.addValidate(node)) {
-        node.validators.push(unevaluatedItemsFeature.validate);
-    }
 }
 
 function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValidatorParams) {

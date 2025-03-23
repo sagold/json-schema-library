@@ -39,13 +39,6 @@ export function parsePatternProperties(node: SchemaNode) {
             `${node.schemaId}/patternProperties/${pattern}`
         )
     }));
-
-    if (patternPropertiesFeature.addReduce(node)) {
-        node.reducers.push(patternPropertiesFeature.reduce);
-    }
-    if (patternPropertiesFeature.addResolve(node)) {
-        node.reducers.push(patternPropertiesFeature.resolve);
-    }
 }
 
 patternPropertyResolver.toJSON = () => "patternProperty";
@@ -89,12 +82,6 @@ function reducePatternProperties({ node, data, key }: JsonSchemaReducerParams) {
 
     mergedSchema = mergeSchema(node.schema, mergedSchema, "patternProperties");
     return node.compileSchema(mergedSchema, node.spointer);
-}
-
-export function patternPropertiesValidator(node: SchemaNode) {
-    if (patternPropertiesFeature.addValidate(node)) {
-        node.validators.push(patternPropertiesFeature.validate);
-    }
 }
 
 validatePatternProperties.toJSON = () => "patternProperties";

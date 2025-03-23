@@ -1,4 +1,4 @@
-import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../types";
 import getTypeOf from "../../lib/getTypeOf";
 
 export const enumFeature: Feature = {
@@ -7,12 +7,6 @@ export const enumFeature: Feature = {
     addValidate: ({ schema }) => Array.isArray(schema.enum),
     validate: validateEnum
 };
-
-export function enumValidator(node: SchemaNode): void {
-    if (enumFeature.addValidate(node)) {
-        node.validators.push(enumFeature.validate);
-    }
-}
 
 function validateEnum({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
     const { schema } = node;

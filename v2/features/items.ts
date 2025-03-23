@@ -34,12 +34,6 @@ export function parseItems(node: SchemaNode) {
     }
 }
 
-export function itemsValidator(node: SchemaNode) {
-    if (itemsFeature.addValidate(node)) {
-        node.validators.push(itemsFeature.validate);
-    }
-}
-
 validateItems.toJSON = () => "validateItems";
 function validateItems({
     node,

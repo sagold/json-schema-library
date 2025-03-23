@@ -3,14 +3,14 @@ import { joinId } from "../../utils/joinId";
 import { isObject } from "../../../lib/utils/isObject";
 import { omit } from "../../../lib/utils/omit";
 import splitRef from "../../../lib/compile/splitRef";
-import { validateRef } from "../draft06/ref";
+import { refFeature as draft06Feature } from "../draft06/ref";
 
 export const refFeature: Feature = {
     id: "$ref",
     keyword: "$ref",
     parse: parseRef,
     addValidate: ({ schema }) => schema.$ref != null,
-    validate: validateRef
+    validate: draft06Feature.validate
 };
 
 function register(node: SchemaNode, path: string) {
@@ -19,7 +19,7 @@ function register(node: SchemaNode, path: string) {
     }
 }
 
-export function parseRef(node: SchemaNode) {
+function parseRef(node: SchemaNode) {
     // get and store current id of node - this may be the same as parent id
     let currentId = node.parent?.$id;
     if (node.schema?.$ref == null && node.schema?.id) {
@@ -57,7 +57,7 @@ export function parseRef(node: SchemaNode) {
     }
 }
 
-export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
+function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
     // throw new Error("resolving ref");
     const node = this as SchemaNode;
     if (node.ref == null) {
@@ -82,7 +82,7 @@ function compileNext(referencedNode: SchemaNode, spointer = referencedNode.spoin
     return referencedNode.compileSchema(referencedSchema, `${spointer}/$ref`, referencedSchema.schemaId);
 }
 
-export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode | undefined {
+function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode | undefined {
     if ($ref == null) {
         return node;
     }

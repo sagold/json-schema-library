@@ -1,4 +1,4 @@
-import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../types";
 
 export const patternFeature: Feature = {
     id: "pattern",
@@ -6,12 +6,6 @@ export const patternFeature: Feature = {
     addValidate: ({ schema }) => typeof schema.pattern === "string",
     validate: validatePattern
 };
-
-export function patternValidator(node: SchemaNode): void {
-    if (patternFeature.addValidate(node)) {
-        node.validators.push(patternFeature.validate);
-    }
-}
 
 function validatePattern({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
     const { schema } = node;

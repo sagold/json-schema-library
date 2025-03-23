@@ -1,5 +1,5 @@
 import { isObject } from "../../lib/utils/isObject";
-import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../types";
 
 export const minPropertiesFeature: Feature = {
     id: "minProperties",
@@ -7,12 +7,6 @@ export const minPropertiesFeature: Feature = {
     addValidate: ({ schema }) => !isNaN(schema.minProperties),
     validate: validateMinProperties
 };
-
-export function minPropertiesValidator(node: SchemaNode): void {
-    if (minPropertiesFeature.addValidate(node)) {
-        node.validators.push(minPropertiesFeature.validate);
-    }
-}
 
 function validateMinProperties({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
     if (!isObject(data)) {

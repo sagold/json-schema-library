@@ -1,4 +1,4 @@
-import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../../types";
+import { Feature, JsonSchemaValidatorParams } from "../../types";
 
 export const exclusiveMinimumFeature: Feature = {
     id: "exclusiveMinimum",
@@ -6,13 +6,6 @@ export const exclusiveMinimumFeature: Feature = {
     addValidate: ({ schema }) => schema.exclusiveMinimum === true || !isNaN(schema.minimum),
     validate: validateExclusiveMinimum
 };
-
-export function exclusiveMinimumValidator({ schema, validators }: SchemaNode): void {
-    if (schema.exclusiveMinimum !== true || isNaN(schema.minimum)) {
-        return undefined;
-    }
-    validators.push();
-}
 
 function validateExclusiveMinimum({ node, data, pointer }: JsonSchemaValidatorParams) {
     if (typeof data !== "number") {

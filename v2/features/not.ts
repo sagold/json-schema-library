@@ -15,12 +15,6 @@ export function parseNot(node: SchemaNode) {
     }
 }
 
-export function notValidator(node: SchemaNode): void {
-    if (notFeature.addValidate(node)) {
-        node.validators.push(notFeature.validate);
-    }
-}
-
 function validateNot({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
     const { schema } = node;
     if (node.not.validate(data, pointer).length === 0) {

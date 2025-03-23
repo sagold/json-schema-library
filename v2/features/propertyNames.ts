@@ -24,12 +24,6 @@ export function parsePropertyNames(node: SchemaNode) {
     }
 }
 
-export function propertyNamesValidator(node: SchemaNode): void {
-    if (propertyNamesFeature.addValidate(node)) {
-        node.validators.push(propertyNamesFeature.validate);
-    }
-}
-
 function validatePropertyNames({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
     const { schema } = node;
     if (!isObject(data)) {

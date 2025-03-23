@@ -1,5 +1,5 @@
 import ucs2decode from "../../lib/utils/punycode.ucs2decode";
-import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../types";
 
 export const minLengthFeature: Feature = {
     id: "minLength",
@@ -7,12 +7,6 @@ export const minLengthFeature: Feature = {
     addValidate: ({ schema }) => !isNaN(schema.minLength),
     validate: validateMinLength
 };
-
-export function minLengthValidator(node: SchemaNode): void {
-    if (minLengthFeature.addValidate(node)) {
-        node.validators.push(minLengthFeature.validate);
-    }
-}
 
 validateMinLength.toJSON = () => "minLength";
 function validateMinLength({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {

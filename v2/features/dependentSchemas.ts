@@ -37,10 +37,6 @@ export function parseDependentSchemas(node: SchemaNode) {
             node.dependentSchemas[property] = schema;
         }
     });
-
-    if (dependentSchemasFeature.addReduce(node)) {
-        node.reducers.push(dependentSchemasFeature.reduce);
-    }
 }
 
 reduceDependentSchemas.toJSON = () => "reduceDependentSchemas";
@@ -70,12 +66,6 @@ export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) 
 
     mergedSchema = mergeSchema(node.schema, mergedSchema, "dependentSchemas");
     return node.compileSchema(mergedSchema, node.spointer, node.schemaId);
-}
-
-export function dependentSchemasValidator(node: SchemaNode): void {
-    if (dependentSchemasFeature.addValidate(node)) {
-        node.validators.push(dependentSchemasFeature.validate);
-    }
 }
 
 export function validateDependentSchemas({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {

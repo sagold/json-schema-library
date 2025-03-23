@@ -1,5 +1,5 @@
 import { JsonError } from "../../lib/types";
-import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../types";
 import deepEqual from "fast-deep-equal";
 
 export const uniqueItemsFeature: Feature = {
@@ -8,12 +8,6 @@ export const uniqueItemsFeature: Feature = {
     addValidate: ({ schema }) => schema.uniqueItems === true,
     validate: validateUniqueItems
 };
-
-export function uniqueItemsValidator(node: SchemaNode): void {
-    if (uniqueItemsFeature.addValidate(node)) {
-        node.validators.push(uniqueItemsFeature.validate);
-    }
-}
 
 function validateUniqueItems({ node, data, pointer }: JsonSchemaValidatorParams) {
     if (!Array.isArray(data)) {

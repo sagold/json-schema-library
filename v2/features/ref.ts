@@ -61,12 +61,6 @@ export function parseRef(node: SchemaNode) {
     }
 }
 
-export function refValidator(node: SchemaNode) {
-    if (refFeature.addValidate(node)) {
-        node.validators.push(refFeature.validate);
-    }
-}
-
 function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
     const nextNode = node.resolveRef({ pointer, path });
     if (nextNode == null) {

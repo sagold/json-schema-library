@@ -433,7 +433,6 @@ describe("step", () => {
                     { type: "object", additionalProperties: { type: "number" } }
                 ]
             }).get("title", { title: 4, test: 2 });
-
             assert.deepEqual(res.schema, { type: "number" });
         });
 

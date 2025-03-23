@@ -1,5 +1,5 @@
 import { isObject } from "../../lib/utils/isObject";
-import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../types";
 
 export const maxPropertiesFeature: Feature = {
     id: "maxProperties",
@@ -7,12 +7,6 @@ export const maxPropertiesFeature: Feature = {
     addValidate: ({ schema }) => !isNaN(schema.maxProperties),
     validate: validateMaxProperties
 };
-
-export function maxPropertiesValidator(node: SchemaNode): void {
-    if (maxPropertiesFeature.addValidate(node)) {
-        node.validators.push(maxPropertiesFeature.validate);
-    }
-}
 
 function validateMaxProperties({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
     if (!isObject(data)) {
