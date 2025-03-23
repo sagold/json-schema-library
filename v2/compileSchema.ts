@@ -7,7 +7,7 @@ import sanitizeErrors from "./utils/sanitizeErrors";
 import { isJsonError, JsonError, JsonSchema } from "../lib/types";
 import { joinId } from "./utils/joinId";
 import { omit } from "../lib/utils/omit";
-import { SchemaNode, JsonSchemaReducerParams, isSchemaNode, Context } from "./types";
+import { SchemaNode, JsonSchemaReducerParams, isSchemaNode, Context, Feature } from "./types";
 import { strict as assert } from "assert";
 import { getTemplate } from "./getTemplate";
 import { join, split } from "@sagold/json-pointer";
@@ -352,21 +352,34 @@ export function compileSchema(schema: JsonSchema, remoteContext?: Context) {
 
 // - $ref parses node id and has to execute everytime
 // - if is a shortcut for if-then-else and should always parse
-const whitelist = ["$ref", "if"];
+// - $defs contains a shortcut for definitions
+const whitelist = ["$ref", "if", "$defs"];
+const noRefMergeDrafts = ["draft-04", "draft-06", "draft-07"];
 function addFeatures(node: SchemaNode) {
+    if (node.schema.$ref && noRefMergeDrafts.includes(node.context.VERSION)) {
+        // for these draft versions only ref is validated
+        const ref = node.context.FEATURES.find((feature) => feature.keyword === "$ref");
+        if (ref) {
+            execFeature(ref, node);
+        }
+        return;
+    }
+
     const keys = Object.keys(node.schema);
     node.context.FEATURES.filter(({ keyword }) => keys.includes(keyword) || whitelist.includes(keyword)).forEach(
-        (feature) => {
-            feature.parse?.(node);
-            if (feature.addReduce?.(node)) {
-                node.reducers.push(feature.reduce);
-            }
-            if (feature.addResolve?.(node)) {
-                node.resolvers.push(feature.resolve);
-            }
-            if (feature.addValidate?.(node)) {
-                node.validators.push(feature.validate);
-            }
-        }
+        (feature) => execFeature(feature, node)
     );
+}
+
+function execFeature(feature: Feature, node: SchemaNode) {
+    feature.parse?.(node);
+    if (feature.addReduce?.(node)) {
+        node.reducers.push(feature.reduce);
+    }
+    if (feature.addResolve?.(node)) {
+        node.resolvers.push(feature.resolve);
+    }
+    if (feature.addValidate?.(node)) {
+        node.validators.push(feature.validate);
+    }
 }
