@@ -113,7 +113,7 @@ export type ValidationPath = {
     node: SchemaNode;
 }[];
 
-type GetSchemaOptions = {
+export type GetSchemaOptions = {
     path?: ValidationPath;
     pointer?: string;
     /**
