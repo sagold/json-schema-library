@@ -154,6 +154,7 @@ const DYNAMIC_PROPERTIES: string[] = [
 const NODE_METHODS: Pick<
     SchemaNode,
     | "get"
+    | "getRef"
     | "getSchema"
     | "getTemplate"
     | "reduce"
@@ -228,6 +229,10 @@ const NODE_METHODS: Pick<
             node = nextNode;
         }
         return node.resolveRef(options);
+    },
+
+    getRef($ref: string) {
+        return compileSchema({ $ref }, { remoteContext: this.context }).resolveRef();
     },
 
     get(key, data, options = {}) {
