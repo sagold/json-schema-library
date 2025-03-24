@@ -1,4 +1,3 @@
-import createSchemaOf from "./createSchema";
 import { errors } from "./errors/errors";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import { CreateError } from "./errors/createCustomError";
@@ -23,6 +22,7 @@ import {
     JsonError,
     JsonSchema
 } from "./types";
+import { createSchema } from "./createSchema";
 
 type CompileOptions = {
     drafts: DraftList;
@@ -97,7 +97,7 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
         drafts
     };
 
-    node.context.remotes[schema.$id ?? "#"] = node;
+    node.context.remotes[schema?.$id ?? "#"] = node;
     addFeatures(node);
     return node;
 }
@@ -110,10 +110,9 @@ const noRefMergeDrafts = ["draft-04", "draft-06", "draft-07"];
 function addFeatures(node: SchemaNode) {
     if (node.schema.$ref && noRefMergeDrafts.includes(node.context.version)) {
         // for these draft versions only ref is validated
-        const ref = node.context.features.find((feature) => feature.keyword === "$ref");
-        if (ref) {
-            execFeature(ref, node);
-        }
+        node.context.features
+            .filter(({ keyword }) => whitelist.includes(keyword))
+            .forEach((feature) => execFeature(feature, node));
         return;
     }
     const keys = Object.keys(node.schema);
@@ -287,7 +286,7 @@ const NODE_METHODS: Pick<
             return node;
             // @ts-expect-error bool schema
         } else if (node.schema === true) {
-            const nextNode = node.compileSchema(createSchemaOf(data), node.spointer, node.schemaId);
+            const nextNode = node.compileSchema(createSchema(data), node.spointer, node.schemaId);
             path?.push({ pointer, node });
             return nextNode;
         }

@@ -1,5 +1,5 @@
-import { expect } from "chai";
-import { mergeSchema } from "../../lib/mergeSchema";
+import { strict as assert } from "assert";
+import { mergeSchema } from "./mergeSchema";
 
 describe("mergeSchema", () => {
     it("should merge required statements", () => {
@@ -7,14 +7,14 @@ describe("mergeSchema", () => {
             { type: "object", required: ["one", "two"] },
             { type: "object", required: ["one", "three"] }
         );
-        expect(schema.required).to.deep.equal(["one", "two", "three"]);
+        assert.deepEqual(schema.required, ["one", "two", "three"]);
     });
     it("should merge properties", () => {
         const schema = mergeSchema(
             { type: "object", properties: { one: { type: "string" } } },
             { type: "object", properties: { two: { type: "number" } } }
         );
-        expect(schema.properties).to.deep.equal({
+        assert.deepEqual(schema.properties, {
             one: { type: "string" },
             two: { type: "number" }
         });
@@ -24,7 +24,7 @@ describe("mergeSchema", () => {
             { type: "object", properties: { one: { type: "string", minLength: 1 } } },
             { type: "object", properties: { one: { type: "string", maxLength: 2 } } }
         );
-        expect(schema.properties).to.deep.equal({
+        assert.deepEqual(schema.properties, {
             one: { type: "string", minLength: 1, maxLength: 2 }
         });
     });
@@ -33,21 +33,18 @@ describe("mergeSchema", () => {
             { type: "array", items: { properties: { one: { type: "string", minLength: 1 } } } },
             { type: "array", items: { properties: { one: { type: "string", maxLength: 2 } } } }
         );
-        expect(schema.items.properties).to.deep.equal({
+        assert.deepEqual(schema.items.properties, {
             one: { type: "string", minLength: 1, maxLength: 2 }
         });
     });
     it("should overwrite properties by last argument", () => {
         const schema = mergeSchema({ type: "array" }, { type: "object" });
-        expect(schema.type).to.equal("object");
+        assert.deepEqual(schema.type, "object");
     });
 
     it("should overwrite items by last argument", () => {
-        const schema = mergeSchema(
-            { type: "array", items: [{ type: "string" }] },
-            { type: "array", items: [true] }
-        );
-        expect(schema.items).to.deep.equal([true]);
+        const schema = mergeSchema({ type: "array", items: [{ type: "string" }] }, { type: "array", items: [true] });
+        assert.deepEqual(schema.items, [true]);
     });
 
     it("should merge items of same type", () => {
@@ -55,7 +52,7 @@ describe("mergeSchema", () => {
             { type: "array", items: [{ type: "string", minLength: 1 }] },
             { type: "array", items: [{ type: "string", maxLength: 9 }] }
         );
-        expect(schema.items).to.deep.equal([{ type: "string", minLength: 1, maxLength: 9 }]);
+        assert.deepEqual(schema.items, [{ type: "string", minLength: 1, maxLength: 9 }]);
     });
 
     it("should not merge items of different type", () => {
@@ -63,7 +60,7 @@ describe("mergeSchema", () => {
             { type: "array", items: [{ type: "number", minimum: 1 }] },
             { type: "array", items: [{ type: "string", maxLength: 9 }] }
         );
-        expect(schema.items).to.deep.equal([{ type: "string", maxLength: 9 }]);
+        assert.deepEqual(schema.items, [{ type: "string", maxLength: 9 }]);
     });
 
     it("should replace items by last argument", () => {
@@ -71,6 +68,6 @@ describe("mergeSchema", () => {
             { type: "array", items: [{ type: "string" }, { type: "number" }] },
             { type: "array", items: [{ type: "boolean" }] }
         );
-        expect(schema.items).to.deep.equal([{ type: "boolean" }]);
+        assert.deepEqual(schema.items, [{ type: "boolean" }]);
     });
 });
