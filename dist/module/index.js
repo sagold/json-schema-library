@@ -6,8 +6,10 @@ export { draft04 } from "./src/draft04";
 export { draft06 } from "./src/draft06";
 export { draft07 } from "./src/draft07";
 export { draft2019 } from "./src/draft2019";
-// node methods
+// extra SchemaNode methods
 export { each } from "./src/each";
+export { eachSchema } from "./src/eachSchema";
+export { createSchema } from "./src/createSchema";
 // import { createError, createCustomError } from "./lib/utils/createCustomError";
 // import getTypeOf from "./lib/getTypeOf";
 // import { resolveOneOf, resolveOneOfFuzzy } from "./lib/features/oneOf";

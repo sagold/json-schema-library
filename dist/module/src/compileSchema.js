@@ -1,4 +1,3 @@
-import createSchemaOf from "./createSchema";
 import { errors } from "./errors/errors";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import { draft04 } from "./draft04";
@@ -12,6 +11,7 @@ import { joinId } from "./utils/joinId";
 import { mergeNode } from "./mergeNode";
 import { omit } from "./utils/omit";
 import { isSchemaNode, isJsonError } from "./types";
+import { createSchema } from "./createSchema";
 const defaultDrafts = [
     { regexp: "draft-04", draft: draft04 },
     { regexp: "draft-06", draft: draft06 },
@@ -71,7 +71,7 @@ export function compileSchema(schema, options = {}) {
         templateDefaultOptions: options.templateDefaultOptions,
         drafts
     };
-    node.context.remotes[(_c = schema.$id) !== null && _c !== void 0 ? _c : "#"] = node;
+    node.context.remotes[(_c = schema === null || schema === void 0 ? void 0 : schema.$id) !== null && _c !== void 0 ? _c : "#"] = node;
     addFeatures(node);
     return node;
 }
@@ -83,10 +83,9 @@ const noRefMergeDrafts = ["draft-04", "draft-06", "draft-07"];
 function addFeatures(node) {
     if (node.schema.$ref && noRefMergeDrafts.includes(node.context.version)) {
         // for these draft versions only ref is validated
-        const ref = node.context.features.find((feature) => feature.keyword === "$ref");
-        if (ref) {
-            execFeature(ref, node);
-        }
+        node.context.features
+            .filter(({ keyword }) => whitelist.includes(keyword))
+            .forEach((feature) => execFeature(feature, node));
         return;
     }
     const keys = Object.keys(node.schema);
@@ -185,6 +184,9 @@ const NODE_METHODS = {
         }
         return node.resolveRef(options);
     },
+    getRef($ref) {
+        return compileSchema({ $ref }, { remoteContext: this.context }).resolveRef();
+    },
     get(key, data, options = {}) {
         var _a, _b, _c;
         options.path = (_a = options.path) !== null && _a !== void 0 ? _a : [];
@@ -236,7 +238,7 @@ const NODE_METHODS = {
             // @ts-expect-error bool schema
         }
         else if (node.schema === true) {
-            const nextNode = node.compileSchema(createSchemaOf(data), node.spointer, node.schemaId);
+            const nextNode = node.compileSchema(createSchema(data), node.spointer, node.schemaId);
             path === null || path === void 0 ? void 0 : path.push({ pointer, node });
             return nextNode;
         }

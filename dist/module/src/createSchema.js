@@ -4,7 +4,7 @@ import { isObject } from "./utils/isObject";
  * Create a simple json schema for the given input data
  * @param  data - data to get json schema for
  */
-export default function createSchema(data) {
+export function createSchema(data) {
     if (data === undefined) {
         return undefined;
     }

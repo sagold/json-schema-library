@@ -140,6 +140,7 @@ export type SchemaNode = {
     compileSchema: (schema: JsonSchema, spointer?: string, schemaId?: string) => SchemaNode;
     /** Step into a property or array by name or index and return the schema-node its value */
     get: (key: string | number, data?: unknown, options?: GetSchemaOptions) => SchemaNode | JsonError;
+    getRef: ($ref: string) => SchemaNode | undefined;
     getSchema: (pointer: string, data?: unknown, options?: GetSchemaOptions) => SchemaNode | JsonError | undefined;
     /** Creates data that is valid to the schema of this node */
     getTemplate: (data?: unknown, options?: TemplateOptions) => unknown;
