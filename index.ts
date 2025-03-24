@@ -8,9 +8,11 @@ export { draft06 } from "./src/draft06";
 export { draft07 } from "./src/draft07";
 export { draft2019 } from "./src/draft2019";
 
-// node methods
+// extra SchemaNode methods
 export { each } from "./src/each";
 export type { EachCallback } from "./src/each";
+export { eachSchema } from "./src/eachSchema";
+export type { EachSchemaCallback } from "./src/eachSchema";
 
 // types
 export type {
