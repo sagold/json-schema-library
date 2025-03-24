@@ -1,1 +1,0 @@
-- In Draft 4, `$id` is just `id` (https://json-schema.org/understanding-json-schema/basics.html#declaring-a-unique-identifier)

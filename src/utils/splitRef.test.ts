@@ -1,60 +1,58 @@
-import { expect } from "chai";
-import splitRef from "../../../lib/compile/splitRef";
-
+import { strict as assert } from "assert";
+import splitRef from "./splitRef";
 
 describe("compile.splitRef", () => {
-
     it("should return empty list for empty string", () => {
         const result = splitRef("");
 
-        expect(result).to.deep.eq([]);
+        assert.deepEqual(result, []);
     });
 
     it("should return empty list for root pointer", () => {
         const result = splitRef("#");
 
-        expect(result).to.deep.eq([]);
+        assert.deepEqual(result, []);
     });
 
     it("should return input pointer from uri fragment", () => {
         const result = splitRef("#/a/b");
 
-        expect(result).to.deep.eq(["#/a/b"]);
+        assert.deepEqual(result, ["#/a/b"]);
     });
 
     it("should return input pointer", () => {
         const result = splitRef("/a/b");
 
-        expect(result).to.deep.eq(["/a/b"]);
+        assert.deepEqual(result, ["/a/b"]);
     });
 
     it("should return input id", () => {
         const result = splitRef("#ab");
 
-        expect(result).to.deep.eq(["#ab"]);
+        assert.deepEqual(result, ["#ab"]);
     });
 
     it("should return sanitized url", () => {
         const result = splitRef("http://example.com/");
 
-        expect(result).to.deep.eq(["http://example.com"]);
+        assert.deepEqual(result, ["http://example.com"]);
     });
 
     it("should return sanitized url", () => {
         const result = splitRef("http://example.com/#");
 
-        expect(result).to.deep.eq(["http://example.com"]);
+        assert.deepEqual(result, ["http://example.com"]);
     });
 
     it("should return sanitized url and id", () => {
         const result = splitRef("http://example.com/#ab");
 
-        expect(result).to.deep.eq(["http://example.com", "#ab"]);
+        assert.deepEqual(result, ["http://example.com", "#ab"]);
     });
 
     it("should return sanitized url and pointer", () => {
         const result = splitRef("http://example.com/#/a/b");
 
-        expect(result).to.deep.eq(["http://example.com", "#/a/b"]);
+        assert.deepEqual(result, ["http://example.com", "#/a/b"]);
     });
 });
