@@ -28,12 +28,6 @@ export function parseAdditionalItems(node: SchemaNode) {
     }
 }
 
-export function additionalItemsValidator(node: SchemaNode): void {
-    if (additionalItemsFeature.addValidate(node)) {
-        node.validators.push(additionalItemsFeature.validate);
-    }
-}
-
 function additionalItemsResolver({ node, key, data }: JsonSchemaResolverParams) {
     if (Array.isArray(data)) {
         // @attention: items, etc should already have been tried

@@ -188,6 +188,26 @@ const NODE_METHODS: Pick<
         return node;
     },
 
+    /**
+     * Returns a node containing json-schema of a data-json-pointer.
+     *
+     * To resolve dynamic schema where the type of json-schema is evaluated by
+     * its value, a data object has to be passed in options.
+     *
+     * Per default this function will return `undefined` schema for valid properties
+     * that do not have a defined schema. Use the option `withSchemaWarning: true` to
+     * receive an error with `code: schema-warning` containing the location of its
+     * last evaluated json-schema.
+     *
+     * Example:
+     *
+     * ```ts
+     * draft.setSchema({ type: "object", properties: { title: { type: "string" } } });
+     * const result = draft.getSchema({  pointer: "#/title" }, data: { title: "my header" });
+     * const schema = isSchemaNode(result) ? result.schema : undefined;
+     * // schema = { type: "string" }
+     * ```
+     */
     getSchema(pointer, data, options = {}) {
         options.path = options.path ?? [];
         options.withSchemaWarning = options.withSchemaWarning ?? false;
