@@ -1,8 +1,8 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../compileSchema";
-import { isJsonError } from "../../lib/types";
+import { isJsonError } from "../types";
 import { reduceOneOfDeclarator, reduceOneOfFuzzy } from "./oneOf";
-import settings from "../../lib/config/settings";
+import settings from "../settings";
 const DECLARATOR_ONEOF = settings.DECLARATOR_ONEOF;
 
 describe("feature : oneof : validate", () => {

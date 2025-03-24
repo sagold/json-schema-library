@@ -1,4 +1,4 @@
-import { getPrecision } from "../../lib/utils/getPrecision";
+import { getPrecision } from "../utils/getPrecision";
 import { Feature, JsonSchemaValidatorParams } from "../types";
 
 export const multipleOfFeature: Feature = {

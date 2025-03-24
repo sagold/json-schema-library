@@ -1,4 +1,4 @@
-import { isObject } from "../../lib/utils/isObject";
+import { isObject } from "../utils/isObject";
 
 export function pick(value: Record<string, unknown>, ...properties: string[]) {
     if (!isObject(value) || properties.length === 0) {

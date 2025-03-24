@@ -1,7 +1,7 @@
 import { strict as assert } from "assert";
 
 import { compileSchema } from "../compileSchema";
-import { isJsonError } from "../../lib/types";
+import { isJsonError } from "../types";
 
 describe("feature : properties : get", () => {
     it("should step into properties without data", () => {

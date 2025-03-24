@@ -1,8 +1,8 @@
 import { Feature, JsonSchemaValidatorParams, SchemaNode, ValidationPath } from "../types";
 import { joinId } from "../utils/joinId";
-import splitRef from "../../lib/compile/splitRef";
-import { omit } from "../../lib/utils/omit";
-import { isObject } from "../../lib/utils/isObject";
+import splitRef from "../utils/splitRef";
+import { omit } from "../utils/omit";
+import { isObject } from "../utils/isObject";
 
 export const refFeature: Feature = {
     id: "$ref",

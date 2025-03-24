@@ -1,13 +1,13 @@
-import { isSchemaNode, SchemaNode } from "./types";
-import getTypeOf from "../lib/getTypeOf";
-import { getValue } from "./utils/getValue";
-import { isObject } from "../lib/utils/isObject";
-import { getSchemaType } from "./utils/getSchemaType";
 import copy from "fast-copy";
-import { isEmpty } from "../lib/utils/isEmpty";
+import getTypeOf from "./utils/getTypeOf";
+import { getSchemaType } from "./utils/getSchemaType";
+import { getValue } from "./utils/getValue";
+import { isEmpty } from "./utils/isEmpty";
+import { isJsonError } from "./types";
+import { isObject } from "./utils/isObject";
+import { isSchemaNode, SchemaNode } from "./types";
 import { mergeNode } from "./mergeNode";
 import { reduceOneOfFuzzy } from "./features/oneOf";
-import { isJsonError } from "../lib/types";
 
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */

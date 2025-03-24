@@ -1,9 +1,15 @@
-import { JsonError, JsonSchema } from "../../lib/types";
-import { isObject } from "../../lib/utils/isObject";
-import { Feature, isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams } from "../types";
+import {
+    Feature,
+    isSchemaNode,
+    JsonSchemaReducerParams,
+    JsonSchemaValidatorParams,
+    JsonError,
+    JsonSchema,
+    SchemaNode
+} from "../types";
 import { getValue } from "../utils/getValue";
-import { SchemaNode } from "../types";
-import { mergeSchema } from "../../lib/mergeSchema";
+import { isObject } from "../utils/isObject";
+import { mergeSchema } from "../utils/mergeSchema";
 
 export const dependenciesFeature: Feature = {
     id: "dependencies",

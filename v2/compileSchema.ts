@@ -1,19 +1,28 @@
-import createSchemaOf from "../lib/createSchemaOf";
-import errors from "../lib/validation/errors";
+import createSchemaOf from "./createSchema";
+import { errors } from "./errors/errors";
 import sanitizeErrors from "./utils/sanitizeErrors";
-import { CreateError } from "../lib/utils/createCustomError";
+import { CreateError } from "./errors/createCustomError";
 import { draft04 } from "./draft04";
 import { draft06 } from "./draft06";
 import { draft07 } from "./draft07";
 import { draft2019 } from "./draft2019";
 import { getTemplate, TemplateOptions } from "./getTemplate";
 import { getValue } from "./utils/getValue";
-import { isJsonError, JsonError, JsonSchema } from "../lib/types";
 import { join, split } from "@sagold/json-pointer";
 import { joinId } from "./utils/joinId";
 import { mergeNode } from "./mergeNode";
-import { omit } from "../lib/utils/omit";
-import { SchemaNode, JsonSchemaReducerParams, isSchemaNode, Context, Feature, DraftList } from "./types";
+import { omit } from "./utils/omit";
+import {
+    SchemaNode,
+    JsonSchemaReducerParams,
+    isSchemaNode,
+    Context,
+    Feature,
+    DraftList,
+    isJsonError,
+    JsonError,
+    JsonSchema
+} from "./types";
 
 type CompileOptions = {
     drafts: DraftList;

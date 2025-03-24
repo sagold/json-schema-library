@@ -1,4 +1,4 @@
-import getTypeOf from "../getTypeOf";
+import getTypeOf from "./getTypeOf";
 
 export function isEmpty(v: unknown): boolean {
     const type = getTypeOf(v);

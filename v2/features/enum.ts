@@ -1,5 +1,5 @@
 import { Feature, JsonSchemaValidatorParams } from "../types";
-import getTypeOf from "../../lib/getTypeOf";
+import getTypeOf from "../utils/getTypeOf";
 
 export const enumFeature: Feature = {
     id: "enum",

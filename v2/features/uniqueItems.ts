@@ -1,4 +1,4 @@
-import { JsonError } from "../../lib/types";
+import { JsonError } from "../types";
 import { Feature, JsonSchemaValidatorParams } from "../types";
 import deepEqual from "fast-deep-equal";
 

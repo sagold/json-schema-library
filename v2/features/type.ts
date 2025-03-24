@@ -1,4 +1,4 @@
-import getTypeOf, { JSType } from "../../lib/getTypeOf";
+import getTypeOf, { JSType } from "../utils/getTypeOf";
 import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
 
 export const typeFeature: Feature = {

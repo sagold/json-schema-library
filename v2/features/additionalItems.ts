@@ -1,6 +1,5 @@
-import { JsonError } from "../../lib/types";
-import { isObject } from "../../lib/utils/isObject";
-import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { isObject } from "../utils/isObject";
+import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode, JsonError } from "../types";
 import { getValue } from "../utils/getValue";
 
 export const additionalItemsFeature: Feature = {

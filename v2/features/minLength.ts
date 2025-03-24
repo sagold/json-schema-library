@@ -1,4 +1,4 @@
-import ucs2decode from "../../lib/utils/punycode.ucs2decode";
+import ucs2decode from "../utils/punycode.ucs2decode";
 import { Feature, JsonSchemaValidatorParams } from "../types";
 
 export const minLengthFeature: Feature = {

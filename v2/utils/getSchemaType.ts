@@ -1,5 +1,5 @@
-import getTypeOf from "../../lib/getTypeOf";
-import { isObject } from "../../lib/utils/isObject";
+import getTypeOf from "./getTypeOf";
+import { isObject } from "../utils/isObject";
 import { SchemaNode } from "../types";
 
 export const SCHEMA_TYPES = ["string", "number", "integer", "boolean", "null", "array", "object"];

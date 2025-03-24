@@ -1,4 +1,4 @@
-import { isObject } from "../../lib/utils/isObject";
+import { isObject } from "../utils/isObject";
 import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
 
 export const containsFeature: Feature = {

@@ -1,8 +1,8 @@
-import { JsonError } from "../../lib/types";
+import { JsonError } from "../types";
 import { Feature, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 import { JsonSchemaResolverParams, JsonSchemaValidatorParams } from "../types";
-import { isObject } from "../../lib/utils/isObject";
+import { isObject } from "../utils/isObject";
 
 export const propertiesFeature: Feature = {
     id: "property",

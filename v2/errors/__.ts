@@ -1,5 +1,5 @@
-import strings from "../config/strings";
-import render from "./render";
+import { strings } from "./strings";
+import { render } from "./render";
 
 /**
  * Renders the given string as defined in __@see config/strings.js__

@@ -1,5 +1,5 @@
 import { isSchemaNode, SchemaNode } from "./types";
-import { mergeSchema } from "../lib/mergeSchema";
+import { mergeSchema } from "./utils/mergeSchema";
 
 interface SchemaNodeCB {
     toJSON?: () => string;

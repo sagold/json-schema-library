@@ -1,8 +1,8 @@
 import { Feature, SchemaNode, ValidationPath } from "../../types";
 import { joinId } from "../../utils/joinId";
-import { isObject } from "../../../lib/utils/isObject";
-import { omit } from "../../../lib/utils/omit";
-import splitRef from "../../../lib/compile/splitRef";
+import { isObject } from "../../utils/isObject";
+import { omit } from "../../utils/omit";
+import splitRef from "../../utils/splitRef";
 import { refFeature as draft06Feature } from "../draft06/ref";
 
 export const refFeature: Feature = {

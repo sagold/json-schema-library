@@ -2,7 +2,7 @@ import { strict as assert } from "assert";
 import { DraftVersion, FeatureTest, getDraftTests, Setup } from "./getDraftTests";
 import { addRemotes } from "./addRemotes";
 import { compileSchema } from "../../compileSchema";
-import { isObject } from "../../../lib/utils/isObject";
+import { isObject } from "../../utils/isObject";
 import { SchemaNode } from "../../types";
 
 let measurements = {

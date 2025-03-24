@@ -1,5 +1,4 @@
-/* eslint max-len: 0 */
-export default {
+export const strings: Record<string, string> = {
     // validation errors
     AdditionalItemsError: "Array at `{{pointer}}` may not have an additional item `{{key}}`",
     AdditionalPropertiesError: "Additional property `{{property}}` on `{{pointer}}` does not match schema `{{schema}}`",
@@ -37,14 +36,16 @@ export default {
     MaximumError: "Value in `{{pointer}}` is `{{length}}`, but should be `{{maximum}}` at maximum",
     MaxItemsError: "Too many items in `{{pointer}}`, should be `{{maximum}}` at most, but got `{{length}}`",
     MaxLengthError: "Value `{{pointer}}` should have a maximum length of `{{maxLength}}`, but got `{{length}}`.",
-    MaxPropertiesError: "Too many properties in `{{pointer}}`, should be `{{maxProperties}}` at most, but got `{{length}}`",
+    MaxPropertiesError:
+        "Too many properties in `{{pointer}}`, should be `{{maxProperties}}` at most, but got `{{length}}`",
     MinimumError: "Value in `{{pointer}}` is `{{length}}`, but should be `{{minimum}}` at minimum",
     MinItemsError: "Too few items in `{{pointer}}`, should be at least `{{minItems}}`, but got `{{length}}`",
     MinItemsOneError: "At least one item is required in `{{pointer}}`",
     MinLengthError: "Value `{{pointer}}` should have a minimum length of `{{minLength}}`, but got `{{length}}`.",
     MinLengthOneError: "A value is required in `{{pointer}}`",
     MissingOneOfDeclaratorError: "Missing oneOf declarator `{{declarator}}` in `{{pointer}}`",
-    MinPropertiesError: "Too few properties in `{{pointer}}`, should be at least `{{minProperties}}`, but got `{{length}}`",
+    MinPropertiesError:
+        "Too few properties in `{{pointer}}`, should be at least `{{minProperties}}`, but got `{{length}}`",
     MissingArrayItemError: "Array at '{{pointer}}' has a missing item at '{{key}}'",
     MissingDependencyError: "The required propery '{{missingProperty}}' in `{{pointer}}` is missing",
     MissingOneOfPropertyError: "Value at `{{pointer}}` property: `{{property}}`",
@@ -53,17 +54,19 @@ export default {
     NoAdditionalPropertiesError: "Additional property `{{property}}` in `{{pointer}}` is not allowed",
     NotError: "Value `{{value}}` at pointer should not match schema `{{not}}`",
     OneOfError: "Value `{{value}}` in `{{pointer}}` does not match any given oneof schema",
-    OneOfPropertyError: "Failed finding a matching oneOfProperty schema in `{{pointer}}` where `{{property}}` matches `{{value}}`",
+    OneOfPropertyError:
+        "Failed finding a matching oneOfProperty schema in `{{pointer}}` where `{{property}}` matches `{{value}}`",
     PatternError: "Value in `{{pointer}}` should match `{{description}}`, but received `{{received}}`",
-    PatternPropertiesError: "Property `{{key}}` does not match any patterns in `{{pointer}}`. Valid patterns are: {{patterns}}",
+    PatternPropertiesError:
+        "Property `{{key}}` does not match any patterns in `{{pointer}}`. Valid patterns are: {{patterns}}",
     RequiredPropertyError: "The required property `{{key}}` is missing at `{{pointer}}`",
     SchemaWarning: "Failed retrieving a schema from '{{pointer}}' to key '{{key}}'",
     TypeError: "Expected `{{value}}` ({{received}}) in `{{pointer}}` to be of type `{{expected}}`",
     UndefinedValueError: "Value must not be undefined in `{{pointer}}`",
     UnevaluatedPropertyError: "Invalid unevaluated property `{{pointer}}`",
     UnevaluatedItemsError: "Invalid unevaluated item `{{pointer}}`",
-    UniqueItemsError: "Items in array must be unique. Value `{{value}}` in `{{pointer}}` is a duplicate of {{duplicatePointer}}.",
+    UniqueItemsError:
+        "Items in array must be unique. Value `{{value}}` in `{{pointer}}` is a duplicate of {{duplicatePointer}}.",
     UnknownPropertyError: "Could not find a valid schema for property `{{pointer}}` within object",
     ValueNotEmptyError: "A value for `{{property}}` is required at `{{pointer}}`"
-} as Record<string, string>;
-
+};

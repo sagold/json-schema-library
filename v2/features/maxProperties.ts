@@ -1,4 +1,4 @@
-import { isObject } from "../../lib/utils/isObject";
+import { isObject } from "../utils/isObject";
 import { Feature, JsonSchemaValidatorParams } from "../types";
 
 export const maxPropertiesFeature: Feature = {

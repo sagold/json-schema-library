@@ -1,4 +1,4 @@
-import getTypeOf from "../getTypeOf";
+import getTypeOf from "../utils/getTypeOf";
 
 const OBJECT_TYPE = "object";
 const ARRAY_TYPE = "array";
@@ -11,7 +11,7 @@ const ARRAY_TYPE = "array";
  * @param data - flat object containing properties matching variables
  * @return rendered string
  */
-export default function render(template: string, data: { [p: string]: any } = {}): string {
+export function render(template: string, data: { [p: string]: any } = {}): string {
     return template.replace(/\{\{\w+\}\}/g, (match) => {
         const key = match.replace(/[{}]/g, "");
         const variable = data[key];

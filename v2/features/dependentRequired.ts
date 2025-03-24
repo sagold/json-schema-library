@@ -1,6 +1,5 @@
-import { JsonError } from "../../lib/types";
-import { isObject } from "../../lib/utils/isObject";
-import { Feature, JsonSchemaValidatorParams } from "../types";
+import { JsonError, Feature, JsonSchemaValidatorParams } from "../types";
+import { isObject } from "../utils/isObject";
 
 export const dependentRequiredFeature: Feature = {
     id: "dependentRequired",

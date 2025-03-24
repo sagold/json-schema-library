@@ -1,5 +1,5 @@
 import { globSync } from "glob";
-import { JsonSchema } from "../../../lib/types";
+import { JsonSchema } from "../../types";
 import { SchemaNode } from "../../types";
 import path from "path";
 

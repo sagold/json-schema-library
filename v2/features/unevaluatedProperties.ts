@@ -1,5 +1,5 @@
-import { isJsonError, JsonError } from "../../lib/types";
-import { isObject } from "../../lib/utils/isObject";
+import { isJsonError, JsonError } from "../types";
+import { isObject } from "../utils/isObject";
 import { Feature, isSchemaNode, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 

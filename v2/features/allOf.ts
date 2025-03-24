@@ -1,6 +1,5 @@
-import { mergeSchema } from "../../lib/mergeSchema";
-import { JsonError } from "../../lib/types";
-import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { mergeSchema } from "../utils/mergeSchema";
+import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode, JsonError } from "../types";
 
 export const allOfFeature: Feature = {
     id: "allOf",

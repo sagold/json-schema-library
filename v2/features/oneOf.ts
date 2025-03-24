@@ -1,9 +1,9 @@
-import { JsonError } from "../../lib/types";
+import { JsonError } from "../types";
 import { Feature, isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
-import settings from "../../lib/config/settings";
+import settings from "../settings";
 import { getValue } from "../utils/getValue";
 import sanitizeErrors from "../utils/sanitizeErrors";
-import { isObject } from "../../lib/utils/isObject";
+import { isObject } from "../utils/isObject";
 
 const { DECLARATOR_ONEOF } = settings;
 

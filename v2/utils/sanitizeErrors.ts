@@ -1,4 +1,4 @@
-import { isJsonError, JsonError } from "../../lib/types";
+import { isJsonError, JsonError } from "../types";
 
 export default function sanitizeErrors<T = JsonError>(list: (JsonError | unknown)[], result: T[] = []): T[] {
     for (let i = 0; i < list.length; i += 1) {

@@ -1,6 +1,6 @@
-import { mergeSchema } from "../../lib/mergeSchema";
-import { JsonError, JsonSchema } from "../../lib/types";
-import { isObject } from "../../lib/utils/isObject";
+import { mergeSchema } from "../utils/mergeSchema";
+import { JsonError, JsonSchema } from "../types";
+import { isObject } from "../utils/isObject";
 import {
     Feature,
     JsonSchemaReducerParams,

@@ -1,7 +1,33 @@
-import { JsonError, JsonSchema } from "../lib/types";
-import { CreateError } from "../lib/utils/createCustomError";
-import { isObject } from "../lib/utils/isObject";
+import { CreateError } from "./errors/createCustomError";
+import { isObject } from "./utils/isObject";
 import { TemplateOptions } from "./getTemplate";
+
+export type JsonSchema = { [p: string]: any };
+export type JsonPointer = string;
+
+export type ErrorData<T extends Record<string, unknown> = { [p: string]: unknown }> = T & {
+    /* json-pointer to location of error */
+    pointer: string;
+    /* json-schema of error location */
+    schema: JsonSchema;
+    /* value: data in error location */
+    value: unknown;
+};
+export type JsonError<T extends ErrorData = ErrorData> = {
+    type: "error";
+    name: string;
+    code: string;
+    message: string;
+    data: T;
+    [p: string]: unknown;
+};
+/**
+ * ts type guard for json error
+ * @returns true if passed type is a JsonError
+ */
+export function isJsonError(error: any): error is JsonError {
+    return error?.type === "error";
+}
 
 export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "latest";
 
