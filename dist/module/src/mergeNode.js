@@ -34,7 +34,7 @@ function mergeArray(a, b) {
     return a || b ? [...(a !== null && a !== void 0 ? a : []), ...(b !== null && b !== void 0 ? b : [])] : undefined;
 }
 export function mergeNode(a, b, ...omit) {
-    var _a;
+    var _a, _b;
     if (a == null || b == null) {
         return a || b;
     }
@@ -59,6 +59,7 @@ export function mergeNode(a, b, ...omit) {
         ...a,
         ...b,
         ...arraySelection,
+        oneOfIndex: (_b = a.oneOfIndex) !== null && _b !== void 0 ? _b : b.oneOfIndex,
         schema: mergeSchema(a.schema, b.schema, ...omit),
         parent: a.parent,
         resolvers: a.resolvers.concat(b.resolvers).filter(removeDuplicates).sort(sortCb),

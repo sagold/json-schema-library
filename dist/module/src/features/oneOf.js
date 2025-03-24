@@ -39,8 +39,8 @@ function reduceOneOf({ node, data, pointer, path }) {
     }
     if (matches.length === 1) {
         const { node, index } = matches[0];
-        node.oneOfIndex = index; // @evaluation-info
         const reducedNode = node.reduce({ data, pointer, path });
+        reducedNode.oneOfIndex = index; // @evaluation-info
         return reducedNode;
     }
     if (matches.length === 0) {

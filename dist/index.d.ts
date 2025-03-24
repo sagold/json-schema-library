@@ -9,4 +9,5 @@ export type { EachCallback } from "./src/each";
 export { eachSchema } from "./src/eachSchema";
 export type { EachSchemaCallback } from "./src/eachSchema";
 export { createSchema } from "./src/createSchema";
+export { mergeNode } from "./src/mergeNode";
 export type { Context, Draft, DraftList, DraftVersion, Feature, GetSchemaOptions, ValidationPath, JsonError, JsonSchema, JsonSchemaReducerParams, JsonSchemaReducer, JsonSchemaResolverParams, JsonSchemaResolver, JsonSchemaValidatorParams, JsonSchemaValidator, JsonSchemaDefaultDataResolverParams, JsonSchemaDefaultDataResolver } from "./src/types";
