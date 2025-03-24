@@ -68,6 +68,7 @@ export function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): Sch
         ...a,
         ...b,
         ...arraySelection,
+        oneOfIndex: a.oneOfIndex ?? b.oneOfIndex,
         schema: mergeSchema(a.schema, b.schema, ...omit),
         parent: a.parent,
         resolvers: a.resolvers.concat(b.resolvers).filter(removeDuplicates).sort(sortCb),

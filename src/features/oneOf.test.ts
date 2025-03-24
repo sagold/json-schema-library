@@ -39,7 +39,7 @@ describe("feature : oneOf : reduce", () => {
         }).reduce({ data: 111 });
 
         assert.deepEqual(node.schema, { type: "number", title: "A Number" });
-        // assert.equal(node.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
+        assert.equal(node.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
 
     it("should return error if no matching schema could be found", () => {
@@ -69,7 +69,10 @@ describe("feature : oneOf : reduce", () => {
             $defs: { withData: { oneOf: [{ required: ["b"], properties: { b: { type: "number" } } }] } },
             oneOf: [{ required: ["a"], properties: { a: { type: "string" } } }, { $ref: "#/$defs/withData" }]
         }).reduce({ data: { b: 111 } });
+
         assert.deepEqual(node.schema, { required: ["b"], properties: { b: { type: "number" } } });
+        // @note that we override nested oneOfIndex
+        assert.equal(node.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
 
     it("should reduce nested oneOf boolean schema using ref", () => {
@@ -77,7 +80,9 @@ describe("feature : oneOf : reduce", () => {
             $defs: { withData: { oneOf: [{ required: ["b"], properties: { b: true } }] } },
             oneOf: [{ required: ["a"], properties: { a: false } }, { $ref: "#/$defs/withData" }]
         }).reduce({ data: { b: 111 } });
+
         assert.deepEqual(node.schema, { required: ["b"], properties: { b: true } });
+        assert.equal(node.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
 
     it("should resolve matching object schema", () => {
@@ -94,10 +99,8 @@ describe("feature : oneOf : reduce", () => {
             ]
         }).reduce({ data: { title: 4 } });
 
-        assert.deepEqual(node.schema, {
-            type: "object",
-            properties: { title: { type: "number" } }
-        });
+        assert.deepEqual(node.schema, { type: "object", properties: { title: { type: "number" } } });
+        assert.equal(node.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
 
     it("should return matching oneOf, for objects missing properties", () => {
@@ -114,10 +117,8 @@ describe("feature : oneOf : reduce", () => {
             ]
         }).reduce({ data: { title: 4, test: 2 } });
 
-        assert.deepEqual(node.schema, {
-            type: "object",
-            additionalProperties: { type: "number" }
-        });
+        assert.deepEqual(node.schema, { type: "object", additionalProperties: { type: "number" } });
+        assert.equal(node.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
 });
 
@@ -129,7 +130,7 @@ describe("feature : oneof-fuzzy : reduce", () => {
         const res = reduceOneOfFuzzy({ node, data: 4 });
         assert.deepEqual(res.schema, { type: "number" });
         // @todo should move oneOfIndex-property to exported node
-        // assert.deepEqual(res.oneOfIndex, 1);
+        assert.equal(res.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
 
     it("should return schema with matching pattern", () => {
@@ -141,6 +142,7 @@ describe("feature : oneof-fuzzy : reduce", () => {
         });
         const res = reduceOneOfFuzzy({ node, data: "anasterixcame" });
         assert.deepEqual(res.schema, { type: "string", pattern: "asterix" });
+        assert.equal(res.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
 
     it("should resolve $ref before schema", () => {
@@ -153,6 +155,7 @@ describe("feature : oneof-fuzzy : reduce", () => {
         });
         const res = reduceOneOfFuzzy({ node, data: "anasterixcame" });
         assert.deepEqual(res.schema, { type: "string", pattern: "asterix" });
+        assert.equal(res.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
 
     describe("object", () => {
@@ -199,6 +202,7 @@ describe("feature : oneof-fuzzy : reduce", () => {
                 type: "object",
                 properties: { a: t, b: t, c: t }
             });
+            assert.equal(res.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
         });
 
         it("should only count properties that match the schema", () => {
@@ -284,6 +288,7 @@ describe("feature : oneof-property : reduce", () => {
                     title: { type: "number" }
                 }
             });
+            assert.equal(res.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
         });
 
         it("should return schema matching oneOfProperty even it is invalid", () => {
