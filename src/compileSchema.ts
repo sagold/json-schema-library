@@ -23,8 +23,9 @@ import {
     JsonSchema
 } from "./types";
 import { createSchema } from "./createSchema";
+import { hasProperty } from "./utils/hasProperty";
 
-type CompileOptions = {
+export type CompileOptions = {
     drafts: DraftList;
     errors: Record<string, CreateError>;
     remoteContext?: Context;
@@ -65,7 +66,7 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
     // - Selective Parsing or Optimization: Example: If "unevaluatedProperties" is not in a supported vocabulary, your validator should not enforce it.
     // - Future-Proofing for Extensions: Future versions of JSON Schema may add optional vocabularies that aren't explicitly included in allOf.
 
-    if (schema.$vocabulary) {
+    if (schema?.$vocabulary) {
         console.log("handle vocabulary", schema.$vocabulary);
         // compile referenced meta schema
         // 1. could validate passed in schema
@@ -150,6 +151,15 @@ const DYNAMIC_PROPERTIES: string[] = [
     "dependencies",
     "patternProperties"
 ];
+
+export function isReduceable(node: SchemaNode) {
+    for (let i = 0, l = DYNAMIC_PROPERTIES.length; i < l; i += 1) {
+        if (hasProperty(node, DYNAMIC_PROPERTIES[i])) {
+            return true;
+        }
+    }
+    return false;
+}
 
 const NODE_METHODS: Pick<
     SchemaNode,
@@ -267,6 +277,14 @@ const NODE_METHODS: Pick<
         if (options.withSchemaWarning === true) {
             return node.errors.schemaWarning({ pointer, value: data, schema: node.schema, key });
         }
+
+        if (options.createSchema === true) {
+            return node.compileSchema(
+                createSchema(getValue(data, key)),
+                `${node.spointer}/additional`,
+                `${node.schemaId}/additional`
+            );
+        }
     },
 
     getTemplate(data?, options?) {
@@ -318,7 +336,7 @@ const NODE_METHODS: Pick<
         }
 
         if (schema === false) {
-            console.log("BOOLEAN SCHEMA RETURN");
+            console.log("return boolean schema `false`");
             // @ts-expect-error bool schema
             return { ...node, schema: false, reducers: [] } as SchemaNode;
         }

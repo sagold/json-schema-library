@@ -125,6 +125,8 @@ export type GetSchemaOptions = {
      *  ```
      */
     withSchemaWarning?: boolean;
+    /** If true, creates a json schema for valid but unspecified data, Defaults to false */
+    createSchema?: boolean;
 };
 
 export type SchemaNode = {
