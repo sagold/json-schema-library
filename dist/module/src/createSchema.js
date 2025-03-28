@@ -5,12 +5,14 @@ import { isObject } from "./utils/isObject";
  * @param  data - data to get json schema for
  */
 export function createSchema(data) {
-    if (data === undefined) {
-        return undefined;
-    }
-    const schema = {
-        type: getTypeOf(data)
-    };
+    // if (data === undefined) {
+    //     return undefined;
+    // }
+    const schema = data === undefined
+        ? {}
+        : {
+            type: getTypeOf(data)
+        };
     if (schema.type === "object" && isObject(data)) {
         schema.properties = {};
         Object.keys(data).forEach((key) => (schema.properties[key] = createSchema(data[key])));

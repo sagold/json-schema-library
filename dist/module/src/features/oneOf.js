@@ -13,6 +13,15 @@ export const oneOfFeature = {
     addValidate: (node) => node.oneOf != null,
     validate: oneOfValidator
 };
+export const oneOfFuzzyFeature = {
+    id: "oneOf-fuzzy",
+    keyword: "oneOf",
+    parse: parseOneOf,
+    addReduce: (node) => node.oneOf != null,
+    reduce: reduceOneOfFuzzy,
+    addValidate: (node) => node.oneOf != null,
+    validate: oneOfValidator
+};
 export function parseOneOf(node) {
     const { schema, spointer, schemaId } = node;
     if (Array.isArray(schema.oneOf) && schema.oneOf.length) {
@@ -139,6 +148,10 @@ function fuzzyObjectValue(node, data) {
  * @return oneOf schema or an error
  */
 export function reduceOneOfFuzzy({ node, data, pointer, path }) {
+    // @todo: usingMergeNode may add reducers that are no longer available
+    if (node.oneOf == null) {
+        return node;
+    }
     const oneOfResult = reduceOneOf({ node, data, pointer, path });
     if (isSchemaNode(oneOfResult)) {
         return oneOfResult;

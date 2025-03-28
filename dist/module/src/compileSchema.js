@@ -12,6 +12,7 @@ import { mergeNode } from "./mergeNode";
 import { omit } from "./utils/omit";
 import { isSchemaNode, isJsonError } from "./types";
 import { createSchema } from "./createSchema";
+import { hasProperty } from "./utils/hasProperty";
 const defaultDrafts = [
     { regexp: "draft-04", draft: draft04 },
     { regexp: "draft-06", draft: draft06 },
@@ -42,7 +43,7 @@ export function compileSchema(schema, options = {}) {
     // - Determining Supported Features: Example: A validator could warn or error out if it encounters a vocabulary it does not support.
     // - Selective Parsing or Optimization: Example: If "unevaluatedProperties" is not in a supported vocabulary, your validator should not enforce it.
     // - Future-Proofing for Extensions: Future versions of JSON Schema may add optional vocabularies that aren't explicitly included in allOf.
-    if (schema.$vocabulary) {
+    if (schema === null || schema === void 0 ? void 0 : schema.$vocabulary) {
         console.log("handle vocabulary", schema.$vocabulary);
         // compile referenced meta schema
         // 1. could validate passed in schema
@@ -122,6 +123,14 @@ const DYNAMIC_PROPERTIES = [
     "dependencies",
     "patternProperties"
 ];
+export function isReduceable(node) {
+    for (let i = 0, l = DYNAMIC_PROPERTIES.length; i < l; i += 1) {
+        if (hasProperty(node, DYNAMIC_PROPERTIES[i])) {
+            return true;
+        }
+    }
+    return false;
+}
 const NODE_METHODS = {
     errors,
     compileSchema(schema, spointer = this.spointer, schemaId) {
@@ -216,6 +225,9 @@ const NODE_METHODS = {
         if (options.withSchemaWarning === true) {
             return node.errors.schemaWarning({ pointer, value: data, schema: node.schema, key });
         }
+        if (options.createSchema === true) {
+            return node.compileSchema(createSchema(getValue(data, key)), `${node.spointer}/additional`, `${node.schemaId}/additional`);
+        }
     },
     getTemplate(data, options) {
         const opts = {
@@ -262,7 +274,7 @@ const NODE_METHODS = {
             }
         }
         if (schema === false) {
-            console.log("BOOLEAN SCHEMA RETURN");
+            console.log("return boolean schema `false`");
             // @ts-expect-error bool schema
             return { ...node, schema: false, reducers: [] };
         }

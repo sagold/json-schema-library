@@ -1,7 +1,7 @@
 import { CreateError } from "./errors/createCustomError";
 import { TemplateOptions } from "./getTemplate";
 import { SchemaNode, Context, DraftList, JsonSchema } from "./types";
-type CompileOptions = {
+export type CompileOptions = {
     drafts: DraftList;
     errors: Record<string, CreateError>;
     remoteContext?: Context;
@@ -13,4 +13,4 @@ type CompileOptions = {
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
 export declare function compileSchema(schema: JsonSchema, options?: Partial<CompileOptions>): SchemaNode;
-export {};
+export declare function isReduceable(node: SchemaNode): boolean;

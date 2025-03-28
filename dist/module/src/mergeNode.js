@@ -79,6 +79,23 @@ export function mergeNode(a, b, ...omit) {
         patternProperties: mergeArray(a.patternProperties, b.patternProperties),
         properties: mergeObjects(a.properties, b.properties)
     };
-    // mergedNode.context.VALIDATORS.forEach((registerValidator) => registerValidator(mergedNode));
+    // this removes any function that has no keyword associated on schema
+    // @todo this might remove default reducers and we need a feature-flag for behaviour
+    function filterKeywordsBySchema(fun) {
+        var _a, _b, _c;
+        const funName = (_b = (_a = fun.toJSON) === null || _a === void 0 ? void 0 : _a.call(fun)) !== null && _b !== void 0 ? _b : fun.name;
+        if (((_c = mergedNode.schema) === null || _c === void 0 ? void 0 : _c[funName]) === undefined) {
+            // @ts-expect-error forced key
+            mergedNode[funName] = undefined;
+            return false;
+        }
+        return true;
+    }
+    // @ts-expect-error forced key
+    omit === null || omit === void 0 ? void 0 : omit.forEach((key) => (mergedNode[key] = undefined));
+    // @todo better run addX features to determine removal as it is more performant and direct?
+    mergedNode.resolvers = mergedNode.resolvers.filter(filterKeywordsBySchema);
+    mergedNode.reducers = mergedNode.reducers.filter(filterKeywordsBySchema);
+    mergedNode.validators = mergedNode.validators.filter(filterKeywordsBySchema);
     return mergedNode;
 }

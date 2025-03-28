@@ -88,6 +88,12 @@ describe("compileSchema templateDefaultOptions", () => {
     });
 });
 describe("compileSchema `schemaId`", () => {
+    // @todo maybe this should throw an error to catch unwanted behaviour
+    it.skip("should return boolean schema true for undefined", () => {
+        const node = compileSchema(undefined);
+        assert.deepEqual(node.$id, "#");
+        assert.deepEqual(node.schema, true);
+    });
     it("should store path from rootSchema as schemaId", () => {
         const node = compileSchema({
             if: { type: "string" },

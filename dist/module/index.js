@@ -6,11 +6,18 @@ export { draft04 } from "./src/draft04";
 export { draft06 } from "./src/draft06";
 export { draft07 } from "./src/draft07";
 export { draft2019 } from "./src/draft2019";
+export { draftEditor } from "./src/draftEditor";
+// errors
+export { createCustomError } from "./src/errors/createCustomError";
+export { strings } from "./src/errors/strings";
 // extra SchemaNode methods
 export { each } from "./src/each";
 export { eachSchema } from "./src/eachSchema";
 export { createSchema } from "./src/createSchema";
 export { mergeNode } from "./src/mergeNode";
+// utilities
+export { default as getTypeOf } from "./src/utils/getTypeOf";
+export { isReduceable } from "./src/compileSchema";
 // import { createError, createCustomError } from "./lib/utils/createCustomError";
 // import getTypeOf from "./lib/getTypeOf";
 // import settings from "./lib/config/settings";
