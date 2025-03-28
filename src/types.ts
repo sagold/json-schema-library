@@ -64,13 +64,22 @@ export type JsonSchemaReducerParams = {
     path?: ValidationPath;
 };
 
-export type JsonSchemaReducer = (options: JsonSchemaReducerParams) => SchemaNode | JsonError | undefined;
+export interface JsonSchemaReducer {
+    toJSON?: () => string;
+    (options: JsonSchemaReducerParams): SchemaNode | JsonError | undefined;
+}
 
 export type JsonSchemaResolverParams = { key: string | number; data: unknown; node: SchemaNode };
-export type JsonSchemaResolver = (options: JsonSchemaResolverParams) => SchemaNode | JsonError | undefined;
+export interface JsonSchemaResolver {
+    toJSON?: () => string;
+    (options: JsonSchemaResolverParams): SchemaNode | JsonError | undefined;
+}
 
 export type JsonSchemaValidatorParams = { pointer?: string; data: unknown; node: SchemaNode; path?: ValidationPath };
-export type JsonSchemaValidator = (options: JsonSchemaValidatorParams) => JsonError | JsonError[] | undefined;
+export interface JsonSchemaValidator {
+    toJSON?: () => string;
+    (options: JsonSchemaValidatorParams): JsonError | JsonError[] | undefined;
+}
 
 export type JsonSchemaDefaultDataResolverParams = {
     pointer?: string;
@@ -78,7 +87,10 @@ export type JsonSchemaDefaultDataResolverParams = {
     node: SchemaNode;
     options?: TemplateOptions;
 };
-export type JsonSchemaDefaultDataResolver = (options: JsonSchemaDefaultDataResolverParams) => unknown;
+export interface JsonSchemaDefaultDataResolver {
+    toJSON?: () => string;
+    (options: JsonSchemaDefaultDataResolverParams): unknown;
+}
 
 export type Context = {
     /** root node of this json-schema */

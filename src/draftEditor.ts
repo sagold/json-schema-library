@@ -29,15 +29,12 @@ export const draftEditor: Draft = {
         .map((feature) => {
             const logKeyword = () => feature.keyword;
             if (feature.validate) {
-                // @ts-expect-error missing interface
                 feature.validate.toJSON = logKeyword;
             }
             if (feature.reduce) {
-                // @ts-expect-error missing interface
                 feature.reduce.toJSON = logKeyword;
             }
             if (feature.resolve) {
-                // @ts-expect-error missing interface
                 feature.resolve.toJSON = logKeyword;
             }
             return feature;
