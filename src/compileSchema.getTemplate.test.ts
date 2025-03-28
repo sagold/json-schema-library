@@ -1,28 +1,6 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
 
-// const spec = [
-//     {
-//         "should return empty string for missing default value": {
-//             schema: { type: "string" },
-//             input: undefined,
-//             result: ""
-//         },
-//         "should return default value": {
-//             schema: { type: "string", default: "default" },
-//             result: "default"
-//         },
-//         "should return default object": {
-//             schema: {
-//                 type: "object",
-//                 properties: { first: { type: "string" }, second: { type: "number" } },
-//                 default: { first: "john", second: 4 }
-//             },
-//             result: { first: "john", second: 4 }
-//         }
-//     }
-// ];
-
 describe("compileSchema.getTemplate", () => {
     it("should not modify input schema", () => {
         const schema = {
@@ -530,6 +508,64 @@ describe("compileSchema.getTemplate", () => {
 
                     const res = node.getTemplate({ type: "paragraph" });
                     assert.deepEqual(res, { type: "paragraph" });
+                });
+
+                it("should return valid default data", () => {
+                    const node = compileSchema({
+                        type: "object",
+                        default: { value: 123 },
+                        oneOf: [
+                            {
+                                type: "object",
+                                required: ["title"],
+                                properties: { title: { type: "string", default: "jane" } }
+                            },
+                            { type: "object", required: ["value"], properties: { value: { type: "number" } } }
+                        ]
+                    });
+                    const res = node.getTemplate();
+
+                    assert.deepEqual(res, { value: 123 });
+                });
+
+                it("should return invalid default data", () => {
+                    const node = compileSchema({
+                        type: "object",
+                        default: { value: "wrong type" },
+                        oneOf: [
+                            {
+                                type: "object",
+                                required: ["title"],
+                                properties: { title: { type: "string", default: "jane" } }
+                            },
+                            { type: "object", required: ["value"], properties: { value: { type: "number" } } }
+                        ]
+                    });
+                    const res = node.getTemplate();
+
+                    assert.deepEqual(res, { value: "wrong type" });
+                });
+
+                it("should add correct optional properties from schema matching default data", () => {
+                    const node = compileSchema({
+                        type: "object",
+                        default: { value: 123 },
+                        oneOf: [
+                            {
+                                type: "object",
+                                required: ["title"],
+                                properties: { title: { type: "string", default: "jane" } }
+                            },
+                            {
+                                type: "object",
+                                required: ["value"],
+                                properties: { value: { type: "number" }, optional: { type: "string" } }
+                            }
+                        ]
+                    });
+                    const res = node.getTemplate(undefined, { addOptionalProps: true });
+
+                    assert.deepEqual(res, { value: 123, optional: "" });
                 });
             });
         });
