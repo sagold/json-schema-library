@@ -45,4 +45,20 @@ describe("mergeNode", () => {
         const errors = node.validate([0, 10]);
         assert.deepEqual(errors.length, 1);
     });
+
+    describe("omit", () => {
+        it("should omit oneOf node- and schema-property", () => {
+            const a = compileSchema({
+                oneOf: [
+                    { type: "string", minLength: 1 },
+                    { type: "number", minimum: 2 }
+                ]
+            });
+            const node = mergeNode(a, a, "oneOf");
+            assert(isSchemaNode(node), "should have returned a valid schema node");
+
+            assert.deepEqual(node.schema.oneOf, undefined);
+            assert.deepEqual(node.oneOf, undefined);
+        });
+    });
 });
