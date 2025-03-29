@@ -1,6 +1,6 @@
 import settings from "../settings";
 import { isObject } from "../utils/isObject";
-import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode, JsonError } from "../types";
+import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode, ValidationResult } from "../types";
 import { getValue } from "../utils/getValue";
 
 export const additionalPropertiesFeature: Feature = {
@@ -53,7 +53,7 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
     }
 
     const { schema } = node;
-    const errors: JsonError[] = [];
+    const errors: ValidationResult[] = [];
     let receivedProperties = Object.keys(data).filter((prop) => settings.propertyBlacklist.includes(prop) === false);
     if (Array.isArray(node.patternProperties)) {
         // filter received properties by matching patternProperties
@@ -76,7 +76,7 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
             if (isObject(node.additionalProperties)) {
                 const validationErrors = node.additionalProperties.validate(propertyValue, pointer, path);
                 // @note: we pass through specific errors here
-                errors.push(...validationErrors);
+                validationErrors && errors.push(...validationErrors);
             } else {
                 errors.push(
                     node.errors.noAdditionalPropertiesError({

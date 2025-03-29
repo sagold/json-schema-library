@@ -1,6 +1,9 @@
 import { isJsonError, JsonError } from "../types";
 
-export default function sanitizeErrors<T = JsonError>(list: (JsonError | unknown)[], result: T[] = []): T[] {
+export default function sanitizeErrors<T extends JsonError = JsonError>(
+    list: (JsonError | unknown)[],
+    result: T[] = []
+): T[] {
     for (let i = 0; i < list.length; i += 1) {
         const item = list[i];
         if (Array.isArray(item)) {

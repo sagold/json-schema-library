@@ -1,4 +1,4 @@
-import { JsonError } from "../types";
+import { ValidationResult } from "../types";
 import { Feature, isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import settings from "../settings";
 import { getValue } from "../utils/getValue";
@@ -45,7 +45,7 @@ function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     }
 
     const matches = [];
-    const errors: JsonError[] = [];
+    const errors: ValidationResult[] = [];
     for (let i = 0; i < node.oneOf.length; i += 1) {
         const validationErrors = node.oneOf[i].validate(data, pointer);
         if (validationErrors.length === 0) {

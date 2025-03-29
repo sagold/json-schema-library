@@ -1,4 +1,4 @@
-import { JsonError } from "../types";
+import { ValidationResult } from "../types";
 import { Feature, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 import { JsonSchemaResolverParams, JsonSchemaValidatorParams } from "../types";
@@ -38,7 +38,7 @@ function validateProperties({ node, data, pointer, path }: JsonSchemaValidatorPa
         return;
     }
     // move validation through properties
-    const errors: JsonError[] = [];
+    const errors: ValidationResult[] = [];
     Object.keys(data).forEach((propertyName) => {
         if (node.properties[propertyName] == null) {
             return;

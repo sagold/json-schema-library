@@ -1,4 +1,4 @@
-import { isJsonError, JsonError } from "../types";
+import { isJsonError, ValidationResult } from "../types";
 import { isObject } from "../utils/isObject";
 import { Feature, isSchemaNode, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
@@ -41,7 +41,7 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
         return undefined;
     }
 
-    const errors: JsonError[] = [];
+    const errors: ValidationResult[] = [];
     for (let i = 0; i < unevaluated.length; i += 1) {
         const propertyName = unevaluated[i];
         const child = node.get(propertyName, data, { path });

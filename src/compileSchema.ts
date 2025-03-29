@@ -18,9 +18,9 @@ import {
     Context,
     Feature,
     isJsonError,
-    JsonError,
     JsonSchema,
-    Draft
+    Draft,
+    ValidationResult
 } from "./types";
 import { createSchema } from "./createSchema";
 import { hasProperty } from "./utils/hasProperty";
@@ -353,10 +353,9 @@ const NODE_METHODS: Pick<
         const node = this as SchemaNode;
         path.push({ pointer, node });
 
-        const errors: JsonError[] = [];
         // @ts-expect-error untyped boolean schema
         if (node.schema === true) {
-            return errors;
+            return [];
         }
 
         // @ts-expect-error untyped boolean schema
@@ -370,6 +369,7 @@ const NODE_METHODS: Pick<
             ];
         }
 
+        const errors: ValidationResult[] = [];
         for (const validate of node.validators) {
             // console.log("validator", validate.name);
             const result = validate({ node, data, pointer, path });

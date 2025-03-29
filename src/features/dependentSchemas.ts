@@ -6,8 +6,8 @@ import {
     JsonSchemaReducerParams,
     JsonSchemaValidatorParams,
     SchemaNode,
-    JsonError,
-    JsonSchema
+    JsonSchema,
+    ValidationResult
 } from "../types";
 
 export const dependentSchemasFeature: Feature = {
@@ -79,7 +79,7 @@ export function validateDependentSchemas({ node, data, pointer = "#" }: JsonSche
     if (!isObject(data)) {
         return undefined;
     }
-    const errors: JsonError[] = [];
+    const errors: ValidationResult[] = [];
     Object.keys(data).forEach((property) => {
         const dependencies = dependentSchemas[property];
         // @draft >= 6 boolean schema

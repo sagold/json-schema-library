@@ -1,5 +1,5 @@
 import { mergeSchema } from "../utils/mergeSchema";
-import { JsonError, JsonSchema } from "../types";
+import { JsonSchema, ValidationResult } from "../types";
 import { isObject } from "../utils/isObject";
 import {
     Feature,
@@ -84,7 +84,7 @@ function validatePatternProperties({ node, data, pointer = "#" }: JsonSchemaVali
     const { schema, patternProperties } = node;
     const properties = schema.properties || {};
     const patterns = Object.keys(schema.patternProperties).join(",");
-    const errors: JsonError[] = [];
+    const errors: ValidationResult[] = [];
     const keys = Object.keys(data);
 
     keys.forEach((key) => {

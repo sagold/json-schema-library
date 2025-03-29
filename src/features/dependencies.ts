@@ -5,7 +5,8 @@ import {
     JsonSchemaValidatorParams,
     JsonError,
     JsonSchema,
-    SchemaNode
+    SchemaNode,
+    ValidationResult
 } from "../types";
 import { getValue } from "../utils/getValue";
 import { isObject } from "../utils/isObject";
@@ -78,7 +79,7 @@ function validateDependencies({ node, data, pointer = "#" }: JsonSchemaValidator
         return undefined;
     }
 
-    const errors: JsonError[] = [];
+    const errors: ValidationResult[] = [];
     const dependencies = node.dependencies;
     Object.keys(data).forEach((property) => {
         const propertyValue = dependencies[property];
@@ -94,25 +95,24 @@ function validateDependencies({ node, data, pointer = "#" }: JsonSchemaValidator
             return;
         }
 
-        let dependencyErrors: JsonError[] = [];
         if (Array.isArray(propertyValue)) {
-            dependencyErrors = propertyValue
+            propertyValue
                 .filter((dependency: any) => getValue(data, dependency) === undefined)
-                .map((missingProperty: any) =>
-                    node.errors.missingDependencyError({
-                        missingProperty,
-                        pointer: `${pointer}/${missingProperty}`,
-                        schema: node.schema,
-                        value: data
-                    })
+                .forEach((missingProperty: any) =>
+                    errors.push(
+                        node.errors.missingDependencyError({
+                            missingProperty,
+                            pointer: `${pointer}/${missingProperty}`,
+                            schema: node.schema,
+                            value: data
+                        })
+                    )
                 );
         } else if (isSchemaNode(propertyValue)) {
-            dependencyErrors = propertyValue.validate(data, pointer);
+            errors.push(...propertyValue.validate(data, pointer));
         } else {
             throw new Error(`Invalid dependency definition for ${pointer}/${property}. Must be string[] or schema`);
         }
-
-        errors.push(...dependencyErrors);
     });
     return errors;
 }

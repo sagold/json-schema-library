@@ -75,10 +75,12 @@ export interface JsonSchemaResolver {
     (options: JsonSchemaResolverParams): SchemaNode | JsonError | undefined;
 }
 
+export type ValidationResult = JsonError | Promise<JsonError>;
+
 export type JsonSchemaValidatorParams = { pointer?: string; data: unknown; node: SchemaNode; path?: ValidationPath };
 export interface JsonSchemaValidator {
     toJSON?: () => string;
-    (options: JsonSchemaValidatorParams): JsonError | JsonError[] | undefined;
+    (options: JsonSchemaValidatorParams): undefined | JsonError | ValidationResult[];
 }
 
 export type JsonSchemaDefaultDataResolverParams = {
@@ -185,6 +187,7 @@ export type SchemaNode = {
         path?: ValidationPath;
     }) => SchemaNode | JsonError;
     toJSON: () => unknown;
+    validateAsync?: (data: unknown, pointer?: string, path?: ValidationPath) => ValidationResult[];
     validate: (data: unknown, pointer?: string, path?: ValidationPath) => JsonError[];
 
     // logic

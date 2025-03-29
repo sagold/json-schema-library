@@ -1,4 +1,4 @@
-import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode, JsonError } from "../types";
+import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode, ValidationResult } from "../types";
 import { isObject } from "../utils/isObject";
 
 export const itemsFeature: Feature = {
@@ -32,12 +32,7 @@ export function parseItems(node: SchemaNode) {
     }
 }
 
-function validateItems({
-    node,
-    data,
-    pointer = "#",
-    path
-}: JsonSchemaValidatorParams): JsonError | JsonError[] | undefined {
+function validateItems({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
     const { schema } = node;
     if (!Array.isArray(data) || data.length === 0) {
         return;
@@ -51,7 +46,7 @@ function validateItems({
         return node.errors.invalidDataError({ pointer, value: data, schema });
     }
 
-    const errors: JsonError[] = [];
+    const errors: ValidationResult[] = [];
     if (node.itemsList) {
         // note: schema is valid when data does not have enough elements as defined by array-list
         for (let i = 0; i < Math.min(node.itemsList.length, data.length); i += 1) {
