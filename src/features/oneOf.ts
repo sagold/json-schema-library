@@ -1,9 +1,10 @@
-import { ValidationResult } from "../types";
+import { ValidationPath, ValidationResult } from "../types";
 import { Feature, isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import settings from "../settings";
 import { getValue } from "../utils/getValue";
 import sanitizeErrors from "../utils/sanitizeErrors";
 import { isObject } from "../utils/isObject";
+import { validateNode } from "../validateNode";
 
 const { DECLARATOR_ONEOF } = settings;
 
@@ -47,7 +48,7 @@ function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     const matches = [];
     const errors: ValidationResult[] = [];
     for (let i = 0; i < node.oneOf.length; i += 1) {
-        const validationErrors = node.oneOf[i].validate(data, pointer);
+        const validationErrors = validateNode(node.oneOf[i], data, pointer, path);
         if (validationErrors.length === 0) {
             matches.push({ index: i, node: node.oneOf[i] });
         } else {
@@ -108,7 +109,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaR
             });
         }
 
-        const result = sanitizeErrors(resultNode.validate(oneOfValue, pointer));
+        const result = sanitizeErrors(validateNode(resultNode, oneOfValue, pointer, path));
         // result = result.filter(errorOrPromise);
         if (result.length > 0) {
             errors.push(...result);
@@ -137,7 +138,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaR
  * @param [pointer]
  * @return ranking value (higher is better)
  */
-function fuzzyObjectValue(node: SchemaNode, data: Record<string, unknown>) {
+function fuzzyObjectValue(node: SchemaNode, data: Record<string, unknown>, pointer: string, path: ValidationPath) {
     if (data == null || node.properties == null) {
         return -1;
     }
@@ -146,7 +147,7 @@ function fuzzyObjectValue(node: SchemaNode, data: Record<string, unknown>) {
     for (let i = 0; i < keys.length; i += 1) {
         const key = keys[i];
         if (data[key]) {
-            if (node.properties[key].validate(data[key]).length === 0) {
+            if (validateNode(node.properties[key], data[key], pointer, path).length === 0) {
                 value += 1;
             }
         }
@@ -182,7 +183,7 @@ export function reduceOneOfFuzzy({ node, data, pointer, path }: JsonSchemaReduce
 
         for (let i = 0; i < node.oneOf.length; i += 1) {
             const oneNode = node.oneOf[i];
-            const fuzzyValue = fuzzyObjectValue(oneNode, data);
+            const fuzzyValue = fuzzyObjectValue(oneNode, data, pointer, path);
 
             if (fuzzyGreatest < fuzzyValue) {
                 fuzzyGreatest = fuzzyValue;
@@ -216,7 +217,7 @@ function oneOfValidator({ node, data, pointer = "#", path }: JsonSchemaValidator
     const matches = [];
     const errors = [];
     for (let i = 0; i < oneOf.length; i += 1) {
-        const validationResult = oneOf[i].validate(data, pointer, path);
+        const validationResult = validateNode(oneOf[i], data, pointer, path);
         if (validationResult.length > 0) {
             errors.push(...validationResult);
         } else {

@@ -11,6 +11,7 @@ import {
 import { getValue } from "../utils/getValue";
 import { isObject } from "../utils/isObject";
 import { mergeSchema } from "../utils/mergeSchema";
+import { validateNode } from "../validateNode";
 
 export const dependenciesFeature: Feature = {
     id: "dependencies",
@@ -74,7 +75,7 @@ export function reduceDependencies({ node, data, path }: JsonSchemaReducerParams
     return node.compileSchema(mergedSchema, node.spointer).reduce({ data, path });
 }
 
-function validateDependencies({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
+function validateDependencies({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     if (!isObject(data)) {
         return undefined;
     }
@@ -109,7 +110,7 @@ function validateDependencies({ node, data, pointer = "#" }: JsonSchemaValidator
                     )
                 );
         } else if (isSchemaNode(propertyValue)) {
-            errors.push(...propertyValue.validate(data, pointer));
+            errors.push(...validateNode(propertyValue, data, pointer, path));
         } else {
             throw new Error(`Invalid dependency definition for ${pointer}/${property}. Must be string[] or schema`);
         }

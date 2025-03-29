@@ -1,5 +1,6 @@
 import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode, ValidationResult } from "../types";
 import { isObject } from "../utils/isObject";
+import { validateNode } from "../validateNode";
 
 export const itemsFeature: Feature = {
     id: "items",
@@ -53,7 +54,7 @@ function validateItems({ node, data, pointer = "#", path }: JsonSchemaValidatorP
             const itemData = data[i];
             // @todo v1 reevaluate: incomplete schema is created here?
             const itemNode = node.itemsList[i];
-            const result = itemNode.validate(itemData, `${pointer}/${i}`, path);
+            const result = validateNode(itemNode, itemData, `${pointer}/${i}`, path);
             errors.push(...result);
         }
         return errors;
@@ -62,7 +63,7 @@ function validateItems({ node, data, pointer = "#", path }: JsonSchemaValidatorP
     if (node.itemsObject) {
         for (let i = 0; i < data.length; i += 1) {
             const itemData = data[i];
-            const result = node.itemsObject.validate(itemData, `${pointer}/${i}`, path);
+            const result = validateNode(node.itemsObject, itemData, `${pointer}/${i}`, path);
             if (result) {
                 errors.push(...result);
             }

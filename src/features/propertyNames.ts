@@ -1,6 +1,7 @@
 import { JsonError } from "../types";
 import { isObject } from "../utils/isObject";
 import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { validateNode } from "../validateNode";
 
 export const propertyNamesFeature: Feature = {
     id: "propertyNames",
@@ -24,7 +25,7 @@ export function parsePropertyNames(node: SchemaNode) {
     }
 }
 
-function validatePropertyNames({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
+function validatePropertyNames({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     const { schema } = node;
     if (!isObject(data)) {
         return undefined;
@@ -56,7 +57,7 @@ function validatePropertyNames({ node, data, pointer = "#" }: JsonSchemaValidato
     const errors: JsonError[] = [];
     const properties = Object.keys(data);
     properties.forEach((prop) => {
-        const validationResult = node.propertyNames.validate(prop);
+        const validationResult = validateNode(node.propertyNames, prop, `${pointer}/prop`, path);
         if (validationResult.length > 0) {
             errors.push(
                 node.errors.invalidPropertyNameError({

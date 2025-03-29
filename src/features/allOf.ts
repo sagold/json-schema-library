@@ -1,5 +1,6 @@
 import { mergeSchema } from "../utils/mergeSchema";
 import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode, ValidationResult } from "../types";
+import { validateNode } from "../validateNode";
 
 export const allOfFeature: Feature = {
     id: "allOf",
@@ -38,7 +39,7 @@ function validateAllOf({ node, data, pointer, path }: JsonSchemaValidatorParams)
     }
     const errors: ValidationResult[] = [];
     node.allOf.forEach((allOfNode) => {
-        errors.push(...allOfNode.validate(data, pointer, path));
+        errors.push(...validateNode(allOfNode, data, pointer, path));
     });
     return errors;
 }

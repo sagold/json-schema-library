@@ -19,11 +19,11 @@ import {
     Feature,
     isJsonError,
     JsonSchema,
-    Draft,
-    ValidationResult
+    Draft
 } from "./types";
 import { createSchema } from "./createSchema";
 import { hasProperty } from "./utils/hasProperty";
+import { validateNode } from "./validateNode";
 
 export type CompileOptions = {
     drafts: Draft[];
@@ -168,6 +168,7 @@ const NODE_METHODS: Pick<
     | "addRemote"
     | "compileSchema"
     | "validate"
+    | "validateAsync"
     | "errors"
 > = {
     errors,
@@ -348,39 +349,13 @@ const NODE_METHODS: Pick<
     },
 
     validate(data: unknown, pointer = "#", path = []) {
-        // before running validation, we need to resolve ref and recompile for any
-        // newly resolved schema properties - but this should be done for refs, etc only
-        const node = this as SchemaNode;
-        path.push({ pointer, node });
+        const errors = validateNode(this, data, pointer, path) ?? [];
+        return sanitizeErrors(Array.isArray(errors) ? errors : [errors]).filter((error) => error.then == null);
+    },
 
-        // @ts-expect-error untyped boolean schema
-        if (node.schema === true) {
-            return [];
-        }
-
-        // @ts-expect-error untyped boolean schema
-        if (node.schema === false) {
-            return [
-                node.errors.invalidDataError({
-                    value: data,
-                    pointer,
-                    schema: node.schema
-                })
-            ];
-        }
-
-        const errors: ValidationResult[] = [];
-        for (const validate of node.validators) {
-            // console.log("validator", validate.name);
-            const result = validate({ node, data, pointer, path });
-            if (Array.isArray(result)) {
-                errors.push(...result);
-            } else if (result) {
-                errors.push(result);
-            }
-        }
-
-        return sanitizeErrors(errors);
+    validateAsync(data: unknown, pointer = "#", path = []) {
+        const errors = validateNode(this, data, pointer, path) ?? [];
+        return Promise.all(sanitizeErrors(Array.isArray(errors) ? errors : [errors])).then(sanitizeErrors);
     },
 
     addRemote(url: string, schema: JsonSchema) {

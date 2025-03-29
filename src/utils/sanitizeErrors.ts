@@ -8,7 +8,8 @@ export default function sanitizeErrors<T extends JsonError = JsonError>(
         const item = list[i];
         if (Array.isArray(item)) {
             sanitizeErrors(item, result);
-        } else if (isJsonError(item)) {
+            // @ts-ignore
+        } else if (isJsonError(item) || item?.then != null) {
             result.push(item as T);
         }
     }

@@ -1,5 +1,6 @@
 import { mergeSchema } from "../utils/mergeSchema";
 import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { validateNode } from "../validateNode";
 
 export const anyOfFeature: Feature = {
     id: "anyOf",
@@ -20,10 +21,10 @@ export function parseAnyOf(node: SchemaNode) {
     }
 }
 
-function reduceAnyOf({ node, data }: JsonSchemaReducerParams) {
+function reduceAnyOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     let mergedSchema = {};
     for (let i = 0; i < node.anyOf.length; i += 1) {
-        if (node.anyOf[i].validate(data).length === 0) {
+        if (validateNode(node.anyOf[i], data, pointer, path).length === 0) {
             const schemaNode = node.anyOf[i].reduce({ data });
             const schema = mergeSchema(node.anyOf[i].schema, schemaNode.schema);
             mergedSchema = mergeSchema(mergedSchema, schema, "anyOf");
@@ -34,7 +35,7 @@ function reduceAnyOf({ node, data }: JsonSchemaReducerParams) {
 
 function validateAnyOf({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     for (let i = 0; i < node.anyOf.length; i += 1) {
-        if (node.anyOf[i].validate(data, pointer, path).length === 0) {
+        if (validateNode(node.anyOf[i], data, pointer, path).length === 0) {
             return undefined;
         }
     }

@@ -3,6 +3,7 @@ import { Feature, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 import { JsonSchemaResolverParams, JsonSchemaValidatorParams } from "../types";
 import { isObject } from "../utils/isObject";
+import { validateNode } from "../validateNode";
 
 export const propertiesFeature: Feature = {
     id: "property",
@@ -44,7 +45,7 @@ function validateProperties({ node, data, pointer, path }: JsonSchemaValidatorPa
             return;
         }
         const propertyNode = node.properties[propertyName];
-        const result = propertyNode.validate(getValue(data, propertyName), `${pointer}/${propertyName}`, path);
+        const result = validateNode(propertyNode, getValue(data, propertyName), `${pointer}/${propertyName}`, path);
         errors.push(...result);
     });
     return errors;

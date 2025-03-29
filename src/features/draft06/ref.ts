@@ -1,6 +1,7 @@
 import { Feature, JsonSchemaValidatorParams, SchemaNode, ValidationPath } from "../../types";
 import { resolveRef } from "../ref";
 import { joinId } from "../../utils/joinId";
+import { validateNode } from "../../validateNode";
 
 export const refFeature: Feature = {
     id: "$ref",
@@ -52,7 +53,7 @@ function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorPar
     if (nextNode == null) {
         return undefined;
     }
-    return nextNode.validate(data, pointer, path);
+    return validateNode(nextNode, data, pointer, path);
 }
 
 function resolveAllRefs(node: SchemaNode, pointer: string, path: ValidationPath) {

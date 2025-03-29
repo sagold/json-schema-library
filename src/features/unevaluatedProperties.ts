@@ -2,6 +2,7 @@ import { isJsonError, ValidationResult } from "../types";
 import { isObject } from "../utils/isObject";
 import { Feature, isSchemaNode, JsonSchemaValidatorParams, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
+import { validateNode } from "../validateNode";
 
 export const unevaluatedPropertiesFeature: Feature = {
     id: "unevaluatedProperties",
@@ -47,7 +48,7 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
         const child = node.get(propertyName, data, { path });
 
         if (isSchemaNode(child)) {
-            if (child.validate(data[propertyName], `${pointer}/${propertyName}`, path).length > 0) {
+            if (validateNode(child, data[propertyName], `${pointer}/${propertyName}`, path).length > 0) {
                 errors.push(
                     node.errors.unevaluatedPropertyError({
                         pointer: `${pointer}/${propertyName}`,
@@ -63,7 +64,8 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
             if (node.if && isPropertyEvaluated(node.if, propertyName, data)) {
                 // skip
             } else if (reducedNode.unevaluatedProperties) {
-                const validationResult = node.unevaluatedProperties.validate(
+                const validationResult = validateNode(
+                    node.unevaluatedProperties,
                     data[propertyName],
                     `${pointer}/${propertyName}`,
                     path

@@ -3,6 +3,7 @@ import { joinId } from "../utils/joinId";
 import splitRef from "../utils/splitRef";
 import { omit } from "../utils/omit";
 import { isObject } from "../utils/isObject";
+import { validateNode } from "../validateNode";
 
 export const refFeature: Feature = {
     id: "$ref",
@@ -76,7 +77,7 @@ function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorPar
     const nextNode = node.resolveRef({ pointer, path });
     if (nextNode != null) {
         // recursively resolveRef and validate
-        return nextNode.validate(data, pointer, path);
+        return validateNode(nextNode, data, pointer, path);
     }
 }
 

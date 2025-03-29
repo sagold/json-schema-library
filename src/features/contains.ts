@@ -1,5 +1,6 @@
 import { isObject } from "../utils/isObject";
 import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { validateNode } from "../validateNode";
 
 export const containsFeature: Feature = {
     id: "contains",
@@ -17,7 +18,7 @@ export function parseContains(node: SchemaNode) {
     node.contains = node.compileSchema(schema.contains, `${spointer}/contains`);
 }
 
-function validateContains({ node, data, pointer }: JsonSchemaValidatorParams) {
+function validateContains({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     const { schema } = node;
     if (!Array.isArray(data)) {
         return;
@@ -41,7 +42,7 @@ function validateContains({ node, data, pointer }: JsonSchemaValidatorParams) {
 
     let count = 0;
     for (let i = 0; i < data.length; i += 1) {
-        if (node.contains.validate(data[i]).length === 0) {
+        if (validateNode(node.contains, data[i], pointer, path).length === 0) {
             count++;
         }
     }

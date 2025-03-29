@@ -2,6 +2,7 @@ import settings from "../settings";
 import { isObject } from "../utils/isObject";
 import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode, ValidationResult } from "../types";
 import { getValue } from "../utils/getValue";
+import { validateNode } from "../validateNode";
 
 export const additionalPropertiesFeature: Feature = {
     id: "additionalProperties",
@@ -74,7 +75,7 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
         .forEach((property) => {
             const propertyValue = getValue(data, property);
             if (isObject(node.additionalProperties)) {
-                const validationErrors = node.additionalProperties.validate(propertyValue, pointer, path);
+                const validationErrors = validateNode(node.additionalProperties, propertyValue, pointer, path);
                 // @note: we pass through specific errors here
                 validationErrors && errors.push(...validationErrors);
             } else {

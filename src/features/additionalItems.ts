@@ -1,6 +1,7 @@
 import { isObject } from "../utils/isObject";
 import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode, ValidationResult } from "../types";
 import { getValue } from "../utils/getValue";
+import { validateNode } from "../validateNode";
 
 export const additionalItemsFeature: Feature = {
     id: "additionalItems",
@@ -36,7 +37,7 @@ function additionalItemsResolver({ node, key, data }: JsonSchemaResolverParams) 
     }
 }
 
-function validateAdditionalItems({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
+function validateAdditionalItems({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     const { schema } = node;
     if (!Array.isArray(data) || data.length === 0) {
         // - no items to validate
@@ -51,7 +52,7 @@ function validateAdditionalItems({ node, data, pointer = "#" }: JsonSchemaValida
     for (let i = startIndex; i < data.length; i += 1) {
         const item = data[i];
         if (node.additionalItems) {
-            const validationResult = node.additionalItems.validate(item, `${pointer}/${i}`);
+            const validationResult = validateNode(node.additionalItems, item, `${pointer}/${i}`, path);
             validationResult && errors.push(...validationResult);
         } else if (schema.additionalItems === false) {
             errors.push(

@@ -1,5 +1,6 @@
 import { mergeSchema } from "../utils/mergeSchema";
 import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { validateNode } from "../validateNode";
 
 export const ifFeature: Feature = {
     id: "if-then-else",
@@ -24,12 +25,12 @@ export function parseIfThenElse(node: SchemaNode) {
     }
 }
 
-function reduceIf({ node, data, pointer }: JsonSchemaReducerParams) {
+function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     if (data === undefined) {
         return undefined;
     }
 
-    if (node.if.validate(data, pointer).length === 0) {
+    if (validateNode(node.if, data, pointer, path).length === 0) {
         if (node.then) {
             // reduce creates a new node
             const schemaNode = node.then.reduce({ data });
@@ -45,11 +46,11 @@ function reduceIf({ node, data, pointer }: JsonSchemaReducerParams) {
 }
 
 function validateIfThenElse({ node, data, pointer, path }: JsonSchemaValidatorParams) {
-    if (node.if.validate(data, pointer, path).length === 0) {
+    if (validateNode(node.if, data, pointer, path).length === 0) {
         if (node.then) {
-            return node.then.validate(data, pointer, path);
+            return validateNode(node.then, data, pointer, path);
         }
     } else if (node.else) {
-        return node.else.validate(data, pointer, path);
+        return validateNode(node.else, data, pointer, path);
     }
 }

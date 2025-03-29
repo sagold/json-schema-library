@@ -1,6 +1,7 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
-import { SchemaNode } from "./types";
+import { Draft, Feature, JsonError, SchemaNode } from "./types";
+import { draft2019 } from "./draft2019";
 
 describe("compileSchema.validate", () => {
     describe("integer", () => {
@@ -752,4 +753,119 @@ describe("compileSchema.validate : format", () => {
             assert.equal(errors[0].code, "format-urlerror");
         });
     });
+});
+
+describe("compileSchema.validateAsync", () => {
+    it("should return a promise", () => {
+        const promise = compileSchema({ type: "number" }).validateAsync(4);
+        assert(promise instanceof Promise);
+    });
+
+    it("should resolve successfull with an empty error", async () => {
+        const promise = compileSchema({ type: "number" }).validateAsync(4);
+        const errors = await promise;
+        assert.deepEqual(errors.length, 0);
+    });
+
+    it("should resolve with errors for a failed validation", async () => {
+        const promise = compileSchema({ type: "number" }).validateAsync("4");
+        const errors = await promise;
+        assert.deepEqual(errors.length, 1);
+        assert.deepEqual(errors[0].code, "type-error");
+    });
+
+    describe("async validation", () => {
+        let draft: Draft;
+        beforeEach(() => {
+            draft = {
+                ...draft2019,
+                features: [
+                    // @ts-expect-error asd
+                    ...draft2019.features,
+                    {
+                        id: "async",
+                        keyword: "asyncError",
+                        addValidate: (node) => node.schema.asyncError != null,
+                        // @ts-expect-error asd
+                        validate: ({ node }) => {
+                            if (node.schema.asyncError === false) {
+                                return;
+                            }
+                            return new Promise((resolve) =>
+                                resolve([
+                                    node.errors.typeError({
+                                        schema: {},
+                                        pointer: "",
+                                        value: ""
+                                    })
+                                ])
+                            ) as Promise<JsonError[]>;
+                        }
+                    }
+                ]
+            };
+
+            it("should resolve async validation returning no error", async () => {
+                const errors = await compileSchema(
+                    { type: "number", asyncError: false },
+                    { drafts: [draft] }
+                ).validateAsync(4);
+                assert.deepEqual(errors.length, 0);
+            });
+
+            it("should resolve async validation errors", async () => {
+                const errors = await compileSchema(
+                    { type: "number", asyncError: true },
+                    { drafts: [draft] }
+                ).validateAsync(4);
+                assert.deepEqual(errors.length, 1);
+                assert.deepEqual(errors[0].code, "type-error");
+            });
+        });
+    });
+
+    // describe("onError", () => {
+    //     before(() => {
+    //         // adds an async validation helper to { type: 'string', asyncError: true }
+    //         // @ts-expect-error type mismatch of vladation function
+    //         addValidator.keyword(draft, "string", "asyncError", (node) => {
+    //             return node.schema.asyncError
+    //                 ? new Promise((resolve) =>
+    //                       // eslint-disable-next-line max-nested-callbacks
+    //                       resolve({
+    //                           type: "error",
+    //                           name: "AsyncError",
+    //                           code: "test-async-error",
+    //                           message: "custom test error"
+    //                       })
+    //                   )
+    //                 : Promise.resolve();
+    //         });
+    //     });
+
+    //     it("should call onProgress immediately with error", async () => {
+    //         const errors: JsonError[] = [];
+    //         return validateAsync(
+    //             draft,
+    //             {
+    //                 async: "test async progres",
+    //                 anotherError: 44
+    //             },
+    //             {
+    //                 schema: {
+    //                     type: "object",
+    //                     properties: {
+    //                         async: { type: "string", asyncError: true },
+    //                         anotherError: { type: "string" }
+    //                     }
+    //                 },
+    //                 onError: (err) => errors.push(err)
+    //             }
+    //         ).then(() => {
+    //             assert.deepEqual(errors.length, 2);
+    //             assert.deepEqual(errors[0].name).to.eq("TypeError");
+    //             assert.deepEqual(errors[1].name).to.eq("AsyncError");
+    //         });
+    //     });
+    // });
 });

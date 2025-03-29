@@ -9,6 +9,7 @@ import {
     SchemaNode
 } from "../types";
 import { getValue } from "../utils/getValue";
+import { validateNode } from "../validateNode";
 
 export const patternPropertiesFeature: Feature = {
     id: "patternProperties",
@@ -77,7 +78,7 @@ function reducePatternProperties({ node, data, key }: JsonSchemaReducerParams) {
     return node.compileSchema(mergedSchema, node.spointer);
 }
 
-function validatePatternProperties({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
+function validatePatternProperties({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     if (!isObject(data)) {
         return;
     }
@@ -90,7 +91,7 @@ function validatePatternProperties({ node, data, pointer = "#" }: JsonSchemaVali
     keys.forEach((key) => {
         const value = getValue(data, key);
         const matchingPatterns = patternProperties.filter((property) => property.pattern.test(key));
-        matchingPatterns.forEach(({ node }) => errors.push(...node.validate(value, `${pointer}/${key}`)));
+        matchingPatterns.forEach(({ node }) => errors.push(...validateNode(node, value, `${pointer}/${key}`, path)));
 
         if (properties[key]) {
             return;

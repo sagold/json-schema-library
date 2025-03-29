@@ -1,4 +1,5 @@
 import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { validateNode } from "../validateNode";
 
 export const notFeature: Feature = {
     id: "not",
@@ -15,9 +16,9 @@ export function parseNot(node: SchemaNode) {
     }
 }
 
-function validateNot({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
+function validateNot({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     const { schema } = node;
-    if (node.not.validate(data, pointer).length === 0) {
+    if (validateNode(node.not, data, pointer, path).length === 0) {
         return node.errors.notError({ value: data, not: schema.not, pointer, schema });
     }
 }

@@ -9,6 +9,7 @@ import {
     JsonSchema,
     ValidationResult
 } from "../types";
+import { validateNode } from "../validateNode";
 
 export const dependentSchemasFeature: Feature = {
     id: "dependentSchemas",
@@ -74,7 +75,7 @@ export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) 
     return node.compileSchema(mergedSchema, node.spointer, node.schemaId);
 }
 
-export function validateDependentSchemas({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
+export function validateDependentSchemas({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     const { schema, dependentSchemas } = node;
     if (!isObject(data)) {
         return undefined;
@@ -91,7 +92,7 @@ export function validateDependentSchemas({ node, data, pointer = "#" }: JsonSche
             return;
         }
         if (isSchemaNode(dependencies)) {
-            errors.push(...dependencies.validate(data, pointer));
+            errors.push(...validateNode(dependencies, data, pointer, path));
             return;
         }
     });
