@@ -28,6 +28,10 @@ export function createSchema(data: unknown): JsonSchema {
             schema.items = createSchema(data[0]);
         } else {
             schema.items = data.map(createSchema);
+            const sameTypes = schema.items.find((item: JsonSchema) => item.type !== schema.items[0].type) == null;
+            if (sameTypes) {
+                schema.items = schema.items[0];
+            }
         }
     }
 

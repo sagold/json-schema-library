@@ -30,4 +30,9 @@ describe("createSchema", () => {
         assert.deepEqual(getTypeOf(res.items), "object");
         assert.deepEqual(res.items, { type: "string" });
     });
+
+    it("should create item-object if array items are of same type", () => {
+        const res = createSchema(["string", "another string"]);
+        assert.deepEqual(res.items, { type: "string" });
+    });
 });
