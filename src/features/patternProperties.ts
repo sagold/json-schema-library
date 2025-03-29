@@ -42,15 +42,10 @@ export function parsePatternProperties(node: SchemaNode) {
 }
 
 function patternPropertyResolver({ node, key }: JsonSchemaResolverParams) {
-    return node.patternProperties?.find(({ pattern }) => {
-        return pattern.test(`${key}`);
-    })?.node;
+    return node.patternProperties?.find(({ pattern }) => pattern.test(`${key}`))?.node;
 }
 
 function reducePatternProperties({ node, data, key }: JsonSchemaReducerParams) {
-    if (!isObject(data) && data != null && key === undefined) {
-        return;
-    }
     const { patternProperties } = node;
     let mergedSchema: JsonSchema;
 

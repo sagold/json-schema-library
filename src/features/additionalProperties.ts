@@ -53,12 +53,6 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
     }
 
     const { schema } = node;
-    if (isObject(schema.patternProperties) && schema.additionalProperties === false) {
-        // this is an arrangement with patternProperties. patternProperties validate before additionalProperties:
-        // https://spacetelescope.github.io/understanding-json-schema/reference/object.html#index-5
-        return undefined;
-    }
-
     const errors: JsonError[] = [];
     let receivedProperties = Object.keys(data).filter((prop) => settings.propertyBlacklist.includes(prop) === false);
     if (Array.isArray(node.patternProperties)) {
