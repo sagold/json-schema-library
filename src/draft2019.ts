@@ -53,6 +53,7 @@ import { uniqueItemsFeature } from "./features/uniqueItems";
  */
 export const draft2019: Draft = {
     version: "draft-2019-09",
+    $schemaRegEx: "draft-2019-09",
     $schema: "https://json-schema.org/draft/2019-09/schema",
     features: [
         refFeature,

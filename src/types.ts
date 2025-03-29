@@ -2,7 +2,8 @@ import { CreateError } from "./errors/createCustomError";
 import { isObject } from "./utils/isObject";
 import { TemplateOptions } from "./getTemplate";
 
-export type JsonSchema = { [p: string]: any };
+export type JsonBooleanSchema = boolean;
+export type JsonSchema = Record<string, any>;
 export type JsonPointer = string;
 
 export type ErrorData<T extends Record<string, unknown> = { [p: string]: unknown }> = T & {
@@ -35,9 +36,8 @@ export type Draft = {
     features: Feature[];
     version: DraftVersion;
     $schema?: string;
+    $schemaRegEx: string;
 };
-
-export type DraftList = { regexp: string; draft: Draft }[];
 
 export type Feature = {
     id: string;
@@ -111,7 +111,7 @@ export type Context = {
     /** draft-version */
     version: string;
     /** available draft configurations */
-    drafts: DraftList;
+    drafts: Draft[];
     /** getTemplate default options */
     templateDefaultOptions?: TemplateOptions;
 };

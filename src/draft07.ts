@@ -48,6 +48,7 @@ import { uniqueItemsFeature } from "./features/uniqueItems";
  */
 export const draft07: Draft = {
     version: "draft-07",
+    $schemaRegEx: "draft-07",
     $schema: "http://json-schema.org/draft-07/schema",
     features: [
         refFeature,

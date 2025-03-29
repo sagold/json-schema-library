@@ -30,7 +30,6 @@ export { isReduceable } from "./src/compileSchema";
 export type {
     Context,
     Draft,
-    DraftList,
     DraftVersion,
     Feature,
     GetSchemaOptions,

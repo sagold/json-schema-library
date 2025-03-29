@@ -17,30 +17,25 @@ import {
     isSchemaNode,
     Context,
     Feature,
-    DraftList,
     isJsonError,
     JsonError,
-    JsonSchema
+    JsonSchema,
+    Draft
 } from "./types";
 import { createSchema } from "./createSchema";
 import { hasProperty } from "./utils/hasProperty";
 
 export type CompileOptions = {
-    drafts: DraftList;
+    drafts: Draft[];
     errors: Record<string, CreateError>;
     remoteContext?: Context;
     templateDefaultOptions?: TemplateOptions;
 };
 
-const defaultDrafts: DraftList = [
-    { regexp: "draft-04", draft: draft04 },
-    { regexp: "draft-06", draft: draft06 },
-    { regexp: "draft-07", draft: draft07 },
-    { regexp: ".", draft: draft2019 }
-];
+const defaultDrafts: Draft[] = [draft04, draft06, draft07, draft2019];
 
-function getDraft(drafts: DraftList, $schema: string) {
-    return drafts.find((d) => new RegExp(d.regexp).test($schema))?.draft ?? draft2019;
+function getDraft(drafts: Draft[], $schema: string) {
+    return drafts.find((d) => new RegExp(d.$schemaRegEx).test($schema)) ?? drafts[drafts.length - 1];
 }
 
 /**

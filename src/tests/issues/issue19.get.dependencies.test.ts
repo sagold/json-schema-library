@@ -71,12 +71,7 @@ describe("issue#19 - getSchema from dependencies", () => {
         // strict oneOf resolution will fail here, so we need to either fuzzy resolve oneOf item or
         // directly set "oneOfProperty" to "generation"
         const modifiedRootNode = compileSchema(rootNode.schema, {
-            drafts: [
-                {
-                    regexp: ".",
-                    draft: draftEditor
-                }
-            ]
+            drafts: [draftEditor]
         });
 
         const node = modifiedRootNode.get("customField", {

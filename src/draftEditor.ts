@@ -37,4 +37,4 @@ function pimpFeatures(draft: Draft) {
  *
  * Uses Draft 2019-09 and changes resolveOneOf to be fuzzy
  */
-export const draftEditor: Draft = pimpFeatures(addFeature(draft2019, oneOfFuzzyFeature));
+export const draftEditor: Draft = { ...pimpFeatures(addFeature(draft2019, oneOfFuzzyFeature)), $schemaRegEx: "." };
