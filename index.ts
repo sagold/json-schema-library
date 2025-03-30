@@ -21,7 +21,7 @@ export { eachSchema } from "./src/eachSchema";
 export type { EachSchemaCallback } from "./src/eachSchema";
 export { createSchema } from "./src/createSchema";
 export { addError } from "./src/addError";
-export { addFeature } from "./src/addFeature";
+export { addFeatures } from "./src/addFeatures";
 export { addFormatValidator } from "./src/addFormatValidator";
 // export { mergeNode } from "./src/mergeNode"; -- not yet
 

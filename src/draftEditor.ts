@@ -1,4 +1,4 @@
-import { addFeature } from "./addFeature";
+import { addFeatures } from "./addFeatures";
 import { draft2019 } from "./draft2019";
 import { oneOfFuzzyFeature } from "./features/oneOf";
 import { Draft } from "./types";
@@ -24,4 +24,4 @@ function pimpFeatures(draft: Draft) {
  *
  * Uses Draft 2019-09 and changes resolveOneOf to be fuzzy
  */
-export const draftEditor: Draft = { ...pimpFeatures(addFeature(draft2019, oneOfFuzzyFeature)), $schemaRegEx: "." };
+export const draftEditor: Draft = { ...pimpFeatures(addFeatures(draft2019, oneOfFuzzyFeature)), $schemaRegEx: "." };
