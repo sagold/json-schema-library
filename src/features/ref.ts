@@ -136,7 +136,7 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
     // check for remote-host + pointer pair to switch rootSchema
     const fragments = splitRef($ref);
     if (fragments.length === 0) {
-        console.error("REF: INVALID", $ref);
+        // console.error("REF: INVALID", $ref);
         return undefined;
     }
 
@@ -147,7 +147,7 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
         if (node.context.remotes[$ref]) {
             return compileNext(node.context.remotes[$ref], node.spointer);
         }
-        console.error("REF: UNFOUND 1", $ref);
+        // console.error("REF: UNFOUND 1", $ref);
         return undefined;
     }
 
@@ -167,7 +167,7 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
                 return nextNode;
             }
         }
-        console.error("REF: UNFOUND 2", $ref);
+        // console.error("REF: UNFOUND 2", $ref);
         return undefined;
     }
 

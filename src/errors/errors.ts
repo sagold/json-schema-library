@@ -1,7 +1,7 @@
 /* eslint no-invalid-this: 0 */
 import { createCustomError, CreateError } from "./createCustomError";
 
-export const errors: Record<string, CreateError> = {
+export const defaultErrors = {
     additionalItemsError: createCustomError("AdditionalItemsError"),
     additionalPropertiesError: createCustomError("AdditionalPropertiesError"),
     allOfError: createCustomError("AllOfError"),
@@ -69,3 +69,5 @@ export const errors: Record<string, CreateError> = {
     unknownPropertyError: createCustomError("UnknownPropertyError"),
     valueNotEmptyError: createCustomError("ValueNotEmptyError")
 };
+
+export const errors: typeof defaultErrors & Record<string, CreateError> = defaultErrors;

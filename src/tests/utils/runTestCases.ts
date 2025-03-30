@@ -100,17 +100,18 @@ export default function runAllTestCases(setup: Setup) {
 
         after(() => {
             measurements.end = Date.now();
-            console.log(
-                "\n",
-                "time overall:",
-                measurements.end - measurements.start,
-                "ms",
-                "time validations:",
-                measurements.validationDuration,
-                "ms",
-                "average validation time:",
-                measurements.validationDuration / measurements.testCount
-            );
+            process.env.DISABLE_LOG !== "true" &&
+                console.log(
+                    "\n",
+                    "time overall:",
+                    measurements.end - measurements.start,
+                    "ms",
+                    "time validations:",
+                    measurements.validationDuration,
+                    "ms",
+                    "average validation time:",
+                    measurements.validationDuration / measurements.testCount
+                );
             // console.log("max time:", measurements.max);
         });
     });
