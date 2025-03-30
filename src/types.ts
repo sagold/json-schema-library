@@ -1,6 +1,6 @@
-import { CreateError } from "./errors/createCustomError";
 import { isObject } from "./utils/isObject";
 import { TemplateOptions } from "./getTemplate";
+import { errors } from "./errors/errors";
 
 export type JsonBooleanSchema = boolean;
 export type JsonSchema = Record<string, any>;
@@ -145,7 +145,7 @@ export type GetSchemaOptions = {
 
 export type SchemaNode = {
     context: Context;
-    errors: Record<string, CreateError>;
+    errors: typeof errors;
     parent?: SchemaNode | undefined;
     ref?: string;
     schema: JsonSchema;

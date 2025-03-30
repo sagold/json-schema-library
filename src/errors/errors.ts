@@ -68,6 +68,6 @@ export const defaultErrors = {
     uniqueItemsError: createCustomError("UniqueItemsError"),
     unknownPropertyError: createCustomError("UnknownPropertyError"),
     valueNotEmptyError: createCustomError("ValueNotEmptyError")
-};
+} as const;
 
 export const errors: typeof defaultErrors & Record<string, CreateError> = defaultErrors;
