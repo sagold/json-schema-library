@@ -1,7 +1,7 @@
 /* eslint-disable max-len, no-control-regex */
 import getTypeOf from "../utils/getTypeOf";
 import validUrl from "valid-url";
-import { Feature, JsonSchemaValidatorParams, JsonError } from "../types";
+import { Feature, JsonSchemaValidatorParams, JsonError, ValidationResult } from "../types";
 import { parse as parseIdnEmail } from "smtp-address-parser";
 
 export const formatFeature: Feature = {
@@ -38,7 +38,7 @@ const isValidDurationString = /^P(?!$)(\d+Y)?(\d+M)?(\d+W)?(\d+D)?(T(?=\d)(\d+H)
 // Default Json-Schema formats: date-time, email, hostname, ipv4, ipv6, uri, uriref
 export const formatValidators: Record<
     string,
-    (options: JsonSchemaValidatorParams) => undefined | JsonError | JsonError[]
+    (options: JsonSchemaValidatorParams) => undefined | JsonError | ValidationResult[]
 > = {
     date: ({ node, pointer, data }) => {
         const { schema } = node;
