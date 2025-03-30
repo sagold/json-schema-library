@@ -47,7 +47,7 @@ jobs:
             - name: Install dependencies
               run: yarn install --frozen-lockfile
             - name: Test spec v4
-              run: yarn test:spec:4:ci
+              run: yarn test:4:ci
             - uses: actions/upload-artifact@v4
               with:
                   name: test-results-spec-4
@@ -66,7 +66,7 @@ jobs:
             - name: Install dependencies
               run: yarn install --frozen-lockfile
             - name: Test spec v6
-              run: yarn test:spec:6:ci
+              run: yarn test:6:ci
             - uses: actions/upload-artifact@v4
               with:
                   name: test-results-spec-6
@@ -85,7 +85,7 @@ jobs:
             - name: Install dependencies
               run: yarn install --frozen-lockfile
             - name: Test spec v7
-              run: yarn test:spec:7:ci
+              run: yarn test:7:ci
             - uses: actions/upload-artifact@v4
               with:
                   name: test-results-spec-7
@@ -104,7 +104,7 @@ jobs:
             - name: Install dependencies
               run: yarn install --frozen-lockfile
             - name: Test spec 2019-09
-              run: yarn test:spec:2019:ci
+              run: yarn test:2019:ci
             - uses: actions/upload-artifact@v4
               with:
                   name: test-results-spec-2019-09
