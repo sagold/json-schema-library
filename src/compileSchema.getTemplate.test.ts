@@ -1518,4 +1518,53 @@ describe("compileSchema.getTemplate", () => {
             });
         });
     });
+
+    describe("defaultTemplateOptions.removeInvalidData", () => {
+        it("should NOT remove invalid data per default", () => {
+            const node = compileSchema({
+                type: "object",
+                properties: { valid: { type: "string" } },
+                additionalProperties: false
+            });
+            const res = node.getTemplate({ valid: "stays", invalid: "not removed" });
+            assert.deepEqual(res, { valid: "stays", invalid: "not removed" });
+        });
+        it("should remove invalid data with 'removeInvalidData=true'", () => {
+            const node = compileSchema({
+                type: "object",
+                properties: { valid: { type: "string" } },
+                additionalProperties: false
+            });
+            const res = node.getTemplate({ valid: "stays", invalid: "removes" }, { removeInvalidData: true });
+            assert.deepEqual(res, { valid: "stays" });
+        });
+        it("should remove invalid data with 'removeInvalidData=true' when set as defaultTemplateOptions", () => {
+            const node = compileSchema(
+                {
+                    type: "object",
+                    properties: { valid: { type: "string" } },
+                    additionalProperties: false
+                },
+                {
+                    templateDefaultOptions: { removeInvalidData: true }
+                }
+            );
+            const res = node.getTemplate({ valid: "stays", invalid: "removes" });
+            assert.deepEqual(res, { valid: "stays" });
+        });
+        it("should NOT remove invalid data when set per default but overwritten on function", () => {
+            const node = compileSchema(
+                {
+                    type: "object",
+                    properties: { valid: { type: "string" } },
+                    additionalProperties: false
+                },
+                {
+                    templateDefaultOptions: { removeInvalidData: true }
+                }
+            );
+            const res = node.getTemplate({ valid: "stays", invalid: "not removed" }, { removeInvalidData: false });
+            assert.deepEqual(res, { valid: "stays", invalid: "not removed" });
+        });
+    });
 });

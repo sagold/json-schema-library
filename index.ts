@@ -23,7 +23,7 @@ export { createSchema } from "./src/createSchema";
 export { addError } from "./src/addError";
 export { addFeature } from "./src/addFeature";
 export { addFormatValidator } from "./src/addFormatValidator";
-// export { mergeNode } from "./src/mergeNode";
+// export { mergeNode } from "./src/mergeNode"; -- not yet
 
 // utilities
 export { default as getTypeOf } from "./src/utils/getTypeOf";
