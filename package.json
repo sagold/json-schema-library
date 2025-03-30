@@ -20,6 +20,7 @@
         "test:6": "TS_NODE_PROJECT=./tsconfig.test.json mocha -r ts-node/register -R spec 'src/tests/spec/draft06.spec.ts'",
         "test:7": "TS_NODE_PROJECT=./tsconfig.test.json mocha -r ts-node/register -R spec 'src/tests/spec/draft07.spec.ts'",
         "test::2019:ci": "yarn test:2019 > test-result-spec2019-09.json; exit 0",
+        "test:inspect": "yarn test:2019 --inspect-brk",
         "test::4:ci": "yarn test:4 > test-result-spec4.json; exit 0",
         "test::6:ci": "yarn test:6 > test-result-spec6.json; exit 0",
         "test::7:ci": "yarn test:7 > test-result-spec7.json; exit 0",
