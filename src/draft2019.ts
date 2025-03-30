@@ -1,3 +1,4 @@
+import type { Draft } from "./types";
 import { additionalItemsFeature } from "./features/additionalItems";
 import { additionalPropertiesFeature } from "./features/additionalProperties";
 import { allOfFeature } from "./features/allOf";
@@ -9,9 +10,9 @@ import { dependenciesFeature } from "./features/dependencies";
 import { dependentRequiredFeature } from "./features/dependentRequired";
 import { dependentSchemasFeature } from "./features/dependentSchemas";
 import { enumFeature } from "./features/enum";
+import { errors } from "./errors/errors";
 import { exclusiveMaximumFeature } from "./features/exclusiveMaximum";
 import { exclusiveMinimumFeature } from "./features/exclusiveMinimum";
-import type { Draft } from "./types";
 import { formatFeature } from "./features/format";
 import { ifFeature } from "./features/ifthenelse";
 import { itemsFeature } from "./features/items";
@@ -55,6 +56,7 @@ export const draft2019: Draft = {
     version: "draft-2019-09",
     $schemaRegEx: "draft-2019-09",
     $schema: "https://json-schema.org/draft/2019-09/schema",
+    errors,
     features: [
         refFeature,
         allOfFeature,

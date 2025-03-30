@@ -33,6 +33,7 @@ export function isJsonError(error: any): error is JsonError {
 export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "latest";
 
 export type Draft = {
+    errors: typeof errors;
     features: Feature[];
     version: DraftVersion;
     $schema?: string;

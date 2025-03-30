@@ -3,7 +3,7 @@ import { JsonError, ErrorData } from "../types";
 
 export type CreateError<T extends ErrorData = ErrorData> = (data: T) => JsonError<T>;
 
-function dashCase(text: string): string {
+export function dashCase(text: string): string {
     return text.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 }
 

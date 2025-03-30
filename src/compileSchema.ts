@@ -77,6 +77,7 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
         resolvers: [],
         validators: [],
         schema,
+        errors: draft.errors,
         ...NODE_METHODS
     } as SchemaNode;
 
@@ -169,10 +170,7 @@ const NODE_METHODS: Pick<
     | "compileSchema"
     | "validate"
     | "validateAsync"
-    | "errors"
 > = {
-    errors,
-
     compileSchema(schema: JsonSchema, spointer: string = this.spointer, schemaId?: string) {
         const nextFragment = spointer.split("/$ref")[0];
         const parentNode = this as SchemaNode;
@@ -186,6 +184,7 @@ const NODE_METHODS: Pick<
             resolvers: [],
             validators: [],
             schema,
+            errors: parentNode.errors,
             ...NODE_METHODS
         };
 
@@ -361,6 +360,8 @@ const NODE_METHODS: Pick<
     addRemote(url: string, schema: JsonSchema) {
         // @draft >= 6
         schema.$id = joinId(schema.$id || url);
+        const { context } = this as SchemaNode;
+        const draft = getDraft(context.drafts, schema?.$schema ?? this.context.rootNode.$schema);
 
         const node: SchemaNode = {
             spointer: "#",
@@ -370,11 +371,10 @@ const NODE_METHODS: Pick<
             resolvers: [],
             validators: [],
             schema,
+            errors: draft.errors,
             ...NODE_METHODS
         } as SchemaNode;
 
-        const { context } = this as SchemaNode;
-        const draft = getDraft(context.drafts, schema?.$schema ?? this.context.rootNode.$schema);
         node.context = {
             ...context,
             refs: {},

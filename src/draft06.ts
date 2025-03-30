@@ -1,4 +1,5 @@
 import type { Draft } from "./types";
+import { errors } from "./errors/errors";
 import { additionalItemsFeature } from "./features/additionalItems";
 import { additionalPropertiesFeature } from "./features/additionalProperties";
 import { allOfFeature } from "./features/allOf";
@@ -59,6 +60,7 @@ export const draft06: Draft = {
     version: "draft-06",
     $schemaRegEx: "draft-06",
     $schema: "http://json-schema.org/draft-06/schema",
+    errors,
     features: [
         refFeature,
         allOfFeature,

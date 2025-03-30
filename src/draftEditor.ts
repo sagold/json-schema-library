@@ -1,7 +1,9 @@
+import __ from "./errors/__";
+import { dashCase } from "./errors/createCustomError";
 import { addFeatures } from "./addFeatures";
+import { Draft } from "./types";
 import { draft2019 } from "./draft2019";
 import { oneOfFuzzyFeature } from "./features/oneOf";
-import { Draft } from "./types";
 
 function pimpFeatures(draft: Draft) {
     draft.features.forEach((feature) => {
@@ -24,4 +26,28 @@ function pimpFeatures(draft: Draft) {
  *
  * Uses Draft 2019-09 and changes resolveOneOf to be fuzzy
  */
-export const draftEditor: Draft = { ...pimpFeatures(addFeatures(draft2019, oneOfFuzzyFeature)), $schemaRegEx: "." };
+export const draftEditor: Draft = {
+    ...pimpFeatures(addFeatures(draft2019, oneOfFuzzyFeature)),
+    errors: {
+        ...draft2019.errors,
+        minLengthError: (data) => {
+            if (data.minLength === 1) {
+                return {
+                    type: "error",
+                    name: "MinLengthOneError",
+                    code: dashCase("MinLengthOneError"),
+                    message: __("MinLengthOneError", data),
+                    data
+                };
+            }
+            return {
+                type: "error",
+                name: "MinLengthError",
+                code: dashCase("MinLengthError"),
+                message: __("MinLengthError", data),
+                data
+            };
+        }
+    },
+    $schemaRegEx: "."
+};
