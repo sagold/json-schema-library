@@ -1,20 +1,7 @@
+import { addFeature } from "./addFeature";
 import { draft2019 } from "./draft2019";
 import { oneOfFuzzyFeature } from "./features/oneOf";
-import { Draft, Feature } from "./types";
-
-function addFeature(draft: Draft, feature: Feature): Draft {
-    const features = [...draft.features];
-    const index = features.findIndex((f) => f.keyword === feature.keyword);
-    if (index === -1) {
-        features.push(feature);
-    } else {
-        features[index] = feature;
-    }
-    return {
-        ...draft,
-        features
-    };
-}
+import { Draft } from "./types";
 
 function pimpFeatures(draft: Draft) {
     draft.features.forEach((feature) => {
