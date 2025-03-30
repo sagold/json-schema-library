@@ -17,15 +17,6 @@ function validateMinLength({ node, data, pointer = "#" }: JsonSchemaValidatorPar
     if (schema.minLength <= length) {
         return;
     }
-    if (schema.minLength === 1) {
-        return node.errors.minLengthOneError({
-            minLength: schema.minLength,
-            length,
-            pointer,
-            schema,
-            value: data
-        });
-    }
     return node.errors.minLengthError({
         minLength: schema.minLength,
         length,

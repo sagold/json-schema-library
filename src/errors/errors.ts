@@ -45,7 +45,6 @@ const defaultErrors = {
     minItemsError: createCustomError("MinItemsError"),
     minItemsOneError: createCustomError("MinItemsOneError"),
     minLengthError: createCustomError("MinLengthError"),
-    minLengthOneError: createCustomError("MinLengthOneError"),
     minPropertiesError: createCustomError("MinPropertiesError"),
     missingArrayItemError: createCustomError("MissingArrayItemError"),
     missingDependencyError: createCustomError("MissingDependencyError"),
