@@ -20,7 +20,10 @@ export type { EachCallback } from "./src/each";
 export { eachSchema } from "./src/eachSchema";
 export type { EachSchemaCallback } from "./src/eachSchema";
 export { createSchema } from "./src/createSchema";
-export { mergeNode } from "./src/mergeNode";
+export { addError } from "./src/addError";
+export { addFeature } from "./src/addFeature";
+export { addFormatValidator } from "./src/addFormatValidator";
+// export { mergeNode } from "./src/mergeNode";
 
 // utilities
 export { default as getTypeOf } from "./src/utils/getTypeOf";

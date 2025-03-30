@@ -1,7 +1,7 @@
 /* eslint no-invalid-this: 0 */
 import { createCustomError, CreateError } from "./createCustomError";
 
-export const defaultErrors = {
+const defaultErrors = {
     additionalItemsError: createCustomError("AdditionalItemsError"),
     additionalPropertiesError: createCustomError("AdditionalPropertiesError"),
     allOfError: createCustomError("AllOfError"),
