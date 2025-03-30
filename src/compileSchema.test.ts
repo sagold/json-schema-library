@@ -1,6 +1,7 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
-import { isSchemaNode } from "./types";
+import { isJsonError, isSchemaNode } from "./types";
+import { draftEditor } from "./draftEditor";
 
 // - processing draft we need to know and support json-schema keywords
 // - Note: meta-schemas are defined flat, combining all properties per type
@@ -141,5 +142,19 @@ describe("compileSchema `schemaId`", () => {
         // @todo should have returned already resolved node?
         const result = node.resolveRef();
         assert.deepEqual(result.schemaId, "#");
+    });
+});
+
+describe("compileSchema `errors`", () => {
+    it("draftEditor come with custom minLengthOneError", () => {
+        const errors = compileSchema(
+            {
+                type: "string",
+                minLength: 1
+            },
+            { drafts: [draftEditor] }
+        ).validate("");
+        assert.equal(errors.length, 1);
+        assert.deepEqual(errors[0].name, "MinLengthOneError");
     });
 });
