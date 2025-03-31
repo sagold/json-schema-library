@@ -1,4 +1,3 @@
-import type { Draft } from "./types";
 import { additionalItemsFeature } from "./features/additionalItems";
 import { additionalPropertiesFeature } from "./features/additionalProperties";
 import { allOfFeature } from "./features/allOf";
@@ -37,6 +36,7 @@ import { typeFeature } from "./features/type";
 import { unevaluatedItemsFeature } from "./features/unevaluatedItems";
 import { unevaluatedPropertiesFeature } from "./features/unevaluatedProperties";
 import { uniqueItemsFeature } from "./features/uniqueItems";
+import { sanitizeFeatures } from "./utils/sanitizeFeatures";
 
 /**
  * @draft-2019 https://json-schema.org/draft/2019-09/release-notes
@@ -52,7 +52,7 @@ import { uniqueItemsFeature } from "./features/uniqueItems";
  * - $ref
  * - dependencies has been split into dependentSchemas and dependentRequired
  */
-export const draft2019: Draft = {
+export const draft2019 = sanitizeFeatures({
     version: "draft-2019-09",
     $schemaRegEx: "draft-2019-09",
     $schema: "https://json-schema.org/draft/2019-09/schema",
@@ -95,17 +95,5 @@ export const draft2019: Draft = {
         oneOfFeature,
         additionalItemsFeature,
         additionalPropertiesFeature
-    ].map((feature) => {
-        const logKeyword = () => feature.keyword;
-        if (feature.validate) {
-            feature.validate.toJSON = logKeyword;
-        }
-        if (feature.reduce) {
-            feature.reduce.toJSON = logKeyword;
-        }
-        if (feature.resolve) {
-            feature.resolve.toJSON = logKeyword;
-        }
-        return feature;
-    })
-};
+    ]
+});

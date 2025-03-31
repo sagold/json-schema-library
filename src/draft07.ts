@@ -1,4 +1,3 @@
-import type { Draft } from "./types";
 import { errors } from "./errors/errors";
 import { additionalItemsFeature } from "./features/additionalItems";
 import { additionalPropertiesFeature } from "./features/additionalProperties";
@@ -35,6 +34,7 @@ import { typeFeature } from "./features/type";
 import { unevaluatedItemsFeature } from "./features/unevaluatedItems";
 import { unevaluatedPropertiesFeature } from "./features/unevaluatedProperties";
 import { uniqueItemsFeature } from "./features/uniqueItems";
+import { sanitizeFeatures } from "./utils/sanitizeFeatures";
 
 /**
  * @draft-07 https://json-schema.org/draft-07/json-schema-release-notes
@@ -47,7 +47,7 @@ import { uniqueItemsFeature } from "./features/uniqueItems";
  * - "contentMediaType"
  * - "contentEncoding"
  */
-export const draft07: Draft = {
+export const draft07 = sanitizeFeatures({
     version: "draft-07",
     $schemaRegEx: "draft-07",
     $schema: "http://json-schema.org/draft-07/schema",
@@ -88,17 +88,5 @@ export const draft07: Draft = {
         oneOfFeature,
         additionalItemsFeature,
         additionalPropertiesFeature
-    ].map((feature) => {
-        const logKeyword = () => feature.keyword;
-        if (feature.validate) {
-            feature.validate.toJSON = logKeyword;
-        }
-        if (feature.reduce) {
-            feature.reduce.toJSON = logKeyword;
-        }
-        if (feature.resolve) {
-            feature.resolve.toJSON = logKeyword;
-        }
-        return feature;
-    })
-};
+    ]
+});

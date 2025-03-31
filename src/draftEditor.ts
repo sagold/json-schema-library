@@ -1,24 +1,22 @@
 import __ from "./errors/__";
 import { dashCase } from "./errors/createCustomError";
 import { addFeatures } from "./addFeatures";
-import { Draft } from "./types";
 import { draft2019 } from "./draft2019";
 import { oneOfFuzzyFeature } from "./features/oneOf";
+import { sanitizeFeatures } from "./utils/sanitizeFeatures";
+import { Draft } from "./types";
 
-function pimpFeatures(draft: Draft) {
-    draft.features.forEach((feature) => {
-        const logKeyword = () => feature.keyword;
-        if (feature.validate) {
-            feature.validate.toJSON = logKeyword;
-        }
-        if (feature.reduce) {
-            feature.reduce.toJSON = logKeyword;
-        }
-        if (feature.resolve) {
-            feature.resolve.toJSON = logKeyword;
-        }
+type PartialDraft = Partial<Omit<Draft, "errors">> & { errors?: Partial<Draft["errors"]> };
+
+function extendDraft(draft: Draft, extension: PartialDraft) {
+    const { features } = addFeatures(draft, ...(extension.features ?? []));
+    const errors = { ...draft.errors, ...(extension.errors ?? {}) };
+    return sanitizeFeatures({
+        ...draft,
+        ...extension,
+        features,
+        errors
     });
-    return draft;
 }
 
 /**
@@ -26,10 +24,10 @@ function pimpFeatures(draft: Draft) {
  *
  * Uses Draft 2019-09 and changes resolveOneOf to be fuzzy
  */
-export const draftEditor: Draft = {
-    ...pimpFeatures(addFeatures(draft2019, oneOfFuzzyFeature)),
+export const draftEditor = extendDraft(draft2019, {
+    $schemaRegEx: ".",
+    features: [oneOfFuzzyFeature],
     errors: {
-        ...draft2019.errors,
         minLengthError: (data) => {
             if (data.minLength === 1) {
                 return {
@@ -48,6 +46,5 @@ export const draftEditor: Draft = {
                 data
             };
         }
-    },
-    $schemaRegEx: "."
-};
+    }
+});

@@ -1,4 +1,3 @@
-import type { Draft } from "./types";
 import { errors } from "./errors/errors";
 import { additionalItemsFeature } from "./features/additionalItems";
 import { additionalPropertiesFeature } from "./features/additionalProperties";
@@ -31,6 +30,7 @@ import { refFeature } from "./features/draft04/ref";
 import { requiredFeature } from "./features/required";
 import { typeFeature } from "./features/type";
 import { uniqueItemsFeature } from "./features/uniqueItems";
+import { sanitizeFeatures } from "./utils/sanitizeFeatures";
 
 /**
  * @draft-04
@@ -53,7 +53,7 @@ import { uniqueItemsFeature } from "./features/uniqueItems";
  * - required  allows an empty array
  * - dependencies allows an empty array for property dependencies
  */
-export const draft04: Draft = {
+export const draft04 = sanitizeFeatures({
     version: "draft-04",
     $schemaRegEx: "draft-04",
     $schema: "http://json-schema.org/draft-04/schema",
@@ -90,17 +90,5 @@ export const draft04: Draft = {
         oneOfFeature,
         additionalItemsFeature,
         additionalPropertiesFeature
-    ].map((feature) => {
-        const logKeyword = () => feature.keyword;
-        if (feature.validate) {
-            feature.validate.toJSON = logKeyword;
-        }
-        if (feature.reduce) {
-            feature.reduce.toJSON = logKeyword;
-        }
-        if (feature.resolve) {
-            feature.resolve.toJSON = logKeyword;
-        }
-        return feature;
-    })
-};
+    ]
+});
