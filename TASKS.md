@@ -1,3 +1,5 @@
+-   only support draft7 and 2020... https://github.com/orgs/json-schema-org/discussions/192#discussioncomment-3057910
+
 # Draft 2019-09 Scope
 
 -   [✓] `getSchema` inconsistent return of non-node for root-requests
