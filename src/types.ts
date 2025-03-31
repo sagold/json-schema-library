@@ -30,7 +30,7 @@ export function isJsonError(error: any): error is JsonError {
     return error?.type === "error";
 }
 
-export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "latest";
+export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "draft-2020-12" | "latest";
 
 export type Draft = {
     errors: typeof errors;

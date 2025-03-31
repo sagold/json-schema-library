@@ -16,6 +16,19 @@ runAllTestCases({
     // logSchema: false,
     skipTestCase: (t) =>
         ![
+            "uniqueItems",
+            "ref",
+            "unevaluatedItems",
+            "unevaluatedProperties",
+            "prefixItems",
+            "items",
+            "format",
+            "defs",
+            // optional:
+            "dynamicRef",
+            "format-email",
+            "format-ecmascript-regex",
+            // 2019:
             "vocabulary", // must
             // optionals
             "cross-draft", // must

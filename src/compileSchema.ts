@@ -4,6 +4,7 @@ import { draft04 } from "./draft04";
 import { draft06 } from "./draft06";
 import { draft07 } from "./draft07";
 import { draft2019 } from "./draft2019";
+import { draft2020 } from "./draft2020";
 import { getTemplate, TemplateOptions } from "./getTemplate";
 import { getValue } from "./utils/getValue";
 import { join, split } from "@sagold/json-pointer";
@@ -32,7 +33,7 @@ export type CompileOptions = {
     templateDefaultOptions?: TemplateOptions;
 };
 
-const defaultDrafts: Draft[] = [draft04, draft06, draft07, draft2019];
+const defaultDrafts: Draft[] = [draft04, draft06, draft07, draft2019, draft2020];
 
 function getDraft(drafts: Draft[], $schema: string) {
     return drafts.find((d) => new RegExp(d.$schemaRegEx).test($schema)) ?? drafts[drafts.length - 1];

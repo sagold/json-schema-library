@@ -17,6 +17,8 @@
         "test": "mocha 'src/**/*.{test,spec}.ts'",
         "test:2019": "mocha 'src/tests/spec/draft2019-09.spec.ts'",
         "test:2019:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft2019-09.spec.ts' > test-result-spec2019-09.json; exit 0",
+        "test:2020": "mocha 'src/tests/spec/draft2020-12.spec.ts'",
+        "test:2020:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft2020-12.spec.ts' > test-result-spec2020-12.json; exit 0",
         "test:4": "mocha 'src/tests/spec/draft04.spec.ts'",
         "test:4:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft04.spec.ts' > test-result-spec4.json; exit 0",
         "test:6": "mocha 'src/tests/spec/draft06.spec.ts'",
