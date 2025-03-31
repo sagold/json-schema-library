@@ -1,6 +1,5 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
-import { isSchemaNode, SchemaNode } from "../../types";
 
 describe("issue#58 - oneOf should invalid type error", () => {
     it("should return one-of-error for invalid type", () => {

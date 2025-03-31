@@ -1,6 +1,6 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
-import { Draft, Feature, JsonError, SchemaNode } from "./types";
+import { Draft, JsonError, SchemaNode } from "./types";
 import { draft2019 } from "./draft2019";
 
 describe("compileSchema.validate", () => {

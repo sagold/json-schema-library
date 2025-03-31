@@ -3,7 +3,6 @@ import {
     isSchemaNode,
     JsonSchemaReducerParams,
     JsonSchemaValidatorParams,
-    JsonError,
     JsonSchema,
     SchemaNode,
     ValidationResult

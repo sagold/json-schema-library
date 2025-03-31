@@ -1,6 +1,6 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
-import { isJsonError, isSchemaNode } from "./types";
+import { isSchemaNode } from "./types";
 import { draftEditor } from "./draftEditor";
 
 // - processing draft we need to know and support json-schema keywords

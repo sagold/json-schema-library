@@ -1,4 +1,3 @@
-import { errors } from "./errors/errors";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import { CreateError } from "./errors/createCustomError";
 import { draft04 } from "./draft04";
@@ -19,7 +18,8 @@ import {
     Feature,
     isJsonError,
     JsonSchema,
-    Draft
+    Draft,
+    JsonError
 } from "./types";
 import { createSchema } from "./createSchema";
 import { hasProperty } from "./utils/hasProperty";
@@ -349,12 +349,14 @@ const NODE_METHODS: Pick<
 
     validate(data: unknown, pointer = "#", path = []) {
         const errors = validateNode(this, data, pointer, path) ?? [];
-        return sanitizeErrors(Array.isArray(errors) ? errors : [errors]).filter((error) => error.then == null);
+        const flatErrorList = sanitizeErrors(Array.isArray(errors) ? errors : [errors]);
+        return flatErrorList.filter(isJsonError);
     },
 
-    validateAsync(data: unknown, pointer = "#", path = []) {
+    async validateAsync(data: unknown, pointer = "#", path = []) {
         const errors = validateNode(this, data, pointer, path) ?? [];
-        return Promise.all(sanitizeErrors(Array.isArray(errors) ? errors : [errors])).then(sanitizeErrors);
+        const resolvedErrors = await Promise.all(sanitizeErrors(Array.isArray(errors) ? errors : [errors]));
+        return sanitizeErrors(resolvedErrors) as JsonError[];
     },
 
     addRemote(url: string, schema: JsonSchema) {
