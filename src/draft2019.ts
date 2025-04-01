@@ -14,7 +14,7 @@ import { exclusiveMaximumFeature } from "./features/exclusiveMaximum";
 import { exclusiveMinimumFeature } from "./features/exclusiveMinimum";
 import { formatFeature } from "./features/format";
 import { ifFeature } from "./features/ifthenelse";
-import { itemsFeature } from "./features/items";
+import { itemsFeature } from "./features/draft2019-09/items";
 import { maximumFeature } from "./features/maximum";
 import { maxItemsFeature } from "./features/maxItems";
 import { maxLengthFeature } from "./features/maxLength";

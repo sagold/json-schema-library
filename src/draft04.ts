@@ -10,7 +10,7 @@ import { enumFeature } from "./features/enum";
 import { exclusiveMaximumFeature } from "./features/draft04/exclusiveMaximum";
 import { exclusiveMinimumFeature } from "./features/draft04/exclusiveMinimum";
 import { formatFeature } from "./features/format";
-import { itemsFeature } from "./features/items";
+import { itemsFeature } from "./features/draft2019-09/items";
 import { maximumFeature } from "./features/maximum";
 import { maxItemsFeature } from "./features/maxItems";
 import { maxLengthFeature } from "./features/maxLength";
