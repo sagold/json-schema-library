@@ -31,6 +31,10 @@ function runTestCase(setup: Setup, tc: FeatureTest, remotes: SchemaNode) {
                     return;
                 }
                 testCase.tests.forEach((testData) => {
+                    if (setup.skipTests && setup.skipTests.includes(testCase.description)) {
+                        it.skip(testData.description, () => {});
+                        return;
+                    }
                     it(testData.description, () => {
                         if (setup.logSchema === true || (setup.logSchema == null && setup.only)) {
                             console.log(

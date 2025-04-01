@@ -85,6 +85,7 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
     node.context = {
         remotes: {},
         anchors: {},
+        dynamicAnchors: {},
         ids: {},
         ...(options.remoteContext ?? {}),
         refs: {},

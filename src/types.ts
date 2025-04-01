@@ -106,6 +106,7 @@ export type Context = {
     ids: Record<string, SchemaNode>;
     /** anchors stored by fully resolved schema-$id + $anchor */
     anchors: Record<string, SchemaNode>;
+    dynamicAnchors: Record<string, SchemaNode>;
     /** json-schema parser, validator, reducer and resolver for this json-schema (root-schema and its child nodes) */
     features?: Feature[];
 

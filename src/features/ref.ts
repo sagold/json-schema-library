@@ -4,12 +4,13 @@ import splitRef from "../utils/splitRef";
 import { omit } from "../utils/omit";
 import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
+import { split } from "@sagold/json-pointer";
 
 export const refFeature: Feature = {
     id: "$ref",
     keyword: "$ref",
     parse: parseRef,
-    addValidate: ({ schema }) => schema.$ref != null || schema.$recursiveRef != null,
+    addValidate: ({ schema }) => schema.$ref != null || schema.$dynamicRef != null,
     validate: validateRef
 };
 
@@ -38,9 +39,24 @@ export function parseRef(node: SchemaNode) {
     }
     // store $rootId + json-pointer to this node
     register(node, joinId(node.context.rootNode.$id, node.spointer));
-    // store this node for retrieval by $id + anchor
-    if (node.schema.$anchor) {
-        node.context.anchors[`${currentId.replace(/#$/, "")}#${node.schema.$anchor}`] = node;
+
+    // @draft-2020:  A $dynamicRef to a $dynamicAnchor in the same schema resource behaves like a normal $ref to an $anchor
+    const anchor = node.schema.$anchor;
+    if (anchor) {
+        // store this node for retrieval by $id + anchor
+        const anchorUrl = `${currentId.replace(/#$/, "")}#${anchor}`;
+        if (node.context.anchors[anchorUrl] == null) {
+            node.context.anchors[anchorUrl] = node;
+        }
+    }
+
+    const dynamicAnchor = node.schema.$dynamicAnchor;
+    if (dynamicAnchor) {
+        // store this node for retrieval by $id + anchor
+        const dynamicAnchorUrl = `${currentId.replace(/#$/, "")}#${dynamicAnchor}`;
+        if (node.context.dynamicAnchors[dynamicAnchorUrl] == null) {
+            node.context.dynamicAnchors[dynamicAnchorUrl] = node;
+        }
     }
 
     // precompile reference
@@ -54,8 +70,9 @@ export function parseRef(node: SchemaNode) {
 
 export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
     const node = this as SchemaNode;
-    if (node.schema.$recursiveRef) {
+    if (node.schema.$dynamicRef) {
         const nextNode = resolveRecursiveRef(node, path);
+        // console.log("resolved node", node.schema.$dynamicRef, "=>", nextNode != null);
         path?.push({ pointer, node: nextNode });
         return nextNode;
     }
@@ -84,30 +101,37 @@ function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorPar
 // 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
 function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode {
     const history = path;
+    const refInCurrentScope = joinId(node.$id, node.schema.$dynamicRef);
+    // console.log("resolve $dynamicRef:", node.schema.$dynamicRef);
+    // console.log(" -> scope:", joinId(node.$id, node.schema.$dynamicRef));
+    // console.log("dynamicAnchors", Object.keys(node.context.dynamicAnchors));
 
-    // RESTRICT BY CHANGE IN BASE-URL
-    // go back in history until we have a domain definition and use this as start node to search for an anchor
-    let startIndex = 0;
-    for (let i = history.length - 1; i >= 0; i--) {
-        if (history[i].node.schema.$recursiveAnchor === false) {
-            // $recursiveRef with $recursiveAnchor: false works like $ref
-            const nextNode = getRef(node, joinId(node.$id, node.schema.$recursiveRef));
-            return nextNode;
-        }
-        if (/^https?:\/\//.test(history[i].node.schema.$id ?? "") && history[i].node.schema.$recursiveAnchor !== true) {
-            startIndex = i;
-            break;
+    // A $dynamicRef with a non-matching $dynamicAnchor in the same schema resource behaves like a normal $ref to $anchor
+    const nonMatchingDynamicAnchor = node.context.dynamicAnchors[refInCurrentScope] == null;
+    if (nonMatchingDynamicAnchor) {
+        if (node.context.anchors[refInCurrentScope]) {
+            return compileNext(node.context.anchors[refInCurrentScope], node.spointer);
         }
     }
 
-    // FROM THERE FIND FIRST OCCURENCE OF AN ANCHOR
-    const firstAnchor = history.find((s, index) => index >= startIndex && s.node.schema.$recursiveAnchor === true);
-    if (firstAnchor) {
-        return firstAnchor.node;
+    for (let i = 0; i < history.length; i += 1) {
+        // A $dynamicRef that initially resolves to a schema with a matching $dynamicAnchor resolves to the first $dynamicAnchor in the dynamic scope
+        if (history[i].node.schema.$dynamicAnchor) {
+            return compileNext(history[i].node, node.spointer);
+        }
+
+        // A $dynamicRef only stops at a $dynamicAnchor if it is in the same dynamic scope.
+        const refWithoutScope = node.schema.$dynamicRef.split("#").pop();
+        const ref = joinId(history[i].node.$id, `#${refWithoutScope}`);
+        const anchorNode = node.context.dynamicAnchors[ref];
+        if (anchorNode) {
+            return compileNext(node.context.dynamicAnchors[ref], node.spointer);
+        }
     }
 
-    // $recursiveRef with no $recursiveAnchor works like $ref?
-    const nextNode = getRef(node, joinId(node.$id, node.schema.$recursiveRef));
+    // A $dynamicRef without a matching $dynamicAnchor in the same schema resource behaves like a normal $ref to $anchor
+    // console.log(" -> resolve as ref");
+    const nextNode = getRef(node, refInCurrentScope);
     return nextNode;
 }
 
@@ -132,11 +156,15 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
     if (node.context.anchors[$ref]) {
         return compileNext(node.context.anchors[$ref], node.spointer);
     }
+    // resolve $ref from $dynamicAnchor
+    if (node.context.dynamicAnchors[$ref]) {
+        // A $ref to a $dynamicAnchor in the same schema resource behaves like a normal $ref to an $anchor
+        return compileNext(node.context.dynamicAnchors[$ref], node.spointer);
+    }
 
     // check for remote-host + pointer pair to switch rootSchema
     const fragments = splitRef($ref);
     if (fragments.length === 0) {
-        // console.error("REF: INVALID", $ref);
         return undefined;
     }
 
@@ -167,7 +195,25 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
                 return nextNode;
             }
         }
-        // console.error("REF: UNFOUND 2", $ref);
+
+        // resolve by json-pointer (optional dynamicRef)
+        if (node.context.refs[$remoteHostRef]) {
+            const parentNode = node.context.refs[$remoteHostRef];
+            const path = split(fragments[1]);
+            // @todo add utility to resolve schema-pointer to schema
+            let currentNode = parentNode;
+            for (let i = 0; i < path.length; i += 1) {
+                // @ts-expect-error random path
+                currentNode = currentNode[path[i]];
+                if (currentNode == null) {
+                    console.error("REF: FAILED RESOLVING ref json-pointer", fragments[1]);
+                    return undefined;
+                }
+            }
+            return currentNode;
+        }
+
+        console.error("REF: UNFOUND 2", $ref);
         return undefined;
     }
 

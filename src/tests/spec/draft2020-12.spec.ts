@@ -35,17 +35,15 @@ import runAllTestCases from "../utils/runTestCases";
  */
 runAllTestCases({
     // only: {
-    //     name: "defs",
-    //     description: "validate definition against metaschema"
+    //     name: "dynamicRef",
+    //     description: "$dynamicRef skips over intermediate resources - pointer reference across resource boundary"
     // },
-    // logSchema: false,
+    // logSchema: true,
     skipTestCase: (t) =>
         ![
             "unevaluatedItems",
             "unevaluatedProperties",
             "format",
-            "defs", // requires dynamicRef support
-            // "dynamicRef",
             // optional:
             "format-email",
             "format-ecmascript-regex",
@@ -61,6 +59,7 @@ runAllTestCases({
             "non-bmp-regex", // should
             "refOfUnknownKeyword" // reference to undefined schema definitions... we support configurations for this
         ].includes(t.name),
+
     metaSchema: draft2020Meta,
     metaSchemaList: [
         draft2020MetaApplicator,
@@ -71,5 +70,9 @@ runAllTestCases({
         draft2020MetaMetaData,
         draft2020MetaUnevaluated,
         draft2020MetaValidation
+    ],
+    skipTests: [
+        // "A $dynamicRef without a matching $dynamicAnchor in the same schema resource behaves like a normal $ref to $anchor",
+        // "A $dynamicRef resolves to the first $dynamicAnchor still in scope that is encountered when the schema is evaluated"
     ]
 });
