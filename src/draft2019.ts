@@ -30,7 +30,7 @@ import { patternFeature } from "./features/pattern";
 import { patternPropertiesFeature } from "./features/patternProperties";
 import { propertiesFeature } from "./features/properties";
 import { propertyNamesFeature } from "./features/propertyNames";
-import { refFeature } from "./features/ref";
+import { refFeature } from "./features/draft2019-09/ref";
 import { requiredFeature } from "./features/required";
 import { typeFeature } from "./features/type";
 import { unevaluatedItemsFeature } from "./features/unevaluatedItems";

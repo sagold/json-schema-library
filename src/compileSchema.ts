@@ -36,7 +36,8 @@ export type CompileOptions = {
 const defaultDrafts: Draft[] = [draft04, draft06, draft07, draft2019, draft2020];
 
 function getDraft(drafts: Draft[], $schema: string) {
-    return drafts.find((d) => new RegExp(d.$schemaRegEx).test($schema)) ?? drafts[drafts.length - 1];
+    // @todo default to 2020 (currently fails a lot of tests)
+    return drafts.find((d) => new RegExp(d.$schemaRegEx).test($schema)) ?? draft2019;
 }
 
 /**
