@@ -65,7 +65,7 @@ import { prefixItemsFeature } from "./features/prefixItems";
  */
 export const draft2020 = sanitizeFeatures({
     version: "draft-2020-12",
-    $schemaRegEx: "draft-2020-12",
+    $schemaRegEx: "draft/2020-12",
     $schema: "https://json-schema.org/draft/2020-12/schema",
     errors,
     features: [
