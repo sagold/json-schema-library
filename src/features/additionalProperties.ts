@@ -75,13 +75,18 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
         .forEach((property) => {
             const propertyValue = getValue(data, property);
             if (isObject(node.additionalProperties)) {
-                const validationErrors = validateNode(node.additionalProperties, propertyValue, pointer, path);
+                const validationErrors = validateNode(
+                    node.additionalProperties,
+                    propertyValue,
+                    `${pointer}/${property}`,
+                    path
+                );
                 // @note: we pass through specific errors here
                 validationErrors && errors.push(...validationErrors);
             } else {
                 errors.push(
                     node.errors.noAdditionalPropertiesError({
-                        pointer,
+                        pointer: `${pointer}/${property}`,
                         schema,
                         value: data,
                         property,

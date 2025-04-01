@@ -5,6 +5,7 @@ import draft2020MetaCore from "../../../remotes/draft2020-12_meta_core.json";
 import draft2020MetaFormatAnnotation from "../../../remotes/draft2020-12_meta_format_annotation.json";
 import draft2020MetaFormatAssertion from "../../../remotes/draft2020-12_meta_format_assertion.json";
 import draft2020MetaMetaData from "../../../remotes/draft2020-12_meta_meta_data.json";
+import draft2020MetaUnevaluated from "../../../remotes/draft2020-12_meta_unevaluated.json";
 import draft2020MetaValidation from "../../../remotes/draft2020-12_meta_validation.json";
 import runAllTestCases from "../utils/runTestCases";
 
@@ -34,21 +35,18 @@ import runAllTestCases from "../utils/runTestCases";
  */
 runAllTestCases({
     // only: {
-    //     name: "unevaluatedProperties",
-    //     description: "unevaluatedProperties with nested unevaluatedProperties"
+    //     name: "defs",
+    //     description: "validate definition against metaschema"
     // },
     // logSchema: false,
     skipTestCase: (t) =>
         ![
-            "uniqueItems",
-            "ref",
             "unevaluatedItems",
             "unevaluatedProperties",
-            // "items",
             "format",
-            "defs",
+            "defs", // requires dynamicRef support
+            // "dynamicRef",
             // optional:
-            "dynamicRef",
             "format-email",
             "format-ecmascript-regex",
             // 2019:
@@ -71,6 +69,7 @@ runAllTestCases({
         draft2020MetaFormatAnnotation,
         draft2020MetaFormatAssertion,
         draft2020MetaMetaData,
+        draft2020MetaUnevaluated,
         draft2020MetaValidation
     ]
 });
