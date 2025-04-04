@@ -1,4 +1,5 @@
-import { JsonSchema, SchemaNode, ValidationPath, ValidationResult } from "./types";
+import { JsonSchema, SchemaNode } from "./types";
+import { ValidationPath, ValidationResult } from "./Feature";
 import sanitizeErrors from "./utils/sanitizeErrors";
 
 export function validateNode(node: SchemaNode, data: unknown, pointer: string, path?: ValidationPath) {

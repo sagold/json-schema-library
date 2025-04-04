@@ -1,6 +1,7 @@
 import settings from "../settings";
 import { isObject } from "../utils/isObject";
-import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode, ValidationResult } from "../types";
+import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../Feature";
+import { SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 import { validateNode } from "../validateNode";
 

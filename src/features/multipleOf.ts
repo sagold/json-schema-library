@@ -1,5 +1,5 @@
 import { getPrecision } from "../utils/getPrecision";
-import { Feature, JsonSchemaValidatorParams } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../Feature";
 
 export const multipleOfFeature: Feature = {
     id: "multipleOf",

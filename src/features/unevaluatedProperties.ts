@@ -1,6 +1,7 @@
-import { isJsonError, ValidationResult } from "../types";
+import { isJsonError, isSchemaNode } from "../types";
 import { isObject } from "../utils/isObject";
-import { Feature, isSchemaNode, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams, ValidationResult } from "../Feature";
 import { getValue } from "../utils/getValue";
 import { validateNode } from "../validateNode";
 

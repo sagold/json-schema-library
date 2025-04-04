@@ -1,5 +1,5 @@
 import ucs2decode from "../utils/punycode.ucs2decode";
-import { Feature, JsonSchemaValidatorParams } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../Feature";
 
 export const maxLengthFeature: Feature = {
     id: "maxLength",

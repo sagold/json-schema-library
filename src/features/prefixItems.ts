@@ -1,4 +1,5 @@
-import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, SchemaNode, ValidationResult } from "../types";
+import { SchemaNode } from "../types";
+import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../Feature";
 import { validateNode } from "../validateNode";
 
 export const prefixItemsFeature: Feature = {

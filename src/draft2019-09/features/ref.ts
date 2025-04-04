@@ -1,9 +1,10 @@
-import { Feature, JsonSchemaValidatorParams, SchemaNode, ValidationPath } from "../../types";
+import { Feature, JsonSchemaValidatorParams, ValidationPath } from "../../Feature";
 import { joinId } from "../../utils/joinId";
 import splitRef from "../../utils/splitRef";
 import { omit } from "../../utils/omit";
 import { isObject } from "../../utils/isObject";
 import { validateNode } from "../../validateNode";
+import { SchemaNode } from "../../types";
 
 export const refFeature: Feature = {
     id: "$ref",

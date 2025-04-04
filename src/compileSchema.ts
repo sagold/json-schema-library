@@ -11,17 +11,8 @@ import { join, split } from "@sagold/json-pointer";
 import { joinId } from "./utils/joinId";
 import { mergeNode } from "./mergeNode";
 import { omit } from "./utils/omit";
-import {
-    SchemaNode,
-    JsonSchemaReducerParams,
-    isSchemaNode,
-    Context,
-    Feature,
-    isJsonError,
-    JsonSchema,
-    Draft,
-    JsonError
-} from "./types";
+import { SchemaNode, isSchemaNode, Context, isJsonError, JsonSchema, Draft, JsonError } from "./types";
+import type { Feature, JsonSchemaReducerParams } from "./Feature";
 import { createSchema } from "./methods/createSchema";
 import { hasProperty } from "./utils/hasProperty";
 import { validateNode } from "./validateNode";

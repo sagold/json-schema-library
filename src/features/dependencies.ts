@@ -1,12 +1,5 @@
-import {
-    Feature,
-    isSchemaNode,
-    JsonSchemaReducerParams,
-    JsonSchemaValidatorParams,
-    JsonSchema,
-    SchemaNode,
-    ValidationResult
-} from "../types";
+import { isSchemaNode, JsonSchema, SchemaNode } from "../types";
+import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationResult } from "../Feature";
 import { getValue } from "../utils/getValue";
 import { isObject } from "../utils/isObject";
 import { mergeSchema } from "../utils/mergeSchema";

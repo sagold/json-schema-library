@@ -1,13 +1,13 @@
 import { mergeSchema } from "../utils/mergeSchema";
-import { JsonSchema, ValidationResult } from "../types";
+import { JsonSchema, SchemaNode } from "../types";
 import { isObject } from "../utils/isObject";
 import {
     Feature,
     JsonSchemaReducerParams,
     JsonSchemaResolverParams,
     JsonSchemaValidatorParams,
-    SchemaNode
-} from "../types";
+    ValidationResult
+} from "../Feature";
 import { getValue } from "../utils/getValue";
 import { validateNode } from "../validateNode";
 

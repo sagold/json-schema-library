@@ -1,5 +1,6 @@
 import { mergeSchema } from "../utils/mergeSchema";
-import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams } from "../Feature";
+import { SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
 
 export const anyOfFeature: Feature = {

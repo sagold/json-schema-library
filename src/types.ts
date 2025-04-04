@@ -1,10 +1,11 @@
 import { isObject } from "./utils/isObject";
-import { getTemplate, TemplateOptions } from "./methods/getTemplate";
-import { errors } from "./errors/errors";
-import { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
-import { each, EachCallback } from "./methods/each";
-import { EachSchemaCallback } from "./methods/eachSchema";
-import { createSchema } from "./methods/createSchema";
+import type { getTemplate, TemplateOptions } from "./methods/getTemplate";
+import type { errors } from "./errors/errors";
+import type { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
+import type { each, EachCallback } from "./methods/each";
+import type { EachSchemaCallback } from "./methods/eachSchema";
+import type { createSchema } from "./methods/createSchema";
+import type { Feature, JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, ValidationPath } from "./Feature";
 
 export type JsonBooleanSchema = boolean;
 export type JsonSchema = Record<string, any>;
@@ -50,61 +51,6 @@ export type Draft = {
     $schemaRegEx: string;
 };
 
-export type Feature = {
-    id: string;
-    keyword: string;
-
-    parse?: (node: SchemaNode) => void;
-
-    addResolve?: (node: SchemaNode) => boolean;
-    resolve?: JsonSchemaResolver;
-
-    addValidate?: (node: SchemaNode) => boolean;
-    validate?: JsonSchemaValidator;
-
-    addReduce?: (node: SchemaNode) => boolean;
-    reduce?: JsonSchemaReducer;
-};
-
-export type JsonSchemaReducerParams = {
-    data: unknown;
-    /** optional key to used to resolve by property without having data */
-    key?: string | number;
-    node: SchemaNode;
-    pointer?: string;
-    path?: ValidationPath;
-};
-
-export interface JsonSchemaReducer {
-    toJSON?: () => string;
-    (options: JsonSchemaReducerParams): SchemaNode | JsonError | undefined;
-}
-
-export type JsonSchemaResolverParams = { key: string | number; data: unknown; node: SchemaNode };
-export interface JsonSchemaResolver {
-    toJSON?: () => string;
-    (options: JsonSchemaResolverParams): SchemaNode | JsonError | undefined;
-}
-
-export type ValidationResult = JsonError | Promise<JsonError>;
-
-export type JsonSchemaValidatorParams = { pointer?: string; data: unknown; node: SchemaNode; path?: ValidationPath };
-export interface JsonSchemaValidator {
-    toJSON?: () => string;
-    (options: JsonSchemaValidatorParams): undefined | JsonError | ValidationResult[];
-}
-
-export type JsonSchemaDefaultDataResolverParams = {
-    pointer?: string;
-    data?: unknown;
-    node: SchemaNode;
-    options?: TemplateOptions;
-};
-export interface JsonSchemaDefaultDataResolver {
-    toJSON?: () => string;
-    (options: JsonSchemaDefaultDataResolverParams): unknown;
-}
-
 export type Context = {
     /** root node of this json-schema */
     rootNode: SchemaNode;
@@ -135,11 +81,6 @@ export type Context = {
 export function isSchemaNode(value: unknown): value is SchemaNode {
     return isObject(value) && Array.isArray(value?.reducers) && Array.isArray(value?.resolvers);
 }
-
-export type ValidationPath = {
-    pointer: string;
-    node: SchemaNode;
-}[];
 
 export type GetSchemaOptions = {
     path?: ValidationPath;

@@ -1,4 +1,4 @@
-import { Feature, JsonSchemaValidatorParams } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../Feature";
 import equal from "fast-deep-equal";
 
 export const constFeature: Feature = {

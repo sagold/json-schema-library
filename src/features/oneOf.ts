@@ -1,5 +1,11 @@
-import { ValidationPath, ValidationResult } from "../types";
-import { Feature, isSchemaNode, JsonSchemaReducerParams, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import {
+    Feature,
+    JsonSchemaReducerParams,
+    JsonSchemaValidatorParams,
+    ValidationPath,
+    ValidationResult
+} from "../Feature";
+import { isSchemaNode, SchemaNode } from "../types";
 import settings from "../settings";
 import { getValue } from "../utils/getValue";
 import sanitizeErrors from "../utils/sanitizeErrors";

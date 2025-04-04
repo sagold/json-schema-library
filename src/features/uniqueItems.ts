@@ -1,5 +1,5 @@
 import { JsonError } from "../types";
-import { Feature, JsonSchemaValidatorParams } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../Feature";
 import deepEqual from "fast-deep-equal";
 
 export const uniqueItemsFeature: Feature = {

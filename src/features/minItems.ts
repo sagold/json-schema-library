@@ -1,4 +1,4 @@
-import { JsonSchemaValidatorParams, Feature } from "../types";
+import { JsonSchemaValidatorParams, Feature } from "../Feature";
 
 export const minItemsFeature: Feature = {
     id: "minItems",

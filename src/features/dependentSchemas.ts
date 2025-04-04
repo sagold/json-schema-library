@@ -1,14 +1,7 @@
 import { mergeSchema } from "../utils/mergeSchema";
 import { isObject } from "../utils/isObject";
-import {
-    Feature,
-    isSchemaNode,
-    JsonSchemaReducerParams,
-    JsonSchemaValidatorParams,
-    SchemaNode,
-    JsonSchema,
-    ValidationResult
-} from "../types";
+import { isSchemaNode, SchemaNode, JsonSchema } from "../types";
+import { Feature, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationResult } from "../Feature";
 import { validateNode } from "../validateNode";
 
 export const dependentSchemasFeature: Feature = {

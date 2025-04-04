@@ -1,6 +1,7 @@
 import { JsonError } from "../types";
 import { isObject } from "../utils/isObject";
-import { Feature, JsonSchemaValidatorParams, SchemaNode } from "../types";
+import { SchemaNode } from "../types";
+import { Feature, JsonSchemaValidatorParams } from "../Feature";
 import { validateNode } from "../validateNode";
 
 export const propertyNamesFeature: Feature = {

@@ -1,6 +1,6 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
-import { ValidationPath } from "./types";
+import { ValidationPath } from "./Feature";
 
 describe("validate - path", () => {
     it("should should resolve both if-then-else and allOf schema", () => {

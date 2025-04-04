@@ -1,5 +1,6 @@
 import { copyDraft } from "./utils/copyDraft";
-import { Draft, Feature } from "./types";
+import { Draft } from "./types";
+import { Feature } from "./Feature";
 
 export function addFeatures(draft: Draft, ...features: Feature[]): Draft {
     const customizedDraft = copyDraft(draft);

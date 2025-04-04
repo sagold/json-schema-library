@@ -1,8 +1,9 @@
 /* eslint-disable max-len, no-control-regex */
 import getTypeOf from "../utils/getTypeOf";
 import validUrl from "valid-url";
-import { Feature, JsonSchemaValidatorParams, JsonError, ValidationResult } from "../types";
+import { Feature, JsonSchemaValidatorParams, ValidationResult } from "../Feature";
 import { parse as parseIdnEmail } from "smtp-address-parser";
+import { JsonError } from "../types";
 
 export const formatFeature: Feature = {
     id: "format",

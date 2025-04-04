@@ -1,7 +1,6 @@
-import { ValidationResult } from "../types";
-import { Feature, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
-import { JsonSchemaResolverParams, JsonSchemaValidatorParams } from "../types";
+import { SchemaNode } from "../types";
+import { Feature, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../Feature";
 import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
 

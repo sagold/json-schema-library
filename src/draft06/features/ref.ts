@@ -1,5 +1,6 @@
-import { Feature, JsonSchemaValidatorParams, SchemaNode, ValidationPath } from "../../types";
+import { Feature, JsonSchemaValidatorParams, ValidationPath } from "../../Feature";
 import { resolveRef } from "../../features/ref";
+import { SchemaNode } from "../../types";
 import { joinId } from "../../utils/joinId";
 import { validateNode } from "../../validateNode";
 
