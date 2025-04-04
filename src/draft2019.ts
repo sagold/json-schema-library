@@ -14,7 +14,7 @@ import { exclusiveMaximumFeature } from "./features/exclusiveMaximum";
 import { exclusiveMinimumFeature } from "./features/exclusiveMinimum";
 import { formatFeature } from "./features/format";
 import { ifFeature } from "./features/ifthenelse";
-import { itemsFeature } from "./features/draft2019-09/items";
+import { itemsFeature } from "./draft2019-09/features/items";
 import { maximumFeature } from "./features/maximum";
 import { maxItemsFeature } from "./features/maxItems";
 import { maxLengthFeature } from "./features/maxLength";
@@ -30,13 +30,13 @@ import { patternFeature } from "./features/pattern";
 import { patternPropertiesFeature } from "./features/patternProperties";
 import { propertiesFeature } from "./features/properties";
 import { propertyNamesFeature } from "./features/propertyNames";
-import { refFeature } from "./features/draft2019-09/ref";
+import { refFeature } from "./draft2019-09/features/ref";
 import { requiredFeature } from "./features/required";
+import { sanitizeFeatures } from "./utils/sanitizeFeatures";
 import { typeFeature } from "./features/type";
 import { unevaluatedItemsFeature } from "./features/unevaluatedItems";
 import { unevaluatedPropertiesFeature } from "./features/unevaluatedProperties";
 import { uniqueItemsFeature } from "./features/uniqueItems";
-import { sanitizeFeatures } from "./utils/sanitizeFeatures";
 
 /**
  * @draft-2019 https://json-schema.org/draft/2019-09/release-notes

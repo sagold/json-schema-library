@@ -3,7 +3,7 @@ import { joinId } from "../../utils/joinId";
 import { isObject } from "../../utils/isObject";
 import { omit } from "../../utils/omit";
 import splitRef from "../../utils/splitRef";
-import { refFeature as draft06Feature } from "../draft06/ref";
+import { refFeature as draft06Feature } from "../../draft06/features/ref";
 
 export const refFeature: Feature = {
     id: "$ref",
