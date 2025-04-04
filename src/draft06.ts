@@ -36,6 +36,7 @@ import { unevaluatedPropertiesFeature } from "./features/unevaluatedProperties";
 import { uniqueItemsFeature } from "./features/uniqueItems";
 import { getChildSchemaSelection } from "./getChildSchemaSelection";
 import { getTemplate } from "./draft2019-09/getTemplate";
+import { each } from "./draft2019-09/each";
 
 /**
  * @draft-06 https://json-schema.org/draft-06/json-schema-release-notes
@@ -65,7 +66,8 @@ export const draft06 = sanitizeFeatures({
     errors,
     methods: {
         getTemplate,
-        getChildSchemaSelection
+        getChildSchemaSelection,
+        each
     },
     features: [
         refFeature,

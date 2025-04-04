@@ -162,6 +162,7 @@ export function isReduceable(node: SchemaNode) {
 
 const NODE_METHODS: Pick<
     SchemaNode,
+    | "each"
     | "get"
     | "getRef"
     | "getSchema"
@@ -194,6 +195,11 @@ const NODE_METHODS: Pick<
         addFeatures(node);
 
         return node;
+    },
+
+    each(data, callback, pointer) {
+        const node = this as SchemaNode;
+        return node.context.methods.each(node, data, callback, pointer);
     },
 
     /**

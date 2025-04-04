@@ -2,6 +2,7 @@ import { isObject } from "./utils/isObject";
 import { getTemplate, TemplateOptions } from "./getTemplate";
 import { errors } from "./errors/errors";
 import { getChildSchemaSelection } from "./getChildSchemaSelection";
+import { each, EachCallback } from "./each";
 
 export type JsonBooleanSchema = boolean;
 export type JsonSchema = Record<string, any>;
@@ -39,6 +40,7 @@ export type Draft = {
     methods: {
         getChildSchemaSelection: typeof getChildSchemaSelection;
         getTemplate: typeof getTemplate;
+        each: typeof each;
     };
     version: DraftVersion;
     $schema?: string;
@@ -183,6 +185,7 @@ export type SchemaNode = {
     getSchema: (pointer: string, data?: unknown, options?: GetSchemaOptions) => SchemaNode | JsonError | undefined;
     /** Creates data that is valid to the schema of this node */
     getTemplate: (data?: unknown, options?: TemplateOptions) => unknown;
+    each: (data: unknown, callback: EachCallback, pointer?: string) => void;
     /** Creates a new node with all dynamic schema properties merged according to the passed in data */
     reduce: ({
         data,

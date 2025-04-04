@@ -40,6 +40,7 @@ import { typeFeature } from "./features/type";
 import { unevaluatedItemsFeature } from "./features/unevaluatedItems";
 import { unevaluatedPropertiesFeature } from "./features/unevaluatedProperties";
 import { uniqueItemsFeature } from "./features/uniqueItems";
+import { each } from "./each";
 
 /**
  * @draft-2020-12 https://json-schema.org/draft/2020-12/release-notes
@@ -72,7 +73,8 @@ export const draft2020 = sanitizeFeatures({
     errors,
     methods: {
         getTemplate,
-        getChildSchemaSelection
+        getChildSchemaSelection,
+        each
     },
     features: [
         refFeature,

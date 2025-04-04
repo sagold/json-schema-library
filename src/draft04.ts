@@ -33,6 +33,7 @@ import { typeFeature } from "./features/type";
 import { uniqueItemsFeature } from "./features/uniqueItems";
 import { getChildSchemaSelection } from "./getChildSchemaSelection";
 import { getTemplate } from "./draft2019-09/getTemplate";
+import { each } from "./draft2019-09/each";
 
 /**
  * @draft-04
@@ -62,7 +63,8 @@ export const draft04 = sanitizeFeatures({
     errors,
     methods: {
         getTemplate,
-        getChildSchemaSelection
+        getChildSchemaSelection,
+        each
     },
     features: [
         refFeature,
