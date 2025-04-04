@@ -78,6 +78,8 @@ export const draft2020 = sanitizeFeatures({
     },
     features: [
         refFeature,
+        additionalItemsFeature,
+        additionalPropertiesFeature,
         allOfFeature,
         anyOfFeature,
         constFeature,
@@ -102,8 +104,9 @@ export const draft2020 = sanitizeFeatures({
         minPropertiesFeature,
         multipleOfFeature,
         notFeature,
-        patternPropertiesFeature,
+        oneOfFeature,
         patternFeature,
+        patternPropertiesFeature,
         prefixItemsFeature,
         propertiesFeature,
         propertyNamesFeature,
@@ -111,9 +114,6 @@ export const draft2020 = sanitizeFeatures({
         typeFeature,
         unevaluatedItemsFeature,
         unevaluatedPropertiesFeature,
-        uniqueItemsFeature,
-        oneOfFeature,
-        additionalItemsFeature,
-        additionalPropertiesFeature
+        uniqueItemsFeature
     ]
 });

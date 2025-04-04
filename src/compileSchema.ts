@@ -168,6 +168,7 @@ const NODE_METHODS: Pick<
     | "getRef"
     | "getSchema"
     | "getTemplate"
+    | "getChildSchemaSelection"
     | "eachSchema"
     | "reduce"
     | "resolveRef"
@@ -207,6 +208,11 @@ const NODE_METHODS: Pick<
     eachSchema(callback) {
         const node = this as SchemaNode;
         return eachSchema(node, callback);
+    },
+
+    getChildSchemaSelection(property) {
+        const node = this as SchemaNode;
+        return node.context.methods.getChildSchemaSelection(node, property);
     },
 
     /**

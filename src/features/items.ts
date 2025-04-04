@@ -12,7 +12,12 @@ export const itemsFeature: Feature = {
     validate: validateItems
 };
 
-function itemsResolver({ node }: JsonSchemaResolverParams) {
+function itemsResolver({ node, key }: JsonSchemaResolverParams) {
+    // prefixItems should handle this, abort
+    // Note: This keeps features sort independent for arrays
+    if (node.itemsList?.length > +key) {
+        return;
+    }
     return node.itemsObject;
 }
 

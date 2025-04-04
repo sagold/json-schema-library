@@ -186,6 +186,7 @@ export type SchemaNode = {
     getSchema: (pointer: string, data?: unknown, options?: GetSchemaOptions) => SchemaNode | JsonError | undefined;
     /** Creates data that is valid to the schema of this node */
     getTemplate: (data?: unknown, options?: TemplateOptions) => unknown;
+    getChildSchemaSelection: (property: string | number) => JsonError | SchemaNode[];
     each: (data: unknown, callback: EachCallback, pointer?: string) => void;
     eachSchema: (callback: EachSchemaCallback) => void;
     /** Creates a new node with all dynamic schema properties merged according to the passed in data */

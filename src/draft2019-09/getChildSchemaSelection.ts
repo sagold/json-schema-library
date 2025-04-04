@@ -1,4 +1,4 @@
-import { isJsonError, isSchemaNode, JsonError, SchemaNode } from "./types";
+import { isJsonError, isSchemaNode, JsonError, SchemaNode } from "../types";
 
 /**
  * Returns a list of possible child-schemas for the given property key. In case of a oneOf selection, multiple schemas
@@ -12,6 +12,7 @@ export function getChildSchemaSelection(node: SchemaNode, property: string | num
     if (node.itemsObject?.oneOf) {
         return node.itemsObject.oneOf.map((childNode: SchemaNode) => childNode.resolveRef());
     }
+
     // array.items[] found
     if (node.itemsList && node.itemsList.length > +property) {
         const childNode = node.get(property);
@@ -20,17 +21,17 @@ export function getChildSchemaSelection(node: SchemaNode, property: string | num
         }
         return childNode;
     }
-    if (node.schema.items === true) {
-        return [node.compileSchema({ type: "string" })];
-    }
-    if (node.schema.items === false) {
-        return [];
-    }
+
     // array.items[] exceeded (or undefined), but additionalItems specified
-    if (node.itemsObject) {
+    if (node.additionalItems && node.itemsObject == null) {
         // we fallback to a string if no schema is defined - might be subject for configuration
-        return [node.itemsObject.resolveRef()];
+        // @ts-expect-error boolean schema
+        if (node.additionalItems.schema === true) {
+            return [node.compileSchema({ type: "string" })];
+        }
+        return [node.additionalItems.resolveRef()];
     }
+
     // array.items[] exceeded
     if (node.itemsList && node.itemsList.length <= +property) {
         return [];
