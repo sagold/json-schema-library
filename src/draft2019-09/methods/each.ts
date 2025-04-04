@@ -1,6 +1,6 @@
-import { getValue } from "./utils/getValue";
-import { isObject } from "./utils/isObject";
-import { isSchemaNode, SchemaNode } from "./types";
+import { getValue } from "../../utils/getValue";
+import { isObject } from "../../utils/isObject";
+import { isSchemaNode, SchemaNode } from "../../types";
 
 export type EachCallback = (node: SchemaNode, data: unknown, pointer: string) => void;
 

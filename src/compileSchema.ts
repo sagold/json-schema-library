@@ -5,7 +5,7 @@ import { draft06 } from "./draft06";
 import { draft07 } from "./draft07";
 import { draft2019 } from "./draft2019";
 import { draft2020 } from "./draft2020";
-import { TemplateOptions } from "./getTemplate";
+import { TemplateOptions } from "./methods/getTemplate";
 import { getValue } from "./utils/getValue";
 import { join, split } from "@sagold/json-pointer";
 import { joinId } from "./utils/joinId";
@@ -22,10 +22,10 @@ import {
     Draft,
     JsonError
 } from "./types";
-import { createSchema } from "./createSchema";
+import { createSchema } from "./methods/createSchema";
 import { hasProperty } from "./utils/hasProperty";
 import { validateNode } from "./validateNode";
-import { eachSchema } from "./eachSchema";
+import { eachSchema } from "./methods/eachSchema";
 
 export type CompileOptions = {
     drafts: Draft[];

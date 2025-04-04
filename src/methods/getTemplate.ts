@@ -157,15 +157,6 @@ export function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOpt
         currentNode = resolvedNode;
     }
 
-    // if (TYPE[type] == null) {
-    //     // in case we could not resolve the type
-    //     // (schema-type could not be resolved and returned an error)
-    //     if (opts.removeInvalidData) {
-    //         return undefined;
-    //     }
-    //     return data;
-    // }
-
     const type = getSchemaType(currentNode, defaultData);
     const templateData = TYPE[type as string]?.(currentNode, defaultData, opts);
     return templateData === undefined ? defaultData : templateData;
@@ -273,12 +264,15 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
         const minItems = opts.extendDefaults === false && schema.default !== undefined ? 0 : (schema.minItems ?? 0);
 
         // when there are no array-items are defined
-        if (schema.items == null) {
+        if (schema.prefixItems == null) {
             // => all items are additionalItems
-            if (node.additionalItems) {
+            if (node.itemsObject && (canResolveRef(node.itemsObject, opts) || d?.length > 0)) {
+                const cache = { ...opts.cache };
                 const itemCount = Math.max(minItems, d.length);
                 for (let i = 0; i < itemCount; i += 1) {
-                    d[i] = node.additionalItems.getTemplate(d[i], opts);
+                    opts.cache = copy(cache);
+                    const options = { ...opts, disableRecusionLimit: true };
+                    d[i] = node.itemsObject.getTemplate(d[i] == null ? template[i] : d[i], options);
                 }
             }
             return d || [];
@@ -291,7 +285,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
             // build defined set of items
             const length = Math.max(minItems ?? 0, node.itemsList.length);
             for (let i = 0; i < length; i += 1) {
-                const childNode = node.itemsList[i] ?? node.additionalItems;
+                const childNode = node.itemsList[i] ?? node.itemsObject;
                 if ((childNode && canResolveRef(childNode, opts)) || input[i] !== undefined) {
                     const result = childNode.getTemplate(d[i] == null ? template[i] : d[i], opts);
                     if (result !== undefined) {

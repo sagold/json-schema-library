@@ -1,7 +1,7 @@
 /* eslint quote-props: 0, no-unused-expressions: 0 */
 import { strict as assert } from "assert";
 import { eachSchema } from "./eachSchema";
-import { compileSchema } from "./compileSchema";
+import { compileSchema } from "../compileSchema";
 
 describe("eachSchema", () => {
     it("should execute callback on root-schema", () => {

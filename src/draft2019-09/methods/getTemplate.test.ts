@@ -1,7 +1,7 @@
-import { compileSchema } from "../compileSchema";
+import { compileSchema } from "../../compileSchema";
 import { strict as assert } from "assert";
 
-describe("compileSchema.getTemplate (2019)", () => {
+describe("getTemplate (2019)", () => {
     it("should not modify input schema", () => {
         const schema = {
             $schema: "draft-2019-09",
@@ -1337,7 +1337,7 @@ describe("compileSchema.getTemplate (2019)", () => {
 
         it("should create template of draft04", () => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const schema = require("../../remotes/draft04.json");
+            const schema = require("../../../remotes/draft04.json");
             const node = compileSchema({ ...schema, $schema: "draft-06" });
             const res = node.getTemplate({}, { addOptionalProps: true });
             // console.log("RESULT\n", JSON.stringify(res, null, 2));
@@ -1346,7 +1346,7 @@ describe("compileSchema.getTemplate (2019)", () => {
 
         it("should create template of draft07", () => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const data = compileSchema(require("../../remotes/draft07.json")).getTemplate(
+            const data = compileSchema(require("../../../remotes/draft07.json")).getTemplate(
                 {},
                 { addOptionalProps: true }
             );

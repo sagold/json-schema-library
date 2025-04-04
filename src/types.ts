@@ -1,9 +1,10 @@
 import { isObject } from "./utils/isObject";
-import { getTemplate, TemplateOptions } from "./getTemplate";
+import { getTemplate, TemplateOptions } from "./methods/getTemplate";
 import { errors } from "./errors/errors";
-import { getChildSchemaSelection } from "./getChildSchemaSelection";
-import { each, EachCallback } from "./each";
-import { EachSchemaCallback } from "./eachSchema";
+import { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
+import { each, EachCallback } from "./methods/each";
+import { EachSchemaCallback } from "./methods/eachSchema";
+import { createSchema } from "./methods/createSchema";
 
 export type JsonBooleanSchema = boolean;
 export type JsonSchema = Record<string, any>;
@@ -39,6 +40,7 @@ export type Draft = {
     errors: typeof errors;
     features: Feature[];
     methods: {
+        createSchema: typeof createSchema;
         getChildSchemaSelection: typeof getChildSchemaSelection;
         getTemplate: typeof getTemplate;
         each: typeof each;

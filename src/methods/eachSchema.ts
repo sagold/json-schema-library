@@ -1,4 +1,4 @@
-import { isSchemaNode, SchemaNode } from "./types";
+import { isSchemaNode, SchemaNode } from "../types";
 
 export type EachSchemaCallback = (node: SchemaNode) => unknown | true;
 

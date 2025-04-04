@@ -31,9 +31,10 @@ import { requiredFeature } from "./features/required";
 import { sanitizeFeatures } from "./utils/sanitizeFeatures";
 import { typeFeature } from "./features/type";
 import { uniqueItemsFeature } from "./features/uniqueItems";
-import { getChildSchemaSelection } from "./draft2019-09/getChildSchemaSelection";
-import { getTemplate } from "./draft2019-09/getTemplate";
-import { each } from "./draft2019-09/each";
+import { getChildSchemaSelection } from "./draft2019-09/methods/getChildSchemaSelection";
+import { getTemplate } from "./draft2019-09/methods/getTemplate";
+import { each } from "./draft2019-09/methods/each";
+import { createSchema } from "./methods/createSchema";
 
 /**
  * @draft-04
@@ -62,6 +63,7 @@ export const draft04 = sanitizeFeatures({
     $schema: "http://json-schema.org/draft-04/schema",
     errors,
     methods: {
+        createSchema,
         getTemplate,
         getChildSchemaSelection,
         each

@@ -1,7 +1,7 @@
-import { compileSchema } from "./compileSchema";
+import { compileSchema } from "../compileSchema";
 import { strict as assert } from "assert";
 
-describe("compileSchema.getTemplate", () => {
+describe("getTemplate", () => {
     it("should not modify input schema", () => {
         const schema = {
             type: "object",
@@ -1260,7 +1260,7 @@ describe("compileSchema.getTemplate", () => {
 
         it("should create template of draft04", () => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const schema = require("../remotes/draft04.json");
+            const schema = require("../../remotes/draft04.json");
             const node = compileSchema({ ...schema, $schema: "draft-06" });
             const res = node.getTemplate({}, { addOptionalProps: true });
             // console.log("RESULT\n", JSON.stringify(res, null, 2));
@@ -1269,7 +1269,10 @@ describe("compileSchema.getTemplate", () => {
 
         it("should create template of draft07", () => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const data = compileSchema(require("../remotes/draft07.json")).getTemplate({}, { addOptionalProps: true });
+            const data = compileSchema(require("../../remotes/draft07.json")).getTemplate(
+                {},
+                { addOptionalProps: true }
+            );
             // console.log("RESULT\n", JSON.stringify(data, null, 2));
             assert.deepEqual(Object.prototype.toString.call(data), "[object Object]");
         });

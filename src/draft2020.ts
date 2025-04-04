@@ -8,13 +8,14 @@ import { defsFeature } from "./features/defs";
 import { dependenciesFeature } from "./features/dependencies";
 import { dependentRequiredFeature } from "./features/dependentRequired";
 import { dependentSchemasFeature } from "./features/dependentSchemas";
+import { each } from "./methods/each";
 import { enumFeature } from "./features/enum";
 import { errors } from "./errors/errors";
 import { exclusiveMaximumFeature } from "./features/exclusiveMaximum";
 import { exclusiveMinimumFeature } from "./features/exclusiveMinimum";
 import { formatFeature } from "./features/format";
-import { getChildSchemaSelection } from "./getChildSchemaSelection";
-import { getTemplate } from "./getTemplate";
+import { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
+import { getTemplate } from "./methods/getTemplate";
 import { ifFeature } from "./features/ifthenelse";
 import { itemsFeature } from "./features/items";
 import { maximumFeature } from "./features/maximum";
@@ -40,7 +41,7 @@ import { typeFeature } from "./features/type";
 import { unevaluatedItemsFeature } from "./features/unevaluatedItems";
 import { unevaluatedPropertiesFeature } from "./features/unevaluatedProperties";
 import { uniqueItemsFeature } from "./features/uniqueItems";
-import { each } from "./each";
+import { createSchema } from "./methods/createSchema";
 
 /**
  * @draft-2020-12 https://json-schema.org/draft/2020-12/release-notes
@@ -72,6 +73,7 @@ export const draft2020 = sanitizeFeatures({
     $schema: "https://json-schema.org/draft/2020-12/schema",
     errors,
     methods: {
+        createSchema,
         getTemplate,
         getChildSchemaSelection,
         each

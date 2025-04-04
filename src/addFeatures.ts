@@ -1,4 +1,4 @@
-import { copyDraft } from "./copyDraft";
+import { copyDraft } from "./utils/copyDraft";
 import { Draft, Feature } from "./types";
 
 export function addFeatures(draft: Draft, ...features: Feature[]): Draft {

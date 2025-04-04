@@ -37,9 +37,10 @@ import { typeFeature } from "./features/type";
 import { unevaluatedItemsFeature } from "./features/unevaluatedItems";
 import { unevaluatedPropertiesFeature } from "./features/unevaluatedProperties";
 import { uniqueItemsFeature } from "./features/uniqueItems";
-import { getChildSchemaSelection } from "./draft2019-09/getChildSchemaSelection";
-import { getTemplate } from "./draft2019-09/getTemplate";
-import { each } from "./draft2019-09/each";
+import { getChildSchemaSelection } from "./draft2019-09/methods/getChildSchemaSelection";
+import { getTemplate } from "./draft2019-09/methods/getTemplate";
+import { each } from "./draft2019-09/methods/each";
+import { createSchema } from "./methods/createSchema";
 
 /**
  * @draft-2019 https://json-schema.org/draft/2019-09/release-notes
@@ -61,6 +62,7 @@ export const draft2019 = sanitizeFeatures({
     $schema: "https://json-schema.org/draft/2019-09/schema",
     errors,
     methods: {
+        createSchema,
         getTemplate,
         getChildSchemaSelection,
         each

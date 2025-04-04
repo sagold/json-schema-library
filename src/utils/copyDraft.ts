@@ -1,4 +1,4 @@
-import { Draft } from "./types";
+import { Draft } from "../types";
 
 export function copyDraft(draft: Draft) {
     return {

@@ -1,6 +1,6 @@
-import getTypeOf from "./utils/getTypeOf";
-import { JsonSchema } from "./types";
-import { isObject } from "./utils/isObject";
+import getTypeOf from "../utils/getTypeOf";
+import { JsonSchema } from "../types";
+import { isObject } from "../utils/isObject";
 
 /**
  * Create a simple json schema for the given input data
