@@ -15,9 +15,7 @@ export { createCustomError } from "./src/errors/createCustomError";
 export { strings } from "./src/errors/strings";
 
 // extra SchemaNode methods
-export { each } from "./src/each";
 export type { EachCallback } from "./src/each";
-export { eachSchema } from "./src/eachSchema";
 export type { EachSchemaCallback } from "./src/eachSchema";
 export { createSchema } from "./src/createSchema";
 export { addError } from "./src/addError";

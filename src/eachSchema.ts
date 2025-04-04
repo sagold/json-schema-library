@@ -39,7 +39,6 @@ export function eachSchema(node: SchemaNode | unknown, callback: EachSchemaCallb
     node.patternProperties && Object.values(node.patternProperties).forEach(({ node }) => eachSchema(node, callback));
     eachProperty(callback, node.properties);
     node.propertyNames && eachSchema(node.propertyNames, callback);
-    node.propertyNames && eachSchema(node.propertyNames, callback);
     node.unevaluatedProperties && eachSchema(node.unevaluatedProperties, callback);
     node.unevaluatedItems && eachSchema(node.unevaluatedItems, callback);
 }

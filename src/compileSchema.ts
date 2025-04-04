@@ -25,6 +25,7 @@ import {
 import { createSchema } from "./createSchema";
 import { hasProperty } from "./utils/hasProperty";
 import { validateNode } from "./validateNode";
+import { eachSchema } from "./eachSchema";
 
 export type CompileOptions = {
     drafts: Draft[];
@@ -167,6 +168,7 @@ const NODE_METHODS: Pick<
     | "getRef"
     | "getSchema"
     | "getTemplate"
+    | "eachSchema"
     | "reduce"
     | "resolveRef"
     | "toJSON"
@@ -200,6 +202,11 @@ const NODE_METHODS: Pick<
     each(data, callback, pointer) {
         const node = this as SchemaNode;
         return node.context.methods.each(node, data, callback, pointer);
+    },
+
+    eachSchema(callback) {
+        const node = this as SchemaNode;
+        return eachSchema(node, callback);
     },
 
     /**

@@ -68,6 +68,7 @@ describe("eachSchema", () => {
     it("should call on each item schema", () => {
         const calls: Record<string, unknown>[] = [];
         const rootSchema = compileSchema({
+            $schema: "draft-2019-09",
             type: "array",
             items: [{ type: "string" }, { type: "number" }]
         });
@@ -79,6 +80,22 @@ describe("eachSchema", () => {
         assert.deepEqual(calls[1].spointer, "#/items/0");
         assert.deepEqual(calls[2].schema, rootSchema.schema.items[1]);
         assert.deepEqual(calls[2].spointer, "#/items/1");
+    });
+
+    it("should call on each prefixItem", () => {
+        const calls: Record<string, unknown>[] = [];
+        const rootSchema = compileSchema({
+            type: "array",
+            prefixItems: [{ type: "string" }, { type: "number" }]
+        });
+
+        eachSchema(rootSchema, ({ schema, spointer }) => calls.push({ schema, spointer }));
+
+        assert.deepEqual(calls.length, 3);
+        assert.deepEqual(calls[1].schema, rootSchema.schema.prefixItems[0]);
+        assert.deepEqual(calls[1].spointer, "#/prefixItems/0");
+        assert.deepEqual(calls[2].schema, rootSchema.schema.prefixItems[1]);
+        assert.deepEqual(calls[2].spointer, "#/prefixItems/1");
     });
 
     it("should call on each item property", () => {

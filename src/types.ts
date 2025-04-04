@@ -3,6 +3,7 @@ import { getTemplate, TemplateOptions } from "./getTemplate";
 import { errors } from "./errors/errors";
 import { getChildSchemaSelection } from "./getChildSchemaSelection";
 import { each, EachCallback } from "./each";
+import { EachSchemaCallback } from "./eachSchema";
 
 export type JsonBooleanSchema = boolean;
 export type JsonSchema = Record<string, any>;
@@ -186,6 +187,7 @@ export type SchemaNode = {
     /** Creates data that is valid to the schema of this node */
     getTemplate: (data?: unknown, options?: TemplateOptions) => unknown;
     each: (data: unknown, callback: EachCallback, pointer?: string) => void;
+    eachSchema: (callback: EachSchemaCallback) => void;
     /** Creates a new node with all dynamic schema properties merged according to the passed in data */
     reduce: ({
         data,
