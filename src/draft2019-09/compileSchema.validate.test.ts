@@ -1,13 +1,16 @@
-import { compileSchema } from "./compileSchema";
+import { compileSchema } from "../compileSchema";
 import { strict as assert } from "assert";
-import { Draft, JsonError, SchemaNode } from "./types";
-import { draft2020 } from "./draft2020";
+import { Draft, JsonError, SchemaNode } from "../types";
+import { draft2019 } from "../draft2019";
 
-describe("compileSchema.validate", () => {
+const $schema = "draft-2019-09";
+
+describe("compileSchema.validate (2019)", () => {
     describe("integer", () => {
         describe("exclusiveMaximum", () => {
             it("should fail if value is equal to 0", () => {
                 const errors = compileSchema({
+                    $schema,
                     exclusiveMaximum: 0
                 }).validate(0);
                 assert.deepEqual(errors.length, 1);
@@ -15,6 +18,7 @@ describe("compileSchema.validate", () => {
 
             it("should succeed if value is below to 0", () => {
                 const errors = compileSchema({
+                    $schema,
                     exclusiveMaximum: 0
                 }).validate(-1);
                 assert.deepEqual(errors.length, 0);
@@ -24,6 +28,7 @@ describe("compileSchema.validate", () => {
         describe("exclusiveMinimum", () => {
             it("should fail if value is equal to 0", () => {
                 const errors = compileSchema({
+                    $schema,
                     exclusiveMinimum: 0
                 }).validate(0);
                 assert.deepEqual(errors.length, 1);
@@ -31,6 +36,7 @@ describe("compileSchema.validate", () => {
 
             it("should succeed if value is above to 0", () => {
                 const errors = compileSchema({
+                    $schema,
                     exclusiveMinimum: 0
                 }).validate(1);
                 assert.deepEqual(errors.length, 0);
@@ -40,6 +46,7 @@ describe("compileSchema.validate", () => {
         describe("oneOf", () => {
             it("should validate on a matching oneOf definition", () => {
                 const errors = compileSchema({
+                    $schema,
                     oneOf: [{ type: "integer" }, { type: "string" }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 0);
@@ -47,6 +54,7 @@ describe("compileSchema.validate", () => {
 
             it("should return an error for multiple matching oneOf schemas", () => {
                 const errors = compileSchema({
+                    $schema,
                     oneOf: [{ type: "integer" }, { minimum: 2 }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 1);
@@ -57,6 +65,7 @@ describe("compileSchema.validate", () => {
         describe("allOf", () => {
             it("should validate if all allOf-schemas are valid", () => {
                 const errors = compileSchema({
+                    $schema,
                     allOf: [{ type: "integer" }, { minimum: 2 }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 0);
@@ -64,6 +73,7 @@ describe("compileSchema.validate", () => {
 
             it("should return error if not all schemas match", () => {
                 const errors = compileSchema({
+                    $schema,
                     allOf: [{ type: "integer" }, { minimum: 4 }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 1);
@@ -72,6 +82,7 @@ describe("compileSchema.validate", () => {
 
             it("should return all errors for each non-matching schemas", () => {
                 const errors = compileSchema({
+                    $schema,
                     allOf: [{ type: "integer" }, { minimum: 4 }, { maximum: 2 }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 2);
@@ -83,6 +94,7 @@ describe("compileSchema.validate", () => {
         describe("anyOf", () => {
             it("should validate if one schemas in anyOf validates", () => {
                 const errors = compileSchema({
+                    $schema,
                     anyOf: [{ minimum: 4 }, { maximum: 4 }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 0);
@@ -90,6 +102,7 @@ describe("compileSchema.validate", () => {
 
             it("should return error if not all schemas match", () => {
                 const errors = compileSchema({
+                    $schema,
                     anyOf: [{ minimum: 4 }, { maximum: 2 }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 1);
@@ -98,6 +111,7 @@ describe("compileSchema.validate", () => {
 
             it("should validate null", () => {
                 const errors = compileSchema({
+                    $schema,
                     anyOf: [{ type: "null" }]
                 }).validate(null);
                 assert.deepEqual(errors.length, 0);
@@ -105,6 +119,7 @@ describe("compileSchema.validate", () => {
 
             it("should return error if invalid null", () => {
                 const errors = compileSchema({
+                    $schema,
                     anyOf: [{ type: "null" }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 1);
@@ -113,6 +128,7 @@ describe("compileSchema.validate", () => {
 
             it("should resolve references", () => {
                 const errors = compileSchema({
+                    $schema,
                     definitions: { integer: { type: "integer" } },
                     anyOf: [{ type: "null" }, { $ref: "#/definitions/integer" }]
                 }).validate(3);
@@ -124,6 +140,7 @@ describe("compileSchema.validate", () => {
     describe("if-then-else", () => {
         it("should validate if-then constructs", () => {
             const node = compileSchema({
+                $schema,
                 if: { exclusiveMaximum: 0 }, // if this schema matches
                 then: { minimum: -10 } // also test this schema
             });
@@ -134,6 +151,7 @@ describe("compileSchema.validate", () => {
 
         it("should validate if-else constructs", () => {
             const node = compileSchema({
+                $schema,
                 if: { exclusiveMaximum: 0 }, // valid if 'if' valid
                 else: { multipleOf: 2 } // test if 'if' fails
             });
@@ -146,6 +164,7 @@ describe("compileSchema.validate", () => {
     describe("object", () => {
         it("should still be valid for missing type", () => {
             const errors = compileSchema({
+                $schema,
                 maxProperties: 1,
                 minProperties: 1
             }).validate({ a: 1 });
@@ -154,6 +173,7 @@ describe("compileSchema.validate", () => {
 
         it("should return all errors", () => {
             const errors = compileSchema({
+                $schema,
                 type: "object",
                 additionalProperties: false,
                 properties: {
@@ -170,6 +190,7 @@ describe("compileSchema.validate", () => {
         describe("min/maxProperties", () => {
             it("should return MinPropertiesError for too few properties", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "object",
                     minProperties: 2
                 }).validate({ a: 1 });
@@ -179,6 +200,7 @@ describe("compileSchema.validate", () => {
 
             it("should return MaxPropertiesError for too many properties", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "object",
                     maxProperties: 1
                 }).validate({ a: 1, b: 2 });
@@ -188,6 +210,7 @@ describe("compileSchema.validate", () => {
 
             it("should be valid if property count is within range", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "object",
                     maxProperties: 1,
                     minProperties: 1
@@ -199,6 +222,7 @@ describe("compileSchema.validate", () => {
         describe("not", () => {
             it("should be invalid if 'not' keyword does match", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "object",
                     not: { type: "object", properties: { a: { type: "number" } } }
                 }).validate({ a: 1 });
@@ -210,6 +234,7 @@ describe("compileSchema.validate", () => {
         describe("dependencies", () => {
             it("should ignore any dependencies if the property is no set", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "object",
                     properties: { title: { type: "string" }, url: { type: "string" }, target: { type: "string" } },
                     dependencies: { url: ["target"] }
@@ -220,6 +245,7 @@ describe("compileSchema.validate", () => {
 
             it("should return a 'MissingDependencyError' if the dependent property is missing", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "object",
                     properties: { title: { type: "string" }, url: { type: "string" }, target: { type: "string" } },
                     dependencies: {
@@ -233,6 +259,7 @@ describe("compileSchema.validate", () => {
 
             it("should return a 'MissingDependencyError' if the dependent counterpart is missing", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "object",
                     properties: { title: { type: "string" }, url: { type: "string" }, target: { type: "string" } },
                     dependencies: { url: ["target"], target: ["url"] }
@@ -244,6 +271,7 @@ describe("compileSchema.validate", () => {
 
             it("should be valid for a matching schema dependency", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "object",
                     properties: { title: { type: "string" }, url: { type: "string" }, target: { type: "string" } },
                     dependencies: { url: { properties: { target: { type: "string" } } } }
@@ -254,6 +282,7 @@ describe("compileSchema.validate", () => {
 
             it("should return validation error for a non-matching schema dependency", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "object",
                     properties: { title: { type: "string" }, url: { type: "string" }, target: { type: "string" } },
                     dependencies: { url: { required: ["target"], properties: { target: { type: "string" } } } }
@@ -264,6 +293,7 @@ describe("compileSchema.validate", () => {
 
             it("should return correct error for invalid dependency", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "object",
                     properties: {
                         nested: {
@@ -287,8 +317,9 @@ describe("compileSchema.validate", () => {
     describe("array", () => {
         it("should return error for invalid index", () => {
             const errors = compileSchema({
+                $schema,
                 type: "array",
-                prefixItems: [{ type: "string" }]
+                items: [{ type: "string" }]
             }).validate([1]);
             assert.deepEqual(errors.length, 1);
             assert.deepEqual(errors[0].name, "TypeError");
@@ -296,6 +327,7 @@ describe("compileSchema.validate", () => {
 
         it("should be valid for matching indices", () => {
             const errors = compileSchema({
+                $schema,
                 type: "array",
                 items: [{ type: "string" }, { type: "number" }]
             }).validate(["1", 2]);
@@ -304,6 +336,7 @@ describe("compileSchema.validate", () => {
 
         it("should return all errors", () => {
             const errors = compileSchema({
+                $schema,
                 type: "array",
                 items: { type: "string" },
                 maxItems: 1
@@ -317,6 +350,7 @@ describe("compileSchema.validate", () => {
         describe("min/maxItems", () => {
             it("should return MinItemsError for too few items", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "array",
                     minItems: 2
                 }).validate([1]);
@@ -326,6 +360,7 @@ describe("compileSchema.validate", () => {
 
             it("should return MaxItemsError for too many items", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "array",
                     maxItems: 1
                 }).validate([1, 2]);
@@ -335,6 +370,7 @@ describe("compileSchema.validate", () => {
 
             it("should be valid if item count is within range", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "array",
                     minItems: 2,
                     maxItems: 2
@@ -344,6 +380,7 @@ describe("compileSchema.validate", () => {
 
             it("should still be valid for missing type", () => {
                 const errors = compileSchema({
+                    $schema,
                     minItems: 2,
                     maxItems: 2
                 }).validate([1, 2]);
@@ -354,6 +391,7 @@ describe("compileSchema.validate", () => {
         describe("not", () => {
             it("should be invalid if 'not' keyword does match", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "array",
                     items: [{ type: "string" }, { type: "number" }],
                     additionalItems: { type: "object" },
@@ -367,6 +405,7 @@ describe("compileSchema.validate", () => {
         describe("uniqueItems", () => {
             it("should not validate for duplicated values", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "array",
                     uniqueItems: true
                 }).validate([1, 2, 3, 4, 3]);
@@ -377,6 +416,7 @@ describe("compileSchema.validate", () => {
 
             it("should not validate for duplicated objects", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "array",
                     uniqueItems: true
                 }).validate([{ id: "first" }, { id: "second" }, { id: "first" }]);
@@ -387,6 +427,7 @@ describe("compileSchema.validate", () => {
 
             it("should validate for mismatching objects with equal properties", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "array",
                     uniqueItems: true
                 }).validate([
@@ -402,6 +443,7 @@ describe("compileSchema.validate", () => {
         describe("oneOf", () => {
             it("should return no error for valid oneOf items", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "array",
                     items: {
                         oneOf: [
@@ -415,6 +457,7 @@ describe("compileSchema.validate", () => {
 
             it("should return error if no item does match", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "array",
                     items: {
                         oneOf: [
@@ -429,6 +472,7 @@ describe("compileSchema.validate", () => {
 
             it("should return MultipleOneOfError if multiple oneOf definitions match the given value", () => {
                 const errors = compileSchema({
+                    $schema,
                     type: "array",
                     items: { oneOf: [{ type: "integer" }, { minimum: 2 }] }
                 }).validate([3]);
@@ -441,6 +485,7 @@ describe("compileSchema.validate", () => {
     describe("string", () => {
         it("should return MinLengthError if string is too short", () => {
             const errors = compileSchema({
+                $schema,
                 type: "string",
                 minLength: 2
             }).validate("a");
@@ -450,6 +495,7 @@ describe("compileSchema.validate", () => {
 
         it("should return MaxLengthError if string is too long", () => {
             const errors = compileSchema({
+                $schema,
                 type: "string",
                 maxLength: 2
             }).validate("abc");
@@ -459,6 +505,7 @@ describe("compileSchema.validate", () => {
 
         it("should be valid if string is within range", () => {
             const errors = compileSchema({
+                $schema,
                 type: "string",
                 minLength: 2,
                 maxLength: 2
@@ -468,6 +515,7 @@ describe("compileSchema.validate", () => {
 
         it("should still be valid for missing type", () => {
             const errors = compileSchema({
+                $schema,
                 minLength: 2,
                 maxLength: 2
             }).validate("ab");
@@ -476,6 +524,7 @@ describe("compileSchema.validate", () => {
 
         it("should return EnumError if value is not within enum list", () => {
             const errors = compileSchema({
+                $schema,
                 type: "string",
                 enum: ["a", "c"]
             }).validate("b");
@@ -485,6 +534,7 @@ describe("compileSchema.validate", () => {
 
         it("should be valid if value is within enum list", () => {
             const errors = compileSchema({
+                $schema,
                 type: "string",
                 enum: ["a", "b", "c"]
             }).validate("b");
@@ -493,6 +543,7 @@ describe("compileSchema.validate", () => {
 
         it("should be invalid if 'not' keyword does match", () => {
             const errors = compileSchema({
+                $schema,
                 type: "string",
                 not: { type: "string", pattern: "^b$" }
             }).validate("b");
@@ -504,6 +555,7 @@ describe("compileSchema.validate", () => {
     describe("number", () => {
         it("should return MinimumError if number is too small", () => {
             const errors = compileSchema({
+                $schema,
                 type: "number",
                 minimum: 2
             }).validate(1);
@@ -513,6 +565,7 @@ describe("compileSchema.validate", () => {
 
         it("should return MinimumError if number is equal and exclusiveMinimum is set", () => {
             const errors = compileSchema({
+                $schema,
                 type: "number",
                 minimum: 2,
                 exclusiveMinimum: true
@@ -523,6 +576,7 @@ describe("compileSchema.validate", () => {
 
         it("should return MaximumError if number is too large", () => {
             const errors = compileSchema({
+                $schema,
                 type: "number",
                 maximum: 1
             }).validate(2);
@@ -532,6 +586,7 @@ describe("compileSchema.validate", () => {
 
         it("should return MaximumError if number same and exclusiveMaximum is set", () => {
             const errors = compileSchema({
+                $schema,
                 type: "number",
                 maximum: 2,
                 exclusiveMaximum: true
@@ -542,6 +597,7 @@ describe("compileSchema.validate", () => {
 
         it("should be valid if number is within range", () => {
             const errors = compileSchema({
+                $schema,
                 type: "number",
                 minimum: 1,
                 maximum: 1
@@ -551,6 +607,7 @@ describe("compileSchema.validate", () => {
 
         it("should still be valid for missing type", () => {
             const errors = compileSchema({
+                $schema,
                 minimum: 1,
                 maximum: 1
             }).validate(1);
@@ -559,6 +616,7 @@ describe("compileSchema.validate", () => {
 
         it("should validate NaN", () => {
             const errors = compileSchema({
+                $schema,
                 type: "number"
             }).validate(parseInt("a"));
             assert.deepEqual(errors.length, 0);
@@ -566,6 +624,7 @@ describe("compileSchema.validate", () => {
 
         it("should return EnumError if value is not within enum list", () => {
             const errors = compileSchema({
+                $schema,
                 type: "number",
                 enum: [21, 27, 42]
             }).validate(13);
@@ -575,6 +634,7 @@ describe("compileSchema.validate", () => {
 
         it("should be valid if value is within enum list", () => {
             const errors = compileSchema({
+                $schema,
                 type: "number",
                 enum: [21, 27, 42]
             }).validate(27);
@@ -583,6 +643,7 @@ describe("compileSchema.validate", () => {
 
         it("should return error if value is not multiple of 1.5", () => {
             const errors = compileSchema({
+                $schema,
                 type: "number",
                 multipleOf: 1.5
             }).validate(4);
@@ -592,6 +653,7 @@ describe("compileSchema.validate", () => {
 
         it("should be valid if value if a multiple of 1.5", () => {
             const errors = compileSchema({
+                $schema,
                 type: "number",
                 multipleOf: 1.5
             }).validate(4.5);
@@ -600,6 +662,7 @@ describe("compileSchema.validate", () => {
 
         it("should be valid if 'multipleOf' is not a number", () => {
             const errors = compileSchema({
+                $schema,
                 type: "number",
                 multipleOf: "non-number"
             }).validate(4.5);
@@ -608,6 +671,7 @@ describe("compileSchema.validate", () => {
 
         it("should be invalid if 'not' keyword does match", () => {
             const errors = compileSchema({
+                $schema,
                 type: "number",
                 not: { type: "number", minimum: 4 }
             }).validate(4.5);
@@ -619,10 +683,12 @@ describe("compileSchema.validate", () => {
     describe("arrays of types", () => {
         it("should not return an error for a valid type", () => {
             let errors = compileSchema({
+                $schema,
                 type: ["object", "null"]
             }).validate({});
             assert.deepEqual(errors.length, 0);
             errors = compileSchema({
+                $schema,
                 type: ["object", "null"]
             }).validate(null);
             assert.deepEqual(errors.length, 0);
@@ -630,6 +696,7 @@ describe("compileSchema.validate", () => {
 
         it("should return a TypeError if passed type is not within array", () => {
             const errors = compileSchema({
+                $schema,
                 type: ["object", "null"]
             }).validate([]);
             assert.deepEqual(errors.length, 1);
@@ -638,6 +705,7 @@ describe("compileSchema.validate", () => {
 
         it("should support 'integer' as a valid type within array", () => {
             const errors = compileSchema({
+                $schema,
                 type: ["integer", "null"]
             }).validate(1);
             assert.deepEqual(errors.length, 0);
@@ -648,6 +716,7 @@ describe("compileSchema.validate", () => {
         describe("enum", () => {
             it("should validate a matching value within enum", () => {
                 const errors = compileSchema({
+                    $schema,
                     enum: [1, "second", []]
                 }).validate("second");
                 assert.deepEqual(errors.length, 0);
@@ -655,6 +724,7 @@ describe("compileSchema.validate", () => {
 
             it("should validate a matching array within enum", () => {
                 const errors = compileSchema({
+                    $schema,
                     enum: [1, "second", []]
                 }).validate([]);
                 assert.deepEqual(errors.length, 0);
@@ -662,6 +732,7 @@ describe("compileSchema.validate", () => {
 
             it("should validate a matching object within enum", () => {
                 const errors = compileSchema({
+                    $schema,
                     enum: [1, "second", { id: "third" }]
                 }).validate({ id: "third" });
                 assert.deepEqual(errors.length, 0);
@@ -669,6 +740,7 @@ describe("compileSchema.validate", () => {
 
             it("should return error for non-matching object", () => {
                 const errors = compileSchema({
+                    $schema,
                     enum: [1, "second", { id: "third" }]
                 }).validate({ id: "first" });
                 assert.deepEqual(errors.length, 1);
@@ -677,6 +749,7 @@ describe("compileSchema.validate", () => {
 
             it("should return error for invalid null", () => {
                 const errors = compileSchema({
+                    $schema,
                     enum: [1, "second", { id: "third" }]
                 }).validate(null);
                 assert.deepEqual(errors.length, 1);
@@ -687,6 +760,7 @@ describe("compileSchema.validate", () => {
         describe("$ref", () => {
             it("should correctly validate data through nested $ref", () => {
                 const errors = compileSchema({
+                    $schema,
                     $ref: "#/definitions/c",
                     definitions: {
                         a: { type: "integer" },
@@ -700,8 +774,9 @@ describe("compileSchema.validate", () => {
 
             it("should correctly validate combination of remote, allOf, and allOf-$ref", () => {
                 // eslint-disable-next-line @typescript-eslint/no-var-requires
-                const draft04Meta = require("../remotes/draft04.json");
+                const draft04Meta = require("../../remotes/draft04.json");
                 const errors = compileSchema({
+                    $schema,
                     $ref: "http://json-schema.org/draft-04/schema#",
                     _id: "input"
                 })
@@ -713,6 +788,7 @@ describe("compileSchema.validate", () => {
 
             it("should correctly resolve local remote url", () => {
                 const errors = compileSchema({
+                    $schema,
                     $ref: "http://localhost:1234/integer.json",
                     _id: "input"
                 })
@@ -759,7 +835,7 @@ describe("compileSchema.validate", () => {
             it("integer does not match as a property value", () => {
                 // how it should resolve
                 // { foo } » root:anyOf: [false, ?]
-                //      1. resolve http://localhost:4242/draft2020-09/recursiveRef2/schema.json#/$defs/myobject
+                //      1. resolve http://localhost:4242/draft2019-09/recursiveRef2/schema.json#/$defs/myobject
                 //      => domain + local path (fragments 2) => myobject-schema
                 //      2. { foo } » anyOf: [false, true + ?]
                 //          3. { foo } » myObject:anyof:additionalProperties => recursiveRef
@@ -767,7 +843,7 @@ describe("compileSchema.validate", () => {
                 //          4. 1 » anyOf: [false, false] => error
                 const node = compileSchema({
                     $schema: "https://json-schema.org/draft/2019-09/schema",
-                    $id: "http://localhost:4242/draft2020-09/recursiveRef2/schema.json",
+                    $id: "http://localhost:4242/draft2019-09/recursiveRef2/schema.json",
                     $defs: {
                         myobject: {
                             $id: "myobject.json",
@@ -795,7 +871,7 @@ describe("compileSchema.validate", () => {
             beforeEach(() => {
                 node = compileSchema({
                     $schema: "https://json-schema.org/draft/2019-09/schema",
-                    $id: "http://localhost:4242/draft2020-09/recursiveRef4/schema.json",
+                    $id: "http://localhost:4242/draft2019-09/recursiveRef4/schema.json",
                     $recursiveAnchor: false,
                     $defs: {
                         myobject: {
@@ -817,7 +893,7 @@ describe("compileSchema.validate", () => {
             it("single level match", () => {
                 // how it should resolve
                 // { foo } » root:anyOf: [false, ?]
-                //      1. resolve http://localhost:4242/draft2020-09/recursiveRef2/schema.json#/$defs/myobject
+                //      1. resolve http://localhost:4242/draft2019-09/recursiveRef2/schema.json#/$defs/myobject
                 //      => domain + local path (fragments 2) => myobject-schema
                 //      2. { foo } » anyOf: [false, true + ?]
                 //          3. { foo } » myObject:anyof:additionalProperties => recursiveRef
@@ -839,6 +915,7 @@ describe("compileSchema.validate : format", () => {
     describe("time", () => {
         it("should validate HH:mm:ss-HH:mm", () => {
             const errors = compileSchema({
+                $schema,
                 type: "string",
                 format: "time"
             }).validate("15:31:12-02:30");
@@ -847,6 +924,7 @@ describe("compileSchema.validate : format", () => {
 
         it("should validate HH:mm:ssZ", () => {
             const errors = compileSchema({
+                $schema,
                 type: "string",
                 format: "time"
             }).validate("15:31:12Z");
@@ -855,6 +933,7 @@ describe("compileSchema.validate : format", () => {
 
         it("should not validate minutes above 59", () => {
             const errors = compileSchema({
+                $schema,
                 type: "string",
                 format: "time"
             }).validate("15:60:12");
@@ -863,6 +942,7 @@ describe("compileSchema.validate : format", () => {
 
         it("should not validate seconds above 59", () => {
             const errors = compileSchema({
+                $schema,
                 type: "string",
                 format: "time"
             }).validate("15:31:60");
@@ -871,6 +951,7 @@ describe("compileSchema.validate : format", () => {
 
         it("should not validate HH:mm", () => {
             const errors = compileSchema({
+                $schema,
                 type: "string",
                 format: "time"
             }).validate("15:31");
@@ -881,6 +962,7 @@ describe("compileSchema.validate : format", () => {
     describe("url", () => {
         it("should validate format url", () => {
             const errors = compileSchema({
+                $schema,
                 type: "string",
                 format: "url"
             }).validate("https://developer.mozilla.org/en-US/");
@@ -889,6 +971,7 @@ describe("compileSchema.validate : format", () => {
 
         it("should return error UrlFormatError for invalid urls", () => {
             const errors = compileSchema({
+                $schema,
                 type: "string",
                 format: "url"
             }).validate("123");
@@ -901,6 +984,7 @@ describe("compileSchema.validate : format", () => {
 describe("compileSchema.validateAsync", () => {
     it("should return a promise", () => {
         const promise = compileSchema({
+            $schema,
             type: "number"
         }).validateAsync(4);
         assert(promise instanceof Promise);
@@ -908,6 +992,7 @@ describe("compileSchema.validateAsync", () => {
 
     it("should resolve successfull with an empty error", async () => {
         const promise = compileSchema({
+            $schema,
             type: "number"
         }).validateAsync(4);
         const errors = await promise;
@@ -916,6 +1001,7 @@ describe("compileSchema.validateAsync", () => {
 
     it("should resolve with errors for a failed validation", async () => {
         const promise = compileSchema({
+            $schema,
             type: "number"
         }).validateAsync("4");
         const errors = await promise;
@@ -927,10 +1013,10 @@ describe("compileSchema.validateAsync", () => {
         let draft: Draft;
         beforeEach(() => {
             draft = {
-                ...draft2020,
+                ...draft2019,
                 features: [
                     // @ts-expect-error asd
-                    ...draft2020.features,
+                    ...draft2019.features,
                     {
                         id: "async",
                         keyword: "asyncError",
@@ -972,49 +1058,4 @@ describe("compileSchema.validateAsync", () => {
             });
         });
     });
-
-    // describe("onError", () => {
-    //     before(() => {
-    //         // adds an async validation helper to { type: 'string', asyncError: true }
-    //         // @ts-expect-error type mismatch of vladation function
-    //         addValidator.keyword(draft, "string", "asyncError", (node) => {
-    //             return node.schema.asyncError
-    //                 ? new Promise((resolve) =>
-    //                       // eslint-disable-next-line max-nested-callbacks
-    //                       resolve({
-    //                           type: "error",
-    //                           name: "AsyncError",
-    //                           code: "test-async-error",
-    //                           message: "custom test error"
-    //                       })
-    //                   )
-    //                 : Promise.resolve();
-    //         });
-    //     });
-
-    //     it("should call onProgress immediately with error", async () => {
-    //         const errors: JsonError[] = [];
-    //         return validateAsync(
-    //             draft,
-    //             {
-    //                 async: "test async progres",
-    //                 anotherError: 44
-    //             },
-    //             {
-    //                 schema: {
-    //                     type: "object",
-    //                     properties: {
-    //                         async: { type: "string", asyncError: true },
-    //                         anotherError: { type: "string" }
-    //                     }
-    //                 },
-    //                 onError: (err) => errors.push(err)
-    //             }
-    //         ).then(() => {
-    //             assert.deepEqual(errors.length, 2);
-    //             assert.deepEqual(errors[0].name).to.eq("TypeError");
-    //             assert.deepEqual(errors[1].name).to.eq("AsyncError");
-    //         });
-    //     });
-    // });
 });
