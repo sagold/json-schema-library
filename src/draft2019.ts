@@ -37,6 +37,8 @@ import { typeFeature } from "./features/type";
 import { unevaluatedItemsFeature } from "./features/unevaluatedItems";
 import { unevaluatedPropertiesFeature } from "./features/unevaluatedProperties";
 import { uniqueItemsFeature } from "./features/uniqueItems";
+import { getChildSchemaSelection } from "./getChildSchemaSelection";
+import { getTemplate } from "./getTemplate";
 
 /**
  * @draft-2019 https://json-schema.org/draft/2019-09/release-notes
@@ -57,6 +59,10 @@ export const draft2019 = sanitizeFeatures({
     $schemaRegEx: "draft[/-]2019-09",
     $schema: "https://json-schema.org/draft/2019-09/schema",
     errors,
+    methods: {
+        getTemplate,
+        getChildSchemaSelection
+    },
     features: [
         refFeature,
         allOfFeature,

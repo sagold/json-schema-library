@@ -1,6 +1,7 @@
 import { isObject } from "./utils/isObject";
-import { TemplateOptions } from "./getTemplate";
+import { getTemplate, TemplateOptions } from "./getTemplate";
 import { errors } from "./errors/errors";
+import { getChildSchemaSelection } from "./getChildSchemaSelection";
 
 export type JsonBooleanSchema = boolean;
 export type JsonSchema = Record<string, any>;
@@ -35,6 +36,10 @@ export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09
 export type Draft = {
     errors: typeof errors;
     features: Feature[];
+    methods: {
+        getChildSchemaSelection: typeof getChildSchemaSelection;
+        getTemplate: typeof getTemplate;
+    };
     version: DraftVersion;
     $schema?: string;
     $schemaRegEx: string;
@@ -108,7 +113,9 @@ export type Context = {
     anchors: Record<string, SchemaNode>;
     dynamicAnchors: Record<string, SchemaNode>;
     /** json-schema parser, validator, reducer and resolver for this json-schema (root-schema and its child nodes) */
-    features?: Feature[];
+    features: Draft["features"];
+    /** json-schema draft-dependend methods */
+    methods: Draft["methods"];
 
     // runtime configuration
 

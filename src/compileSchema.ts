@@ -92,6 +92,7 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
         rootNode: node,
         version: draft.version,
         features: draft.features,
+        methods: draft.methods,
         templateDefaultOptions: options.templateDefaultOptions,
         drafts
     };
@@ -383,6 +384,7 @@ const NODE_METHODS: Pick<
             ...context,
             refs: {},
             rootNode: node,
+            methods: draft.methods,
             features: draft.features,
             version: draft.version
         };

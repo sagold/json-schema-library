@@ -13,6 +13,8 @@ import { errors } from "./errors/errors";
 import { exclusiveMaximumFeature } from "./features/exclusiveMaximum";
 import { exclusiveMinimumFeature } from "./features/exclusiveMinimum";
 import { formatFeature } from "./features/format";
+import { getChildSchemaSelection } from "./getChildSchemaSelection";
+import { getTemplate } from "./getTemplate";
 import { ifFeature } from "./features/ifthenelse";
 import { itemsFeature } from "./features/items";
 import { maximumFeature } from "./features/maximum";
@@ -28,16 +30,16 @@ import { notFeature } from "./features/not";
 import { oneOfFeature } from "./features/oneOf";
 import { patternFeature } from "./features/pattern";
 import { patternPropertiesFeature } from "./features/patternProperties";
+import { prefixItemsFeature } from "./features/prefixItems";
 import { propertiesFeature } from "./features/properties";
 import { propertyNamesFeature } from "./features/propertyNames";
 import { refFeature } from "./features/ref";
 import { requiredFeature } from "./features/required";
+import { sanitizeFeatures } from "./utils/sanitizeFeatures";
 import { typeFeature } from "./features/type";
 import { unevaluatedItemsFeature } from "./features/unevaluatedItems";
 import { unevaluatedPropertiesFeature } from "./features/unevaluatedProperties";
 import { uniqueItemsFeature } from "./features/uniqueItems";
-import { sanitizeFeatures } from "./utils/sanitizeFeatures";
-import { prefixItemsFeature } from "./features/prefixItems";
 
 /**
  * @draft-2020-12 https://json-schema.org/draft/2020-12/release-notes
@@ -68,6 +70,10 @@ export const draft2020 = sanitizeFeatures({
     $schemaRegEx: "draft[/-]2020-12",
     $schema: "https://json-schema.org/draft/2020-12/schema",
     errors,
+    methods: {
+        getTemplate,
+        getChildSchemaSelection
+    },
     features: [
         refFeature,
         allOfFeature,

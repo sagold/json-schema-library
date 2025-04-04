@@ -35,6 +35,8 @@ import { typeFeature } from "./features/type";
 import { unevaluatedItemsFeature } from "./features/unevaluatedItems";
 import { unevaluatedPropertiesFeature } from "./features/unevaluatedProperties";
 import { uniqueItemsFeature } from "./features/uniqueItems";
+import { getChildSchemaSelection } from "./getChildSchemaSelection";
+import { getTemplate } from "./getTemplate";
 
 /**
  * @draft-07 https://json-schema.org/draft-07/json-schema-release-notes
@@ -52,6 +54,10 @@ export const draft07 = sanitizeFeatures({
     $schemaRegEx: "draft-07",
     $schema: "http://json-schema.org/draft-07/schema",
     errors,
+    methods: {
+        getTemplate,
+        getChildSchemaSelection
+    },
     features: [
         refFeature,
         allOfFeature,

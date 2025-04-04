@@ -31,6 +31,8 @@ import { requiredFeature } from "./features/required";
 import { sanitizeFeatures } from "./utils/sanitizeFeatures";
 import { typeFeature } from "./features/type";
 import { uniqueItemsFeature } from "./features/uniqueItems";
+import { getChildSchemaSelection } from "./getChildSchemaSelection";
+import { getTemplate } from "./getTemplate";
 
 /**
  * @draft-04
@@ -58,6 +60,10 @@ export const draft04 = sanitizeFeatures({
     $schemaRegEx: "draft-04",
     $schema: "http://json-schema.org/draft-04/schema",
     errors,
+    methods: {
+        getTemplate,
+        getChildSchemaSelection
+    },
     features: [
         refFeature,
         allOfFeature,
