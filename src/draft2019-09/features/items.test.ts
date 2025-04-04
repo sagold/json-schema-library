@@ -5,6 +5,7 @@ describe("feature : items : get", () => {
     describe("items-object", () => {
         it("should step into items without data", () => {
             const node = compileSchema({
+                $schema: "draft-2019-09",
                 type: "array",
                 items: { type: "string", minLength: 1 }
             });
@@ -18,6 +19,7 @@ describe("feature : items : get", () => {
     describe("items-array", () => {
         it("should step into items without data", () => {
             const node = compileSchema({
+                $schema: "draft-2019-09",
                 type: "array",
                 items: [{ type: "number" }, { type: "string", minLength: 1 }]
             });
