@@ -32,7 +32,7 @@ import { sanitizeFeatures } from "./utils/sanitizeFeatures";
 import { typeFeature } from "./features/type";
 import { uniqueItemsFeature } from "./features/uniqueItems";
 import { getChildSchemaSelection } from "./getChildSchemaSelection";
-import { getTemplate } from "./getTemplate";
+import { getTemplate } from "./draft2019-09/getTemplate";
 
 /**
  * @draft-04

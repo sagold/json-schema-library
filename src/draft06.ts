@@ -35,7 +35,7 @@ import { unevaluatedItemsFeature } from "./features/unevaluatedItems";
 import { unevaluatedPropertiesFeature } from "./features/unevaluatedProperties";
 import { uniqueItemsFeature } from "./features/uniqueItems";
 import { getChildSchemaSelection } from "./getChildSchemaSelection";
-import { getTemplate } from "./getTemplate";
+import { getTemplate } from "./draft2019-09/getTemplate";
 
 /**
  * @draft-06 https://json-schema.org/draft-06/json-schema-release-notes

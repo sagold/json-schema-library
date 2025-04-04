@@ -1,9 +1,10 @@
-import { compileSchema } from "./compileSchema";
+import { compileSchema } from "../compileSchema";
 import { strict as assert } from "assert";
 
-describe("compileSchema.getTemplate", () => {
+describe("compileSchema.getTemplate (2019)", () => {
     it("should not modify input schema", () => {
         const schema = {
+            $schema: "draft-2019-09",
             type: "object",
             properties: {
                 title: { type: "string", default: "title" },
@@ -28,23 +29,24 @@ describe("compileSchema.getTemplate", () => {
 
     describe("values", () => {
         it("should return default value missing input and type", () => {
-            const data = compileSchema({ default: 123 }).getTemplate();
+            const data = compileSchema({ $schema: "draft-2019-09", default: 123 }).getTemplate();
             assert.deepEqual(data, 123);
         });
 
         it("should NOT override input value for missing type", () => {
-            const data = compileSchema({ default: 123 }).getTemplate("input");
+            const data = compileSchema({ $schema: "draft-2019-09", default: 123 }).getTemplate("input");
             assert.deepEqual(data, "input");
         });
 
         // @attention, changing input data
         it("should alwayys return const value", () => {
-            const data = compileSchema({ const: "const", default: 123 }).getTemplate(123);
+            const data = compileSchema({ $schema: "draft-2019-09", const: "const", default: 123 }).getTemplate(123);
             assert.deepEqual(data, "const");
         });
 
         it("should prefer const over default", () => {
             const data = compileSchema({
+                $schema: "draft-2019-09",
                 type: "string",
                 const: "static",
                 default: "should be overwritten"
@@ -54,12 +56,13 @@ describe("compileSchema.getTemplate", () => {
 
         describe("string", () => {
             it("should return empty string for missing default value", () => {
-                const data = compileSchema({ type: "string" }).getTemplate();
+                const data = compileSchema({ $schema: "draft-2019-09", type: "string" }).getTemplate();
                 assert.deepEqual(data, "");
             });
 
             it("should return default value", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "string",
                     default: "default"
                 }).getTemplate();
@@ -68,6 +71,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should return string data", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "string",
                     default: "default"
                 }).getTemplate("input");
@@ -77,17 +81,17 @@ describe("compileSchema.getTemplate", () => {
 
         describe("number", () => {
             it("should return 0 for missing default value", () => {
-                const data = compileSchema({ type: "number" }).getTemplate();
+                const data = compileSchema({ $schema: "draft-2019-09", type: "number" }).getTemplate();
                 assert.deepEqual(data, 0);
             });
 
             it("should return default value", () => {
-                const data = compileSchema({ type: "number", default: 99 }).getTemplate();
+                const data = compileSchema({ $schema: "draft-2019-09", type: "number", default: 99 }).getTemplate();
                 assert.deepEqual(data, 99);
             });
 
             it("should return number data", () => {
-                const data = compileSchema({ type: "number", default: 99 }).getTemplate(123);
+                const data = compileSchema({ $schema: "draft-2019-09", type: "number", default: 99 }).getTemplate(123);
                 assert.deepEqual(data, 123);
             });
         });
@@ -96,51 +100,56 @@ describe("compileSchema.getTemplate", () => {
 
         describe("boolean", () => {
             it("should return `false` for missing default value", () => {
-                const data = compileSchema({ type: "boolean", default: false }).getTemplate();
+                const data = compileSchema({ $schema: "draft-2019-09", type: "boolean", default: false }).getTemplate();
                 assert.deepEqual(data, false);
             });
 
             it("should return default value of boolean", () => {
-                const data = compileSchema({ type: "boolean", default: false }).getTemplate();
+                const data = compileSchema({ $schema: "draft-2019-09", type: "boolean", default: false }).getTemplate();
                 assert.deepEqual(data, false);
             });
 
             it("should not override given boolean if it is `false`", () => {
-                const data = compileSchema({ type: "boolean", default: true }).getTemplate(false);
+                const data = compileSchema({ $schema: "draft-2019-09", type: "boolean", default: true }).getTemplate(
+                    false
+                );
                 assert.deepEqual(data, false);
             });
 
             it("should not override given boolean if it is `true`", () => {
-                const data = compileSchema({ type: "boolean", default: false }).getTemplate(true);
+                const data = compileSchema({ $schema: "draft-2019-09", type: "boolean", default: false }).getTemplate(
+                    true
+                );
                 assert.deepEqual(data, true);
             });
         });
 
         describe("null", () => {
             it("should return `null` for missing default value", () => {
-                const data = compileSchema({ type: "null" }).getTemplate();
+                const data = compileSchema({ $schema: "draft-2019-09", type: "null" }).getTemplate();
                 assert.deepEqual(data, null);
             });
 
             it("should return `null` when first type in type-array", () => {
-                const node = compileSchema({ type: ["null", "string"] });
+                const node = compileSchema({ $schema: "draft-2019-09", type: ["null", "string"] });
                 const res = node.getTemplate();
 
                 assert.deepEqual(res, null);
             });
 
             it("should return default value of null", () => {
-                const data = compileSchema({ type: "null", default: null }).getTemplate();
+                const data = compileSchema({ $schema: "draft-2019-09", type: "null", default: null }).getTemplate();
                 assert.deepEqual(data, null);
             });
 
             it("should return default value of null even for wrong typye", () => {
-                const data = compileSchema({ type: "number", default: null }).getTemplate();
+                const data = compileSchema({ $schema: "draft-2019-09", type: "number", default: null }).getTemplate();
                 assert.deepEqual(data, null);
             });
 
             it("should support `null` type properties", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     required: ["nullType"],
                     properties: { nullType: { type: "null" } }
@@ -149,12 +158,13 @@ describe("compileSchema.getTemplate", () => {
             });
 
             it("should return `null` input for strings", () => {
-                const data = compileSchema({ type: "string" }).getTemplate(null);
+                const data = compileSchema({ $schema: "draft-2019-09", type: "string" }).getTemplate(null);
                 assert.deepEqual(data, null);
             });
 
             it("should return `null` input for value-property", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     required: ["title"],
                     properties: { title: { type: "number" } }
@@ -165,7 +175,7 @@ describe("compileSchema.getTemplate", () => {
 
         describe("enum", () => {
             it("should set the first enum option for a missing default", () => {
-                const data = compileSchema({ enum: ["first", "second"] }).getTemplate();
+                const data = compileSchema({ $schema: "draft-2019-09", enum: ["first", "second"] }).getTemplate();
                 assert.deepEqual(data, "first");
             });
         });
@@ -174,6 +184,7 @@ describe("compileSchema.getTemplate", () => {
             it("should not modify file-instance", () => {
                 const file = new File([], "testfile.pdf");
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: ["string", "object"],
                     format: "file"
                 }).getTemplate(file);
@@ -183,6 +194,7 @@ describe("compileSchema.getTemplate", () => {
             it("should not modify file-instance on object", () => {
                 const file = new File([], "testfile.pdf");
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     properties: { file: { type: ["string", "object"], format: "file" } }
                 }).getTemplate({ file });
@@ -193,6 +205,7 @@ describe("compileSchema.getTemplate", () => {
         describe("oneOf", () => {
             it("should return first schema for mixed types", () => {
                 const node = compileSchema({
+                    $schema: "draft-2019-09",
                     oneOf: [{ type: "string", default: "jane" }, { type: "number" }]
                 });
                 const res = node.getTemplate();
@@ -205,12 +218,13 @@ describe("compileSchema.getTemplate", () => {
     describe("object", () => {
         describe("behaviour", () => {
             it("should return {} for a missing default value", () => {
-                const data = compileSchema({ type: "object" }).getTemplate();
+                const data = compileSchema({ $schema: "draft-2019-09", type: "object" }).getTemplate();
                 assert.deepEqual(data, {});
             });
 
             it("should return default value of object", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     default: { init: true }
                 }).getTemplate();
@@ -218,12 +232,13 @@ describe("compileSchema.getTemplate", () => {
             });
 
             it("should return input data", () => {
-                const data = compileSchema({ type: "object" }).getTemplate({ init: false });
+                const data = compileSchema({ $schema: "draft-2019-09", type: "object" }).getTemplate({ init: false });
                 assert.deepEqual(data, { init: false });
             });
 
             it("should override default by input data", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     default: { init: true }
                 }).getTemplate({ init: false });
@@ -234,6 +249,7 @@ describe("compileSchema.getTemplate", () => {
         describe("properties", () => {
             it("should return default object", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     properties: { first: { type: "string" }, second: { type: "number" } },
                     default: { first: "john", second: 4 }
@@ -243,6 +259,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should return only required object properties", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     required: ["first"],
                     properties: { first: { type: "string" }, second: { type: "number" } }
@@ -252,6 +269,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should not fail on falsy input data", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     properties: {
                         first: { type: "boolean", default: true },
@@ -263,6 +281,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should return all object properties with `addOptionalProps=true`", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     required: ["first", "second"],
                     properties: { first: { type: "string" }, second: { type: "number" } }
@@ -272,6 +291,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should NOT override given default values by other default values", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     properties: { first: { type: "string", default: "jane" }, second: { type: "number" } },
                     default: { first: "john", second: 4 }
@@ -281,6 +301,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should extend given template data by property default values", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     properties: { first: { type: "string", default: "jane" }, second: { type: "number" } },
                     default: { first: "john", second: 4 }
@@ -292,6 +313,7 @@ describe("compileSchema.getTemplate", () => {
         describe("additionalProperties & option: removeInvalidData", () => {
             it("should NOT remove additional properties `additionalProperties=undefined`", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     required: ["first", "second"],
                     properties: { first: { type: "string" } }
@@ -301,6 +323,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should NOT remove additional properties `additionalProperties=true`", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     required: ["first", "second"],
                     properties: { first: { type: "string" } },
@@ -311,6 +334,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should NOT remove non matching properties with `additionalProperties={schema}`", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     required: ["first", "second"],
                     properties: { first: { type: "string" } },
@@ -321,6 +345,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should NOT remove additional properties with `additionalProperties=false`", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     required: ["first", "second"],
                     properties: { first: { type: "string" } },
@@ -331,6 +356,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should remove unmatched properties with option `removeInvalidData=true`", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     required: ["first", "second"],
                     properties: { first: { type: "string" } },
@@ -341,6 +367,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should remove invalid properties with option `removeInvalidData=true`", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     required: ["first", "second"],
                     properties: { first: { type: "string" } },
@@ -362,6 +389,7 @@ describe("compileSchema.getTemplate", () => {
         describe("allOf", () => {
             it("should create template for merged allOf schema", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     allOf: [
                         {
@@ -381,6 +409,7 @@ describe("compileSchema.getTemplate", () => {
         describe("anyOf", () => {
             it("should create template for first anyOf schema", () => {
                 const node = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     anyOf: [
                         {
@@ -408,6 +437,7 @@ describe("compileSchema.getTemplate", () => {
             describe("oneOf", () => {
                 it("should return template of first oneOf schema", () => {
                     const node = compileSchema({
+                        $schema: "draft-2019-09",
                         type: "object",
                         oneOf: [
                             {
@@ -431,6 +461,7 @@ describe("compileSchema.getTemplate", () => {
 
                 it("should extend empty object with first oneOf schema", () => {
                     const node = compileSchema({
+                        $schema: "draft-2019-09",
                         type: "object",
                         oneOf: [
                             {
@@ -454,6 +485,7 @@ describe("compileSchema.getTemplate", () => {
 
                 it("should return template of matching oneOf schema", () => {
                     const node = compileSchema({
+                        $schema: "draft-2019-09",
                         type: "object",
                         oneOf: [
                             {
@@ -480,6 +512,7 @@ describe("compileSchema.getTemplate", () => {
 
                 it("should return input value if no oneOf-schema matches ", () => {
                     const node = compileSchema({
+                        $schema: "draft-2019-09",
                         type: "object",
                         oneOf: [
                             {
@@ -504,6 +537,7 @@ describe("compileSchema.getTemplate", () => {
 
                 it("should not require object type definition in oneOf schemas", () => {
                     const node = compileSchema({
+                        $schema: "draft-2019-09",
                         type: "object",
                         oneOf: [
                             {
@@ -527,6 +561,7 @@ describe("compileSchema.getTemplate", () => {
 
                 it("should return valid default data", () => {
                     const node = compileSchema({
+                        $schema: "draft-2019-09",
                         type: "object",
                         default: { value: 123 },
                         oneOf: [
@@ -545,6 +580,7 @@ describe("compileSchema.getTemplate", () => {
 
                 it("should return invalid default data", () => {
                     const node = compileSchema({
+                        $schema: "draft-2019-09",
                         type: "object",
                         default: { value: "wrong type" },
                         oneOf: [
@@ -563,6 +599,7 @@ describe("compileSchema.getTemplate", () => {
 
                 it("should add correct optional properties from schema matching default data", () => {
                     const node = compileSchema({
+                        $schema: "draft-2019-09",
                         type: "object",
                         default: { value: 123 },
                         oneOf: [
@@ -589,22 +626,23 @@ describe("compileSchema.getTemplate", () => {
     describe("array", () => {
         describe("behaviour", () => {
             it("should return [] for a missing default value", () => {
-                const data = compileSchema({ type: "array" }).getTemplate();
+                const data = compileSchema({ $schema: "draft-2019-09", type: "array" }).getTemplate();
                 assert.deepEqual(data, []);
             });
 
             it("should return default value of object", () => {
-                const data = compileSchema({ type: "array", default: [true] }).getTemplate();
+                const data = compileSchema({ $schema: "draft-2019-09", type: "array", default: [true] }).getTemplate();
                 assert.deepEqual(data, [true]);
             });
 
             it("should return input data", () => {
-                const data = compileSchema({ type: "array" }).getTemplate(["input"]);
+                const data = compileSchema({ $schema: "draft-2019-09", type: "array" }).getTemplate(["input"]);
                 assert.deepEqual(data, ["input"]);
             });
 
             it("should override default by input data", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     default: ["default"]
                 }).getTemplate(["input"]);
@@ -614,12 +652,13 @@ describe("compileSchema.getTemplate", () => {
 
         describe("items: {}", () => {
             it("should return empty array if minItems is undefined", () => {
-                const data = compileSchema({ items: { type: "boolean" } }).getTemplate();
+                const data = compileSchema({ $schema: "draft-2019-09", items: { type: "boolean" } }).getTemplate();
                 assert.deepEqual(data, []);
             });
 
             it("should return array with length of minItems", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     minItems: 3,
                     items: { type: "boolean" }
                 }).getTemplate();
@@ -630,6 +669,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should return default array even if minItems is not set", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     default: ["a", "b"],
                     items: { type: "string" }
                 }).getTemplate();
@@ -638,6 +678,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should return default array if part of object", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     required: ["list"],
                     properties: { list: { type: "array", default: ["a", "b"], items: { type: "string" } } }
                 }).getTemplate();
@@ -646,6 +687,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should not override given default values", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     minItems: 2,
                     default: ["abba", "doors"],
                     items: { type: "string", default: "elvis" }
@@ -655,6 +697,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should extend given template data by default values", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     minItems: 2,
                     default: ["abba", "doors"],
                     items: { type: "string" }
@@ -664,6 +707,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should extend all input objects by missing properties", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     default: ["abba", "doors"],
                     items: {
                         type: "object",
@@ -681,33 +725,36 @@ describe("compileSchema.getTemplate", () => {
             });
         });
 
-        describe("prefixItems: []", () => {
+        describe("items: []", () => {
             // - Tuple validation is useful when the array is a collection of items where each has a different schema
             // and the ordinal index of each item is meaningful.
             // - It’s ok to not provide all of the items:
             // https://spacetelescope.github.io/understanding-json-schema/reference/array.html#tuple-validation
             it("should return array with minItems in given order", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 2,
-                    prefixItems: [{ type: "string" }, { type: "boolean" }]
+                    items: [{ type: "string" }, { type: "boolean" }]
                 }).getTemplate();
                 assert.deepEqual(data, ["", false]);
             });
 
             it("should not override input items when complementing minItems", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 2,
-                    prefixItems: [{ type: "boolean", default: false }, { type: "string" }]
+                    items: [{ type: "boolean", default: false }, { type: "string" }]
                 }).getTemplate([true]);
                 assert.deepEqual(data, [true, ""]);
             });
 
             it("should not override wrong input items", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
-                    prefixItems: [
+                    items: [
                         { type: "boolean", default: false },
                         { type: "string", default: "default" }
                     ]
@@ -717,6 +764,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should return default array", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 1,
                     default: [true],
@@ -729,9 +777,10 @@ describe("compileSchema.getTemplate", () => {
 
             it("should convert input data for strings", () => {
                 const node = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 1,
-                    prefixItems: [{ type: "string" }]
+                    items: [{ type: "string" }]
                 });
                 const res = node.getTemplate([43]);
 
@@ -740,54 +789,60 @@ describe("compileSchema.getTemplate", () => {
 
             it("should convert input data for numbers", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 1,
-                    prefixItems: [{ type: "number" }]
+                    items: [{ type: "number" }]
                 }).getTemplate(["43"]);
                 assert.deepEqual(data, [43]);
             });
 
             it("should convert input data for strings", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 1,
-                    prefixItems: [{ type: "string" }]
+                    items: [{ type: "string" }]
                 }).getTemplate([43]);
                 assert.deepEqual(data, ["43"]);
             });
 
             it("should NOT convert invalid number if we would lose data", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 1,
-                    prefixItems: [{ type: "number" }]
+                    items: [{ type: "number" }]
                 }).getTemplate(["asd"]);
                 assert.deepEqual(data, ["asd"]);
             });
 
             it("should convert input data for booleans", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 1,
-                    prefixItems: [{ type: "boolean" }]
+                    items: [{ type: "boolean" }]
                 }).getTemplate(["false"]);
                 assert.deepEqual(data, [false]);
             });
 
             it("should NOT convert invalid boolean if we would lose data", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 1,
-                    prefixItems: [{ type: "boolean" }]
+                    items: [{ type: "boolean" }]
                 }).getTemplate(["43"]);
                 assert.deepEqual(data, ["43"]);
             });
 
-            it("should add defaults from `items`", () => {
+            it("should add defaults from `additionalItems`", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 2,
-                    items: {
+                    additionalItems: {
                         type: "number",
                         default: 2
                     }
@@ -795,12 +850,13 @@ describe("compileSchema.getTemplate", () => {
                 assert.deepEqual(data, [43, 2]);
             });
 
-            it("should add defaults from `items` for items not in prefixItems", () => {
+            it("should add defaults from `additionalItems` for unspecified items ", () => {
                 const data = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 2,
-                    prefixItems: [{ type: "boolean" }],
-                    items: { type: "number", default: 2 }
+                    items: [{ type: "boolean" }],
+                    additionalItems: { type: "number", default: 2 }
                 }).getTemplate([43]);
                 assert.deepEqual(data, [43, 2]);
             });
@@ -809,6 +865,7 @@ describe("compileSchema.getTemplate", () => {
         describe("oneOf", () => {
             it("should return template of first oneOf schema", () => {
                 const node = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 1,
                     items: {
@@ -827,6 +884,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should merge with input data", () => {
                 const node = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 1,
                     items: {
@@ -869,6 +927,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should not remove invalid oneOf schema if 'removeInvalidData' is unset", () => {
                 const node = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     properties: {
                         filter: {
@@ -902,6 +961,7 @@ describe("compileSchema.getTemplate", () => {
         describe("allOf", () => {
             it("should create template for merged allOf schema", () => {
                 const node = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 2,
                     items: {
@@ -937,6 +997,7 @@ describe("compileSchema.getTemplate", () => {
         describe("anyOf", () => {
             it("should create template for first anyOf schema", () => {
                 const node = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     minItems: 2,
                     items: {
@@ -973,6 +1034,7 @@ describe("compileSchema.getTemplate", () => {
                 describe("dependency required", () => {
                     it("should not add dependency if it is not required", () => {
                         const node = compileSchema({
+                            $schema: "draft-2019-09",
                             type: "object",
                             properties: {
                                 trigger: { type: "string" },
@@ -989,6 +1051,7 @@ describe("compileSchema.getTemplate", () => {
 
                     it("should add dependency if triggered as required", () => {
                         const node = compileSchema({
+                            $schema: "draft-2019-09",
                             type: "object",
                             properties: {
                                 trigger: { type: "string" },
@@ -1005,6 +1068,7 @@ describe("compileSchema.getTemplate", () => {
 
                     it("should add dependency if initially triggered as required", () => {
                         const node = compileSchema({
+                            $schema: "draft-2019-09",
                             type: "object",
                             required: ["trigger"],
                             properties: {
@@ -1024,6 +1088,7 @@ describe("compileSchema.getTemplate", () => {
                 describe("dependency schema", () => {
                     it("should not add dependency from schema if it is not required", () => {
                         const node = compileSchema({
+                            $schema: "draft-2019-09",
                             type: "object",
                             properties: {
                                 trigger: { type: "string" }
@@ -1043,6 +1108,7 @@ describe("compileSchema.getTemplate", () => {
 
                     it("should add dependency from schema if triggered as required", () => {
                         const node = compileSchema({
+                            $schema: "draft-2019-09",
                             type: "object",
                             properties: {
                                 trigger: { type: "string" }
@@ -1066,6 +1132,7 @@ describe("compileSchema.getTemplate", () => {
             describe("option: `additionalProps: true`", () => {
                 it("should create template for valid dependency", () => {
                     const node = compileSchema({
+                        $schema: "draft-2019-09",
                         type: "object",
                         properties: {
                             test: { type: "string", default: "tested value" }
@@ -1089,6 +1156,7 @@ describe("compileSchema.getTemplate", () => {
 
                 it("should not change passed value of dependency", () => {
                     const node = compileSchema({
+                        $schema: "draft-2019-09",
                         type: "object",
                         properties: {
                             test: { type: "string", default: "tested value" }
@@ -1115,6 +1183,7 @@ describe("compileSchema.getTemplate", () => {
 
                 it("should not create data for non matching dependency", () => {
                     const node = compileSchema({
+                        $schema: "draft-2019-09",
                         type: "object",
                         properties: {
                             test: { type: "string", default: "tested value" }
@@ -1139,6 +1208,7 @@ describe("compileSchema.getTemplate", () => {
     describe("$ref", () => {
         it("should return default value of resolved ref", () => {
             const data = compileSchema({
+                $schema: "draft-2019-09",
                 $ref: "#/$defs/once",
                 $defs: { once: { default: "once" } }
             }).getTemplate();
@@ -1147,6 +1217,7 @@ describe("compileSchema.getTemplate", () => {
 
         it("should follow all refs", () => {
             const data = compileSchema({
+                $schema: "draft-2019-09",
                 $ref: "#/$defs/once",
                 $defs: { once: { $ref: "#/$defs/twice" }, twice: { default: "twice" } }
             }).getTemplate();
@@ -1155,6 +1226,7 @@ describe("compileSchema.getTemplate", () => {
 
         it("should resolve $ref in object schema", () => {
             const data = compileSchema({
+                $schema: "draft-2019-09",
                 type: "object",
                 required: ["first"],
                 properties: { first: { $ref: "#/definitions/first" } },
@@ -1165,6 +1237,7 @@ describe("compileSchema.getTemplate", () => {
 
         it("should create template for all followed refs (draft 2019-09)", () => {
             const data = compileSchema({
+                $schema: "draft-2019-09",
                 $ref: "#/$defs/once",
                 $defs: {
                     once: { required: ["once"], properties: { once: { type: "number" } }, $ref: "#/$defs/twice" },
@@ -1176,8 +1249,9 @@ describe("compileSchema.getTemplate", () => {
 
         it("should resolve $ref in items-array", () => {
             const data = compileSchema({
+                $schema: "draft-2019-09",
                 type: "array",
-                prefixItems: [{ $ref: "#/definitions/first" }],
+                items: [{ $ref: "#/definitions/first" }],
                 definitions: {
                     first: {
                         type: "object",
@@ -1191,6 +1265,7 @@ describe("compileSchema.getTemplate", () => {
 
         it("should follow $ref once", () => {
             const data = compileSchema({
+                $schema: "draft-2019-09",
                 type: "object",
                 required: ["value", "nodes"],
                 properties: {
@@ -1203,6 +1278,7 @@ describe("compileSchema.getTemplate", () => {
 
         it("should resolve all reoccuring refs ", () => {
             const data = compileSchema({
+                $schema: "draft-2019-09",
                 minItems: 3,
                 items: {
                     $ref: "#/$defs/item"
@@ -1225,6 +1301,7 @@ describe("compileSchema.getTemplate", () => {
         // iteration depth is 1, input-depth is 2 => still add template to depth 2
         it("should respect depth of input data in $ref-resolution", () => {
             const data = compileSchema({
+                $schema: "draft-2019-09",
                 type: "object",
                 required: ["value", "nodes"],
                 properties: {
@@ -1260,7 +1337,7 @@ describe("compileSchema.getTemplate", () => {
 
         it("should create template of draft04", () => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const schema = require("../remotes/draft04.json");
+            const schema = require("../../remotes/draft04.json");
             const node = compileSchema({ ...schema, $schema: "draft-06" });
             const res = node.getTemplate({}, { addOptionalProps: true });
             // console.log("RESULT\n", JSON.stringify(res, null, 2));
@@ -1269,7 +1346,10 @@ describe("compileSchema.getTemplate", () => {
 
         it("should create template of draft07", () => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const data = compileSchema(require("../remotes/draft07.json")).getTemplate({}, { addOptionalProps: true });
+            const data = compileSchema(require("../../remotes/draft07.json")).getTemplate(
+                {},
+                { addOptionalProps: true }
+            );
             // console.log("RESULT\n", JSON.stringify(data, null, 2));
             assert.deepEqual(Object.prototype.toString.call(data), "[object Object]");
         });
@@ -1278,6 +1358,7 @@ describe("compileSchema.getTemplate", () => {
     describe("if-then-else", () => {
         it("should return template of then-schema for valid if-schema", () => {
             const data = compileSchema({
+                $schema: "draft-2019-09",
                 type: "object",
                 required: ["test"],
                 properties: { test: { type: "string", default: "with value" } },
@@ -1292,6 +1373,7 @@ describe("compileSchema.getTemplate", () => {
 
         it("should NOT create data for then-schema if it is not required", () => {
             const data = compileSchema({
+                $schema: "draft-2019-09",
                 type: "object",
                 required: ["test"],
                 properties: { test: { type: "string", default: "with value" } },
@@ -1303,6 +1385,7 @@ describe("compileSchema.getTemplate", () => {
 
         it("should NOT return template of then-schema for invalid if-schema", () => {
             const data = compileSchema({
+                $schema: "draft-2019-09",
                 type: "object",
                 required: ["test"],
                 properties: { test: { type: "string", default: "too short" } },
@@ -1314,6 +1397,7 @@ describe("compileSchema.getTemplate", () => {
 
         it("should return template of else-schema for invalid if-schema", () => {
             const data = compileSchema({
+                $schema: "draft-2019-09",
                 type: "object",
                 required: ["test"],
                 properties: { test: { type: "string", default: "with test" } },
@@ -1326,6 +1410,7 @@ describe("compileSchema.getTemplate", () => {
 
         it("should incrementally resolve multiple 'then'-schema", () => {
             const data = compileSchema({
+                $schema: "draft-2019-09",
                 type: "object",
                 required: ["trigger"],
                 properties: { trigger: { type: "boolean" } },
@@ -1353,6 +1438,7 @@ describe("compileSchema.getTemplate", () => {
     describe("type-array", () => {
         it("should return first type of list for template", () => {
             const node = compileSchema({
+                $schema: "draft-2019-09",
                 type: ["string", "object"]
             });
             const res = node.getTemplate();
@@ -1362,6 +1448,7 @@ describe("compileSchema.getTemplate", () => {
 
         it("should return input data", () => {
             const node = compileSchema({
+                $schema: "draft-2019-09",
                 type: ["string", "object"]
             });
             const res = node.getTemplate("title");
@@ -1371,6 +1458,7 @@ describe("compileSchema.getTemplate", () => {
 
         it("should return type of default value if data is not given", () => {
             const node = compileSchema({
+                $schema: "draft-2019-09",
                 type: ["string", "array", "object"],
                 default: []
             });
@@ -1383,6 +1471,7 @@ describe("compileSchema.getTemplate", () => {
     describe("templateOptions", () => {
         it("should remove invalid oneOf schema if 'removeInvalidData=true'", () => {
             const node = compileSchema({
+                $schema: "draft-2019-09",
                 type: "object",
                 oneOf: [
                     {
@@ -1456,6 +1545,7 @@ describe("compileSchema.getTemplate", () => {
         describe("extendDefaults", () => {
             it("should keep array default-value with 'extendDefaults:false'", () => {
                 const node = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     default: [],
                     items: {
@@ -1473,6 +1563,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should add items to array with no default-value given and 'extendDefaults:false'", () => {
                 const node = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     items: {
                         type: "string",
@@ -1489,6 +1580,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should add items to default-array with 'extendDefaults:true'", () => {
                 const node = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "array",
                     default: [],
                     items: {
@@ -1506,6 +1598,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should not add required items to object with default-value given and 'extendDefaults:false'", () => {
                 const node = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     required: ["title"],
                     default: {},
@@ -1522,6 +1615,7 @@ describe("compileSchema.getTemplate", () => {
 
             it("should extend object by required property with no default-value given and 'extendDefaults:false'", () => {
                 const node = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     required: ["title"],
                     properties: {
@@ -1536,6 +1630,7 @@ describe("compileSchema.getTemplate", () => {
             });
             it("should extend default-object with 'extendDefaults:true'", () => {
                 const node = compileSchema({
+                    $schema: "draft-2019-09",
                     type: "object",
                     required: ["title"],
                     default: {},
@@ -1555,6 +1650,7 @@ describe("compileSchema.getTemplate", () => {
     describe("defaultTemplateOptions.removeInvalidData", () => {
         it("should NOT remove invalid data per default", () => {
             const node = compileSchema({
+                $schema: "draft-2019-09",
                 type: "object",
                 properties: { valid: { type: "string" } },
                 additionalProperties: false
@@ -1564,6 +1660,7 @@ describe("compileSchema.getTemplate", () => {
         });
         it("should remove invalid data with 'removeInvalidData=true'", () => {
             const node = compileSchema({
+                $schema: "draft-2019-09",
                 type: "object",
                 properties: { valid: { type: "string" } },
                 additionalProperties: false

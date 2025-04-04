@@ -5,7 +5,7 @@ import { draft06 } from "./draft06";
 import { draft07 } from "./draft07";
 import { draft2019 } from "./draft2019";
 import { draft2020 } from "./draft2020";
-import { getTemplate, TemplateOptions } from "./getTemplate";
+import { TemplateOptions } from "./getTemplate";
 import { getValue } from "./utils/getValue";
 import { join, split } from "@sagold/json-pointer";
 import { joinId } from "./utils/joinId";
@@ -286,13 +286,14 @@ const NODE_METHODS: Pick<
     },
 
     getTemplate(data?, options?) {
+        const node = this as SchemaNode;
         const opts = {
             recursionLimit: 1,
-            ...this.context.templateDefaultOptions,
+            ...node.context.templateDefaultOptions,
             cache: {},
             ...(options ?? {})
         };
-        return getTemplate(this as SchemaNode, data, opts);
+        return node.context.methods.getTemplate(node, data, opts);
     },
 
     reduce({ data, pointer, key, path }: JsonSchemaReducerParams) {
