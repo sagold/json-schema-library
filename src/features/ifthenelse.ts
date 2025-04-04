@@ -30,7 +30,7 @@ function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
         return undefined;
     }
 
-    if (validateNode(node.if, data, pointer, [...path]).length === 0) {
+    if (validateNode(node.if, data, pointer, [...(path ?? [])]).length === 0) {
         if (node.then) {
             // reduce creates a new node
             const schemaNode = node.then.reduce({ data });
@@ -46,7 +46,7 @@ function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
 }
 
 function validateIfThenElse({ node, data, pointer, path }: JsonSchemaValidatorParams) {
-    if (validateNode(node.if, data, pointer, [...path]).length === 0) {
+    if (validateNode(node.if, data, pointer, [...(path ?? [])]).length === 0) {
         if (node.then) {
             return validateNode(node.then, data, pointer, path);
         }
