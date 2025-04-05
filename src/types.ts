@@ -67,9 +67,6 @@ export type Context = {
     features: Draft["features"];
     /** json-schema draft-dependend methods */
     methods: Draft["methods"];
-
-    // runtime configuration
-
     /** draft-version */
     version: string;
     /** available draft configurations */

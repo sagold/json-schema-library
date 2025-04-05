@@ -36,7 +36,7 @@ export function mergeSchema2(a: unknown, b: unknown, property?: string): unknown
         if (property === "required") {
             return a.concat(b).filter((item, index, array) => array.indexOf(item) === index);
         }
-        if (property === "items") {
+        if (property === "items" || property === "prefixItems") {
             const result = [];
             for (let i = 0; i < b.length; i += 1) {
                 if (isObject(a[i]) && isObject(b[i]) && a[i].type === b[i].type) {

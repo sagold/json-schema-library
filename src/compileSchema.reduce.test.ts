@@ -335,6 +335,15 @@ describe("compileSchema : reduce", () => {
 
             assert.deepEqual(node.schema, { type: "object", properties: { id: { const: "second", minLength: 4 } } });
         });
+
+        it("should correctly reduce multiple prefixItems", () => {
+            const node = compileSchema({
+                prefixItems: [{ const: "foo" }],
+                anyOf: [{ prefixItems: [true, { const: "bar" }] }, { prefixItems: [true, true, { const: "baz" }] }]
+            }).reduce({ data: ["foo", "bar"] });
+
+            assert.deepEqual(node.schema, { prefixItems: [true, true, { const: "baz" }] });
+        });
     });
 
     describe("allOf", () => {
