@@ -15,11 +15,11 @@ export { createCustomError } from "./src/errors/createCustomError";
 export { strings } from "./src/errors/strings";
 
 // extra SchemaNode methods
-export type { EachCallback } from "./src/each";
-export type { EachSchemaCallback } from "./src/eachSchema";
-export { createSchema } from "./src/createSchema";
+export type { EachCallback } from "./src/methods/each";
+export type { EachSchemaCallback } from "./src/methods/eachSchema";
+export { createSchema } from "./src/methods/createSchema";
 export { addError } from "./src/addError";
-export { addFeatures } from "./src/addFeatures";
+export { addKeywords } from "./src/addKeywords";
 export { addFormatValidator } from "./src/addFormatValidator";
 // export { mergeNode } from "./src/mergeNode"; -- not yet
 
@@ -32,12 +32,16 @@ export type {
     Context,
     Draft,
     DraftVersion,
-    Feature,
     GetSchemaOptions,
-    ValidationPath,
     JsonError,
     JsonPointer,
     JsonSchema,
+    SchemaNode
+} from "./src/types";
+
+export type {
+    Keyword,
+    ValidationPath,
     JsonSchemaReducerParams,
     JsonSchemaReducer,
     JsonSchemaResolverParams,
@@ -45,9 +49,8 @@ export type {
     JsonSchemaValidatorParams,
     JsonSchemaValidator,
     JsonSchemaDefaultDataResolverParams,
-    JsonSchemaDefaultDataResolver,
-    SchemaNode
-} from "./src/types";
+    JsonSchemaDefaultDataResolver
+} from "./src/Keyword";
 
 // import { createError, createCustomError } from "./lib/utils/createCustomError";
 // import getTypeOf from "./lib/getTypeOf";

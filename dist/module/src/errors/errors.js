@@ -1,6 +1,6 @@
 /* eslint no-invalid-this: 0 */
 import { createCustomError } from "./createCustomError";
-export const errors = {
+const defaultErrors = {
     additionalItemsError: createCustomError("AdditionalItemsError"),
     additionalPropertiesError: createCustomError("AdditionalPropertiesError"),
     allOfError: createCustomError("AllOfError"),
@@ -44,7 +44,6 @@ export const errors = {
     minItemsError: createCustomError("MinItemsError"),
     minItemsOneError: createCustomError("MinItemsOneError"),
     minLengthError: createCustomError("MinLengthError"),
-    minLengthOneError: createCustomError("MinLengthOneError"),
     minPropertiesError: createCustomError("MinPropertiesError"),
     missingArrayItemError: createCustomError("MissingArrayItemError"),
     missingDependencyError: createCustomError("MissingDependencyError"),
@@ -68,3 +67,4 @@ export const errors = {
     unknownPropertyError: createCustomError("UnknownPropertyError"),
     valueNotEmptyError: createCustomError("ValueNotEmptyError")
 };
+export const errors = defaultErrors;

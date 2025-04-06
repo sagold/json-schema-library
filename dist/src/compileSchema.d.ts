@@ -1,10 +1,11 @@
 import { CreateError } from "./errors/createCustomError";
-import { TemplateOptions } from "./getTemplate";
-import { SchemaNode, Context, DraftList, JsonSchema } from "./types";
+import { TemplateOptions } from "./methods/getTemplate";
+import { SchemaNode, JsonSchema, Draft } from "./types";
 export type CompileOptions = {
-    drafts: DraftList;
+    drafts: Draft[];
+    remote: SchemaNode;
+    formatAssertion: boolean | "meta-schema";
     errors: Record<string, CreateError>;
-    remoteContext?: Context;
     templateDefaultOptions?: TemplateOptions;
 };
 /**

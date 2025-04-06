@@ -28,10 +28,10 @@ export function mergeSchema2(a, b, property) {
         return newObject;
     }
     if (Array.isArray(a) && Array.isArray(b)) {
-        if (property === "required") {
+        if (property === "required" || property === "anyOf") {
             return a.concat(b).filter((item, index, array) => array.indexOf(item) === index);
         }
-        if (property === "items") {
+        if (property === "items" || property === "prefixItems") {
             const result = [];
             for (let i = 0; i < b.length; i += 1) {
                 if (isObject(a[i]) && isObject(b[i]) && a[i].type === b[i].type) {

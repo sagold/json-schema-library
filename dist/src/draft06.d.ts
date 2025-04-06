@@ -1,4 +1,3 @@
-import type { Draft } from "./types";
 /**
  * @draft-06 https://json-schema.org/draft-06/json-schema-release-notes
  *
@@ -20,4 +19,4 @@ import type { Draft } from "./types";
  * - required  allows an empty array
  * - dependencies allows an empty array for property dependencies
  */
-export declare const draft06: Draft;
+export declare const draft06: import("./types").Draft;

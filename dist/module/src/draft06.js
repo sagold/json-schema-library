@@ -1,37 +1,41 @@
-import { additionalItemsFeature } from "./features/additionalItems";
-import { additionalPropertiesFeature } from "./features/additionalProperties";
-import { allOfFeature } from "./features/allOf";
-import { anyOfFeature } from "./features/anyOf";
-import { constFeature } from "./features/const";
-import { containsFeature } from "./features/contains";
-import { defsFeature } from "./features/defs";
-import { dependenciesFeature } from "./features/dependencies";
-import { enumFeature } from "./features/enum";
-import { exclusiveMaximumFeature } from "./features/exclusiveMaximum";
-import { exclusiveMinimumFeature } from "./features/exclusiveMinimum";
-import { formatFeature } from "./features/format";
-import { itemsFeature } from "./features/items";
-import { maximumFeature } from "./features/maximum";
-import { maxItemsFeature } from "./features/maxItems";
-import { maxLengthFeature } from "./features/maxLength";
-import { maxPropertiesFeature } from "./features/maxProperties";
-import { minimumFeature } from "./features/minimum";
-import { minItemsFeature } from "./features/minItems";
-import { minLengthFeature } from "./features/minLength";
-import { minPropertiesFeature } from "./features/minProperties";
-import { multipleOfFeature } from "./features/multipleOf";
-import { notFeature } from "./features/not";
-import { oneOfFeature } from "./features/oneOf";
-import { patternFeature } from "./features/pattern";
-import { patternPropertiesFeature } from "./features/patternProperties";
-import { propertiesFeature } from "./features/properties";
-import { propertyNamesFeature } from "./features/propertyNames";
-import { refFeature } from "./features/draft06/ref";
-import { requiredFeature } from "./features/required";
-import { typeFeature } from "./features/type";
-import { unevaluatedItemsFeature } from "./features/unevaluatedItems";
-import { unevaluatedPropertiesFeature } from "./features/unevaluatedProperties";
-import { uniqueItemsFeature } from "./features/uniqueItems";
+import { additionalItemsKeyword } from "./keywords/additionalItems";
+import { additionalPropertiesKeyword } from "./keywords/additionalProperties";
+import { allOfKeyword } from "./keywords/allOf";
+import { anyOfKeyword } from "./keywords/anyOf";
+import { constKeyword } from "./keywords/const";
+import { containsKeyword } from "./keywords/contains";
+import { defsKeyword } from "./keywords/defs";
+import { dependenciesKeyword } from "./keywords/dependencies";
+import { enumKeyword } from "./keywords/enum";
+import { errors } from "./errors/errors";
+import { exclusiveMaximumKeyword } from "./keywords/exclusiveMaximum";
+import { exclusiveMinimumKeyword } from "./keywords/exclusiveMinimum";
+import { formatKeyword } from "./keywords/format";
+import { itemsKeyword } from "./draft2019-09/keywords/items";
+import { maximumKeyword } from "./keywords/maximum";
+import { maxItemsKeyword } from "./keywords/maxItems";
+import { maxLengthKeyword } from "./keywords/maxLength";
+import { maxPropertiesKeyword } from "./keywords/maxProperties";
+import { minimumKeyword } from "./keywords/minimum";
+import { minItemsKeyword } from "./keywords/minItems";
+import { minLengthKeyword } from "./keywords/minLength";
+import { minPropertiesKeyword } from "./keywords/minProperties";
+import { multipleOfKeyword } from "./keywords/multipleOf";
+import { notKeyword } from "./keywords/not";
+import { oneOfKeyword } from "./keywords/oneOf";
+import { patternKeyword } from "./keywords/pattern";
+import { patternPropertiesKeyword } from "./keywords/patternProperties";
+import { propertiesKeyword } from "./keywords/properties";
+import { propertyNamesKeyword } from "./keywords/propertyNames";
+import { refKeyword } from "./draft06/keywords/ref";
+import { requiredKeyword } from "./keywords/required";
+import { sanitizeKeywords } from "./utils/sanitizeKeywords";
+import { typeKeyword } from "./keywords/type";
+import { uniqueItemsKeyword } from "./keywords/uniqueItems";
+import { getChildSchemaSelection } from "./draft2019-09/methods/getChildSchemaSelection";
+import { getTemplate } from "./draft2019-09/methods/getTemplate";
+import { each } from "./draft2019-09/methods/each";
+import { createSchema } from "./methods/createSchema";
 /**
  * @draft-06 https://json-schema.org/draft-06/json-schema-release-notes
  *
@@ -53,58 +57,49 @@ import { uniqueItemsFeature } from "./features/uniqueItems";
  * - required  allows an empty array
  * - dependencies allows an empty array for property dependencies
  */
-export const draft06 = {
+export const draft06 = sanitizeKeywords({
     version: "draft-06",
+    $schemaRegEx: "draft-06",
     $schema: "http://json-schema.org/draft-06/schema",
-    features: [
-        refFeature,
-        allOfFeature,
-        anyOfFeature,
-        constFeature,
-        containsFeature,
-        defsFeature,
-        dependenciesFeature, // optional support for old draft-version
-        enumFeature,
-        exclusiveMaximumFeature,
-        exclusiveMinimumFeature,
-        formatFeature,
-        itemsFeature,
-        maximumFeature,
-        maxItemsFeature,
-        maxLengthFeature,
-        maxPropertiesFeature,
-        minimumFeature,
-        minItemsFeature,
-        minLengthFeature,
-        minPropertiesFeature,
-        multipleOfFeature,
-        notFeature,
-        patternPropertiesFeature,
-        patternFeature,
-        propertiesFeature,
-        propertyNamesFeature,
-        requiredFeature,
-        typeFeature,
-        unevaluatedItemsFeature,
-        unevaluatedPropertiesFeature,
-        uniqueItemsFeature,
-        oneOfFeature,
-        additionalItemsFeature,
-        additionalPropertiesFeature
-    ].map((feature) => {
-        const logKeyword = () => feature.keyword;
-        if (feature.validate) {
-            // @ts-expect-error missing interface
-            feature.validate.toJSON = logKeyword;
-        }
-        if (feature.reduce) {
-            // @ts-expect-error missing interface
-            feature.reduce.toJSON = logKeyword;
-        }
-        if (feature.resolve) {
-            // @ts-expect-error missing interface
-            feature.resolve.toJSON = logKeyword;
-        }
-        return feature;
-    })
-};
+    errors,
+    methods: {
+        createSchema,
+        getTemplate,
+        getChildSchemaSelection,
+        each
+    },
+    keywords: [
+        refKeyword,
+        allOfKeyword,
+        anyOfKeyword,
+        constKeyword,
+        containsKeyword,
+        defsKeyword,
+        dependenciesKeyword, // optional support for old draft-version
+        enumKeyword,
+        exclusiveMaximumKeyword,
+        exclusiveMinimumKeyword,
+        formatKeyword,
+        itemsKeyword,
+        maximumKeyword,
+        maxItemsKeyword,
+        maxLengthKeyword,
+        maxPropertiesKeyword,
+        minimumKeyword,
+        minItemsKeyword,
+        minLengthKeyword,
+        minPropertiesKeyword,
+        multipleOfKeyword,
+        notKeyword,
+        patternPropertiesKeyword,
+        patternKeyword,
+        propertiesKeyword,
+        propertyNamesKeyword,
+        requiredKeyword,
+        typeKeyword,
+        uniqueItemsKeyword,
+        oneOfKeyword,
+        additionalItemsKeyword,
+        additionalPropertiesKeyword
+    ]
+});

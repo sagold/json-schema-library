@@ -1,2 +1,4 @@
-import { JsonError } from "../types";
-export default function sanitizeErrors<T = JsonError>(list: (JsonError | unknown)[], result?: T[]): T[];
+import { ValidationResult, JsonSchemaValidator } from "../Keyword";
+type MaybeNestedErrors = ReturnType<JsonSchemaValidator>;
+export default function sanitizeErrors(list: MaybeNestedErrors | MaybeNestedErrors[], result?: ValidationResult[]): ValidationResult[];
+export {};

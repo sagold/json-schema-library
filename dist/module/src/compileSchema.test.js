@@ -1,41 +1,43 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
 import { isSchemaNode } from "./types";
-// - processing draft we need to know and support json-schema keywords
-// - Note: meta-schemas are defined flat, combining all properties per type
-// - parsing schemas under draft build functionality available for schema
-// - building up available functionality has to be done for every root schema (if $vocabulary is set)
-// import draft2019Root from "../../remotes/draft2019-09.json"; // defines general root-schema
-// import draft2019Core from "../../remotes/draft2019-09_meta_core.json"; // $-keywords likle $ref, $id
-// import draft2019Applicator from "../../remotes/draft2019-09_meta_applicator.json";
-// import { mergeSchema } from "../mergeSchema";
-// const simplifiedMetaSchema = {
-//     $id: "https://json-schema.org/draft/2019-09/schema",
-//     $vocabulary: {
-//         "https://json-schema.org/draft/2019-09/vocab/core": true
-//     },
-//     $recursiveAnchor: true,
-//     type: ["object", "boolean"],
-//     properties: {
-//         properties: {
-//             type: "object",
-//             additionalProperties: { $recursiveRef: "#" },
-//             default: {}
-//         }
-//     }
-// };
-// const PARSER: Record<string, object> = {
-//     properties: {}
-// };
-// function parse(schema: JsonSchema, metaSchema: JsonSchema, schemaPointer: string = "#") {
-//     // use meta-schema to validate schema - or step-by-step parse schema while doing incremental validation
-//     // 1. there are validation rules in meta-schema for given schema
-//     // 2. while validating schema we need to
-//     //  2a. abort if there are keywords we do not support and
-//     //  2b. only add functionality that is defined by schema
-//     // - doing this, we must reuse schema-logic for initial parsing, schema validation and utility functions
-//     // - possibly optimize all this once for actual exection (compilation)
-// }
+import { draftEditor } from "./draftEditor";
+describe("compileSchema vocabulary", () => {
+    it("should add remote schema on compile", () => {
+        const remote = compileSchema({
+            $id: "https://remote/schema",
+            minLength: 10
+        });
+        const node = compileSchema({ $ref: "https://remote/schema" }, { remote, formatAssertion: "meta-schema" });
+        const errors = node.validate("123");
+        assert.deepEqual(errors.length, 1);
+        assert.deepEqual(errors[0].code, "min-length-error");
+    });
+    it("should NOT validate formats when $vocabulary.format-assertion = false", () => {
+        const remote = compileSchema({
+            $id: "https://remote/schema",
+            $vocabulary: {
+                "https://json-schema.org/draft/2020-12/vocab/format-assertion": false
+            },
+            allOf: [{ $ref: "https://json-schema.org/draft/2020-12/vocab/format-assertion" }]
+        });
+        const node = compileSchema({ $schema: "https://remote/schema", format: "date-time" }, { remote, formatAssertion: "meta-schema" });
+        const errors = node.validate("123");
+        assert.deepEqual(errors.length, 0);
+    });
+    it("should validate formats when $vocabulary.format-assertion = true", () => {
+        const remote = compileSchema({
+            $id: "https://remote/schema",
+            $vocabulary: {
+                "https://json-schema.org/draft/2020-12/vocab/format-assertion": true
+            },
+            allOf: [{ $ref: "https://json-schema.org/draft/2020-12/vocab/format-assertion" }]
+        });
+        const node = compileSchema({ $schema: "https://remote/schema", format: "date-time" }, { remote, formatAssertion: "meta-schema" });
+        const errors = node.validate("123");
+        assert.deepEqual(errors.length, 1);
+    });
+});
 describe("compileSchema templateDefaultOptions", () => {
     it("should apply `templateDefaultOptions.addOptionalProps` to getTemplate", () => {
         const schema = {
@@ -88,12 +90,6 @@ describe("compileSchema templateDefaultOptions", () => {
     });
 });
 describe("compileSchema `schemaId`", () => {
-    // @todo maybe this should throw an error to catch unwanted behaviour
-    it.skip("should return boolean schema true for undefined", () => {
-        const node = compileSchema(undefined);
-        assert.deepEqual(node.$id, "#");
-        assert.deepEqual(node.schema, true);
-    });
     it("should store path from rootSchema as schemaId", () => {
         const node = compileSchema({
             if: { type: "string" },
@@ -125,5 +121,15 @@ describe("compileSchema `schemaId`", () => {
         // @todo should have returned already resolved node?
         const result = node.resolveRef();
         assert.deepEqual(result.schemaId, "#");
+    });
+});
+describe("compileSchema `errors`", () => {
+    it("draftEditor come with custom minLengthOneError", () => {
+        const errors = compileSchema({
+            type: "string",
+            minLength: 1
+        }, { drafts: [draftEditor] }).validate("");
+        assert.equal(errors.length, 1);
+        assert.deepEqual(errors[0].name, "MinLengthOneError");
     });
 });

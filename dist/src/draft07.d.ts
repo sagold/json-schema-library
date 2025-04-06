@@ -1,4 +1,3 @@
-import type { Draft } from "./types";
 /**
  * @draft-07 https://json-schema.org/draft-07/json-schema-release-notes
  *
@@ -10,4 +9,4 @@ import type { Draft } from "./types";
  * - "contentMediaType"
  * - "contentEncoding"
  */
-export declare const draft07: Draft;
+export declare const draft07: import("./types").Draft;

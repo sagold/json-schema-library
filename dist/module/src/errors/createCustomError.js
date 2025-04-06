@@ -1,5 +1,5 @@
 import __ from "./__";
-function dashCase(text) {
+export function dashCase(text) {
     return text.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 }
 export function createError(name, data) {

@@ -1,8 +1,12 @@
-import { CreateError } from "./errors/createCustomError";
-import { TemplateOptions } from "./getTemplate";
-export type JsonSchema = {
-    [p: string]: any;
-};
+import type { getTemplate, TemplateOptions } from "./methods/getTemplate";
+import type { errors } from "./errors/errors";
+import type { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
+import type { each, EachCallback } from "./methods/each";
+import type { EachSchemaCallback } from "./methods/eachSchema";
+import type { createSchema } from "./methods/createSchema";
+import type { Keyword, JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, ValidationPath } from "./Keyword";
+export type JsonBooleanSchema = boolean;
+export type JsonSchema = Record<string, any>;
 export type JsonPointer = string;
 export type ErrorData<T extends Record<string, unknown> = {
     [p: string]: unknown;
@@ -24,56 +28,20 @@ export type JsonError<T extends ErrorData = ErrorData> = {
  * @returns true if passed type is a JsonError
  */
 export declare function isJsonError(error: any): error is JsonError;
-export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "latest";
+export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "draft-2020-12" | "latest";
 export type Draft = {
-    features: Feature[];
+    errors: typeof errors;
+    keywords: Keyword[];
+    methods: {
+        createSchema: typeof createSchema;
+        getChildSchemaSelection: typeof getChildSchemaSelection;
+        getTemplate: typeof getTemplate;
+        each: typeof each;
+    };
     version: DraftVersion;
     $schema?: string;
+    $schemaRegEx: string;
 };
-export type DraftList = {
-    regexp: string;
-    draft: Draft;
-}[];
-export type Feature = {
-    id: string;
-    keyword: string;
-    parse?: (node: SchemaNode) => void;
-    addResolve?: (node: SchemaNode) => boolean;
-    resolve?: JsonSchemaResolver;
-    addValidate?: (node: SchemaNode) => boolean;
-    validate?: JsonSchemaValidator;
-    addReduce?: (node: SchemaNode) => boolean;
-    reduce?: JsonSchemaReducer;
-};
-export type JsonSchemaReducerParams = {
-    data: unknown;
-    /** optional key to used to resolve by property without having data */
-    key?: string | number;
-    node: SchemaNode;
-    pointer?: string;
-    path?: ValidationPath;
-};
-export type JsonSchemaReducer = (options: JsonSchemaReducerParams) => SchemaNode | JsonError | undefined;
-export type JsonSchemaResolverParams = {
-    key: string | number;
-    data: unknown;
-    node: SchemaNode;
-};
-export type JsonSchemaResolver = (options: JsonSchemaResolverParams) => SchemaNode | JsonError | undefined;
-export type JsonSchemaValidatorParams = {
-    pointer?: string;
-    data: unknown;
-    node: SchemaNode;
-    path?: ValidationPath;
-};
-export type JsonSchemaValidator = (options: JsonSchemaValidatorParams) => JsonError | JsonError[] | undefined;
-export type JsonSchemaDefaultDataResolverParams = {
-    pointer?: string;
-    data?: unknown;
-    node: SchemaNode;
-    options?: TemplateOptions;
-};
-export type JsonSchemaDefaultDataResolver = (options: JsonSchemaDefaultDataResolverParams) => unknown;
 export type Context = {
     /** root node of this json-schema */
     rootNode: SchemaNode;
@@ -85,20 +53,19 @@ export type Context = {
     ids: Record<string, SchemaNode>;
     /** anchors stored by fully resolved schema-$id + $anchor */
     anchors: Record<string, SchemaNode>;
+    dynamicAnchors: Record<string, SchemaNode>;
     /** json-schema parser, validator, reducer and resolver for this json-schema (root-schema and its child nodes) */
-    features?: Feature[];
+    keywords: Draft["keywords"];
+    /** json-schema draft-dependend methods */
+    methods: Draft["methods"];
     /** draft-version */
     version: string;
     /** available draft configurations */
-    drafts: DraftList;
+    drafts: Draft[];
     /** getTemplate default options */
     templateDefaultOptions?: TemplateOptions;
 };
 export declare function isSchemaNode(value: unknown): value is SchemaNode;
-export type ValidationPath = {
-    pointer: string;
-    node: SchemaNode;
-}[];
 export type GetSchemaOptions = {
     path?: ValidationPath;
     pointer?: string;
@@ -116,7 +83,7 @@ export type GetSchemaOptions = {
 };
 export type SchemaNode = {
     context: Context;
-    errors: Record<string, CreateError>;
+    errors: typeof errors;
     parent?: SchemaNode | undefined;
     ref?: string;
     schema: JsonSchema;
@@ -146,6 +113,9 @@ export type SchemaNode = {
     getSchema: (pointer: string, data?: unknown, options?: GetSchemaOptions) => SchemaNode | JsonError | undefined;
     /** Creates data that is valid to the schema of this node */
     getTemplate: (data?: unknown, options?: TemplateOptions) => unknown;
+    getChildSchemaSelection: (property: string | number) => JsonError | SchemaNode[];
+    each: (data: unknown, callback: EachCallback, pointer?: string) => void;
+    eachSchema: (callback: EachSchemaCallback) => void;
     /** Creates a new node with all dynamic schema properties merged according to the passed in data */
     reduce: ({ data, pointer, key, path }: {
         data: unknown;
@@ -154,6 +124,7 @@ export type SchemaNode = {
         path?: ValidationPath;
     }) => SchemaNode | JsonError;
     toJSON: () => unknown;
+    validateAsync: (data: unknown, pointer?: string, path?: ValidationPath) => Promise<JsonError[]>;
     validate: (data: unknown, pointer?: string, path?: ValidationPath) => JsonError[];
     reducers: JsonSchemaReducer[];
     resolvers: JsonSchemaResolver[];

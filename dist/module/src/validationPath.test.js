@@ -17,7 +17,7 @@ describe("validate - path", () => {
             withHeader: true,
             date: "2013-13-13"
         }, "#", path);
-        console.log(path.map((v) => ({ ptr: v.pointer, sptr: v.node.spointer })));
+        // console.log(path.map((v) => ({ ptr: v.pointer, sptr: v.node.spointer })));
         assert(path.length > 0);
     });
 });

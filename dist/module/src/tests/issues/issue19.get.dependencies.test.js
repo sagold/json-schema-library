@@ -1,8 +1,7 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
 import { isSchemaNode } from "../../types";
-import { draft2019 } from "../../draft2019";
-import { reduceOneOfFuzzy } from "../../features/oneOf";
+import { draftEditor } from "../../draftEditor";
 describe("issue#19 - getSchema from dependencies", () => {
     let rootNode;
     beforeEach(() => (rootNode = compileSchema({
@@ -64,29 +63,14 @@ describe("issue#19 - getSchema from dependencies", () => {
     it("should return correct schema for missing data property 'customField'", () => {
         // strict oneOf resolution will fail here, so we need to either fuzzy resolve oneOf item or
         // directly set "oneOfProperty" to "generation"
-        // @todo this is a lot of work
-        const oneOfFeature = draft2019.features.findIndex((feat) => feat.keyword === "oneOf");
-        assert(!isNaN(oneOfFeature));
-        const features = [...draft2019.features];
-        features[oneOfFeature] = {
-            ...features[oneOfFeature],
-            reduce: reduceOneOfFuzzy
-        };
         const modifiedRootNode = compileSchema(rootNode.schema, {
-            drafts: [
-                {
-                    regexp: ".",
-                    draft: {
-                        version: "draft-2019-09",
-                        features
-                    }
-                }
-            ]
+            drafts: [draftEditor]
         });
         const node = modifiedRootNode.get("customField", {
             name: "issue #19",
             generation: "Display Custom Field"
         });
+        assert(isSchemaNode(node), "should have returned a valid schemaNode");
         assert.deepEqual(node.schema, {
             title: "Custom Field",
             type: "string"

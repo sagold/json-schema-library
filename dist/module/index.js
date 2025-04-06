@@ -10,11 +10,11 @@ export { draftEditor } from "./src/draftEditor";
 // errors
 export { createCustomError } from "./src/errors/createCustomError";
 export { strings } from "./src/errors/strings";
-// extra SchemaNode methods
-export { each } from "./src/each";
-export { eachSchema } from "./src/eachSchema";
-export { createSchema } from "./src/createSchema";
-export { mergeNode } from "./src/mergeNode";
+export { createSchema } from "./src/methods/createSchema";
+export { addError } from "./src/addError";
+export { addKeywords } from "./src/addKeywords";
+export { addFormatValidator } from "./src/addFormatValidator";
+// export { mergeNode } from "./src/mergeNode"; -- not yet
 // utilities
 export { default as getTypeOf } from "./src/utils/getTypeOf";
 export { isReduceable } from "./src/compileSchema";

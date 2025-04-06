@@ -1,5 +1,6 @@
 import { JsonError, ErrorData } from "../types";
 export type CreateError<T extends ErrorData = ErrorData> = (data: T) => JsonError<T>;
+export declare function dashCase(text: string): string;
 export declare function createError<T extends ErrorData = ErrorData>(name: string, data: T): JsonError<T>;
 /**
  * Creates a custom Error Creator. Its messages are defined by strings-object @see config/strings.ts

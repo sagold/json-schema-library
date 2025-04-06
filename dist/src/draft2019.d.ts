@@ -1,4 +1,3 @@
-import type { Draft } from "./types";
 /**
  * @draft-2019 https://json-schema.org/draft/2019-09/release-notes
  *
@@ -13,4 +12,4 @@ import type { Draft } from "./types";
  * - $ref
  * - dependencies has been split into dependentSchemas and dependentRequired
  */
-export declare const draft2019: Draft;
+export declare const draft2019: import("./types").Draft;

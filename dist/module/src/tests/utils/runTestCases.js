@@ -21,13 +21,17 @@ function runTestCase(setup, tc, remotes) {
             const $schema = (_a = setup.metaSchema.$id) !== null && _a !== void 0 ? _a : setup.metaSchema.id;
             // get schema and add $schema to identify draft version
             const schema = isObject(testCase.schema) ? { $schema, ...testCase.schema } : testCase.schema;
-            const node = compileSchema(schema, { remoteContext: remotes.context });
+            const node = compileSchema(schema, { remote: remotes, formatAssertion: tc.optional });
             // register tests
             describe(testCase.description, () => {
                 if (setup.only && setup.only.description && setup.only.description !== testCase.description) {
                     return;
                 }
                 testCase.tests.forEach((testData) => {
+                    if (setup.skipTests && setup.skipTests.includes(testCase.description)) {
+                        it.skip(testData.description, () => { });
+                        return;
+                    }
                     it(testData.description, () => {
                         if (setup.logSchema === true || (setup.logSchema == null && setup.only)) {
                             console.log(testData.description, JSON.stringify(schema, null, 2), JSON.stringify(testData.data, null, 2));
@@ -90,7 +94,8 @@ export default function runAllTestCases(setup) {
             .forEach((tc) => runTestCase(setup, tc, remotes));
         after(() => {
             measurements.end = Date.now();
-            console.log("\n", "time overall:", measurements.end - measurements.start, "ms", "time validations:", measurements.validationDuration, "ms", "average validation time:", measurements.validationDuration / measurements.testCount);
+            process.env.DISABLE_LOG !== "true" &&
+                console.log("\n", "time overall:", measurements.end - measurements.start, "ms", "time validations:", measurements.validationDuration, "ms", "average validation time:", measurements.validationDuration / measurements.testCount);
             // console.log("max time:", measurements.max);
         });
     });

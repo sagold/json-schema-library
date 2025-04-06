@@ -1,27 +1,24 @@
-import { errors } from "./errors/errors";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import { draft04 } from "./draft04";
 import { draft06 } from "./draft06";
 import { draft07 } from "./draft07";
 import { draft2019 } from "./draft2019";
-import { getTemplate } from "./getTemplate";
+import { draft2020 } from "./draft2020";
 import { getValue } from "./utils/getValue";
 import { join, split } from "@sagold/json-pointer";
 import { joinId } from "./utils/joinId";
 import { mergeNode } from "./mergeNode";
 import { omit } from "./utils/omit";
 import { isSchemaNode, isJsonError } from "./types";
-import { createSchema } from "./createSchema";
+import { createSchema } from "./methods/createSchema";
 import { hasProperty } from "./utils/hasProperty";
-const defaultDrafts = [
-    { regexp: "draft-04", draft: draft04 },
-    { regexp: "draft-06", draft: draft06 },
-    { regexp: "draft-07", draft: draft07 },
-    { regexp: ".", draft: draft2019 }
-];
+import { validateNode } from "./validateNode";
+import { eachSchema } from "./methods/eachSchema";
+import getRef from "./keywords/ref";
+const defaultDrafts = [draft04, draft06, draft07, draft2019, draft2020];
 function getDraft(drafts, $schema) {
-    var _a, _b;
-    return (_b = (_a = drafts.find((d) => new RegExp(d.regexp).test($schema))) === null || _a === void 0 ? void 0 : _a.draft) !== null && _b !== void 0 ? _b : draft2019;
+    var _a;
+    return (_a = drafts.find((d) => new RegExp(d.$schemaRegEx).test($schema))) !== null && _a !== void 0 ? _a : drafts[drafts.length - 1];
 }
 /**
  * With compileSchema we replace the schema and all sub-schemas with a schemaNode,
@@ -29,27 +26,10 @@ function getDraft(drafts, $schema) {
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
 export function compileSchema(schema, options = {}) {
-    var _a, _b, _c;
-    const drafts = (_a = options.drafts) !== null && _a !== void 0 ? _a : defaultDrafts;
+    var _a, _b, _c, _d, _e;
+    let formatAssertion = (_a = options.formatAssertion) !== null && _a !== void 0 ? _a : true;
+    const drafts = (_b = options.drafts) !== null && _b !== void 0 ? _b : defaultDrafts;
     const draft = getDraft(drafts, schema === null || schema === void 0 ? void 0 : schema.$schema);
-    // # $vocabulary
-    // - declares which JSON Schema features (vocabularies) are supported by this meta-schema
-    // - each vocabulary is referenced by a URL, and its boolean value indicates whether it is required (true) or optional (false).
-    // # allOf
-    // - allOf actually includes the rules and constraints from the referenced schemas
-    // - allOf pulls in the relevant meta-schema definitions to actually apply them
-    // ✅ For validation purposes, you can ignore $vocabulary and rely on allOf to load the necessary meta-schemas.
-    // ⚠️ However, if your validator is designed to support multiple versions or optimize processing, $vocabulary provides useful metadata.
-    // - Determining Supported Features: Example: A validator could warn or error out if it encounters a vocabulary it does not support.
-    // - Selective Parsing or Optimization: Example: If "unevaluatedProperties" is not in a supported vocabulary, your validator should not enforce it.
-    // - Future-Proofing for Extensions: Future versions of JSON Schema may add optional vocabularies that aren't explicitly included in allOf.
-    if (schema === null || schema === void 0 ? void 0 : schema.$vocabulary) {
-        console.log("handle vocabulary", schema.$vocabulary);
-        // compile referenced meta schema
-        // 1. could validate passed in schema
-        // 2. could return a sanitized schema based on validation
-        // then add parsers and validators based on meta-schema
-    }
     const node = {
         spointer: "#",
         lastIdPointer: "#",
@@ -58,54 +38,72 @@ export function compileSchema(schema, options = {}) {
         resolvers: [],
         validators: [],
         schema,
+        errors: draft.errors,
         ...NODE_METHODS
     };
     node.context = {
         remotes: {},
         anchors: {},
+        dynamicAnchors: {},
         ids: {},
-        ...((_b = options.remoteContext) !== null && _b !== void 0 ? _b : {}),
+        ...((_d = (_c = options.remote) === null || _c === void 0 ? void 0 : _c.context) !== null && _d !== void 0 ? _d : {}),
         refs: {},
         rootNode: node,
         version: draft.version,
-        features: draft.features,
+        keywords: draft.keywords,
+        methods: draft.methods,
         templateDefaultOptions: options.templateDefaultOptions,
         drafts
     };
-    node.context.remotes[(_c = schema === null || schema === void 0 ? void 0 : schema.$id) !== null && _c !== void 0 ? _c : "#"] = node;
-    addFeatures(node);
+    if (options.remote) {
+        const metaSchema = getRef(node, node.schema.$schema);
+        if (isSchemaNode(metaSchema) && metaSchema.schema.$vocabulary) {
+            const vocabs = Object.keys(metaSchema.schema.$vocabulary);
+            // const withAnnotations = vocabs.find((vocab) => vocab.includes("vocab/format-annotation"));
+            const formatAssertionString = vocabs.find((vocab) => vocab.includes("vocab/format-assertion"));
+            if (formatAssertion === "meta-schema") {
+                formatAssertion = metaSchema.schema.$vocabulary[formatAssertionString] === true;
+            }
+            const validKeywords = Object.keys(metaSchema.getTemplate({}, { addOptionalProps: true }));
+            if (validKeywords.length > 0) {
+                node.context.keywords = node.context.keywords.filter((f) => validKeywords.includes(f.keyword));
+            }
+        }
+    }
+    if (formatAssertion === false) {
+        node.context.keywords = node.context.keywords.filter((f) => f.keyword !== "format");
+    }
+    node.context.remotes[(_e = schema === null || schema === void 0 ? void 0 : schema.$id) !== null && _e !== void 0 ? _e : "#"] = node;
+    addKeywords(node);
     return node;
 }
-// - $ref parses node id and has to execute everytime
-// - if is a shortcut for if-then-else and should always parse
-// - $defs contains a shortcut for definitions
 const whitelist = ["$ref", "if", "$defs"];
 const noRefMergeDrafts = ["draft-04", "draft-06", "draft-07"];
-function addFeatures(node) {
+function addKeywords(node) {
     if (node.schema.$ref && noRefMergeDrafts.includes(node.context.version)) {
         // for these draft versions only ref is validated
-        node.context.features
+        node.context.keywords
             .filter(({ keyword }) => whitelist.includes(keyword))
-            .forEach((feature) => execFeature(feature, node));
+            .forEach((keyword) => execKeyword(keyword, node));
         return;
     }
     const keys = Object.keys(node.schema);
-    node.context.features
+    node.context.keywords
         .filter(({ keyword }) => keys.includes(keyword) || whitelist.includes(keyword))
-        .forEach((feature) => execFeature(feature, node));
+        .forEach((keyword) => execKeyword(keyword, node));
 }
-function execFeature(feature, node) {
+function execKeyword(keyword, node) {
     var _a, _b, _c, _d;
     // @todo consider first parsing all nodes
-    (_a = feature.parse) === null || _a === void 0 ? void 0 : _a.call(feature, node);
-    if ((_b = feature.addReduce) === null || _b === void 0 ? void 0 : _b.call(feature, node)) {
-        node.reducers.push(feature.reduce);
+    (_a = keyword.parse) === null || _a === void 0 ? void 0 : _a.call(keyword, node);
+    if ((_b = keyword.addReduce) === null || _b === void 0 ? void 0 : _b.call(keyword, node)) {
+        node.reducers.push(keyword.reduce);
     }
-    if ((_c = feature.addResolve) === null || _c === void 0 ? void 0 : _c.call(feature, node)) {
-        node.resolvers.push(feature.resolve);
+    if ((_c = keyword.addResolve) === null || _c === void 0 ? void 0 : _c.call(keyword, node)) {
+        node.resolvers.push(keyword.resolve);
     }
-    if ((_d = feature.addValidate) === null || _d === void 0 ? void 0 : _d.call(feature, node)) {
-        node.validators.push(feature.validate);
+    if ((_d = keyword.addValidate) === null || _d === void 0 ? void 0 : _d.call(keyword, node)) {
+        node.validators.push(keyword.validate);
     }
 }
 const DYNAMIC_PROPERTIES = [
@@ -132,7 +130,6 @@ export function isReduceable(node) {
     return false;
 }
 const NODE_METHODS = {
-    errors,
     compileSchema(schema, spointer = this.spointer, schemaId) {
         const nextFragment = spointer.split("/$ref")[0];
         const parentNode = this;
@@ -146,10 +143,23 @@ const NODE_METHODS = {
             resolvers: [],
             validators: [],
             schema,
+            errors: parentNode.errors,
             ...NODE_METHODS
         };
-        addFeatures(node);
+        addKeywords(node);
         return node;
+    },
+    each(data, callback, pointer) {
+        const node = this;
+        return node.context.methods.each(node, data, callback, pointer);
+    },
+    eachSchema(callback) {
+        const node = this;
+        return eachSchema(node, callback);
+    },
+    getChildSchemaSelection(property) {
+        const node = this;
+        return node.context.methods.getChildSchemaSelection(node, property);
     },
     /**
      * Returns a node containing json-schema of a data-json-pointer.
@@ -194,7 +204,7 @@ const NODE_METHODS = {
         return node.resolveRef(options);
     },
     getRef($ref) {
-        return compileSchema({ $ref }, { remoteContext: this.context }).resolveRef();
+        return compileSchema({ $ref }, { remote: this }).resolveRef();
     },
     get(key, data, options = {}) {
         var _a, _b, _c;
@@ -230,13 +240,14 @@ const NODE_METHODS = {
         }
     },
     getTemplate(data, options) {
+        const node = this;
         const opts = {
             recursionLimit: 1,
-            ...this.context.templateDefaultOptions,
+            ...node.context.templateDefaultOptions,
             cache: {},
             ...(options !== null && options !== void 0 ? options : {})
         };
-        return getTemplate(this, data, opts);
+        return node.context.methods.getTemplate(node, data, opts);
     },
     reduce({ data, pointer, key, path }) {
         const resolvedNode = { ...this.resolveRef({ pointer, path }) };
@@ -288,41 +299,23 @@ const NODE_METHODS = {
         return workingNode;
     },
     validate(data, pointer = "#", path = []) {
-        // before running validation, we need to resolve ref and recompile for any
-        // newly resolved schema properties - but this should be done for refs, etc only
-        const node = this;
-        path.push({ pointer, node });
-        const errors = [];
-        // @ts-expect-error untyped boolean schema
-        if (node.schema === true) {
-            return errors;
-        }
-        // @ts-expect-error untyped boolean schema
-        if (node.schema === false) {
-            return [
-                node.errors.invalidDataError({
-                    value: data,
-                    pointer,
-                    schema: node.schema
-                })
-            ];
-        }
-        for (const validate of node.validators) {
-            // console.log("validator", validate.name);
-            const result = validate({ node, data, pointer, path });
-            if (Array.isArray(result)) {
-                errors.push(...result);
-            }
-            else if (result) {
-                errors.push(result);
-            }
-        }
-        return sanitizeErrors(errors);
+        var _a;
+        const errors = (_a = validateNode(this, data, pointer, path)) !== null && _a !== void 0 ? _a : [];
+        const flatErrorList = sanitizeErrors(Array.isArray(errors) ? errors : [errors]);
+        return flatErrorList.filter(isJsonError);
+    },
+    async validateAsync(data, pointer = "#", path = []) {
+        var _a;
+        const errors = (_a = validateNode(this, data, pointer, path)) !== null && _a !== void 0 ? _a : [];
+        const resolvedErrors = await Promise.all(sanitizeErrors(Array.isArray(errors) ? errors : [errors]));
+        return sanitizeErrors(resolvedErrors);
     },
     addRemote(url, schema) {
         var _a;
         // @draft >= 6
         schema.$id = joinId(schema.$id || url);
+        const { context } = this;
+        const draft = getDraft(context.drafts, (_a = schema === null || schema === void 0 ? void 0 : schema.$schema) !== null && _a !== void 0 ? _a : this.context.rootNode.$schema);
         const node = {
             spointer: "#",
             lastIdPointer: "#",
@@ -331,19 +324,19 @@ const NODE_METHODS = {
             resolvers: [],
             validators: [],
             schema,
+            errors: draft.errors,
             ...NODE_METHODS
         };
-        const { context } = this;
-        const draft = getDraft(context.drafts, (_a = schema === null || schema === void 0 ? void 0 : schema.$schema) !== null && _a !== void 0 ? _a : this.context.rootNode.$schema);
         node.context = {
             ...context,
             refs: {},
             rootNode: node,
-            features: draft.features,
+            methods: draft.methods,
+            keywords: draft.keywords,
             version: draft.version
         };
         node.context.remotes[joinId(url)] = node;
-        addFeatures(node);
+        addKeywords(node);
         return this;
     },
     resolveRef() {

@@ -1,9 +1,9 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
-import { each } from "../../each";
 describe("issue#22 - eachSchema on root $ref", () => {
     it("should call for each properties", () => {
-        const node = compileSchema({
+        const calls = [];
+        compileSchema({
             $schema: "http://json-schema.org/draft-07/schema",
             $ref: "#/definitions/object1",
             definitions: {
@@ -20,9 +20,7 @@ describe("issue#22 - eachSchema on root $ref", () => {
                     }
                 }
             }
-        });
-        const calls = [];
-        each(node, {
+        }).each({
             prop1: "foo",
             prop2: "foo"
         }, (node) => calls.push(node === null || node === void 0 ? void 0 : node.schema));

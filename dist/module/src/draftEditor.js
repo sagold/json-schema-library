@@ -1,43 +1,46 @@
+import __ from "./errors/__";
+import { dashCase } from "./errors/createCustomError";
+import { addKeywords } from "./addKeywords";
 import { draft2019 } from "./draft2019";
-import { oneOfFuzzyFeature } from "./features/oneOf";
+import { oneOfFuzzyKeyword } from "./keywords/oneOf";
+import { sanitizeKeywords } from "./utils/sanitizeKeywords";
+function extendDraft(draft, extension) {
+    var _a, _b;
+    const { keywords } = addKeywords(draft, ...((_a = extension.keywords) !== null && _a !== void 0 ? _a : []));
+    const errors = { ...draft.errors, ...((_b = extension.errors) !== null && _b !== void 0 ? _b : {}) };
+    return sanitizeKeywords({
+        ...draft,
+        ...extension,
+        keywords,
+        errors
+    });
+}
 /**
- * @draft-2019 https://json-schema.org/draft/2019-09/release-notes
+ * @draft-editor https://json-schema.org/draft/2019-09/release-notes
  *
- * new
- * - $anchor
- * - $recursiveAnchor and $recursiveRef
- * - $vocabulary
- *
- * changed
- * - $defs (renamed from definitions)
- * - $id
- * - $ref
- * - dependencies has been split into dependentSchemas and dependentRequired
+ * Uses Draft 2019-09 and changes resolveOneOf to be fuzzy
  */
-export const draftEditor = {
-    version: "draft-2019-09",
-    $schema: "https://json-schema.org/draft/2019-09/schema",
-    features: draft2019.features
-        .map((feature) => {
-        if (feature.keyword === "oneOf") {
-            return oneOfFuzzyFeature;
+export const draftEditor = extendDraft(draft2019, {
+    $schemaRegEx: ".",
+    keywords: [oneOfFuzzyKeyword],
+    errors: {
+        minLengthError: (data) => {
+            if (data.minLength === 1) {
+                return {
+                    type: "error",
+                    name: "MinLengthOneError",
+                    code: dashCase("MinLengthOneError"),
+                    message: __("MinLengthOneError", data),
+                    data
+                };
+            }
+            return {
+                type: "error",
+                name: "MinLengthError",
+                code: dashCase("MinLengthError"),
+                message: __("MinLengthError", data),
+                data
+            };
         }
-        return feature;
-    })
-        .map((feature) => {
-        const logKeyword = () => feature.keyword;
-        if (feature.validate) {
-            // @ts-expect-error missing interface
-            feature.validate.toJSON = logKeyword;
-        }
-        if (feature.reduce) {
-            // @ts-expect-error missing interface
-            feature.reduce.toJSON = logKeyword;
-        }
-        if (feature.resolve) {
-            // @ts-expect-error missing interface
-            feature.resolve.toJSON = logKeyword;
-        }
-        return feature;
-    })
-};
+    }
+});

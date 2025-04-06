@@ -48,7 +48,9 @@ describe("compileSchema : getSchema", () => {
             assert.deepEqual(node, undefined);
         });
         it("should return `undefined` for unknown property if data is passed", () => {
-            const node = compileSchema({ type: "object" }).getSchema("#/title", { title: "value" });
+            const node = compileSchema({ type: "object" }).getSchema("#/title", {
+                title: "value"
+            });
             assert.deepEqual(node, undefined);
         });
         it("should return an error for invalid properties", () => {
@@ -333,7 +335,7 @@ describe("compileSchema : getSchema", () => {
         it("should return item schema based on index", () => {
             const node = compileSchema({
                 type: "array",
-                items: [{ type: "number" }, { name: "target", type: "string" }, { type: "number" }]
+                prefixItems: [{ type: "number" }, { name: "target", type: "string" }, { type: "number" }]
             });
             const result = node.getSchema("#/1");
             assert.deepEqual(result.schema, { name: "target", type: "string" });

@@ -28,5 +28,6 @@ export type Setup = {
     /** $schema string identifying draft, like https://json-schema.org/draft/2019-09/schema */
     metaSchema: JsonSchema;
     metaSchemaList?: JsonSchema[];
+    skipTests?: string[];
 };
 export declare function getDraftTests(draft: DraftVersion): FeatureTest[];

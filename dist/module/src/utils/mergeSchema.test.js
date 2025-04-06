@@ -44,4 +44,8 @@ describe("mergeSchema", () => {
         const schema = mergeSchema({ type: "array", items: [{ type: "string" }, { type: "number" }] }, { type: "array", items: [{ type: "boolean" }] });
         assert.deepEqual(schema.items, [{ type: "boolean" }]);
     });
+    it("should append anyOf schema", () => {
+        const schema = mergeSchema({ type: "array", items: { anyOf: [{ type: "string" }] } }, { type: "array", items: { anyOf: [{ type: "number" }] } });
+        assert.deepEqual(schema.items.anyOf, [{ type: "string" }, { type: "number" }]);
+    });
 });

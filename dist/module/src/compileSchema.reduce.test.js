@@ -306,6 +306,13 @@ describe("compileSchema : reduce", () => {
             }).reduce({ data: { id: "second" } });
             assert.deepEqual(node.schema, { type: "object", properties: { id: { const: "second", minLength: 4 } } });
         });
+        it("should correctly reduce multiple prefixItems", () => {
+            const node = compileSchema({
+                prefixItems: [{ const: "foo" }],
+                anyOf: [{ prefixItems: [true, { const: "bar" }] }, { prefixItems: [true, true, { const: "baz" }] }]
+            }).reduce({ data: ["foo", "bar"] });
+            assert.deepEqual(node.schema, { prefixItems: [true, true, { const: "baz" }] });
+        });
     });
     describe("allOf", () => {
         it("should return merged schema of type string", () => {
@@ -419,6 +426,14 @@ describe("compileSchema : reduce", () => {
                     trigger: { type: "boolean" },
                     title: { type: "string" }
                 }
+            });
+        });
+        describe("contains", () => {
+            it("should resolve allOf-contains schema to array-item schema", () => {
+                const node = compileSchema({
+                    allOf: [{ contains: { multipleOf: 2 } }, { contains: { multipleOf: 3 } }]
+                }).reduce({ data: [2, 5] });
+                assert.deepEqual(node.schema, { items: { anyOf: [{ multipleOf: 2 }, { multipleOf: 3 }] } });
             });
         });
         describe("if-then-else", () => {
