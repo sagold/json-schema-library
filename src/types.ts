@@ -38,17 +38,23 @@ export function isJsonError(error: any): error is JsonError {
 export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "draft-2020-12" | "latest";
 
 export type Draft = {
-    errors: typeof errors;
+    /** test-string if draft can be used with $schema-url */
+    $schemaRegEx: string;
+    /** draft-version of this draft, e.g. draft-2020-12 */
+    version: DraftVersion;
+    /** supported keywords and implementation */
     keywords: Keyword[];
+    /** draft-dependent methods */
     methods: {
         createSchema: typeof createSchema;
         getChildSchemaSelection: typeof getChildSchemaSelection;
         getTemplate: typeof getTemplate;
         each: typeof each;
     };
-    version: DraftVersion;
+    /** meta-schema url associated with this draft */
     $schema?: string;
-    $schemaRegEx: string;
+    /** draft errors (this can still be global) */
+    errors: typeof errors;
 };
 
 export type Context = {
@@ -68,7 +74,7 @@ export type Context = {
     /** json-schema draft-dependend methods */
     methods: Draft["methods"];
     /** draft-version */
-    version: string;
+    version: DraftVersion;
     /** available draft configurations */
     drafts: Draft[];
     /** getTemplate default options */
@@ -133,6 +139,7 @@ export type SchemaNode = {
     getChildSchemaSelection: (property: string | number) => JsonError | SchemaNode[];
     each: (data: unknown, callback: EachCallback, pointer?: string) => void;
     eachSchema: (callback: EachSchemaCallback) => void;
+    getDraftVersion: () => DraftVersion;
     /** Creates a new node with all dynamic schema properties merged according to the passed in data */
     reduce: (
         data: unknown,

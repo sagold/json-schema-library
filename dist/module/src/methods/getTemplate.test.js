@@ -1405,6 +1405,14 @@ describe("getTemplate", () => {
             const res = node.getTemplate({ valid: "stays", invalid: "removes" }, { removeInvalidData: true });
             assert.deepEqual(res, { valid: "stays" });
         });
+        it("should NOT remove valid but unspecified data when 'removeInvalidData=true'", () => {
+            const node = compileSchema({
+                type: "object",
+                properties: { valid: { type: "string" } }
+            });
+            const res = node.getTemplate({ valid: "stays", unspecified: "stays" }, { removeInvalidData: true });
+            assert.deepEqual(res, { valid: "stays", unspecified: "stays" });
+        });
         it("should remove invalid data with 'removeInvalidData=true' when set as defaultTemplateOptions", () => {
             const node = compileSchema({
                 type: "object",

@@ -10,6 +10,9 @@ export { draft07 } from "./src/draft07";
 export { draft2019 } from "./src/draft2019";
 export { draftEditor } from "./src/draftEditor";
 
+// keywords
+export { oneOfFuzzyKeyword, oneOfKeyword } from "./src/keywords/oneOf";
+
 // errors
 export { createCustomError } from "./src/errors/createCustomError";
 export { strings } from "./src/errors/strings";
@@ -17,10 +20,10 @@ export { strings } from "./src/errors/strings";
 // extra SchemaNode methods
 export type { EachCallback } from "./src/methods/each";
 export type { EachSchemaCallback } from "./src/methods/eachSchema";
-export { createSchema } from "./src/methods/createSchema";
 export { addError } from "./src/addError";
 export { addKeywords } from "./src/addKeywords";
 export { addFormatValidator } from "./src/addFormatValidator";
+export { extendDraft } from "./src/extendDraft";
 // export { mergeNode } from "./src/mergeNode"; -- not yet
 
 // utilities

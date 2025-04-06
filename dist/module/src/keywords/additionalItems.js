@@ -4,6 +4,7 @@ import { validateNode } from "../validateNode";
 export const additionalItemsKeyword = {
     id: "additionalItems",
     keyword: "additionalItems",
+    order: -10,
     parse: parseAdditionalItems,
     addResolve: (node) => node.additionalItems != null,
     resolve: additionalItemsResolver,

@@ -1,5 +1,4 @@
 import sanitizeErrors from "./utils/sanitizeErrors";
-import { CreateError } from "./errors/createCustomError";
 import { draft04 } from "./draft04";
 import { draft06 } from "./draft06";
 import { draft07 } from "./draft07";
@@ -23,7 +22,6 @@ export type CompileOptions = {
     drafts: Draft[];
     remote: SchemaNode;
     formatAssertion: boolean | "meta-schema";
-    errors: Record<string, CreateError>;
     templateDefaultOptions?: TemplateOptions;
 };
 
@@ -159,6 +157,7 @@ const NODE_METHODS: Pick<
     | "getSchema"
     | "getTemplate"
     | "getChildSchemaSelection"
+    | "getDraftVersion"
     | "eachSchema"
     | "reduce"
     | "resolveRef"
@@ -306,6 +305,10 @@ const NODE_METHODS: Pick<
             ...(options ?? {})
         };
         return node.context.methods.getTemplate(node, data, opts);
+    },
+
+    getDraftVersion() {
+        return (this as SchemaNode).context.version;
     },
 
     reduce(data, { pointer, key, path } = {}) {

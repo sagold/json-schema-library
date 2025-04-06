@@ -1,11 +1,9 @@
-import { CreateError } from "./errors/createCustomError";
 import { TemplateOptions } from "./methods/getTemplate";
 import { SchemaNode, JsonSchema, Draft } from "./types";
 export type CompileOptions = {
     drafts: Draft[];
     remote: SchemaNode;
     formatAssertion: boolean | "meta-schema";
-    errors: Record<string, CreateError>;
     templateDefaultOptions?: TemplateOptions;
 };
 /**

@@ -1,20 +1,8 @@
 import __ from "./errors/__";
 import { dashCase } from "./errors/createCustomError";
-import { addKeywords } from "./addKeywords";
+import { extendDraft } from "./extendDraft";
 import { draft2019 } from "./draft2019";
 import { oneOfFuzzyKeyword } from "./keywords/oneOf";
-import { sanitizeKeywords } from "./utils/sanitizeKeywords";
-function extendDraft(draft, extension) {
-    var _a, _b;
-    const { keywords } = addKeywords(draft, ...((_a = extension.keywords) !== null && _a !== void 0 ? _a : []));
-    const errors = { ...draft.errors, ...((_b = extension.errors) !== null && _b !== void 0 ? _b : {}) };
-    return sanitizeKeywords({
-        ...draft,
-        ...extension,
-        keywords,
-        errors
-    });
-}
 /**
  * @draft-editor https://json-schema.org/draft/2019-09/release-notes
  *

@@ -1,23 +1,8 @@
 import __ from "./errors/__";
 import { dashCase } from "./errors/createCustomError";
-import { addKeywords } from "./addKeywords";
+import { extendDraft } from "./extendDraft";
 import { draft2019 } from "./draft2019";
 import { oneOfFuzzyKeyword } from "./keywords/oneOf";
-import { sanitizeKeywords } from "./utils/sanitizeKeywords";
-import { Draft } from "./types";
-
-type PartialDraft = Partial<Omit<Draft, "errors">> & { errors?: Partial<Draft["errors"]> };
-
-function extendDraft(draft: Draft, extension: PartialDraft) {
-    const { keywords } = addKeywords(draft, ...(extension.keywords ?? []));
-    const errors = { ...draft.errors, ...(extension.errors ?? {}) };
-    return sanitizeKeywords({
-        ...draft,
-        ...extension,
-        keywords,
-        errors
-    });
-}
 
 /**
  * @draft-editor https://json-schema.org/draft/2019-09/release-notes

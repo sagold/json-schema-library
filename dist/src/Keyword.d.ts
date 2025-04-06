@@ -49,6 +49,8 @@ export interface JsonSchemaDefaultDataResolver {
 export type Keyword = {
     id: string;
     keyword: string;
+    /** sort order of keyword. Lower numbers will be processed last. Default is 0 */
+    order?: number;
     parse?: (node: SchemaNode) => void;
     addResolve?: (node: SchemaNode) => boolean;
     resolve?: JsonSchemaResolver;
