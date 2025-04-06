@@ -35,20 +35,15 @@ import runAllTestCases from "../utils/runTestCases";
  */
 runAllTestCases({
     // only: {
-    //     name: "unevaluatedItems"
-    //     // description: "unevaluatedItems can see annotations from if without then and else"
+    //     name: "vocabulary",
+    //     description: "schema that uses custom metaschema with with no validation vocabulary"
     // },
     // logSchema: false,
     skipTestCase: (t) =>
         ![
-            "format", // vocabulary: annotation vs assertions
             // optional:
             "format-email",
             "format-ecmascript-regex",
-            // 2019:
-            "vocabulary", // must
-            // optionals
-            "cross-draft", // must
             "ecmascript-regex", // should
             "float-overflow",
             "format-idn-hostname",

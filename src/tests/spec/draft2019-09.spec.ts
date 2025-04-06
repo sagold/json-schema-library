@@ -15,9 +15,7 @@ runAllTestCases({
     // logSchema: false,
     skipTestCase: (t) =>
         ![
-            "vocabulary", // must
             // optionals
-            "cross-draft", // must
             "ecmascript-regex", // should
             "float-overflow",
             "format-idn-hostname",
@@ -27,9 +25,8 @@ runAllTestCases({
             "refOfUnknownKeyword" // reference to undefined schema definitions... we support configurations for this
         ].includes(t.name),
     /*
-        ✖ vocabulary - skipped evaluation of meta-schema
-
-        ✓ not - expect for uncle-schema support
+        ✓ vocabulary
+        ✓ not
         ✓ unevaluatedProperties
         ✓ unevaluatedItems
         ✓ additionalItems

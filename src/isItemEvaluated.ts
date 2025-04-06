@@ -16,6 +16,13 @@ type Options = {
     path: ValidationPath;
 };
 
+/**
+ * Returns true if an item is evaluated
+ *
+ * - Note that this check is partial, the remainder is done in unevaluatedItems
+ * - This function currently checks for schema that are not visible by simple validation
+ * - We could introduce this method as a new keyword-layer
+ */
 export function isItemEvaluated({ node, data, key, pointer, path }: Options) {
     const value = getValue(data, key);
 

@@ -11,17 +11,20 @@ import { join, split } from "@sagold/json-pointer";
 import { joinId } from "./utils/joinId";
 import { mergeNode } from "./mergeNode";
 import { omit } from "./utils/omit";
-import { SchemaNode, isSchemaNode, Context, isJsonError, JsonSchema, Draft, JsonError } from "./types";
+import { SchemaNode, isSchemaNode, isJsonError, JsonSchema, Draft, JsonError } from "./types";
 import type { Keyword, JsonSchemaReducerParams } from "./Keyword";
 import { createSchema } from "./methods/createSchema";
 import { hasProperty } from "./utils/hasProperty";
 import { validateNode } from "./validateNode";
 import { eachSchema } from "./methods/eachSchema";
+import getRef from "./keywords/ref";
 
 export type CompileOptions = {
     drafts: Draft[];
+    remote: SchemaNode;
+    formatAssertion: boolean | "meta-schema";
     errors: Record<string, CreateError>;
-    remoteContext?: Context;
+    // remoteContext?: Context;
     templateDefaultOptions?: TemplateOptions;
 };
 
@@ -37,30 +40,9 @@ function getDraft(drafts: Draft[], $schema: string) {
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
 export function compileSchema(schema: JsonSchema, options: Partial<CompileOptions> = {}) {
+    let formatAssertion = options.formatAssertion ?? true;
     const drafts = options.drafts ?? defaultDrafts;
     const draft = getDraft(drafts, schema?.$schema);
-
-    // # $vocabulary
-    // - declares which JSON Schema keywords (vocabularies) are supported by this meta-schema
-    // - each vocabulary is referenced by a URL, and its boolean value indicates whether it is required (true) or optional (false).
-
-    // # allOf
-    // - allOf actually includes the rules and constraints from the referenced schemas
-    // - allOf pulls in the relevant meta-schema definitions to actually apply them
-
-    // ✅ For validation purposes, you can ignore $vocabulary and rely on allOf to load the necessary meta-schemas.
-    // ⚠️ However, if your validator is designed to support multiple versions or optimize processing, $vocabulary provides useful metadata.
-    // - Determining Supported Keywords: Example: A validator could warn or error out if it encounters a vocabulary it does not support.
-    // - Selective Parsing or Optimization: Example: If "unevaluatedProperties" is not in a supported vocabulary, your validator should not enforce it.
-    // - Future-Proofing for Extensions: Future versions of JSON Schema may add optional vocabularies that aren't explicitly included in allOf.
-
-    if (schema?.$vocabulary) {
-        console.log("handle vocabulary", schema.$vocabulary);
-        // compile referenced meta schema
-        // 1. could validate passed in schema
-        // 2. could return a sanitized schema based on validation
-        // then add parsers and validators based on meta-schema
-    }
 
     const node: SchemaNode = {
         spointer: "#",
@@ -79,7 +61,7 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
         anchors: {},
         dynamicAnchors: {},
         ids: {},
-        ...(options.remoteContext ?? {}),
+        ...(options.remote?.context ?? {}),
         refs: {},
         rootNode: node,
         version: draft.version,
@@ -89,17 +71,34 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
         drafts
     };
 
+    if (options.remote) {
+        const metaSchema = getRef(node, node.schema.$schema);
+        if (isSchemaNode(metaSchema) && metaSchema.schema.$vocabulary) {
+            const vocabs = Object.keys(metaSchema.schema.$vocabulary);
+            // const withAnnotations = vocabs.find((vocab) => vocab.includes("vocab/format-annotation"));
+            const formatAssertionString = vocabs.find((vocab) => vocab.includes("vocab/format-assertion"));
+            if (formatAssertion === "meta-schema") {
+                formatAssertion = metaSchema.schema.$vocabulary[formatAssertionString] === true;
+            }
+            const validKeywords = Object.keys(metaSchema.getTemplate({}, { addOptionalProps: true }));
+            if (validKeywords.length > 0) {
+                node.context.keywords = node.context.keywords.filter((f) => validKeywords.includes(f.keyword));
+            }
+        }
+    }
+
+    if (formatAssertion === false) {
+        node.context.keywords = node.context.keywords.filter((f) => f.keyword !== "format");
+    }
+
     node.context.remotes[schema?.$id ?? "#"] = node;
-    addFeatures(node);
+    addKeywords(node);
     return node;
 }
 
-// - $ref parses node id and has to execute everytime
-// - if is a shortcut for if-then-else and should always parse
-// - $defs contains a shortcut for definitions
 const whitelist = ["$ref", "if", "$defs"];
 const noRefMergeDrafts = ["draft-04", "draft-06", "draft-07"];
-function addFeatures(node: SchemaNode) {
+function addKeywords(node: SchemaNode) {
     if (node.schema.$ref && noRefMergeDrafts.includes(node.context.version)) {
         // for these draft versions only ref is validated
         node.context.keywords
@@ -186,7 +185,7 @@ const NODE_METHODS: Pick<
             ...NODE_METHODS
         };
 
-        addFeatures(node);
+        addKeywords(node);
 
         return node;
     },
@@ -250,7 +249,7 @@ const NODE_METHODS: Pick<
     },
 
     getRef($ref: string) {
-        return compileSchema({ $ref }, { remoteContext: this.context }).resolveRef();
+        return compileSchema({ $ref }, { remote: this }).resolveRef();
     },
 
     get(key, data, options = {}) {
@@ -401,7 +400,7 @@ const NODE_METHODS: Pick<
         };
 
         node.context.remotes[joinId(url)] = node;
-        addFeatures(node);
+        addKeywords(node);
 
         return this;
     },
