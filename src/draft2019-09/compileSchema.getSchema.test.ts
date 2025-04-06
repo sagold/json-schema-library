@@ -6,13 +6,14 @@ import { pick } from "../utils/pick";
 describe("compileSchema : getSchema", () => {
     describe("value", () => {
         it("should return schema of any value", () => {
-            const node = compileSchema({ $schema: "draft-2019-09", name: "target", type: "*" }).getSchema("#");
+            const { node } = compileSchema({ $schema: "draft-2019-09", name: "target", type: "*" }).getSchema("#");
+
             assert(isSchemaNode(node));
             assert.deepEqual(node.schema, { $schema: "draft-2019-09", name: "target", type: "*" });
         });
 
         it("should resolve property through root $ref", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 $ref: "#/$defs/root",
                 $defs: {
@@ -24,6 +25,7 @@ describe("compileSchema : getSchema", () => {
                     }
                 }
             }).getSchema("#/value", { value: 123 });
+
             assert(isSchemaNode(node));
             assert.deepEqual(node.schema, { name: "target", type: "number" });
         });
@@ -31,39 +33,46 @@ describe("compileSchema : getSchema", () => {
 
     describe("object", () => {
         it("should return schema of valid property", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: {
                     title: { name: "title", type: "string" }
                 }
-            });
-            const result = node.getSchema("#/title");
-            assert(isSchemaNode(result));
-            assert.deepEqual(result.schema, { name: "title", type: "string" });
+            }).getSchema("#/title");
+
+            assert(isSchemaNode(node));
+            assert.deepEqual(node.schema, { name: "title", type: "string" });
         });
 
         it("should return `schema-warning` for unknown, but valid property", () => {
-            const node = compileSchema({ $schema: "draft-2019-09", type: "object" });
-            const result = node.getSchema("#/title", undefined, { withSchemaWarning: true });
-            assert(isJsonError(result));
-            assert.deepEqual(pick(result, "code", "type"), { code: "schema-warning", type: "error" });
+            const { error } = compileSchema({ $schema: "draft-2019-09", type: "object" }).getSchema(
+                "#/title",
+                undefined,
+                { withSchemaWarning: true }
+            );
+
+            assert(isJsonError(error));
+            assert.deepEqual(pick(error, "code", "type"), { code: "schema-warning", type: "error" });
         });
 
         it("should return `undefined` for unknown, but valid property", () => {
-            const node = compileSchema({ $schema: "draft-2019-09", type: "object" }).getSchema("#/title");
+            const { node, error } = compileSchema({ $schema: "draft-2019-09", type: "object" }).getSchema("#/title");
+
+            assert.deepEqual(error, undefined);
             assert.deepEqual(node, undefined);
         });
 
         it("should return `undefined` for unknown property if data is passed", () => {
-            const node = compileSchema({ $schema: "draft-2019-09", type: "object" }).getSchema("#/title", {
+            const { node, error } = compileSchema({ $schema: "draft-2019-09", type: "object" }).getSchema("#/title", {
                 title: "value"
             });
+            assert.deepEqual(error, undefined);
             assert.deepEqual(node, undefined);
         });
 
         it("should return an error for invalid properties", () => {
-            const error = compileSchema({
+            const { error } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: { title: { type: "string" } },
@@ -78,7 +87,7 @@ describe("compileSchema : getSchema", () => {
         });
 
         it("should return an error for invalid properties, even if value is given", () => {
-            const error = compileSchema({
+            const { error } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: { title: { type: "string" } },
@@ -93,7 +102,7 @@ describe("compileSchema : getSchema", () => {
         });
 
         it("should return schema for property within nested object", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: {
@@ -104,14 +113,14 @@ describe("compileSchema : getSchema", () => {
                         }
                     }
                 }
-            });
-            const result = node.getSchema("#/image/title");
-            assert(isSchemaNode(result));
-            assert.deepEqual(result.schema, { name: "title", type: "string" });
+            }).getSchema("#/image/title");
+
+            assert(isSchemaNode(node));
+            assert.deepEqual(node.schema, { name: "title", type: "string" });
         });
 
         it("should resolve $ref as property", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 definitions: {
@@ -125,12 +134,13 @@ describe("compileSchema : getSchema", () => {
                     }
                 }
             }).getSchema("#/image");
+
             assert(isSchemaNode(node));
             assert.deepEqual(node.schema, { name: "target" });
         });
 
         it("should return correct 'oneOf' object definition", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 additionalProperties: false,
@@ -153,10 +163,10 @@ describe("compileSchema : getSchema", () => {
                         additionalProperties: false
                     }
                 ]
-            });
-            const result = node.getSchema("#/second", { second: "string" });
-            assert(isSchemaNode(result));
-            assert.deepEqual(result.schema, { name: "target", type: "string" });
+            }).getSchema("#/second", { second: "string" });
+
+            assert(isSchemaNode(node));
+            assert.deepEqual(node.schema, { name: "target", type: "string" });
         });
 
         it("should return 'one-of-error' if enforced oneOf schema could not be resolved", () => {
@@ -168,7 +178,7 @@ describe("compileSchema : getSchema", () => {
                 }
             ];
 
-            const error = compileSchema({
+            const { error } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 required: ["nested"],
@@ -195,7 +205,7 @@ describe("compileSchema : getSchema", () => {
         });
 
         it("should return only one-of schema is no data is given", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 required: ["nested"],
@@ -213,35 +223,36 @@ describe("compileSchema : getSchema", () => {
                     }
                 }
             }).getSchema("#/nested/second");
+
             assert(isSchemaNode(node), "should have returned valid node");
             assert.deepEqual(node.schema, { type: "string", name: "target" });
         });
 
         it("should return schema of matching patternProperty", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 patternProperties: {
                     "^abc$": { type: "string" },
                     "^def$": { type: "number" }
                 }
-            });
-            const result = node.getSchema("#/def");
-            assert(isSchemaNode(result));
-            assert.deepEqual(result.schema, { type: "number" });
+            }).getSchema("#/def");
+
+            assert(isSchemaNode(node));
+            assert.deepEqual(node.schema, { type: "number" });
         });
 
         it("should return an error if schema could not be resolved", () => {
-            const node = compileSchema({
+            const { error } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: { coffee: { type: "string" } },
                 patternProperties: { "^tee$": { type: "string" } },
                 additionalProperties: false
-            });
-            const result = node.getSchema("#/beer");
-            assert(isJsonError(result));
-            assert.deepEqual(result.name, "NoAdditionalPropertiesError");
+            }).getSchema("#/beer");
+
+            assert(isJsonError(error));
+            assert.deepEqual(error.name, "NoAdditionalPropertiesError");
         });
 
         describe("dependencies", () => {
@@ -263,7 +274,7 @@ describe("compileSchema : getSchema", () => {
             //     assert.deepEqual(schema.type,"error");
             // });
             it("should return schema from dependencies when dependent property is present", () => {
-                const node = compileSchema({
+                const { node } = compileSchema({
                     $schema: "draft-2019-09",
                     type: "object",
                     properties: {
@@ -276,15 +287,15 @@ describe("compileSchema : getSchema", () => {
                             }
                         }
                     }
-                });
-                const result = node.getSchema("/additionalValue", { test: "is defined" });
-                assert.deepEqual(result.schema, { type: "string" });
+                }).getSchema("/additionalValue", { test: "is defined" });
+
+                assert.deepEqual(node.schema, { type: "string" });
             });
         });
 
         describe("if-then-else", () => {
             it("should return then-schema for matching if-schema", () => {
-                const node = compileSchema({
+                const { node } = compileSchema({
                     $schema: "draft-2019-09",
                     type: "object",
                     properties: {
@@ -300,13 +311,12 @@ describe("compileSchema : getSchema", () => {
                             additionalValue: { description: "added", type: "string" }
                         }
                     }
-                });
+                }).getSchema("/additionalValue", { test: "validates if" });
 
-                const result = node.getSchema("/additionalValue", { test: "validates if" });
-                assert.deepEqual(result.schema, { type: "string", description: "added" });
+                assert.deepEqual(node.schema, { type: "string", description: "added" });
             });
             it("should return else-schema for non-matching if-schema", () => {
-                const node = compileSchema({
+                const { node } = compileSchema({
                     $schema: "draft-2019-09",
                     type: "object",
                     properties: {
@@ -327,13 +337,12 @@ describe("compileSchema : getSchema", () => {
                             elseValue: { description: "else", type: "string" }
                         }
                     }
-                });
+                }).getSchema("/elseValue", { test: "" });
 
-                const result = node.getSchema("/elseValue", { test: "" });
-                assert.deepEqual(result.schema, { type: "string", description: "else" });
+                assert.deepEqual(node.schema, { type: "string", description: "else" });
             });
             it("should return correct schema for duplicate property", () => {
-                const node = compileSchema({
+                const { node } = compileSchema({
                     $schema: "draft-2019-09",
                     type: "object",
                     properties: {
@@ -354,37 +363,36 @@ describe("compileSchema : getSchema", () => {
                             dynamicValue: { description: "else", type: "string" }
                         }
                     }
-                });
+                }).getSchema("/dynamicValue", { test: "" });
 
-                const result = node.getSchema("/dynamicValue", { test: "" });
-                assert.deepEqual(result.schema, { type: "string", description: "else" });
+                assert.deepEqual(node.schema, { type: "string", description: "else" });
             });
         });
     });
 
     describe("array", () => {
         it("should return item schema", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "array",
                 items: { name: "title", type: "string" }
-            });
-            const result = node.getSchema("#/0");
-            assert.deepEqual(result.schema, { name: "title", type: "string" });
+            }).getSchema("#/0");
+
+            assert.deepEqual(node.schema, { name: "title", type: "string" });
         });
 
         it("should return item schema based on index", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "array",
                 items: [{ type: "number" }, { name: "target", type: "string" }, { type: "number" }]
-            });
-            const result = node.getSchema("#/1");
-            assert.deepEqual(result.schema, { name: "target", type: "string" });
+            }).getSchema("#/1");
+
+            assert.deepEqual(node.schema, { name: "target", type: "string" });
         });
 
         it("should return schema for matching 'oneOf' item", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "array",
                 items: {
@@ -409,6 +417,7 @@ describe("compileSchema : getSchema", () => {
                     ]
                 }
             }).getSchema("#/0/second", [{ second: "second" }]);
+
             assert.deepEqual(node.schema, { type: "string", name: "target" });
         });
 
@@ -440,8 +449,7 @@ describe("compileSchema : getSchema", () => {
                 }
             };
 
-            const node = compileSchema(schema);
-            const error = node.getSchema("#/0/second", []);
+            const { error } = compileSchema(schema).getSchema("#/0/second", []);
             assert(isJsonError(error));
             assert.deepEqual(error.code, "one-of-error");
             assert.deepEqual(error.data.schema, schema.items, "should have exposed json-schema of error location");

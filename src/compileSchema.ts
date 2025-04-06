@@ -12,7 +12,7 @@ import { joinId } from "./utils/joinId";
 import { mergeNode } from "./mergeNode";
 import { omit } from "./utils/omit";
 import { SchemaNode, isSchemaNode, isJsonError, JsonSchema, Draft, JsonError } from "./types";
-import type { Keyword, JsonSchemaReducerParams } from "./Keyword";
+import type { Keyword } from "./Keyword";
 import { createSchema } from "./methods/createSchema";
 import { hasProperty } from "./utils/hasProperty";
 import { validateNode } from "./validateNode";
@@ -230,22 +230,25 @@ const NODE_METHODS: Pick<
         options.withSchemaWarning = options.withSchemaWarning ?? false;
         options.pointer = options.pointer ?? "#";
 
+        const node = this as SchemaNode;
         const keys = split(pointer);
         if (keys.length === 0) {
-            return this.resolveRef(options);
+            const result = node.resolveRef(options);
+            return isJsonError(result) ? { node: undefined, error: result } : { node: result, error: undefined };
         }
         let currentPointer = "#";
-        let node = this as SchemaNode;
+        let currentNode = node;
         for (let i = 0, l = keys.length; i < l; i += 1) {
             currentPointer = `${currentPointer}/${keys[i]}`;
-            const nextNode = node.get(keys[i], data, { ...options, pointer: currentPointer });
+            const nextNode = currentNode.get(keys[i], data, { ...options, pointer: currentPointer });
             if (!isSchemaNode(nextNode)) {
-                return nextNode;
+                return { node: undefined, error: nextNode };
             }
             data = getValue(data, keys[i]);
-            node = nextNode;
+            currentNode = nextNode;
         }
-        return node.resolveRef(options);
+        const result = currentNode.resolveRef(options);
+        return isJsonError(result) ? { node: undefined, error: result } : { node: result, error: undefined };
     },
 
     getRef($ref: string) {
@@ -281,16 +284,16 @@ const NODE_METHODS: Pick<
             return referencedNode.get(key, data, options);
         }
 
-        if (options.withSchemaWarning === true) {
-            return node.errors.schemaWarning({ pointer, value: data, schema: node.schema, key });
-        }
-
         if (options.createSchema === true) {
             return node.compileSchema(
                 createSchema(getValue(data, key)),
                 `${node.spointer}/additional`,
                 `${node.schemaId}/additional`
             );
+        }
+
+        if (options.withSchemaWarning === true) {
+            return node.errors.schemaWarning({ pointer, value: data, schema: node.schema, key });
         }
     },
 

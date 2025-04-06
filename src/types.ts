@@ -123,7 +123,11 @@ export type SchemaNode = {
     /** Step into a property or array by name or index and return the schema-node its value */
     get: (key: string | number, data?: unknown, options?: GetSchemaOptions) => SchemaNode | JsonError;
     getRef: ($ref: string) => SchemaNode | undefined;
-    getSchema: (pointer: string, data?: unknown, options?: GetSchemaOptions) => SchemaNode | JsonError | undefined;
+    getSchema: (
+        pointer: string,
+        data?: unknown,
+        options?: GetSchemaOptions
+    ) => { node?: SchemaNode; error: undefined } | { node: undefined; error?: JsonError };
     /** Creates data that is valid to the schema of this node */
     getTemplate: (data?: unknown, options?: TemplateOptions) => unknown;
     getChildSchemaSelection: (property: string | number) => JsonError | SchemaNode[];

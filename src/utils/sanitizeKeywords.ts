@@ -13,5 +13,6 @@ export function sanitizeKeywords(draft: Draft) {
             keyword.resolve.toJSON = logKeyword;
         }
     });
+    draft.keywords.sort((a, b) => (b.order ?? 0) - (a.order ?? 0));
     return draft;
 }

@@ -272,34 +272,40 @@ expect(myData).to.deep.equal([]);
 
 ### getSchema
 
-`getSchema` retrieves the json-schema of a specific location in data. The location in data is given by a _json-pointer_. In many cases the json-schema can be retrieved without passing any data, but in situations where the schema is dynamic (for example in _oneOf_, _dependencies_, etc.), the data is required or will return a _JsonError_ if the location cannot be found.
+`getSchema` returns the json-schema from data location specified by a _json-pointer_. In many cases the json-schema can be retrieved without passing any data, but in situations where the schema is dynamic (for example in _oneOf_, _dependencies_, etc.), input-data is required or `getSchema` will return a _JsonError_ as is done when the json-pointer path is invalid.
 
 ```ts
-const schemaNode = compileSchema(mySchema);
-let schemaOfName: JsonSchema | JsonError | undefined;
-schemaOfName = schemaNode.getSchema("/list/1/name", myData);
+const { node, error } = compileSchema(mySchema).getSchema("/list/1/name", myData);
+if (node) console.log(node.schema);
 ```
 
-**Note** `getSchema` will return `undefined` for paths that lead to valid properties, but miss a schema definition. For example:
+**Note** `getSchema` will return a `node=undefined` for paths that lead to valid properties, but miss a schema definition. For example:
 
 ```ts
-const schemaNode = compileSchema({ type: "object" });
-let schemaOfName = schemaNode.getSchema("/name");
-console.log(schemaOfName); // undefined
+const { node, error } = compileSchema({ type: "object" }).getSchema("/name");
+console.log(node, error); // undefined, undefined
 ```
 
 In case this is unwanted behaviour, use the `withSchemaWarning` option to return a json-error with code `schema-warning` instead:
 
 ```ts
 const schemaNode = compileSchema({ type: "object" });
-let schemaOfName = schemaNode.getSchema("/name", undefined, { withSchemaWarning: true });
-console.log(schemaOfName); // { type: "error", code: "schema-warning" }
+const { node, error } = schemaNode.getSchema("/name", undefined, { withSchemaWarning: true });
+console.log(node, error); // undefined, { type: "error", code: "schema-warning" }
+```
+
+Or set `getSchema` to return a simple json-schema for the found data setting `createSchema: true`:
+
+```ts
+const schemaNode = compileSchema({ type: "object" });
+const { node, error } = schemaNode.getSchema("/name", { name: 123 }, { createSchema: true });
+console.log(node, error); // { type: "number" }, undefined
 ```
 
 <details><summary>Example</summary>
 
 ```ts
-import { Draft2019, JsonSchema, JsonError } from "json-schema-library";
+import { compileSchema } from "json-schema-library";
 
 const mySchema = {
     type: "object",
@@ -334,13 +340,11 @@ const mySchema = {
     }
 };
 
-const schemaNode = compileSchema(mySchema);
-let schemaOfItem: JsonSchema | JsonError | undefined;
-schemaOfItem = schemaNode.getSchema("/list/1", {
+const { node } = compileSchema(mySchema).getSchema("/list/1", {
     list: [{ description: "..." }, { name: "my-item" }]
 });
 
-expect(schemaOfItem).to.deep.equal({
+expect(node.schema).to.deep.equal({
     type: "object",
     required: ["name"],
     properties: {
@@ -363,9 +367,9 @@ All returned json-errors have a data property with the following properties
 -   `value` the data value at this location that could not be resolved
 
 ```ts
-const schema = schemaNode.getSchema("/list/1");
-if (isJsonError(schema)) {
-    console.log(Object.keys(schema.data)); // [pointer, schema, value]
+const { error } = schemaNode.getSchema("/list/1");
+if (error) {
+    console.log(Object.keys(error.data)); // [pointer, schema, value]
 }
 ```
 

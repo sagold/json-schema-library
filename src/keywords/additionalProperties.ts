@@ -8,6 +8,7 @@ import { validateNode } from "../validateNode";
 export const additionalPropertiesKeyword: Keyword = {
     id: "additionalProperties",
     keyword: "additionalProperties",
+    order: -10,
     parse: parseAdditionalProperties,
     addResolve: ({ schema }) => schema.additionalProperties != null,
     resolve: additionalPropertyResolver,
