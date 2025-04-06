@@ -64,7 +64,7 @@ function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
 
     if (matches.length === 1) {
         const { node, index } = matches[0];
-        const reducedNode = node.reduce({ data, pointer, path });
+        const reducedNode = node.reduce(data, { pointer, path });
         reducedNode.oneOfIndex = index; // @evaluation-info
         return reducedNode;
     }
@@ -120,7 +120,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaR
         if (result.length > 0) {
             errors.push(...result);
         } else {
-            const reducedNode = node.oneOf[i].reduce({ data, pointer, path });
+            const reducedNode = node.oneOf[i].reduce(data, { pointer, path });
             reducedNode.oneOfIndex = i; // @evaluation-info
             return reducedNode;
         }
@@ -207,7 +207,7 @@ export function reduceOneOfFuzzy({ node, data, pointer, path }: JsonSchemaReduce
             });
         }
 
-        const reducedNode = nodeOfItem.reduce({ data, pointer, path });
+        const reducedNode = nodeOfItem.reduce(data, { pointer, path });
         reducedNode.oneOfIndex = schemaOfIndex; // @evaluation-info
         return reducedNode;
     }

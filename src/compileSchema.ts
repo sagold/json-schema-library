@@ -260,7 +260,7 @@ const NODE_METHODS: Pick<
 
         let node = this as SchemaNode;
         if (node.reducers.length) {
-            const result = node.reduce({ data, key, path, pointer });
+            const result = node.reduce(data, { key, path, pointer });
             if (isJsonError(result)) {
                 return result;
             }
@@ -305,7 +305,7 @@ const NODE_METHODS: Pick<
         return node.context.methods.getTemplate(node, data, opts);
     },
 
-    reduce({ data, pointer, key, path }: JsonSchemaReducerParams) {
+    reduce(data, { pointer, key, path } = {}) {
         const resolvedNode = { ...this.resolveRef({ pointer, path }) } as SchemaNode;
         // const resolvedSchema = mergeSchema(this.schema, resolvedNode?.schema);
         // const node = (this as SchemaNode).compileSchema(resolvedSchema, this.spointer, resolvedSchema.schemaId);

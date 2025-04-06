@@ -277,7 +277,7 @@ describe("compileSchema : get", () => {
                 }
             }).get("dynamicSchema");
             assert(isSchemaNode(res));
-            res = res.reduce({ data: { trigger: true } });
+            res = res.reduce({ trigger: true });
 
             assert.deepEqual(res.schema, {
                 type: "object",
@@ -608,7 +608,7 @@ describe("step", () => {
             }).get(0, [{ title: 2 }]);
 
             assert(isSchemaNode(res));
-            res = res.reduce({ data: { title: 2 } });
+            res = res.reduce({ title: 2 });
 
             assert.deepEqual(res.schema, {
                 type: "object",
@@ -628,7 +628,7 @@ describe("step", () => {
             }).get(1, [{ title: "two" }, { title: 4 }]);
 
             assert(isSchemaNode(res));
-            res = res.reduce({ data: { title: 4 } });
+            res = res.reduce({ title: 4 });
 
             assert.deepEqual(res.schema, { type: "object", properties: { title: { type: "number" } } });
         });
@@ -646,7 +646,7 @@ describe("step", () => {
             }).get(1, [{ title: "two" }, { title: 4 }]);
 
             assert(isSchemaNode(res));
-            res = res.reduce({ data: { title: 4 } });
+            res = res.reduce({ title: 4 });
 
             assert.deepEqual(res.schema, { type: "object", properties: { title: { type: "number", minimum: 2 } } });
         });
@@ -663,7 +663,7 @@ describe("step", () => {
             }).get(1, [{ title: "two" }, { title: 4 }]);
 
             assert(isSchemaNode(res));
-            res = res.reduce({ data: { title: "two" } });
+            res = res.reduce({ title: "two" });
 
             assert.deepEqual(res.schema, {
                 type: "object",

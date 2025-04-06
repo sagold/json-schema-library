@@ -146,10 +146,8 @@ describe("keyword : patternProperties : reduce", () => {
             properties: { label: { type: "string", maxLength: 99 } },
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
         }).reduce({
-            data: {
-                "007": "match",
-                title: "no match"
-            }
+            "007": "match",
+            title: "no match"
         });
 
         assert(isSchemaNode(node), "should have returned a valid SchemaNode");
@@ -185,7 +183,7 @@ describe("keyword : patternProperties : reduce", () => {
         const node = compileSchema({
             properties: { "007": { type: "string", maxLength: 99 } },
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
-        }).reduce({ data: {} });
+        }).reduce({});
 
         assert(isSchemaNode(node), "should have returned a valid SchemaNode");
 
