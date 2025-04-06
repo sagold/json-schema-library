@@ -27,6 +27,9 @@ export { addFormatValidator } from "./src/addFormatValidator";
 export { default as getTypeOf } from "./src/utils/getTypeOf";
 export { isReduceable } from "./src/compileSchema";
 
+// remotes
+export { remotes } from "./remotes";
+
 // types
 export type {
     Context,
