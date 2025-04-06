@@ -33,7 +33,7 @@ export function parsePatternProperties(node: SchemaNode) {
         return;
     }
     node.patternProperties = patterns.map((pattern) => ({
-        pattern: new RegExp(pattern),
+        pattern: new RegExp(pattern, "u"),
         node: node.compileSchema(
             schema.patternProperties[pattern],
             `${node.spointer}/patternProperties/${pattern}`,
