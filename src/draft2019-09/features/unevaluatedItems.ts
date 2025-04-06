@@ -1,8 +1,8 @@
-import { isObject } from "../utils/isObject";
-import { isSchemaNode, SchemaNode } from "../types";
-import { Feature, JsonSchemaValidatorParams, ValidationResult } from "../Feature";
-import { validateNode } from "../validateNode";
-import { isItemEvaluated } from "../isItemEvaluated";
+import { isObject } from "../../utils/isObject";
+import { isSchemaNode, SchemaNode } from "../../types";
+import { Feature, JsonSchemaValidatorParams, ValidationResult } from "../../Feature";
+import sanitizeErrors from "../../utils/sanitizeErrors";
+import { validateNode } from "../../validateNode";
 
 /**
  * @draft >= 2019-09
@@ -40,18 +40,46 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
         return undefined;
     }
 
+    // const reducedNode = node;
+    let reducedNode = node.reduce({ data, pointer, path });
+    reducedNode = isSchemaNode(reducedNode) ? reducedNode : node;
+    if (reducedNode.schema.unevaluatedItems === true || reducedNode.schema.additionalItems === true) {
+        return undefined;
+    }
+
+    // console.log("EVAL", reducedNode.schema);
+
+    const validIf = node.if != null && validateNode(node.if, data, pointer, path).length === 0;
     const errors: ValidationResult[] = [];
     // "unevaluatedItems with nested items"
     for (let i = 0; i < data.length; i += 1) {
-        if (isItemEvaluated({ node, data, pointer, key: i, path })) {
-            continue;
-        }
-
         const value = data[i];
         const child = node.get(i, data, { path });
+        // console.log(`CHILD '${i}':`, data[i], "=>", child?.schema);
 
+        if (isSchemaNode(child)) {
+            // when a single node is invalid
+            if (validateNode(child, value, `${pointer}/${i}`, path).length > 0) {
+                // nothing should validate, so we validate unevaluated items only
+                if (node.unevaluatedItems) {
+                    return sanitizeErrors(
+                        data.map((value) => validateNode(node.unevaluatedItems, value, `${pointer}/${i}`, path))
+                    );
+                }
+                if (node.schema.unevaluatedItems === false) {
+                    return node.errors.unevaluatedItemsError({
+                        pointer: `${pointer}/${i}`,
+                        value: JSON.stringify(value),
+                        schema
+                    });
+                }
+            }
+        }
+        // "unevaluatedItems false"
         if (child === undefined) {
-            if (node.unevaluatedItems) {
+            if (validIf && node.if.itemsList && node.if.itemsList.length > i) {
+                // evaluated by if -- skip
+            } else if (node.unevaluatedItems) {
                 const result = validateNode(node.unevaluatedItems, value, `${pointer}/${i}`, path);
                 if (result.length > 0) {
                     errors.push(...result);
@@ -64,25 +92,6 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
                         schema
                     })
                 );
-            }
-        }
-
-        if (isSchemaNode(child) && validateNode(child, value, `${pointer}/${i}`, path).length > 0) {
-            // when a single node is invalid
-            if (node.unevaluatedItems && node.unevaluatedItems.validate(value, `${pointer}/${i}`, path).length > 0) {
-                return node.errors.unevaluatedItemsError({
-                    pointer: `${pointer}/${i}`,
-                    value: JSON.stringify(value),
-                    schema
-                });
-            }
-
-            if (node.schema.unevaluatedItems === false) {
-                return node.errors.unevaluatedItemsError({
-                    pointer: `${pointer}/${i}`,
-                    value: JSON.stringify(value),
-                    schema
-                });
             }
         }
     }

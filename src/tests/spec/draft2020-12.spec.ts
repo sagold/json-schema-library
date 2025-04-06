@@ -35,15 +35,14 @@ import runAllTestCases from "../utils/runTestCases";
  */
 runAllTestCases({
     // only: {
-    //     name: "dynamicRef",
-    //     description: "$dynamicRef skips over intermediate resources - pointer reference across resource boundary"
+    //     name: "unevaluatedItems"
+    //     // description: "unevaluatedItems can see annotations from if without then and else"
     // },
-    // logSchema: true,
+    // logSchema: false,
     skipTestCase: (t) =>
         ![
-            "unevaluatedItems",
-            "unevaluatedProperties",
-            "format",
+            // "unevaluatedItems",
+            "format", // vocabulary: annotation vs assertions
             // optional:
             "format-email",
             "format-ecmascript-regex",

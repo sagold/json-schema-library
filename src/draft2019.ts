@@ -34,7 +34,7 @@ import { refFeature } from "./draft2019-09/features/ref";
 import { requiredFeature } from "./features/required";
 import { sanitizeFeatures } from "./utils/sanitizeFeatures";
 import { typeFeature } from "./features/type";
-import { unevaluatedItemsFeature } from "./features/unevaluatedItems";
+import { unevaluatedItemsFeature } from "./draft2019-09/features/unevaluatedItems";
 import { unevaluatedPropertiesFeature } from "./features/unevaluatedProperties";
 import { uniqueItemsFeature } from "./features/uniqueItems";
 import { getChildSchemaSelection } from "./draft2019-09/methods/getChildSchemaSelection";
