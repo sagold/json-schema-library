@@ -24,7 +24,6 @@ export type CompileOptions = {
     remote: SchemaNode;
     formatAssertion: boolean | "meta-schema";
     errors: Record<string, CreateError>;
-    // remoteContext?: Context;
     templateDefaultOptions?: TemplateOptions;
 };
 
@@ -40,6 +39,7 @@ function getDraft(drafts: Draft[], $schema: string) {
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
 export function compileSchema(schema: JsonSchema, options: Partial<CompileOptions> = {}) {
+    /** @todo this option has to be passed to all drafts (remotes) */
     let formatAssertion = options.formatAssertion ?? true;
     const drafts = options.drafts ?? defaultDrafts;
     const draft = getDraft(drafts, schema?.$schema);
