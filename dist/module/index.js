@@ -18,6 +18,8 @@ export { addFormatValidator } from "./src/addFormatValidator";
 // utilities
 export { default as getTypeOf } from "./src/utils/getTypeOf";
 export { isReduceable } from "./src/compileSchema";
+// remotes
+export { remotes } from "./remotes";
 // import { createError, createCustomError } from "./lib/utils/createCustomError";
 // import getTypeOf from "./lib/getTypeOf";
 // import settings from "./lib/config/settings";

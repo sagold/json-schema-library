@@ -16,5 +16,6 @@ export { addKeywords } from "./src/addKeywords";
 export { addFormatValidator } from "./src/addFormatValidator";
 export { default as getTypeOf } from "./src/utils/getTypeOf";
 export { isReduceable } from "./src/compileSchema";
+export { remotes } from "./remotes";
 export type { Context, Draft, DraftVersion, GetSchemaOptions, JsonError, JsonPointer, JsonSchema, SchemaNode } from "./src/types";
 export type { Keyword, ValidationPath, JsonSchemaReducerParams, JsonSchemaReducer, JsonSchemaResolverParams, JsonSchemaResolver, JsonSchemaValidatorParams, JsonSchemaValidator, JsonSchemaDefaultDataResolverParams, JsonSchemaDefaultDataResolver } from "./src/Keyword";

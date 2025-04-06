@@ -58,7 +58,7 @@ describe("keyword : properties : get", () => {
 });
 describe("keyword : properties : validate", () => {
     it("should validate matching property type", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: {
                 header: { type: "string", minLength: 1 }
@@ -67,7 +67,7 @@ describe("keyword : properties : validate", () => {
         assert.deepEqual(errors.length, 0);
     });
     it("should validate boolean schema `true`", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: {
                 header: true
@@ -76,7 +76,7 @@ describe("keyword : properties : validate", () => {
         assert.deepEqual(errors.length, 0);
     });
     it("should validate boolean schema `false` if property not given", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: {
                 header: true,
@@ -86,7 +86,7 @@ describe("keyword : properties : validate", () => {
         assert.deepEqual(errors.length, 0);
     });
     it("should NOT validate boolean schema `false`", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: {
                 header: false

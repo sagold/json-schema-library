@@ -3,6 +3,7 @@ import splitRef from "../../utils/splitRef";
 import { omit } from "../../utils/omit";
 import { isObject } from "../../utils/isObject";
 import { validateNode } from "../../validateNode";
+import { get } from "@sagold/json-pointer";
 export const refKeyword = {
     id: "$ref",
     keyword: "$ref",
@@ -105,6 +106,7 @@ function compileNext(referencedNode, spointer = referencedNode.spointer) {
     return referencedNode.compileSchema(referencedSchema, `${spointer}/$ref`, referencedNode.schemaId);
 }
 export default function getRef(node, $ref = node === null || node === void 0 ? void 0 : node.ref) {
+    var _a;
     if ($ref == null) {
         return node;
     }
@@ -128,6 +130,17 @@ export default function getRef(node, $ref = node === null || node === void 0 ? v
         // this is a reference to remote-host root node
         if (node.context.remotes[$ref]) {
             return compileNext(node.context.remotes[$ref], node.spointer);
+        }
+        if ($ref[0] === "#") {
+            // @todo there is a bug joining multiple fragments to e.g. #/base#/examples/0
+            // from "$id": "/base" +  $ref "#/examples/0" (in refOfUnknownKeyword spec)
+            const ref = (_a = $ref.match(/#[^#]*$/)) === null || _a === void 0 ? void 0 : _a.pop(); // sanitize pointer
+            // support refOfUnknownKeyword
+            const rootSchema = node.context.rootNode.schema;
+            const targetSchema = get(rootSchema, ref);
+            if (targetSchema) {
+                return node.compileSchema(targetSchema, `${node.spointer}/$ref`, ref);
+            }
         }
         // console.error("REF: UNFOUND 1", $ref);
         return undefined;

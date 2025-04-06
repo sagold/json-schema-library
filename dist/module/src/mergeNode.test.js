@@ -19,7 +19,7 @@ describe("mergeNode", () => {
         assert(isSchemaNode(node), "should have returned a valid schema node");
         assert.deepEqual((_a = node.properties) === null || _a === void 0 ? void 0 : _a.title.schema, { type: "string", minLength: 1 });
         assert.deepEqual((_b = node.properties) === null || _b === void 0 ? void 0 : _b.label.schema, { type: "string", minLength: 20 });
-        const errors = node.validate({ title: "valid", label: "error" });
+        const { errors } = node.validate({ title: "valid", label: "error" });
         assert.deepEqual(errors.length, 1);
         assert.deepEqual(errors[0].code, "min-length-error");
     });
@@ -38,7 +38,7 @@ describe("mergeNode", () => {
         const node = mergeNode(a, b);
         assert(isSchemaNode(node), "should have returned a valid schema node");
         assert.deepEqual((_a = node.itemsObject) === null || _a === void 0 ? void 0 : _a.schema, { type: "number", minimum: 1, minLength: 1 });
-        const errors = node.validate([0, 10]);
+        const { errors } = node.validate([0, 10]);
         assert.deepEqual(errors.length, 1);
     });
     describe("omit", () => {

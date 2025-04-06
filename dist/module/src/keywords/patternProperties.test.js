@@ -24,7 +24,7 @@ describe("keyword : patternProperties : get", () => {
 });
 describe("keyword : patternProperties : validate", () => {
     it("should return an error for matching pattern and failed validation", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: { test: { type: "number" } }
         }).validate({ test: "invalid type" });
@@ -32,14 +32,14 @@ describe("keyword : patternProperties : validate", () => {
         assert.equal(errors[0].code, "type-error");
     });
     it("should validate a correct matching pattern", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: { test: { type: "number" } }
         }).validate({ test: 10 });
         assert.equal(errors.length, 0);
     });
     it("should return an error for matching regex pattern and failed validation", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: { "^.est?": { type: "number" } }
         }).validate({ test: "invalid type" });
@@ -47,7 +47,7 @@ describe("keyword : patternProperties : validate", () => {
         assert.equal(errors[0].code, "type-error");
     });
     it("should invalidate defined property", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: {
                 test: { type: "string" }
@@ -60,7 +60,7 @@ describe("keyword : patternProperties : validate", () => {
         assert.equal(errors[0].code, "type-error");
     });
     it("should return 'no-additional-properties-error' if additional properties are not allowed", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: {
                 test: { type: "string" }
@@ -74,7 +74,7 @@ describe("keyword : patternProperties : validate", () => {
         assert.equal(errors[0].code, "no-additional-properties-error");
     });
     it("should return an error if one of the matching patterns does not validate", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: {
                 "^.est?$": { type: "number" },
@@ -86,7 +86,7 @@ describe("keyword : patternProperties : validate", () => {
         assert.equal(errors[0].code, "type-error");
     });
     it("should return no error if additional properties are not allowed but valid in patterns", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: {
                 "^.est?$": { type: "number" }
@@ -96,7 +96,7 @@ describe("keyword : patternProperties : validate", () => {
         assert.equal(errors.length, 0);
     });
     it("should return no error if additional properties validate value", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: {
                 "^.est?$": { type: "number" }
@@ -106,7 +106,7 @@ describe("keyword : patternProperties : validate", () => {
         assert.equal(errors.length, 0);
     });
     it("should return an AdditionalPropertiesError if additional properties do not validate", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: {
                 "^.est?$": { type: "number" }
@@ -123,10 +123,8 @@ describe("keyword : patternProperties : reduce", () => {
             properties: { label: { type: "string", maxLength: 99 } },
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
         }).reduce({
-            data: {
-                "007": "match",
-                title: "no match"
-            }
+            "007": "match",
+            title: "no match"
         });
         assert(isSchemaNode(node), "should have returned a valid SchemaNode");
         assert.deepEqual(node.schema, {
@@ -156,7 +154,7 @@ describe("keyword : patternProperties : reduce", () => {
         const node = compileSchema({
             properties: { "007": { type: "string", maxLength: 99 } },
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
-        }).reduce({ data: {} });
+        }).reduce({});
         assert(isSchemaNode(node), "should have returned a valid SchemaNode");
         assert.deepEqual(node.schema, {
             properties: {

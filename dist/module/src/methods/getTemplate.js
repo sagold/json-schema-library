@@ -190,7 +190,7 @@ const TYPE = {
                         if (d[key] == null) {
                             // merge valid missing data (additionals) to resulting object
                             const value = getValue(data, key);
-                            if (node.additionalProperties.validate(value).length === 0) {
+                            if (node.additionalProperties.validate(value).valid) {
                                 d[key] = value;
                             }
                         }
@@ -204,7 +204,7 @@ const TYPE = {
         }
         // @keyword if-then-else
         if (node.if) {
-            const errors = node.if.validate(d);
+            const { errors } = node.if.validate(d);
             if (errors.length === 0 && node.then) {
                 const templateData = node.then.getTemplate(d, opts);
                 Object.assign(d, templateData);

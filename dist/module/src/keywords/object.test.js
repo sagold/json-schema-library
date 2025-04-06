@@ -7,7 +7,7 @@ describe("keyword : object : validate", () => {
                 type: "object",
                 maxProperties: 1
             });
-            const errors = node.validate({ a: "1", b: "2" });
+            const { errors } = node.validate({ a: "1", b: "2" });
             assert.equal(errors.length, 1);
             assert.deepEqual(errors[0].code, "max-properties-error");
         });
@@ -16,7 +16,7 @@ describe("keyword : object : validate", () => {
                 type: "object",
                 maxProperties: 2
             });
-            const errors = node.validate({ a: "1", b: "2" });
+            const { errors } = node.validate({ a: "1", b: "2" });
             assert.equal(errors.length, 0);
         });
         it("should return an error if maxProperties of nested properties is exceeded", () => {
@@ -30,7 +30,7 @@ describe("keyword : object : validate", () => {
                     }
                 }
             });
-            const errors = node.validate({ header: { a: "1", b: "2" } });
+            const { errors } = node.validate({ header: { a: "1", b: "2" } });
             assert.equal(errors.length, 1);
             assert.deepEqual(errors[0].code, "max-properties-error");
         });
@@ -41,7 +41,7 @@ describe("keyword : object : validate", () => {
                 type: "object",
                 minProperties: 2
             });
-            const errors = node.validate({ a: "1" });
+            const { errors } = node.validate({ a: "1" });
             assert.equal(errors.length, 1);
             assert.deepEqual(errors[0].code, "min-properties-error");
         });
@@ -50,7 +50,7 @@ describe("keyword : object : validate", () => {
                 type: "object",
                 minProperties: 2
             });
-            const errors = node.validate({ a: "1", b: "2" });
+            const { errors } = node.validate({ a: "1", b: "2" });
             assert.equal(errors.length, 0);
         });
     });

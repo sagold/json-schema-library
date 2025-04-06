@@ -22,7 +22,7 @@ function validateUnevaluatedProperties({ node, data, pointer, path }) {
         return undefined;
     }
     // this will break?
-    let reducedNode = node.reduce({ data, pointer, path });
+    let reducedNode = node.reduce(data, { pointer, path });
     reducedNode = isSchemaNode(reducedNode) ? reducedNode : node;
     if (reducedNode.schema.unevaluatedProperties === true || reducedNode.schema.additionalProperties === true) {
         return undefined;
@@ -70,5 +70,5 @@ function isPropertyEvaluated(schemaNode, propertyName, data) {
     if (node == null || isJsonError(node)) {
         return false;
     }
-    return node.validate(getValue(data, propertyName)).length === 0;
+    return node.validate(getValue(data, propertyName)).valid;
 }

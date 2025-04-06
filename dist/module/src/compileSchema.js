@@ -27,6 +27,7 @@ function getDraft(drafts, $schema) {
  */
 export function compileSchema(schema, options = {}) {
     var _a, _b, _c, _d, _e;
+    /** @todo this option has to be passed to all drafts (remotes) */
     let formatAssertion = (_a = options.formatAssertion) !== null && _a !== void 0 ? _a : true;
     const drafts = (_b = options.drafts) !== null && _b !== void 0 ? _b : defaultDrafts;
     const draft = getDraft(drafts, schema === null || schema === void 0 ? void 0 : schema.$schema);
@@ -214,7 +215,7 @@ const NODE_METHODS = {
         const { path, pointer } = options;
         let node = this;
         if (node.reducers.length) {
-            const result = node.reduce({ data, key, path, pointer });
+            const result = node.reduce(data, { key, path, pointer });
             if (isJsonError(result)) {
                 return result;
             }
@@ -249,7 +250,7 @@ const NODE_METHODS = {
         };
         return node.context.methods.getTemplate(node, data, opts);
     },
-    reduce({ data, pointer, key, path }) {
+    reduce(data, { pointer, key, path } = {}) {
         const resolvedNode = { ...this.resolveRef({ pointer, path }) };
         // const resolvedSchema = mergeSchema(this.schema, resolvedNode?.schema);
         // const node = (this as SchemaNode).compileSchema(resolvedSchema, this.spointer, resolvedSchema.schemaId);
@@ -301,14 +302,21 @@ const NODE_METHODS = {
     validate(data, pointer = "#", path = []) {
         var _a;
         const errors = (_a = validateNode(this, data, pointer, path)) !== null && _a !== void 0 ? _a : [];
-        const flatErrorList = sanitizeErrors(Array.isArray(errors) ? errors : [errors]);
-        return flatErrorList.filter(isJsonError);
+        const flatErrorList = sanitizeErrors(Array.isArray(errors) ? errors : [errors]).filter(isJsonError);
+        return {
+            valid: flatErrorList.length === 0,
+            errors: flatErrorList
+        };
     },
     async validateAsync(data, pointer = "#", path = []) {
         var _a;
         const errors = (_a = validateNode(this, data, pointer, path)) !== null && _a !== void 0 ? _a : [];
-        const resolvedErrors = await Promise.all(sanitizeErrors(Array.isArray(errors) ? errors : [errors]));
-        return sanitizeErrors(resolvedErrors);
+        let resolvedErrors = await Promise.all(sanitizeErrors(Array.isArray(errors) ? errors : [errors]));
+        resolvedErrors = sanitizeErrors(resolvedErrors);
+        return {
+            valid: resolvedErrors.length === 0,
+            errors: resolvedErrors
+        };
     },
     addRemote(url, schema) {
         var _a;

@@ -50,7 +50,7 @@ describe("issue#44 - chained negative logic", () => {
         });
     });
     it("should validate input data", () => {
-        const errors = node.validate({
+        const { errors } = node.validate({
             animal_species: "cat",
             diet_type: "omnivore",
             habitat_type: "mountain"

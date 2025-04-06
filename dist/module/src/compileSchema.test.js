@@ -9,7 +9,7 @@ describe("compileSchema vocabulary", () => {
             minLength: 10
         });
         const node = compileSchema({ $ref: "https://remote/schema" }, { remote, formatAssertion: "meta-schema" });
-        const errors = node.validate("123");
+        const { errors } = node.validate("123");
         assert.deepEqual(errors.length, 1);
         assert.deepEqual(errors[0].code, "min-length-error");
     });
@@ -22,7 +22,7 @@ describe("compileSchema vocabulary", () => {
             allOf: [{ $ref: "https://json-schema.org/draft/2020-12/vocab/format-assertion" }]
         });
         const node = compileSchema({ $schema: "https://remote/schema", format: "date-time" }, { remote, formatAssertion: "meta-schema" });
-        const errors = node.validate("123");
+        const { errors } = node.validate("123");
         assert.deepEqual(errors.length, 0);
     });
     it("should validate formats when $vocabulary.format-assertion = true", () => {
@@ -34,7 +34,7 @@ describe("compileSchema vocabulary", () => {
             allOf: [{ $ref: "https://json-schema.org/draft/2020-12/vocab/format-assertion" }]
         });
         const node = compileSchema({ $schema: "https://remote/schema", format: "date-time" }, { remote, formatAssertion: "meta-schema" });
-        const errors = node.validate("123");
+        const { errors } = node.validate("123");
         assert.deepEqual(errors.length, 1);
     });
 });
@@ -125,7 +125,7 @@ describe("compileSchema `schemaId`", () => {
 });
 describe("compileSchema `errors`", () => {
     it("draftEditor come with custom minLengthOneError", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "string",
             minLength: 1
         }, { drafts: [draftEditor] }).validate("");

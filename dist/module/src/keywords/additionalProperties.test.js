@@ -50,11 +50,11 @@ describe("keyword : additionalProperties : get", () => {
 });
 describe("keyword : additionalProperties : validate", () => {
     it("should return no-additional-properties-error if no schema is given for an additional property", () => {
-        const errors = compileSchema({ type: "object", additionalProperties: false }).validate({ a: 1 });
+        const { errors } = compileSchema({ type: "object", additionalProperties: false }).validate({ a: 1 });
         assert.deepEqual(errors.length, 1);
     });
     it("should return error for property not in properties schema", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             $schema: "https://json-schema.org/draft/2019-09/schema",
             properties: { foo: { $ref: "#" } },
             additionalProperties: false
@@ -62,7 +62,7 @@ describe("keyword : additionalProperties : validate", () => {
         assert.deepEqual(errors.length, 1);
     });
     it("should return all no-additional-properties-error", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: {
                 dummy: false
@@ -77,11 +77,11 @@ describe("keyword : additionalProperties : validate", () => {
         assert.deepEqual(errors[1].code, "no-additional-properties-error");
     });
     it("should be valid if 'additionalProperties' is 'true'", () => {
-        const errors = compileSchema({ type: "object", additionalProperties: true }).validate({ a: 1 });
+        const { errors } = compileSchema({ type: "object", additionalProperties: true }).validate({ a: 1 });
         assert.deepEqual(errors.length, 0);
     });
     it("should be valid if value matches 'additionalProperties' schema", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: { b: { type: "string" } },
             additionalProperties: { type: "number" }
@@ -89,7 +89,7 @@ describe("keyword : additionalProperties : validate", () => {
         assert.deepEqual(errors.length, 0);
     });
     it("should only validate existing definition in 'properties'", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: { b: { type: "string" } },
             additionalProperties: { type: "number" }
@@ -97,7 +97,7 @@ describe("keyword : additionalProperties : validate", () => {
         assert.deepEqual(errors.length, 0);
     });
     it("should return error if value does not match 'additionalProperties' schema", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: { b: { type: "string" } },
             additionalProperties: { type: "string" }
@@ -106,7 +106,7 @@ describe("keyword : additionalProperties : validate", () => {
         assert.deepEqual(errors[0].type, "error");
     });
     it("should be valid if value matches 'additionalProperties' oneOf schema", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: { b: { type: "string" } },
             additionalProperties: {
@@ -116,7 +116,7 @@ describe("keyword : additionalProperties : validate", () => {
         assert.deepEqual(errors.length, 0);
     });
     it("should be invalid if value does not match 'additionalProperties' in oneOf schema", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: { b: { type: "string" } },
             additionalProperties: {
@@ -126,7 +126,7 @@ describe("keyword : additionalProperties : validate", () => {
         assert.deepEqual(errors.length, 1);
     });
     it("should be ignore properties that are matched by patternProperties", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: { b: { type: "string" } },
             patternProperties: {
@@ -139,7 +139,7 @@ describe("keyword : additionalProperties : validate", () => {
         assert.deepEqual(errors.length, 0);
     });
     it("should be invalid if value does match multiple 'additionalProperties' in oneOf schema", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: { b: { type: "string" } },
             additionalProperties: {

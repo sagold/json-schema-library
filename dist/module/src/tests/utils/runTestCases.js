@@ -37,10 +37,10 @@ function runTestCase(setup, tc, remotes) {
                             console.log(testData.description, JSON.stringify(schema, null, 2), JSON.stringify(testData.data, null, 2));
                         }
                         const startTime = Date.now();
-                        const errors = node.validate(testData.data);
+                        const { valid } = node.validate(testData.data);
                         const duration = Date.now() - startTime;
                         measurements.validationDuration += duration;
-                        assert.equal(errors.length === 0, testData.valid);
+                        assert.equal(valid, testData.valid);
                         measurements.testCount++;
                         if (measurements.max.duration < duration) {
                             measurements.max.duration = duration;

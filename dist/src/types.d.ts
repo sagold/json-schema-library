@@ -117,15 +117,20 @@ export type SchemaNode = {
     each: (data: unknown, callback: EachCallback, pointer?: string) => void;
     eachSchema: (callback: EachSchemaCallback) => void;
     /** Creates a new node with all dynamic schema properties merged according to the passed in data */
-    reduce: ({ data, pointer, key, path }: {
-        data: unknown;
+    reduce: (data: unknown, options?: {
         key?: string | number;
         pointer?: string;
         path?: ValidationPath;
     }) => SchemaNode | JsonError;
     toJSON: () => unknown;
-    validateAsync: (data: unknown, pointer?: string, path?: ValidationPath) => Promise<JsonError[]>;
-    validate: (data: unknown, pointer?: string, path?: ValidationPath) => JsonError[];
+    validateAsync: (data: unknown, pointer?: string, path?: ValidationPath) => Promise<{
+        valid: boolean;
+        errors: JsonError[];
+    }>;
+    validate: (data: unknown, pointer?: string, path?: ValidationPath) => {
+        valid: boolean;
+        errors: JsonError[];
+    };
     reducers: JsonSchemaReducer[];
     resolvers: JsonSchemaResolver[];
     validators: JsonSchemaValidator[];

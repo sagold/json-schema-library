@@ -54,7 +54,8 @@ function validateUnevaluatedItems({ node, data, pointer, path }) {
         }
         if (isSchemaNode(child) && validateNode(child, value, `${pointer}/${i}`, path).length > 0) {
             // when a single node is invalid
-            if (node.unevaluatedItems && node.unevaluatedItems.validate(value, `${pointer}/${i}`, path).length > 0) {
+            if (node.unevaluatedItems &&
+                node.unevaluatedItems.validate(value, `${pointer}/${i}`, path).valid === false) {
                 return node.errors.unevaluatedItemsError({
                     pointer: `${pointer}/${i}`,
                     value: JSON.stringify(value),

@@ -6,6 +6,6 @@ runAllTestCases({
     //     description: "schema that uses custom metaschema with with no validation vocabulary"
     // },
     logSchema: false,
-    skipTestCase: (t) => !["ecmascript-regex", "non-bmp-regex", "float-overflow"].includes(t.name),
+    skipTestCase: (t) => !["float-overflow"].includes(t.name),
     metaSchema: draft06Meta
 });

@@ -19,7 +19,7 @@ function reduceAnyOf({ node, data, pointer, path }) {
     let mergedSchema = {};
     for (let i = 0; i < node.anyOf.length; i += 1) {
         if (validateNode(node.anyOf[i], data, pointer, path).length === 0) {
-            const schemaNode = node.anyOf[i].reduce({ data });
+            const schemaNode = node.anyOf[i].reduce(data);
             const schema = mergeSchema(node.anyOf[i].schema, schemaNode.schema);
             mergedSchema = mergeSchema(mergedSchema, schema, "anyOf");
         }

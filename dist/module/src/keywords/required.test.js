@@ -2,7 +2,7 @@ import { strict as assert } from "assert";
 import { compileSchema } from "../compileSchema";
 describe("keyword : properties : get", () => {
     it("shoud return errors for missing `required` properties", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             required: ["id", "a", "aa", "aaa"]
         }).validate({ id: "first", a: "correct", b: "ignored" });

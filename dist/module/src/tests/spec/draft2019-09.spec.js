@@ -14,13 +14,10 @@ runAllTestCases({
     // logSchema: false,
     skipTestCase: (t) => ![
         // optionals
-        "ecmascript-regex", // should
         "float-overflow",
         "format-idn-hostname",
         "format-iri",
-        "format-iri-reference",
-        "non-bmp-regex", // should
-        "refOfUnknownKeyword" // reference to undefined schema definitions... we support configurations for this
+        "format-iri-reference"
     ].includes(t.name),
     /*
         ✓ vocabulary
