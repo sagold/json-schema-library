@@ -196,7 +196,7 @@ describe("keyword : ref : resolve", () => {
 
 describe("keyword : ref : validate", () => {
     it("should return error", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             $schema: "https://json-schema.org/draft/2019-09/schema",
             properties: { foo: { $ref: "#" } },
             additionalProperties: false
@@ -206,7 +206,7 @@ describe("keyword : ref : validate", () => {
     });
 
     it("should return error for recursive mismatch", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             $schema: "https://json-schema.org/draft/2019-09/schema",
             properties: { foo: { $ref: "#" } },
             additionalProperties: false
@@ -241,13 +241,13 @@ describe("keyword : ref : validate", () => {
             type: "integer"
         });
         // console.log("\nVALIDATE\n");
-        const errors = node.validate({ list: [1] });
+        const { errors } = node.validate({ list: [1] });
 
         assert.equal(errors.length, 0);
     });
 
     it("should resolve base URI change ref valid", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             $schema: "https://json-schema.org/draft/2019-09/schema",
             $id: "http://localhost:1234/draft2019-09/",
             items: {
@@ -267,7 +267,7 @@ describe("keyword : ref : validate", () => {
 
     // requires anchor
     it("should resolve Location-independent identifier in remote ref", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             $schema: "https://json-schema.org/draft/2019-09/schema",
             $ref: "http://localhost:1234/draft2019-09/locationIndependentIdentifier.json#/$defs/refToInteger"
         })

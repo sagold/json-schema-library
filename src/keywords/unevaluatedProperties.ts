@@ -92,5 +92,5 @@ function isPropertyEvaluated(schemaNode: SchemaNode, propertyName: string, data:
     if (node == null || isJsonError(node)) {
         return false;
     }
-    return node.validate(getValue(data, propertyName)).length === 0;
+    return node.validate(getValue(data, propertyName)).valid;
 }

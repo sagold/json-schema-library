@@ -11,7 +11,7 @@ describe("compileSchema vocabulary", () => {
         });
         const node = compileSchema({ $ref: "https://remote/schema" }, { remote, formatAssertion: "meta-schema" });
 
-        const errors = node.validate("123");
+        const { errors } = node.validate("123");
 
         assert.deepEqual(errors.length, 1);
         assert.deepEqual(errors[0].code, "min-length-error");
@@ -30,7 +30,7 @@ describe("compileSchema vocabulary", () => {
             { remote, formatAssertion: "meta-schema" }
         );
 
-        const errors = node.validate("123");
+        const { errors } = node.validate("123");
 
         assert.deepEqual(errors.length, 0);
     });
@@ -48,7 +48,7 @@ describe("compileSchema vocabulary", () => {
             { remote, formatAssertion: "meta-schema" }
         );
 
-        const errors = node.validate("123");
+        const { errors } = node.validate("123");
 
         assert.deepEqual(errors.length, 1);
     });
@@ -151,7 +151,7 @@ describe("compileSchema `schemaId`", () => {
 
 describe("compileSchema `errors`", () => {
     it("draftEditor come with custom minLengthOneError", () => {
-        const errors = compileSchema(
+        const { errors } = compileSchema(
             {
                 type: "string",
                 minLength: 1

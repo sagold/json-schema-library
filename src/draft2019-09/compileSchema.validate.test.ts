@@ -9,7 +9,7 @@ describe("compileSchema.validate (2019)", () => {
     describe("integer", () => {
         describe("exclusiveMaximum", () => {
             it("should fail if value is equal to 0", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     exclusiveMaximum: 0
                 }).validate(0);
@@ -17,7 +17,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should succeed if value is below to 0", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     exclusiveMaximum: 0
                 }).validate(-1);
@@ -27,7 +27,7 @@ describe("compileSchema.validate (2019)", () => {
 
         describe("exclusiveMinimum", () => {
             it("should fail if value is equal to 0", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     exclusiveMinimum: 0
                 }).validate(0);
@@ -35,7 +35,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should succeed if value is above to 0", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     exclusiveMinimum: 0
                 }).validate(1);
@@ -45,7 +45,7 @@ describe("compileSchema.validate (2019)", () => {
 
         describe("oneOf", () => {
             it("should validate on a matching oneOf definition", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     oneOf: [{ type: "integer" }, { type: "string" }]
                 }).validate(3);
@@ -53,7 +53,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return an error for multiple matching oneOf schemas", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     oneOf: [{ type: "integer" }, { minimum: 2 }]
                 }).validate(3);
@@ -64,7 +64,7 @@ describe("compileSchema.validate (2019)", () => {
 
         describe("allOf", () => {
             it("should validate if all allOf-schemas are valid", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     allOf: [{ type: "integer" }, { minimum: 2 }]
                 }).validate(3);
@@ -72,7 +72,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return error if not all schemas match", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     allOf: [{ type: "integer" }, { minimum: 4 }]
                 }).validate(3);
@@ -81,7 +81,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return all errors for each non-matching schemas", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     allOf: [{ type: "integer" }, { minimum: 4 }, { maximum: 2 }]
                 }).validate(3);
@@ -93,7 +93,7 @@ describe("compileSchema.validate (2019)", () => {
 
         describe("anyOf", () => {
             it("should validate if one schemas in anyOf validates", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     anyOf: [{ minimum: 4 }, { maximum: 4 }]
                 }).validate(3);
@@ -101,7 +101,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return error if not all schemas match", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     anyOf: [{ minimum: 4 }, { maximum: 2 }]
                 }).validate(3);
@@ -110,7 +110,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should validate null", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     anyOf: [{ type: "null" }]
                 }).validate(null);
@@ -118,7 +118,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return error if invalid null", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     anyOf: [{ type: "null" }]
                 }).validate(3);
@@ -127,7 +127,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should resolve references", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     definitions: { integer: { type: "integer" } },
                     anyOf: [{ type: "null" }, { $ref: "#/definitions/integer" }]
@@ -144,9 +144,9 @@ describe("compileSchema.validate (2019)", () => {
                 if: { exclusiveMaximum: 0 }, // if this schema matches
                 then: { minimum: -10 } // also test this schema
             });
-            assert.deepEqual(node.validate(-1).length, 0, "valid through then");
-            assert.deepEqual(node.validate(-100).length, 1, "invalid through then");
-            assert.deepEqual(node.validate(3).length, 0, "valid when if test fails");
+            assert.deepEqual(node.validate(-1).errors.length, 0, "valid through then");
+            assert.deepEqual(node.validate(-100).errors.length, 1, "invalid through then");
+            assert.deepEqual(node.validate(3).errors.length, 0, "valid when if test fails");
         });
 
         it("should validate if-else constructs", () => {
@@ -155,15 +155,15 @@ describe("compileSchema.validate (2019)", () => {
                 if: { exclusiveMaximum: 0 }, // valid if 'if' valid
                 else: { multipleOf: 2 } // test if 'if' fails
             });
-            assert.deepEqual(node.validate(-1).length, 0, "valid when if test passes");
-            assert.deepEqual(node.validate(4).length, 0, "valid through else");
-            assert.deepEqual(node.validate(3).length, 1, "invalid through else");
+            assert.deepEqual(node.validate(-1).errors.length, 0, "valid when if test passes");
+            assert.deepEqual(node.validate(4).errors.length, 0, "valid through else");
+            assert.deepEqual(node.validate(3).errors.length, 1, "invalid through else");
         });
     });
 
     describe("object", () => {
         it("should still be valid for missing type", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 maxProperties: 1,
                 minProperties: 1
@@ -172,7 +172,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should return all errors", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "object",
                 additionalProperties: false,
@@ -189,7 +189,7 @@ describe("compileSchema.validate (2019)", () => {
 
         describe("min/maxProperties", () => {
             it("should return MinPropertiesError for too few properties", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "object",
                     minProperties: 2
@@ -199,7 +199,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return MaxPropertiesError for too many properties", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "object",
                     maxProperties: 1
@@ -209,7 +209,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should be valid if property count is within range", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "object",
                     maxProperties: 1,
@@ -221,7 +221,7 @@ describe("compileSchema.validate (2019)", () => {
 
         describe("not", () => {
             it("should be invalid if 'not' keyword does match", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "object",
                     not: { type: "object", properties: { a: { type: "number" } } }
@@ -233,7 +233,7 @@ describe("compileSchema.validate (2019)", () => {
 
         describe("dependencies", () => {
             it("should ignore any dependencies if the property is no set", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "object",
                     properties: { title: { type: "string" }, url: { type: "string" }, target: { type: "string" } },
@@ -244,7 +244,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return a 'MissingDependencyError' if the dependent property is missing", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "object",
                     properties: { title: { type: "string" }, url: { type: "string" }, target: { type: "string" } },
@@ -258,7 +258,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return a 'MissingDependencyError' if the dependent counterpart is missing", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "object",
                     properties: { title: { type: "string" }, url: { type: "string" }, target: { type: "string" } },
@@ -270,7 +270,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should be valid for a matching schema dependency", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "object",
                     properties: { title: { type: "string" }, url: { type: "string" }, target: { type: "string" } },
@@ -281,7 +281,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return validation error for a non-matching schema dependency", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "object",
                     properties: { title: { type: "string" }, url: { type: "string" }, target: { type: "string" } },
@@ -292,7 +292,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return correct error for invalid dependency", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "object",
                     properties: {
@@ -316,7 +316,7 @@ describe("compileSchema.validate (2019)", () => {
 
     describe("array", () => {
         it("should return error for invalid index", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "array",
                 items: [{ type: "string" }]
@@ -326,7 +326,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should be valid for matching indices", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "array",
                 items: [{ type: "string" }, { type: "number" }]
@@ -335,7 +335,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should return all errors", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "array",
                 items: { type: "string" },
@@ -349,7 +349,7 @@ describe("compileSchema.validate (2019)", () => {
 
         describe("min/maxItems", () => {
             it("should return MinItemsError for too few items", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "array",
                     minItems: 2
@@ -359,7 +359,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return MaxItemsError for too many items", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "array",
                     maxItems: 1
@@ -369,7 +369,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should be valid if item count is within range", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "array",
                     minItems: 2,
@@ -379,7 +379,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should still be valid for missing type", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     minItems: 2,
                     maxItems: 2
@@ -390,7 +390,7 @@ describe("compileSchema.validate (2019)", () => {
 
         describe("not", () => {
             it("should be invalid if 'not' keyword does match", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "array",
                     items: [{ type: "string" }, { type: "number" }],
@@ -404,7 +404,7 @@ describe("compileSchema.validate (2019)", () => {
 
         describe("uniqueItems", () => {
             it("should not validate for duplicated values", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "array",
                     uniqueItems: true
@@ -415,7 +415,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should not validate for duplicated objects", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "array",
                     uniqueItems: true
@@ -426,7 +426,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should validate for mismatching objects with equal properties", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "array",
                     uniqueItems: true
@@ -442,7 +442,7 @@ describe("compileSchema.validate (2019)", () => {
 
         describe("oneOf", () => {
             it("should return no error for valid oneOf items", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "array",
                     items: {
@@ -456,7 +456,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return error if no item does match", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "array",
                     items: {
@@ -471,7 +471,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return MultipleOneOfError if multiple oneOf definitions match the given value", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     type: "array",
                     items: { oneOf: [{ type: "integer" }, { minimum: 2 }] }
@@ -484,7 +484,7 @@ describe("compileSchema.validate (2019)", () => {
 
     describe("string", () => {
         it("should return MinLengthError if string is too short", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 minLength: 2
@@ -494,7 +494,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should return MaxLengthError if string is too long", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 maxLength: 2
@@ -504,7 +504,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should be valid if string is within range", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 minLength: 2,
@@ -514,7 +514,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should still be valid for missing type", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 minLength: 2,
                 maxLength: 2
@@ -523,7 +523,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should return EnumError if value is not within enum list", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 enum: ["a", "c"]
@@ -533,7 +533,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should be valid if value is within enum list", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 enum: ["a", "b", "c"]
@@ -542,7 +542,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should be invalid if 'not' keyword does match", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 not: { type: "string", pattern: "^b$" }
@@ -554,7 +554,7 @@ describe("compileSchema.validate (2019)", () => {
 
     describe("number", () => {
         it("should return MinimumError if number is too small", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "number",
                 minimum: 2
@@ -564,7 +564,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should return MinimumError if number is equal and exclusiveMinimum is set", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "number",
                 minimum: 2,
@@ -575,7 +575,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should return MaximumError if number is too large", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "number",
                 maximum: 1
@@ -585,7 +585,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should return MaximumError if number same and exclusiveMaximum is set", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "number",
                 maximum: 2,
@@ -596,7 +596,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should be valid if number is within range", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "number",
                 minimum: 1,
@@ -606,7 +606,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should still be valid for missing type", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 minimum: 1,
                 maximum: 1
@@ -615,7 +615,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should validate NaN", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "number"
             }).validate(parseInt("a"));
@@ -623,7 +623,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should return EnumError if value is not within enum list", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "number",
                 enum: [21, 27, 42]
@@ -633,7 +633,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should be valid if value is within enum list", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "number",
                 enum: [21, 27, 42]
@@ -642,7 +642,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should return error if value is not multiple of 1.5", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "number",
                 multipleOf: 1.5
@@ -652,7 +652,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should be valid if value if a multiple of 1.5", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "number",
                 multipleOf: 1.5
@@ -661,7 +661,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should be valid if 'multipleOf' is not a number", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "number",
                 multipleOf: "non-number"
@@ -670,7 +670,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should be invalid if 'not' keyword does match", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "number",
                 not: { type: "number", minimum: 4 }
@@ -682,20 +682,12 @@ describe("compileSchema.validate (2019)", () => {
 
     describe("arrays of types", () => {
         it("should not return an error for a valid type", () => {
-            let errors = compileSchema({
-                $schema,
-                type: ["object", "null"]
-            }).validate({});
-            assert.deepEqual(errors.length, 0);
-            errors = compileSchema({
-                $schema,
-                type: ["object", "null"]
-            }).validate(null);
-            assert.deepEqual(errors.length, 0);
+            assert(compileSchema({ $schema, type: ["object", "null"] }).validate({}).valid);
+            assert(compileSchema({ $schema, type: ["object", "null"] }).validate(null).valid);
         });
 
         it("should return a TypeError if passed type is not within array", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: ["object", "null"]
             }).validate([]);
@@ -704,7 +696,7 @@ describe("compileSchema.validate (2019)", () => {
         });
 
         it("should support 'integer' as a valid type within array", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: ["integer", "null"]
             }).validate(1);
@@ -715,7 +707,7 @@ describe("compileSchema.validate (2019)", () => {
     describe("heterogeneous types", () => {
         describe("enum", () => {
             it("should validate a matching value within enum", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     enum: [1, "second", []]
                 }).validate("second");
@@ -723,7 +715,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should validate a matching array within enum", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     enum: [1, "second", []]
                 }).validate([]);
@@ -731,7 +723,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should validate a matching object within enum", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     enum: [1, "second", { id: "third" }]
                 }).validate({ id: "third" });
@@ -739,7 +731,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return error for non-matching object", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     enum: [1, "second", { id: "third" }]
                 }).validate({ id: "first" });
@@ -748,7 +740,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should return error for invalid null", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     enum: [1, "second", { id: "third" }]
                 }).validate(null);
@@ -759,7 +751,7 @@ describe("compileSchema.validate (2019)", () => {
 
         describe("$ref", () => {
             it("should correctly validate data through nested $ref", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     $ref: "#/definitions/c",
                     definitions: {
@@ -775,7 +767,7 @@ describe("compileSchema.validate (2019)", () => {
             it("should correctly validate combination of remote, allOf, and allOf-$ref", () => {
                 // eslint-disable-next-line @typescript-eslint/no-var-requires
                 const draft04Meta = require("../../remotes/draft04.json");
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     $ref: "http://json-schema.org/draft-04/schema#",
                     _id: "input"
@@ -787,7 +779,7 @@ describe("compileSchema.validate (2019)", () => {
             });
 
             it("should correctly resolve local remote url", () => {
-                const errors = compileSchema({
+                const { errors } = compileSchema({
                     $schema,
                     $ref: "http://localhost:1234/integer.json",
                     _id: "input"
@@ -824,7 +816,7 @@ describe("compileSchema.validate (2019)", () => {
                     oneOf: [{ $ref: "#/$defs/one" }, { required: ["a"], properties: { a: true } }],
                     unevaluatedProperties: false
                 });
-                const errors = node.validate({ a: 1 });
+                const { errors } = node.validate({ a: 1 });
                 assert(errors.length === 0);
             });
         });
@@ -860,7 +852,7 @@ describe("compileSchema.validate (2019)", () => {
                     anyOf: [{ type: "integer" }, { $ref: "#/$defs/myobject" }]
                 });
 
-                const errors = node.validate({ foo: 1 });
+                const { errors } = node.validate({ foo: 1 });
 
                 assert(errors.length > 0, "should have returned error for invalid integer");
             });
@@ -899,12 +891,12 @@ describe("compileSchema.validate (2019)", () => {
                 //          3. { foo } » myObject:anyof:additionalProperties => recursiveRef
                 //          => recursiveAnchor = myObject
                 //          4. 1 » anyOf: [false, false] => error
-                const errors = node.validate({ foo: "hi" });
+                const { errors } = node.validate({ foo: "hi" });
                 assert(errors.length === 0, "should have validated data");
             });
 
             it("integer does not match as a property value", () => {
-                const errors = node.validate({ foo: 1 });
+                const { errors } = node.validate({ foo: 1 });
                 assert(errors.length > 0, "should have returned error for integer");
             });
         });
@@ -914,7 +906,7 @@ describe("compileSchema.validate (2019)", () => {
 describe("compileSchema.validate : format", () => {
     describe("time", () => {
         it("should validate HH:mm:ss-HH:mm", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 format: "time"
@@ -923,7 +915,7 @@ describe("compileSchema.validate : format", () => {
         });
 
         it("should validate HH:mm:ssZ", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 format: "time"
@@ -932,7 +924,7 @@ describe("compileSchema.validate : format", () => {
         });
 
         it("should not validate minutes above 59", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 format: "time"
@@ -941,7 +933,7 @@ describe("compileSchema.validate : format", () => {
         });
 
         it("should not validate seconds above 59", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 format: "time"
@@ -950,7 +942,7 @@ describe("compileSchema.validate : format", () => {
         });
 
         it("should not validate HH:mm", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 format: "time"
@@ -961,7 +953,7 @@ describe("compileSchema.validate : format", () => {
 
     describe("url", () => {
         it("should validate format url", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 format: "url"
@@ -970,7 +962,7 @@ describe("compileSchema.validate : format", () => {
         });
 
         it("should return error UrlFormatError for invalid urls", () => {
-            const errors = compileSchema({
+            const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 format: "url"
@@ -995,7 +987,7 @@ describe("compileSchema.validateAsync", () => {
             $schema,
             type: "number"
         }).validateAsync(4);
-        const errors = await promise;
+        const { errors } = await promise;
         assert.deepEqual(errors.length, 0);
     });
 
@@ -1004,7 +996,7 @@ describe("compileSchema.validateAsync", () => {
             $schema,
             type: "number"
         }).validateAsync("4");
-        const errors = await promise;
+        const { errors } = await promise;
         assert.deepEqual(errors.length, 1);
         assert.deepEqual(errors[0].code, "type-error");
     });
@@ -1041,7 +1033,7 @@ describe("compileSchema.validateAsync", () => {
             };
 
             it("should resolve async validation returning no error", async () => {
-                const errors = await compileSchema(
+                const { errors } = await compileSchema(
                     { type: "number", asyncError: false },
                     { drafts: [draft] }
                 ).validateAsync(4);
@@ -1049,7 +1041,7 @@ describe("compileSchema.validateAsync", () => {
             });
 
             it("should resolve async validation errors", async () => {
-                const errors = await compileSchema(
+                const { errors } = await compileSchema(
                     { type: "number", asyncError: true },
                     { drafts: [draft] }
                 ).validateAsync(4);

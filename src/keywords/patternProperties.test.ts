@@ -29,7 +29,7 @@ describe("keyword : patternProperties : get", () => {
 
 describe("keyword : patternProperties : validate", () => {
     it("should return an error for matching pattern and failed validation", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: { test: { type: "number" } }
         }).validate({ test: "invalid type" });
@@ -39,7 +39,7 @@ describe("keyword : patternProperties : validate", () => {
     });
 
     it("should validate a correct matching pattern", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: { test: { type: "number" } }
         }).validate({ test: 10 });
@@ -48,7 +48,7 @@ describe("keyword : patternProperties : validate", () => {
     });
 
     it("should return an error for matching regex pattern and failed validation", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: { "^.est?": { type: "number" } }
         }).validate({ test: "invalid type" });
@@ -58,7 +58,7 @@ describe("keyword : patternProperties : validate", () => {
     });
 
     it("should invalidate defined property", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: {
                 test: { type: "string" }
@@ -73,7 +73,7 @@ describe("keyword : patternProperties : validate", () => {
     });
 
     it("should return 'no-additional-properties-error' if additional properties are not allowed", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             properties: {
                 test: { type: "string" }
@@ -89,7 +89,7 @@ describe("keyword : patternProperties : validate", () => {
     });
 
     it("should return an error if one of the matching patterns does not validate", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: {
                 "^.est?$": { type: "number" },
@@ -103,7 +103,7 @@ describe("keyword : patternProperties : validate", () => {
     });
 
     it("should return no error if additional properties are not allowed but valid in patterns", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: {
                 "^.est?$": { type: "number" }
@@ -115,7 +115,7 @@ describe("keyword : patternProperties : validate", () => {
     });
 
     it("should return no error if additional properties validate value", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: {
                 "^.est?$": { type: "number" }
@@ -127,7 +127,7 @@ describe("keyword : patternProperties : validate", () => {
     });
 
     it("should return an AdditionalPropertiesError if additional properties do not validate", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             patternProperties: {
                 "^.est?$": { type: "number" }

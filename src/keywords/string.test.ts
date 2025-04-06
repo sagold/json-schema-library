@@ -5,7 +5,7 @@ describe("keyword : string : validation", () => {
     it("should return error for string shorter than minLength", () => {
         const node = compileSchema({ type: "string", minLength: 2 });
 
-        const errors = node.validate("a");
+        const { errors } = node.validate("a");
 
         assert.equal(errors.length, 1);
         assert.deepEqual(errors[0].code, "min-length-error");
@@ -14,7 +14,7 @@ describe("keyword : string : validation", () => {
     it("should NOT return error for string matching minLength", () => {
         const node = compileSchema({ type: "string", minLength: 2 });
 
-        const errors = node.validate("ab");
+        const { errors } = node.validate("ab");
 
         assert.equal(errors.length, 0);
     });
@@ -22,7 +22,7 @@ describe("keyword : string : validation", () => {
     it("should return error for string larger than maxLength", () => {
         const node = compileSchema({ type: "string", maxLength: 2 });
 
-        const errors = node.validate("abc");
+        const { errors } = node.validate("abc");
 
         assert.equal(errors.length, 1);
         assert.deepEqual(errors[0].code, "max-length-error");
@@ -31,7 +31,7 @@ describe("keyword : string : validation", () => {
     it("should NOT return error for string matching maxLength", () => {
         const node = compileSchema({ type: "string", maxLength: 2 });
 
-        const errors = node.validate("ab");
+        const { errors } = node.validate("ab");
 
         assert.equal(errors.length, 0);
     });

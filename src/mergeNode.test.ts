@@ -22,7 +22,7 @@ describe("mergeNode", () => {
         assert.deepEqual(node.properties?.title.schema, { type: "string", minLength: 1 });
         assert.deepEqual(node.properties?.label.schema, { type: "string", minLength: 20 });
 
-        const errors = node.validate({ title: "valid", label: "error" });
+        const { errors } = node.validate({ title: "valid", label: "error" });
         assert.deepEqual(errors.length, 1);
         assert.deepEqual(errors[0].code, "min-length-error");
     });
@@ -42,7 +42,7 @@ describe("mergeNode", () => {
         assert(isSchemaNode(node), "should have returned a valid schema node");
         assert.deepEqual(node.itemsObject?.schema, { type: "number", minimum: 1, minLength: 1 });
 
-        const errors = node.validate([0, 10]);
+        const { errors } = node.validate([0, 10]);
         assert.deepEqual(errors.length, 1);
     });
 

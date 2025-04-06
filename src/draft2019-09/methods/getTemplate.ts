@@ -238,7 +238,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
                         if (d[key] == null) {
                             // merge valid missing data (additionals) to resulting object
                             const value = getValue(data, key);
-                            if (node.additionalProperties.validate(value).length === 0) {
+                            if (node.additionalProperties.validate(value).valid) {
                                 d[key] = value;
                             }
                         }
@@ -252,11 +252,11 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
 
         // @keyword if-then-else
         if (node.if) {
-            const errors = node.if.validate(d);
-            if (errors.length === 0 && node.then) {
+            const { valid } = node.if.validate(d);
+            if (valid && node.then) {
                 const templateData = node.then.getTemplate(d, opts);
                 Object.assign(d, templateData);
-            } else if (errors.length > 0 && node.else) {
+            } else if (!valid && node.else) {
                 const templateData = node.else.getTemplate(d, opts);
                 Object.assign(d, templateData);
             }

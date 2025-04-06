@@ -6,7 +6,7 @@ describe("issue#58 - oneOf should invalid type error", () => {
         const node = compileSchema({
             oneOf: [{ type: "null" }, { type: "number" }]
         });
-        const errors = node.validate("string");
+        const { errors } = node.validate("string");
         assert(errors.length > 0);
     });
 
@@ -14,7 +14,7 @@ describe("issue#58 - oneOf should invalid type error", () => {
         const node = compileSchema({
             oneOf: [{ type: "null" }, { type: "number" }]
         });
-        const errors = node.validate(123);
+        const { errors } = node.validate(123);
         assert(errors.length === 0);
     });
 
@@ -30,7 +30,7 @@ describe("issue#58 - oneOf should invalid type error", () => {
                 }
             }
         });
-        const errors = node.validate({ foo: { number: "not an integer" } });
+        const { errors } = node.validate({ foo: { number: "not an integer" } });
         assert(errors.length > 0);
     });
 
@@ -54,7 +54,7 @@ describe("issue#58 - oneOf should invalid type error", () => {
                 }
             }
         });
-        const errors = node.validate({ foo: { number: "not an integer" } });
+        const { errors } = node.validate({ foo: { number: "not an integer" } });
         assert(errors.length > 0);
     });
 
@@ -98,7 +98,7 @@ describe("issue#58 - oneOf should invalid type error", () => {
         };
 
         const node = compileSchema(schema);
-        const errors = node.validate(inputData);
+        const { errors } = node.validate(inputData);
         assert.equal(errors.length, 1);
         assert.equal(errors[0].code, "type-error");
     });
@@ -141,7 +141,7 @@ describe("issue#58 - oneOf should invalid type error", () => {
         };
 
         const node = compileSchema(schema);
-        const errors = node.validate(inputData);
+        const { errors } = node.validate(inputData);
         assert.equal(errors.length, 0);
     });
 });

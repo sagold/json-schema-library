@@ -362,14 +362,21 @@ const NODE_METHODS: Pick<
 
     validate(data: unknown, pointer = "#", path = []) {
         const errors = validateNode(this, data, pointer, path) ?? [];
-        const flatErrorList = sanitizeErrors(Array.isArray(errors) ? errors : [errors]);
-        return flatErrorList.filter(isJsonError);
+        const flatErrorList = sanitizeErrors(Array.isArray(errors) ? errors : [errors]).filter(isJsonError);
+        return {
+            valid: flatErrorList.length === 0,
+            errors: flatErrorList
+        };
     },
 
     async validateAsync(data: unknown, pointer = "#", path = []) {
         const errors = validateNode(this, data, pointer, path) ?? [];
-        const resolvedErrors = await Promise.all(sanitizeErrors(Array.isArray(errors) ? errors : [errors]));
-        return sanitizeErrors(resolvedErrors) as JsonError[];
+        let resolvedErrors = await Promise.all(sanitizeErrors(Array.isArray(errors) ? errors : [errors]));
+        resolvedErrors = sanitizeErrors(resolvedErrors) as JsonError[];
+        return {
+            valid: resolvedErrors.length === 0,
+            errors: resolvedErrors
+        };
     },
 
     addRemote(url: string, schema: JsonSchema) {

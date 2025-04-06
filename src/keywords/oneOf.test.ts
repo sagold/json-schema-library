@@ -7,7 +7,7 @@ const DECLARATOR_ONEOF = settings.DECLARATOR_ONEOF;
 
 describe("keyword : oneof : validate", () => {
     it("should validate matching oneOf", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             oneOf: [
                 { type: "object", properties: { value: { type: "string" } } },
                 { type: "object", properties: { value: { type: "integer" } } }
@@ -17,7 +17,7 @@ describe("keyword : oneof : validate", () => {
     });
 
     it("should return error for non-matching oneOf", () => {
-        const errors = compileSchema({
+        const { errors } = compileSchema({
             type: "object",
             oneOf: [
                 { type: "object", properties: { value: { type: "string" } } },

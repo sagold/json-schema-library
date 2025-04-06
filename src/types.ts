@@ -142,8 +142,12 @@ export type SchemaNode = {
         path?: ValidationPath;
     }) => SchemaNode | JsonError;
     toJSON: () => unknown;
-    validateAsync: (data: unknown, pointer?: string, path?: ValidationPath) => Promise<JsonError[]>;
-    validate: (data: unknown, pointer?: string, path?: ValidationPath) => JsonError[];
+    validateAsync: (
+        data: unknown,
+        pointer?: string,
+        path?: ValidationPath
+    ) => Promise<{ valid: boolean; errors: JsonError[] }>;
+    validate: (data: unknown, pointer?: string, path?: ValidationPath) => { valid: boolean; errors: JsonError[] };
 
     // logic
     reducers: JsonSchemaReducer[];

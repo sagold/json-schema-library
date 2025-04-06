@@ -44,10 +44,10 @@ function runTestCase(setup: Setup, tc: FeatureTest, remotes: SchemaNode) {
                             );
                         }
                         const startTime = Date.now();
-                        const errors = node.validate(testData.data);
+                        const { valid } = node.validate(testData.data);
                         const duration = Date.now() - startTime;
                         measurements.validationDuration += duration;
-                        assert.equal(errors.length === 0, testData.valid);
+                        assert.equal(valid, testData.valid);
                         measurements.testCount++;
                         if (measurements.max.duration < duration) {
                             measurements.max.duration = duration;

@@ -10,7 +10,7 @@ describe("keyword : object : validate", () => {
                 maxProperties: 1
             });
 
-            const errors = node.validate({ a: "1", b: "2" });
+            const { errors } = node.validate({ a: "1", b: "2" });
 
             assert.equal(errors.length, 1);
             assert.deepEqual(errors[0].code, "max-properties-error");
@@ -22,7 +22,7 @@ describe("keyword : object : validate", () => {
                 maxProperties: 2
             });
 
-            const errors = node.validate({ a: "1", b: "2" });
+            const { errors } = node.validate({ a: "1", b: "2" });
 
             assert.equal(errors.length, 0);
         });
@@ -39,7 +39,7 @@ describe("keyword : object : validate", () => {
                 }
             });
 
-            const errors = node.validate({ header: { a: "1", b: "2" } });
+            const { errors } = node.validate({ header: { a: "1", b: "2" } });
 
             assert.equal(errors.length, 1);
             assert.deepEqual(errors[0].code, "max-properties-error");
@@ -53,7 +53,7 @@ describe("keyword : object : validate", () => {
                 minProperties: 2
             });
 
-            const errors = node.validate({ a: "1" });
+            const { errors } = node.validate({ a: "1" });
 
             assert.equal(errors.length, 1);
             assert.deepEqual(errors[0].code, "min-properties-error");
@@ -65,7 +65,7 @@ describe("keyword : object : validate", () => {
                 minProperties: 2
             });
 
-            const errors = node.validate({ a: "1", b: "2" });
+            const { errors } = node.validate({ a: "1", b: "2" });
 
             assert.equal(errors.length, 0);
         });
