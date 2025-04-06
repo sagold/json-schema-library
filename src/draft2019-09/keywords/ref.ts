@@ -5,6 +5,7 @@ import { omit } from "../../utils/omit";
 import { isObject } from "../../utils/isObject";
 import { validateNode } from "../../validateNode";
 import { SchemaNode } from "../../types";
+import { get } from "@sagold/json-pointer";
 
 export const refKeyword: Keyword = {
     id: "$ref",
@@ -147,6 +148,17 @@ export default function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode |
         // this is a reference to remote-host root node
         if (node.context.remotes[$ref]) {
             return compileNext(node.context.remotes[$ref], node.spointer);
+        }
+        if ($ref[0] === "#") {
+            // @todo there is a bug joining multiple fragments to e.g. #/base#/examples/0
+            // from "$id": "/base" +  $ref "#/examples/0" (in refOfUnknownKeyword spec)
+            const ref = $ref.match(/#[^#]*$/)?.pop(); // sanitize pointer
+            // support refOfUnknownKeyword
+            const rootSchema = node.context.rootNode.schema;
+            const targetSchema = get(rootSchema, ref);
+            if (targetSchema) {
+                return node.compileSchema(targetSchema, `${node.spointer}/$ref`, ref);
+            }
         }
         // console.error("REF: UNFOUND 1", $ref);
         return undefined;
