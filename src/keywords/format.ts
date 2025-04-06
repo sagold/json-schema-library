@@ -101,18 +101,40 @@ export const formatValidators: Record<
         if (typeof data !== "string" || data === "") {
             return undefined;
         }
-        // taken from https://github.com/ExodusMovement/schemasafe/blob/master/src/formats.js
-        if (data[0] === '"') {
+
+        const lastIndex = data.lastIndexOf("@");
+        const name = data.substr(0, lastIndex);
+        const host = data.substr(lastIndex + 1);
+        if (!name || !host || name.length > 64 || host.length > 253) {
             return node.errors.formatEmailError({ value: data, pointer, schema });
         }
-        const [name, host, ...rest] = data.split("@");
-        if (!name || !host || rest.length !== 0 || name.length > 64 || host.length > 253) {
+
+        // if name is in double quotes: "joe bloggs"@example.com, whitespaces, dots etc are allowed
+        // so, we remove valid strings in quote
+        let strippedName = name;
+        if (/^".*"$/.test(name)) {
+            strippedName = name.replace(/(^")|([. @]+)|("$)/g, "");
+        }
+
+        if (strippedName[0] === "." || strippedName.endsWith(".") || strippedName.includes("..")) {
             return node.errors.formatEmailError({ value: data, pointer, schema });
         }
-        if (name[0] === "." || name.endsWith(".") || name.includes("..")) {
+        if (!/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+$/i.test(strippedName)) {
             return node.errors.formatEmailError({ value: data, pointer, schema });
         }
-        if (!/^[a-z0-9.-]+$/i.test(host) || !/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+$/i.test(name)) {
+
+        if (/^\[.*\]$/.test(host)) {
+            const possibleIp = host.substr(1, host.length - 2);
+            if (
+                isValidIPV4.test(possibleIp) ||
+                isValidIPV6.test(possibleIp) ||
+                /IPv6:::[0-9a-f]{1,4}/.test(possibleIp)
+            ) {
+                return undefined;
+            }
+        }
+
+        if (!/^[a-z0-9.-]+$/i.test(host)) {
             return node.errors.formatEmailError({ value: data, pointer, schema });
         }
         if (!host.split(".").every((part) => /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/i.test(part))) {
@@ -203,15 +225,6 @@ export const formatValidators: Record<
 
     regex: ({ node, pointer, data }) => {
         const { schema } = node;
-        if (typeof data === "string" && /\\Z$/.test(data) === false) {
-            try {
-                new RegExp(data);
-                return undefined;
-            } catch (e) {} // eslint-disable-line no-empty
-
-            return node.errors.formatRegExError({ value: data, pointer, schema });
-        }
-        // v7 tests, ignore non-regex values
         if (
             typeof data === "object" ||
             typeof data === "number" ||
@@ -220,6 +233,16 @@ export const formatValidators: Record<
         ) {
             return undefined;
         }
+        if (typeof data === "string" && /\\Z$/.test(data) === false) {
+            try {
+                new RegExp(data, "u");
+                return undefined;
+            } catch (e) {} // eslint-disable-line no-empty
+
+            return node.errors.formatRegExError({ value: data, pointer, schema });
+        }
+        // v7 tests, ignore non-regex values
+
         return node.errors.formatRegExError({ value: data, pointer, schema });
     },
 

@@ -35,22 +35,17 @@ import runAllTestCases from "../utils/runTestCases";
  */
 runAllTestCases({
     // only: {
-    //     name: "vocabulary",
-    //     description: "schema that uses custom metaschema with with no validation vocabulary"
+    //     name: "format-email"
+    //     // description: "patterns always use unicode semantics with patternProperties"
     // },
     // logSchema: false,
     skipTestCase: (t) =>
         ![
             // optional:
-            "format-email",
-            "format-ecmascript-regex",
-            "ecmascript-regex", // should
             "float-overflow",
             "format-idn-hostname",
-            "format-iri",
-            "format-iri-reference",
-            "non-bmp-regex", // should
-            "refOfUnknownKeyword" // reference to undefined schema definitions... we support configurations for this
+            "format-iri"
+            "format-iri-reference"
         ].includes(t.name),
 
     metaSchema: draft2020Meta,
