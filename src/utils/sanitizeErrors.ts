@@ -1,5 +1,5 @@
 import { isJsonError } from "../types";
-import { ValidationResult, JsonSchemaValidator } from "../Feature";
+import { ValidationResult, JsonSchemaValidator } from "../Keyword";
 
 type MaybeNestedErrors = ReturnType<JsonSchemaValidator>;
 

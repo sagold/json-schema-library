@@ -1,4 +1,4 @@
-import { ValidationPath } from "./Feature";
+import { ValidationPath } from "./Keyword";
 import { SchemaNode } from "./types";
 import { getValue } from "./utils/getValue";
 import { validateNode } from "./validateNode";

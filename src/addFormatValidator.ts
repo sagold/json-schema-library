@@ -1,4 +1,4 @@
-import { formatValidators } from "./features/format";
+import { formatValidators } from "./keywords/format";
 import { JsonSchemaValidator } from "./types";
 
 export function addFormatValidator(formatValue: string, validator: JsonSchemaValidator) {

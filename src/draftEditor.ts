@@ -1,20 +1,20 @@
 import __ from "./errors/__";
 import { dashCase } from "./errors/createCustomError";
-import { addFeatures } from "./addFeatures";
+import { addKeywords } from "./addKeywords";
 import { draft2019 } from "./draft2019";
-import { oneOfFuzzyFeature } from "./features/oneOf";
-import { sanitizeFeatures } from "./utils/sanitizeFeatures";
+import { oneOfFuzzyKeyword } from "./keywords/oneOf";
+import { sanitizeKeywords } from "./utils/sanitizeKeywords";
 import { Draft } from "./types";
 
 type PartialDraft = Partial<Omit<Draft, "errors">> & { errors?: Partial<Draft["errors"]> };
 
 function extendDraft(draft: Draft, extension: PartialDraft) {
-    const { features } = addFeatures(draft, ...(extension.features ?? []));
+    const { keywords } = addKeywords(draft, ...(extension.keywords ?? []));
     const errors = { ...draft.errors, ...(extension.errors ?? {}) };
-    return sanitizeFeatures({
+    return sanitizeKeywords({
         ...draft,
         ...extension,
-        features,
+        keywords,
         errors
     });
 }
@@ -26,7 +26,7 @@ function extendDraft(draft: Draft, extension: PartialDraft) {
  */
 export const draftEditor = extendDraft(draft2019, {
     $schemaRegEx: ".",
-    features: [oneOfFuzzyFeature],
+    keywords: [oneOfFuzzyKeyword],
     errors: {
         minLengthError: (data) => {
             if (data.minLength === 1) {

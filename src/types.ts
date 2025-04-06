@@ -5,7 +5,7 @@ import type { getChildSchemaSelection } from "./methods/getChildSchemaSelection"
 import type { each, EachCallback } from "./methods/each";
 import type { EachSchemaCallback } from "./methods/eachSchema";
 import type { createSchema } from "./methods/createSchema";
-import type { Feature, JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, ValidationPath } from "./Feature";
+import type { Keyword, JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, ValidationPath } from "./Keyword";
 
 export type JsonBooleanSchema = boolean;
 export type JsonSchema = Record<string, any>;
@@ -39,7 +39,7 @@ export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09
 
 export type Draft = {
     errors: typeof errors;
-    features: Feature[];
+    keywords: Keyword[];
     methods: {
         createSchema: typeof createSchema;
         getChildSchemaSelection: typeof getChildSchemaSelection;
@@ -64,7 +64,7 @@ export type Context = {
     anchors: Record<string, SchemaNode>;
     dynamicAnchors: Record<string, SchemaNode>;
     /** json-schema parser, validator, reducer and resolver for this json-schema (root-schema and its child nodes) */
-    features: Draft["features"];
+    keywords: Draft["keywords"];
     /** json-schema draft-dependend methods */
     methods: Draft["methods"];
     /** draft-version */

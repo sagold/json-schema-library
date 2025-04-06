@@ -7,7 +7,7 @@ import { isJsonError } from "../types";
 import { isObject } from "../utils/isObject";
 import { isSchemaNode, SchemaNode } from "../types";
 import { mergeNode } from "../mergeNode";
-import { reduceOneOfFuzzy } from "../features/oneOf";
+import { reduceOneOfFuzzy } from "../keywords/oneOf";
 
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
@@ -115,19 +115,19 @@ export function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOpt
         }
     }
 
-    // @feature allOf
+    // @keyword allOf
     if (currentNode.allOf?.length) {
         currentNode.allOf.forEach((partialNode) => {
             defaultData = partialNode.getTemplate(defaultData, opts) ?? defaultData;
         });
     }
 
-    // @feature anyOf
+    // @keyword anyOf
     if (currentNode.anyOf?.length > 0) {
         defaultData = currentNode.anyOf[0].getTemplate(defaultData, opts) ?? defaultData;
     }
 
-    // @feature oneOf
+    // @keyword oneOf
     if (currentNode.oneOf?.length > 0) {
         if (isEmpty(defaultData)) {
             currentNode = mergeNode(currentNode, currentNode.oneOf[0]);
@@ -207,7 +207,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
             });
         }
 
-        // @feature dependencies - has to be done after resolving properties so dependency may trigger
+        // @keyword dependencies - has to be done after resolving properties so dependency may trigger
         if (node.dependentSchemas) {
             Object.keys(node.dependentSchemas).forEach((prop) => {
                 if (d[prop] !== undefined && isObject(node.dependentSchemas[prop])) {
@@ -241,7 +241,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
             }
         }
 
-        // @feature if-then-else
+        // @keyword if-then-else
         if (node.if) {
             const errors = node.if.validate(d);
             if (errors.length === 0 && node.then) {

@@ -12,7 +12,7 @@ import { joinId } from "./utils/joinId";
 import { mergeNode } from "./mergeNode";
 import { omit } from "./utils/omit";
 import { SchemaNode, isSchemaNode, Context, isJsonError, JsonSchema, Draft, JsonError } from "./types";
-import type { Feature, JsonSchemaReducerParams } from "./Feature";
+import type { Keyword, JsonSchemaReducerParams } from "./Keyword";
 import { createSchema } from "./methods/createSchema";
 import { hasProperty } from "./utils/hasProperty";
 import { validateNode } from "./validateNode";
@@ -41,7 +41,7 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
     const draft = getDraft(drafts, schema?.$schema);
 
     // # $vocabulary
-    // - declares which JSON Schema features (vocabularies) are supported by this meta-schema
+    // - declares which JSON Schema keywords (vocabularies) are supported by this meta-schema
     // - each vocabulary is referenced by a URL, and its boolean value indicates whether it is required (true) or optional (false).
 
     // # allOf
@@ -50,7 +50,7 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
 
     // ✅ For validation purposes, you can ignore $vocabulary and rely on allOf to load the necessary meta-schemas.
     // ⚠️ However, if your validator is designed to support multiple versions or optimize processing, $vocabulary provides useful metadata.
-    // - Determining Supported Features: Example: A validator could warn or error out if it encounters a vocabulary it does not support.
+    // - Determining Supported Keywords: Example: A validator could warn or error out if it encounters a vocabulary it does not support.
     // - Selective Parsing or Optimization: Example: If "unevaluatedProperties" is not in a supported vocabulary, your validator should not enforce it.
     // - Future-Proofing for Extensions: Future versions of JSON Schema may add optional vocabularies that aren't explicitly included in allOf.
 
@@ -83,7 +83,7 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
         refs: {},
         rootNode: node,
         version: draft.version,
-        features: draft.features,
+        keywords: draft.keywords,
         methods: draft.methods,
         templateDefaultOptions: options.templateDefaultOptions,
         drafts
@@ -102,28 +102,28 @@ const noRefMergeDrafts = ["draft-04", "draft-06", "draft-07"];
 function addFeatures(node: SchemaNode) {
     if (node.schema.$ref && noRefMergeDrafts.includes(node.context.version)) {
         // for these draft versions only ref is validated
-        node.context.features
+        node.context.keywords
             .filter(({ keyword }) => whitelist.includes(keyword))
-            .forEach((feature) => execFeature(feature, node));
+            .forEach((keyword) => execKeyword(keyword, node));
         return;
     }
     const keys = Object.keys(node.schema);
-    node.context.features
+    node.context.keywords
         .filter(({ keyword }) => keys.includes(keyword) || whitelist.includes(keyword))
-        .forEach((feature) => execFeature(feature, node));
+        .forEach((keyword) => execKeyword(keyword, node));
 }
 
-function execFeature(feature: Feature, node: SchemaNode) {
+function execKeyword(keyword: Keyword, node: SchemaNode) {
     // @todo consider first parsing all nodes
-    feature.parse?.(node);
-    if (feature.addReduce?.(node)) {
-        node.reducers.push(feature.reduce);
+    keyword.parse?.(node);
+    if (keyword.addReduce?.(node)) {
+        node.reducers.push(keyword.reduce);
     }
-    if (feature.addResolve?.(node)) {
-        node.resolvers.push(feature.resolve);
+    if (keyword.addResolve?.(node)) {
+        node.resolvers.push(keyword.resolve);
     }
-    if (feature.addValidate?.(node)) {
-        node.validators.push(feature.validate);
+    if (keyword.addValidate?.(node)) {
+        node.validators.push(keyword.validate);
     }
 }
 
@@ -396,7 +396,7 @@ const NODE_METHODS: Pick<
             refs: {},
             rootNode: node,
             methods: draft.methods,
-            features: draft.features,
+            keywords: draft.keywords,
             version: draft.version
         };
 

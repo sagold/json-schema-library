@@ -1014,9 +1014,9 @@ describe("compileSchema.validateAsync", () => {
         beforeEach(() => {
             draft = {
                 ...draft2019,
-                features: [
+                keywords: [
                     // @ts-expect-error asd
-                    ...draft2019.features,
+                    ...draft2019.keywords,
                     {
                         id: "async",
                         keyword: "asyncError",

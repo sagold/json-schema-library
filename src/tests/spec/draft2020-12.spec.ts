@@ -41,7 +41,6 @@ runAllTestCases({
     // logSchema: false,
     skipTestCase: (t) =>
         ![
-            // "unevaluatedItems",
             "format", // vocabulary: annotation vs assertions
             // optional:
             "format-email",
