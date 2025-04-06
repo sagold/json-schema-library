@@ -1,94 +1,106 @@
-<p align="center"><img src="./docs/json-schema-library.png" width="256" alt="json-schema-library"></p>
+<p align="center"><img src="./docs/json-schema-library-10.png" width="128" alt="json-schema-library"></p>
 
-**Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation**
+# json-schema-library ✨ [![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) [![CI](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) ![Types](https://badgen.net/npm/types/json-schema-library)
 
-> This package offers tools and utilities to work with json-schema, create and validate data. Unfortunately, most
-> packages, editors or validators do not care to expose basic json-schema functionality. Instead of small memory
-> footprint or high performance, this package focuses on exposing utilities for browser and node environments and
-> lessens the pain to build custom tools around json-schema.
+<p style="text-align:center"><a href="#draft-methods">draft methods</a> | <a href="#draft-extensions">draft extensions</a> | <a href="#draft-customization">draft customization</a> | <a href="#breaking-changes">breaking changes</a></p>
 
-> ⚠️ This documentation refers to the upcoming release version 10, which can be installed by `npm install json-schema-library@10.0.0-rc8`. For the latest release please refer to the [documentation of version 9.3.5](https://github.com/sagold/json-schema-library/tree/v9.3.5)
+> This package offers tools and utilities to work with json-schema, create and validate data. Unfortunately, most packages, editors or validators do not care to expose basic json-schema functionality. Instead of small memory footprint or high performance, this package focuses on exposing utilities for browser and node environments and lessens the pain to build custom tools around json-schema.
 
-<p style="text-align:center">
-  <a href="#draft-methods">draft methods</a> | <a href="#draft-extensions">draft extensions</a> | <a href="#draft-customization">draft customization</a> | <a href="#breaking-changes">breaking changes</a>
-</p>
+> ⚠️ This documentation refers to the upcoming release version 10, which can be installed by `npm install json-schema-library@10.0.0-rc9`. For the latest release please refer to the [documentation of version 9.3.5](https://github.com/sagold/json-schema-library/tree/v9.3.5)
 
-**install**
+**Quick start**
 
 `yarn add json-schema-library`
 
-[![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml)
-[![CI](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml)
-
-This library currently supports draft4, draft6, draft7 and draft2019-09 features [@see benchmark](https://github.com/sagold/json-schema-benchmark)
-
-**usage**
-
-`json-schema-library` exposes a `Draft` for most json-schema drafts. Each `Draft` can be instantiated and offers a common set of actions working on the specified json-schema version. Example:
+_json-schema-library_ exposes a function `compileSchema` to compile a json-schema to a `SchemaNode`, which offers a common set of actions working on the specified _json-schema_:
 
 ```ts
-import { Draft04, Draft06, Draft07, Draft2019, Draft, JsonError } from "json-schema-library";
+import { compileSchema, SchemaNode } from "json-schema-library";
 import myJsonSchema from "./myJsonSchema.json";
 import myData from "./myData.json";
 
-const jsonSchema: Draft = new Draft2019(myJsonSchema);
-const errors: JsonError[] = jsonSchema.validate(myData);
+const schema: SchemaNode = compileSchema(myJsonSchema);
+// validate myData to the given json-schema myJsonSchema
+const { valid, errors } = schema.validate(myData);
+// create data which validates to the compiled json-schema
+const defaultData = schema.getTemplate();
 ```
 
-What follows is a description of the main draft methods.
+Per default, `compileSchema` uses the draft-version referenced in `$schema` for _cross-draft_ support:
+
+```ts
+const schemaNode = compileSchema({ $schema: "draft-07" });
+console.log(schemaNode.context.version); // draft-07
+```
+
+If no `$schema` is given the latest draft (draft-2020-12) is used.
+
+```ts
+const schemaNode = compileSchema({ $schema: "invalid-version" });
+console.log(schemaNode.context.version); // draft-2020-12
+```
+
+If you are only interested in a specific draft-version you can change the set of available drafts:
+
+```ts
+import { compileSchema, draft07 } from "json-schema-library";
+
+const schemaNode = compileSchema(mySchema, { drafts: [draft07] });
+console.log(schemaNode.context.version); // draft-07
+```
+
+For further draft customization check [draft customization](#draft-customization).
 
 ## Draft support
 
-`json-schema-library` supports almost all draft features. This sections lists currently unsupported features for each draft
+_json-schema-library_ fully supports all draft versions draft-04, draft-06, draft-07, draft-2019-09 and draft2020-12. Additionally, most format-validations are supported per default besides the listed format below. You can always override or extend format validation as is documented in [draft customization](#draft-customization).
 
-<details><summary>Draft 2019-09</summary>
+<details><summary>Overview draft support</summary>
 
-**Currently unsupported core features:**
+Draft support is defined by running a validator against the official [json-schema-test-suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite).
 
--   `$vocabulary` - meta-schemas are not parsed for enabled features
--   `unevaluatedItems: uncle-schema` - evaluation of uncle-schemas is not supported. Properties will be returned as evaluated
--   `unevaluatedProperties: uncle-schema` - evaluation of uncle-schemas is not supported. Properties will be returned as evaluated
+-   Test results for _json-schema-library_ can be inspected in [github actions](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml)
+-   A comparison to other validators is listed on [json-schema-benchmark](https://github.com/sagold/json-schema-benchmark)
 
-For further details see [draft2019-09 tests](https://github.com/sagold/json-schema-library/blob/main/test/spec/v2019-09/draft2019-09.test.ts)
+Please note that these benchmarks refer to validation only. _json-schema-library_ offers tooling outside of validation and strives to be as spec-compliant as possible.
+
+</details>
+
+<details><summary>Overview format validation support</summary>
+
+-   **`❌ supported formats`** iri, iri-reference, idn-hostname
+-   **`✅ supported formats`**: date, date-time, date, duration, ecmascript-regex, email, hostname, idn-email, ipv4, ipv6, json-pointer, regex, relative-json-pointer, time, unknown, uri-reference, uri-template, uri, uuid
 
 </details>
 
 ## Draft methods
 
 -   [validate](#validate)
--   [isValid](#isvalid)
 -   [validateAsync](#validateasync)
 -   [getTemplate](#gettemplate)
+-   [getSchema](#getschema)
+-   [reduce](#reduce)
+
+-   [get](#get)
 -   [each](#each)
 -   [eachSchema](#eachschema)
--   [getSchema](#getschema)
+
+-   [addRemote](#addremote)
+-   [createSchema](#createSchema)
 -   [getChildSchemaSelection](#getchildschemaselection)
--   [step](#step)
--   [addRemoteSchema](#addremoteschema)
--   [createSchemaOf](#createschemaof)
--   [compileSchema](#compileschema)
 
 ### validate
 
 `validate` is a complete _json-schema validator_ for your input data. Calling _validate_ will return a list of validation errors for the passed data.
 
 ```ts
-const jsonSchema = new Draft2019(myJsonSchema);
-const errors: JsonError[] = jsonSchema.validate(myData);
+const { valid, errors } = compileSchema(myJsonSchema).validate(myData);
+// { valid: boolean, errors: JsonError[] }
 ```
-
-Additionally, you can validate a sub-schema and its data. Doing this, the intial schema will be used as rootSchema (for example, to resolve `$ref` from _definitions_).
-
-```ts
-const jsonSchema = new Draft2019(myJsonSchema);
-const errors: JsonError[] = jsonSchema.validate("my-string", { type: "number" });
-```
-
-> To prevent some errors when using helper methods with an independent sub-schema, please use `compileSchema` if it is not retrieved from a draft-method directly (which was compiled by passing it to Draft). Specifically, if the schema contains a $ref you need to use `compileSchema`. More details in [compileSchema](#compileSchema).
 
 <details><summary>About type JsonError</summary>
 
-In `json-schema-library` all errors are in the format of a `JsonError`:
+In _json-schema-library_ all errors are in the format of a `JsonError`:
 
 ```ts
 type JsonError = {
@@ -100,24 +112,19 @@ type JsonError = {
 };
 ```
 
-In almost all cases, a _json-pointer_ is given on _error.data.pointer_, which points to the source within data where the error occured.
-
-For more details on how to work with errors, refer to section [custom errors](#custom-errors).
+In almost all cases, a _json-pointer_ is given on _error.data.pointer_, which points to the source within data where the error occured. For more details on how to work with errors, refer to section [custom errors](#custom-errors).
 
 </details>
 
 <details><summary>Example</summary>
 
 ```ts
-import { Draft2019, JsonSchema, JsonError } from "json-schema-library";
-
 const myJsonSchema: JsonSchema = {
     type: "object",
     additionalProperties: false
 };
 
-const jsonSchema = new Draft2019(myJsonSchema);
-const errors: JsonError[] = jsonSchema.validate({ name: "my-data" });
+const { errors } = compileSchema(myJsonSchema).validate({ name: "my-data" });
 
 expect(errors).to.deep.equal([
     {
@@ -132,90 +139,42 @@ expect(errors).to.deep.equal([
 
 </details>
 
-<details><summary>Example with separate schema</summary>
-
-```ts
-import { Draft2019, JsonSchema, JsonError } from "json-schema-library";
-
-const myJsonSchema: JsonSchema = {
-    type: "object",
-    additionalProperties: false
-};
-
-const jsonSchema = new Draft2019(myJsonSchema);
-const mySchema = jsonSchema.compileSchema({ type: "number" });
-const errors: JsonError[] = jsonSchema.validate("my-string", mySchema);
-
-expect(errors).to.deep.equal([
-    {
-        type: "error",
-        name: "TypeError",
-        code: "type-error",
-        message: "Expected `my-string` (string) in `#` to be of type `number`",
-        data: {
-            received: "string",
-            expected: "number",
-            value: "my-string",
-            pointer: "#"
-        }
-    }
-]);
-```
-
-</details>
-
-### isValid
-
-`isValid` will return `true` if the given json-data is valid against the json-schema.
-
-```ts
-const jsonSchema = new Draft2019(myJsonSchema);
-const isValid: boolean = jsonSchema.isValid(myData);
-```
-
 ### validateAsync
 
-> This method is not yet exposed by a draft directly as the API of this is yet unsatisfactory. Nonetheless, this function is in production and can be used reliably.
+Per default all _json-schema-library_ validators are sync, but adding custom async validators is supported. To resolve async validators use `validateAsync`:
 
-Optional support for `onError` helper, which is invoked for each error (after being resolved):
+~~Optional support for `onError` helper, which is invoked for each error (after being resolved)~~
 
 ```ts
-import { Draft2019, JsonError, validateAsync } from "json-schema-library";
-
-const draft = new Draft2019(mySchema);
-
-validateAsync(draft, "", { onError: (err: JsonError) => {}, schema: draft.getSchema() }).then(
-    (allErrors: JsonError[]) => {}
-);
+compileSchema(mySchema)
+    .validateAsync(myData)
+    .then(({ valid, error }) => console.log(errors));
 ```
 
 ### getTemplate
 
-`getTemplate` creates input data from a json-schema that is valid to the schema. Where possible, the json-schema `default` property will be used to initially setup input data. Otherwise, the first values encountered (enum values, initial values, etc.) are user to build up the json-data.
+`getTemplate` creates input data from a json-schema that is valid to the schema. Where possible, the json-schema `default` property will be used to initially setup input data. Otherwise, the first values encountered (enum values, initial values, etc.) are used to build up the json-data.
 
 ```ts
-const jsonSchema = new Draft2019(myJsonSchema);
-const myData = jsonSchema.getTemplate();
+const myData = compileSchema(myJsonSchema).getTemplate();
 ```
 
 Additionally, you can pass input data. `getTemplate` will then complement any missing values from the schema, while keeping the initial values.
 
 ```ts
-const jsonSchema = new Draft2019(myJsonSchema);
-const myData = jsonSchema.getTemplate({ name: "input-data" });
+const myData = compileSchema(myJsonSchema).getTemplate({ name: "input-data" });
 ```
 
-**Note** If you are using references in your schema, `getTemplate` will only resolve the first _$ref_ in each path, ensuring no inifinte data structures are created. In case the limit of **1** _$ref_ resolution is too low, you can modify the value globally one by adjusting the json-schema-library settings:
+**Note** If you are using references in your schema, `getTemplate` will only resolve the first _$ref_ in each path, ensuring no infinite data structures are created. In case the limit of **1** _$ref_ resolution is too low, you can modify the value globally one by adjusting the json-schema-library settings:
 
 ```ts
-import { settings } from "json-schema-library";
-settings.GET_TEMPLATE_RECURSION_LIMIT = 5;
+const myData = compileSchema(myJsonSchema).getTemplate(inputData, { recursionLimit: 2 });
 ```
 
 <details><summary>Example</summary>
 
 ```ts
-import { Draft2019, JsonSchema } from 'json-schema-library';
+import { compileSchema, JsonSchema } from 'json-schema-library';
 
 const myJsonSchema: JsonSchema = {
   type: 'object',
@@ -237,8 +196,8 @@ const myJsonSchema: JsonSchema = {
   }
 };
 
-const jsonSchema = new Draft2019(myJsonSchema);
-const myData = jsonSchema.getTemplate();
+const schemaNode = new compileSchema(myJsonSchema);
+const myData = schemaNode.getTemplate();
 
 expect(myData).to.deep.equal({
   name: ',
@@ -252,7 +211,7 @@ expect(myData).to.deep.equal({
 <details><summary>Example with input data</summary>
 
 ```ts
-import { Draft2019, JsonSchema } from "json-schema-library";
+import { compileSchema, JsonSchema } from "json-schema-library";
 
 const myJsonSchema: JsonSchema = {
     type: "object",
@@ -274,7 +233,7 @@ const myJsonSchema: JsonSchema = {
     }
 };
 
-const jsonSchema = new Draft2019(myJsonSchema);
+const jsonSchema = compileSchema(myJsonSchema);
 const myData = jsonSchema.getTemplate({ name: "input-data", list: [] });
 
 expect(myData).to.deep.equal({
@@ -291,7 +250,7 @@ expect(myData).to.deep.equal({
 Per default, `getTemplate` does try to create data that is valid to the json-schema. Example: array-schemas with `minItems: 1` will add one item to fullfil the validation criteria. You can use the option and pass `{ extendDefaults: false }` to override this behaviour with a default value:
 
 ```ts
-import { Draft2019 } from "json-schema-library";
+import { compileSchema } from "json-schema-library";
 
 const myJsonSchema = {
     type: "array",
@@ -303,10 +262,159 @@ const myJsonSchema = {
     minItems: 1 // usually adds an enty, but default states: []
 };
 
-const jsonSchema = new Draft2019(myJsonSchema);
-const myData = jsonSchema.getTemplate(undefined, undefined, { extendDefaults: false });
+const jsonSchema = compileSchema(myJsonSchema);
+const myData = jsonSchema.getTemplate(undefined, { extendDefaults: false });
 
 expect(myData).to.deep.equal([]);
+```
+
+</details>
+
+### getSchema
+
+`getSchema` retrieves the json-schema of a specific location in data. The location in data is given by a _json-pointer_. In many cases the json-schema can be retrieved without passing any data, but in situations where the schema is dynamic (for example in _oneOf_, _dependencies_, etc.), the data is required or will return a _JsonError_ if the location cannot be found.
+
+```ts
+const schemaNode = compileSchema(mySchema);
+let schemaOfName: JsonSchema | JsonError | undefined;
+schemaOfName = schemaNode.getSchema("/list/1/name", myData);
+```
+
+**Note** `getSchema` will return `undefined` for paths that lead to valid properties, but miss a schema definition. For example:
+
+```ts
+const schemaNode = compileSchema({ type: "object" });
+let schemaOfName = schemaNode.getSchema("/name");
+console.log(schemaOfName); // undefined
+```
+
+In case this is unwanted behaviour, use the `withSchemaWarning` option to return a json-error with code `schema-warning` instead:
+
+```ts
+const schemaNode = compileSchema({ type: "object" });
+let schemaOfName = schemaNode.getSchema("/name", undefined, { withSchemaWarning: true });
+console.log(schemaOfName); // { type: "error", code: "schema-warning" }
+```
+
+<details><summary>Example</summary>
+
+```ts
+import { Draft2019, JsonSchema, JsonError } from "json-schema-library";
+
+const mySchema = {
+    type: "object",
+    properties: {
+        list: {
+            type: "array",
+            items: {
+                oneOf: [
+                    {
+                        type: "object",
+                        required: ["name"],
+                        properties: {
+                            name: {
+                                type: "string",
+                                title: "name of item"
+                            }
+                        }
+                    },
+                    {
+                        type: "object",
+                        required: ["description"],
+                        properties: {
+                            description: {
+                                type: "string",
+                                title: "description of item"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+};
+
+const schemaNode = compileSchema(mySchema);
+let schemaOfItem: JsonSchema | JsonError | undefined;
+schemaOfItem = schemaNode.getSchema("/list/1", {
+    list: [{ description: "..." }, { name: "my-item" }]
+});
+
+expect(schemaOfItem).to.deep.equal({
+    type: "object",
+    required: ["name"],
+    properties: {
+        name: {
+            type: "string",
+            title: "name of item"
+        }
+    }
+});
+```
+
+</details>
+
+<details><summary>Evaluating errors</summary>
+
+All returned json-errors have a data property with the following properties
+
+-   `pointer` json-pointer to the location where the error occured. In case of omitted data, this is the last json-schema location that could be resolved
+-   `schema` the json-schema of the last resolved location and the source of the error
+-   `value` the data value at this location that could not be resolved
+
+```ts
+const schema = schemaNode.getSchema("/list/1");
+if (isJsonError(schema)) {
+    console.log(Object.keys(schema.data)); // [pointer, schema, value]
+}
+```
+
+</details>
+
+<details><summary>About JsonPointer</summary>
+
+**[Json-Pointer](https://tools.ietf.org/html/rfc6901)** defines a string syntax for identifying a specific value within a Json document and is [supported by Json-Schema](https://json-schema.org/understanding-json-schema/structuring.html). Given a Json document, it behaves similar to a [lodash path](https://lodash.com/docs/4.17.5#get) (`a[0].b.c`), which follows JS-syntax, but instead uses `/` separators (e.g., `a/0/b/c`). In the end, you describe a path into the Json data to a specific point.
+
+</details>
+
+### reduce
+
+`reduce` compiles dynamic schema-keywords of a SchemaNode according to the given data.
+
+### get
+
+`get` retrieves the json-schema of a child property or index. Using `get` it is possible to incrementally go through the data, retrieving the schema for each next item.
+
+```ts
+const mySchema = { type: "object", properties: { title: { type: "string" } } };
+const root = compileSchema(mySchema);
+const node = root.get("title", { title: "value" });
+if (!isSchemaNode(node)) return;
+console.log(node.schema);
+```
+
+<details><summary>Example</summary>
+
+```ts
+import { compileSchema, JsonSchema } from "json-schema-library";
+
+const root = compileSchema(mySchema);
+const localSchema: JsonSchema = {
+    oneOf: [
+        {
+            type: "object",
+            properties: { title: { type: "string" } }
+        },
+        {
+            type: "object",
+            properties: { title: { type: "number" } }
+        }
+    ]
+};
+
+const schema = root.step("title", { title: 4 })?.schema;
+
+expect(schema).to.deep.eq({ type: "number" });
 ```
 
 </details>
@@ -316,30 +424,30 @@ expect(myData).to.deep.equal([]);
 `each` iterates over each data-item (_object_, _array_ and _value_) and emits the data-item, schema and location to a callback.
 
 ```ts
-const jsonSchema = new Draft2019(mySchema);
-const myCallback = (schema: JsonSchema, value: unknown, pointer: JsonPointer) => {
-    console.log(schema, value, pointer);
+const schemaNode = compileSchema(mySchema);
+const myCallback = (node: SchemaNode, value: unknown, pointer: JsonPointer) => {
+    console.log(node.schema, value, pointer);
 };
-jsonSchema.each(myData, myCallback);
+schemaNode.each(myData, myCallback);
 ```
 
 <details><summary>Example</summary>
 
 ```ts
-import { Draft2019, JsonSchema, JsonPointer } from "json-schema-library";
+import { compileSchema, JsonSchema, JsonPointer } from "json-schema-library";
 
 const mySchema: JsonSchema = {
     type: "array",
     items: [{ type: "number" }, { type: "string" }]
 };
 
-const jsonSchema = new Draft2019(mySchema);
+const schemaNode = compileSchema(mySchema);
 const calls = [];
-const myCallback = (schema: JsonSchema, value: unknown, pointer: JsonPointer) => {
-    calls.push({ schema, value, pointer });
+const myCallback = (node: SchemaNode, value: unknown, pointer: JsonPointer) => {
+    calls.push({ schema: node.schema, value, pointer });
 };
 
-jsonSchema.each([5, "nine"], myCallback);
+schemaNode.each([5, "nine"], myCallback);
 
 expect(calls).to.deep.equal([
     { schema: mySchema, value: [5, "nine"], pointer: "#" },
@@ -398,123 +506,13 @@ expect(calls).to.deep.equal([
 
 </details>
 
-### getSchema
-
-`getSchema` retrieves the json-schema of a specific location in data. The location in data is given by a _json-pointer_. In many cases the json-schema can be retrieved without passing any data, but in situations where the schema is dynamic (for example in _oneOf_, _dependencies_, etc.), the data is required or will return a _JsonError_ if the location cannot be found.
-
-```ts
-const jsonSchema = new Draft2019(mySchema);
-let schemaOfName: JsonSchema | JsonError | undefined;
-schemaOfName = jsonSchema.getSchema({ pointer: "/list/1/name", data: myData });
-```
-
-**Note** that `getSchema` will return `undefined` for paths that lead to valid properties, but miss a schema definition. For example:
-
-```ts
-const jsonSchema = new Draft2019({ type: "object" });
-let schemaOfName = jsonSchema.getSchema({ pointer: "/name" });
-console.log(schemaOfName); // undefined
-```
-
-In case this is unwanted behaviour, use the `withSchemaWarning` option to return a json-error with code `schema-warning` instead:
-
-```ts
-const jsonSchema = new Draft2019({ type: "object" });
-let schemaOfName = jsonSchema.getSchema({ pointer: "/name", withSchemaWarning: true });
-console.log(schemaOfName); // { type: "error", code: "schema-warning" }
-```
-
-<details><summary>Example</summary>
-
-```ts
-import { Draft2019, JsonSchema, JsonError } from "json-schema-library";
-
-const mySchema = {
-    type: "object",
-    properties: {
-        list: {
-            type: "array",
-            items: {
-                oneOf: [
-                    {
-                        type: "object",
-                        required: ["name"],
-                        properties: {
-                            name: {
-                                type: "string",
-                                title: "name of item"
-                            }
-                        }
-                    },
-                    {
-                        type: "object",
-                        required: ["description"],
-                        properties: {
-                            description: {
-                                type: "string",
-                                title: "description of item"
-                            }
-                        }
-                    }
-                ]
-            }
-        }
-    }
-};
-
-const jsonSchema = new Draft2019(mySchema);
-let schemaOfItem: JsonSchema | JsonError | undefined;
-schemaOfItem = jsonSchema.getSchema({
-    pointer: "/list/1",
-    data: {
-        list: [{ description: "..." }, { name: "my-item" }]
-    }
-});
-
-expect(schemaOfItem).to.deep.equal({
-    type: "object",
-    required: ["name"],
-    properties: {
-        name: {
-            type: "string",
-            title: "name of item"
-        }
-    }
-});
-```
-
-</details>
-
-<details><summary>Evaluating errors</summary>
-
-All returned json-errors have a data property with the following properties
-
--   `pointer` json-pointer to the location where the error occured. In case of omitted data, this is the last json-schema location that could be resolved
--   `schema` the json-schema of the last resolved location and the source of the error
--   `value` the data value at this location that could not be resolved
-
-```ts
-const schema = jsonSchema.getSchema({ pointer: "/list/1" });
-if (isJsonError(schema)) {
-    console.log(Object.keys(schema.data)); // [pointer, schema, value]
-}
-```
-
-</details>
-
-<details><summary>About JsonPointer</summary>
-
-**[Json-Pointer](https://tools.ietf.org/html/rfc6901)** defines a string syntax for identifying a specific value within a Json document and is [supported by Json-Schema](https://json-schema.org/understanding-json-schema/structuring.html). Given a Json document, it behaves similar to a [lodash path](https://lodash.com/docs/4.17.5#get) (`a[0].b.c`), which follows JS-syntax, but instead uses `/` separators (e.g., `a/0/b/c`). In the end, you describe a path into the Json data to a specific point.
-
-</details>
-
 ### getChildSchemaSelection
 
 `getChildSchemaSelection` returns a list of available sub-schemas for the given property. In many cases, a single schema will be returned. For _oneOf_-schemas, a list of possible options is returned.
 
 This helper always returns a list of schemas.
 
-**Note** This helper currenly supports a subset of json-schema for multiple results, mainly _oneOf_-definitions
+**Note** This helper currently supports a subset of json-schema for multiple results, mainly _oneOf_-definitions
 
 ```ts
 const jsonSchema = new Draft2019(mySchema);
@@ -543,71 +541,16 @@ expect(schemas).to.deep.equal([{ type: "string" }, { type: "number" }]);
 
 </details>
 
-### step
+### addRemote
 
-`step` retrieves the json-schema of a child property or index. Using `step` it is possible to incrementally go through the data, retrieving the schema for each next item.
+`addRemote` lets you add additional schemas that can be referenced by an URL using `$ref`. Use this to combine multiple schemas without changing the actual schema.
 
-@todo talk about `schemaNode`
+Each schemas is referenced by their unique `$id` (since draft-06, previously `id`). Usually an `$id` is specified as an url, for example `https://mydomain.com/schema/schema-name` or with a file extension like `https://mydomain.com/schema/schema-name.json`. At least in _json-schema-library_ you can use any name, just ensure the `$id` is unique across all schemas.
 
-```ts
-const draft = new Draft2019(mySchema);
-const localSchema = { type: "object", properties: { title: { type: "string" } } };
-const localData = { title: "value" };
-const { schema } = draft.step(draft.createNode(localSchema), "title", localData);
-```
-
-<details><summary>Example</summary>
+On a compiled schema
 
 ```ts
-import { Draft2019, JsonSchema } from "json-schema-library";
-
-const draft = new Draft2019(mySchema);
-const localSchema: JsonSchema = {
-    oneOf: [
-        {
-            type: "object",
-            properties: { title: { type: "string" } }
-        },
-        {
-            type: "object",
-            properties: { title: { type: "number" } }
-        }
-    ]
-};
-const localData = { title: 4 };
-const { schema } = draft.step(draft.createNode(localSchema), "title", localData);
-
-expect(schema).to.deep.eq({ type: "number" });
-```
-
-</details>
-
-### addRemoteSchema
-
-`addRemoteSchema` lets you add additional schemas that can be referenced by an URL using `$ref`. Use this to combine multiple schemas without changing the actual schema.
-
-Each schemas is referenced by their unique `$id` (since draft-06, previously `id`). Usually an `$id` is specified as an url, for example `https://mydomain.com/schema/schema-name` or with a file extension like `https://mydomain.com/schema/schema-name.json`. At least in `json-schema-library` you can use any name, just ensure the `$id` is unique across all schemas.
-
-To add a remote schema use the exposed method `addRemoteSchema`:
-
-```ts
-const jsonSchema = new Draft2019();
-
-jsonSchema.addRemoteSchema("https://sagold.com/remote", {
-    $id: "https://sagold.com/remote",
-    title: "A character",
-    type: "string",
-    minLength: 1,
-    maxLength: 1
-});
-```
-
-**Note** the given _url_ and `$id` on the root schema should match. If `$id` is omitted it will be added from the passed url.
-
-To access the remote schema, add a $ref within your local schema
-
-```ts
-jsonSchema.setSchema({
+const schemaNode = compileSchema({
     $id: "https://sagold.com/local",
     type: "object",
     required: ["character"],
@@ -619,24 +562,38 @@ jsonSchema.setSchema({
 });
 ```
 
-and the remote schema will be resolved automatically:
+use the exposed method `addRemote` to add a remote schema for $ref-resolution:
 
 ```ts
-jsonSchema.validate({ character: "AB" }); // maxLength error
-jsonSchema.getTemplate({}); // { character: "A" } - default value resolved
-// returns remote schema (from compiled local schema):
-jsonSchema.getSchema().getRef("https://sagold.com/remote");
+schemaNode.addRemote("https://sagold.com/remote", {
+    $id: "https://sagold.com/remote",
+    title: "A character",
+    type: "string",
+    minLength: 1,
+    maxLength: 1
+});
 ```
 
-**Note** the support for $ref resolution has additional complexities, if you add nested $ids to you schema. Here, json-schema-library has only partial support ([@see integration test result](https://github.com/sagold/json-schema-library/actions/runs/4037856805/jobs/6941448741)). Thus, it is recommended to omit the features of changing scopes by nested $ids. For more details, see [json-schema.org: Structuring a complex schema](https://json-schema.org/understanding-json-schema/structuring.html#base-uri)
+**Note** the given _url_ and `$id` on the root schema should match. If `$id` is omitted it will be added from the passed url.
 
-<details><summary>Access local subschemas in remote schemas</summary>
-
-You can add a local uri reference to the remote schema by using the `#` separator. The following example resolves hte local path `/$defs/character` in the remote schema `https://sagold.com/remote` throught the combined url:
-`https://sagold.com/remote#/$defs/character`
+To access the remote schema, add a $ref within your local schema and the remote schema will be resolved automatically:
 
 ```ts
-jsonSchema.addRemoteSchema("https://sagold.com/remote", {
+schemaNode.validate({ character: "AB" }); // maxLength error
+schemaNode.getTemplate({}); // { character: "A" } - default value resolved
+// returns remote schema (from compiled local schema):
+schemaNode.getRef("https://sagold.com/remote");
+```
+
+**Note** the support for $ref resolution has additional complexities, if you add nested $ids to you schema. Here, json-schema-library has only partial support ([@see integration test result](https://github.com/sagold/json-schema-library/actions/runs/4037856805/jobs/6941448741)). Thus, it is recommended to omit the features of changing scopes by nested $ids. For more details, see [json-schema.org: Structuring a complex schema](https://json-schema.org/understanding-json-schema/structuring.html#base-uri).
+
+<details><summary>Adding remote schema to compileSchema</summary>
+
+It is possible to pass remoteSchema on compileSchema by passing a SchemaNode (with all its remote schemas) in `remote`:
+
+```ts
+const remote = compileSchema({
+    $id: "https://sagold.com/remote",
     $defs: {
         character: {
             title: "A character",
@@ -647,21 +604,48 @@ jsonSchema.addRemoteSchema("https://sagold.com/remote", {
     }
 });
 
-jsonSchema.setSchema({
+const schemaNode = compileSchema({ $ref: "https://sagold.com/remote#/defs/character" }, { remote });
+```
+
+</details>
+
+<details><summary>Access local subschemas in remote schemas</summary>
+
+You can add a local uri reference to the remote schema by using the `#` separator. The following example resolves hte local path `/$defs/character` in the remote schema `https://sagold.com/remote` throught the combined url:
+`https://sagold.com/remote#/$defs/character`
+
+```ts
+const schemaNode = compileSchema({
     $id: "https://sagold.com/local",
     $ref: "https://sagold.com/remote#/$defs/character"
 });
 
-jsonSchema.validate("AB"); // maxLength error
-jsonSchema.getTemplate("A"); // "A" - default value resolved
+schemaNode.addRemote("https://sagold.com/remote", {
+    $defs: {
+        character: {
+            title: "A character",
+            type: "string",
+            minLength: 1,
+            maxLength: 1
+        }
+    }
+});
+
+schemaNode.validate("AB"); // maxLength error
+schemaNode.getTemplate("A"); // "A" - default value resolved
 // returns remote schema (from compiled local schema):
-jsonSchema.getSchema().getRef("https://sagold.com/remote#/$defs/character");
+schemaNode.getRef("https://sagold.com/remote#/$defs/character");
 ```
 
 **Note** json-pointers are not restricted to `$defs` (definitions), but can reference any subschema. For example:
 
 ```ts
-jsonSchema.addRemoteSchema("https://sagold.com/remote", {
+const schemaNode = compileSchema({
+    $id: "https://sagold.com/local",
+    $ref: "https://sagold.com/remote#/properties/character"
+});
+
+schemaNode.addRemote("https://sagold.com/remote", {
     type: "object",
     properties: {
         character: {
@@ -673,39 +657,22 @@ jsonSchema.addRemoteSchema("https://sagold.com/remote", {
     }
 });
 
-jsonSchema.setSchema({
-    $id: "https://sagold.com/local",
-    $ref: "https://sagold.com/remote#/properties/character"
-});
-
-jsonSchema.validate("AB"); // maxLength error
-jsonSchema.getTemplate("A"); // "A" - default value resolved
+schemaNode.validate("AB"); // maxLength error
+schemaNode.getTemplate("A"); // "A" - default value resolved
 // returns remote schema (from compiled local schema):
-jsonSchema.getSchema().getRef("https://sagold.com/remote#/properties/character");
+schemaNode.getRef("https://sagold.com/remote#/properties/character");
 ```
 
 </details>
 
-### createSchemaOf
+### createSchema
 
-`createSchemaOf` returns a simple json-schema of the input data.
-
-```ts
-const jsonSchema = new Draft2019(mySchema);
-const schema: JsonSchema = jsonSchema.createSchemaOf({ title: "initial value" });
-```
-
-### compileSchema
-
-`compileSchema` adds _$ref_ resolution support to a json-schema. Internally, each draft compiles a passed schema on its own, but when passing additional schemas to individual functions, `compileSchema` has to be called manually for json-schemas containing _$ref_-references.
+`createSchema` returns a simple json-schema for the input data.
 
 ```ts
-const jsonSchema = new Draft2019(mySchema);
-const compiledSchema = jsonSchema.compileSchema({ $ref: "/$defs/table" });
-const tableSchema = compiledSchema.getRef();
+const schemaNode = compileSchema(mySchema);
+const schema: JsonSchema = schemaNode.createSchema({ title: "initial value" });
 ```
-
-**Note** that `draft.compileSchema` compiles a schema under the current rootSchema. That is, definitions from root schema will be copied to the local schema, to enable _$ref_ resolutions.
 
 ## Draft extensions
 
@@ -802,7 +769,7 @@ A _resolver_ is a simple method implementing a specific feature of json-schema t
 
 #### `resolveRef` with merge
 
-Until _draft07_ json-schema behaviour for `$ref` resolution is to replace the schema where a `$ref` is defined. Since _draft2019-09_ $ref resolution merges the resolved schema, which can be used to add context-specific information (e.g., a specific _title_). 
+Until _draft07_ json-schema behaviour for `$ref` resolution is to replace the schema where a `$ref` is defined. Since _draft2019-09_ $ref resolution merges the resolved schema, which can be used to add context-specific information (e.g., a specific _title_).
 To add this behaviour to older drafts, a `$ref`-resolver is exposed by `json-schema-library`:
 
 ```ts
@@ -1068,10 +1035,10 @@ The above documentation reflects all these changes. Just reach out if you have t
 
 -   replaced `Core` interface by new `Draft` interface
 -   changed export of `Interface` to `Draft`
--   renamed `addSchema` to `addRemoteSchema`
+-   renamed `addSchema` to `addRemote`
 -   changed API of `compileSchema` to have an additional schema-parameter for rootSchema reference
--   changed `compileSchema` and `addRemoteSchema` to work on instance state, instead of global state
--   `addRemoteSchema`, `compileSchema` now requires draft instance as first parameter
+-   changed `compileSchema` and `addRemote` to work on instance state, instead of global state
+-   `addRemote`, `compileSchema` now requires draft instance as first parameter
 -   removed direct export of following functions: `addValidator`, `compileSchema`, `createSchemaOf`, `each`, `eachSchema`, `getChildSchemaSelection`, `getSchema`, `getTemplate`, `isValid`, `step`, `validate`. They are still accessible under the draftConfigs of each draft-version
 -   changed draft version of `JsonEditor` to draft07
 
