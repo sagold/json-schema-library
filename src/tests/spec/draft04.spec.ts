@@ -7,7 +7,6 @@ runAllTestCases({
     //     description: "validate definition against metaschema"
     // },
     logSchema: false,
-    skipTestCase: (t) =>
-        !["ecmascript-regex", "non-bmp-regex", "float-overflow", "zeroTerminatedFloats"].includes(t.name),
+    skipTestCase: (t) => !["float-overflow", "zeroTerminatedFloats"].includes(t.name),
     metaSchema: draft04Meta
 });

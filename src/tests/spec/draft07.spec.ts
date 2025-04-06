@@ -8,14 +8,6 @@ runAllTestCases({
     // },
     logSchema: false,
     skipTestCase: (t) =>
-        ![
-            "content",
-            "ecmascript-regex",
-            "float-overflow",
-            "format-iri",
-            "format-iri-reference",
-            "format-idn-hostname",
-            "non-bmp-regex"
-        ].includes(t.name),
+        !["content", "float-overflow", "format-iri", "format-iri-reference", "format-idn-hostname"].includes(t.name),
     metaSchema: draft07Meta
 });
