@@ -44,7 +44,7 @@ runAllTestCases({
             // optional:
             "float-overflow",
             "format-idn-hostname",
-            "format-iri"
+            "format-iri",
             "format-iri-reference"
         ].includes(t.name),
 
