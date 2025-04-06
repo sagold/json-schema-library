@@ -465,6 +465,16 @@ describe("compileSchema : reduce", () => {
             });
         });
 
+        describe("contains", () => {
+            it("should resolve allOf-contains schema to array-item schema", () => {
+                const node = compileSchema({
+                    allOf: [{ contains: { multipleOf: 2 } }, { contains: { multipleOf: 3 } }]
+                }).reduce({ data: [2, 5] });
+
+                assert.deepEqual(node.schema, { items: { anyOf: [{ multipleOf: 2 }, { multipleOf: 3 }] } });
+            });
+        });
+
         describe("if-then-else", () => {
             it("should not return 'then'-schema when 'if' does not match", () => {
                 const node = compileSchema({

@@ -8,7 +8,19 @@ export const containsFeature: Feature = {
     keyword: "contains",
     parse: parseContains,
     addValidate: (node) => node.contains != null,
-    validate: validateContains
+    validate: validateContains,
+    addReduce: (node) => node.contains != null,
+    reduce: ({ node }) => {
+        return node.compileSchema(
+            {
+                items: {
+                    anyOf: [node.contains.schema]
+                }
+            },
+            node.spointer,
+            node.schemaId
+        );
+    }
 };
 
 export function parseContains(node: SchemaNode) {

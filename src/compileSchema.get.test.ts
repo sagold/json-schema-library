@@ -89,6 +89,18 @@ describe("compileSchema : get", () => {
         });
     });
 
+    describe("array - multiple contains", () => {
+        it("should pick correct schema from allOf contains", () => {
+            const node = compileSchema({
+                allOf: [{ contains: { multipleOf: 2 } }, { contains: { multipleOf: 3 } }]
+            }).get(0, [2, 5]);
+
+            assert(isSchemaNode(node), "should have returned a valid schema property node");
+
+            assert.deepEqual(node.schema, { anyOf: [{ multipleOf: 2 }, { multipleOf: 3 }] });
+        });
+    });
+
     describe("object - reduce parent schema when returning child-property", () => {
         it("should reduce parent if-then schema when returning property node", () => {
             const node = compileSchema({

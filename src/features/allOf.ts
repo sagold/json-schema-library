@@ -29,7 +29,7 @@ function reduceAllOf({ node, data }: JsonSchemaReducerParams) {
     for (let i = 0; i < node.allOf.length; i += 1) {
         const schemaNode = node.allOf[i].reduce({ data });
         const schema = mergeSchema(node.allOf[i].schema, schemaNode.schema);
-        mergedSchema = mergeSchema(mergedSchema, schema, "allOf");
+        mergedSchema = mergeSchema(mergedSchema, schema, "allOf", "contains");
     }
     return node.compileSchema(mergedSchema, `${node.spointer}/allOf`, node.schemaId);
 }

@@ -33,7 +33,7 @@ export function mergeSchema2(a: unknown, b: unknown, property?: string): unknown
     }
 
     if (Array.isArray(a) && Array.isArray(b)) {
-        if (property === "required") {
+        if (property === "required" || property === "anyOf") {
             return a.concat(b).filter((item, index, array) => array.indexOf(item) === index);
         }
         if (property === "items" || property === "prefixItems") {
