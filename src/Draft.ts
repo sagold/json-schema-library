@@ -6,7 +6,6 @@ import { ErrorConfig } from "./types";
 import { formats } from "./formats/formats";
 import { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
 import { getTemplate } from "./methods/getTemplate";
-import { sanitizeKeywords } from "./utils/sanitizeKeywords";
 
 export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "draft-2020-12" | "latest";
 
@@ -65,4 +64,24 @@ function addKeyword(draft: Draft, keyword: Keyword) {
     } else {
         draft.keywords[index] = keyword;
     }
+}
+
+export function sanitizeKeywords(draft: Draft) {
+    draft.keywords.forEach((keyword) => {
+        const logKeyword = () => keyword.keyword;
+        if (keyword.validate) {
+            keyword.validate.toJSON = logKeyword;
+            keyword.validate.order = keyword.order ?? 0;
+        }
+        if (keyword.reduce) {
+            keyword.reduce.toJSON = logKeyword;
+            keyword.reduce.order = keyword.order ?? 0;
+        }
+        if (keyword.resolve) {
+            keyword.resolve.toJSON = logKeyword;
+            keyword.resolve.order = keyword.order ?? 0;
+        }
+    });
+    draft.keywords.sort((a, b) => (b.order ?? 0) - (a.order ?? 0));
+    return draft;
 }

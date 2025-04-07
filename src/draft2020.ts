@@ -35,7 +35,7 @@ import { propertiesKeyword } from "./keywords/properties";
 import { propertyNamesKeyword } from "./keywords/propertyNames";
 import { refKeyword } from "./keywords/ref";
 import { requiredKeyword } from "./keywords/required";
-import { sanitizeKeywords } from "./utils/sanitizeKeywords";
+import { sanitizeKeywords } from "./Draft";
 import { typeKeyword } from "./keywords/type";
 import { unevaluatedItemsKeyword } from "./keywords/unevaluatedItems";
 import { unevaluatedPropertiesKeyword } from "./keywords/unevaluatedProperties";

@@ -28,7 +28,7 @@ import { propertiesKeyword } from "./keywords/properties";
 import { propertyNamesKeyword } from "./keywords/propertyNames";
 import { refKeyword } from "./draft06/keywords/ref";
 import { requiredKeyword } from "./keywords/required";
-import { sanitizeKeywords } from "./utils/sanitizeKeywords";
+import { sanitizeKeywords } from "./Draft";
 import { typeKeyword } from "./keywords/type";
 import { uniqueItemsKeyword } from "./keywords/uniqueItems";
 import { getChildSchemaSelection } from "./draft2019-09/methods/getChildSchemaSelection";

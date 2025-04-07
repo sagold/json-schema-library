@@ -670,7 +670,8 @@ expect(childNodes.map((n) => n.schema)).to.deep.equal([{ type: "string" }, { typ
 
 `addRemote` lets you add additional schemas that can be referenced by an URL using `$ref`. Use this to combine multiple schemas without changing the actual schema.
 
-Each schemas is referenced by their unique `$id` (since draft-06, previously `id`). Usually an `$id` is specified as an url, for example `https://mydomain.com/schema/schema-name` or with a file extension like `https://mydomain.com/schema/schema-name.json`. ~~At least in _json-schema-library_ you can use any name, just ensure the `$id` is unique across all schemas.~
+Each schemas is referenced by their unique `$id` (since draft-06, previously `id`). Usually an `$id` is specified as an url, for example `https://mydomain.com/schema/schema-name` or with a file extension like `https://mydomain.com/schema/schema-name.json`.
+~~At least in _json-schema-library_ you can use any name, just ensure the `$id` is unique across all schemas.~
 
 On a compiled schema
 

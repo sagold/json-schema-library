@@ -3,14 +3,12 @@ import { mergeSchema } from "./utils/mergeSchema";
 
 interface SchemaNodeCB {
     toJSON?: () => string;
+    order?: number;
     (...args: unknown[]): void;
 }
 
-// dummy sorting validators in reverse (so that additional* is to the end)
-export function sortCb(a: SchemaNodeCB, b: SchemaNodeCB) {
-    const aString = a?.toJSON?.() ?? a.name ?? "";
-    const bString = b?.toJSON?.() ?? b.name ?? "";
-    return bString.localeCompare(aString); // inverted
+function sortCb(a: SchemaNodeCB, b: SchemaNodeCB) {
+    return (b.order ?? 0) - (a.order ?? 0);
 }
 
 export function removeDuplicates(fun: SchemaNodeCB, funIndex: number, list: ((...args: unknown[]) => void)[]) {

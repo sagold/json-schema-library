@@ -1,18 +1,14 @@
 import copy from "fast-copy";
 import getRef from "./keywords/ref";
-import settings from "./settings";
 import { draft04 } from "./draft04";
 import { draft06 } from "./draft06";
 import { draft07 } from "./draft07";
 import { draft2019 } from "./draft2019";
 import { draft2020 } from "./draft2020";
-import { hasProperty } from "./utils/hasProperty";
 import { pick } from "./utils/pick";
 import { JsonSchema, Draft } from "./types";
 import { TemplateOptions } from "./methods/getTemplate";
 import { SchemaNode, SchemaNodeMethods, addKeywords, isSchemaNode } from "./SchemaNode";
-
-const { DYNAMIC_PROPERTIES } = settings;
 
 export type CompileOptions = {
     drafts: Draft[];
