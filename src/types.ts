@@ -66,14 +66,15 @@ export type Draft = {
 export type Context = {
     /** root node of this json-schema */
     rootNode: SchemaNode;
-    /** root nodes of registered remote json-schema, stored by id/url */
+    /** available draft configurations */
+    drafts: Draft[];
+    /** [SHARED ACROSS REMOTES] root nodes of registered remote json-schema, stored by id/url */
     remotes: Record<string, SchemaNode>;
     /** references stored by fully resolved schema-$id + local-pointer */
     refs: Record<string, SchemaNode>;
-    /** references stored by fully resolved schema-$id */
-    // ids: Record<string, SchemaNode>;
     /** anchors stored by fully resolved schema-$id + $anchor */
     anchors: Record<string, SchemaNode>;
+    /** [SHARED ACROSS REMOTES] dynamicAnchors stored by fully resolved schema-$id + $anchor */
     dynamicAnchors: Record<string, SchemaNode>;
     /** json-schema parser, validator, reducer and resolver for this json-schema (root-schema and its child nodes) */
     keywords: Draft["keywords"];
@@ -81,11 +82,9 @@ export type Context = {
     methods: Draft["methods"];
     /** draft-version */
     version: Draft["version"];
-    /** available draft configurations */
-    drafts: Draft[];
     errors: Draft["errors"];
     formats: Draft["formats"];
-    /** getTemplate default options */
+    /** [SHARED USING ADD REMOTE] getTemplate default options */
     templateDefaultOptions?: TemplateOptions;
 };
 
@@ -109,22 +108,21 @@ export type GetSchemaOptions = {
     createSchema?: boolean;
 };
 
+type OptionalNodeAndError = { node?: SchemaNode; error: undefined } | { node: undefined; error?: JsonError };
+
 export type SchemaNode = {
     context: Context;
-    parent?: SchemaNode | undefined;
-    ref?: string;
     schema: JsonSchema;
     spointer: string;
     /** local path within json-schema (not extended by resolving ref) */
     schemaId: string;
-    /**
-     * @todo this is a ref specific property as is $id
-     * json-pointer from last $id ~~to this location~~ to resolve $refs to $id#/idLocalPointer
-     * */
+    parent?: SchemaNode | undefined;
+    /** json-pointer from last $id ~~to this location~~ to resolve $refs to $id#/idLocalPointer */
     lastIdPointer: string;
     oneOfIndex?: number;
 
     // methods
+
     resolveRef: (args?: { pointer?: string; path?: ValidationPath }) => SchemaNode;
     createSchema: typeof createSchema;
     createError: <T extends string = DefaultErrors>(name: T, data: ErrorData, message?: string) => JsonError;
@@ -138,11 +136,7 @@ export type SchemaNode = {
     /** Step into a property or array by name or index and return the schema-node its value */
     get: (key: string | number, data?: unknown, options?: GetSchemaOptions) => SchemaNode | JsonError;
     getRef: ($ref: string) => SchemaNode | undefined;
-    getSchema: (
-        pointer: string,
-        data?: unknown,
-        options?: GetSchemaOptions
-    ) => { node?: SchemaNode; error: undefined } | { node: undefined; error?: JsonError };
+    getSchema: (pointer: string, data?: unknown, options?: GetSchemaOptions) => OptionalNodeAndError;
     each: (data: unknown, callback: EachCallback, pointer?: string) => void;
     eachSchema: (callback: EachSchemaCallback) => void;
     getChildSchemaSelection: (property: string | number) => JsonError | SchemaNode[];
@@ -158,20 +152,22 @@ export type SchemaNode = {
             path?: ValidationPath;
         }
     ) => SchemaNode | JsonError;
-    toJSON: () => unknown;
+    validate: (data: unknown, pointer?: string, path?: ValidationPath) => { valid: boolean; errors: JsonError[] };
     validateAsync: (
         data: unknown,
         pointer?: string,
         path?: ValidationPath
     ) => Promise<{ valid: boolean; errors: JsonError[] }>;
-    validate: (data: unknown, pointer?: string, path?: ValidationPath) => { valid: boolean; errors: JsonError[] };
+    toJSON: () => unknown;
 
-    // logic
+    // registered keyword functions
+
     reducers: JsonSchemaReducer[];
     resolvers: JsonSchemaResolver[];
     validators: JsonSchemaValidator[];
 
-    // parsed schema (registered by parsers...)
+    // parsed schema properties (registered by parsers)
+
     $defs?: Record<string, SchemaNode>;
     $id?: string;
     additionalItems?: SchemaNode;
@@ -190,7 +186,8 @@ export type SchemaNode = {
     patternProperties?: { pattern: RegExp; node: SchemaNode }[];
     properties?: Record<string, SchemaNode>;
     propertyNames?: SchemaNode;
+    ref?: string;
     then?: SchemaNode;
-    unevaluatedProperties?: SchemaNode;
     unevaluatedItems?: SchemaNode;
+    unevaluatedProperties?: SchemaNode;
 };

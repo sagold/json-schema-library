@@ -21,6 +21,9 @@ import { render } from "./errors/render";
 import { dashCase } from "./utils/dashCase";
 import { pick } from "./utils/pick";
 import copy from "fast-copy";
+import settings from "./settings";
+
+const { DYNAMIC_PROPERTIES } = settings;
 
 export type CompileOptions = {
     drafts: Draft[];
@@ -59,10 +62,9 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
 
     node.context = {
         remotes: {},
-        anchors: {},
         dynamicAnchors: {},
-        // ids: {},
         ...(options.remote?.context ?? {}),
+        anchors: {},
         refs: {},
         rootNode: node,
         ...copy(pick(draft, "methods", "keywords", "version", "formats", "errors")),
@@ -124,22 +126,6 @@ function execKeyword(keyword: Keyword, node: SchemaNode) {
         node.validators.push(keyword.validate);
     }
 }
-
-const DYNAMIC_PROPERTIES: string[] = [
-    "$ref",
-    "$defs",
-    "if",
-    "then",
-    "else",
-    "allOf",
-    "anyOf",
-    "oneOf",
-    "dependentSchemas",
-    "dependentRequired",
-    "definitions",
-    "dependencies",
-    "patternProperties"
-];
 
 export function isReduceable(node: SchemaNode) {
     for (let i = 0, l = DYNAMIC_PROPERTIES.length; i < l; i += 1) {
@@ -421,6 +407,7 @@ const NODE_METHODS: Pick<
         node.context = {
             ...context,
             refs: {},
+            anchors: {},
             rootNode: node,
             ...copy(pick(draft, "methods", "keywords", "version", "formats", "errors"))
         };
