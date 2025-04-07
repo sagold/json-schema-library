@@ -29,7 +29,7 @@ function additionalPropertyResolver({ node, data, key }) {
         return node.additionalProperties.reduce(value);
     }
     if (node.schema.additionalProperties === false) {
-        return node.errors.noAdditionalPropertiesError({
+        return node.createError("NoAdditionalPropertiesError", {
             pointer: `${key}`,
             schema: node.schema,
             value: getValue(data, key),
@@ -69,7 +69,7 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }) {
             validationErrors && errors.push(...validationErrors);
         }
         else {
-            errors.push(node.errors.noAdditionalPropertiesError({
+            errors.push(node.createError("NoAdditionalPropertiesError", {
                 pointer: `${pointer}/${property}`,
                 schema,
                 value: data,

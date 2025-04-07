@@ -15,6 +15,10 @@ import { hasProperty } from "./utils/hasProperty";
 import { validateNode } from "./validateNode";
 import { eachSchema } from "./methods/eachSchema";
 import getRef from "./keywords/ref";
+import { render } from "./errors/render";
+import { dashCase } from "./utils/dashCase";
+import { pick } from "./utils/pick";
+import copy from "fast-copy";
 const defaultDrafts = [draft04, draft06, draft07, draft2019, draft2020];
 function getDraft(drafts, $schema) {
     var _a;
@@ -39,20 +43,17 @@ export function compileSchema(schema, options = {}) {
         resolvers: [],
         validators: [],
         schema,
-        errors: draft.errors,
         ...NODE_METHODS
     };
     node.context = {
         remotes: {},
         anchors: {},
         dynamicAnchors: {},
-        ids: {},
+        // ids: {},
         ...((_d = (_c = options.remote) === null || _c === void 0 ? void 0 : _c.context) !== null && _d !== void 0 ? _d : {}),
         refs: {},
         rootNode: node,
-        version: draft.version,
-        keywords: draft.keywords,
-        methods: draft.methods,
+        ...copy(pick(draft, "methods", "keywords", "version", "formats", "errors")),
         templateDefaultOptions: options.templateDefaultOptions,
         drafts
     };
@@ -144,12 +145,23 @@ const NODE_METHODS = {
             resolvers: [],
             validators: [],
             schema,
-            errors: parentNode.errors,
             ...NODE_METHODS
         };
         addKeywords(node);
         return node;
     },
+    createError(name, data, message) {
+        let errorMessage = message;
+        if (errorMessage === undefined) {
+            const error = this.context.errors[name];
+            if (typeof error === "function") {
+                return error(data);
+            }
+            errorMessage = render(error !== null && error !== void 0 ? error : name, data);
+        }
+        return { type: "error", name, code: dashCase(name), message: errorMessage, data };
+    },
+    createSchema,
     each(data, callback, pointer) {
         const node = this;
         return node.context.methods.each(node, data, callback, pointer);
@@ -240,7 +252,7 @@ const NODE_METHODS = {
             return node.compileSchema(createSchema(getValue(data, key)), `${node.spointer}/additional`, `${node.schemaId}/additional`);
         }
         if (options.withSchemaWarning === true) {
-            return node.errors.schemaWarning({ pointer, value: data, schema: node.schema, key });
+            return node.createError("SchemaWarning", { pointer, value: data, schema: node.schema, key });
         }
     },
     getTemplate(data, options) {
@@ -338,16 +350,13 @@ const NODE_METHODS = {
             resolvers: [],
             validators: [],
             schema,
-            errors: draft.errors,
             ...NODE_METHODS
         };
         node.context = {
             ...context,
             refs: {},
             rootNode: node,
-            methods: draft.methods,
-            keywords: draft.keywords,
-            version: draft.version
+            ...copy(pick(draft, "methods", "keywords", "version", "formats", "errors"))
         };
         node.context.remotes[joinId(url)] = node;
         addKeywords(node);

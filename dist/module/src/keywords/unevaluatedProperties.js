@@ -37,7 +37,7 @@ function validateUnevaluatedProperties({ node, data, pointer, path }) {
         const child = node.get(propertyName, data, { path });
         if (isSchemaNode(child)) {
             if (validateNode(child, data[propertyName], `${pointer}/${propertyName}`, path).length > 0) {
-                errors.push(node.errors.unevaluatedPropertyError({
+                errors.push(node.createError("UnevaluatedPropertyError", {
                     pointer: `${pointer}/${propertyName}`,
                     value: JSON.stringify(data[propertyName]),
                     schema: node.schema
@@ -54,7 +54,7 @@ function validateUnevaluatedProperties({ node, data, pointer, path }) {
                 errors.push(...validationResult);
             }
             else if (reducedNode.schema.unevaluatedProperties === false) {
-                errors.push(node.errors.unevaluatedPropertyError({
+                errors.push(node.createError("UnevaluatedPropertyError", {
                     pointer: `${pointer}/${propertyName}`,
                     value: JSON.stringify(data[propertyName]),
                     schema: node.schema

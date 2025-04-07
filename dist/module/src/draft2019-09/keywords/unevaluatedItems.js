@@ -51,7 +51,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }) {
                     return sanitizeErrors(data.map((value) => validateNode(node.unevaluatedItems, value, `${pointer}/${i}`, path)));
                 }
                 if (node.schema.unevaluatedItems === false) {
-                    return node.errors.unevaluatedItemsError({
+                    return node.createError("UnevaluatedItemsError", {
                         pointer: `${pointer}/${i}`,
                         value: JSON.stringify(value),
                         schema
@@ -71,7 +71,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }) {
                 }
             }
             else {
-                errors.push(node.errors.unevaluatedItemsError({
+                errors.push(node.createError("UnevaluatedItemsError", {
                     pointer: `${pointer}/${i}`,
                     value: JSON.stringify(value),
                     schema

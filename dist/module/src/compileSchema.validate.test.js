@@ -8,6 +8,7 @@ describe("compileSchema.validate", () => {
                 const { errors } = compileSchema({
                     exclusiveMaximum: 0
                 }).validate(0);
+                console.log("errors", errors);
                 assert.deepEqual(errors.length, 1);
             });
             it("should succeed if value is below to 0", () => {
@@ -832,7 +833,7 @@ describe("compileSchema.validateAsync", () => {
                                 return;
                             }
                             return new Promise((resolve) => resolve([
-                                node.errors.typeError({
+                                node.createError("TypeError", {
                                     schema: {},
                                     pointer: "",
                                     value: ""

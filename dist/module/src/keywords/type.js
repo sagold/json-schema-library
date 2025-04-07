@@ -30,7 +30,7 @@ function validateType({ node, data, pointer }) {
         (Array.isArray(schema.type) && schema.type.includes(dataType))) {
         return;
     }
-    return node.errors.typeError({
+    return node.createError("TypeError", {
         value: data,
         received: dataType,
         expected: schema.type,

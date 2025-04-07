@@ -10,7 +10,7 @@ function validateMinimum({ node, data, pointer }) {
     }
     const { schema } = node;
     if (schema.minimum > data) {
-        return node.errors.minimumError({
+        return node.createError("MinimumError", {
             minimum: schema.minimum,
             length: data,
             pointer,
@@ -19,7 +19,7 @@ function validateMinimum({ node, data, pointer }) {
         });
     }
     if (schema.exclusiveMinimum === true && schema.minimum === data) {
-        return node.errors.minimumError({
+        return node.createError("MinimumError", {
             minimum: schema.minimum,
             length: data,
             pointer,

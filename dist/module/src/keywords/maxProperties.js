@@ -12,7 +12,7 @@ function validateMaxProperties({ node, data, pointer = "#" }) {
     const { schema } = node;
     const propertyCount = Object.keys(data).length;
     if (isNaN(schema.maxProperties) === false && schema.maxProperties < propertyCount) {
-        return node.errors.maxPropertiesError({
+        return node.createError("MaxPropertiesError", {
             maxProperties: schema.maxProperties,
             length: propertyCount,
             pointer,

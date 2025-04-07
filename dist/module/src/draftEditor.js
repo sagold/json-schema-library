@@ -1,8 +1,8 @@
-import __ from "./errors/__";
-import { dashCase } from "./errors/createCustomError";
+import { dashCase } from "./utils/dashCase";
 import { extendDraft } from "./extendDraft";
 import { draft2019 } from "./draft2019";
 import { oneOfFuzzyKeyword } from "./keywords/oneOf";
+import { render } from "./errors/render";
 /**
  * @draft-editor https://json-schema.org/draft/2019-09/release-notes
  *
@@ -12,13 +12,13 @@ export const draftEditor = extendDraft(draft2019, {
     $schemaRegEx: ".",
     keywords: [oneOfFuzzyKeyword],
     errors: {
-        minLengthError: (data) => {
+        MinLengthError: (data) => {
             if (data.minLength === 1) {
                 return {
                     type: "error",
                     name: "MinLengthOneError",
                     code: dashCase("MinLengthOneError"),
-                    message: __("MinLengthOneError", data),
+                    message: "Input is required",
                     data
                 };
             }
@@ -26,7 +26,7 @@ export const draftEditor = extendDraft(draft2019, {
                 type: "error",
                 name: "MinLengthError",
                 code: dashCase("MinLengthError"),
-                message: __("MinLengthError", data),
+                message: render("Value in `{{pointer}}` is `{{length}}`, but should be `{{minimum}}` at minimum", data),
                 data
             };
         }

@@ -3,7 +3,9 @@ import { SchemaNode } from "../types";
 export declare const oneOfKeyword: Keyword;
 export declare const oneOfFuzzyKeyword: Keyword;
 export declare function parseOneOf(node: SchemaNode): void;
-export declare function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaReducerParams): SchemaNode | import("../types").JsonError<import("../types").ErrorData>;
+export declare function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaReducerParams): SchemaNode | import("../types").JsonError<import("../types").ErrorData<{
+    [p: string]: unknown;
+}>>;
 /**
  * Selects and returns a oneOf schema for the given data
  *
@@ -13,4 +15,6 @@ export declare function reduceOneOfDeclarator({ node, data, pointer, path }: Jso
  * @param [pointer] - json pointer to data
  * @return oneOf schema or an error
  */
-export declare function reduceOneOfFuzzy({ node, data, pointer, path }: JsonSchemaReducerParams): SchemaNode | import("../types").JsonError<import("../types").ErrorData>;
+export declare function reduceOneOfFuzzy({ node, data, pointer, path }: JsonSchemaReducerParams): SchemaNode | import("../types").JsonError<import("../types").ErrorData<{
+    [p: string]: unknown;
+}>>;

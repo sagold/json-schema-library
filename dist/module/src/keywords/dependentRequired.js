@@ -19,7 +19,7 @@ export function validateDependentRequired({ node, data, pointer = "#" }) {
             return;
         }
         if (dependencies === false) {
-            errors.push(node.errors.missingDependencyError({ pointer, schema, value: data }));
+            errors.push(node.createError("MissingDependencyError", { pointer, schema, value: data }));
             return;
         }
         if (!Array.isArray(dependencies)) {
@@ -27,7 +27,7 @@ export function validateDependentRequired({ node, data, pointer = "#" }) {
         }
         for (let i = 0, l = dependencies.length; i < l; i += 1) {
             if (data[dependencies[i]] === undefined) {
-                errors.push(node.errors.missingDependencyError({
+                errors.push(node.createError("MissingDependencyError", {
                     missingProperty: dependencies[i],
                     pointer,
                     schema,

@@ -32,5 +32,5 @@ function validateAnyOf({ node, data, pointer, path }) {
             return undefined;
         }
     }
-    return node.errors.anyOfError({ pointer, schema: node.schema, value: data, anyOf: node.schema.anyOf });
+    return node.createError("AnyOfError", { pointer, schema: node.schema, value: data, anyOf: node.schema.anyOf });
 }

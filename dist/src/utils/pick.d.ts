@@ -1,1 +1,1 @@
-export declare function pick(value: Record<string, unknown>, ...properties: string[]): Record<string, unknown>;
+export declare function pick<T extends Record<string, unknown>, K extends keyof T>(value: T, ...properties: K[]): Pick<T, K>;

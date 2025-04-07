@@ -7,7 +7,6 @@ import { containsKeyword } from "./keywords/contains";
 import { defsKeyword } from "./keywords/defs";
 import { dependenciesKeyword } from "./keywords/dependencies";
 import { enumKeyword } from "./keywords/enum";
-import { errors } from "./errors/errors";
 import { exclusiveMaximumKeyword } from "./keywords/exclusiveMaximum";
 import { exclusiveMinimumKeyword } from "./keywords/exclusiveMinimum";
 import { formatKeyword } from "./keywords/format";
@@ -36,6 +35,8 @@ import { getChildSchemaSelection } from "./draft2019-09/methods/getChildSchemaSe
 import { getTemplate } from "./draft2019-09/methods/getTemplate";
 import { each } from "./draft2019-09/methods/each";
 import { createSchema } from "./methods/createSchema";
+import { errors } from "./errors/errors";
+import { formats } from "./formats/formats";
 /**
  * @draft-06 https://json-schema.org/draft-06/json-schema-release-notes
  *
@@ -62,6 +63,7 @@ export const draft06 = sanitizeKeywords({
     $schemaRegEx: "draft-06",
     $schema: "http://json-schema.org/draft-06/schema",
     errors,
+    formats,
     methods: {
         createSchema,
         getTemplate,

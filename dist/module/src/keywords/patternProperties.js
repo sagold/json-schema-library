@@ -79,7 +79,7 @@ function validatePatternProperties({ node, data, pointer, path }) {
         }
         if (matchingPatterns.length === 0 && schema.additionalProperties === false) {
             // this is an arrangement with additionalProperties
-            errors.push(node.errors.noAdditionalPropertiesError({
+            errors.push(node.createError("NoAdditionalPropertiesError", {
                 key,
                 pointer: `${pointer}/${key}`,
                 schema,

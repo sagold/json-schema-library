@@ -14,7 +14,7 @@ function validateMultipleOf({ node, data, pointer }) {
     const multiplePrecision = getPrecision(schema.multipleOf);
     if (valuePrecision > multiplePrecision) {
         // value with higher precision then multipleOf-precision can never be multiple
-        return node.errors.multipleOfError({
+        return node.createError("MultipleOfError", {
             multipleOf: schema.multipleOf,
             value: data,
             pointer,
@@ -25,7 +25,7 @@ function validateMultipleOf({ node, data, pointer }) {
     const val = Math.round(data * precision);
     const multiple = Math.round(schema.multipleOf * precision);
     if ((val % multiple) / precision !== 0) {
-        return node.errors.multipleOfError({
+        return node.createError("MultipleOfError", {
             multipleOf: schema.multipleOf,
             value: data,
             pointer,

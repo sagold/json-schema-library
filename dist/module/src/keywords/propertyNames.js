@@ -27,7 +27,7 @@ function validatePropertyNames({ node, data, pointer, path }) {
         if (Object.keys(data).length === 0) {
             return undefined;
         }
-        return node.errors.invalidPropertyNameError({
+        return node.createError("InvalidPropertyNameError", {
             property: Object.keys(data),
             pointer,
             value: data,
@@ -46,7 +46,7 @@ function validatePropertyNames({ node, data, pointer, path }) {
     properties.forEach((prop) => {
         const validationResult = validateNode(node.propertyNames, prop, `${pointer}/prop`, path);
         if (validationResult.length > 0) {
-            errors.push(node.errors.invalidPropertyNameError({
+            errors.push(node.createError("InvalidPropertyNameError", {
                 property: prop,
                 pointer,
                 validationError: validationResult[0],

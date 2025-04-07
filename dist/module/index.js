@@ -10,11 +10,9 @@ export { draftEditor } from "./src/draftEditor";
 // keywords
 export { oneOfFuzzyKeyword, oneOfKeyword } from "./src/keywords/oneOf";
 // errors
-export { createCustomError } from "./src/errors/createCustomError";
-export { strings } from "./src/errors/strings";
-export { addError } from "./src/addError";
+export { render } from "./src/errors/render";
+export { dashCase } from "./src/utils/dashCase";
 export { addKeywords } from "./src/addKeywords";
-export { addFormatValidator } from "./src/addFormatValidator";
 export { extendDraft } from "./src/extendDraft";
 // export { mergeNode } from "./src/mergeNode"; -- not yet
 // utilities

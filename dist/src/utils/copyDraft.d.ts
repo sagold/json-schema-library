@@ -21,5 +21,6 @@ export declare function copyDraft(draft: Draft): {
         each: typeof import("../methods/each").each;
     };
     $schema?: string;
-    errors: typeof import("../errors/errors").errors;
+    errors: import("../types").ErrorConfig;
+    formats: typeof import("../formats/formats").formats;
 };
