@@ -31,7 +31,7 @@ describe("keyword : oneof : validate", () => {
 
 describe("keyword : oneOf : reduce", () => {
     it("should resolve matching value schema", () => {
-        const node = compileSchema({
+        const { node } = compileSchema({
             oneOf: [
                 { type: "string", title: "A String" },
                 { type: "number", title: "A Number" }
@@ -43,29 +43,31 @@ describe("keyword : oneOf : reduce", () => {
     });
 
     it("should return error if no matching schema could be found", () => {
-        const node = compileSchema({
+        const { node, error } = compileSchema({
             oneOf: [
                 { type: "string", title: "A String" },
                 { type: "number", title: "A Number" }
             ]
         }).reduce(true);
 
-        assert(isJsonError(node));
+        assert(isJsonError(error));
+        assert.equal(node, undefined);
     });
 
     it("should return error if multiple schema match", () => {
-        const node = compileSchema({
+        const { node, error } = compileSchema({
             oneOf: [
                 { type: "string", minLength: 1 },
                 { type: "string", maxLength: 3 }
             ]
         }).reduce("12");
 
-        assert(isJsonError(node));
+        assert(isJsonError(error));
+        assert.equal(node, undefined);
     });
 
     it("should reduce nested oneOf objects using ref", () => {
-        const node = compileSchema({
+        const { node } = compileSchema({
             $defs: { withData: { oneOf: [{ required: ["b"], properties: { b: { type: "number" } } }] } },
             oneOf: [{ required: ["a"], properties: { a: { type: "string" } } }, { $ref: "#/$defs/withData" }]
         }).reduce({ b: 111 });
@@ -76,7 +78,7 @@ describe("keyword : oneOf : reduce", () => {
     });
 
     it("should reduce nested oneOf boolean schema using ref", () => {
-        const node = compileSchema({
+        const { node } = compileSchema({
             $defs: { withData: { oneOf: [{ required: ["b"], properties: { b: true } }] } },
             oneOf: [{ required: ["a"], properties: { a: false } }, { $ref: "#/$defs/withData" }]
         }).reduce({ b: 111 });
@@ -86,7 +88,7 @@ describe("keyword : oneOf : reduce", () => {
     });
 
     it("should resolve matching object schema", () => {
-        const node = compileSchema({
+        const { node } = compileSchema({
             oneOf: [
                 {
                     type: "object",
@@ -104,7 +106,7 @@ describe("keyword : oneOf : reduce", () => {
     });
 
     it("should return matching oneOf, for objects missing properties", () => {
-        const node = compileSchema({
+        const { node } = compileSchema({
             oneOf: [
                 {
                     type: "object",

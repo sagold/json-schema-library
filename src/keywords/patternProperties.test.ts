@@ -1,6 +1,5 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../compileSchema";
-import { isSchemaNode } from "../types";
 
 describe("keyword : patternProperties : get", () => {
     it("should step into patternProperties", () => {
@@ -142,15 +141,13 @@ describe("keyword : patternProperties : validate", () => {
 
 describe("keyword : patternProperties : reduce", () => {
     it("should return schema of matching property", () => {
-        const node = compileSchema({
+        const { node } = compileSchema({
             properties: { label: { type: "string", maxLength: 99 } },
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
         }).reduce({
             "007": "match",
             title: "no match"
         });
-
-        assert(isSchemaNode(node), "should have returned a valid SchemaNode");
 
         assert.deepEqual(node.schema, {
             properties: {
@@ -161,7 +158,7 @@ describe("keyword : patternProperties : reduce", () => {
     });
 
     it("should merge schema with matching property schema", () => {
-        const node = compileSchema({
+        const { node } = compileSchema({
             properties: { "007": { type: "string", maxLength: 99 } },
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
         }).reduce({
@@ -169,8 +166,6 @@ describe("keyword : patternProperties : reduce", () => {
                 "007": "match"
             }
         });
-
-        assert(isSchemaNode(node), "should have returned a valid SchemaNode");
 
         assert.deepEqual(node.schema, {
             properties: {
@@ -180,12 +175,10 @@ describe("keyword : patternProperties : reduce", () => {
     });
 
     it("should add patterns to properties per default", () => {
-        const node = compileSchema({
+        const { node } = compileSchema({
             properties: { "007": { type: "string", maxLength: 99 } },
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
         }).reduce({});
-
-        assert(isSchemaNode(node), "should have returned a valid SchemaNode");
 
         assert.deepEqual(node.schema, {
             properties: {

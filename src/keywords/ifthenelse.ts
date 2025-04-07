@@ -34,14 +34,18 @@ function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     if (validateNode(node.if, data, pointer, [...(path ?? [])]).length === 0) {
         if (node.then) {
             // reduce creates a new node
-            const schemaNode = node.then.reduce(data);
-            const schema = mergeSchema(node.then.schema, schemaNode.schema, "if", "then", "else");
-            return node.compileSchema(schema, node.then.spointer);
+            const { node: schemaNode } = node.then.reduce(data);
+            if (schemaNode) {
+                const schema = mergeSchema(node.then.schema, schemaNode.schema, "if", "then", "else");
+                return node.compileSchema(schema, node.then.spointer);
+            }
         }
     } else if (node.else) {
-        const schemaNode = node.else.reduce(data);
-        const schema = mergeSchema(node.else.schema, schemaNode.schema, "if", "then", "else");
-        return node.compileSchema(schema, node.else.spointer);
+        const { node: schemaNode } = node.else.reduce(data);
+        if (schemaNode) {
+            const schema = mergeSchema(node.else.schema, schemaNode.schema, "if", "then", "else");
+            return node.compileSchema(schema, node.else.spointer);
+        }
     }
     return undefined;
 }

@@ -11,6 +11,7 @@ import { getValue } from "../utils/getValue";
 import sanitizeErrors from "../utils/sanitizeErrors";
 import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
+import { reduceDependencies } from "./dependencies";
 
 const { DECLARATOR_ONEOF } = settings;
 
@@ -64,9 +65,12 @@ function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
 
     if (matches.length === 1) {
         const { node, index } = matches[0];
-        const reducedNode = node.reduce(data, { pointer, path });
-        reducedNode.oneOfIndex = index; // @evaluation-info
-        return reducedNode;
+        const { node: reducedNode, error } = node.reduce(data, { pointer, path });
+        if (reducedNode) {
+            reducedNode.oneOfIndex = index; // @evaluation-info
+            return reducedNode;
+        }
+        return error;
     }
 
     if (matches.length === 0) {
@@ -120,9 +124,11 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaR
         if (result.length > 0) {
             errors.push(...result);
         } else {
-            const reducedNode = node.oneOf[i].reduce(data, { pointer, path });
-            reducedNode.oneOfIndex = i; // @evaluation-info
-            return reducedNode;
+            const { node: reducedNode } = node.oneOf[i].reduce(data, { pointer, path });
+            if (reducedNode) {
+                reducedNode.oneOfIndex = i; // @evaluation-info
+                return reducedNode;
+            }
         }
     }
 
@@ -207,9 +213,12 @@ export function reduceOneOfFuzzy({ node, data, pointer, path }: JsonSchemaReduce
             });
         }
 
-        const reducedNode = nodeOfItem.reduce(data, { pointer, path });
-        reducedNode.oneOfIndex = schemaOfIndex; // @evaluation-info
-        return reducedNode;
+        const { node: reducedNode, error } = nodeOfItem.reduce(data, { pointer, path });
+        if (reducedNode) {
+            reducedNode.oneOfIndex = schemaOfIndex; // @evaluation-info
+            return reducedNode;
+        }
+        return error;
     }
 
     return oneOfResult;

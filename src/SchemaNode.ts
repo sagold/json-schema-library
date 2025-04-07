@@ -237,12 +237,12 @@ export const SchemaNodeMethods = {
 
         let node = this as SchemaNode;
         if (node.reducers.length) {
-            const result = node.reduce(data, { key, path, pointer });
-            if (isJsonError(result)) {
-                return result;
+            const { node: reducedNode, error } = node.reduce(data, { key, path, pointer });
+            if (error) {
+                return error;
             }
-            if (isSchemaNode(result)) {
-                node = result;
+            if (isSchemaNode(reducedNode)) {
+                node = reducedNode;
             }
         }
 
@@ -289,7 +289,7 @@ export const SchemaNodeMethods = {
     reduce(
         data: unknown,
         options: { key?: string | number; pointer?: string; path?: ValidationPath } = {}
-    ): SchemaNode | JsonError {
+    ): OptionalNodeAndError {
         const { key, pointer, path } = options;
         const resolvedNode = { ...this.resolveRef({ pointer, path }) } as SchemaNode;
         // const resolvedSchema = mergeSchema(this.schema, resolvedNode?.schema);
@@ -299,12 +299,12 @@ export const SchemaNodeMethods = {
 
         // @ts-expect-error bool schema
         if (node.schema === false) {
-            return node;
+            return { node, error: undefined };
             // @ts-expect-error bool schema
         } else if (node.schema === true) {
             const nextNode = node.compileSchema(createSchema(data), node.spointer, node.schemaId);
             path?.push({ pointer, node });
-            return nextNode;
+            return { node: nextNode, error: undefined };
         }
 
         let schema;
@@ -313,7 +313,7 @@ export const SchemaNodeMethods = {
         for (let i = 0; i < reducers.length; i += 1) {
             const result = reducers[i]({ data, key, node, pointer });
             if (isJsonError(result)) {
-                return result;
+                return { node: undefined, error: result };
             }
             if (result) {
                 // @ts-expect-error bool schema - for undefined & false schema return false schema
@@ -331,7 +331,7 @@ export const SchemaNodeMethods = {
         if (schema === false) {
             console.log("return boolean schema `false`");
             // @ts-expect-error bool schema
-            return { ...node, schema: false, reducers: [] } as SchemaNode;
+            return { node: { ...node, schema: false, reducers: [] } as SchemaNode, error: undefined };
         }
 
         if (workingNode !== node) {
@@ -342,7 +342,7 @@ export const SchemaNodeMethods = {
         workingNode.schema = omit(workingNode.schema, ...DYNAMIC_PROPERTIES);
         // @ts-expect-error string accessing schema props
         DYNAMIC_PROPERTIES.forEach((prop) => (workingNode[prop] = undefined));
-        return workingNode;
+        return { node: workingNode, error: undefined };
     },
 
     /** Creates a new node with all dynamic schema properties merged according to the passed in data */

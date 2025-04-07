@@ -265,7 +265,7 @@ describe("compileSchema : get", () => {
                 { properties: { secondary: { id: "secondary", type: "string" } } },
                 { properties: { tertiary: { id: "tertiary", type: "number" } } }
             ];
-            let res = compileSchema({
+            const res = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: {
@@ -277,9 +277,9 @@ describe("compileSchema : get", () => {
                 }
             }).get("dynamicSchema");
             assert(isSchemaNode(res));
-            res = res.reduce({ trigger: true });
+            const { node } = res.reduce({ trigger: true });
 
-            assert.deepEqual(res.schema, {
+            assert.deepEqual(node.schema, {
                 type: "object",
                 properties: {
                     trigger: { type: "boolean" },
@@ -596,7 +596,7 @@ describe("step", () => {
         });
 
         it("should return matching item in oneOf", () => {
-            let res = compileSchema({
+            const res = compileSchema({
                 $schema: "draft-2019-09",
                 type: "array",
                 items: {
@@ -608,16 +608,16 @@ describe("step", () => {
             }).get(0, [{ title: 2 }]);
 
             assert(isSchemaNode(res));
-            res = res.reduce({ title: 2 });
+            const { node } = res.reduce({ title: 2 });
 
-            assert.deepEqual(res.schema, {
+            assert.deepEqual(node.schema, {
                 type: "object",
                 properties: { title: { type: "number" } }
             });
         });
 
         it("should return matching anyOf", () => {
-            let res = compileSchema({
+            const res = compileSchema({
                 $schema: "draft-2019-09",
                 items: {
                     anyOf: [
@@ -628,13 +628,13 @@ describe("step", () => {
             }).get(1, [{ title: "two" }, { title: 4 }]);
 
             assert(isSchemaNode(res));
-            res = res.reduce({ title: 4 });
+            const { node } = res.reduce({ title: 4 });
 
-            assert.deepEqual(res.schema, { type: "object", properties: { title: { type: "number" } } });
+            assert.deepEqual(node.schema, { type: "object", properties: { title: { type: "number" } } });
         });
 
         it("should return combined anyOf schema", () => {
-            let res = compileSchema({
+            const res = compileSchema({
                 $schema: "draft-2019-09",
                 items: {
                     anyOf: [
@@ -646,13 +646,13 @@ describe("step", () => {
             }).get(1, [{ title: "two" }, { title: 4 }]);
 
             assert(isSchemaNode(res));
-            res = res.reduce({ title: 4 });
+            const { node } = res.reduce({ title: 4 });
 
-            assert.deepEqual(res.schema, { type: "object", properties: { title: { type: "number", minimum: 2 } } });
+            assert.deepEqual(node.schema, { type: "object", properties: { title: { type: "number", minimum: 2 } } });
         });
 
         it("should return combined allOf schema", () => {
-            let res = compileSchema({
+            const res = compileSchema({
                 $schema: "draft-2019-09",
                 items: {
                     allOf: [
@@ -663,9 +663,9 @@ describe("step", () => {
             }).get(1, [{ title: "two" }, { title: 4 }]);
 
             assert(isSchemaNode(res));
-            res = res.reduce({ title: "two" });
+            const { node } = res.reduce({ title: "two" });
 
-            assert.deepEqual(res.schema, {
+            assert.deepEqual(node.schema, {
                 type: "object",
                 properties: { title: { type: "number", minimum: 3 } }
             });
