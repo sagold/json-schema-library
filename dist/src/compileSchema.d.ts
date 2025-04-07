@@ -13,4 +13,3 @@ export type CompileOptions = {
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
 export declare function compileSchema(schema: JsonSchema, options?: Partial<CompileOptions>): SchemaNode;
-export declare function isReduceable(node: SchemaNode): boolean;

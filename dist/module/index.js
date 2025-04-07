@@ -12,12 +12,11 @@ export { oneOfFuzzyKeyword, oneOfKeyword } from "./src/keywords/oneOf";
 // errors
 export { render } from "./src/errors/render";
 export { dashCase } from "./src/utils/dashCase";
-export { addKeywords } from "./src/addKeywords";
-export { extendDraft } from "./src/extendDraft";
 // export { mergeNode } from "./src/mergeNode"; -- not yet
 // utilities
 export { default as getTypeOf } from "./src/utils/getTypeOf";
-export { isReduceable } from "./src/compileSchema";
+export { isReduceable } from "./src/SchemaNode";
+export { extendDraft, addKeywords } from "./src/Draft";
 // remotes
 export { remotes } from "./remotes";
 // import { createError, createCustomError } from "./lib/utils/createCustomError";

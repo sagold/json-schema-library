@@ -1,8 +1,8 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
-import { extendDraft } from "./extendDraft";
+import { extendDraft } from "./Draft";
 import { draft2020 } from "./draft2020";
-describe("extendDraft", () => {
+describe("Draft.extendDraft", () => {
     it("should add format validator", () => {
         const draft = extendDraft(draft2020, {
             formats: {

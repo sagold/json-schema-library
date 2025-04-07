@@ -18,6 +18,15 @@ const { DYNAMIC_PROPERTIES } = settings;
 export function isSchemaNode(value) {
     return isObject(value) && Array.isArray(value === null || value === void 0 ? void 0 : value.reducers) && Array.isArray(value === null || value === void 0 ? void 0 : value.resolvers);
 }
+export function isReduceable(node) {
+    for (let i = 0, l = DYNAMIC_PROPERTIES.length; i < l; i += 1) {
+        // @ts-expect-error interface to object conversion
+        if (hasProperty(node, DYNAMIC_PROPERTIES[i])) {
+            return true;
+        }
+    }
+    return false;
+}
 function getDraft(drafts, $schema) {
     var _a;
     return (_a = drafts.find((d) => new RegExp(d.$schemaRegEx).test($schema))) !== null && _a !== void 0 ? _a : drafts[drafts.length - 1];

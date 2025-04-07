@@ -1,5 +1,5 @@
 import { dashCase } from "./utils/dashCase";
-import { extendDraft } from "./extendDraft";
+import { extendDraft } from "./Draft";
 import { draft2019 } from "./draft2019";
 import { oneOfFuzzyKeyword } from "./keywords/oneOf";
 import { render } from "./errors/render";

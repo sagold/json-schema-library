@@ -6,7 +6,6 @@ import { draft06 } from "./draft06";
 import { draft07 } from "./draft07";
 import { draft2019 } from "./draft2019";
 import { draft2020 } from "./draft2020";
-import { hasProperty } from "./utils/hasProperty";
 import { pick } from "./utils/pick";
 import { SchemaNodeMethods, addKeywords, isSchemaNode } from "./SchemaNode";
 const { DYNAMIC_PROPERTIES } = settings;
@@ -48,6 +47,7 @@ export function compileSchema(schema, options = {}) {
         ...SchemaNodeMethods
     };
     node.context.rootNode = node;
+    node.context.remotes[(_e = schema === null || schema === void 0 ? void 0 : schema.$id) !== null && _e !== void 0 ? _e : "#"] = node;
     if (options.remote) {
         const metaSchema = getRef(node, node.schema.$schema);
         if (isSchemaNode(metaSchema) && metaSchema.schema.$vocabulary) {
@@ -66,16 +66,6 @@ export function compileSchema(schema, options = {}) {
     if (formatAssertion === false) {
         node.context.keywords = node.context.keywords.filter((f) => f.keyword !== "format");
     }
-    node.context.remotes[(_e = schema === null || schema === void 0 ? void 0 : schema.$id) !== null && _e !== void 0 ? _e : "#"] = node;
     addKeywords(node);
     return node;
-}
-export function isReduceable(node) {
-    for (let i = 0, l = DYNAMIC_PROPERTIES.length; i < l; i += 1) {
-        // @ts-expect-error asd
-        if (hasProperty(node, DYNAMIC_PROPERTIES[i])) {
-            return true;
-        }
-    }
-    return false;
 }

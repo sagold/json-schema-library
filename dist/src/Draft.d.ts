@@ -1,10 +1,10 @@
-import { getTemplate } from "./methods/getTemplate";
-import { ErrorConfig } from "./types";
 import type { Keyword } from "./Keyword";
 import { createSchema } from "./methods/createSchema";
 import { each } from "./methods/each";
-import { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
+import { ErrorConfig } from "./types";
 import { formats } from "./formats/formats";
+import { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
+import { getTemplate } from "./methods/getTemplate";
 export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "draft-2020-12" | "latest";
 export type Draft = {
     /** test-string if draft can be used with $schema-url */
@@ -26,3 +26,10 @@ export type Draft = {
     errors: ErrorConfig;
     formats: typeof formats;
 };
+type PartialDraft = Partial<Omit<Draft, "errors" | "formats">> & {
+    errors?: Partial<Draft["errors"]>;
+    formats?: Partial<Draft["formats"]>;
+};
+export declare function extendDraft(draft: Draft, extension: PartialDraft): Draft;
+export declare function addKeywords(draft: Draft, ...keywords: Keyword[]): Draft;
+export {};

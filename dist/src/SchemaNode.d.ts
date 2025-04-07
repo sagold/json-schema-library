@@ -6,20 +6,30 @@ import { EachSchemaCallback } from "./methods/eachSchema";
 import { JsonSchema, JsonError, ErrorData, OptionalNodeAndError } from "./types";
 import { TemplateOptions } from "./methods/getTemplate";
 export declare function isSchemaNode(value: unknown): value is SchemaNode;
-export type GetSchemaOptions = {
-    path?: ValidationPath;
-    pointer?: string;
-    /**
-     *  Get always returns `undefined` for valid data, but undefined schema.
-     *  Using `withSchemaWarning: true` will return an error instead:
-     *
-     *  ```json
-     *  { type: "error", code: "schema-warning" }
-     *  ```
-     */
-    withSchemaWarning?: boolean;
-    /** If true, creates a json schema for valid but unspecified data, Defaults to false */
-    createSchema?: boolean;
+export declare function isReduceable(node: SchemaNode): boolean;
+export type Context = {
+    /** root node of this json-schema */
+    rootNode: SchemaNode;
+    /** available draft configurations */
+    drafts: Draft[];
+    /** [SHARED ACROSS REMOTES] root nodes of registered remote json-schema, stored by id/url */
+    remotes: Record<string, SchemaNode>;
+    /** references stored by fully resolved schema-$id + local-pointer */
+    refs: Record<string, SchemaNode>;
+    /** anchors stored by fully resolved schema-$id + $anchor */
+    anchors: Record<string, SchemaNode>;
+    /** [SHARED ACROSS REMOTES] dynamicAnchors stored by fully resolved schema-$id + $anchor */
+    dynamicAnchors: Record<string, SchemaNode>;
+    /** json-schema parser, validator, reducer and resolver for this json-schema (root-schema and its child nodes) */
+    keywords: Draft["keywords"];
+    /** json-schema draft-dependend methods */
+    methods: Draft["methods"];
+    /** draft-version */
+    version: Draft["version"];
+    errors: Draft["errors"];
+    formats: Draft["formats"];
+    /** [SHARED USING ADD REMOTE] getTemplate default options */
+    templateDefaultOptions?: TemplateOptions;
 };
 export interface SchemaNode extends SchemaNodeMethodsType {
     context: Context;
@@ -64,31 +74,23 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     unevaluatedItems?: SchemaNode;
     unevaluatedProperties?: SchemaNode;
 }
-export type Context = {
-    /** root node of this json-schema */
-    rootNode: SchemaNode;
-    /** available draft configurations */
-    drafts: Draft[];
-    /** [SHARED ACROSS REMOTES] root nodes of registered remote json-schema, stored by id/url */
-    remotes: Record<string, SchemaNode>;
-    /** references stored by fully resolved schema-$id + local-pointer */
-    refs: Record<string, SchemaNode>;
-    /** anchors stored by fully resolved schema-$id + $anchor */
-    anchors: Record<string, SchemaNode>;
-    /** [SHARED ACROSS REMOTES] dynamicAnchors stored by fully resolved schema-$id + $anchor */
-    dynamicAnchors: Record<string, SchemaNode>;
-    /** json-schema parser, validator, reducer and resolver for this json-schema (root-schema and its child nodes) */
-    keywords: Draft["keywords"];
-    /** json-schema draft-dependend methods */
-    methods: Draft["methods"];
-    /** draft-version */
-    version: Draft["version"];
-    errors: Draft["errors"];
-    formats: Draft["formats"];
-    /** [SHARED USING ADD REMOTE] getTemplate default options */
-    templateDefaultOptions?: TemplateOptions;
-};
 type SchemaNodeMethodsType = typeof SchemaNodeMethods;
+export type GetSchemaOptions = {
+    /**
+     *  Per default `undefined` is returned for valid data, but undefined schema.
+     *
+     * - Using `withSchemaWarning:true` will return an error instead: `{ type: "error", code: "schema-warning" }`
+     */
+    withSchemaWarning?: boolean;
+    /**
+     *  Per default `undefined` is returned for valid data, but undefined schema.
+     *
+     * - Using `createSchema:true` will create a schema instead
+     */
+    createSchema?: boolean;
+    path?: ValidationPath;
+    pointer?: string;
+};
 export declare const SchemaNodeMethods: {
     /** Compiles a child-schema of this node to its context */
     readonly compileSchema: (schema: JsonSchema, spointer?: string, schemaId?: string) => SchemaNode;
