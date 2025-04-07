@@ -41,7 +41,7 @@ function validateType({ node, data, pointer }: JsonSchemaValidatorParams) {
         return;
     }
 
-    return node.errors.typeError({
+    return node.createError("TypeError", {
         value: data,
         received: dataType,
         expected: schema.type,

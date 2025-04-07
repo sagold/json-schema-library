@@ -10,7 +10,6 @@ import { dependentRequiredKeyword } from "./keywords/dependentRequired";
 import { dependentSchemasKeyword } from "./keywords/dependentSchemas";
 import { each } from "./methods/each";
 import { enumKeyword } from "./keywords/enum";
-import { errors } from "./errors/errors";
 import { exclusiveMaximumKeyword } from "./keywords/exclusiveMaximum";
 import { exclusiveMinimumKeyword } from "./keywords/exclusiveMinimum";
 import { formatKeyword } from "./keywords/format";
@@ -42,6 +41,7 @@ import { unevaluatedItemsKeyword } from "./keywords/unevaluatedItems";
 import { unevaluatedPropertiesKeyword } from "./keywords/unevaluatedProperties";
 import { uniqueItemsKeyword } from "./keywords/uniqueItems";
 import { createSchema } from "./methods/createSchema";
+import { errors } from "./errors/errors";
 
 /**
  * @draft-2020-12 https://json-schema.org/draft/2020-12/release-notes

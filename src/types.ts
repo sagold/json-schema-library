@@ -1,6 +1,6 @@
 import { isObject } from "./utils/isObject";
 import type { getTemplate, TemplateOptions } from "./methods/getTemplate";
-import type { errors } from "./errors/errors";
+import { errors } from "./errors/errors";
 import type { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
 import type { each, EachCallback } from "./methods/each";
 import type { EachSchemaCallback } from "./methods/eachSchema";
@@ -19,6 +19,10 @@ export type ErrorData<T extends Record<string, unknown> = { [p: string]: unknown
     /* value: data in error location */
     value: unknown;
 };
+
+type DefaultErrors = keyof typeof errors;
+export type ErrorConfig = Record<DefaultErrors, string | ((error: ErrorData) => void)>;
+
 export type JsonError<T extends ErrorData = ErrorData> = {
     type: "error";
     name: string;
@@ -54,7 +58,7 @@ export type Draft = {
     /** meta-schema url associated with this draft */
     $schema?: string;
     /** draft errors (this can still be global) */
-    errors: typeof errors;
+    errors: ErrorConfig;
 };
 
 export type Context = {
@@ -77,6 +81,7 @@ export type Context = {
     version: DraftVersion;
     /** available draft configurations */
     drafts: Draft[];
+    errors: ErrorConfig;
     /** getTemplate default options */
     templateDefaultOptions?: TemplateOptions;
 };
@@ -103,7 +108,6 @@ export type GetSchemaOptions = {
 
 export type SchemaNode = {
     context: Context;
-    errors: typeof errors;
     parent?: SchemaNode | undefined;
     ref?: string;
     schema: JsonSchema;
@@ -119,6 +123,8 @@ export type SchemaNode = {
 
     // methods
     resolveRef: (args?: { pointer?: string; path?: ValidationPath }) => SchemaNode;
+    createSchema: typeof createSchema;
+    createError: <T extends string = DefaultErrors>(name: T, data: ErrorData, message?: string) => JsonError;
     /**
      * Register a json-schema as a remote-schema to be resolved by $ref, $anchor, etc
      * @returns the current node (not the remote schema-node)
@@ -134,12 +140,12 @@ export type SchemaNode = {
         data?: unknown,
         options?: GetSchemaOptions
     ) => { node?: SchemaNode; error: undefined } | { node: undefined; error?: JsonError };
-    /** Creates data that is valid to the schema of this node */
-    getTemplate: (data?: unknown, options?: TemplateOptions) => unknown;
-    getChildSchemaSelection: (property: string | number) => JsonError | SchemaNode[];
     each: (data: unknown, callback: EachCallback, pointer?: string) => void;
     eachSchema: (callback: EachSchemaCallback) => void;
+    getChildSchemaSelection: (property: string | number) => JsonError | SchemaNode[];
     getDraftVersion: () => DraftVersion;
+    /** Creates data that is valid to the schema of this node */
+    getTemplate: (data?: unknown, options?: TemplateOptions) => unknown;
     /** Creates a new node with all dynamic schema properties merged according to the passed in data */
     reduce: (
         data: unknown,

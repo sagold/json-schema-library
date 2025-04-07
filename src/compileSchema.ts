@@ -17,6 +17,8 @@ import { hasProperty } from "./utils/hasProperty";
 import { validateNode } from "./validateNode";
 import { eachSchema } from "./methods/eachSchema";
 import getRef from "./keywords/ref";
+import { render } from "./errors/render";
+import { dashCase } from "./utils/dashCase";
 
 export type CompileOptions = {
     drafts: Draft[];
@@ -50,7 +52,6 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
         resolvers: [],
         validators: [],
         schema,
-        errors: draft.errors,
         ...NODE_METHODS
     } as SchemaNode;
 
@@ -62,6 +63,7 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
         ...(options.remote?.context ?? {}),
         refs: {},
         rootNode: node,
+        errors: { ...draft.errors },
         version: draft.version,
         keywords: draft.keywords,
         methods: draft.methods,
@@ -151,19 +153,21 @@ export function isReduceable(node: SchemaNode) {
 
 const NODE_METHODS: Pick<
     SchemaNode,
+    | "addRemote"
+    | "compileSchema"
+    | "createError"
+    | "createSchema"
     | "each"
+    | "eachSchema"
     | "get"
+    | "getChildSchemaSelection"
+    | "getDraftVersion"
     | "getRef"
     | "getSchema"
     | "getTemplate"
-    | "getChildSchemaSelection"
-    | "getDraftVersion"
-    | "eachSchema"
     | "reduce"
     | "resolveRef"
     | "toJSON"
-    | "addRemote"
-    | "compileSchema"
     | "validate"
     | "validateAsync"
 > = {
@@ -180,7 +184,6 @@ const NODE_METHODS: Pick<
             resolvers: [],
             validators: [],
             schema,
-            errors: parentNode.errors,
             ...NODE_METHODS
         };
 
@@ -188,6 +191,20 @@ const NODE_METHODS: Pick<
 
         return node;
     },
+
+    createError(name, data, message?) {
+        let errorMessage = message;
+        if (errorMessage === undefined) {
+            const error = this.context.errors[name];
+            if (typeof error === "function") {
+                return error(data);
+            }
+            errorMessage = render(error ?? name, data);
+        }
+        return { type: "error", name, code: dashCase(name), message: errorMessage, data };
+    },
+
+    createSchema,
 
     each(data, callback, pointer) {
         const node = this as SchemaNode;
@@ -292,7 +309,7 @@ const NODE_METHODS: Pick<
         }
 
         if (options.withSchemaWarning === true) {
-            return node.errors.schemaWarning({ pointer, value: data, schema: node.schema, key });
+            return node.createError("SchemaWarning", { pointer, value: data, schema: node.schema, key });
         }
     },
 
@@ -399,7 +416,6 @@ const NODE_METHODS: Pick<
             resolvers: [],
             validators: [],
             schema,
-            errors: draft.errors,
             ...NODE_METHODS
         } as SchemaNode;
 

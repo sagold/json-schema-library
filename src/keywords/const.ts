@@ -10,6 +10,8 @@ export const constKeyword: Keyword = {
 
 function validateConst({ node, data, pointer }: JsonSchemaValidatorParams) {
     if (!equal(data, node.schema.const)) {
-        return [node.errors.constError({ pointer, schema: node.schema, value: data, expected: node.schema.const })];
+        return [
+            node.createError("ConstError", { pointer, schema: node.schema, value: data, expected: node.schema.const })
+        ];
     }
 }

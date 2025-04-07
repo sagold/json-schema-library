@@ -38,7 +38,7 @@ function validatePrefixItems({ node, data, pointer = "#", path }: JsonSchemaVali
     //     if (Array.isArray(data) && data.length === 0) {
     //         return undefined;
     //     }
-    //     return node.errors.invalidDataError({ pointer, value: data, schema });
+    //     return node.createError("InvalidDataError", { pointer, value: data, schema });
     // }
 
     const errors: ValidationResult[] = [];

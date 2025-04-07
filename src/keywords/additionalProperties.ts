@@ -39,7 +39,7 @@ function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParam
         return node.additionalProperties.reduce(value);
     }
     if (node.schema.additionalProperties === false) {
-        return node.errors.noAdditionalPropertiesError({
+        return node.createError("NoAdditionalPropertiesError", {
             pointer: `${key}`,
             schema: node.schema,
             value: getValue(data, key),
@@ -87,7 +87,7 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
                 validationErrors && errors.push(...validationErrors);
             } else {
                 errors.push(
-                    node.errors.noAdditionalPropertiesError({
+                    node.createError("NoAdditionalPropertiesError", {
                         pointer: `${pointer}/${property}`,
                         schema,
                         value: data,

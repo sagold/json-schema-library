@@ -13,7 +13,7 @@ function validateMaximum({ node, data, pointer }: JsonSchemaValidatorParams) {
     }
     const { schema } = node;
     if (schema.maximum && schema.maximum < data) {
-        return node.errors.maximumError({
+        return node.createError("MaximumError", {
             maximum: schema.maximum,
             length: data,
             value: data,
@@ -22,7 +22,7 @@ function validateMaximum({ node, data, pointer }: JsonSchemaValidatorParams) {
         });
     }
     if (schema.maximum && schema.exclusiveMaximum === true && schema.maximum === data) {
-        return node.errors.maximumError({
+        return node.createError("MaximumError", {
             maximum: schema.maximum,
             length: data,
             pointer,

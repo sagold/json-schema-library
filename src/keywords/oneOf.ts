@@ -70,7 +70,7 @@ function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     }
 
     if (matches.length === 0) {
-        return node.errors.oneOfError({
+        return node.createError("OneOfError", {
             value: JSON.stringify(data),
             pointer,
             schema: node.schema,
@@ -79,7 +79,7 @@ function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
         });
     }
 
-    return node.errors.oneOfError({
+    return node.createError("OneOfError", {
         value: JSON.stringify(data),
         pointer,
         schema: node.schema,
@@ -94,7 +94,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaR
     const oneOfValue = getValue(data, oneOfProperty);
 
     if (oneOfValue === undefined) {
-        return node.errors.missingOneOfPropertyError({
+        return node.createError("MissingOneOfPropertyError", {
             property: oneOfProperty,
             pointer,
             schema: node.schema,
@@ -105,7 +105,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaR
     for (let i = 0; i < node.oneOf.length; i += 1) {
         const resultNode = node.oneOf[i].get(oneOfProperty, data);
         if (!isSchemaNode(resultNode)) {
-            return node.errors.missingOneOfDeclaratorError({
+            return node.createError("MissingOneOfDeclaratorError", {
                 declarator: DECLARATOR_ONEOF,
                 oneOfProperty,
                 schemaPointer: node.oneOf[i].schemaId,
@@ -126,7 +126,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaR
         }
     }
 
-    return node.errors.oneOfPropertyError({
+    return node.createError("OneOfPropertyError", {
         property: oneOfProperty,
         value: oneOfValue,
         pointer,
@@ -199,7 +199,7 @@ export function reduceOneOfFuzzy({ node, data, pointer, path }: JsonSchemaReduce
         }
 
         if (nodeOfItem === undefined) {
-            return node.errors.oneOfError({
+            return node.createError("OneOfError", {
                 value: JSON.stringify(data),
                 pointer,
                 schema: node.schema,
@@ -238,7 +238,7 @@ function oneOfValidator({ node, data, pointer = "#", path }: JsonSchemaValidator
     }
 
     if (matches.length > 1) {
-        return node.errors.multipleOneOfError({
+        return node.createError("MultipleOneOfError", {
             value: data,
             pointer,
             schema,
@@ -246,7 +246,7 @@ function oneOfValidator({ node, data, pointer = "#", path }: JsonSchemaValidator
         });
     }
 
-    return node.errors.oneOfError({
+    return node.createError("OneOfError", {
         value: JSON.stringify(data),
         pointer,
         schema,

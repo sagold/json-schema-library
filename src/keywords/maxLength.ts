@@ -15,7 +15,7 @@ function validateMaxLength({ node, data, pointer = "#" }: JsonSchemaValidatorPar
     const { schema } = node;
     const length = ucs2decode(data).length;
     if (schema.maxLength < length) {
-        return node.errors.maxLengthError({
+        return node.createError("MaxLengthError", {
             maxLength: schema.maxLength,
             length,
             pointer,

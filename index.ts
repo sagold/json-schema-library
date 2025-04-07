@@ -14,8 +14,8 @@ export { draftEditor } from "./src/draftEditor";
 export { oneOfFuzzyKeyword, oneOfKeyword } from "./src/keywords/oneOf";
 
 // errors
-export { createCustomError } from "./src/errors/createCustomError";
-export { strings } from "./src/errors/strings";
+export { render } from "./src/errors/render";
+export { dashCase } from "./src/utils/dashCase";
 
 // extra SchemaNode methods
 export type { EachCallback } from "./src/methods/each";

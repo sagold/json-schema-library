@@ -58,7 +58,7 @@ function validateAdditionalItems({ node, data, pointer, path }: JsonSchemaValida
             validationResult && errors.push(...validationResult);
         } else if (schema.additionalItems === false) {
             errors.push(
-                node.errors.additionalItemsError({
+                node.createError("AdditionalItemsError", {
                     key: i,
                     pointer: `${pointer}/${i}`,
                     value: data,

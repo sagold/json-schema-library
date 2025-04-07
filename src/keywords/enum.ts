@@ -21,7 +21,7 @@ function validateEnum({ node, data, pointer = "#" }: JsonSchemaValidatorParams) 
     } else if (schema.enum.includes(data)) {
         return undefined;
     }
-    return node.errors.enumError({
+    return node.createError("EnumError", {
         pointer,
         schema,
         value: data

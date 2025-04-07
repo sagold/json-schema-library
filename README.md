@@ -903,7 +903,7 @@ each: typeof each;
 _json-schema-library_ exposes a utility to simplify draft extension. `extendDraft` will create a new, modified draft:
 
 ```ts
-import { extendDraft, draft2020, oneOfFuzzyKeyword, createCustomError } from "json-schema-library";
+import { extendDraft, draft2020, oneOfFuzzyKeyword, createCustomError, render } from "json-schema-library";
 
 const myDraft = extendDraft(draft2020, {
     // match all $schema
@@ -912,23 +912,22 @@ const myDraft = extendDraft(draft2020, {
     keywords: [oneOfFuzzyKeyword],
     errors: {
         // add new custom error invalidImageError
-        invalidImageError: createCustomError("InvalidImageError"),
-        // overwrite minLengthError by custom error message with logic
-        minLengthError: (data) => {
+        invalidImageError: "Image type '{{imageType}}' is unsupported.",
+        MinLengthError: (data) => {
             if (data.minLength === 1) {
                 return {
                     type: "error",
                     name: "MinLengthOneError",
-                    code: "min-length-one-error",
-                    message: __("MinLengthOneError", data),
+                    code: dashCase("MinLengthOneError"),
+                    message: "Input is required",
                     data
                 };
             }
             return {
                 type: "error",
                 name: "MinLengthError",
-                code: "min-length-error",
-                message: __("MinLengthError", data),
+                code: dashCase("MinLengthError"),
+                message: render("Value in `{{pointer}}` is `{{length}}`, but should be `{{minimum}}` at minimum", data),
                 data
             };
         }

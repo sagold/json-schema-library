@@ -10,7 +10,7 @@ export const maxItemsKeyword: Keyword = {
 function validateMaxItems({ node, data, pointer }: JsonSchemaValidatorParams) {
     const { schema } = node;
     if (Array.isArray(data) && schema.maxItems < data.length) {
-        return node.errors.maxItemsError({
+        return node.createError("MaxItemsError", {
             maximum: schema.maxItems,
             length: data.length,
             schema,

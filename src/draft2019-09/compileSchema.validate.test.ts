@@ -1020,7 +1020,7 @@ describe("compileSchema.validateAsync", () => {
                             }
                             return new Promise((resolve) =>
                                 resolve([
-                                    node.errors.typeError({
+                                    node.createError("TypeError", {
                                         schema: {},
                                         pointer: "",
                                         value: ""

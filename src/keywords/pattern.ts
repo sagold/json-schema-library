@@ -14,7 +14,7 @@ function validatePattern({ node, data, pointer = "#" }: JsonSchemaValidatorParam
     }
     const pattern = new RegExp(schema.pattern, "u");
     if (pattern.test(data) === false) {
-        return node.errors.patternError({
+        return node.createError("PatternError", {
             pattern: schema.pattern,
             description: schema.patternExample || schema.pattern,
             received: data,

@@ -14,7 +14,7 @@ function validateMinItems({ node, data, pointer }: JsonSchemaValidatorParams) {
     const { schema } = node;
     if (schema.minItems > data.length) {
         if (schema.minItems === 1) {
-            return node.errors.minItemsOneError({
+            return node.createError("MinItemsOneError", {
                 minItems: schema.minItems,
                 length: data.length,
                 pointer,
@@ -22,7 +22,7 @@ function validateMinItems({ node, data, pointer }: JsonSchemaValidatorParams) {
                 value: data
             });
         }
-        return node.errors.minItemsError({
+        return node.createError("MinItemsError", {
             minItems: schema.minItems,
             length: data.length,
             pointer,
