@@ -20,9 +20,7 @@ export { dashCase } from "./src/utils/dashCase";
 // extra SchemaNode methods
 export type { EachCallback } from "./src/methods/each";
 export type { EachSchemaCallback } from "./src/methods/eachSchema";
-export { addError } from "./src/addError";
 export { addKeywords } from "./src/addKeywords";
-export { addFormatValidator } from "./src/addFormatValidator";
 export { extendDraft } from "./src/extendDraft";
 // export { mergeNode } from "./src/mergeNode"; -- not yet
 
