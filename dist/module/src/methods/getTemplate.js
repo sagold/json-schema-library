@@ -174,8 +174,9 @@ const TYPE = {
         // @keyword dependencies - has to be done after resolving properties so dependency may trigger
         if (node.dependentSchemas) {
             Object.keys(node.dependentSchemas).forEach((prop) => {
-                if (d[prop] !== undefined && isObject(node.dependentSchemas[prop])) {
-                    const dependencyData = node.dependentSchemas[prop].getTemplate(data !== null && data !== void 0 ? data : d, opts);
+                const dependency = node.dependentSchemas[prop];
+                if (d[prop] !== undefined && isSchemaNode(dependency)) {
+                    const dependencyData = dependency.getTemplate(data !== null && data !== void 0 ? data : d, opts);
                     Object.assign(d, dependencyData);
                 }
                 // if false and removeInvalidData => remove from data

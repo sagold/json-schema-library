@@ -20,28 +20,20 @@ export { dashCase } from "./src/utils/dashCase";
 // extra SchemaNode methods
 export type { EachCallback } from "./src/methods/each";
 export type { EachSchemaCallback } from "./src/methods/eachSchema";
-export { addKeywords } from "./src/addKeywords";
-export { extendDraft } from "./src/extendDraft";
 // export { mergeNode } from "./src/mergeNode"; -- not yet
 
 // utilities
 export { default as getTypeOf } from "./src/utils/getTypeOf";
-export { isReduceable } from "./src/compileSchema";
+export { isReduceable } from "./src/SchemaNode";
+export { extendDraft, addKeywords } from "./src/Draft";
 
 // remotes
 export { remotes } from "./remotes";
 
 // types
-export type {
-    Context,
-    Draft,
-    DraftVersion,
-    GetSchemaOptions,
-    JsonError,
-    JsonPointer,
-    JsonSchema,
-    SchemaNode
-} from "./src/types";
+export type { JsonError, JsonPointer, JsonSchema } from "./src/types";
+export type { Draft, DraftVersion } from "./src/Draft";
+export type { Context, SchemaNode, GetSchemaOptions } from "./src/SchemaNode";
 
 export type {
     Keyword,

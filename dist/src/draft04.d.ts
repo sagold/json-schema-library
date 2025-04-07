@@ -19,4 +19,4 @@
  * - required  allows an empty array
  * - dependencies allows an empty array for property dependencies
  */
-export declare const draft04: import("./types").Draft;
+export declare const draft04: import("./Draft").Draft;

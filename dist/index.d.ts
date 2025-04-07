@@ -16,5 +16,7 @@ export { extendDraft } from "./src/extendDraft";
 export { default as getTypeOf } from "./src/utils/getTypeOf";
 export { isReduceable } from "./src/compileSchema";
 export { remotes } from "./remotes";
-export type { Context, Draft, DraftVersion, GetSchemaOptions, JsonError, JsonPointer, JsonSchema, SchemaNode } from "./src/types";
+export type { JsonError, JsonPointer, JsonSchema } from "./src/types";
+export type { Draft, DraftVersion } from "./src/Draft";
+export type { Context, SchemaNode, GetSchemaOptions } from "./src/SchemaNode";
 export type { Keyword, ValidationPath, JsonSchemaReducerParams, JsonSchemaReducer, JsonSchemaResolverParams, JsonSchemaResolver, JsonSchemaValidatorParams, JsonSchemaValidator, JsonSchemaDefaultDataResolverParams, JsonSchemaDefaultDataResolver } from "./src/Keyword";

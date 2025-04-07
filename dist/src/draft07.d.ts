@@ -9,4 +9,4 @@
  * - "contentMediaType"
  * - "contentEncoding"
  */
-export declare const draft07: import("./types").Draft;
+export declare const draft07: import("./Draft").Draft;

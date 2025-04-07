@@ -22,4 +22,4 @@
  *  is required.
  *
  */
-export declare const draft2020: import("./types").Draft;
+export declare const draft2020: import("./Draft").Draft;

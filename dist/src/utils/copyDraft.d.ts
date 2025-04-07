@@ -4,16 +4,16 @@ export declare function copyDraft(draft: Draft): {
         id: string;
         keyword: string;
         order?: number;
-        parse?: (node: import("../types").SchemaNode) => void;
-        addResolve?: (node: import("../types").SchemaNode) => boolean;
+        parse?: (node: import("../SchemaNode").SchemaNode) => void;
+        addResolve?: (node: import("../SchemaNode").SchemaNode) => boolean;
         resolve?: import("../Keyword").JsonSchemaResolver;
-        addValidate?: (node: import("../types").SchemaNode) => boolean;
+        addValidate?: (node: import("../SchemaNode").SchemaNode) => boolean;
         validate?: import("../Keyword").JsonSchemaValidator;
-        addReduce?: (node: import("../types").SchemaNode) => boolean;
+        addReduce?: (node: import("../SchemaNode").SchemaNode) => boolean;
         reduce?: import("../Keyword").JsonSchemaReducer;
     }[];
     $schemaRegEx: string;
-    version: import("../types").DraftVersion;
+    version: import("../Draft").DraftVersion;
     methods: {
         createSchema: typeof import("../methods/createSchema").createSchema;
         getChildSchemaSelection: typeof import("../methods/getChildSchemaSelection").getChildSchemaSelection;
