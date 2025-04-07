@@ -36,6 +36,7 @@ import { getTemplate } from "./draft2019-09/methods/getTemplate";
 import { each } from "./draft2019-09/methods/each";
 import { createSchema } from "./methods/createSchema";
 import { errors } from "./errors/errors";
+import { formats } from "./formats/formats";
 
 /**
  * @draft-06 https://json-schema.org/draft-06/json-schema-release-notes
@@ -63,6 +64,7 @@ export const draft06 = sanitizeKeywords({
     $schemaRegEx: "draft-06",
     $schema: "http://json-schema.org/draft-06/schema",
     errors,
+    formats,
     methods: {
         createSchema,
         getTemplate,

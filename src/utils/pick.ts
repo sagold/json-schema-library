@@ -1,10 +1,10 @@
 import { isObject } from "../utils/isObject";
 
-export function pick(value: Record<string, unknown>, ...properties: string[]) {
+export function pick<T extends Record<string, unknown>, K extends keyof T>(value: T, ...properties: K[]) {
     if (!isObject(value) || properties.length === 0) {
         return value;
     }
-    const result: Record<string, unknown> = {};
+    const result = {} as Pick<T, K>;
     properties.forEach((property) => (result[property] = value[property]));
     return result;
 }

@@ -19,6 +19,8 @@ import { eachSchema } from "./methods/eachSchema";
 import getRef from "./keywords/ref";
 import { render } from "./errors/render";
 import { dashCase } from "./utils/dashCase";
+import { pick } from "./utils/pick";
+import copy from "fast-copy";
 
 export type CompileOptions = {
     drafts: Draft[];
@@ -59,14 +61,11 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
         remotes: {},
         anchors: {},
         dynamicAnchors: {},
-        ids: {},
+        // ids: {},
         ...(options.remote?.context ?? {}),
         refs: {},
         rootNode: node,
-        errors: { ...draft.errors },
-        version: draft.version,
-        keywords: draft.keywords,
-        methods: draft.methods,
+        ...copy(pick(draft, "methods", "keywords", "version", "formats", "errors")),
         templateDefaultOptions: options.templateDefaultOptions,
         drafts
     };
@@ -423,9 +422,7 @@ const NODE_METHODS: Pick<
             ...context,
             refs: {},
             rootNode: node,
-            methods: draft.methods,
-            keywords: draft.keywords,
-            version: draft.version
+            ...copy(pick(draft, "methods", "keywords", "version", "formats", "errors"))
         };
 
         node.context.remotes[joinId(url)] = node;

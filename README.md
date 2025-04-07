@@ -163,7 +163,7 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 ## SchemaNode methods
 
-[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getTemplate**](#gettemplate) · [**getSchema**](#getschema) · [**reduce**](#reduce) · [**get**](#get) · [**each**](#each) · [**eachSchema**](#eachschema) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema) · [createSchema](#createSchema) · [getChildSchemaSelection](#getchildschemaselection)
+[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getTemplate**](#gettemplate) · [**getSchema**](#getschema) · [**reduce**](#reduce) · [**get**](#get) · [**each**](#each) · [**eachSchema**](#eachschema) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSchemaSelection](#getchildschemaselection)
 
 ### validate
 
@@ -188,7 +188,7 @@ type JsonError = {
 };
 ```
 
-In almost all cases, a JSON Pointer is given on _error.data.pointer_, which points to the source within data where the error occured. For more details on how to work with errors, refer to section [custom errors](#custom-errors).
+In almost all cases, a JSON Pointer is given on _error.data.pointer_, which points to the source within data where the error occured. For more details on how to work with errors, refer to section [custom errors](#extending-a-draft).
 
 </details>
 
@@ -846,7 +846,7 @@ expect(resolvedNode?.schema).to.deep.eq({
 
 ## Draft Customization
 
-[**Extending a Draft**](#extending-a-draft) · [**Keyword**](#Keyword) · [**Errors**](#custom-errors)
+[**Extending a Draft**](#extending-a-draft) · [**Keyword**](#Keyword)
 
 _json-schema-library_ uses a list of drafts to support different draft-versions and cross-draft support. A draft is exported for each json-schema-draft:
 
@@ -903,17 +903,33 @@ each: typeof each;
 _json-schema-library_ exposes a utility to simplify draft extension. `extendDraft` will create a new, modified draft:
 
 ```ts
-import { extendDraft, draft2020, oneOfFuzzyKeyword, createCustomError, render } from "json-schema-library";
+import { extendDraft, draft2020, oneOfFuzzyKeyword, createCustomError, render, ErrorData } from "json-schema-library";
 
 const myDraft = extendDraft(draft2020, {
     // match all $schema
     $schemaRegEx: "",
     // Keyword registers to "oneOf", replacing existing keyword
     keywords: [oneOfFuzzyKeyword],
+    formats: {
+        // add new `"format": "test"` which returns an error when the value is test
+        test: ({ data, node, pointer }) => {
+            if (data === "test") {
+                return node.createError("testError", {
+                    schema: node.schema,
+                    pointer: pointer,
+                    value: data,
+                    customValue: "test"
+                });
+            }
+        }
+    },
     errors: {
-        // add new custom error invalidImageError
-        invalidImageError: "Image type '{{imageType}}' is unsupported.",
-        MinLengthError: (data) => {
+        // add new custom error testError
+        testError: "Test error for value {{value}} - {{customValue}}",
+        // overwrite existing error message
+        MaxLengthError: "Too many characters",
+        // add dynamic error
+        MinLengthError: (data: ErrorData) => {
             if (data.minLength === 1) {
                 return {
                     type: "error",
@@ -934,10 +950,6 @@ const myDraft = extendDraft(draft2020, {
     }
 });
 ```
-
--   @todo customize error-strings
--   @todo add format validation
--   @todo add formats to draft
 
 <details><summary>About fuzzy oneOf resolution</summary>
 
@@ -1044,8 +1056,6 @@ function reduceType({ node, pointer, data }: JsonSchemaReducerParams): undefined
 ```
 
 </details>
-
-### Errors
 
 ## Breaking Changes
 

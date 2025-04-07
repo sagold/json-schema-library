@@ -6,6 +6,7 @@ import type { each, EachCallback } from "./methods/each";
 import type { EachSchemaCallback } from "./methods/eachSchema";
 import type { createSchema } from "./methods/createSchema";
 import type { Keyword, JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, ValidationPath } from "./Keyword";
+import { formats } from "./formats/formats";
 
 export type JsonBooleanSchema = boolean;
 export type JsonSchema = Record<string, any>;
@@ -59,6 +60,7 @@ export type Draft = {
     $schema?: string;
     /** draft errors (this can still be global) */
     errors: ErrorConfig;
+    formats: typeof formats;
 };
 
 export type Context = {
@@ -69,7 +71,7 @@ export type Context = {
     /** references stored by fully resolved schema-$id + local-pointer */
     refs: Record<string, SchemaNode>;
     /** references stored by fully resolved schema-$id */
-    ids: Record<string, SchemaNode>;
+    // ids: Record<string, SchemaNode>;
     /** anchors stored by fully resolved schema-$id + $anchor */
     anchors: Record<string, SchemaNode>;
     dynamicAnchors: Record<string, SchemaNode>;
@@ -78,10 +80,11 @@ export type Context = {
     /** json-schema draft-dependend methods */
     methods: Draft["methods"];
     /** draft-version */
-    version: DraftVersion;
+    version: Draft["version"];
     /** available draft configurations */
     drafts: Draft[];
-    errors: ErrorConfig;
+    errors: Draft["errors"];
+    formats: Draft["formats"];
     /** getTemplate default options */
     templateDefaultOptions?: TemplateOptions;
 };
