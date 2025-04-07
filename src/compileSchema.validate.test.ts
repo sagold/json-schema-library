@@ -10,7 +10,6 @@ describe("compileSchema.validate", () => {
                 const { errors } = compileSchema({
                     exclusiveMaximum: 0
                 }).validate(0);
-                console.log("errors", errors);
                 assert.deepEqual(errors.length, 1);
             });
 
