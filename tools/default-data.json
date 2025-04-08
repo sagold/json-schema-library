@@ -1,0 +1,592 @@
+{
+    "iggypus": {
+        "id": "56f2c00da1bb8d3c3495aa0a",
+        "department": {
+            "title": "Politik"
+        }
+    },
+    "header": {
+        "theme": "dark",
+        "datePublished": "2016-01-01 08:00"
+    },
+    "intro": {
+        "title": "Vergiftete Versprechen",
+        "caption": "Why is this required?",
+        "subtitle": "<p>Marinduque leidet unter dem giftigen Erbe des schwersten Industrieunglücks in der Geschichte der Philippinen. Seit zwanzig Jahren kämpft die kleine Insel gegen einen der größten Bergbaukonzerne der Welt.</p>",
+        "author": "",
+        "yAlign": "bottom",
+        "displayMode": "parallax",
+        "image": {
+            "desktop": {
+                "url": "data/assets/intro.jpg",
+                "quality": 70
+            },
+            "mobile": {
+                "url": "data/assets/introMobile.jpg",
+                "quality": 70
+            }
+        },
+        "video": {
+            "url": "http://example.com/wissen/2015-11-27_Marshallinseln/assets/chapter01/loop-lagune.mp4",
+            "quality": 70,
+            "type": "video",
+            "loop": true
+        }
+    },
+    "modules": [
+        {
+            "partial": "app/src/modules/text/text",
+            "text": {
+                "withInitial": false,
+                "content": "<p>Zuerst war es nur eine unscheinbare Wunde, wie sie sich die Fischer hier ständig zuziehen, wenn sie über die scharfkantigen Korallenfelsen zu ihren Booten klettern oder die Nylonfäden beim Einholen der Netze in ihre Hände schneiden. Doch die Wunde an Wilson Manubas rechtem Fuß fraß sich tiefer und tiefer in sein Fleisch. Die Salben aus der Klinik halfen nicht. Sein Bein schmolz, sagt Manuba, wie Kerzenwachs. Die Wunde entzündete sich, bis die Infektion seinen ganzen Körper bedrohte. Die Ärzte mussten das Bein amputieren, um Manubas Leben zu retten.</p>"
+            }
+        },
+        {
+            "partial": "app/src/modules/video/video",
+            "video": {
+                "url": "http://example.com/assets/videos/831efdfa02e706d5b124b49fcea0d755172db876c6e7fdd4f79d70893fcf644cc9b17857eb6fd163265257a4ca2db073c6c07fa235399a2f5e716c7479b5da78.mp4",
+                "previewImage": {
+                    "url": "data/assets/video_dergipfel.png",
+                    "quality": 70
+                },
+                "source": "DPA",
+                "autoplay": true,
+                "type": "video",
+                "displayMode": "float-left"
+            }
+        },
+        {
+            "partial": "app/src/modules/text/text",
+            "text": {
+                "withInitial": false,
+                "content": "<p><b>Alorem ipsum dolor sit amet, consectetur <a href='#'>adipiscing</a> elit.</b> Cur igitur, inquam, res tam dissimiles eodem nomine appellas? Iis igitur est difficilius satis facere, qui se Latina scripta dicunt contemnere. Duo Reges: constructio interrete. Quae si potest singula consolando levare, universa quo modo sustinebit? Ita relinquet duas, de quibus etiam atque etiam consideret.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cur igitur, inquam, res tam dissimiles eodem nomine appellas? Iis igitur est difficilius satis facere, qui se Latina scripta dicunt contemnere. Duo Reges: constructio interrete. Quae si potest singula consolando levare, universa quo modo sustinebit? Ita relinquet duas, de quibus etiam atque etiam consideret.</p>"
+            }
+        },
+        {
+            "partial": "app/src/modules/video/video",
+            "video": {
+                "url": "http://example.com/assets/videos/3fe4cf92b10879203675eebe582d2a0ec5e38dcd369149b63074f1b1ba54bdef7c866897ad9fa59102f775e555bcfc5af998a827dcde3a4708a1821e4553184f.mp4",
+                "previewImage": {
+                    "url": "data/assets/video_dergipfel.png",
+                    "quality": 70
+                },
+                "source": "DPA",
+                "autoplay": true,
+                "type": "video",
+                "displayMode": "float-left"
+            }
+        },
+        {
+            "partial": "app/src/modules/image/image",
+            "image": {
+                "desktop": {
+                    "url": "data/assets/animated_map.gif",
+                    "quality": 70
+                },
+                "mobile": {
+                    "url": "data/assets/animated_map.gif",
+                    "quality": 70
+                },
+                "caption": "Animiertes GIF, das immer wieder neu startet. Toll, oder?",
+                "source": "Selbst gemacht",
+                "displayMode": "expanded",
+                "animated": {
+                    "resetOnVisible": true
+                }
+            }
+        },
+        {
+            "partial": "app/src/modules/text/text",
+            "text": {
+                "withInitial": false,
+                "content": "<p><b>Alorem ipsum dolor sit amet, consectetur <a href='#'>adipiscing</a> elit.</b> Cur igitur, inquam, res tam dissimiles eodem nomine appellas? Iis igitur est difficilius satis facere, qui se Latina scripta dicunt contemnere. Duo Reges: constructio interrete. Quae si potest singula consolando levare, universa quo modo sustinebit? Ita relinquet duas, de quibus etiam atque etiam consideret.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cur igitur, inquam, res tam dissimiles eodem nomine appellas? Iis igitur est difficilius satis facere, qui se Latina scripta dicunt contemnere. Duo Reges: constructio interrete. Quae si potest singula consolando levare, universa quo modo sustinebit? Ita relinquet duas, de quibus etiam atque etiam consideret.</p>"
+            }
+        },
+        {
+            "partial": "app/src/modules/counter/counter",
+            "counter": {
+                "intro": "<p>Jetzt kommt der <b>kontinuierliche Hochzähler</b>...</p>",
+                "rate": 1672124,
+                "throttle": 20000,
+                "outro": "<p>WOW. Seitdem sie hier auf der Seite sind wurde diese Zahl mit 1672124 Zahlen pro Minute berechnet</p>"
+            }
+        },
+        {
+            "partial": "app/src/modules/typing/typing",
+            "typing": {
+                "position": "left",
+                "headline": "12.04.2012 - Absender: Peter Lorem",
+                "content": "Griaß God beinand aba schoo, luja gscheit a Hoiwe an Namidog. Sog i luja hod oa, Broadwurschtbudn gfreit mi nois. Hogg di hera und kummd, a geh."
+            }
+        },
+        {
+            "partial": "app/src/modules/typing/typing",
+            "typing": {
+                "position": "right",
+                "headline": "12.04.2012 - Empfänger: Huber Ipsum",
+                "content": "Zwoa, gsuffa Hetschapfah da Kini Ohrwaschl scheans Sauakraud. Schoo heitzdog geh, auf der Oim, da gibt’s koa Sünd!"
+            }
+        },
+        {
+            "partial": "app/src/modules/typing/typing",
+            "typing": {
+                "position": "left",
+                "headline": "12.04.2012 - Absender: Peter Lorem",
+                "content": "Broadwurschtbudn gfreit mi nois. Hogg di hera und kummd, a geh."
+            }
+        },
+        {
+            "partial": "app/src/modules/typing/typing",
+            "typing": {
+                "position": "right",
+                "headline": "12.04.2012 - Empfänger: Huber Ipsum",
+                "content": "Alorem ipsum dolor sit amet, consectetur adipiscing elit. Cur igitur, inquam, res tam dissimiles "
+            }
+        },
+        {
+            "partial": "app/src/modules/popin/popin",
+            "popin": {
+                "content": "<p>&quot;Noch immer sterben Menschen an Hunger oder frieren zu Tode&quot;, sagt die UNHCR-Sprecherin - weil das Regime in Syrien und in geringerem Umfang auch Rebellen humanitäre Hilfe blockierten. Aber auch in den wichtigsten Aufnahmeländern, der Türkei, <a href=\"http://example.com/thema/Libanon\" target=\"_blank\">Libanon</a> und Jordanien, <u>habe die Unterfinanzierung schlimme Folgen.</u></p>",
+                "image": {
+                    "desktop": {
+                        "url": "data/assets/erbgang04.jpg",
+                        "quality": 70
+                    },
+                    "mobile": {
+                        "url": "data/assets/erbgang03.jpg",
+                        "quality": 70
+                    }
+                },
+                "caption": "",
+                "source": "",
+                "withInitial": false
+            }
+        },
+        {
+            "partial": "app/src/modules/text/text",
+            "text": {
+                "withInitial": false,
+                "content": "<h2>Duo Reges: Lorem ipsum dolor sit amet, <a href='#'>consectetur adipiscing</a> elit.</h2><p>Cur igitur, inquam, res tam dissimiles eodem nomine appellas? Iis igitur est difficilius satis facere, qui se Latina scripta dicunt contemnere. Duo Reges: constructio interrete. Quae si potest singula consolando levare, universa quo modo sustinebit? Ita relinquet duas, de quibus etiam atque etiam consideret.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p><h3>Cur igitur</h3><p>inquam, res tam dissimiles eodem nomine appellas? Iis igitur est difficilius satis facere, qui se Latina scripta dicunt contemnere. Duo Reges: constructio interrete. Quae si potest singula consolando levare, universa quo modo sustinebit? Ita relinquet duas, de quibus etiam atque etiam consideret.</p>"
+            }
+        },
+        {
+            "partial": "app/src/modules/embed/embed",
+            "embed": {
+                "url": "http://example.com/apps/5820c8ccf38f33fb247b5c4c/CURRENT/map-elector/",
+                "config": "{horizontalPadding: false}",
+                "channel": "www"
+            }
+        },
+        {
+            "partial": "app/src/modules/text/text",
+            "text": {
+                "withInitial": false,
+                "content": "<h2>Duo Reges: Lorem ipsum dolor sit amet, <a href='#'>consectetur adipiscing</a> elit.</h2><p>Cur igitur, inquam, res tam dissimiles eodem nomine appellas? Iis igitur est difficilius satis facere, qui se Latina scripta dicunt contemnere. Duo Reges: constructio interrete. Quae si potest singula consolando levare, universa quo modo sustinebit? Ita relinquet duas, de quibus etiam atque etiam consideret.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p><h3>Cur igitur</h3><p>inquam, res tam dissimiles eodem nomine appellas? Iis igitur est difficilius satis facere, qui se Latina scripta dicunt contemnere. Duo Reges: constructio interrete. Quae si potest singula consolando levare, universa quo modo sustinebit? Ita relinquet duas, de quibus etiam atque etiam consideret.</p>"
+            }
+        },
+        {
+            "partial": "app/src/modules/parallax/parallax",
+            "parallax": {
+                "title": "Ich bin eine Überschrift für den nächsten Abschnitt",
+                "caption": "a dummy caption",
+                "image": {
+                    "desktop": {
+                        "url": "data/assets/ocean_2x768x511.jpg",
+                        "quality": 70
+                    },
+                    "mobile": {
+                        "url": "data/assets/animated_map.gif",
+                        "quality": 70
+                    }
+                },
+                "video": {
+                    "url": "http://www.vidsplay.com/vids/shower.mp4",
+                    "type": "video",
+                    "loop": true
+                }
+            }
+        },
+        {
+            "partial": "app/src/modules/text/text",
+            "text": {
+                "withInitial": false,
+                "content": "<h2>Duo Reges:</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cur igitur, inquam, res tam dissimiles eodem nomine appellas? Iis igitur est difficilius satis facere, qui se Latina scripta dicunt contemnere. Duo Reges: constructio interrete. Quae si potest singula consolando levare, universa quo modo sustinebit? Ita relinquet duas, de quibus etiam atque etiam consideret.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p><h3>Cur igitur</h3><p>inquam, res tam dissimiles eodem nomine appellas? Iis igitur est difficilius satis facere, qui se Latina scripta dicunt contemnere. Duo Reges: constructio interrete. Quae si potest singula consolando levare, universa quo modo sustinebit? Ita relinquet duas, de quibus etiam atque etiam consideret.</p>"
+            }
+        },
+        {
+            "theme": "light",
+            "partial": "app/src/modules/blender/imageBlender",
+            "slides": {
+                "displayMode": "cover",
+                "default": [
+                    {
+                        "desktop": {
+                            "url": "data/assets/largeToSmall.png",
+                            "quality": 70
+                        },
+                        "mobile": {
+                            "url": "data/assets/smallToLarge.png",
+                            "quality": 70
+                        }
+                    },
+                    {
+                        "desktop": {
+                            "url": "data/assets/desktopOnly.png",
+                            "quality": 70
+                        },
+                        "mobile": {
+                            "url": "data/assets/smallToLarge.png",
+                            "quality": 1
+                        }
+                    }
+                ],
+                "fallback": [
+                    {
+                        "image": {
+                            "url": "data/assets/mobileOnly.png",
+                            "quality": 70
+                        }
+                    },
+                    {
+                        "image": {
+                            "url": "data/assets/noChange.png",
+                            "quality": 70
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "partial": "app/src/modules/text/text",
+            "text": {
+                "withInitial": true,
+                "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cur igitur, inquam, res tam dissimiles eodem nomine appellas? Iis igitur est difficilius satis facere, qui se Latina scripta dicunt contemnere. Duo Reges: constructio interrete. Quae si potest singula consolando levare, universa quo modo sustinebit? Ita relinquet duas, de quibus etiam atque etiam consideret.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cur igitur, inquam, res tam dissimiles eodem nomine appellas? Iis igitur est difficilius satis facere, qui se Latina scripta dicunt contemnere. Duo Reges: constructio interrete. Quae si potest singula consolando levare, universa quo modo sustinebit? Ita relinquet duas, de quibus etiam atque etiam consideret.</p>"
+            }
+        },
+        {
+            "partial": "app/src/modules/image/image",
+            "image": {
+                "desktop": {
+                    "url": "data/assets/animation.gif",
+                    "quality": 70
+                },
+                "mobile": {
+                    "url": "data/assets/portrait.jpg",
+                    "quality": 70
+                },
+                "caption": "Hier sieht man ein floatendes, responsives Bild. Toll, oder?",
+                "source": "Selbst gemacht",
+                "displayMode": "float-right",
+                "animated": {
+                    "resetOnVisible": true
+                }
+            }
+        },
+        {
+            "partial": "app/src/modules/text/text",
+            "text": {
+                "withInitial": false,
+                "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. An nisi populari fama? Eorum enim est haec querela, qui sibi cari sunt seseque diligunt. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Duo Reges: constructio interrete. Qui autem esse poteris, nisi te amor ipse ceperit? Is ita vivebat, ut nulla tam exquisita posset inveniri voluptas, qua non abundaret. Sed tamen intellego quid velit. Quo modo autem optimum, si bonum praeterea nullum est? Quoniam, si dis placet, ab Epicuro loqui discimus. In his igitur partibus duabus nihil erat, quod Zeno commutare gestiret. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Haec quo modo conveniant, non sane intellego.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. An nisi populari fama? Eorum enim est haec querela, qui sibi cari sunt seseque diligunt. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Duo Reges: constructio interrete. Qui autem esse poteris, nisi te amor ipse ceperit? Is ita vivebat, ut nulla tam exquisita posset inveniri voluptas, qua non abundaret. Sed tamen intellego quid velit. Quo modo autem optimum, si bonum praeterea nullum est? Quoniam, si dis placet, ab Epicuro loqui discimus. In his igitur partibus duabus nihil erat, quod Zeno commutare gestiret. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Haec quo modo conveniant, non sane intellego.</p>"
+            }
+        },
+        {
+            "partial": "app/src/modules/image/image",
+            "image": {
+                "desktop": {
+                    "url": "data/assets/landscape.jpg",
+                    "quality": 70
+                },
+                "mobile": {
+                    "url": "data/assets/animated_map.gif",
+                    "quality": 1
+                },
+                "caption": "Das hier ist nicht so responsive. Muss ja nicht immer sein.",
+                "source": "Auch selbst gemacht",
+                "displayMode": "text-wide",
+                "animated": {
+                    "resetOnVisible": false
+                }
+            }
+        },
+        {
+            "partial": "app/src/modules/target/target",
+            "target": "kapitel2"
+        },
+        {
+            "partial": "app/src/modules/text/text",
+            "text": {
+                "withInitial": false,
+                "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. An nisi populari fama? Eorum enim est haec querela, qui sibi cari sunt seseque diligunt. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Duo Reges: constructio interrete. Qui autem esse poteris, nisi te amor ipse ceperit? Is ita vivebat, ut nulla tam exquisita posset inveniri voluptas, qua non abundaret. Sed tamen intellego quid velit. Quo modo autem optimum, si bonum praeterea nullum est? Quoniam, si dis placet, ab Epicuro loqui discimus. In his igitur partibus duabus nihil erat, quod Zeno commutare gestiret. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Haec quo modo conveniant, non sane intellego.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. An nisi populari fama? Eorum enim est haec querela, qui sibi cari sunt seseque diligunt. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Duo Reges: constructio interrete. Qui autem esse poteris, nisi te amor ipse ceperit? Is ita vivebat, ut nulla tam exquisita posset inveniri voluptas, qua non abundaret. Sed tamen intellego quid velit. Quo modo autem optimum, si bonum praeterea nullum est? Quoniam, si dis placet, ab Epicuro loqui discimus. In his igitur partibus duabus nihil erat, quod Zeno commutare gestiret. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Haec quo modo conveniant, non sane intellego.</p>"
+            }
+        },
+        {
+            "partial": "app/src/modules/image/image",
+            "image": {
+                "caption": "Hier ein richtig überbreites Bild.",
+                "source": "YO",
+                "displayMode": "expanded",
+                "animated": {
+                    "resetOnVisible": false
+                },
+
+                "desktop": {
+                    "url": "data/assets/landscape.jpg",
+                    "quality": 70
+                },
+                "mobile": {
+                    "url": "data/assets/animated_map.gif",
+                    "quality": 1
+                }
+            }
+        },
+        {
+            "partial": "app/src/modules/text/text",
+            "text": {
+                "withInitial": false,
+                "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. An nisi populari fama? Eorum enim est haec querela, qui sibi cari sunt seseque diligunt. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Duo Reges: constructio interrete. Qui autem esse poteris, nisi te amor ipse ceperit? Is ita vivebat, ut nulla tam exquisita posset inveniri voluptas, qua non abundaret. Sed tamen intellego quid velit. Quo modo autem optimum, si bonum praeterea nullum est? Quoniam, si dis placet, ab Epicuro loqui discimus. In his igitur partibus duabus nihil erat, quod Zeno commutare gestiret. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Haec quo modo conveniant, non sane intellego.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. An nisi populari fama? Eorum enim est haec querela, qui sibi cari sunt seseque diligunt. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Duo Reges: constructio interrete. Qui autem esse poteris, nisi te amor ipse ceperit? Is ita vivebat, ut nulla tam exquisita posset inveniri voluptas, qua non abundaret. Sed tamen intellego quid velit. Quo modo autem optimum, si bonum praeterea nullum est? Quoniam, si dis placet, ab Epicuro loqui discimus. In his igitur partibus duabus nihil erat, quod Zeno commutare gestiret. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Haec quo modo conveniant, non sane intellego.</p>"
+            }
+        },
+        {
+            "partial": "app/src/modules/image/image",
+            "image": {
+                "desktop": {
+                    "url": "data/assets/landscape.jpg",
+                    "quality": 70
+                },
+                "mobile": {
+                    "url": "data/assets/animated_map.gif",
+                    "quality": 70
+                },
+                "caption": "Hier ein total überbreites Bild.",
+                "source": "Das hier ist 1320px breit",
+                "displayMode": "fullwidth",
+                "animated": {
+                    "resetOnVisible": false
+                }
+            }
+        },
+        {
+            "theme": "light",
+            "partial": "app/src/modules/blender/imageBlender",
+            "slides": {
+                "displayMode": "contain",
+                "default": [
+                    {
+                        "desktop": {
+                            "url": "data/assets/blender01_03.png",
+                            "quality": 63
+                        },
+                        "mobile": {
+                            "url": "data/assets/animated_map.gif",
+                            "quality": 70
+                        }
+                    },
+                    {
+                        "desktop": {
+                            "url": "data/assets/blender02_03.png",
+                            "quality": 70
+                        },
+                        "mobile": {
+                            "url": "data/assets/animated_map.gif",
+                            "quality": 70
+                        }
+                    },
+                    {
+                        "desktop": {
+                            "url": "data/assets/blender03_03.png",
+                            "quality": 70
+                        },
+                        "mobile": {
+                            "url": "data/assets/animated_map.gif",
+                            "quality": 70
+                        }
+                    }
+                ],
+                "fallback": [
+                    {
+                        "image": {
+                            "url": "data/assets/blender03.png",
+                            "quality": 70
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "partial": "app/src/modules/text/text",
+            "text": {
+                "withInitial": false,
+                "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. An nisi populari fama? Eorum enim est haec querela, qui sibi cari sunt seseque diligunt. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Duo Reges: constructio interrete. Qui autem esse poteris, nisi te amor ipse ceperit? Is ita vivebat, ut nulla tam exquisita posset inveniri voluptas, qua non abundaret. Sed tamen intellego quid velit. Quo modo autem optimum, si bonum praeterea nullum est? Quoniam, si dis placet, ab Epicuro loqui discimus.</p>"
+            }
+        },
+        {
+            "slides": {
+                "displayMode": "contain",
+                "default": [
+                    {
+                        "desktop": {
+                            "url": "data/assets/blender01_04.png",
+                            "quality": 70
+                        },
+                        "mobile": {
+                            "url": "data/assets/animated_map.gif",
+                            "quality": 70
+                        }
+                    },
+                    {
+                        "desktop": {
+                            "url": "data/assets/blender02_04.png",
+                            "quality": 70
+                        },
+                        "mobile": {
+                            "url": "data/assets/animated_map.gif",
+                            "quality": 70
+                        }
+                    },
+                    {
+                        "desktop": {
+                            "url": "data/assets/blender03_04.png",
+                            "quality": 70
+                        },
+                        "mobile": {
+                            "url": "data/assets/animated_map.gif",
+                            "quality": 70
+                        }
+                    },
+                    {
+                        "desktop": {
+                            "url": "data/assets/blender04_04.png",
+                            "quality": 70
+                        },
+                        "mobile": {
+                            "url": "data/assets/animated_map.gif",
+                            "quality": 70
+                        }
+                    }
+                ],
+                "fallback": [
+                    {
+                        "image": {
+                            "url": "data/assets/blender04.png",
+                            "quality": 70
+                        }
+                    }
+                ]
+            },
+            "theme": "light",
+            "partial": "app/src/modules/blender/imageBlender"
+        },
+        {
+            "partial": "app/src/modules/text/text",
+            "text": {
+                "withInitial": false,
+                "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. An nisi populari fama? Eorum enim est haec querela, qui sibi cari sunt seseque diligunt. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Duo Reges: constructio interrete. Qui autem esse poteris, nisi te amor ipse ceperit? Is ita vivebat, ut nulla tam exquisita posset inveniri voluptas, qua non abundaret. Sed tamen intellego quid velit. Quo modo autem optimum, si bonum praeterea nullum est? Quoniam, si dis placet, ab Epicuro loqui discimus. In his igitur partibus duabus nihil erat, quod Zeno commutare gestiret. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Haec quo modo conveniant, non sane intellego.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. An nisi populari fama? Eorum enim est haec querela, qui sibi cari sunt seseque diligunt. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Duo Reges: constructio interrete. Qui autem esse poteris, nisi te amor ipse ceperit? Is ita vivebat, ut nulla tam exquisita posset inveniri voluptas, qua non abundaret. Sed tamen intellego quid velit. Quo modo autem optimum, si bonum praeterea nullum est? Quoniam, si dis placet, ab Epicuro loqui discimus. In his igitur partibus duabus nihil erat, quod Zeno commutare gestiret. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Haec quo modo conveniant, non sane intellego.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. An nisi populari fama? Eorum enim est haec querela, qui sibi cari sunt seseque diligunt. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Duo Reges: constructio interrete. Qui autem esse poteris, nisi te amor ipse ceperit? Is ita vivebat, ut nulla tam exquisita posset inveniri voluptas, qua non abundaret. Sed tamen intellego quid velit. Quo modo autem optimum, si bonum praeterea nullum est? Quoniam, si dis placet, ab Epicuro loqui discimus. In his igitur partibus duabus nihil erat, quod Zeno commutare gestiret. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Haec quo modo conveniant, non sane intellego.</p>"
+            }
+        },
+        {
+            "partial": "app/src/modules/video/video",
+            "video": {
+                "url": "http://example.com/test/g7/asset/video/g7-intro.mp4",
+                "quality": 70,
+                "previewImage": {
+                    "url": "data/assets/video_dergipfel.png",
+                    "quality": 70
+                },
+                "source": "DPA",
+                "autoplay": true,
+                "type": "video",
+                "displayMode": "float-left"
+            }
+        },
+        {
+            "partial": "app/src/modules/text/text",
+            "text": {
+                "withInitial": false,
+                "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. An nisi populari fama? Eorum enim est haec querela, qui sibi cari sunt seseque diligunt. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Duo Reges: constructio interrete. Qui autem esse poteris, nisi te amor ipse ceperit? Is ita vivebat, ut nulla tam exquisita posset inveniri voluptas, qua non abundaret. Sed tamen intellego quid velit. Quo modo autem optimum, si bonum praeterea nullum est? Quoniam, si dis placet, ab Epicuro loqui discimus. In his igitur partibus duabus nihil erat, quod Zeno commutare gestiret. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Haec quo modo conveniant, non sane intellego.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. An nisi populari fama? Eorum enim est haec querela, qui sibi cari sunt seseque diligunt. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Duo Reges: constructio interrete. Qui autem esse poteris, nisi te amor ipse ceperit? Is ita vivebat, ut nulla tam exquisita posset inveniri voluptas, qua non abundaret. Sed tamen intellego quid velit. Quo modo autem optimum, si bonum praeterea nullum est? Quoniam, si dis placet, ab Epicuro loqui discimus. In his igitur partibus duabus nihil erat, quod Zeno commutare gestiret. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Haec quo modo conveniant, non sane intellego.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. An nisi populari fama? Eorum enim est haec querela, qui sibi cari sunt seseque diligunt. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Duo Reges: constructio interrete. Qui autem esse poteris, nisi te amor ipse ceperit? Is ita vivebat, ut nulla tam exquisita posset inveniri voluptas, qua non abundaret. Sed tamen intellego quid velit. Quo modo autem optimum, si bonum praeterea nullum est? Quoniam, si dis placet, ab Epicuro loqui discimus. In his igitur partibus duabus nihil erat, quod Zeno commutare gestiret. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Haec quo modo conveniant, non sane intellego.</p>"
+            }
+        }
+    ],
+
+    "furtherReading": [
+        {
+            "kicker": "Dachzeile",
+            "headline": "Hier steht eine kleine Blindüberschrift",
+            "link": "http://example.com",
+            "image": {
+                "type": "image",
+                "url": "data/assets/houseAtNight.jpg",
+                "quality": 70
+            }
+        },
+        {
+            "kicker": "Island",
+            "headline": "Was für ein schönes Parlament die doch haben",
+            "link": "http://example.com",
+            "image": {
+                "type": "image",
+                "url": "data/assets/houseAtNight.jpg",
+                "quality": 70
+            }
+        },
+        {
+            "kicker": "The world is not enough",
+            "headline": "Na was haben wir denn da? Logos!",
+            "link": "http://example.com",
+            "image": {
+                "type": "image",
+                "url": "data/assets/houseAtNight.jpg",
+                "quality": 70
+            }
+        }
+    ],
+
+    "credits": [
+        {
+            "what": "Gestaltung und Infografiken",
+            "who": "Manni Kostryzinsikissi"
+        },
+        {
+            "what": "Redaktion",
+            "who": "Rolfmann Jaschneskie"
+        },
+        {
+            "what": "Programmierung",
+            "who": "Bämjanine Turban, Sascha Götzhoser"
+        }
+    ],
+
+    "seo": {
+        "title": "Das ist ein Seitentitel",
+        "teaser": "Das ist ein Teaser",
+        "keywords": "Longread",
+        "schemaOrg": {
+            "title": "Schema.org title",
+            "description": "Schema.org description",
+            "image": { "url": "data/assets/coconut.jpg", "quality": 70 },
+            "logo": "small-black.png"
+        }
+    },
+    "socialMedia": {
+        "email": {
+            "sharingSubject": "Mail subject with ümläuts",
+            "sharingBody": "Mail body with ümläuts"
+        },
+        "facebook": {
+            "title": "Facebook title",
+            "description": "Facebook description",
+            "image": { "url": "data/assets/coconut.jpg", "quality": 70 }
+        },
+        "twitter": {
+            "title": "Twitter title",
+            "description": "Twitter description",
+            "image": { "url": "data/assets/coconut.jpg", "quality": 70 },
+            "sharingText": "Twitter custom share message {{url}} with #hash #tags and ümläuts"
+        },
+        "whatsapp": {
+            "sharingText": "Whats app custom share message with ümläuts - {{url}}"
+        }
+    },
+    "dev": {
+        "customCSS": "header.szig-header { background-color: hotpink; }"
+    }
+}

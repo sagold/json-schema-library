@@ -1,10 +1,11 @@
 const jsl = require("../dist/jsonSchemaLibrary");
-const Core = jsl.Draft07;
+const compileSchema = jsl.compileSchema;
 
-const schema = require("../test/integration/support/default-schema.json");
-const data = require("../test/integration/support/default-data.json");
+const schema = require("./default-schema.json");
+const data = require("./default-data.json");
 
+let valid;
 for (let i = 0; i < 1000; i += 1) {
-    const validator = new Core(schema);
-    const errors = validator.validate(schema, data);
+    const node = compileSchema(schema);
+    valid = node.validate(data).valid;
 }
