@@ -3,7 +3,9 @@ import { errors } from "./errors/errors";
 import { SchemaNode, isSchemaNode, GetSchemaOptions } from "./SchemaNode";
 
 export type JsonBooleanSchema = boolean;
-export type JsonSchema = Record<string, any>;
+export interface JsonSchema {
+    [p: string]: any;
+}
 export type JsonPointer = string;
 
 export type DefaultErrors = keyof typeof errors;

@@ -9,7 +9,7 @@ import { getTemplate } from "./methods/getTemplate";
 
 export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "draft-2020-12" | "latest";
 
-export type Draft = {
+export interface Draft {
     /** test-string if draft can be used with $schema-url */
     $schemaRegEx: string;
     /** draft-version of this draft, e.g. draft-2020-12 */
@@ -28,7 +28,7 @@ export type Draft = {
     /** draft errors (this can still be global) */
     errors: ErrorConfig;
     formats: typeof formats;
-};
+}
 
 type PartialDraft = Partial<Omit<Draft, "errors" | "formats">> & {
     errors?: Partial<Draft["errors"]>;

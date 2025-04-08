@@ -1,6 +1,6 @@
 import { isObject } from "../utils/isObject";
 
-export function pick<T extends Record<string, unknown>, K extends keyof T>(value: T, ...properties: K[]) {
+export function pick<T extends { [P in keyof T]: unknown }, K extends keyof T>(value: T, ...properties: K[]) {
     if (!isObject(value) || properties.length === 0) {
         return value;
     }
