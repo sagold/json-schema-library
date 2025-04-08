@@ -32,20 +32,20 @@ export type TemplateOptions = {
 };
 
 function safeResolveRef(node: SchemaNode, options: TemplateOptions) {
-    if (node.ref == null) {
+    if (node.$ref == null) {
         return undefined;
     }
     const { cache, recursionLimit = 1 } = options;
 
     const origin = node.schemaId;
     cache[origin] = cache[origin] ?? {};
-    cache[origin][node.ref] = cache[origin][node.ref] ?? 0;
-    const value = cache[origin][node.ref];
+    cache[origin][node.$ref] = cache[origin][node.$ref] ?? 0;
+    const value = cache[origin][node.$ref];
     if (value >= recursionLimit && options.disableRecusionLimit !== true) {
         return false;
     }
     options.disableRecusionLimit = false;
-    cache[origin][node.ref] += 1;
+    cache[origin][node.$ref] += 1;
     const resolvedNode = node.resolveRef();
     if (resolvedNode && resolvedNode !== node) {
         return resolvedNode;
@@ -55,7 +55,7 @@ function safeResolveRef(node: SchemaNode, options: TemplateOptions) {
 }
 
 function canResolveRef(node: SchemaNode, options: TemplateOptions) {
-    const counter = options.cache?.[node.schemaId]?.[node.ref] ?? -1;
+    const counter = options.cache?.[node.schemaId]?.[node.$ref] ?? -1;
     return counter < options.recursionLimit;
 }
 

@@ -1,10 +1,10 @@
 import { Keyword, JsonSchemaValidatorParams, ValidationPath } from "../../Keyword";
-import { resolveRef } from "../../keywords/ref";
+import { resolveRef } from "../../keywords/$ref";
 import { SchemaNode } from "../../types";
 import { joinId } from "../../utils/joinId";
 import { validateNode } from "../../validateNode";
 
-export const refKeyword: Keyword = {
+export const $refKeyword: Keyword = {
     id: "$ref",
     keyword: "$ref",
     parse: parseRef,
@@ -45,7 +45,7 @@ function parseRef(node: SchemaNode) {
 
     // precompile reference
     if (node.schema.$ref) {
-        node.ref = joinId(currentId, node.schema.$ref);
+        node.$ref = joinId(currentId, node.schema.$ref);
     }
 }
 

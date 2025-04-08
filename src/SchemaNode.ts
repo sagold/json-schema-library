@@ -80,8 +80,10 @@ export interface SchemaNode extends SchemaNodeMethodsType {
 
     resolveRef?: (args?: { pointer?: string; path?: ValidationPath }) => SchemaNode;
     // parsed schema properties (registered by parsers)
-    $defs?: Record<string, SchemaNode>;
     $id?: string;
+    $defs?: Record<string, SchemaNode>;
+    $ref?: string;
+    /** only used for draft <= 2019-09 */
     additionalItems?: SchemaNode;
     additionalProperties?: SchemaNode;
     allOf?: SchemaNode[];
@@ -98,7 +100,6 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     patternProperties?: { pattern: RegExp; node: SchemaNode }[];
     properties?: Record<string, SchemaNode>;
     propertyNames?: SchemaNode;
-    ref?: string;
     then?: SchemaNode;
     unevaluatedItems?: SchemaNode;
     unevaluatedProperties?: SchemaNode;

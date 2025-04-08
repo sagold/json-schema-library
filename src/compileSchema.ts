@@ -1,5 +1,5 @@
 import copy from "fast-copy";
-import getRef from "./keywords/ref";
+import { getRef } from "./keywords/$ref";
 import { draft04 } from "./draft04";
 import { draft06 } from "./draft06";
 import { draft07 } from "./draft07";

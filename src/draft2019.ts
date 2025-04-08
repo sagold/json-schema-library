@@ -4,7 +4,7 @@ import { allOfKeyword } from "./keywords/allOf";
 import { anyOfKeyword } from "./keywords/anyOf";
 import { constKeyword } from "./keywords/const";
 import { containsKeyword } from "./keywords/contains";
-import { defsKeyword } from "./keywords/defs";
+import { $defsKeyword } from "./keywords/$defs";
 import { dependenciesKeyword } from "./keywords/dependencies";
 import { dependentRequiredKeyword } from "./keywords/dependentRequired";
 import { dependentSchemasKeyword } from "./keywords/dependentSchemas";
@@ -29,7 +29,7 @@ import { patternKeyword } from "./keywords/pattern";
 import { patternPropertiesKeyword } from "./keywords/patternProperties";
 import { propertiesKeyword } from "./keywords/properties";
 import { propertyNamesKeyword } from "./keywords/propertyNames";
-import { refKeyword } from "./draft2019-09/keywords/ref";
+import { $refKeyword } from "./draft2019-09/keywords/$ref";
 import { requiredKeyword } from "./keywords/required";
 import { sanitizeKeywords } from "./Draft";
 import { typeKeyword } from "./keywords/type";
@@ -70,12 +70,12 @@ export const draft2019 = sanitizeKeywords({
         toDataNodes
     },
     keywords: [
-        refKeyword,
+        $refKeyword,
         allOfKeyword,
         anyOfKeyword,
         constKeyword,
         containsKeyword,
-        defsKeyword,
+        $defsKeyword,
         dependenciesKeyword, // optional support for old draft-version
         dependentRequiredKeyword, // draft-2019: new
         dependentSchemasKeyword, // draft-2019: new

@@ -3,7 +3,7 @@ import { additionalPropertiesKeyword } from "./keywords/additionalProperties";
 import { allOfKeyword } from "./keywords/allOf";
 import { anyOfKeyword } from "./keywords/anyOf";
 import { containsKeyword } from "./keywords/contains";
-import { defsKeyword } from "./keywords/defs";
+import { $defsKeyword } from "./keywords/$defs";
 import { dependenciesKeyword } from "./keywords/dependencies";
 import { enumKeyword } from "./keywords/enum";
 import { exclusiveMaximumKeyword } from "./draft04/keywords/exclusiveMaximum";
@@ -25,7 +25,7 @@ import { patternKeyword } from "./keywords/pattern";
 import { patternPropertiesKeyword } from "./keywords/patternProperties";
 import { propertiesKeyword } from "./keywords/properties";
 import { propertyNamesKeyword } from "./keywords/propertyNames";
-import { refKeyword } from "./draft04/keywords/ref";
+import { $refKeyword } from "./draft04/keywords/$ref";
 import { requiredKeyword } from "./keywords/required";
 import { sanitizeKeywords } from "./Draft";
 import { typeKeyword } from "./keywords/type";
@@ -71,11 +71,11 @@ export const draft04 = sanitizeKeywords({
         toDataNodes
     },
     keywords: [
-        refKeyword,
+        $refKeyword,
         allOfKeyword,
         anyOfKeyword,
         containsKeyword,
-        defsKeyword,
+        $defsKeyword,
         dependenciesKeyword, // optional support for old draft-version
         enumKeyword,
         exclusiveMaximumKeyword,

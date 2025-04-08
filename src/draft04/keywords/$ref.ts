@@ -3,10 +3,10 @@ import { joinId } from "../../utils/joinId";
 import { isObject } from "../../utils/isObject";
 import { omit } from "../../utils/omit";
 import splitRef from "../../utils/splitRef";
-import { refKeyword as draft06Keyword } from "../../draft06/keywords/ref";
+import { $refKeyword as draft06Keyword } from "../../draft06/keywords/$ref";
 import { SchemaNode } from "../../types";
 
-export const refKeyword: Keyword = {
+export const $refKeyword: Keyword = {
     id: "$ref",
     keyword: "$ref",
     parse: parseRef,
@@ -54,23 +54,23 @@ function parseRef(node: SchemaNode) {
 
     // precompile reference
     if (node.schema.$ref) {
-        node.ref = joinId(currentId, node.schema.$ref);
+        node.$ref = joinId(currentId, node.schema.$ref);
     }
 }
 
 function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
     // throw new Error("resolving ref");
     const node = this as SchemaNode;
-    if (node.ref == null) {
+    if (node.$ref == null) {
         return node;
     }
     const resolvedNode = getRef(node);
-    // console.log("RESOLVE REF", node.schema, "resolved ref", node.ref, "=>", resolvedNode.schema);
+    // console.log("RESOLVE REF", node.schema, "resolved ref", node.$ref, "=>", resolvedNode.schema);
     if (resolvedNode != null) {
         path?.push({ pointer, node: resolvedNode });
-        // console.log("resolve ref", node.ref, "=>", resolvedNode.schema, Object.keys(node.context.refs));
+        // console.log("resolve ref", node.$ref, "=>", resolvedNode.schema, Object.keys(node.context.refs));
     } else {
-        console.log("failed resolving", node.ref, "from", Object.keys(node.context.refs));
+        console.log("failed resolving", node.$ref, "from", Object.keys(node.context.refs));
     }
 
     return resolvedNode;
@@ -83,7 +83,7 @@ function compileNext(referencedNode: SchemaNode, spointer = referencedNode.spoin
     return referencedNode.compileSchema(referencedSchema, `${spointer}/$ref`, referencedSchema.schemaId);
 }
 
-function getRef(node: SchemaNode, $ref = node?.ref): SchemaNode | undefined {
+function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefined {
     if ($ref == null) {
         return node;
     }

@@ -1,7 +1,7 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
 
-describe("keyword : ref : resolve", () => {
+describe("keyword : $ref : resolve", () => {
     it("should return undefined for missing reference", () => {
         const node = compileSchema({
             $ref: "#/$defs/header",
