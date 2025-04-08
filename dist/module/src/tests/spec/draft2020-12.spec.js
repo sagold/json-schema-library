@@ -34,8 +34,8 @@ import runAllTestCases from "../utils/runTestCases";
  */
 runAllTestCases({
     // only: {
-    //     name: "format-email"
-    //     // description: "patterns always use unicode semantics with patternProperties"
+    //     name: "unevaluatedProperties",
+    //     description: "unevaluatedProperties with $dynamicRef"
     // },
     // logSchema: false,
     skipTestCase: (t) => ![

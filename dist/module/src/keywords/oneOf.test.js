@@ -314,7 +314,7 @@ describe("keyword : oneof-property : reduce", () => {
             });
             const res = reduceOneOfDeclarator({ node, data: { title: "not a number" } });
             assert(isJsonError(res), "expected result to be an error");
-            assert.deepEqual(res.name, "MissingOneOfPropertyError");
+            assert.deepEqual(res.code, "missing-one-of-property-error");
         });
     });
     describe("array", () => {
@@ -334,7 +334,7 @@ describe("keyword : oneof-property : reduce", () => {
             });
             const res = reduceOneOfDeclarator({ node, data: { name: "2", title: "not a number" } });
             assert(isJsonError(res), "expected result to be an error");
-            assert.deepEqual(res.name, "MissingOneOfPropertyError");
+            assert.deepEqual(res.code, "missing-one-of-property-error");
         });
     });
 });

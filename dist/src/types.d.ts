@@ -26,7 +26,6 @@ export type ErrorData<T extends Record<string, unknown> = {
 };
 export type JsonError<T extends ErrorData = ErrorData> = {
     type: "error";
-    name: string;
     code: string;
     message: string;
     data: T;

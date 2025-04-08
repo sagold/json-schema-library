@@ -4,6 +4,7 @@ import { getValue } from "../utils/getValue";
 import sanitizeErrors from "../utils/sanitizeErrors";
 import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
+import { joinDynamicId } from "../SchemaNode";
 const { DECLARATOR_ONEOF } = settings;
 export const oneOfKeyword = {
     id: "oneOf",
@@ -30,6 +31,7 @@ export function parseOneOf(node) {
     }
 }
 function reduceOneOf({ node, data, pointer, path }) {
+    var _a, _b;
     // !keyword: oneOfProperty
     // an additional <DECLARATOR_ONEOF> (default `oneOfProperty`) on the schema will exactly determine the
     // oneOf value (if set in data)
@@ -51,7 +53,10 @@ function reduceOneOf({ node, data, pointer, path }) {
         const { node, index } = matches[0];
         const { node: reducedNode, error } = node.reduceSchema(data, { pointer, path });
         if (reducedNode) {
+            const nestedDynamicId = (_b = (_a = reducedNode.dynamicId) === null || _a === void 0 ? void 0 : _a.replace(node.dynamicId, "")) !== null && _b !== void 0 ? _b : "";
+            const dynamicId = nestedDynamicId === "" ? `oneOf/${index}` : nestedDynamicId;
             reducedNode.oneOfIndex = index; // @evaluation-info
+            reducedNode.dynamicId = joinDynamicId(reducedNode.dynamicId, `+${node.schemaId}(${dynamicId})`);
             return reducedNode;
         }
         return error;

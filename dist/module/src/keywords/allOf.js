@@ -15,18 +15,23 @@ export function parseAllOf(node) {
         node.allOf = schema.allOf.map((s, index) => node.compileSchema(s, `${spointer}/allOf/${index}`, `${node.schemaId}/allOf/${index}`));
     }
 }
-function reduceAllOf({ node, data }) {
+function reduceAllOf({ node, data, key, pointer, path }) {
+    var _a, _b;
     // note: parts of schemas could be merged, e.g. if they do not include
     // dynamic schema parts
     let mergedSchema = {};
+    let dynamicId = "";
     for (let i = 0; i < node.allOf.length; i += 1) {
-        const { node: schemaNode } = node.allOf[i].reduceSchema(data);
+        const { node: schemaNode } = node.allOf[i].reduceSchema(data, { key, pointer, path });
         if (schemaNode) {
+            const nestedDynamicId = (_b = (_a = schemaNode.dynamicId) === null || _a === void 0 ? void 0 : _a.replace(node.dynamicId, "")) !== null && _b !== void 0 ? _b : "";
+            const localDynamicId = nestedDynamicId === "" ? `allOf/${i}` : nestedDynamicId;
+            dynamicId += `${dynamicId === "" ? "" : ","}${localDynamicId}`;
             const schema = mergeSchema(node.allOf[i].schema, schemaNode.schema);
             mergedSchema = mergeSchema(mergedSchema, schema, "allOf", "contains");
         }
     }
-    return node.compileSchema(mergedSchema, `${node.spointer}/allOf`, node.schemaId);
+    return node.compileSchema(mergedSchema, `${node.spointer}/${dynamicId}`, node.schemaId, `${node.schemaId}(${dynamicId})`);
 }
 function validateAllOf({ node, data, pointer, path }) {
     if (!Array.isArray(node.allOf) || node.allOf.length === 0) {

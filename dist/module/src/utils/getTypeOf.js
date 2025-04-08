@@ -1,5 +1,5 @@
 const toString = Object.prototype.toString;
-export default function getTypeOf(value) {
+export function getTypeOf(value) {
     const type = toString
         .call(value)
         .match(/\s([^\]]+)\]/)

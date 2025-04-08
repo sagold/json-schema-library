@@ -1,8 +1,8 @@
 import { isSchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 import { isObject } from "../utils/isObject";
-import { mergeSchema } from "../utils/mergeSchema";
 import { validateNode } from "../validateNode";
+import { mergeNode } from "../mergeNode";
 export const dependenciesKeyword = {
     id: "dependencies",
     keyword: "dependencies",
@@ -34,30 +34,35 @@ export function parseDependencies(node) {
         }
     });
 }
-export function reduceDependencies({ node, data, path }) {
+export function reduceDependencies({ node, data, key, path }) {
+    var _a;
     if (!isObject(data) || node.dependencies == null) {
         // @todo remove dependentSchemas
         return node;
     }
-    let mergedSchema;
+    let workingNode = node.compileSchema(node.schema, node.spointer, node.schemaId);
     const { dependencies } = node;
+    let required = (_a = workingNode.schema.required) !== null && _a !== void 0 ? _a : [];
     Object.keys(dependencies).forEach((propertyName) => {
-        var _a;
-        mergedSchema = mergedSchema !== null && mergedSchema !== void 0 ? mergedSchema : { properties: {} };
         if (isSchemaNode(dependencies[propertyName])) {
-            mergedSchema = mergeSchema(mergedSchema, dependencies[propertyName].schema);
+            const reducedDependency = dependencies[propertyName].reduceSchema(data, { key, path }).node;
+            workingNode = mergeNode(workingNode, reducedDependency);
         }
         else if (Array.isArray(dependencies[propertyName]) && data[propertyName] !== undefined) {
-            mergedSchema.required = (_a = mergedSchema.required) !== null && _a !== void 0 ? _a : [];
-            mergedSchema.required.push(...dependencies[propertyName]);
+            required.push(...dependencies[propertyName]);
         }
     });
-    if (mergedSchema == null) {
+    if (workingNode === node) {
         return node;
     }
-    mergedSchema = mergeSchema(node.schema, mergedSchema, "dependencies");
-    const { node: childNode, error } = node.compileSchema(mergedSchema, node.spointer).reduceSchema(data, { path });
-    return childNode !== null && childNode !== void 0 ? childNode : error;
+    // mergedSchema = mergeSchema(node.schema, mergedSchema, "dependencies");
+    // const { node: childNode, error } = node.compileSchema(mergedSchema, node.spointer).reduceSchema(data, { path });
+    // return childNode ?? error;
+    if (required.length === 0) {
+        return workingNode;
+    }
+    required = workingNode.schema.required ? workingNode.schema.required.concat(...required) : required;
+    return workingNode.compileSchema({ ...workingNode.schema, required }, workingNode.spointer, workingNode.schemaId);
 }
 function validateDependencies({ node, data, pointer, path }) {
     if (!isObject(data)) {

@@ -1,4 +1,4 @@
-import getTypeOf from "../utils/getTypeOf";
+import { getTypeOf } from "../utils/getTypeOf";
 export const enumKeyword = {
     id: "enum",
     keyword: "enum",

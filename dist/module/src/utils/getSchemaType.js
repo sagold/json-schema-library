@@ -1,4 +1,4 @@
-import getTypeOf from "./getTypeOf";
+import { getTypeOf } from "./getTypeOf";
 import { isObject } from "../utils/isObject";
 export const SCHEMA_TYPES = ["string", "number", "integer", "boolean", "null", "array", "object"];
 const OBJECT_PROPERTIES = [

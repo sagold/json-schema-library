@@ -4,10 +4,14 @@ import { omit } from "../utils/omit";
 import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
 import { get, split } from "@sagold/json-pointer";
+import { mergeNode } from "../mergeNode";
 export const $refKeyword = {
     id: "$ref",
     keyword: "$ref",
+    order: 10,
     parse: parseRef,
+    addReduce: (node) => node.$ref != null || node.schema.$dynamicRef != null,
+    reduce: reduceRef,
     addValidate: ({ schema }) => schema.$ref != null || schema.$dynamicRef != null,
     validate: validateRef
 };
@@ -59,11 +63,19 @@ export function parseRef(node) {
         }
     }
 }
+export function reduceRef({ node, data, key, pointer, path }) {
+    const resolvedNode = node.resolveRef({ pointer, path });
+    if (resolvedNode.schemaId === node.schemaId) {
+        return resolvedNode;
+    }
+    const merged = mergeNode(node, resolvedNode);
+    const { node: reducedNode, error } = merged.reduceSchema(data, { key, pointer, path });
+    return reducedNode !== null && reducedNode !== void 0 ? reducedNode : error;
+}
 export function resolveRef({ pointer, path } = {}) {
     const node = this;
     if (node.schema.$dynamicRef) {
         const nextNode = resolveRecursiveRef(node, path);
-        // console.log("resolved node", node.schema.$dynamicRef, "=>", nextNode != null);
         path === null || path === void 0 ? void 0 : path.push({ pointer, node: nextNode });
         return nextNode;
     }
@@ -73,9 +85,6 @@ export function resolveRef({ pointer, path } = {}) {
     const resolvedNode = getRef(node);
     if (resolvedNode != null) {
         path === null || path === void 0 ? void 0 : path.push({ pointer, node: resolvedNode });
-    }
-    else {
-        // console.log("failed resolving", node.$ref, "from", Object.keys(node.context.refs));
     }
     return resolvedNode;
 }
@@ -90,9 +99,6 @@ function validateRef({ node, data, pointer = "#", path }) {
 function resolveRecursiveRef(node, path) {
     const history = path;
     const refInCurrentScope = joinId(node.$id, node.schema.$dynamicRef);
-    // console.log("resolve $dynamicRef:", node.schema.$dynamicRef);
-    // console.log(" -> scope:", joinId(node.$id, node.schema.$dynamicRef));
-    // console.log("dynamicAnchors", Object.keys(node.context.dynamicAnchors));
     // A $dynamicRef with a non-matching $dynamicAnchor in the same schema resource behaves like a normal $ref to $anchor
     const nonMatchingDynamicAnchor = node.context.dynamicAnchors[refInCurrentScope] == null;
     if (nonMatchingDynamicAnchor) {
@@ -114,7 +120,6 @@ function resolveRecursiveRef(node, path) {
         }
     }
     // A $dynamicRef without a matching $dynamicAnchor in the same schema resource behaves like a normal $ref to $anchor
-    // console.log(" -> resolve as ref");
     const nextNode = getRef(node, refInCurrentScope);
     return nextNode;
 }

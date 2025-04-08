@@ -27,6 +27,7 @@ export function compileSchema(schema, options = {}) {
         spointer: "#",
         lastIdPointer: "#",
         schemaId: "#",
+        dynamicId: "",
         reducers: [],
         resolvers: [],
         validators: [],

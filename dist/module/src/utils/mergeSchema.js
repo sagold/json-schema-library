@@ -1,4 +1,4 @@
-import getTypeOf from "./getTypeOf";
+import { getTypeOf } from "./getTypeOf";
 import { isObject } from "./isObject";
 export function mergeSchema(a, b, ...omit) {
     if ((b === null || b === void 0 ? void 0 : b.type) === "error") {

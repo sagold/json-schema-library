@@ -23,6 +23,7 @@ export function parsePatternProperties(node) {
         return;
     }
     node.patternProperties = patterns.map((pattern) => ({
+        name: pattern,
         pattern: new RegExp(pattern, "u"),
         node: node.compileSchema(schema.patternProperties[pattern], `${node.spointer}/patternProperties/${pattern}`, `${node.schemaId}/patternProperties/${pattern}`)
     }));
@@ -39,6 +40,7 @@ function reducePatternProperties({ node, data, key }) {
     if (key) {
         dataProperties.push(`${key}`);
     }
+    let dynamicId = `${node.schemaId}(`;
     dataProperties.push(...Object.keys((_a = node.schema.properties) !== null && _a !== void 0 ? _a : {}));
     dataProperties.forEach((propertyName, index, list) => {
         var _a, _b;
@@ -53,13 +55,14 @@ function reducePatternProperties({ node, data, key }) {
         if (matchingPatterns.length > 0) {
             mergedSchema = mergedSchema !== null && mergedSchema !== void 0 ? mergedSchema : { properties: {} };
             mergedSchema.properties[propertyName] = propertySchema;
+            dynamicId += `${matchingPatterns.map(({ name }) => `patternProperties/${name}`).join(",")}`;
         }
     });
     if (mergedSchema == null) {
         return node;
     }
     mergedSchema = mergeSchema(node.schema, mergedSchema, "patternProperties");
-    return node.compileSchema(mergedSchema, node.spointer);
+    return node.compileSchema(mergedSchema, node.spointer, node.schemaId, `${dynamicId})`);
 }
 function validatePatternProperties({ node, data, pointer, path }) {
     if (!isObject(data)) {

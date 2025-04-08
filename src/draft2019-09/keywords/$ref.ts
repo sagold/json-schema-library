@@ -73,7 +73,6 @@ export function resolveRef({ pointer, path }: { pointer?: string; path?: Validat
     const node = this as SchemaNode;
     if (node.schema.$recursiveRef) {
         const nextNode = resolveRecursiveRef(node, path);
-        console.log("recursive ref:", nextNode.schema);
         path?.push({ pointer, node: nextNode });
         return nextNode;
     }

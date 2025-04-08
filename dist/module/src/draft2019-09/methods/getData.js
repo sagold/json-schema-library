@@ -1,5 +1,5 @@
 import copy from "fast-copy";
-import getTypeOf from "../../utils/getTypeOf";
+import { getTypeOf } from "../../utils/getTypeOf";
 import { getSchemaType } from "../../utils/getSchemaType";
 import { getValue } from "../../utils/getValue";
 import { isEmpty } from "../../utils/isEmpty";

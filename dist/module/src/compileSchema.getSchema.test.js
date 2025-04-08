@@ -257,7 +257,7 @@ describe("compileSchema : getSchema", () => {
                 patternProperties: { "^tee$": { type: "string" } },
                 additionalProperties: false
             }).getSchema("#/beer");
-            assert.deepEqual(error.name, "NoAdditionalPropertiesError");
+            assert.deepEqual(error.code, "no-additional-properties-error");
         });
         describe("dependencies", () => {
             // it("should not return schema from dependencies when dependent property is missing", () => {

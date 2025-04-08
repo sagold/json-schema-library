@@ -38,6 +38,8 @@ export function reduceDependentSchemas({ node, data }) {
     }
     let mergedSchema;
     const { dependentSchemas } = node;
+    let added = 0;
+    let dynamicId = `${node.schemaId}(`;
     Object.keys(data).forEach((propertyName) => {
         if (dependentSchemas[propertyName] == null) {
             return;
@@ -49,12 +51,14 @@ export function reduceDependentSchemas({ node, data }) {
         else {
             mergedSchema.properties[propertyName] = dependentSchemas[propertyName];
         }
+        dynamicId += `${added ? "," : ""}dependentSchemas/${propertyName}`;
+        added++;
     });
     if (mergedSchema == null) {
         return node;
     }
     mergedSchema = mergeSchema(node.schema, mergedSchema, "dependentSchemas");
-    return node.compileSchema(mergedSchema, node.spointer, node.schemaId);
+    return node.compileSchema(mergedSchema, node.spointer, node.schemaId, `${dynamicId})`);
 }
 export function validateDependentSchemas({ node, data, pointer, path }) {
     const { schema, dependentSchemas } = node;

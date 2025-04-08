@@ -29,6 +29,13 @@ export function isItemEvaluated({ node, data, key, pointer, path }) {
             }
         }
     }
+    if (node.oneOf) {
+        for (let i = 0; i < node.oneOf.length; i += 1) {
+            if (isItemEvaluated({ node: node.oneOf[i], data, key, pointer, path })) {
+                return true;
+            }
+        }
+    }
     if (node.if) {
         if (isItemEvaluated({ node: node.if, data, key, pointer, path })) {
             return true;

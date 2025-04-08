@@ -1,5 +1,6 @@
 import { isSchemaNode } from "./types";
 import { mergeSchema } from "./utils/mergeSchema";
+import { joinDynamicId } from "./SchemaNode";
 function sortCb(a, b) {
     var _a, _b;
     return ((_a = b.order) !== null && _a !== void 0 ? _a : 0) - ((_b = a.order) !== null && _b !== void 0 ? _b : 0);
@@ -27,8 +28,21 @@ function mergeObjects(a, b) {
     });
     return object;
 }
-function mergeArray(a, b) {
-    return a || b ? [...(a !== null && a !== void 0 ? a : []), ...(b !== null && b !== void 0 ? b : [])] : undefined;
+// function mergeArray<T = unknown[]>(a?: T[], b?: T[]) {
+//     return a || b ? [...(a ?? []), ...(b ?? [])] : undefined;
+// }
+function mergePatternProperties(a, b) {
+    if (a == null || b == null) {
+        return a || b;
+    }
+    const result = [...a];
+    const pointerList = a.map((p) => p.node.spointer);
+    b.forEach((p) => {
+        if (!pointerList.includes(p.node.spointer)) {
+            result.push(p);
+        }
+    });
+    return result;
 }
 export function mergeNode(a, b, ...omit) {
     var _a, _b;
@@ -56,6 +70,7 @@ export function mergeNode(a, b, ...omit) {
         ...a,
         ...b,
         ...arraySelection,
+        dynamicId: joinDynamicId(a.dynamicId, b.dynamicId),
         oneOfIndex: (_b = a.oneOfIndex) !== null && _b !== void 0 ? _b : b.oneOfIndex,
         schema: mergeSchema(a.schema, b.schema, ...omit),
         parent: a.parent,
@@ -73,7 +88,7 @@ export function mergeNode(a, b, ...omit) {
         unevaluatedProperties: mergeNode(a.unevaluatedProperties, b.unevaluatedProperties),
         unevaluatedItems: mergeNode(a.unevaluatedItems, b.unevaluatedItems),
         $defs: mergeObjects(a.$defs, b.$defs),
-        patternProperties: mergeArray(a.patternProperties, b.patternProperties),
+        patternProperties: mergePatternProperties(a.patternProperties, b.patternProperties),
         properties: mergeObjects(a.properties, b.properties)
     };
     // this removes any function that has no keyword associated on schema

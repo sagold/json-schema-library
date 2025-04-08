@@ -1,4 +1,4 @@
-import getTypeOf from "../utils/getTypeOf";
+import { getTypeOf } from "../utils/getTypeOf";
 export const typeKeyword = {
     id: "type",
     keyword: "type",

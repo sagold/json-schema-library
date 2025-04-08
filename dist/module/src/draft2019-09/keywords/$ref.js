@@ -4,12 +4,15 @@ import { omit } from "../../utils/omit";
 import { isObject } from "../../utils/isObject";
 import { validateNode } from "../../validateNode";
 import { get } from "@sagold/json-pointer";
+import { reduceRef } from "../../keywords/$ref";
 export const $refKeyword = {
     id: "$ref",
     keyword: "$ref",
     parse: parseRef,
     addValidate: ({ schema }) => schema.$ref != null || schema.$recursiveRef != null,
-    validate: validateRef
+    validate: validateRef,
+    addReduce: ({ schema }) => schema.$ref != null || schema.$recursiveRef != null,
+    reduce: reduceRef
 };
 function register(node, path) {
     if (node.context.refs[path] == null) {
@@ -46,10 +49,22 @@ export function parseRef(node) {
         }
     }
 }
+// export function reduceRef({ node, data, key, pointer, path }: JsonSchemaReducerParams) {
+//     const resolvedNode = node.resolveRef({ pointer, path });
+//     if (resolvedNode.schemaId === node.schemaId) {
+//         return resolvedNode;
+//     }
+//     const result = resolvedNode.reduceSchema(data, { key, pointer, path });
+//     return result.node ?? result.error;
+//     // const merged = mergeNode({ ...node, $ref: undefined, schema: { ...node.schema, $ref: undefined } }, resolvedNode);
+//     // const { node: reducedNode, error } = merged.reduceSchema(data, { key, pointer, path });
+//     // return reducedNode ?? error;
+// }
 export function resolveRef({ pointer, path } = {}) {
     const node = this;
     if (node.schema.$recursiveRef) {
         const nextNode = resolveRecursiveRef(node, path);
+        console.log("recursive ref:", nextNode.schema);
         path === null || path === void 0 ? void 0 : path.push({ pointer, node: nextNode });
         return nextNode;
     }

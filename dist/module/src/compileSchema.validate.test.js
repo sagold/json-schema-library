@@ -43,7 +43,7 @@ describe("compileSchema.validate", () => {
                     oneOf: [{ type: "integer" }, { minimum: 2 }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MultipleOneOfError");
+                assert.deepEqual(errors[0].code, "multiple-one-of-error");
             });
         });
         describe("allOf", () => {
@@ -58,15 +58,15 @@ describe("compileSchema.validate", () => {
                     allOf: [{ type: "integer" }, { minimum: 4 }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MinimumError");
+                assert.deepEqual(errors[0].code, "minimum-error");
             });
             it("should return all errors for each non-matching schemas", () => {
                 const { errors } = compileSchema({
                     allOf: [{ type: "integer" }, { minimum: 4 }, { maximum: 2 }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 2);
-                assert.deepEqual(errors[0].name, "MinimumError");
-                assert.deepEqual(errors[1].name, "MaximumError");
+                assert.deepEqual(errors[0].code, "minimum-error");
+                assert.deepEqual(errors[1].code, "maximum-error");
             });
         });
         describe("anyOf", () => {
@@ -81,7 +81,7 @@ describe("compileSchema.validate", () => {
                     anyOf: [{ minimum: 4 }, { maximum: 2 }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "AnyOfError");
+                assert.deepEqual(errors[0].code, "any-of-error");
             });
             it("should validate null", () => {
                 const { errors } = compileSchema({
@@ -94,7 +94,7 @@ describe("compileSchema.validate", () => {
                     anyOf: [{ type: "null" }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "AnyOfError");
+                assert.deepEqual(errors[0].code, "any-of-error");
             });
             it("should resolve references", () => {
                 const { errors } = compileSchema({
@@ -143,8 +143,8 @@ describe("compileSchema.validate", () => {
                 }
             }).validate({ id: "first", a: "correct", b: "notallowed", c: false });
             assert.deepEqual(errors.length, 2);
-            assert.deepEqual(errors[0].name, "NoAdditionalPropertiesError");
-            assert.deepEqual(errors[1].name, "NoAdditionalPropertiesError");
+            assert.deepEqual(errors[0].code, "no-additional-properties-error");
+            assert.deepEqual(errors[1].code, "no-additional-properties-error");
         });
         describe("min/maxProperties", () => {
             it("should return MinPropertiesError for too few properties", () => {
@@ -153,7 +153,7 @@ describe("compileSchema.validate", () => {
                     minProperties: 2
                 }).validate({ a: 1 });
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MinPropertiesError");
+                assert.deepEqual(errors[0].code, "min-properties-error");
             });
             it("should return MaxPropertiesError for too many properties", () => {
                 const { errors } = compileSchema({
@@ -161,7 +161,7 @@ describe("compileSchema.validate", () => {
                     maxProperties: 1
                 }).validate({ a: 1, b: 2 });
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MaxPropertiesError");
+                assert.deepEqual(errors[0].code, "max-properties-error");
             });
             it("should be valid if property count is within range", () => {
                 const { errors } = compileSchema({
@@ -179,7 +179,7 @@ describe("compileSchema.validate", () => {
                     not: { type: "object", properties: { a: { type: "number" } } }
                 }).validate({ a: 1 });
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "NotError");
+                assert.deepEqual(errors[0].code, "not-error");
             });
         });
         describe("dependencies", () => {
@@ -200,7 +200,7 @@ describe("compileSchema.validate", () => {
                     }
                 }).validate({ title: "Check this out", url: "http://example.com" });
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MissingDependencyError");
+                assert.deepEqual(errors[0].code, "missing-dependency-error");
             });
             it("should return a 'MissingDependencyError' if the dependent counterpart is missing", () => {
                 const { errors } = compileSchema({
@@ -209,7 +209,7 @@ describe("compileSchema.validate", () => {
                     dependencies: { url: ["target"], target: ["url"] }
                 }).validate({ title: "Check this out", target: "_blank" });
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MissingDependencyError");
+                assert.deepEqual(errors[0].code, "missing-dependency-error");
             });
             it("should be valid for a matching schema dependency", () => {
                 const { errors } = compileSchema({
@@ -226,7 +226,7 @@ describe("compileSchema.validate", () => {
                     dependencies: { url: { required: ["target"], properties: { target: { type: "string" } } } }
                 }).validate({ url: "http://example.com" });
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "RequiredPropertyError");
+                assert.deepEqual(errors[0].code, "required-property-error");
             });
             it("should return correct error for invalid dependency", () => {
                 const { errors } = compileSchema({
@@ -256,7 +256,7 @@ describe("compileSchema.validate", () => {
                 prefixItems: [{ type: "string" }]
             }).validate([1]);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "TypeError");
+            assert.deepEqual(errors[0].code, "type-error");
         });
         it("should be valid for matching indices", () => {
             const { errors } = compileSchema({
@@ -272,8 +272,8 @@ describe("compileSchema.validate", () => {
                 maxItems: 1
             }).validate(["1", 2]);
             assert.deepEqual(errors.length, 2);
-            assert.deepEqual(errors[0].name, "TypeError");
-            assert.deepEqual(errors[1].name, "MaxItemsError");
+            assert.deepEqual(errors[0].code, "type-error");
+            assert.deepEqual(errors[1].code, "max-items-error");
         });
         describe("min/maxItems", () => {
             it("should return MinItemsError for too few items", () => {
@@ -282,7 +282,7 @@ describe("compileSchema.validate", () => {
                     minItems: 2
                 }).validate([1]);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MinItemsError");
+                assert.deepEqual(errors[0].code, "min-items-error");
             });
             it("should return MaxItemsError for too many items", () => {
                 const { errors } = compileSchema({
@@ -290,7 +290,7 @@ describe("compileSchema.validate", () => {
                     maxItems: 1
                 }).validate([1, 2]);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MaxItemsError");
+                assert.deepEqual(errors[0].code, "max-items-error");
             });
             it("should be valid if item count is within range", () => {
                 const { errors } = compileSchema({
@@ -317,7 +317,7 @@ describe("compileSchema.validate", () => {
                     not: { items: {} }
                 }).validate(["1", 2, {}]);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "NotError");
+                assert.deepEqual(errors[0].code, "not-error");
             });
         });
         describe("uniqueItems", () => {
@@ -327,7 +327,7 @@ describe("compileSchema.validate", () => {
                     uniqueItems: true
                 }).validate([1, 2, 3, 4, 3]);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "UniqueItemsError");
+                assert.deepEqual(errors[0].code, "unique-items-error");
             });
             it("should not validate for duplicated objects", () => {
                 const { errors } = compileSchema({
@@ -335,7 +335,7 @@ describe("compileSchema.validate", () => {
                     uniqueItems: true
                 }).validate([{ id: "first" }, { id: "second" }, { id: "first" }]);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "UniqueItemsError");
+                assert.deepEqual(errors[0].code, "unique-items-error");
             });
             it("should validate for mismatching objects with equal properties", () => {
                 const { errors } = compileSchema({
@@ -381,7 +381,7 @@ describe("compileSchema.validate", () => {
                     items: { oneOf: [{ type: "integer" }, { minimum: 2 }] }
                 }).validate([3]);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MultipleOneOfError");
+                assert.deepEqual(errors[0].code, "multiple-one-of-error");
             });
         });
     });
@@ -392,7 +392,7 @@ describe("compileSchema.validate", () => {
                 minLength: 2
             }).validate("a");
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "MinLengthError");
+            assert.deepEqual(errors[0].code, "min-length-error");
         });
         it("should return MaxLengthError if string is too long", () => {
             const { errors } = compileSchema({
@@ -400,7 +400,7 @@ describe("compileSchema.validate", () => {
                 maxLength: 2
             }).validate("abc");
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "MaxLengthError");
+            assert.deepEqual(errors[0].code, "max-length-error");
         });
         it("should be valid if string is within range", () => {
             const { errors } = compileSchema({
@@ -423,7 +423,7 @@ describe("compileSchema.validate", () => {
                 enum: ["a", "c"]
             }).validate("b");
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "EnumError");
+            assert.deepEqual(errors[0].code, "enum-error");
         });
         it("should be valid if value is within enum list", () => {
             const { errors } = compileSchema({
@@ -438,7 +438,7 @@ describe("compileSchema.validate", () => {
                 not: { type: "string", pattern: "^b$" }
             }).validate("b");
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "NotError");
+            assert.deepEqual(errors[0].code, "not-error");
         });
     });
     describe("number", () => {
@@ -448,7 +448,7 @@ describe("compileSchema.validate", () => {
                 minimum: 2
             }).validate(1);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "MinimumError");
+            assert.deepEqual(errors[0].code, "minimum-error");
         });
         it("should return MinimumError if number is equal and exclusiveMinimum is set", () => {
             const { errors } = compileSchema({
@@ -457,7 +457,7 @@ describe("compileSchema.validate", () => {
                 exclusiveMinimum: true
             }).validate(2);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "MinimumError");
+            assert.deepEqual(errors[0].code, "minimum-error");
         });
         it("should return MaximumError if number is too large", () => {
             const { errors } = compileSchema({
@@ -465,7 +465,7 @@ describe("compileSchema.validate", () => {
                 maximum: 1
             }).validate(2);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "MaximumError");
+            assert.deepEqual(errors[0].code, "maximum-error");
         });
         it("should return MaximumError if number same and exclusiveMaximum is set", () => {
             const { errors } = compileSchema({
@@ -474,7 +474,7 @@ describe("compileSchema.validate", () => {
                 exclusiveMaximum: true
             }).validate(2);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "MaximumError");
+            assert.deepEqual(errors[0].code, "maximum-error");
         });
         it("should be valid if number is within range", () => {
             const { errors } = compileSchema({
@@ -503,7 +503,7 @@ describe("compileSchema.validate", () => {
                 enum: [21, 27, 42]
             }).validate(13);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "EnumError");
+            assert.deepEqual(errors[0].code, "enum-error");
         });
         it("should be valid if value is within enum list", () => {
             const { errors } = compileSchema({
@@ -518,7 +518,7 @@ describe("compileSchema.validate", () => {
                 multipleOf: 1.5
             }).validate(4);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "MultipleOfError");
+            assert.deepEqual(errors[0].code, "multiple-of-error");
         });
         it("should be valid if value if a multiple of 1.5", () => {
             const { errors } = compileSchema({
@@ -540,7 +540,7 @@ describe("compileSchema.validate", () => {
                 not: { type: "number", minimum: 4 }
             }).validate(4.5);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "NotError");
+            assert.deepEqual(errors[0].code, "not-error");
         });
     });
     describe("arrays of types", () => {
@@ -553,7 +553,7 @@ describe("compileSchema.validate", () => {
                 type: ["object", "null"]
             }).validate([]);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "TypeError");
+            assert.deepEqual(errors[0].code, "type-error");
         });
         it("should support 'integer' as a valid type within array", () => {
             const { errors } = compileSchema({
@@ -587,14 +587,14 @@ describe("compileSchema.validate", () => {
                     enum: [1, "second", { id: "third" }]
                 }).validate({ id: "first" });
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "EnumError");
+                assert.deepEqual(errors[0].code, "enum-error");
             });
             it("should return error for invalid null", () => {
                 const { errors } = compileSchema({
                     enum: [1, "second", { id: "third" }]
                 }).validate(null);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "EnumError");
+                assert.deepEqual(errors[0].code, "enum-error");
             });
         });
         describe("$ref", () => {
@@ -608,7 +608,7 @@ describe("compileSchema.validate", () => {
                     }
                 }).validate("a");
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "TypeError");
+                assert.deepEqual(errors[0].code, "type-error");
             });
             it("should correctly validate combination of remote, allOf, and allOf-$ref", () => {
                 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -620,7 +620,7 @@ describe("compileSchema.validate", () => {
                     .addRemote("http://json-schema.org/draft-04/schema", draft04Meta)
                     .validate({ minLength: -1 });
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MinimumError");
+                assert.deepEqual(errors[0].code, "minimum-error");
             });
             it("should correctly resolve local remote url", () => {
                 const { errors } = compileSchema({
@@ -632,7 +632,7 @@ describe("compileSchema.validate", () => {
                 require("json-schema-test-suite/remotes/integer.json"))
                     .validate("not an integer");
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "TypeError");
+                assert.deepEqual(errors[0].code, "type-error");
             });
             it("spec/unevaluatedProperties : dynamic evalation inside nested refs : should validate a", () => {
                 const node = compileSchema({
@@ -659,6 +659,56 @@ describe("compileSchema.validate", () => {
                 const { errors } = node.validate({ a: 1 });
                 assert(errors.length === 0);
             });
+        });
+    });
+    describe("unavaluatedProperties", () => {
+        let node;
+        beforeEach(() => (node = compileSchema({
+            $schema: "https://json-schema.org/draft/2020-12/schema",
+            $defs: {
+                one: {
+                    oneOf: [
+                        { $ref: "#/$defs/two" },
+                        { required: ["b"], properties: { b: true } },
+                        {
+                            required: ["xx"],
+                            patternProperties: {
+                                x: true
+                            }
+                        },
+                        {
+                            required: ["all"],
+                            unevaluatedProperties: true
+                        }
+                    ]
+                },
+                two: {
+                    oneOf: [
+                        {
+                            required: ["c"],
+                            properties: {
+                                c: true
+                            }
+                        },
+                        {
+                            required: ["d"],
+                            properties: {
+                                d: true
+                            }
+                        }
+                    ]
+                }
+            },
+            oneOf: [{ $ref: "#/$defs/one" }, { required: ["a"], properties: { a: true } }],
+            unevaluatedProperties: false
+        })));
+        it("`all` is valid", () => {
+            const { errors } = node.validate({ all: 1 });
+            assert(errors.length === 0);
+        });
+        it("`all` and `foo` is valid", () => {
+            const { errors } = node.validate({ all: 1, foo: 1 });
+            assert(errors.length === 0);
         });
     });
     describe("recursiveRef (spec)", () => {
@@ -824,7 +874,7 @@ describe("compileSchema.validateAsync", () => {
                     ...draft2020.keywords,
                     {
                         id: "async",
-                        keyword: "asyncError",
+                        keyword: "async-error",
                         addValidate: (node) => node.schema.asyncError != null,
                         // @ts-expect-error asd
                         validate: ({ node }) => {
@@ -832,7 +882,7 @@ describe("compileSchema.validateAsync", () => {
                                 return;
                             }
                             return new Promise((resolve) => resolve([
-                                node.createError("TypeError", {
+                                node.createError("type-error", {
                                     schema: {},
                                     pointer: "",
                                     value: ""
@@ -853,17 +903,17 @@ describe("compileSchema.validateAsync", () => {
             });
         });
     });
-    // describe("onError", () => {
+    // describe("on-error", () => {
     //     before(() => {
     //         // adds an async validation helper to { type: 'string', asyncError: true }
     //         // @ts-expect-error type mismatch of vladation function
-    //         addValidator.keyword(draft, "string", "asyncError", (node) => {
+    //         addValidator.keyword(draft, "string", "async-error", (node) => {
     //             return node.schema.asyncError
     //                 ? new Promise((resolve) =>
     //                       // eslint-disable-next-line max-nested-callbacks
     //                       resolve({
     //                           type: "error",
-    //                           name: "AsyncError",
+    //                           name: "async-error",
     //                           code: "test-async-error",
     //                           message: "custom test error"
     //                       })
@@ -891,8 +941,8 @@ describe("compileSchema.validateAsync", () => {
     //             }
     //         ).then(() => {
     //             assert.deepEqual(errors.length, 2);
-    //             assert.deepEqual(errors[0].name).to.eq("TypeError");
-    //             assert.deepEqual(errors[1].name).to.eq("AsyncError");
+    //             assert.deepEqual(errors[0].name).to.eq("type-error");
+    //             assert.deepEqual(errors[1].name).to.eq("async-error");
     //         });
     //     });
     // });
