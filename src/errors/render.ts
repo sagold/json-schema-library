@@ -1,4 +1,4 @@
-import getTypeOf from "../utils/getTypeOf";
+import { getTypeOf } from "../utils/getTypeOf";
 
 const OBJECT_TYPE = "object";
 const ARRAY_TYPE = "array";

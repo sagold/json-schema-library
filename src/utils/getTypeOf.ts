@@ -12,7 +12,7 @@ export type JSType =
     | "symbol"
     | "undefined";
 
-export default function getTypeOf(value: unknown): JSType {
+export function getTypeOf(value: unknown): JSType {
     const type = toString
         .call(value)
         .match(/\s([^\]]+)\]/)

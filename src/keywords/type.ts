@@ -1,4 +1,4 @@
-import getTypeOf, { JSType } from "../utils/getTypeOf";
+import { getTypeOf, JSType } from "../utils/getTypeOf";
 import { SchemaNode } from "../types";
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams } from "../Keyword";
 

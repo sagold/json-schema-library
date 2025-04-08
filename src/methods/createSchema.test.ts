@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import { createSchema } from "./createSchema";
-import getTypeOf from "../utils/getTypeOf";
+import { getTypeOf } from "../utils/getTypeOf";
 
 describe("createSchema", () => {
     it("should add type 'object' of data to schema", () => {

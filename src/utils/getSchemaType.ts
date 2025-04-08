@@ -1,4 +1,4 @@
-import getTypeOf from "./getTypeOf";
+import { getTypeOf } from "./getTypeOf";
 import { isObject } from "../utils/isObject";
 import { SchemaNode } from "../types";
 

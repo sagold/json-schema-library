@@ -1,5 +1,5 @@
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
-import getTypeOf from "../utils/getTypeOf";
+import { getTypeOf } from "../utils/getTypeOf";
 
 export const enumKeyword: Keyword = {
     id: "enum",

@@ -31,7 +31,7 @@ export type { ErrorData, ErrorConfig } from "./src/types";
 export { dashCase } from "./src/utils/dashCase";
 
 // utilities
-export { default as getTypeOf } from "./src/utils/getTypeOf";
+export { getTypeOf } from "./src/utils/getTypeOf";
 export { isReduceable } from "./src/SchemaNode";
 export { isJsonError, isSchemaNode } from "./src/types";
 export { extendDraft, addKeywords } from "./src/Draft";

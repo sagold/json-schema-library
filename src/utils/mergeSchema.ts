@@ -1,5 +1,5 @@
 import { JsonSchema } from "../types";
-import getTypeOf from "./getTypeOf";
+import { getTypeOf } from "./getTypeOf";
 import { isObject } from "./isObject";
 
 export function mergeSchema<T extends JsonSchema>(a: T, b: T, ...omit: string[]): T {

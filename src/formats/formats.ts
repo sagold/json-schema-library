@@ -1,5 +1,5 @@
 /* eslint-disable max-len, no-control-regex */
-import getTypeOf from "../utils/getTypeOf";
+import { getTypeOf } from "../utils/getTypeOf";
 import validUrl from "valid-url";
 import { JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
 import { parse as parseIdnEmail } from "smtp-address-parser";

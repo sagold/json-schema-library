@@ -1,4 +1,4 @@
-import getTypeOf from "../utils/getTypeOf";
+import { getTypeOf } from "../utils/getTypeOf";
 import { JsonSchema } from "../types";
 import { isObject } from "../utils/isObject";
 
