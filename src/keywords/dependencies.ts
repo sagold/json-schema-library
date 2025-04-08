@@ -64,7 +64,7 @@ export function reduceDependencies({ node, data, path }: JsonSchemaReducerParams
     }
 
     mergedSchema = mergeSchema(node.schema, mergedSchema, "dependencies");
-    const { node: childNode, error } = node.compileSchema(mergedSchema, node.spointer).reduce(data, { path });
+    const { node: childNode, error } = node.compileSchema(mergedSchema, node.spointer).reduceSchema(data, { path });
     return childNode ?? error;
 }
 

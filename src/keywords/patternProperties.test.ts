@@ -144,7 +144,7 @@ describe("keyword : patternProperties : reduce", () => {
         const { node } = compileSchema({
             properties: { label: { type: "string", maxLength: 99 } },
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
-        }).reduce({
+        }).reduceSchema({
             "007": "match",
             title: "no match"
         });
@@ -161,7 +161,7 @@ describe("keyword : patternProperties : reduce", () => {
         const { node } = compileSchema({
             properties: { "007": { type: "string", maxLength: 99 } },
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
-        }).reduce({
+        }).reduceSchema({
             data: {
                 "007": "match"
             }
@@ -178,7 +178,7 @@ describe("keyword : patternProperties : reduce", () => {
         const { node } = compileSchema({
             properties: { "007": { type: "string", maxLength: 99 } },
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
-        }).reduce({});
+        }).reduceSchema({});
 
         assert.deepEqual(node.schema, {
             properties: {

@@ -41,7 +41,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
     }
 
     // const reducedNode = node;
-    let { node: reducedNode } = node.reduce(data, { pointer, path });
+    let { node: reducedNode } = node.reduceSchema(data, { pointer, path });
     reducedNode = reducedNode ?? node;
     if (reducedNode.schema.unevaluatedItems === true || reducedNode.schema.additionalItems === true) {
         return undefined;

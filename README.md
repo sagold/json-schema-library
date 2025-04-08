@@ -1,20 +1,24 @@
+[![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) [![CI](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) ![Types](https://badgen.net/npm/types/json-schema-library)
+
+<h1 align="center">
+    <img src="./docs/json-schema-library-10.png" width="192" alt="json-schema-library">
+    <br/>
+    ✨ json-schema-library ✨
+</h1>
+
+> **json-schema-library** provides tools and utilities for working with JSON Schema - enabling creation, validation, and schema exploration. Unlike most validators and editors, which hide the inner workings, this library is designed for developers building custom tools around JSON Schema. It runs in both Node and browser environments, prioritizing flexibility and extensibility over minimal memory footprint or raw performance.
+
 <div align="center">
-    <img src="./docs/json-schema-library-10.png" width="128" alt="json-schema-library">
-    <p>✨ <b>json-schema-library</b> ✨</p>
-    <div><a href="#overview"><b>Overview</b></a> · <a href="#schemanode-methods"><b>Methods</b></a> · <a href="#draft-customization"><b>Customization</b></a> · <a href="#keyword-extensions"><b>Extensions</b></a> · <a href="#breaking-changes">Breaking Changes</a></div>
+    <a href="#overview"><b>Overview</b></a> · <a href="#schemanode-methods"><b>Methods</b></a> · <a href="#draft-customization"><b>Customization</b></a> · <a href="#keyword-extensions"><b>Extensions</b></a> · <a href="#breaking-changes">Breaking Changes</a>
 </div>
 
 <div>&nbsp;</div>
-
-> _json-schema-library_ provides tools and utilities for working with JSON Schema - enabling creation, validation, and schema exploration. Unlike most validators and editors, which hide the inner workings, this library is designed for developers building custom tools around JSON Schema. It runs in both Node and browser environments, prioritizing flexibility and extensibility over minimal memory footprint or raw performance.
 
 **Quick start**
 
 `npm install json-schema-library`
 
-[![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) [![CI](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) ![Types](https://badgen.net/npm/types/json-schema-library)
-
-_json-schema-library_ exposes a function `compileSchema` to compile a JSON Schema to a `SchemaNode`, which offers a common set of actions working on the specified _json-schema_:
+_json-schema-library_ includes a compileSchema function that converts a JSON Schema into a SchemaNode, which gives you easy-to-use methods for working with the schema.
 
 ```ts
 import { compileSchema, SchemaNode } from "json-schema-library";
@@ -42,7 +46,7 @@ console.log(schemaNode.getDraftVersion()); // draft-07
 
 ### compileSchema
 
-Use `compileSchema` once for a JSON Schema to convert it to a compiled tree of `SchemaNodes`. From there on you will be working on individual nodes. Besides a _json-schema_, `compileSchema` takes an options-object to modify some aspects creating the `SchemaNodes`:
+Use `compileSchema` once to turn a JSON Schema into a tree of SchemaNodes. After that, you'll work with individual nodes in the tree. You can also pass an options object to `compileSchema` to customize how the nodes are created.
 
 ```ts
 type CompileOptions = {
@@ -81,7 +85,8 @@ Details on `templateDefaultOptions` are documented in [getData](#getData).
 
 ### SchemaNode
 
-`compileSchema` creates a tree of nodes with a node for each sub-schema. Each node exposes the same methods, for example:
+`compileSchema` builds a tree where each sub-schema becomes its own SchemaNode. Every node in the tree offers the same set of methods.
+For example:
 
 ```ts
 const root = compileSchema(mySchema);
@@ -163,7 +168,7 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 ## SchemaNode methods
 
-[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getData**](#getData) · [**getSchema**](#getschema) · [**getChild**](#getchild) · [**reduce**](#reduce) · [**toDataNodes**](#todatanodes) · [**toSchemaNodes**](#toschemanodes) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSchemaSelection](#getchildschemaselection)
+[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getData**](#getdata) · [**getSchema**](#getschema) · [**getChild**](#getchild) · [**reduceSchema**](#reduceschema) · [**toDataNodes**](#todatanodes) · [**toSchemaNodes**](#toschemanodes) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSchemaSelection](#getchildschemaselection)
 
 ### validate
 
@@ -548,9 +553,38 @@ expect(schema).to.deep.eq({ type: "number" });
 
 </details>
 
-### reduce
+### reduceSchema
 
-`reduce` compiles dynamic schema-keywords of a SchemaNode according to the given data.
+`reduceSchema` compiles dynamic JSON schema keywords of a SchemaNode according to the given data.
+This utility helps walking down the schema-tree with a set of data and it helps getting a mostly
+complete json-schema for a specific data-value.
+
+```ts
+const reducedNode = compileSchema({
+    properties: {
+        trigger: { type: "boolean"}
+    }
+    dependentSchemas: {
+        trigger: {
+            required: ["title"],
+            properties: {
+                title: { type: "string" }
+            }
+        }
+    }
+}).reduceSchema({ trigger: true });
+
+expect(reducedNode.schema).to.deep.eq({
+    required: ["title"],
+    properties: {
+        trigger: { type: "boolean"},
+        title: { type: "string" }
+    }
+});
+```
+
+⚠️ Please be aware that certain schema-definitions are lost when resolving or merging sub-schemas.
+This mainly refers to validation-properties, but also some ambigiuous schema might get overriden.
 
 ### toDataNodes
 
@@ -803,72 +837,110 @@ console.log(schema); // { type: "string" }
 
 ## Draft Customization
 
-[**Extending a Draft**](#extending-a-draft) · [**Keyword**](#Keyword)
+[**Extending a Draft**](#extending-a-draft) · [**Keyword**](#keyword)
 
-_json-schema-library_ uses a list of drafts to support different draft-versions and cross-draft support. A draft is exported for each json-schema-draft:
+_json-schema-library_ uses the concept of **drafts** to support different versions of the JSON Schema specification — such as Draft 04, Draft 07, or 2020-12 — and to allow customization of schema behavior.
+
+Each **draft** describes how a schema should be parsed, validated, and interpreted. Drafts can also be extended or modified to change or enhance behavior, such as:
+
+-   Replacing or adding new keywords (`oneOf`, `if/then`, custom ones, etc.)
+-   Defining or overriding format validators (`format: "email"`, etc.)
+-   Customizing or localizing error messages
+-   Tweaking how schema nodes behave during parsing or resolution
+
+Out of the box, the library exports all compliant JSON Schema drafts:
 
 ```ts
 import { draft04, draft06, draft07, draft2019, draft2020 } from "json-schema-library";
 ```
 
-A `Draft` is an object with the following **main** properties
+When you compile a schema, the library will automatically select the correct draft based on the `$schema` field — or fall back to the last draft in the list:
+
+```ts
+compileSchema(schema, { drafts: [draft04, draft07, draft2020] });
+```
+
+A `Draft` is an object that defines the core behavior and extensions for a schema. It includes:
 
 ```ts
 type Draft = {
     $schemaRegEx: string;
     version: DraftVersion;
     keywords: Keyword[];
+    errors: ErrorConfig;
+    formats: typeof formats;
     methods: {};
 };
 ```
 
-**$schemaRegEx**
+Here’s a breakdown of what each piece does:
 
-`$schemaRegEx` is a regex string, e.g. `"draft[-/]2020-12"` to test if the draft should be used for a given JSON Schema with a defined `$schema-url`. So the given draft will match a `$schema: "https://json-schema.org/draft/2020-12/schema"`. `CompileSchema` receives a list of drafts, that will be tested from left to right and the first match will be returned:
+**`$schemaRegEx`**
+
+A regex string that identifies whether a draft should be used for a given schema, based on the `$schema` property. For example:
 
 ```ts
-compileSchema(schema, { drafts: [draft04, draft07, draft2020] });
+draft.$schemaRegEx === "draft[-/]2020-12";
 ```
 
-Note that failing to identify a draft, the last draft in the list will used. Using only one draft ignores the $schemaRegEx so you can simply write: `$schema: ""`
+This would match:
 
-**version**
+```json
+"$schema": "https://json-schema.org/draft/2020-12/schema"
+```
 
-The version refers to a json-schema-draft version and is currently only used for logging
+When compiling, drafts are matched from left to right — the first one that matches is used. If no match is found, the **last draft** in the list is used as a fallback. If you're only using one draft, the `$schemaRegEx` check is skipped.
 
-**keywords**
+**`version`**
 
-_keywords_ is a list of `Keyword` that represent JSON Schema keywords like `$ref`, `oneOf`, etc that hold metadata and their implementation. Each _keyword_ can be replaced, removed or new keywords introduced. Details on customizing keywords are documented in [Keyword](#keyword).
+Describes the draft version (e.g., `"2020-12"`). This is mostly used for debugging and logging.
 
-**methods**
+**`keywords`**
 
-Methods are a set of SchemaNode functions that differ between draft versions and have to be specified on a draft. This methods are only executed by methods in `SchemaNode`. Customizing your draft, these functions can also be overriden
+A list of keyword handlers for that draft, such as `properties`, `allOf`, `oneOf`, `$ref`, and more. Each keyword defines how the library should parse and validate that keyword. You can override, extend, or remove any keyword.
+Learn more in [Keyword](#keyword).
 
-<details><summary>Current methods</summary>
+**`errors`**
+
+An object mapping error types to either template strings or error functions. These can be used to customize error messages globally or define more intelligent error generation logic.
+
+**`formats`**
+
+An object mapping format names (like `"email"`, `"uuid"`, `"date-time"`) to custom validation functions. You can override or add formats depending on your needs.
+
+**`methods`**
+
+Draft-specific implementations for certain core behaviors in `SchemaNode`, such as how child schemas are selected or how schemas are converted to data nodes. These can be overridden in custom drafts if needed.
+
+<details><summary>Available methods</summary>
 
 ```ts
 createSchema: typeof createSchema;
 getChildSchemaSelection: typeof getChildSchemaSelection;
 getData: typeof getData;
-each: typeof each;
+toDataNodes: typeof toDataNodes;
 ```
 
 </details>
 
 ### Extending a Draft
 
-_json-schema-library_ exposes a utility to simplify draft extension. `extendDraft` will create a new, modified draft:
+You may want to extend a draft when the default JSON Schema behavior does not fit your needs. Whether you want to add new keywords, modify error messages, or define custom formats for your validation, `extendDraft` helps you adjust the draft version to meet your specific requirements.
+
+Examples:
 
 ```ts
 import { extendDraft, draft2020, oneOfFuzzyKeyword, createCustomError, render, ErrorData } from "json-schema-library";
 
 const myDraft = extendDraft(draft2020, {
-    // match all $schema
+    // Match all $schema
     $schemaRegEx: "",
-    // Keyword registers to "oneOf", replacing existing keyword
+
+    // Register a custom "oneOf" keyword, replacing the existing one
     keywords: [oneOfFuzzyKeyword],
+
     formats: {
-        // add new `"format": "test"` which returns an error when the value is test
+        // Add a new "format": "test", which returns an error when the value is "test"
         test: ({ data, node, pointer }) => {
             if (data === "test") {
                 return node.createError("testError", {
@@ -880,12 +952,15 @@ const myDraft = extendDraft(draft2020, {
             }
         }
     },
+
     errors: {
-        // add new custom error testError
+        // Add a new custom error "testError"
         testError: "Test error for value {{value}} - {{customValue}}",
-        // overwrite existing error message
+
+        // Overwrite the existing MaxLengthError message
         MaxLengthError: "Too many characters",
-        // add dynamic error
+
+        // Add a dynamic MinLengthError with custom logic
         MinLengthError: (data: ErrorData) => {
             if (data.minLength === 1) {
                 return {
@@ -908,11 +983,11 @@ const myDraft = extendDraft(draft2020, {
 });
 ```
 
-<details><summary>About fuzzy oneOf resolution</summary>
+<details><summary>About `oneOfFuzzyKeyword`</summary>
 
-The default JSON Schema behaviour for `oneOf` resolution is to validate all contained _oneOf_-schemas and return the one schema that validates against the given input data. If no item validates completely an error returned, containing all validation errors of all schemas. When you are interested in the actual error (rather than simply determining “Is the data is valid or not?”), this is behaviour is not very helpful as the result is hard to read.
+If you're working with complex schemas that use the `oneOf` keyword to validate multiple options, `oneOfFuzzyKeyword` offers an alternative approach. It scores the schemas to return the best match, even if none of the schemas fully validate the input data. This makes error messages more readable and helps identify the most appropriate schema when multiple options exist.
 
-`json-schema-library` exposes a method `oneOfFuzzyKeyword`, which will return a single schema in cases where no valid schema could be resolved. `oneOfFuzzyKeyword` uses a simple scoring mechanism to return the best fitting schema for the given input data. Thus, `oneOfFuzzyKeyword` may return schemas that do not validate a given input data.
+`oneOfFuzzyKeyword` helps when no schema fully validates the data but you want to prioritize schemas based on how well they fit the input. This makes it easier to interpret validation results for complex conditions.
 
 </details>
 
@@ -1052,8 +1127,17 @@ expect(resolvedNode?.schema).to.deep.eq({
 
 ## Breaking Changes
 
--   `each(data, callback)` has been replaced by `const nodes = toDataNodes(data)`
--   `eachSchema(callback)` has been replaced by `const nodes = toSchemaNodes()`
+-   `compileSchema` is a standalone function which replaces `Draft`-Class
+-   all return values for JSON Schema are `SchemaNode` that contain a schema-property
+-   `draft.getTemplate(inputData)` has been **renamed** to `node.getData(inputData)`
+-   `draft.each(data, callback)` has been **replaced** by `const nodes = node.toDataNodes(data)`
+-   `draft.eachSchema(callback)` has been **replaced** by `const nodes = node.toSchemaNodes()`
+-   `draft.isValid(data)` has been **replaced** by `node.validate(data).valid`
+-   `draft.getSchema(options)` has been **changed** to `node.getSchema(pointer, data, options)`
+-   `draft.step(property, data)` has been **renamed** to `node.getChild(property, data)`
+-   `draft.addRemoteSchema(schema)` has been **renamed** to `node.addRemote(schema)`
+-   `draft.createSchemaOf(schema)` has been **renamed** to `node.createSchema(schema)`
+-   draft customization has completely changed
 
 ### v10.0.0
 

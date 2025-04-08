@@ -230,7 +230,7 @@ export const SchemaNodeMethods = {
 
         let node = this as SchemaNode;
         if (node.reducers.length) {
-            const result = node.reduce(data, { key, path, pointer });
+            const result = node.reduceSchema(data, { key, path, pointer });
             if (result.error) {
                 return result;
             }
@@ -287,16 +287,13 @@ export const SchemaNodeMethods = {
         return node.context.methods.getData(node, data, opts);
     },
 
-    reduce(
+    reduceSchema(
         data: unknown,
         options: { key?: string | number; pointer?: string; path?: ValidationPath } = {}
     ): OptionalNodeAndError {
         const { key, pointer, path } = options;
         const resolvedNode = { ...this.resolveRef({ pointer, path }) } as SchemaNode;
-        // const resolvedSchema = mergeSchema(this.schema, resolvedNode?.schema);
-        // const node = (this as SchemaNode).compileSchema(resolvedSchema, this.spointer, resolvedSchema.schemaId);
         const node = mergeNode(this, resolvedNode, "$ref");
-        // const node = resolvedNode;
 
         // @ts-expect-error bool schema
         if (node.schema === false) {

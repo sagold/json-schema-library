@@ -277,7 +277,7 @@ describe("compileSchema : getChild", () => {
                 }
             }).getChild("dynamicSchema");
 
-            const { node } = res.reduce({ trigger: true });
+            const { node } = res.reduceSchema({ trigger: true });
 
             assert.deepEqual(node.schema, {
                 type: "object",
@@ -624,7 +624,7 @@ describe("step", () => {
                 }
             }).getChild(0, [{ title: 2 }]);
 
-            const { node } = res.reduce({ title: 2 });
+            const { node } = res.reduceSchema({ title: 2 });
 
             assert.deepEqual(node.schema, {
                 type: "object",
@@ -643,7 +643,7 @@ describe("step", () => {
                 }
             }).getChild(1, [{ title: "two" }, { title: 4 }]);
 
-            const { node } = res.reduce({ title: 4 });
+            const { node } = res.reduceSchema({ title: 4 });
 
             assert.deepEqual(node.schema, { type: "object", properties: { title: { type: "number" } } });
         });
@@ -660,7 +660,7 @@ describe("step", () => {
                 }
             }).getChild(1, [{ title: "two" }, { title: 4 }]);
 
-            const { node } = res.reduce({ title: 4 });
+            const { node } = res.reduceSchema({ title: 4 });
 
             assert.deepEqual(node.schema, { type: "object", properties: { title: { type: "number", minimum: 2 } } });
         });
@@ -676,7 +676,7 @@ describe("step", () => {
                 }
             }).getChild(1, [{ title: "two" }, { title: 4 }]);
 
-            const { node } = res.reduce({ title: "two" });
+            const { node } = res.reduceSchema({ title: "two" });
 
             assert.deepEqual(node.schema, {
                 type: "object",
