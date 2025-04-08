@@ -163,7 +163,7 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 ## SchemaNode methods
 
-[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getTemplate**](#gettemplate) · [**getSchema**](#getschema) · [**reduce**](#reduce) · [**getChild**](#getchild) · [**each**](#each) · [**eachSchema**](#eachschema) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSchemaSelection](#getchildschemaselection)
+[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getTemplate**](#gettemplate) · [**getSchema**](#getschema) · [**getChild**](#getchild) · [**reduce**](#reduce) · [**toDataNodes**](#todatanodes) · [**toSchemaNodes**](#toschemanodes) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSchemaSelection](#getchildschemaselection)
 
 ### validate
 
@@ -510,10 +510,6 @@ if (error) {
 
 </details>
 
-### reduce
-
-`reduce` compiles dynamic schema-keywords of a SchemaNode according to the given data.
-
 ### getChild
 
 `getChild` retrieves the JSON Schema of a child property or index. Using `get` it is possible to incrementally go through the data, retrieving the schema for each next item.
@@ -552,16 +548,18 @@ expect(schema).to.deep.eq({ type: "number" });
 
 </details>
 
-### each
+### reduce
+
+`reduce` compiles dynamic schema-keywords of a SchemaNode according to the given data.
+
+### toDataNodes
 
 `each` iterates over each data-item (_object_, _array_ and _value_) and emits the data-item, schema and location to a callback.
 
 ```ts
+type DataNode = { pointer: string; value: unknown; node: SchemaNode };
 const schemaNode = compileSchema(mySchema);
-const myCallback = (node: SchemaNode, value: unknown, pointer: JsonPointer) => {
-    console.log(node.schema, value, pointer);
-};
-schemaNode.each(myData, myCallback);
+const nodes: DataNode[] = schemaNode.toDataNodes(myData);
 ```
 
 <details><summary>Example</summary>
@@ -575,12 +573,11 @@ const mySchema: JsonSchema = {
 };
 
 const schemaNode = compileSchema(mySchema);
-const calls = [];
-const myCallback = (node: SchemaNode, value: unknown, pointer: JsonPointer) => {
-    calls.push({ schema: node.schema, value, pointer });
-};
-
-schemaNode.each([5, "nine"], myCallback);
+schemaNode.toDataNodes([5, "nine"]).map((dataNode) => ({
+    schema: dataNode.node.schema,
+    value: dataNode.value,
+    pointer: dataNode.pointer
+}));
 
 expect(calls).to.deep.equal([
     { schema: mySchema, value: [5, "nine"], pointer: "#" },
@@ -591,15 +588,12 @@ expect(calls).to.deep.equal([
 
 </details>
 
-### eachSchema
+### toSchemaNodes
 
 `eachSchema` emits each sub-schema definition to a callback. A sub-schema is any schema-definition like in `properties["property"]`, `anyOf[1]`, `contains`, `$defs["name"]`, etc.
 
 ```ts
-const myCallback = (node: SchemaNode) => {
-    console.log(node.spointer, node.schema);
-};
-compileSchema(mySchema).eachSchema(myCallback);
+const nodes: SchemaNode[] = compileSchema(mySchema).toSchemaNodes();
 ```
 
 <details><summary>Example</summary>
@@ -618,11 +612,9 @@ const mySchema: JsonSchema = {
     }
 };
 
-const calls = [];
-const myCallback = (node: SchemaNode) => {
-    calls.push(node.schema);
-};
-compileSchema(mySchema).eachSchema(myCallback);
+const nodes = compileSchema(mySchema)
+    .toSchemaNodes(myCallback)
+    .map((node) => node.schema);
 
 expect(calls).to.deep.equal([
     mySchema,
@@ -1061,6 +1053,7 @@ expect(resolvedNode?.schema).to.deep.eq({
 ## Breaking Changes
 
 -   `each(data, callback)` has been replaced by `const nodes = toDataNodes(data)`
+-   `eachSchema(callback)` has been replaced by `const nodes = toSchemaNodes()`
 
 ### v10.0.0
 

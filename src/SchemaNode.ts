@@ -5,7 +5,7 @@ import type { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, Keywor
 import { createSchema } from "./methods/createSchema";
 import { dashCase } from "./utils/dashCase";
 import { Draft } from "./Draft";
-import { eachSchema, EachSchemaCallback } from "./methods/eachSchema";
+import { toSchemaNodes } from "./methods/toSchemaNodes";
 import { getValue } from "./utils/getValue";
 import { isJsonError, JsonSchema, JsonError, ErrorData, DefaultErrors, OptionalNodeAndError } from "./types";
 import { isObject } from "./utils/isObject";
@@ -159,11 +159,6 @@ export const SchemaNodeMethods = {
     },
 
     createSchema,
-
-    eachSchema(callback: EachSchemaCallback) {
-        const node = this as SchemaNode;
-        return eachSchema(node, callback);
-    },
 
     getChildSchemaSelection(property: string | number): JsonError | SchemaNode[] {
         const node = this as SchemaNode;
@@ -406,6 +401,10 @@ export const SchemaNodeMethods = {
         addKeywords(node);
 
         return this;
+    },
+
+    toSchemaNodes() {
+        return toSchemaNodes(this as SchemaNode);
     },
 
     toDataNodes(data: unknown, pointer?: string) {
