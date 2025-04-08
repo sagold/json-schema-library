@@ -1,5 +1,6 @@
 import { isSchemaNode, SchemaNode } from "./types";
 import { mergeSchema } from "./utils/mergeSchema";
+import { joinDynamicId } from "./SchemaNode";
 
 interface SchemaNodeCB {
     toJSON?: () => string;
@@ -36,8 +37,22 @@ function mergeObjects(a?: Record<string, SchemaNode>, b?: Record<string, SchemaN
     return object;
 }
 
-function mergeArray<T = unknown[]>(a?: T[], b?: T[]) {
-    return a || b ? [...(a ?? []), ...(b ?? [])] : undefined;
+// function mergeArray<T = unknown[]>(a?: T[], b?: T[]) {
+//     return a || b ? [...(a ?? []), ...(b ?? [])] : undefined;
+// }
+
+function mergePatternProperties(a?: SchemaNode["patternProperties"], b?: SchemaNode["patternProperties"]) {
+    if (a == null || b == null) {
+        return a || b;
+    }
+    const result = [...a];
+    const pointerList = a.map((p) => p.node.spointer);
+    b.forEach((p) => {
+        if (!pointerList.includes(p.node.spointer)) {
+            result.push(p);
+        }
+    });
+    return result;
 }
 
 export function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): SchemaNode | undefined {
@@ -66,6 +81,7 @@ export function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): Sch
         ...a,
         ...b,
         ...arraySelection,
+        dynamicId: joinDynamicId(a.dynamicId, b.dynamicId),
         oneOfIndex: a.oneOfIndex ?? b.oneOfIndex,
         schema: mergeSchema(a.schema, b.schema, ...omit),
         parent: a.parent,
@@ -84,7 +100,7 @@ export function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): Sch
         unevaluatedProperties: mergeNode(a.unevaluatedProperties, b.unevaluatedProperties),
         unevaluatedItems: mergeNode(a.unevaluatedItems, b.unevaluatedItems),
         $defs: mergeObjects(a.$defs, b.$defs),
-        patternProperties: mergeArray(a.patternProperties, b.patternProperties),
+        patternProperties: mergePatternProperties(a.patternProperties, b.patternProperties),
         properties: mergeObjects(a.properties, b.properties)
     };
 

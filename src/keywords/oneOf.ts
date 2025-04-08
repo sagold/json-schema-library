@@ -11,6 +11,7 @@ import { getValue } from "../utils/getValue";
 import sanitizeErrors from "../utils/sanitizeErrors";
 import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
+import { joinDynamicId } from "../SchemaNode";
 
 const { DECLARATOR_ONEOF } = settings;
 
@@ -65,8 +66,13 @@ function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     if (matches.length === 1) {
         const { node, index } = matches[0];
         const { node: reducedNode, error } = node.reduceSchema(data, { pointer, path });
+
         if (reducedNode) {
+            const nestedDynamicId = reducedNode.dynamicId?.replace(node.dynamicId, "") ?? "";
+            const dynamicId = nestedDynamicId === "" ? `oneOf/${index}` : nestedDynamicId;
+
             reducedNode.oneOfIndex = index; // @evaluation-info
+            reducedNode.dynamicId = joinDynamicId(reducedNode.dynamicId, `+${node.schemaId}(${dynamicId})`);
             return reducedNode;
         }
         return error;

@@ -26,14 +26,24 @@ function reduceAllOf({ node, data }: JsonSchemaReducerParams) {
     // note: parts of schemas could be merged, e.g. if they do not include
     // dynamic schema parts
     let mergedSchema = {};
+    let dynamicId = "";
     for (let i = 0; i < node.allOf.length; i += 1) {
         const { node: schemaNode } = node.allOf[i].reduceSchema(data);
         if (schemaNode) {
+            const nestedDynamicId = schemaNode.dynamicId?.replace(node.dynamicId, "") ?? "";
+            const localDynamicId = nestedDynamicId === "" ? `allOf/${i}` : nestedDynamicId;
+            dynamicId += `${dynamicId === "" ? "" : ","}${localDynamicId}`;
+
             const schema = mergeSchema(node.allOf[i].schema, schemaNode.schema);
             mergedSchema = mergeSchema(mergedSchema, schema, "allOf", "contains");
         }
     }
-    return node.compileSchema(mergedSchema, `${node.spointer}/allOf`, node.schemaId);
+    return node.compileSchema(
+        mergedSchema,
+        `${node.spointer}/${dynamicId}`,
+        node.schemaId,
+        `${node.schemaId}(${dynamicId})`
+    );
 }
 
 function validateAllOf({ node, data, pointer, path }: JsonSchemaValidatorParams) {

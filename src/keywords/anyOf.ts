@@ -24,16 +24,27 @@ export function parseAnyOf(node: SchemaNode) {
 
 function reduceAnyOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     let mergedSchema = {};
+    let dynamicId = "";
     for (let i = 0; i < node.anyOf.length; i += 1) {
         if (validateNode(node.anyOf[i], data, pointer, path).length === 0) {
             const { node: schemaNode } = node.anyOf[i].reduceSchema(data);
+
             if (schemaNode) {
+                const nestedDynamicId = schemaNode.dynamicId?.replace(node.dynamicId, "") ?? "";
+                const localDynamicId = nestedDynamicId === "" ? `anyOf/${i}` : nestedDynamicId;
+                dynamicId += `${dynamicId === "" ? "" : ","}${localDynamicId}`;
+
                 const schema = mergeSchema(node.anyOf[i].schema, schemaNode.schema);
                 mergedSchema = mergeSchema(mergedSchema, schema, "anyOf");
             }
         }
     }
-    return node.compileSchema(mergedSchema, `${node.spointer}/anyOf`, node.schemaId);
+    return node.compileSchema(
+        mergedSchema,
+        `${node.spointer}${dynamicId}`,
+        node.schemaId,
+        `${node.schemaId}(${dynamicId})`
+    );
 }
 
 function validateAnyOf({ node, data, pointer, path }: JsonSchemaValidatorParams) {

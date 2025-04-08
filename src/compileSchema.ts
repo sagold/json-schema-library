@@ -38,6 +38,7 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
         spointer: "#",
         lastIdPointer: "#",
         schemaId: "#",
+        dynamicId: "",
         reducers: [],
         resolvers: [],
         validators: [],

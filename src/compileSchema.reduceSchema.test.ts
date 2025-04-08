@@ -676,4 +676,145 @@ describe("compileSchema : reduceSchema", () => {
             });
         });
     });
+
+    describe("dynamicId", () => {
+        it("should add dynamicId based on merge anyOf schema", () => {
+            const { node } = compileSchema({
+                anyOf: [{ type: "string" }, { minimum: 1 }]
+            }).reduceSchema(3);
+
+            assert.deepEqual(node.dynamicId, "#(anyOf/1)");
+        });
+
+        it("should add dynamicId based on all merged anyOf schema", () => {
+            const { node } = compileSchema({
+                anyOf: [{ type: "number" }, { minimum: 1 }]
+            }).reduceSchema(3);
+
+            assert.deepEqual(node.dynamicId, "#(anyOf/0,anyOf/1)");
+        });
+
+        it("should add dynamicId based on merge anyOf schema", () => {
+            const { node } = compileSchema({
+                allOf: [{ type: "number" }, { title: "dynamic id" }]
+            }).reduceSchema(3);
+
+            assert.deepEqual(node.dynamicId, "#(allOf/0,allOf/1)");
+        });
+
+        it("should combine dynamicId from `anyOf` and `allOf` schema", () => {
+            const { node } = compileSchema({
+                allOf: [{ type: "number" }, { title: "dynamic id" }],
+                anyOf: [{ minimum: 1 }]
+            }).reduceSchema(3);
+
+            assert.deepEqual(node.dynamicId, "#(allOf/0,allOf/1)+#(anyOf/0)");
+        });
+
+        it("should add dynamicId based on `then` schema", () => {
+            const { node } = compileSchema({
+                if: { const: 3 },
+                then: { type: "string" }
+            }).reduceSchema(3);
+
+            assert.deepEqual(node.dynamicId, "#(then)");
+        });
+
+        it("should add dynamicId based on `else` schema", () => {
+            const { node } = compileSchema({
+                if: { const: 3 },
+                then: { type: "string" },
+                else: { type: "number" }
+            }).reduceSchema(2);
+
+            assert.deepEqual(node.dynamicId, "#(else)");
+        });
+
+        it("should add dynamicId based on selected `patternProperties`", () => {
+            const { node } = compileSchema({
+                patternProperties: {
+                    muh: { type: "string" },
+                    rooar: { type: "bolean" }
+                }
+            }).reduceSchema({ muh: "" });
+
+            assert.deepEqual(node.dynamicId, "#(patternProperties/muh)");
+        });
+
+        it("should add dynamicId based on selected `dependentSchemas`", () => {
+            const { node } = compileSchema({
+                dependentSchemas: {
+                    muh: { properties: { title: { type: "string" } } },
+                    rooar: { properties: { header: { type: "boolean" } } }
+                }
+            }).reduceSchema({ muh: "", rooar: true });
+
+            assert.deepEqual(node.dynamicId, "#(dependentSchemas/muh,dependentSchemas/rooar)");
+        });
+
+        it("should prefix with schemaId", () => {
+            const { node } =
+                compileSchema({
+                    properties: {
+                        counter: { anyOf: [{ type: "number" }, { minimum: 1 }] }
+                    }
+                })
+                    .getChild("counter", { counter: 3 })
+                    .node?.reduceSchema(3) ?? {};
+
+            assert.deepEqual(node.dynamicId, "#/properties/counter(anyOf/0,anyOf/1)");
+        });
+
+        it("should maintain dynamicId through nested reduce-calls", () => {
+            const { node } =
+                compileSchema({
+                    allOf: [
+                        {
+                            properties: {
+                                counter: { anyOf: [{ type: "number" }, { minimum: 1 }] }
+                            }
+                        }
+                    ]
+                })
+                    .getChild("counter", { counter: 3 })
+                    .node?.reduceSchema(3) ?? {};
+
+            assert.deepEqual(node.dynamicId, "#(allOf/0)+#/properties/counter(anyOf/0,anyOf/1)");
+        });
+
+        it("should add dynamicId from nested reducers in allOf", () => {
+            const { node } = compileSchema({
+                allOf: [
+                    {
+                        anyOf: [{ type: "string" }, { minimum: 1 }]
+                    }
+                ]
+            }).reduceSchema(2);
+
+            assert.deepEqual(node.dynamicId, "#(#/allOf/0(anyOf/1))");
+        });
+
+        it("should add dynamicId from nested reducers in anyOf", () => {
+            const { node } = compileSchema({
+                anyOf: [
+                    {
+                        allOf: [{ type: "number" }, { minimum: 1 }]
+                    }
+                ]
+            }).reduceSchema(2);
+
+            assert.deepEqual(node.dynamicId, "#(#/anyOf/0(allOf/0,allOf/1))");
+        });
+
+        it("should add dynamicId from nested reducers in then", () => {
+            const { node } = compileSchema({
+                if: { minimum: 1 },
+                then: {
+                    allOf: [{ type: "number" }, { title: "order" }]
+                }
+            }).reduceSchema(2);
+
+            assert.deepEqual(node.dynamicId, "#/then(allOf/0,allOf/1)");
+        });
+    });
 });

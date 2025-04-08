@@ -36,15 +36,21 @@ function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
             // reduce creates a new node
             const { node: schemaNode } = node.then.reduceSchema(data);
             if (schemaNode) {
+                const nestedDynamicId = schemaNode.dynamicId.replace(node.dynamicId, "").replace(/^#/, "");
+                const dynamicId = nestedDynamicId === "" ? `(then)` : nestedDynamicId;
+
                 const schema = mergeSchema(node.then.schema, schemaNode.schema, "if", "then", "else");
-                return node.compileSchema(schema, node.then.spointer);
+                return node.compileSchema(schema, node.then.spointer, node.schemaId, `${node.schemaId}${dynamicId}`);
             }
         }
     } else if (node.else) {
         const { node: schemaNode } = node.else.reduceSchema(data);
         if (schemaNode) {
+            const nestedDynamicId = schemaNode.dynamicId.replace(node.dynamicId, "");
+            const dynamicId = nestedDynamicId === "" ? `(else)` : nestedDynamicId;
+
             const schema = mergeSchema(node.else.schema, schemaNode.schema, "if", "then", "else");
-            return node.compileSchema(schema, node.else.spointer);
+            return node.compileSchema(schema, node.else.spointer, node.schemaId, `${node.schemaId}${dynamicId}`);
         }
     }
     return undefined;

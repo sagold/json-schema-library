@@ -48,6 +48,8 @@ export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) 
 
     let mergedSchema: JsonSchema;
     const { dependentSchemas } = node;
+    let added = 0;
+    let dynamicId = `${node.schemaId}(`;
     Object.keys(data).forEach((propertyName) => {
         if (dependentSchemas[propertyName] == null) {
             return;
@@ -58,6 +60,8 @@ export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) 
         } else {
             mergedSchema.properties[propertyName] = dependentSchemas[propertyName];
         }
+        dynamicId += `${added ? "," : ""}dependentSchemas/${propertyName}`;
+        added++;
     });
 
     if (mergedSchema == null) {
@@ -65,7 +69,7 @@ export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) 
     }
 
     mergedSchema = mergeSchema(node.schema, mergedSchema, "dependentSchemas");
-    return node.compileSchema(mergedSchema, node.spointer, node.schemaId);
+    return node.compileSchema(mergedSchema, node.spointer, node.schemaId, `${dynamicId})`);
 }
 
 export function validateDependentSchemas({ node, data, pointer, path }: JsonSchemaValidatorParams) {

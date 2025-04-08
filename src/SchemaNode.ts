@@ -39,11 +39,11 @@ function getDraft(drafts: Draft[], $schema: string) {
 }
 
 export type Context = {
-    /** root node of this json-schema */
+    /** root node of this JSON Schema */
     rootNode: SchemaNode;
     /** available draft configurations */
     drafts: Draft[];
-    /** [SHARED ACROSS REMOTES] root nodes of registered remote json-schema, stored by id/url */
+    /** [SHARED ACROSS REMOTES] root nodes of registered remote JSON Schema, stored by id/url */
     remotes: Record<string, SchemaNode>;
     /** references stored by fully resolved schema-$id + local-pointer */
     refs: Record<string, SchemaNode>;
@@ -51,13 +51,15 @@ export type Context = {
     anchors: Record<string, SchemaNode>;
     /** [SHARED ACROSS REMOTES] dynamicAnchors stored by fully resolved schema-$id + $anchor */
     dynamicAnchors: Record<string, SchemaNode>;
-    /** json-schema parser, validator, reducer and resolver for this json-schema (root-schema and its child nodes) */
+    /** JSON Schema parser, validator, reducer and resolver for this JSON Schema (root schema and its child nodes) */
     keywords: Draft["keywords"];
-    /** json-schema draft-dependend methods */
+    /** JSON Schema draft dependend methods */
     methods: Draft["methods"];
-    /** draft-version */
+    /** draft version */
     version: Draft["version"];
+    /** draft errors & template-strings */
     errors: Draft["errors"];
+    /** draft formats & validators */
     formats: Draft["formats"];
     /** [SHARED USING ADD REMOTE] getData default options */
     templateDefaultOptions?: TemplateOptions;
@@ -65,13 +67,19 @@ export type Context = {
 
 export interface SchemaNode extends SchemaNodeMethodsType {
     context: Context;
+    /** JSON Schema of node */
     schema: JsonSchema;
+    /** absolute path into JSON Schema, includes $ref for resolved schema */
     spointer: string;
-    /** local path within json-schema (not extended by resolving ref) */
+    /** local path within JSON Schema (not extended by resolving ref) */
     schemaId: string;
+    /** id created when combining subschemas */
+    dynamicId: string;
+    /** reference to parent node (node used to compile this node) */
     parent?: SchemaNode | undefined;
-    /** json-pointer from last $id ~~to this location~~ to resolve $refs to $id#/idLocalPointer */
+    /** JSON Pointer from last $id ~~to this location~~ to resolve $refs to $id#/idLocalPointer */
     lastIdPointer: string;
+    /** when reduced schema containing `oneOf` schema, `oneOfIndex` stores `oneOf`-item used for merge */
     oneOfIndex?: number;
 
     reducers: JsonSchemaReducer[];
@@ -97,7 +105,7 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     items?: SchemaNode;
     not?: SchemaNode;
     oneOf?: SchemaNode[];
-    patternProperties?: { pattern: RegExp; node: SchemaNode }[];
+    patternProperties?: { name: string; pattern: RegExp; node: SchemaNode }[];
     properties?: Record<string, SchemaNode>;
     propertyNames?: SchemaNode;
     then?: SchemaNode;
@@ -124,12 +132,33 @@ export type GetSchemaOptions = {
     pointer?: string;
 };
 
+export function joinDynamicId(a?: string, b?: string) {
+    if (a == b) {
+        return a ?? "";
+    }
+    if (a == null || b == null) {
+        return a || b;
+    }
+    if (a.startsWith(b)) {
+        return a;
+    }
+    if (b.startsWith(a)) {
+        return b;
+    }
+    return `${a}+${b}`;
+}
+
 export const SchemaNodeMethods = {
     /**
      * Compiles a child-schema of this node to its context
      * @returns SchemaNode representing the passed JSON Schema
      */
-    compileSchema(schema: JsonSchema, spointer: string = this.spointer, schemaId?: string): SchemaNode {
+    compileSchema(
+        schema: JsonSchema,
+        spointer: string = this.spointer,
+        schemaId?: string,
+        dynamicId?: string
+    ): SchemaNode {
         const nextFragment = spointer.split("/$ref")[0];
         const parentNode = this as SchemaNode;
         const node: SchemaNode = {
@@ -137,6 +166,7 @@ export const SchemaNodeMethods = {
             context: parentNode.context,
             parent: parentNode,
             spointer,
+            dynamicId: joinDynamicId(parentNode.dynamicId, dynamicId),
             schemaId: schemaId ?? join(parentNode.schemaId, nextFragment),
             reducers: [],
             resolvers: [],
@@ -170,9 +200,9 @@ export const SchemaNodeMethods = {
     },
 
     /**
-     * Returns a node containing json-schema of a data-json-pointer.
+     * Returns a node containing JSON Schema of a data-JSON Pointer.
      *
-     * To resolve dynamic schema where the type of json-schema is evaluated by
+     * To resolve dynamic schema where the type of JSON Schema is evaluated by
      * its value, a data object has to be passed in options.
      *
      * Per default this function will return `undefined` schema for valid properties
@@ -390,7 +420,7 @@ export const SchemaNodeMethods = {
     },
 
     /**
-     * Register a json-schema as a remote-schema to be resolved by $ref, $anchor, etc
+     * Register a JSON Schema as a remote-schema to be resolved by $ref, $anchor, etc
      * @returns the current node (not the remote schema-node)
      */
     addRemote(url: string, schema: JsonSchema): SchemaNode {
@@ -403,6 +433,7 @@ export const SchemaNodeMethods = {
             spointer: "#",
             lastIdPointer: "#",
             schemaId: "#",
+            dynamicId: "",
             reducers: [],
             resolvers: [],
             validators: [],
