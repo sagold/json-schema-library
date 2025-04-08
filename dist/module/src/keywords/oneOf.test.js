@@ -33,7 +33,7 @@ describe("keyword : oneOf : reduce", () => {
                 { type: "string", title: "A String" },
                 { type: "number", title: "A Number" }
             ]
-        }).reduce(111);
+        }).reduceSchema(111);
         assert.deepEqual(node.schema, { type: "number", title: "A Number" });
         assert.equal(node.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
@@ -43,7 +43,7 @@ describe("keyword : oneOf : reduce", () => {
                 { type: "string", title: "A String" },
                 { type: "number", title: "A Number" }
             ]
-        }).reduce(true);
+        }).reduceSchema(true);
         assert(isJsonError(error));
         assert.equal(node, undefined);
     });
@@ -53,7 +53,7 @@ describe("keyword : oneOf : reduce", () => {
                 { type: "string", minLength: 1 },
                 { type: "string", maxLength: 3 }
             ]
-        }).reduce("12");
+        }).reduceSchema("12");
         assert(isJsonError(error));
         assert.equal(node, undefined);
     });
@@ -61,7 +61,7 @@ describe("keyword : oneOf : reduce", () => {
         const { node } = compileSchema({
             $defs: { withData: { oneOf: [{ required: ["b"], properties: { b: { type: "number" } } }] } },
             oneOf: [{ required: ["a"], properties: { a: { type: "string" } } }, { $ref: "#/$defs/withData" }]
-        }).reduce({ b: 111 });
+        }).reduceSchema({ b: 111 });
         assert.deepEqual(node.schema, { required: ["b"], properties: { b: { type: "number" } } });
         // @note that we override nested oneOfIndex
         assert.equal(node.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
@@ -70,7 +70,7 @@ describe("keyword : oneOf : reduce", () => {
         const { node } = compileSchema({
             $defs: { withData: { oneOf: [{ required: ["b"], properties: { b: true } }] } },
             oneOf: [{ required: ["a"], properties: { a: false } }, { $ref: "#/$defs/withData" }]
-        }).reduce({ b: 111 });
+        }).reduceSchema({ b: 111 });
         assert.deepEqual(node.schema, { required: ["b"], properties: { b: true } });
         assert.equal(node.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
@@ -86,7 +86,7 @@ describe("keyword : oneOf : reduce", () => {
                     properties: { title: { type: "number" } }
                 }
             ]
-        }).reduce({ title: 4 });
+        }).reduceSchema({ title: 4 });
         assert.deepEqual(node.schema, { type: "object", properties: { title: { type: "number" } } });
         assert.equal(node.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
@@ -102,7 +102,7 @@ describe("keyword : oneOf : reduce", () => {
                     additionalProperties: { type: "number" }
                 }
             ]
-        }).reduce({ title: 4, test: 2 });
+        }).reduceSchema({ title: 4, test: 2 });
         assert.deepEqual(node.schema, { type: "object", additionalProperties: { type: "number" } });
         assert.equal(node.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });

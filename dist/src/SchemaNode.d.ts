@@ -1,9 +1,8 @@
 import type { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, Keyword, ValidationPath } from "./Keyword";
 import { createSchema } from "./methods/createSchema";
 import { Draft } from "./Draft";
-import { EachSchemaCallback } from "./methods/eachSchema";
 import { JsonSchema, JsonError, ErrorData, OptionalNodeAndError } from "./types";
-import { TemplateOptions } from "./methods/getTemplate";
+import { TemplateOptions } from "./methods/getData";
 export declare function isSchemaNode(value: unknown): value is SchemaNode;
 export declare function isReduceable(node: SchemaNode): boolean;
 export type Context = {
@@ -27,7 +26,7 @@ export type Context = {
     version: Draft["version"];
     errors: Draft["errors"];
     formats: Draft["formats"];
-    /** [SHARED USING ADD REMOTE] getTemplate default options */
+    /** [SHARED USING ADD REMOTE] getData default options */
     templateDefaultOptions?: TemplateOptions;
 };
 export interface SchemaNode extends SchemaNodeMethodsType {
@@ -47,8 +46,10 @@ export interface SchemaNode extends SchemaNodeMethodsType {
         pointer?: string;
         path?: ValidationPath;
     }) => SchemaNode;
-    $defs?: Record<string, SchemaNode>;
     $id?: string;
+    $defs?: Record<string, SchemaNode>;
+    $ref?: string;
+    /** only used for draft <= 2019-09 */
     additionalItems?: SchemaNode;
     additionalProperties?: SchemaNode;
     allOf?: SchemaNode[];
@@ -58,8 +59,8 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     dependentSchemas?: Record<string, SchemaNode | boolean>;
     else?: SchemaNode;
     if?: SchemaNode;
-    itemsList?: SchemaNode[];
-    itemsObject?: SchemaNode;
+    prefixItems?: SchemaNode[];
+    items?: SchemaNode;
     not?: SchemaNode;
     oneOf?: SchemaNode[];
     patternProperties?: {
@@ -68,7 +69,6 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     }[];
     properties?: Record<string, SchemaNode>;
     propertyNames?: SchemaNode;
-    ref?: string;
     then?: SchemaNode;
     unevaluatedItems?: SchemaNode;
     unevaluatedProperties?: SchemaNode;
@@ -95,7 +95,6 @@ export declare const SchemaNodeMethods: {
     readonly compileSchema: (schema: JsonSchema, spointer?: string, schemaId?: string) => SchemaNode;
     readonly createError: <T extends string = "AdditionalItemsError" | "AdditionalPropertiesError" | "AllOfError" | "AnyOfError" | "ConstError" | "ContainsAnyError" | "ContainsArrayError" | "ContainsError" | "ContainsMinError" | "ContainsMaxError" | "EnumError" | "ExclusiveMaximumError" | "ExclusiveMinimumError" | "ForbiddenPropertyError" | "FormatDateError" | "FormatDateTimeError" | "FormatDurationError" | "FormatEmailError" | "FormatHostnameError" | "FormatIPV4Error" | "FormatIPV4LeadingZeroError" | "FormatIPV6Error" | "FormatIPV6LeadingZeroError" | "FormatJsonPointerError" | "FormatRegExError" | "FormatTimeError" | "FormatURIError" | "FormatURIReferenceError" | "FormatURITemplateError" | "FormatURLError" | "FormatUUIDError" | "InvalidDataError" | "InvalidPropertyNameError" | "MaximumError" | "MaxItemsError" | "MaxLengthError" | "MaxPropertiesError" | "MinimumError" | "MinItemsError" | "MinItemsOneError" | "MinLengthError" | "MinLengthOneError" | "MissingOneOfDeclaratorError" | "MinPropertiesError" | "MissingArrayItemError" | "MissingDependencyError" | "MissingOneOfPropertyError" | "MultipleOfError" | "MultipleOneOfError" | "NoAdditionalPropertiesError" | "NotError" | "OneOfError" | "OneOfPropertyError" | "PatternError" | "PatternPropertiesError" | "RequiredPropertyError" | "SchemaWarning" | "TypeError" | "UndefinedValueError" | "UnevaluatedPropertyError" | "UnevaluatedItemsError" | "UniqueItemsError" | "UnknownPropertyError" | "ValueNotEmptyError">(name: T, data: ErrorData, message?: string) => JsonError;
     readonly createSchema: typeof createSchema;
-    readonly eachSchema: (callback: EachSchemaCallback) => void;
     readonly getChildSchemaSelection: (property: string | number) => JsonError | SchemaNode[];
     /**
      * Returns a node containing json-schema of a data-json-pointer.
@@ -122,8 +121,8 @@ export declare const SchemaNodeMethods: {
     readonly getChild: (key: string | number, data?: unknown, options?: GetSchemaOptions) => OptionalNodeAndError;
     readonly getDraftVersion: () => import("./Draft").DraftVersion;
     /** Creates data that is valid to the schema of this node */
-    readonly getTemplate: (data?: unknown, options?: TemplateOptions) => any;
-    readonly reduce: (data: unknown, options?: {
+    readonly getData: (data?: unknown, options?: TemplateOptions) => any;
+    readonly reduceSchema: (data: unknown, options?: {
         key?: string | number;
         pointer?: string;
         path?: ValidationPath;
@@ -142,6 +141,7 @@ export declare const SchemaNodeMethods: {
      * @returns the current node (not the remote schema-node)
      */
     readonly addRemote: (url: string, schema: JsonSchema) => SchemaNode;
+    readonly toSchemaNodes: () => SchemaNode[];
     readonly toDataNodes: (data: unknown, pointer?: string) => import("..").DataNode[];
     readonly toJSON: () => any;
 };

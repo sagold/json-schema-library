@@ -1,5 +1,5 @@
 import { JsonSchema, Draft } from "./types";
-import { TemplateOptions } from "./methods/getTemplate";
+import { TemplateOptions } from "./methods/getData";
 import { SchemaNode } from "./SchemaNode";
 export type CompileOptions = {
     drafts: Draft[];

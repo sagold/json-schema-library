@@ -28,7 +28,7 @@ function reduceIf({ node, data, pointer, path }) {
     if (validateNode(node.if, data, pointer, [...(path !== null && path !== void 0 ? path : [])]).length === 0) {
         if (node.then) {
             // reduce creates a new node
-            const { node: schemaNode } = node.then.reduce(data);
+            const { node: schemaNode } = node.then.reduceSchema(data);
             if (schemaNode) {
                 const schema = mergeSchema(node.then.schema, schemaNode.schema, "if", "then", "else");
                 return node.compileSchema(schema, node.then.spointer);
@@ -36,7 +36,7 @@ function reduceIf({ node, data, pointer, path }) {
         }
     }
     else if (node.else) {
-        const { node: schemaNode } = node.else.reduce(data);
+        const { node: schemaNode } = node.else.reduceSchema(data);
         if (schemaNode) {
             const schema = mergeSchema(node.else.schema, schemaNode.schema, "if", "then", "else");
             return node.compileSchema(schema, node.else.spointer);

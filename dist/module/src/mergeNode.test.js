@@ -37,7 +37,7 @@ describe("mergeNode", () => {
         const b = compileSchema({ type: "array", items: { type: "number", minimum: 1 } });
         const node = mergeNode(a, b);
         assert(isSchemaNode(node), "should have returned a valid schema node");
-        assert.deepEqual((_a = node.itemsObject) === null || _a === void 0 ? void 0 : _a.schema, { type: "number", minimum: 1, minLength: 1 });
+        assert.deepEqual((_a = node.items) === null || _a === void 0 ? void 0 : _a.schema, { type: "number", minimum: 1, minLength: 1 });
         const { errors } = node.validate([0, 10]);
         assert.deepEqual(errors.length, 1);
     });

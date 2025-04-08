@@ -1,18 +1,18 @@
 import { strict as assert } from "assert";
-import { compileSchema } from "../compileSchema";
+import { compileSchema } from "../../compileSchema";
 describe("keyword : additionalItems : validate", () => {
     it("should allow any additional item when set to 'true'", () => {
-        const node = compileSchema({ type: "array", additionalItems: true });
+        const node = compileSchema({ $schema: "draft-2019-09", type: "array", additionalItems: true });
         const { errors } = node.validate(["a"]);
         assert.deepEqual(errors.length, 0);
     });
     it("should allow any additional item when undefined", () => {
-        const node = compileSchema({ type: "array" });
+        const node = compileSchema({ $schema: "draft-2019-09", type: "array" });
         const { errors } = node.validate(["a"]);
         assert.deepEqual(errors.length, 0);
     });
     it("should NOT allow any additional item when set to 'false' but a schema is given", () => {
-        const node = compileSchema({ type: "array", items: [], additionalItems: false });
+        const node = compileSchema({ $schema: "draft-2019-09", type: "array", items: [], additionalItems: false });
         const { errors } = node.validate(["a"]);
         assert.deepEqual(errors.length, 1);
         assert.deepEqual(errors[0].code, "additional-items-error");
@@ -20,12 +20,13 @@ describe("keyword : additionalItems : validate", () => {
         assert.deepEqual(errors[0].data.key, 0);
     });
     it("should allow any additional item when set to 'false' and no schema given", () => {
-        const node = compileSchema({ type: "array", additionalItems: false });
+        const node = compileSchema({ $schema: "draft-2019-09", type: "array", additionalItems: false });
         const { errors } = node.validate(["a"]);
         assert.deepEqual(errors.length, 0);
     });
     it("should return error for prohibited additional items", () => {
         const { errors } = compileSchema({
+            $schema: "draft-2019-09",
             type: "array",
             items: [{ type: "string" }, { type: "number" }],
             additionalItems: false
@@ -35,6 +36,7 @@ describe("keyword : additionalItems : validate", () => {
     });
     it("should be valid if 'additionalItems' is true", () => {
         const { errors } = compileSchema({
+            $schema: "draft-2019-09",
             type: "array",
             items: [{ type: "string" }, { type: "number" }],
             additionalItems: true
@@ -43,6 +45,7 @@ describe("keyword : additionalItems : validate", () => {
     });
     it("should also be valid if 'additionalItems' is undefined", () => {
         const { errors } = compileSchema({
+            $schema: "draft-2019-09",
             type: "array",
             items: [{ type: "string" }, { type: "number" }]
         }).validate(["1", 2, "a"]);
@@ -50,6 +53,7 @@ describe("keyword : additionalItems : validate", () => {
     });
     it("should return error for mismatching 'additionalItems' schema", () => {
         const { errors } = compileSchema({
+            $schema: "draft-2019-09",
             type: "array",
             items: [{ type: "string" }, { type: "number" }],
             additionalItems: { type: "object" }
@@ -59,6 +63,7 @@ describe("keyword : additionalItems : validate", () => {
     });
     it("should be valid for matching 'additionalItems' schema", () => {
         const { errors } = compileSchema({
+            $schema: "draft-2019-09",
             type: "array",
             items: [{ type: "string" }, { type: "number" }],
             additionalItems: { type: "object" }

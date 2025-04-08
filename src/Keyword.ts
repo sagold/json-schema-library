@@ -36,17 +36,6 @@ export interface JsonSchemaValidator {
     (options: JsonSchemaValidatorParams): undefined | JsonError | ValidationResult[];
 }
 
-export type JsonSchemaDefaultDataResolverParams = {
-    pointer?: string;
-    data?: unknown;
-    node: SchemaNode;
-    options?: TemplateOptions;
-};
-export interface JsonSchemaDefaultDataResolver {
-    toJSON?: () => string;
-    (options: JsonSchemaDefaultDataResolverParams): unknown;
-}
-
 export type Keyword = {
     id: string;
     keyword: string;

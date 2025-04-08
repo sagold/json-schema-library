@@ -4,7 +4,7 @@ import { toDataNodes } from "./methods/toDataNodes";
 import { ErrorConfig } from "./types";
 import { formats } from "./formats/formats";
 import { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
-import { getTemplate } from "./methods/getTemplate";
+import { getData } from "./methods/getData";
 export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "draft-2020-12" | "latest";
 export interface Draft {
     /** test-string if draft can be used with $schema-url */
@@ -17,7 +17,7 @@ export interface Draft {
     methods: {
         createSchema: typeof createSchema;
         getChildSchemaSelection: typeof getChildSchemaSelection;
-        getTemplate: typeof getTemplate;
+        getData: typeof getData;
         toDataNodes: typeof toDataNodes;
     };
     /** meta-schema url associated with this draft */

@@ -56,7 +56,7 @@ export function reduceDependencies({ node, data, path }) {
         return node;
     }
     mergedSchema = mergeSchema(node.schema, mergedSchema, "dependencies");
-    const { node: childNode, error } = node.compileSchema(mergedSchema, node.spointer).reduce(data, { path });
+    const { node: childNode, error } = node.compileSchema(mergedSchema, node.spointer).reduceSchema(data, { path });
     return childNode !== null && childNode !== void 0 ? childNode : error;
 }
 function validateDependencies({ node, data, pointer, path }) {

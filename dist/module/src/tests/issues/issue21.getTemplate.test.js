@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
-describe("issue#21 - getTemplate containing refs", () => {
+describe("issue#21 - getData containing refs", () => {
     let node;
     beforeEach(() => {
         node = compileSchema({
@@ -52,7 +52,7 @@ describe("issue#21 - getTemplate containing refs", () => {
         });
     });
     it("should append property 'runner' on partial objects", () => {
-        const data = node.getTemplate({
+        const data = node.getData({
             jobs: [{ name: "job-1" }, { name: "job-2" }, { name: "job-3" }]
         }, { recursionLimit: 1 });
         assert.deepEqual(data, {

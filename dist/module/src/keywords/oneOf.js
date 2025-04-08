@@ -49,7 +49,7 @@ function reduceOneOf({ node, data, pointer, path }) {
     }
     if (matches.length === 1) {
         const { node, index } = matches[0];
-        const { node: reducedNode, error } = node.reduce(data, { pointer, path });
+        const { node: reducedNode, error } = node.reduceSchema(data, { pointer, path });
         if (reducedNode) {
             reducedNode.oneOfIndex = index; // @evaluation-info
             return reducedNode;
@@ -103,7 +103,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }) {
             errors.push(...result);
         }
         else {
-            const { node: reducedNode } = node.oneOf[i].reduce(data, { pointer, path });
+            const { node: reducedNode } = node.oneOf[i].reduceSchema(data, { pointer, path });
             if (reducedNode) {
                 reducedNode.oneOfIndex = i; // @evaluation-info
                 return reducedNode;
@@ -184,7 +184,7 @@ export function reduceOneOfFuzzy({ node, data, pointer, path }) {
                 oneOf: node.schema.oneOf
             });
         }
-        const { node: reducedNode, error } = nodeOfItem.reduce(data, { pointer, path });
+        const { node: reducedNode, error } = nodeOfItem.reduceSchema(data, { pointer, path });
         if (reducedNode) {
             reducedNode.oneOfIndex = schemaOfIndex; // @evaluation-info
             return reducedNode;

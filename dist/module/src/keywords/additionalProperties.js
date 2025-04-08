@@ -26,7 +26,7 @@ export function parseAdditionalProperties(node) {
 function additionalPropertyResolver({ node, data, key }) {
     const value = getValue(data, key);
     if (node.additionalProperties) {
-        const { node: reduced, error } = node.additionalProperties.reduce(value);
+        const { node: reduced, error } = node.additionalProperties.reduceSchema(value);
         return reduced !== null && reduced !== void 0 ? reduced : error;
     }
     if (node.schema.additionalProperties === false) {

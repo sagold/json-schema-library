@@ -1,9 +1,9 @@
-import { additionalItemsKeyword } from "./keywords/additionalItems";
+import { additionalItemsKeyword } from "./draft2019-09/keywords/additionalItems";
 import { additionalPropertiesKeyword } from "./keywords/additionalProperties";
 import { allOfKeyword } from "./keywords/allOf";
 import { anyOfKeyword } from "./keywords/anyOf";
 import { containsKeyword } from "./keywords/contains";
-import { defsKeyword } from "./keywords/defs";
+import { $defsKeyword } from "./keywords/$defs";
 import { dependenciesKeyword } from "./keywords/dependencies";
 import { enumKeyword } from "./keywords/enum";
 import { exclusiveMaximumKeyword } from "./draft04/keywords/exclusiveMaximum";
@@ -25,13 +25,13 @@ import { patternKeyword } from "./keywords/pattern";
 import { patternPropertiesKeyword } from "./keywords/patternProperties";
 import { propertiesKeyword } from "./keywords/properties";
 import { propertyNamesKeyword } from "./keywords/propertyNames";
-import { refKeyword } from "./draft04/keywords/ref";
+import { $refKeyword } from "./draft04/keywords/$ref";
 import { requiredKeyword } from "./keywords/required";
 import { sanitizeKeywords } from "./Draft";
 import { typeKeyword } from "./keywords/type";
 import { uniqueItemsKeyword } from "./keywords/uniqueItems";
 import { getChildSchemaSelection } from "./draft2019-09/methods/getChildSchemaSelection";
-import { getTemplate } from "./draft2019-09/methods/getTemplate";
+import { getData } from "./draft2019-09/methods/getData";
 import { toDataNodes } from "./methods/toDataNodes";
 import { createSchema } from "./methods/createSchema";
 import { errors } from "./errors/errors";
@@ -65,16 +65,16 @@ export const draft04 = sanitizeKeywords({
     formats,
     methods: {
         createSchema,
-        getTemplate,
+        getData,
         getChildSchemaSelection,
         toDataNodes
     },
     keywords: [
-        refKeyword,
+        $refKeyword,
         allOfKeyword,
         anyOfKeyword,
         containsKeyword,
-        defsKeyword,
+        $defsKeyword,
         dependenciesKeyword, // optional support for old draft-version
         enumKeyword,
         exclusiveMaximumKeyword,

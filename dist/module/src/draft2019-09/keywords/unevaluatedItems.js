@@ -29,7 +29,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }) {
         return undefined;
     }
     // const reducedNode = node;
-    let { node: reducedNode } = node.reduce(data, { pointer, path });
+    let { node: reducedNode } = node.reduceSchema(data, { pointer, path });
     reducedNode = reducedNode !== null && reducedNode !== void 0 ? reducedNode : node;
     if (reducedNode.schema.unevaluatedItems === true || reducedNode.schema.additionalItems === true) {
         return undefined;
@@ -60,7 +60,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }) {
         }
         // "unevaluatedItems false"
         if (child === undefined) {
-            if (validIf && node.if.itemsList && node.if.itemsList.length > i) {
+            if (validIf && node.if.prefixItems && node.if.prefixItems.length > i) {
                 // evaluated by if -- skip
             }
             else if (node.unevaluatedItems) {

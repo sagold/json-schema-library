@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
-describe("issue#38 - getTemplate anyOf should not modify valid default value", () => {
+describe("issue#38 - getData anyOf should not modify valid default value", () => {
     let node;
     beforeEach(() => {
         node = compileSchema({
@@ -17,7 +17,7 @@ describe("issue#38 - getTemplate anyOf should not modify valid default value", (
         });
     });
     it("should return valid default value", () => {
-        const result = node.getTemplate();
+        const result = node.getData();
         assert.deepEqual(result, {
             someList: [{ a: 1 }, { b: "schfifty-five" }, { c: "foo" }]
         });

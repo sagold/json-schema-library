@@ -4,7 +4,7 @@ export const itemsKeyword = {
     id: "items",
     keyword: "items",
     parse: parseItems,
-    addResolve: (node) => node.itemsObject != null,
+    addResolve: (node) => node.items != null,
     resolve: itemsResolver,
     addValidate: ({ schema }) => schema.items != null,
     validate: validateItems
@@ -13,16 +13,16 @@ function itemsResolver({ node, key }) {
     var _a;
     // prefixItems should handle this, abort
     // Note: This keeps features sort independent for arrays
-    if (((_a = node.itemsList) === null || _a === void 0 ? void 0 : _a.length) > +key) {
+    if (((_a = node.prefixItems) === null || _a === void 0 ? void 0 : _a.length) > +key) {
         return;
     }
-    return node.itemsObject;
+    return node.items;
 }
 export function parseItems(node) {
     const { schema, spointer } = node;
     if (isObject(schema.items)) {
         const propertyNode = node.compileSchema(schema.items, `${spointer}/items`, `${node.schemaId}/items`);
-        node.itemsObject = propertyNode;
+        node.items = propertyNode;
     }
 }
 function validateItems({ node, data, pointer = "#", path }) {
@@ -42,10 +42,10 @@ function validateItems({ node, data, pointer = "#", path }) {
         return node.createError("InvalidDataError", { pointer, value: data, schema });
     }
     const errors = [];
-    if (node.itemsObject) {
+    if (node.items) {
         for (let i = (_b = (_a = schema.prefixItems) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0; i < data.length; i += 1) {
             const itemData = data[i];
-            const result = validateNode(node.itemsObject, itemData, `${pointer}/${i}`, path);
+            const result = validateNode(node.items, itemData, `${pointer}/${i}`, path);
             if (result) {
                 errors.push(...result);
             }

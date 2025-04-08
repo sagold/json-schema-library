@@ -27,12 +27,12 @@ describe("keyword : string : validation", () => {
 describe("keyword : string : default data", () => {
     it("should return default value if string is undefined", () => {
         const node = compileSchema({ type: "string", default: "abc" });
-        const data = node.getTemplate();
+        const data = node.getData();
         assert.deepEqual(data, "abc");
     });
     it("should NOT return default value if string is undefined", () => {
         const node = compileSchema({ type: "string", default: "abc" });
-        const data = node.getTemplate("123");
+        const data = node.getData("123");
         assert.deepEqual(data, "123");
     });
 });

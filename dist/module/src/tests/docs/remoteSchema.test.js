@@ -21,7 +21,7 @@ describe("docs - remote schema", () => {
         });
         const remoteSchema = (_a = node.getRef("https://remote.com/schemas/character")) === null || _a === void 0 ? void 0 : _a.schema;
         assert.deepEqual(remoteSchema.title, "character remote schema", "should have resolved remote root schema");
-        const data = node.getTemplate({});
+        const data = node.getData({});
         assert.deepEqual(data, { character: "A" }, "should have retrieved default value from remote schema");
     });
     it.skip("should resolve remote schemas from simple ids", () => {
@@ -44,7 +44,7 @@ describe("docs - remote schema", () => {
         });
         const remoteSchema = (_a = node.getRef("character")) === null || _a === void 0 ? void 0 : _a.schema;
         assert.deepEqual(remoteSchema.title, "character remote schema", "should have resolved remote root schema");
-        const data = node.getTemplate({});
+        const data = node.getData({});
         assert.deepEqual(data, { character: "A" }, "should have retrieved default value from remote schema");
     });
     it("should resolve $defs from remote schema", () => {
@@ -76,7 +76,7 @@ describe("docs - remote schema", () => {
             maxLength: 1,
             minLength: 1
         }, "should have resolved remote definition");
-        const data = node.getTemplate({});
+        const data = node.getData({});
         assert.deepEqual(data, { character: "A" }, "should have retrieved default value from remote schema");
     });
     it.skip("should resolve $defs from remote schema using simple ids", () => {
@@ -108,7 +108,7 @@ describe("docs - remote schema", () => {
             maxLength: 1,
             minLength: 1
         }, "should have resolved remote definition");
-        const data = node.getTemplate({});
+        const data = node.getData({});
         assert.deepEqual(data, { character: "A" }, "should have retrieved default value from remote schema");
     });
     it.skip("should resolve pointer to nested object in remote schema", () => {
@@ -140,7 +140,7 @@ describe("docs - remote schema", () => {
             maxLength: 1,
             minLength: 1
         }, "should have resolved remote definition");
-        const data = node.getTemplate({});
+        const data = node.getData({});
         assert.deepEqual(data, { character: "A" }, "should have retrieved default value from remote schema");
     });
 });

@@ -34,7 +34,7 @@ export function isItemEvaluated({ node, data, key, pointer, path }) {
             return true;
         }
         const validIf = validateNode(node.if, data, pointer, path).length === 0;
-        if (validIf && node.if.itemsList && node.if.itemsList.length > key) {
+        if (validIf && node.if.prefixItems && node.if.prefixItems.length > key) {
             // evaluated by if
             return true;
         }

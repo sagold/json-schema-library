@@ -1,5 +1,5 @@
 import copy from "fast-copy";
-import getRef from "./keywords/ref";
+import { getRef } from "./keywords/$ref";
 import { draft04 } from "./draft04";
 import { draft06 } from "./draft06";
 import { draft07 } from "./draft07";
@@ -55,7 +55,7 @@ export function compileSchema(schema, options = {}) {
             if (formatAssertion === "meta-schema") {
                 formatAssertion = metaSchema.schema.$vocabulary[formatAssertionString] === true;
             }
-            const validKeywords = Object.keys(metaSchema.getTemplate({}, { addOptionalProps: true }));
+            const validKeywords = Object.keys(metaSchema.getData({}, { addOptionalProps: true }));
             if (validKeywords.length > 0) {
                 node.context.keywords = node.context.keywords.filter((f) => validKeywords.includes(f.keyword));
             }

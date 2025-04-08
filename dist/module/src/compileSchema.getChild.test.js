@@ -225,7 +225,7 @@ describe("compileSchema : getChild", () => {
                     }
                 }
             }).getChild("dynamicSchema");
-            const { node } = res.reduce({ trigger: true });
+            const { node } = res.reduceSchema({ trigger: true });
             assert.deepEqual(node.schema, {
                 type: "object",
                 properties: {
@@ -521,7 +521,7 @@ describe("step", () => {
                     ]
                 }
             }).getChild(0, [{ title: 2 }]);
-            const { node } = res.reduce({ title: 2 });
+            const { node } = res.reduceSchema({ title: 2 });
             assert.deepEqual(node.schema, {
                 type: "object",
                 properties: { title: { type: "number" } }
@@ -537,7 +537,7 @@ describe("step", () => {
                     ]
                 }
             }).getChild(1, [{ title: "two" }, { title: 4 }]);
-            const { node } = res.reduce({ title: 4 });
+            const { node } = res.reduceSchema({ title: 4 });
             assert.deepEqual(node.schema, { type: "object", properties: { title: { type: "number" } } });
         });
         it("should return combined anyOf schema", () => {
@@ -551,7 +551,7 @@ describe("step", () => {
                     ]
                 }
             }).getChild(1, [{ title: "two" }, { title: 4 }]);
-            const { node } = res.reduce({ title: 4 });
+            const { node } = res.reduceSchema({ title: 4 });
             assert.deepEqual(node.schema, { type: "object", properties: { title: { type: "number", minimum: 2 } } });
         });
         it("should return combined allOf schema", () => {
@@ -564,7 +564,7 @@ describe("step", () => {
                     ]
                 }
             }).getChild(1, [{ title: "two" }, { title: 4 }]);
-            const { node } = res.reduce({ title: "two" });
+            const { node } = res.reduceSchema({ title: "two" });
             assert.deepEqual(node.schema, {
                 type: "object",
                 properties: { title: { type: "number", minimum: 3 } }

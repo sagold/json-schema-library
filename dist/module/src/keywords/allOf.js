@@ -20,7 +20,7 @@ function reduceAllOf({ node, data }) {
     // dynamic schema parts
     let mergedSchema = {};
     for (let i = 0; i < node.allOf.length; i += 1) {
-        const { node: schemaNode } = node.allOf[i].reduce(data);
+        const { node: schemaNode } = node.allOf[i].reduceSchema(data);
         if (schemaNode) {
             const schema = mergeSchema(node.allOf[i].schema, schemaNode.schema);
             mergedSchema = mergeSchema(mergedSchema, schema, "allOf", "contains");

@@ -4,7 +4,7 @@ import { omit } from "../../utils/omit";
 import { isObject } from "../../utils/isObject";
 import { validateNode } from "../../validateNode";
 import { get } from "@sagold/json-pointer";
-export const refKeyword = {
+export const $refKeyword = {
     id: "$ref",
     keyword: "$ref",
     parse: parseRef,
@@ -40,9 +40,9 @@ export function parseRef(node) {
     }
     // precompile reference
     if (node.schema.$ref) {
-        node.ref = joinId(currentId, node.schema.$ref);
-        if (node.ref.startsWith("/")) {
-            node.ref = `#${node.ref}`;
+        node.$ref = joinId(currentId, node.schema.$ref);
+        if (node.$ref.startsWith("/")) {
+            node.$ref = `#${node.$ref}`;
         }
     }
 }
@@ -53,7 +53,7 @@ export function resolveRef({ pointer, path } = {}) {
         path === null || path === void 0 ? void 0 : path.push({ pointer, node: nextNode });
         return nextNode;
     }
-    if (node.ref == null) {
+    if (node.$ref == null) {
         return node;
     }
     const resolvedNode = getRef(node);
@@ -61,7 +61,7 @@ export function resolveRef({ pointer, path } = {}) {
         path === null || path === void 0 ? void 0 : path.push({ pointer, node: resolvedNode });
     }
     else {
-        // console.log("failed resolving", node.ref, "from", Object.keys(node.context.refs));
+        // console.log("failed resolving", node.$ref, "from", Object.keys(node.context.refs));
     }
     return resolvedNode;
 }
@@ -105,7 +105,7 @@ function compileNext(referencedNode, spointer = referencedNode.spointer) {
         : referencedNode.schema;
     return referencedNode.compileSchema(referencedSchema, `${spointer}/$ref`, referencedNode.schemaId);
 }
-export default function getRef(node, $ref = node === null || node === void 0 ? void 0 : node.ref) {
+export default function getRef(node, $ref = node === null || node === void 0 ? void 0 : node.$ref) {
     var _a;
     if ($ref == null) {
         return node;

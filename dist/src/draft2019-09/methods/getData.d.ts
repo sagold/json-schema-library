@@ -20,4 +20,4 @@ export type TemplateOptions = {
     /** @internal context to track recursion limit */
     cache?: Record<string, Record<string, number>>;
 };
-export declare function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOptions): any;
+export declare function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions): any;

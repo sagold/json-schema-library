@@ -1,7 +1,7 @@
-import { resolveRef } from "../../keywords/ref";
+import { resolveRef } from "../../keywords/$ref";
 import { joinId } from "../../utils/joinId";
 import { validateNode } from "../../validateNode";
-export const refKeyword = {
+export const $refKeyword = {
     id: "$ref",
     keyword: "$ref",
     parse: parseRef,
@@ -38,7 +38,7 @@ function parseRef(node) {
     node.context.refs[joinId(node.context.rootNode.$id, node.spointer)] = node;
     // precompile reference
     if (node.schema.$ref) {
-        node.ref = joinId(currentId, node.schema.$ref);
+        node.$ref = joinId(currentId, node.schema.$ref);
     }
 }
 function validateRef({ node, data, pointer = "#", path }) {

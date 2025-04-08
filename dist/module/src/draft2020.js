@@ -1,10 +1,9 @@
-import { additionalItemsKeyword } from "./keywords/additionalItems";
 import { additionalPropertiesKeyword } from "./keywords/additionalProperties";
 import { allOfKeyword } from "./keywords/allOf";
 import { anyOfKeyword } from "./keywords/anyOf";
 import { constKeyword } from "./keywords/const";
 import { containsKeyword } from "./keywords/contains";
-import { defsKeyword } from "./keywords/defs";
+import { $defsKeyword } from "./keywords/$defs";
 import { dependenciesKeyword } from "./keywords/dependencies";
 import { dependentRequiredKeyword } from "./keywords/dependentRequired";
 import { dependentSchemasKeyword } from "./keywords/dependentSchemas";
@@ -14,7 +13,7 @@ import { exclusiveMaximumKeyword } from "./keywords/exclusiveMaximum";
 import { exclusiveMinimumKeyword } from "./keywords/exclusiveMinimum";
 import { formatKeyword } from "./keywords/format";
 import { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
-import { getTemplate } from "./methods/getTemplate";
+import { getData } from "./methods/getData";
 import { ifKeyword } from "./keywords/ifthenelse";
 import { itemsKeyword } from "./keywords/items";
 import { maximumKeyword } from "./keywords/maximum";
@@ -33,7 +32,7 @@ import { patternPropertiesKeyword } from "./keywords/patternProperties";
 import { prefixItemsKeyword } from "./keywords/prefixItems";
 import { propertiesKeyword } from "./keywords/properties";
 import { propertyNamesKeyword } from "./keywords/propertyNames";
-import { refKeyword } from "./keywords/ref";
+import { $refKeyword } from "./keywords/$ref";
 import { requiredKeyword } from "./keywords/required";
 import { sanitizeKeywords } from "./Draft";
 import { typeKeyword } from "./keywords/type";
@@ -75,19 +74,18 @@ export const draft2020 = sanitizeKeywords({
     formats,
     methods: {
         createSchema,
-        getTemplate,
+        getData,
         getChildSchemaSelection,
         toDataNodes
     },
     keywords: [
-        refKeyword,
-        additionalItemsKeyword,
+        $refKeyword,
         additionalPropertiesKeyword,
         allOfKeyword,
         anyOfKeyword,
         constKeyword,
         containsKeyword,
-        defsKeyword,
+        $defsKeyword,
         dependenciesKeyword,
         dependentRequiredKeyword,
         dependentSchemasKeyword,

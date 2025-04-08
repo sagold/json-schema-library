@@ -5,7 +5,7 @@ function urlEncodeJsonPointerProperty(property) {
     property = property.replace(/\//g, "~1");
     return encodeURIComponent(property);
 }
-export const defsKeyword = {
+export const $defsKeyword = {
     id: "$defs",
     keyword: "$defs",
     parse: parseDefs

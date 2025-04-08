@@ -1,4 +1,3 @@
-import type { TemplateOptions } from "./methods/getTemplate";
 import type { SchemaNode, JsonError } from "./types";
 export type ValidationPath = {
     pointer: string;
@@ -38,16 +37,6 @@ export interface JsonSchemaValidator {
     toJSON?: () => string;
     order?: number;
     (options: JsonSchemaValidatorParams): undefined | JsonError | ValidationResult[];
-}
-export type JsonSchemaDefaultDataResolverParams = {
-    pointer?: string;
-    data?: unknown;
-    node: SchemaNode;
-    options?: TemplateOptions;
-};
-export interface JsonSchemaDefaultDataResolver {
-    toJSON?: () => string;
-    (options: JsonSchemaDefaultDataResolverParams): unknown;
 }
 export type Keyword = {
     id: string;

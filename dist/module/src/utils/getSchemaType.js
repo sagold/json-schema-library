@@ -36,7 +36,7 @@ const ARRAY_PROPERTIES = [
     "uniqueItems"
 ];
 /**
- * @helper for getTemplate
+ * @helper for getData
  * returns schema type, which might be an educated guess based on defined schema
  * properties if an exact type cannot be retried from type.
  */

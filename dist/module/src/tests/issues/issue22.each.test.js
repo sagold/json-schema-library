@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
-describe("issue#22 - eachSchema on root $ref", () => {
+describe("issue#22 - toDataNodes on root $ref", () => {
     it("should call for each properties", () => {
         const nodes = compileSchema({
             $schema: "http://json-schema.org/draft-07/schema",

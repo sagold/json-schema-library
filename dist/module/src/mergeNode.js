@@ -35,20 +35,20 @@ export function mergeNode(a, b, ...omit) {
     if (a == null || b == null) {
         return a || b;
     }
-    // do not merge itemsObject and itemsList (+ additionalItems)
+    // do not merge items and prefixItems (+ additionalItems)
     const arraySelection = {};
-    if ((a.itemsObject && b.itemsList) || (a.itemsList && b.itemsObject)) {
-        if (b.itemsList) {
-            arraySelection.itemsList = b.itemsList;
+    if ((a.items && b.prefixItems) || (a.prefixItems && b.items)) {
+        if (b.prefixItems) {
+            arraySelection.prefixItems = b.prefixItems;
         }
         else {
-            arraySelection.itemsObject = b.itemsObject;
+            arraySelection.items = b.items;
         }
     }
     else {
-        // itemsList?: SchemaNode[];
-        arraySelection.itemsList = (_a = b.itemsList) !== null && _a !== void 0 ? _a : a.itemsList;
-        arraySelection.itemsObject = mergeNode(a.itemsObject, b.itemsObject);
+        // prefixItems?: SchemaNode[];
+        arraySelection.prefixItems = (_a = b.prefixItems) !== null && _a !== void 0 ? _a : a.prefixItems;
+        arraySelection.items = mergeNode(a.items, b.items);
     }
     // we have no node-type if (atype !== b.type) {return a; }
     // note: {x: b.x ?? a.x} is already done by {...a, ...b}

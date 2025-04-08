@@ -2,8 +2,8 @@ import { joinId } from "../../utils/joinId";
 import { isObject } from "../../utils/isObject";
 import { omit } from "../../utils/omit";
 import splitRef from "../../utils/splitRef";
-import { refKeyword as draft06Keyword } from "../../draft06/keywords/ref";
-export const refKeyword = {
+import { $refKeyword as draft06Keyword } from "../../draft06/keywords/$ref";
+export const $refKeyword = {
     id: "$ref",
     keyword: "$ref",
     parse: parseRef,
@@ -46,23 +46,23 @@ function parseRef(node) {
     register(node, joinId(node.context.rootNode.$id, node.spointer));
     // precompile reference
     if (node.schema.$ref) {
-        node.ref = joinId(currentId, node.schema.$ref);
+        node.$ref = joinId(currentId, node.schema.$ref);
     }
 }
 function resolveRef({ pointer, path } = {}) {
     // throw new Error("resolving ref");
     const node = this;
-    if (node.ref == null) {
+    if (node.$ref == null) {
         return node;
     }
     const resolvedNode = getRef(node);
-    // console.log("RESOLVE REF", node.schema, "resolved ref", node.ref, "=>", resolvedNode.schema);
+    // console.log("RESOLVE REF", node.schema, "resolved ref", node.$ref, "=>", resolvedNode.schema);
     if (resolvedNode != null) {
         path === null || path === void 0 ? void 0 : path.push({ pointer, node: resolvedNode });
-        // console.log("resolve ref", node.ref, "=>", resolvedNode.schema, Object.keys(node.context.refs));
+        // console.log("resolve ref", node.$ref, "=>", resolvedNode.schema, Object.keys(node.context.refs));
     }
     else {
-        console.log("failed resolving", node.ref, "from", Object.keys(node.context.refs));
+        console.log("failed resolving", node.$ref, "from", Object.keys(node.context.refs));
     }
     return resolvedNode;
 }
@@ -72,7 +72,7 @@ function compileNext(referencedNode, spointer = referencedNode.spointer) {
         : referencedNode.schema;
     return referencedNode.compileSchema(referencedSchema, `${spointer}/$ref`, referencedSchema.schemaId);
 }
-function getRef(node, $ref = node === null || node === void 0 ? void 0 : node.ref) {
+function getRef(node, $ref = node === null || node === void 0 ? void 0 : node.$ref) {
     var _a;
     if ($ref == null) {
         return node;

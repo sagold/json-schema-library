@@ -3,7 +3,7 @@ import sanitizeErrors from "./utils/sanitizeErrors";
 import settings from "./settings";
 import { createSchema } from "./methods/createSchema";
 import { dashCase } from "./utils/dashCase";
-import { eachSchema } from "./methods/eachSchema";
+import { toSchemaNodes } from "./methods/toSchemaNodes";
 import { getValue } from "./utils/getValue";
 import { isJsonError } from "./types";
 import { isObject } from "./utils/isObject";
@@ -63,10 +63,6 @@ export const SchemaNodeMethods = {
         return { type: "error", name, code: dashCase(name), message: errorMessage, data };
     },
     createSchema,
-    eachSchema(callback) {
-        const node = this;
-        return eachSchema(node, callback);
-    },
     getChildSchemaSelection(property) {
         const node = this;
         return node.context.methods.getChildSchemaSelection(node, property);
@@ -131,7 +127,7 @@ export const SchemaNodeMethods = {
         const { path, pointer } = options;
         let node = this;
         if (node.reducers.length) {
-            const result = node.reduce(data, { key, path, pointer });
+            const result = node.reduceSchema(data, { key, path, pointer });
             if (result.error) {
                 return result;
             }
@@ -166,7 +162,7 @@ export const SchemaNodeMethods = {
         return this.context.version;
     },
     /** Creates data that is valid to the schema of this node */
-    getTemplate(data, options) {
+    getData(data, options) {
         const node = this;
         const opts = {
             recursionLimit: 1,
@@ -174,15 +170,12 @@ export const SchemaNodeMethods = {
             cache: {},
             ...(options !== null && options !== void 0 ? options : {})
         };
-        return node.context.methods.getTemplate(node, data, opts);
+        return node.context.methods.getData(node, data, opts);
     },
-    reduce(data, options = {}) {
+    reduceSchema(data, options = {}) {
         const { key, pointer, path } = options;
         const resolvedNode = { ...this.resolveRef({ pointer, path }) };
-        // const resolvedSchema = mergeSchema(this.schema, resolvedNode?.schema);
-        // const node = (this as SchemaNode).compileSchema(resolvedSchema, this.spointer, resolvedSchema.schemaId);
         const node = mergeNode(this, resolvedNode, "$ref");
-        // const node = resolvedNode;
         // @ts-expect-error bool schema
         if (node.schema === false) {
             return { node, error: undefined };
@@ -276,6 +269,9 @@ export const SchemaNodeMethods = {
         node.context.remotes[joinId(url)] = node;
         addKeywords(node);
         return this;
+    },
+    toSchemaNodes() {
+        return toSchemaNodes(this);
     },
     toDataNodes(data, pointer) {
         const node = this;
