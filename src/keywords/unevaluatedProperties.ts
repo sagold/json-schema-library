@@ -1,9 +1,8 @@
-import { isSchemaNode } from "../types";
 import { isObject } from "../utils/isObject";
 import { SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
-import { getValue } from "../utils/getValue";
 import { validateNode } from "../validateNode";
+import { isPropertyEvaluated } from "../isPropertyEvaluated";
 
 export const unevaluatedPropertiesKeyword: Keyword = {
     id: "unevaluatedProperties",
@@ -24,17 +23,11 @@ export function parseUnevaluatedProperties(node: SchemaNode) {
     );
 }
 
+// @todo we should use collected annotation to evaluated unevaluate properties
 function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     // if not in properties, evaluated by additionalProperties and not matches patternProperties
     // @todo we need to know dynamic parent statements - they should not be counted as evaluated...
     if (!isObject(data)) {
-        return undefined;
-    }
-
-    // this will break?
-    let { node: reducedNode } = node.reduceSchema(data, { pointer, path });
-    reducedNode = isSchemaNode(reducedNode) ? reducedNode : node;
-    if (reducedNode.schema.unevaluatedProperties === true || reducedNode.schema.additionalProperties === true) {
         return undefined;
     }
 
@@ -46,25 +39,15 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
     const errors: ValidationResult[] = [];
     for (let i = 0; i < unevaluated.length; i += 1) {
         const propertyName = unevaluated[i];
-        const { node: child } = node.getChild(propertyName, data, { path });
 
-        if (child) {
-            if (validateNode(child, data[propertyName], `${pointer}/${propertyName}`, path).length > 0) {
-                errors.push(
-                    node.createError("UnevaluatedPropertyError", {
-                        pointer: `${pointer}/${propertyName}`,
-                        value: JSON.stringify(data[propertyName]),
-                        schema: node.schema
-                    })
-                );
-                continue;
-            }
+        if (isPropertyEvaluated({ node, data, key: propertyName, pointer, path })) {
+            continue;
         }
 
+        const { node: child } = node.getChild(propertyName, data, { pointer, path });
+
         if (child === undefined) {
-            if (node.if && isPropertyEvaluated(node.if, propertyName, data)) {
-                // skip
-            } else if (reducedNode.unevaluatedProperties) {
+            if (node.unevaluatedProperties) {
                 const validationResult = validateNode(
                     node.unevaluatedProperties,
                     data[propertyName],
@@ -72,7 +55,27 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
                     path
                 );
                 errors.push(...validationResult);
-            } else if (reducedNode.schema.unevaluatedProperties === false) {
+            } else if (node.schema.unevaluatedProperties === false) {
+                errors.push(
+                    node.createError("UnevaluatedPropertyError", {
+                        pointer: `${pointer}/${propertyName}`,
+                        value: JSON.stringify(data[propertyName]),
+                        schema: node.schema
+                    })
+                );
+            }
+        }
+
+        if (child && validateNode(child, data[propertyName], `${pointer}/${propertyName}`, path).length > 0) {
+            if (node.unevaluatedProperties) {
+                const validationResult = validateNode(
+                    node.unevaluatedProperties,
+                    data[propertyName],
+                    `${pointer}/${propertyName}`,
+                    path
+                );
+                errors.push(...validationResult);
+            } else if (node.schema.unevaluatedProperties === false) {
                 errors.push(
                     node.createError("UnevaluatedPropertyError", {
                         pointer: `${pointer}/${propertyName}`,
@@ -83,14 +86,6 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
             }
         }
     }
-    return errors;
-}
 
-/** tests if a property is evaluated by the given schema */
-function isPropertyEvaluated(schemaNode: SchemaNode, propertyName: string, data: unknown) {
-    const { node, error } = schemaNode.getChild(propertyName, data);
-    if (node == null || error) {
-        return false;
-    }
-    return node.validate(getValue(data, propertyName)).valid;
+    return errors;
 }

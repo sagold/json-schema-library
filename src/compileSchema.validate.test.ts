@@ -748,6 +748,62 @@ describe("compileSchema.validate", () => {
         });
     });
 
+    describe("unavaluatedProperties", () => {
+        let node: SchemaNode;
+        beforeEach(
+            () =>
+                (node = compileSchema({
+                    $schema: "https://json-schema.org/draft/2020-12/schema",
+                    $defs: {
+                        one: {
+                            oneOf: [
+                                { $ref: "#/$defs/two" },
+                                { required: ["b"], properties: { b: true } },
+                                {
+                                    required: ["xx"],
+                                    patternProperties: {
+                                        x: true
+                                    }
+                                },
+                                {
+                                    required: ["all"],
+                                    unevaluatedProperties: true
+                                }
+                            ]
+                        },
+                        two: {
+                            oneOf: [
+                                {
+                                    required: ["c"],
+                                    properties: {
+                                        c: true
+                                    }
+                                },
+                                {
+                                    required: ["d"],
+                                    properties: {
+                                        d: true
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    oneOf: [{ $ref: "#/$defs/one" }, { required: ["a"], properties: { a: true } }],
+                    unevaluatedProperties: false
+                }))
+        );
+
+        it("`all` is valid", () => {
+            const { errors } = node.validate({ all: 1 });
+            assert(errors.length === 0);
+        });
+
+        it("`all` and `foo` is valid", () => {
+            const { errors } = node.validate({ all: 1, foo: 1 });
+            assert(errors.length === 0);
+        });
+    });
+
     describe("recursiveRef (spec)", () => {
         describe("$recursiveRef without using nesting", () => {
             it("integer does not match as a property value", () => {

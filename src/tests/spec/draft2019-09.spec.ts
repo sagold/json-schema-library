@@ -9,8 +9,8 @@ import runAllTestCases from "../utils/runTestCases";
 
 runAllTestCases({
     // only: {
-    //     name: "unevaluatedProperties",
-    //     description: "unevaluatedProperties with nested unevaluatedProperties"
+    //     name: "ref",
+    //     description: "$ref with $recursiveAnchor"
     // },
     // logSchema: false,
     skipTestCase: (t) =>

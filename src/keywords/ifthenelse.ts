@@ -27,7 +27,8 @@ export function parseIfThenElse(node: SchemaNode) {
 }
 
 function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
-    if (data === undefined) {
+    // @todo issue with mergeNode (node.if == null)
+    if (data === undefined || node.if == null) {
         return undefined;
     }
 
@@ -36,7 +37,7 @@ function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
             // reduce creates a new node
             const { node: schemaNode } = node.then.reduceSchema(data);
             if (schemaNode) {
-                const nestedDynamicId = schemaNode.dynamicId.replace(node.dynamicId, "").replace(/^#/, "");
+                const nestedDynamicId = schemaNode.dynamicId?.replace(node.dynamicId, "").replace(/^#/, "") ?? "";
                 const dynamicId = nestedDynamicId === "" ? `(then)` : nestedDynamicId;
 
                 const schema = mergeSchema(node.then.schema, schemaNode.schema, "if", "then", "else");
@@ -46,7 +47,7 @@ function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     } else if (node.else) {
         const { node: schemaNode } = node.else.reduceSchema(data);
         if (schemaNode) {
-            const nestedDynamicId = schemaNode.dynamicId.replace(node.dynamicId, "");
+            const nestedDynamicId = schemaNode.dynamicId?.replace(node.dynamicId, "") ?? "";
             const dynamicId = nestedDynamicId === "" ? `(else)` : nestedDynamicId;
 
             const schema = mergeSchema(node.else.schema, schemaNode.schema, "if", "then", "else");
@@ -57,6 +58,10 @@ function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
 }
 
 function validateIfThenElse({ node, data, pointer, path }: JsonSchemaValidatorParams) {
+    // @todo issue with mergeNode
+    if (node.if == null) {
+        return;
+    }
     if (validateNode(node.if, data, pointer, [...(path ?? [])]).length === 0) {
         if (node.then) {
             return validateNode(node.then, data, pointer, path);

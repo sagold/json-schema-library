@@ -156,6 +156,7 @@ describe("compileSchema : reduceSchema", () => {
                     }
                 }
             }).reduceSchema({ one: "" });
+
             assert.deepEqual(node.schema, {
                 type: "object",
                 required: ["one", "two", "three"],
@@ -673,6 +674,49 @@ describe("compileSchema : reduceSchema", () => {
                 properties: {
                     trigger: { type: "boolean", const: true }
                 }
+            });
+        });
+    });
+
+    describe("$ref", () => {
+        it("should resolve to $ref referenced schema", () => {
+            const { node } = compileSchema({
+                $ref: "/$defs/one",
+                $defs: {
+                    one: { type: "boolean", title: "one" }
+                }
+            }).reduceSchema(3);
+
+            assert.deepEqual(node.schema, { type: "boolean", title: "one" });
+        });
+
+        it("should resolve to multiple $ref referenced schema", () => {
+            const { node } = compileSchema({
+                $ref: "/$defs/one",
+                $defs: {
+                    one: { $ref: "/$defs/two" },
+                    two: { type: "boolean", title: "two" }
+                }
+            }).reduceSchema(3);
+
+            assert.deepEqual(node.schema, { type: "boolean", title: "two" });
+        });
+
+        it("should merge nested sub-schema", () => {
+            const { node } = compileSchema({
+                $ref: "/$defs/one",
+                description: "from root",
+                $defs: {
+                    one: { default: "from one", $ref: "/$defs/two" },
+                    two: { type: "boolean", title: "from two" }
+                }
+            }).reduceSchema(3);
+
+            assert.deepEqual(node.schema, {
+                description: "from root",
+                default: "from one",
+                title: "from two",
+                type: "boolean"
             });
         });
     });

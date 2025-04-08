@@ -1,16 +1,20 @@
 import { SchemaNode } from "../types";
-import { Keyword, JsonSchemaValidatorParams, ValidationPath } from "../Keyword";
+import { Keyword, JsonSchemaValidatorParams, ValidationPath, JsonSchemaReducerParams } from "../Keyword";
 import { joinId } from "../utils/joinId";
 import splitRef from "../utils/splitRef";
 import { omit } from "../utils/omit";
 import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
 import { get, split } from "@sagold/json-pointer";
+import { mergeNode } from "../mergeNode";
 
 export const $refKeyword: Keyword = {
     id: "$ref",
     keyword: "$ref",
+    order: 10,
     parse: parseRef,
+    addReduce: (node) => node.$ref != null || node.schema.$dynamicRef != null,
+    reduce: reduceRef,
     addValidate: ({ schema }) => schema.$ref != null || schema.$dynamicRef != null,
     validate: validateRef
 };
@@ -69,11 +73,21 @@ export function parseRef(node: SchemaNode) {
     }
 }
 
+export function reduceRef({ node, data, key, pointer, path }: JsonSchemaReducerParams) {
+    const resolvedNode = node.resolveRef({ pointer, path });
+    if (resolvedNode.schemaId === node.schemaId) {
+        return resolvedNode;
+    }
+    const merged = mergeNode(node, resolvedNode);
+    const { node: reducedNode, error } = merged.reduceSchema(data, { key, pointer, path });
+    return reducedNode ?? error;
+}
+
 export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
     const node = this as SchemaNode;
+
     if (node.schema.$dynamicRef) {
         const nextNode = resolveRecursiveRef(node, path);
-        // console.log("resolved node", node.schema.$dynamicRef, "=>", nextNode != null);
         path?.push({ pointer, node: nextNode });
         return nextNode;
     }
@@ -85,8 +99,6 @@ export function resolveRef({ pointer, path }: { pointer?: string; path?: Validat
     const resolvedNode = getRef(node);
     if (resolvedNode != null) {
         path?.push({ pointer, node: resolvedNode });
-    } else {
-        // console.log("failed resolving", node.$ref, "from", Object.keys(node.context.refs));
     }
     return resolvedNode;
 }
@@ -103,9 +115,6 @@ function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorPar
 function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode {
     const history = path;
     const refInCurrentScope = joinId(node.$id, node.schema.$dynamicRef);
-    // console.log("resolve $dynamicRef:", node.schema.$dynamicRef);
-    // console.log(" -> scope:", joinId(node.$id, node.schema.$dynamicRef));
-    // console.log("dynamicAnchors", Object.keys(node.context.dynamicAnchors));
 
     // A $dynamicRef with a non-matching $dynamicAnchor in the same schema resource behaves like a normal $ref to $anchor
     const nonMatchingDynamicAnchor = node.context.dynamicAnchors[refInCurrentScope] == null;
@@ -131,7 +140,7 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     }
 
     // A $dynamicRef without a matching $dynamicAnchor in the same schema resource behaves like a normal $ref to $anchor
-    // console.log(" -> resolve as ref");
+
     const nextNode = getRef(node, refInCurrentScope);
     return nextNode;
 }

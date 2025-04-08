@@ -22,13 +22,13 @@ export function parseAllOf(node: SchemaNode) {
     }
 }
 
-function reduceAllOf({ node, data }: JsonSchemaReducerParams) {
+function reduceAllOf({ node, data, key, pointer, path }: JsonSchemaReducerParams) {
     // note: parts of schemas could be merged, e.g. if they do not include
     // dynamic schema parts
     let mergedSchema = {};
     let dynamicId = "";
     for (let i = 0; i < node.allOf.length; i += 1) {
-        const { node: schemaNode } = node.allOf[i].reduceSchema(data);
+        const { node: schemaNode } = node.allOf[i].reduceSchema(data, { key, pointer, path });
         if (schemaNode) {
             const nestedDynamicId = schemaNode.dynamicId?.replace(node.dynamicId, "") ?? "";
             const localDynamicId = nestedDynamicId === "" ? `allOf/${i}` : nestedDynamicId;

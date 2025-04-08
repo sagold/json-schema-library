@@ -338,9 +338,8 @@ export const SchemaNodeMethods = {
         data: unknown,
         options: { key?: string | number; pointer?: string; path?: ValidationPath } = {}
     ): OptionalNodeAndError {
+        const node = this as SchemaNode;
         const { key, pointer, path } = options;
-        const resolvedNode = { ...this.resolveRef({ pointer, path }) } as SchemaNode;
-        const node = mergeNode(this, resolvedNode, "$ref");
 
         // @ts-expect-error bool schema
         if (node.schema === false) {
@@ -353,10 +352,12 @@ export const SchemaNodeMethods = {
         }
 
         let schema;
-        let workingNode = node;
+        // we need to copy node to prevent modification of source
+        // @todo does mergeNode break immutability?
+        let workingNode = node.compileSchema(node.schema, node.spointer, node.schemaId);
         const reducers = node.reducers;
         for (let i = 0; i < reducers.length; i += 1) {
-            const result = reducers[i]({ data, key, node, pointer });
+            const result = reducers[i]({ data, key, node, pointer, path });
             if (isJsonError(result)) {
                 return { node: undefined, error: result };
             }
@@ -374,7 +375,6 @@ export const SchemaNodeMethods = {
         }
 
         if (schema === false) {
-            console.log("return boolean schema `false`");
             // @ts-expect-error bool schema
             return { node: { ...node, schema: false, reducers: [] } as SchemaNode, error: undefined };
         }

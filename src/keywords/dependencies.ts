@@ -1,9 +1,9 @@
-import { isSchemaNode, JsonSchema, SchemaNode } from "../types";
+import { isSchemaNode, SchemaNode } from "../types";
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
 import { getValue } from "../utils/getValue";
 import { isObject } from "../utils/isObject";
-import { mergeSchema } from "../utils/mergeSchema";
 import { validateNode } from "../validateNode";
+import { mergeNode } from "../mergeNode";
 
 export const dependenciesKeyword: Keyword = {
     id: "dependencies",
@@ -41,31 +41,38 @@ export function parseDependencies(node: SchemaNode) {
     });
 }
 
-export function reduceDependencies({ node, data, path }: JsonSchemaReducerParams) {
+export function reduceDependencies({ node, data, key, path }: JsonSchemaReducerParams) {
     if (!isObject(data) || node.dependencies == null) {
         // @todo remove dependentSchemas
         return node;
     }
 
-    let mergedSchema: JsonSchema;
+    let workingNode = node.compileSchema(node.schema, node.spointer, node.schemaId);
     const { dependencies } = node;
+    let required = workingNode.schema.required ?? [];
     Object.keys(dependencies).forEach((propertyName) => {
-        mergedSchema = mergedSchema ?? { properties: {} };
         if (isSchemaNode(dependencies[propertyName])) {
-            mergedSchema = mergeSchema(mergedSchema, dependencies[propertyName].schema);
+            const reducedDependency = dependencies[propertyName].reduceSchema(data, { key, path }).node;
+            workingNode = mergeNode(workingNode, reducedDependency);
         } else if (Array.isArray(dependencies[propertyName]) && data[propertyName] !== undefined) {
-            mergedSchema.required = mergedSchema.required ?? [];
-            mergedSchema.required.push(...dependencies[propertyName]);
+            required.push(...dependencies[propertyName]);
         }
     });
 
-    if (mergedSchema == null) {
+    if (workingNode === node) {
         return node;
     }
 
-    mergedSchema = mergeSchema(node.schema, mergedSchema, "dependencies");
-    const { node: childNode, error } = node.compileSchema(mergedSchema, node.spointer).reduceSchema(data, { path });
-    return childNode ?? error;
+    // mergedSchema = mergeSchema(node.schema, mergedSchema, "dependencies");
+    // const { node: childNode, error } = node.compileSchema(mergedSchema, node.spointer).reduceSchema(data, { path });
+    // return childNode ?? error;
+
+    if (required.length === 0) {
+        return workingNode;
+    }
+
+    required = workingNode.schema.required ? workingNode.schema.required.concat(...required) : required;
+    return workingNode.compileSchema({ ...workingNode.schema, required }, workingNode.spointer, workingNode.schemaId);
 }
 
 function validateDependencies({ node, data, pointer, path }: JsonSchemaValidatorParams) {
