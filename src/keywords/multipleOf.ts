@@ -17,7 +17,7 @@ function validateMultipleOf({ node, data, pointer }: JsonSchemaValidatorParams) 
     const multiplePrecision = getPrecision(schema.multipleOf);
     if (valuePrecision > multiplePrecision) {
         // value with higher precision then multipleOf-precision can never be multiple
-        return node.createError("MultipleOfError", {
+        return node.createError("multiple-of-error", {
             multipleOf: schema.multipleOf,
             value: data,
             pointer,
@@ -29,7 +29,7 @@ function validateMultipleOf({ node, data, pointer }: JsonSchemaValidatorParams) 
     const val = Math.round(data * precision);
     const multiple = Math.round(schema.multipleOf * precision);
     if ((val % multiple) / precision !== 0) {
-        return node.createError("MultipleOfError", {
+        return node.createError("multiple-of-error", {
             multipleOf: schema.multipleOf,
             value: data,
             pointer,

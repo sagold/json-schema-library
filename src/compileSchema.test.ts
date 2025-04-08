@@ -158,6 +158,6 @@ describe("compileSchema `errors`", () => {
             { drafts: [draftEditor] }
         ).validate("");
         assert.equal(errors.length, 1);
-        assert.deepEqual(errors[0].name, "MinLengthOneError");
+        assert.deepEqual(errors[0].code, "min-length-one-error");
     });
 });

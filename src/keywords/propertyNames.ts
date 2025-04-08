@@ -38,7 +38,7 @@ function validatePropertyNames({ node, data, pointer, path }: JsonSchemaValidato
         if (Object.keys(data).length === 0) {
             return undefined;
         }
-        return node.createError("InvalidPropertyNameError", {
+        return node.createError("invalid-property-name-error", {
             property: Object.keys(data),
             pointer,
             value: data,
@@ -61,7 +61,7 @@ function validatePropertyNames({ node, data, pointer, path }: JsonSchemaValidato
         const validationResult = validateNode(node.propertyNames, prop, `${pointer}/prop`, path);
         if (validationResult.length > 0) {
             errors.push(
-                node.createError("InvalidPropertyNameError", {
+                node.createError("invalid-property-name-error", {
                     property: prop,
                     pointer,
                     validationError: validationResult[0],

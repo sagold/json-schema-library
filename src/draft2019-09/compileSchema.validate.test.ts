@@ -968,7 +968,7 @@ describe("compileSchema.validate : format", () => {
                 format: "url"
             }).validate("123");
             assert.equal(errors.length, 1);
-            assert.equal(errors[0].code, "format-urlerror");
+            assert.equal(errors[0].code, "format-url-error");
         });
     });
 });
@@ -1020,7 +1020,7 @@ describe("compileSchema.validateAsync", () => {
                             }
                             return new Promise((resolve) =>
                                 resolve([
-                                    node.createError("TypeError", {
+                                    node.createError("type-error", {
                                         schema: {},
                                         pointer: "",
                                         value: ""

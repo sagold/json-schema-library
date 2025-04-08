@@ -10,7 +10,7 @@ export function validateNode(node: SchemaNode, data: unknown, pointer: string, p
     }
     if (schema === false) {
         return [
-            node.createError("InvalidDataError", {
+            node.createError("invalid-data-error", {
                 value: data,
                 pointer,
                 schema: node.schema

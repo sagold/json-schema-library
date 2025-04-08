@@ -45,7 +45,7 @@ function validateItems({ node, data, pointer = "#", path }: JsonSchemaValidatorP
         if (Array.isArray(data) && data.length === 0) {
             return undefined;
         }
-        return node.createError("InvalidDataError", { pointer, value: data, schema });
+        return node.createError("invalid-data-error", { pointer, value: data, schema });
     }
 
     const errors: ValidationResult[] = [];

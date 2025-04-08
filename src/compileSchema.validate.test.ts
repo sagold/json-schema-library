@@ -943,7 +943,7 @@ describe("compileSchema.validate : format", () => {
                 format: "url"
             }).validate("123");
             assert.equal(errors.length, 1);
-            assert.equal(errors[0].code, "format-urlerror");
+            assert.equal(errors[0].code, "format-url-error");
         });
     });
 });

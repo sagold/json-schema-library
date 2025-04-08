@@ -92,7 +92,7 @@ function validateDependencies({ node, data, pointer, path }: JsonSchemaValidator
             return;
         }
         if (propertyValue === false) {
-            errors.push(node.createError("MissingDependencyError", { pointer, schema: node.schema, value: data }));
+            errors.push(node.createError("missing-dependency-error", { pointer, schema: node.schema, value: data }));
             return;
         }
 
@@ -101,7 +101,7 @@ function validateDependencies({ node, data, pointer, path }: JsonSchemaValidator
                 .filter((dependency: any) => getValue(data, dependency) === undefined)
                 .forEach((missingProperty: any) =>
                     errors.push(
-                        node.createError("MissingDependencyError", {
+                        node.createError("missing-dependency-error", {
                             missingProperty,
                             pointer: `${pointer}/${missingProperty}`,
                             schema: node.schema,

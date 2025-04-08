@@ -12,7 +12,7 @@ function validateExclusiveMaximum({ node, data, pointer }: JsonSchemaValidatorPa
         return undefined;
     }
     if (node.schema.exclusiveMaximum <= data) {
-        return node.createError("ExclusiveMaximumError", {
+        return node.createError("exclusive-maximum-error", {
             maximum: node.schema.exclusiveMaximum,
             length: data,
             pointer,

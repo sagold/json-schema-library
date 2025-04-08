@@ -104,7 +104,7 @@ function validatePatternProperties({ node, data, pointer, path }: JsonSchemaVali
         if (matchingPatterns.length === 0 && schema.additionalProperties === false) {
             // this is an arrangement with additionalProperties
             errors.push(
-                node.createError("NoAdditionalPropertiesError", {
+                node.createError("no-additional-properties-error", {
                     key,
                     pointer: `${pointer}/${key}`,
                     schema,

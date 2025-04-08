@@ -16,7 +16,7 @@ function validateRequired({ node, data, pointer = "#" }: JsonSchemaValidatorPara
     }
     return schema.required.map((property: string) => {
         if (!hasProperty(data, property)) {
-            return node.createError("RequiredPropertyError", {
+            return node.createError("required-property-error", {
                 key: property,
                 pointer,
                 schema,

@@ -28,7 +28,6 @@ export { oneOfFuzzyKeyword, oneOfKeyword } from "./src/keywords/oneOf";
 // errors
 export { render } from "./src/errors/render";
 export type { ErrorData, ErrorConfig } from "./src/types";
-export { dashCase } from "./src/utils/dashCase";
 
 // utilities
 export { getTypeOf } from "./src/utils/getTypeOf";

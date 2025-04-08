@@ -20,7 +20,7 @@ function validateUniqueItems({ node, data, pointer }: JsonSchemaValidatorParams)
         for (let i = index + 1; i < data.length; i += 1) {
             if (deepEqual(item, data[i]) && !duplicates.includes(i)) {
                 errors.push(
-                    node.createError("UniqueItemsError", {
+                    node.createError("unique-items-error", {
                         pointer: `${pointer}/${i}`,
                         duplicatePointer: `${pointer}/${index}`,
                         arrayPointer: pointer,

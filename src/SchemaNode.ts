@@ -3,7 +3,6 @@ import sanitizeErrors from "./utils/sanitizeErrors";
 import settings from "./settings";
 import type { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, Keyword, ValidationPath } from "./Keyword";
 import { createSchema } from "./methods/createSchema";
-import { dashCase } from "./utils/dashCase";
 import { Draft } from "./Draft";
 import { toSchemaNodes } from "./methods/toSchemaNodes";
 import { getValue } from "./utils/getValue";
@@ -180,16 +179,16 @@ export const SchemaNodeMethods = {
         return node;
     },
 
-    createError<T extends string = DefaultErrors>(name: T, data: ErrorData, message?: string): JsonError {
+    createError<T extends string = DefaultErrors>(code: T, data: ErrorData, message?: string): JsonError {
         let errorMessage = message;
         if (errorMessage === undefined) {
-            const error = this.context.errors[name];
+            const error = this.context.errors[code];
             if (typeof error === "function") {
                 return error(data);
             }
             errorMessage = render(error ?? name, data);
         }
-        return { type: "error", code: dashCase(name), message: errorMessage, data };
+        return { type: "error", code, message: errorMessage, data };
     },
 
     createSchema,
@@ -296,7 +295,7 @@ export const SchemaNodeMethods = {
         }
 
         if (options.withSchemaWarning === true) {
-            const error = node.createError("SchemaWarning", { pointer, value: data, schema: node.schema, key });
+            const error = node.createError("schema-warning", { pointer, value: data, schema: node.schema, key });
             return { node: undefined, error };
         }
 

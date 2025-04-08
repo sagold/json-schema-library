@@ -941,7 +941,7 @@ const myDraft = extendDraft(draft2020, {
         // Add a new "format": "test", which returns an error when the value is "test"
         test: ({ data, node, pointer }) => {
             if (data === "test") {
-                return node.createError("testError", {
+                return node.createError("test-error", {
                     schema: node.schema,
                     pointer: pointer,
                     value: data,
@@ -952,25 +952,25 @@ const myDraft = extendDraft(draft2020, {
     },
 
     errors: {
-        // Add a new custom error "testError"
-        testError: "Test error for value {{value}} - {{customValue}}",
+        // Add a new custom error "test-error"
+        "test-error": "Test error for value {{value}} - {{customValue}}",
 
         // Overwrite the existing MaxLengthError message
-        MaxLengthError: "Too many characters",
+        "max-length-error": "Too many characters",
 
         // Add a dynamic MinLengthError with custom logic
-        MinLengthError: (data: ErrorData) => {
+        "min-length-error": (data: ErrorData) => {
             if (data.minLength === 1) {
                 return {
                     type: "error",
-                    code: dashCase("MinLengthOneError"),
+                    code: "min-length-one-error",
                     message: "Input is required",
                     data
                 };
             }
             return {
                 type: "error",
-                code: dashCase("MinLengthError"),
+                code: "min-length-error",
                 message: render("Value in `{{pointer}}` is `{{length}}`, but should be `{{minimum}}` at minimum", data),
                 data
             };

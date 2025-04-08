@@ -23,7 +23,7 @@ export function validateDependentRequired({ node, data, pointer = "#" }: JsonSch
             return;
         }
         if (dependencies === false) {
-            errors.push(node.createError("MissingDependencyError", { pointer, schema, value: data }));
+            errors.push(node.createError("missing-dependency-error", { pointer, schema, value: data }));
             return;
         }
         if (!Array.isArray(dependencies)) {
@@ -32,7 +32,7 @@ export function validateDependentRequired({ node, data, pointer = "#" }: JsonSch
         for (let i = 0, l = dependencies.length; i < l; i += 1) {
             if (data[dependencies[i]] === undefined) {
                 errors.push(
-                    node.createError("MissingDependencyError", {
+                    node.createError("missing-dependency-error", {
                         missingProperty: dependencies[i],
                         pointer,
                         schema,

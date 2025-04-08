@@ -12,7 +12,7 @@ function validateExclusiveMinimum({ node, data, pointer }: JsonSchemaValidatorPa
         return undefined;
     }
     if (node.schema.exclusiveMinimum >= data) {
-        return node.createError("ExclusiveMinimumError", {
+        return node.createError("exclusive-minimum-error", {
             minimum: node.schema.exclusiveMinimum,
             length: data,
             pointer,

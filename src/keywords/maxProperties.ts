@@ -15,7 +15,7 @@ function validateMaxProperties({ node, data, pointer = "#" }: JsonSchemaValidato
     const { schema } = node;
     const propertyCount = Object.keys(data).length;
     if (isNaN(schema.maxProperties) === false && schema.maxProperties < propertyCount) {
-        return node.createError("MaxPropertiesError", {
+        return node.createError("max-properties-error", {
             maxProperties: schema.maxProperties,
             length: propertyCount,
             pointer,

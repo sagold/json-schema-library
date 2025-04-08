@@ -9,7 +9,7 @@ describe("Draft.extendDraft", () => {
             formats: {
                 test: ({ data, node, pointer }) => {
                     if (data === "test") {
-                        return node.createError("InvalidDataError", {
+                        return node.createError("invalid-data-error", {
                             schema: node.schema,
                             pointer: pointer,
                             value: data

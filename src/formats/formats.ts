@@ -38,7 +38,7 @@ export const formats: Record<
         // full-date from http://tools.ietf.org/html/rfc3339#section-5.6
         const matches = data.match(matchDate);
         if (!matches) {
-            return node.createError("FormatDateTimeError", { value: data, pointer, schema });
+            return node.createError("format-date-time-error", { value: data, pointer, schema });
         }
         const year = +matches[1];
         const month = +matches[2];
@@ -48,7 +48,7 @@ export const formats: Record<
         if (month >= 1 && month <= 12 && day >= 1 && day <= (month == 2 && isLeapYear ? 29 : DAYS[month])) {
             return undefined;
         }
-        return node.createError("FormatDateError", { value: data, pointer, schema });
+        return node.createError("format-date-error", { value: data, pointer, schema });
     },
 
     "date-time": ({ node, pointer, data }) => {
@@ -64,7 +64,7 @@ export const formats: Record<
                 return undefined;
             }
         }
-        return node.createError("FormatDateTimeError", { value: data, pointer, schema });
+        return node.createError("format-date-time-error", { value: data, pointer, schema });
     },
 
     duration: ({ node, pointer, data }) => {
@@ -77,7 +77,7 @@ export const formats: Record<
         const isInvalidDurationString = /(\d+M)(\d+W)|(\d+Y)(\d+W)/;
 
         if (!isValidDurationString.test(data as string) || isInvalidDurationString.test(data as string)) {
-            return node.createError("FormatDurationError", {
+            return node.createError("format-duration-error", {
                 value: data,
                 pointer,
                 schema: node.schema
@@ -94,7 +94,7 @@ export const formats: Record<
         const name = data.substr(0, lastIndex);
         const host = data.substr(lastIndex + 1);
         if (!name || !host || name.length > 64 || host.length > 253) {
-            return node.createError("FormatEmailError", { value: data, pointer, schema });
+            return node.createError("format-email-error", { value: data, pointer, schema });
         }
 
         // if name is in double quotes: "joe bloggs"@example.com, whitespaces, dots etc are allowed
@@ -105,10 +105,10 @@ export const formats: Record<
         }
 
         if (strippedName[0] === "." || strippedName.endsWith(".") || strippedName.includes("..")) {
-            return node.createError("FormatEmailError", { value: data, pointer, schema });
+            return node.createError("format-email-error", { value: data, pointer, schema });
         }
         if (!/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+$/i.test(strippedName)) {
-            return node.createError("FormatEmailError", { value: data, pointer, schema });
+            return node.createError("format-email-error", { value: data, pointer, schema });
         }
 
         if (/^\[.*\]$/.test(host)) {
@@ -123,10 +123,10 @@ export const formats: Record<
         }
 
         if (!/^[a-z0-9.-]+$/i.test(host)) {
-            return node.createError("FormatEmailError", { value: data, pointer, schema });
+            return node.createError("format-email-error", { value: data, pointer, schema });
         }
         if (!host.split(".").every((part) => /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/i.test(part))) {
-            return node.createError("FormatEmailError", { value: data, pointer, schema });
+            return node.createError("format-email-error", { value: data, pointer, schema });
         }
         return undefined;
     },
@@ -144,7 +144,7 @@ export const formats: Record<
             parseIdnEmail(data);
             return undefined;
         } catch (e) {
-            return node.createError("FormatEmailError", { value: data, pointer, schema });
+            return node.createError("format-email-error", { value: data, pointer, schema });
         }
     },
 
@@ -156,7 +156,7 @@ export const formats: Record<
         if (isValidHostname.test(data)) {
             return undefined;
         }
-        return node.createError("FormatHostnameError", { value: data, pointer, schema });
+        return node.createError("format-hostname-error", { value: data, pointer, schema });
     },
 
     ipv4: ({ node, pointer, data }) => {
@@ -166,12 +166,12 @@ export const formats: Record<
         }
         if (data && data[0] === "0") {
             // leading zeroes should be rejected, as they are treated as octals
-            return node.createError("FormatIPV4LeadingZeroError", { value: data, pointer, schema });
+            return node.createError("format-ipv4-leading-zero-error", { value: data, pointer, schema });
         }
         if (data.length <= 15 && isValidIPV4.test(data)) {
             return undefined;
         }
-        return node.createError("FormatIPV4Error", { value: data, pointer, schema });
+        return node.createError("format-ipv4-error", { value: data, pointer, schema });
     },
 
     ipv6: ({ node, pointer, data }) => {
@@ -181,12 +181,12 @@ export const formats: Record<
         }
         if (data && data[0] === "0") {
             // leading zeroes should be rejected, as they are treated as octals
-            return node.createError("FormatIPV6LeadingZeroError", { value: data, pointer, schema });
+            return node.createError("format-ipv6-leading-zero-error", { value: data, pointer, schema });
         }
         if (data.length <= 45 && isValidIPV6.test(data)) {
             return undefined;
         }
-        return node.createError("FormatIPV6Error", { value: data, pointer, schema });
+        return node.createError("format-ipv6-error", { value: data, pointer, schema });
     },
 
     "json-pointer": ({ node, pointer, data }) => {
@@ -197,7 +197,7 @@ export const formats: Record<
         if (isValidJsonPointer.test(data)) {
             return undefined;
         }
-        return node.createError("FormatJsonPointerError", { value: data, pointer, schema });
+        return node.createError("format-json-pointer-error", { value: data, pointer, schema });
     },
 
     "relative-json-pointer": ({ node, pointer, data }) => {
@@ -208,7 +208,7 @@ export const formats: Record<
         if (isValidRelativeJsonPointer.test(data)) {
             return undefined;
         }
-        return node.createError("FormatJsonPointerError", { value: data, pointer, schema });
+        return node.createError("format-json-pointer-error", { value: data, pointer, schema });
     },
 
     regex: ({ node, pointer, data }) => {
@@ -227,11 +227,11 @@ export const formats: Record<
                 return undefined;
             } catch (e) {} // eslint-disable-line no-empty
 
-            return node.createError("FormatRegExError", { value: data, pointer, schema });
+            return node.createError("format-regex-error", { value: data, pointer, schema });
         }
         // v7 tests, ignore non-regex values
 
-        return node.createError("FormatRegExError", { value: data, pointer, schema });
+        return node.createError("format-regex-error", { value: data, pointer, schema });
     },
 
     // hh:mm:ss.sTZD
@@ -245,7 +245,7 @@ export const formats: Record<
         // https://github.com/cfworker/cfworker/blob/main/packages/json-schema/src/format.ts
         const matches = data.match(matchTime);
         if (!matches) {
-            return node.createError("FormatDateTimeError", { value: data, pointer, schema });
+            return node.createError("format-date-time-error", { value: data, pointer, schema });
         }
 
         // leap second
@@ -275,7 +275,7 @@ export const formats: Record<
                     return undefined;
                 }
             }
-            return node.createError("FormatDateTimeError", { value: data, pointer, schema });
+            return node.createError("format-date-time-error", { value: data, pointer, schema });
         }
 
         return undefined;
@@ -289,7 +289,7 @@ export const formats: Record<
         if (validUrl.isUri(data)) {
             return undefined;
         }
-        return node.createError("FormatURIError", { value: data, pointer, schema });
+        return node.createError("format-uri-error", { value: data, pointer, schema });
     },
 
     "uri-reference": ({ node, pointer, data }) => {
@@ -300,7 +300,7 @@ export const formats: Record<
         if (isValidURIRef.test(data)) {
             return undefined;
         }
-        return node.createError("FormatURIReferenceError", { value: data, pointer, schema });
+        return node.createError("format-uri-reference-error", { value: data, pointer, schema });
     },
 
     "uri-template": ({ node, pointer, data }) => {
@@ -311,7 +311,7 @@ export const formats: Record<
         if (isValidURITemplate.test(data)) {
             return undefined;
         }
-        return node.createError("FormatURITemplateError", { value: data, pointer, schema });
+        return node.createError("format-uri-template-error", { value: data, pointer, schema });
     },
 
     url: ({ node, data, pointer }) => {
@@ -319,7 +319,7 @@ export const formats: Record<
         if (data === "" || validUrl.isWebUri(`${data}`)) {
             return undefined;
         }
-        return node.createError("FormatURLError", { value: data, pointer, schema });
+        return node.createError("format-url-error", { value: data, pointer, schema });
     },
 
     uuid: ({ node, data, pointer }) => {
@@ -330,6 +330,6 @@ export const formats: Record<
         if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(data)) {
             return undefined;
         }
-        return node.createError("FormatUUIDError", { value: data, pointer, schema });
+        return node.createError("format-uuid-error", { value: data, pointer, schema });
     }
 };

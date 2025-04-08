@@ -53,5 +53,5 @@ function validateAnyOf({ node, data, pointer, path }: JsonSchemaValidatorParams)
             return undefined;
         }
     }
-    return node.createError("AnyOfError", { pointer, schema: node.schema, value: data, anyOf: node.schema.anyOf });
+    return node.createError("any-of-error", { pointer, schema: node.schema, value: data, anyOf: node.schema.anyOf });
 }
