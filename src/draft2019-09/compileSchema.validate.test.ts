@@ -58,7 +58,7 @@ describe("compileSchema.validate (2019)", () => {
                     oneOf: [{ type: "integer" }, { minimum: 2 }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MultipleOneOfError");
+                assert.deepEqual(errors[0].code, "multiple-one-of-error");
             });
         });
 
@@ -77,7 +77,7 @@ describe("compileSchema.validate (2019)", () => {
                     allOf: [{ type: "integer" }, { minimum: 4 }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MinimumError");
+                assert.deepEqual(errors[0].code, "minimum-error");
             });
 
             it("should return all errors for each non-matching schemas", () => {
@@ -86,8 +86,8 @@ describe("compileSchema.validate (2019)", () => {
                     allOf: [{ type: "integer" }, { minimum: 4 }, { maximum: 2 }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 2);
-                assert.deepEqual(errors[0].name, "MinimumError");
-                assert.deepEqual(errors[1].name, "MaximumError");
+                assert.deepEqual(errors[0].code, "minimum-error");
+                assert.deepEqual(errors[1].code, "maximum-error");
             });
         });
 
@@ -106,7 +106,7 @@ describe("compileSchema.validate (2019)", () => {
                     anyOf: [{ minimum: 4 }, { maximum: 2 }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "AnyOfError");
+                assert.deepEqual(errors[0].code, "any-of-error");
             });
 
             it("should validate null", () => {
@@ -123,7 +123,7 @@ describe("compileSchema.validate (2019)", () => {
                     anyOf: [{ type: "null" }]
                 }).validate(3);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "AnyOfError");
+                assert.deepEqual(errors[0].code, "any-of-error");
             });
 
             it("should resolve references", () => {
@@ -183,29 +183,29 @@ describe("compileSchema.validate (2019)", () => {
             }).validate({ id: "first", a: "correct", b: "notallowed", c: false });
 
             assert.deepEqual(errors.length, 2);
-            assert.deepEqual(errors[0].name, "NoAdditionalPropertiesError");
-            assert.deepEqual(errors[1].name, "NoAdditionalPropertiesError");
+            assert.deepEqual(errors[0].code, "no-additional-properties-error");
+            assert.deepEqual(errors[1].code, "no-additional-properties-error");
         });
 
         describe("min/maxProperties", () => {
-            it("should return MinPropertiesError for too few properties", () => {
+            it("should return min-properties-error for too few properties", () => {
                 const { errors } = compileSchema({
                     $schema,
                     type: "object",
                     minProperties: 2
                 }).validate({ a: 1 });
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MinPropertiesError");
+                assert.deepEqual(errors[0].code, "min-properties-error");
             });
 
-            it("should return MaxPropertiesError for too many properties", () => {
+            it("should return max-properties-error for too many properties", () => {
                 const { errors } = compileSchema({
                     $schema,
                     type: "object",
                     maxProperties: 1
                 }).validate({ a: 1, b: 2 });
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MaxPropertiesError");
+                assert.deepEqual(errors[0].code, "max-properties-error");
             });
 
             it("should be valid if property count is within range", () => {
@@ -227,7 +227,7 @@ describe("compileSchema.validate (2019)", () => {
                     not: { type: "object", properties: { a: { type: "number" } } }
                 }).validate({ a: 1 });
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "NotError");
+                assert.deepEqual(errors[0].code, "not-error");
             });
         });
 
@@ -243,7 +243,7 @@ describe("compileSchema.validate (2019)", () => {
                 assert.deepEqual(errors.length, 0);
             });
 
-            it("should return a 'MissingDependencyError' if the dependent property is missing", () => {
+            it("should return a 'missing-dependency-error' if the dependent property is missing", () => {
                 const { errors } = compileSchema({
                     $schema,
                     type: "object",
@@ -254,10 +254,10 @@ describe("compileSchema.validate (2019)", () => {
                 }).validate({ title: "Check this out", url: "http://example.com" });
 
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MissingDependencyError");
+                assert.deepEqual(errors[0].code, "missing-dependency-error");
             });
 
-            it("should return a 'MissingDependencyError' if the dependent counterpart is missing", () => {
+            it("should return a 'missing-dependency-error' if the dependent counterpart is missing", () => {
                 const { errors } = compileSchema({
                     $schema,
                     type: "object",
@@ -266,7 +266,7 @@ describe("compileSchema.validate (2019)", () => {
                 }).validate({ title: "Check this out", target: "_blank" });
 
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MissingDependencyError");
+                assert.deepEqual(errors[0].code, "missing-dependency-error");
             });
 
             it("should be valid for a matching schema dependency", () => {
@@ -288,7 +288,7 @@ describe("compileSchema.validate (2019)", () => {
                     dependencies: { url: { required: ["target"], properties: { target: { type: "string" } } } }
                 }).validate({ url: "http://example.com" });
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "RequiredPropertyError");
+                assert.deepEqual(errors[0].code, "required-property-error");
             });
 
             it("should return correct error for invalid dependency", () => {
@@ -322,7 +322,7 @@ describe("compileSchema.validate (2019)", () => {
                 items: [{ type: "string" }]
             }).validate([1]);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "TypeError");
+            assert.deepEqual(errors[0].code, "type-error");
         });
 
         it("should be valid for matching indices", () => {
@@ -343,8 +343,8 @@ describe("compileSchema.validate (2019)", () => {
             }).validate(["1", 2]);
 
             assert.deepEqual(errors.length, 2);
-            assert.deepEqual(errors[0].name, "TypeError");
-            assert.deepEqual(errors[1].name, "MaxItemsError");
+            assert.deepEqual(errors[0].code, "type-error");
+            assert.deepEqual(errors[1].code, "max-items-error");
         });
 
         describe("min/maxItems", () => {
@@ -355,7 +355,7 @@ describe("compileSchema.validate (2019)", () => {
                     minItems: 2
                 }).validate([1]);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MinItemsError");
+                assert.deepEqual(errors[0].code, "min-items-error");
             });
 
             it("should return MaxItemsError for too many items", () => {
@@ -365,7 +365,7 @@ describe("compileSchema.validate (2019)", () => {
                     maxItems: 1
                 }).validate([1, 2]);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MaxItemsError");
+                assert.deepEqual(errors[0].code, "max-items-error");
             });
 
             it("should be valid if item count is within range", () => {
@@ -398,7 +398,7 @@ describe("compileSchema.validate (2019)", () => {
                     not: { items: {} }
                 }).validate(["1", 2, {}]);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "NotError");
+                assert.deepEqual(errors[0].code, "not-error");
             });
         });
 
@@ -411,7 +411,7 @@ describe("compileSchema.validate (2019)", () => {
                 }).validate([1, 2, 3, 4, 3]);
 
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "UniqueItemsError");
+                assert.deepEqual(errors[0].code, "unique-items-error");
             });
 
             it("should not validate for duplicated objects", () => {
@@ -422,7 +422,7 @@ describe("compileSchema.validate (2019)", () => {
                 }).validate([{ id: "first" }, { id: "second" }, { id: "first" }]);
 
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "UniqueItemsError");
+                assert.deepEqual(errors[0].code, "unique-items-error");
             });
 
             it("should validate for mismatching objects with equal properties", () => {
@@ -470,37 +470,37 @@ describe("compileSchema.validate (2019)", () => {
                 assert.deepEqual(errors.length, 1);
             });
 
-            it("should return MultipleOneOfError if multiple oneOf definitions match the given value", () => {
+            it("should return multiple-one-of-error if multiple oneOf definitions match the given value", () => {
                 const { errors } = compileSchema({
                     $schema,
                     type: "array",
                     items: { oneOf: [{ type: "integer" }, { minimum: 2 }] }
                 }).validate([3]);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MultipleOneOfError");
+                assert.deepEqual(errors[0].code, "multiple-one-of-error");
             });
         });
     });
 
     describe("string", () => {
-        it("should return MinLengthError if string is too short", () => {
+        it("should return min-length-error if string is too short", () => {
             const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 minLength: 2
             }).validate("a");
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "MinLengthError");
+            assert.deepEqual(errors[0].code, "min-length-error");
         });
 
-        it("should return MaxLengthError if string is too long", () => {
+        it("should return max-length-error if string is too long", () => {
             const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 maxLength: 2
             }).validate("abc");
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "MaxLengthError");
+            assert.deepEqual(errors[0].code, "max-length-error");
         });
 
         it("should be valid if string is within range", () => {
@@ -522,14 +522,14 @@ describe("compileSchema.validate (2019)", () => {
             assert.deepEqual(errors.length, 0);
         });
 
-        it("should return EnumError if value is not within enum list", () => {
+        it("should return enum-error if value is not within enum list", () => {
             const { errors } = compileSchema({
                 $schema,
                 type: "string",
                 enum: ["a", "c"]
             }).validate("b");
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "EnumError");
+            assert.deepEqual(errors[0].code, "enum-error");
         });
 
         it("should be valid if value is within enum list", () => {
@@ -548,22 +548,22 @@ describe("compileSchema.validate (2019)", () => {
                 not: { type: "string", pattern: "^b$" }
             }).validate("b");
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "NotError");
+            assert.deepEqual(errors[0].code, "not-error");
         });
     });
 
     describe("number", () => {
-        it("should return MinimumError if number is too small", () => {
+        it("should return minimum-error if number is too small", () => {
             const { errors } = compileSchema({
                 $schema,
                 type: "number",
                 minimum: 2
             }).validate(1);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "MinimumError");
+            assert.deepEqual(errors[0].code, "minimum-error");
         });
 
-        it("should return MinimumError if number is equal and exclusiveMinimum is set", () => {
+        it("should return minimum-error if number is equal and exclusiveMinimum is set", () => {
             const { errors } = compileSchema({
                 $schema,
                 type: "number",
@@ -571,20 +571,20 @@ describe("compileSchema.validate (2019)", () => {
                 exclusiveMinimum: true
             }).validate(2);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "MinimumError");
+            assert.deepEqual(errors[0].code, "minimum-error");
         });
 
-        it("should return MaximumError if number is too large", () => {
+        it("should return maximum-error if number is too large", () => {
             const { errors } = compileSchema({
                 $schema,
                 type: "number",
                 maximum: 1
             }).validate(2);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "MaximumError");
+            assert.deepEqual(errors[0].code, "maximum-error");
         });
 
-        it("should return MaximumError if number same and exclusiveMaximum is set", () => {
+        it("should return maximum-error if number same and exclusiveMaximum is set", () => {
             const { errors } = compileSchema({
                 $schema,
                 type: "number",
@@ -592,7 +592,7 @@ describe("compileSchema.validate (2019)", () => {
                 exclusiveMaximum: true
             }).validate(2);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "MaximumError");
+            assert.deepEqual(errors[0].code, "maximum-error");
         });
 
         it("should be valid if number is within range", () => {
@@ -622,14 +622,14 @@ describe("compileSchema.validate (2019)", () => {
             assert.deepEqual(errors.length, 0);
         });
 
-        it("should return EnumError if value is not within enum list", () => {
+        it("should return enum-error if value is not within enum list", () => {
             const { errors } = compileSchema({
                 $schema,
                 type: "number",
                 enum: [21, 27, 42]
             }).validate(13);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "EnumError");
+            assert.deepEqual(errors[0].code, "enum-error");
         });
 
         it("should be valid if value is within enum list", () => {
@@ -648,7 +648,7 @@ describe("compileSchema.validate (2019)", () => {
                 multipleOf: 1.5
             }).validate(4);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "MultipleOfError");
+            assert.deepEqual(errors[0].code, "multiple-of-error");
         });
 
         it("should be valid if value if a multiple of 1.5", () => {
@@ -676,7 +676,7 @@ describe("compileSchema.validate (2019)", () => {
                 not: { type: "number", minimum: 4 }
             }).validate(4.5);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "NotError");
+            assert.deepEqual(errors[0].code, "not-error");
         });
     });
 
@@ -692,7 +692,7 @@ describe("compileSchema.validate (2019)", () => {
                 type: ["object", "null"]
             }).validate([]);
             assert.deepEqual(errors.length, 1);
-            assert.deepEqual(errors[0].name, "TypeError");
+            assert.deepEqual(errors[0].code, "type-error");
         });
 
         it("should support 'integer' as a valid type within array", () => {
@@ -736,7 +736,7 @@ describe("compileSchema.validate (2019)", () => {
                     enum: [1, "second", { id: "third" }]
                 }).validate({ id: "first" });
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "EnumError");
+                assert.deepEqual(errors[0].code, "enum-error");
             });
 
             it("should return error for invalid null", () => {
@@ -745,7 +745,7 @@ describe("compileSchema.validate (2019)", () => {
                     enum: [1, "second", { id: "third" }]
                 }).validate(null);
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "EnumError");
+                assert.deepEqual(errors[0].code, "enum-error");
             });
         });
 
@@ -761,7 +761,7 @@ describe("compileSchema.validate (2019)", () => {
                     }
                 }).validate("a");
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "TypeError");
+                assert.deepEqual(errors[0].code, "type-error");
             });
 
             it("should correctly validate combination of remote, allOf, and allOf-$ref", () => {
@@ -775,7 +775,7 @@ describe("compileSchema.validate (2019)", () => {
                     .addRemote("http://json-schema.org/draft-04/schema", draft04Meta)
                     .validate({ minLength: -1 });
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "MinimumError");
+                assert.deepEqual(errors[0].code, "minimum-error");
             });
 
             it("should correctly resolve local remote url", () => {
@@ -791,7 +791,7 @@ describe("compileSchema.validate (2019)", () => {
                     )
                     .validate("not an integer");
                 assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].name, "TypeError");
+                assert.deepEqual(errors[0].code, "type-error");
             });
 
             it("spec/unevaluatedProperties : dynamic evalation inside nested refs : should validate a", () => {

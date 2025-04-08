@@ -125,7 +125,10 @@ export type GetSchemaOptions = {
 };
 
 export const SchemaNodeMethods = {
-    /** Compiles a child-schema of this node to its context */
+    /**
+     * Compiles a child-schema of this node to its context
+     * @returns SchemaNode representing the passed JSON Schema
+     */
     compileSchema(schema: JsonSchema, spointer: string = this.spointer, schemaId?: string): SchemaNode {
         const nextFragment = spointer.split("/$ref")[0];
         const parentNode = this as SchemaNode;
@@ -156,7 +159,7 @@ export const SchemaNodeMethods = {
             }
             errorMessage = render(error ?? name, data);
         }
-        return { type: "error", name, code: dashCase(name), message: errorMessage, data };
+        return { type: "error", code: dashCase(name), message: errorMessage, data };
     },
 
     createSchema,
@@ -216,11 +219,17 @@ export const SchemaNodeMethods = {
         return isJsonError(result) ? { node: undefined, error: result } : { node: result, error: undefined };
     },
 
+    /**
+     * @returns for $ref, the corresponding SchemaNode or undefined
+     */
     getRef($ref: string): SchemaNode | undefined {
         const node = this as SchemaNode;
         return node.compileSchema({ $ref }).resolveRef();
     },
 
+    /**
+     * @returns child node identified by property as SchemaNode
+     */
     getChild(key: string | number, data?: unknown, options: GetSchemaOptions = {}): OptionalNodeAndError {
         options.path = options.path ?? [];
 
@@ -271,11 +280,16 @@ export const SchemaNodeMethods = {
         return { node: undefined, error: undefined };
     },
 
+    /**
+     * @returns draft version this JSON Schema is evaluated by
+     */
     getDraftVersion() {
         return (this as SchemaNode).context.version;
     },
 
-    /** Creates data that is valid to the schema of this node */
+    /**
+     * @returns data that is valid to the schema of this node
+     */
     getData(data?: unknown, options?: TemplateOptions) {
         const node = this as SchemaNode;
         const opts = {
@@ -287,6 +301,9 @@ export const SchemaNodeMethods = {
         return node.context.methods.getData(node, data, opts);
     },
 
+    /**
+     * @returns SchemaNode with a reduced JSON Schema matching the given data
+     */
     reduceSchema(
         data: unknown,
         options: { key?: string | number; pointer?: string; path?: ValidationPath } = {}
@@ -343,7 +360,9 @@ export const SchemaNodeMethods = {
         return { node: workingNode, error: undefined };
     },
 
-    /** Creates a new node with all dynamic schema properties merged according to the passed in data */
+    /**
+     * @returns validation result of data validated by this node's JSON Schema
+     */
     validate(data: unknown, pointer = "#", path: ValidationPath = []): { valid: boolean; errors: JsonError[] } {
         const errors = validateNode(this, data, pointer, path) ?? [];
         const flatErrorList = sanitizeErrors(Array.isArray(errors) ? errors : [errors]).filter(isJsonError);
@@ -353,6 +372,9 @@ export const SchemaNodeMethods = {
         };
     },
 
+    /**
+     * @returns a promise which resolves to validation-result
+     */
     async validateAsync(
         data: unknown,
         pointer = "#",
@@ -401,10 +423,16 @@ export const SchemaNodeMethods = {
         return this;
     },
 
+    /**
+     * @returns a list of all sub-schema as SchemaNode
+     */
     toSchemaNodes() {
         return toSchemaNodes(this as SchemaNode);
     },
 
+    /**
+     * @returns a list of values (including objects and arrays) and their corresponding JSON Schema as SchemaNode
+     */
     toDataNodes(data: unknown, pointer?: string) {
         const node = this as SchemaNode;
         return node.context.methods.toDataNodes(node, data, pointer);

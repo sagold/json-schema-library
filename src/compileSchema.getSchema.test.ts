@@ -310,7 +310,7 @@ describe("compileSchema : getSchema", () => {
                 additionalProperties: false
             }).getSchema("#/beer");
 
-            assert.deepEqual(error.name, "NoAdditionalPropertiesError");
+            assert.deepEqual(error.code, "no-additional-properties-error");
         });
 
         describe("dependencies", () => {

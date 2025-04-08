@@ -186,7 +186,6 @@ In _json-schema-library_ all errors are in the format of a `JsonError`:
 ```ts
 type JsonError = {
     type: "error";
-    name: string;
     code: string;
     message: string;
     data?: { [p: string]: any };
@@ -210,7 +209,6 @@ const { errors } = compileSchema(myJsonSchema).validate({ name: "my-data" });
 expect(errors).to.deep.equal([
     {
         type: "error",
-        name: "NoAdditionalPropertiesError",
         code: "no-additional-properties-error",
         message: "Additional property `name` in `#` is not allowed",
         data: { property: "name", properties: [], pointer: "#" }
@@ -965,7 +963,6 @@ const myDraft = extendDraft(draft2020, {
             if (data.minLength === 1) {
                 return {
                     type: "error",
-                    name: "MinLengthOneError",
                     code: dashCase("MinLengthOneError"),
                     message: "Input is required",
                     data
@@ -973,7 +970,6 @@ const myDraft = extendDraft(draft2020, {
             }
             return {
                 type: "error",
-                name: "MinLengthError",
                 code: dashCase("MinLengthError"),
                 message: render("Value in `{{pointer}}` is `{{length}}`, but should be `{{minimum}}` at minimum", data),
                 data
@@ -1167,6 +1163,9 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
     -   `draft.createSchemaOf(schema)` → `node.createSchema(schema)`
 
 -   **Draft Customization**: Customizing drafts has changed completely. The previous methods of extending drafts are no longer valid, and draft handling is now centered around `SchemaNode`.
+
+-   **Remove Property**:
+    Error property `name` has been removed from `JsonError` in favor of `code`.
 
 -   **Removed Configuration Option**:  
     The `templateDefaultOptions` property has been removed from the global settings object. You should now configure it using the `compileSchema` options:

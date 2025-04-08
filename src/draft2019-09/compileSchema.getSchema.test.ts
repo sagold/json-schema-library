@@ -3,7 +3,7 @@ import { strict as assert } from "assert";
 import { isSchemaNode, isJsonError } from "../types";
 import { pick } from "../utils/pick";
 
-describe("compileSchema : getSchema", () => {
+describe("compileSchema : getSchema (2019)", () => {
     describe("value", () => {
         it("should return schema of any value", () => {
             const { node } = compileSchema({ $schema: "draft-2019-09", name: "target", type: "*" }).getSchema("#");
@@ -252,7 +252,7 @@ describe("compileSchema : getSchema", () => {
             }).getSchema("#/beer");
 
             assert(isJsonError(error));
-            assert.deepEqual(error.name, "NoAdditionalPropertiesError");
+            assert.deepEqual(error.code, "no-additional-properties-error");
         });
 
         describe("dependencies", () => {
