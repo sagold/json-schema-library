@@ -1,11 +1,9 @@
-/* eslint max-statements-per-line: ["error", { "max": 2 }] */
 const suffixes = /(#)+$/;
 const trailingHash = /#$/;
 const startingHashAndSlash = /^[#/]+/;
 const isDomain = /^[^:]+:\/\/[^/]+\//;
 const trailingFragments = /\/[^/]*$/;
 const idAndPointer = /#.*$/;
-// @todo add missing test for urn ids
 const isURN = /^urn:uuid:[0-9A-Fa-f]/;
 function _joinScope(previous, id) {
     if (previous == null && (id == null || id === "")) {

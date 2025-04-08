@@ -16,8 +16,6 @@ export function parseUnevaluatedProperties(node) {
 }
 // @todo we should use collected annotation to evaluated unevaluate properties
 function validateUnevaluatedProperties({ node, data, pointer, path }) {
-    // if not in properties, evaluated by additionalProperties and not matches patternProperties
-    // @todo we need to know dynamic parent statements - they should not be counted as evaluated...
     if (!isObject(data)) {
         return undefined;
     }

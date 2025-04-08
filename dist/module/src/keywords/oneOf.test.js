@@ -114,7 +114,6 @@ describe("keyword : oneof-fuzzy : reduce", () => {
         });
         const res = reduceOneOfFuzzy({ node, data: 4, pointer: "#", path: [] });
         assert.deepEqual(res.schema, { type: "number" });
-        // @todo should move oneOfIndex-property to exported node
         assert.equal(res.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
     it("should return schema with matching pattern", () => {
