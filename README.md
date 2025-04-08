@@ -1127,46 +1127,63 @@ expect(resolvedNode?.schema).to.deep.eq({
 
 ## Breaking Changes
 
--   `compileSchema` is a standalone function which replaces `Draft`-Class
--   all return values for JSON Schema are `SchemaNode` that contain a schema-property
--   `draft.getTemplate(inputData)` has been **renamed** to `node.getData(inputData)`
--   `draft.each(data, callback)` has been **replaced** by `const nodes = node.toDataNodes(data)`
--   `draft.eachSchema(callback)` has been **replaced** by `const nodes = node.toSchemaNodes()`
--   `draft.isValid(data)` has been **replaced** by `node.validate(data).valid`
--   `draft.getSchema(options)` has been **changed** to `node.getSchema(pointer, data, options)`
--   `draft.step(property, data)` has been **renamed** to `node.getChild(property, data)`
--   `draft.addRemoteSchema(schema)` has been **renamed** to `node.addRemote(schema)`
--   `draft.createSchemaOf(schema)` has been **renamed** to `node.createSchema(schema)`
--   draft customization has completely changed
-
 ### v10.0.0
 
-With version `v10.0.0` _draft 2019-09_ is supported and can be used with `import { Draft2019 } from "json-schema-library";` Note that older drafts are now resolving all official test cases, especially remaining ref-resolution issues.
+In version v10.0.0, we've made significant changes to the library’s API, particularly in how we handle drafts and schemas. These changes are required to support features like `dynamicAnchor`, `unevaluatedItems`, and `oneOfIndex` and to integrate with the headless-json-editor. The previous approach of directly working with JSON schema objects lacked the flexibility needed for more advanced features and extensibility.
 
-**breaking changes**:
+The new implementation revolves around compiling schemas into a **SchemaNode** tree. This change offers a more fitting, simpler, and extensible approach to working with JSON schemas.
 
--   removed `templateDefaultOptions` from global settings-object. Instead configure getData per draft instead on `draft.templateDefaultOptions`
+#### Key Changes:
 
-```ts
-new Draft2019(schema, {
-    templateDefaultOptions: {
-        addOptionalProps: false,
-        removeInvalidData: false,
-        extendDefaults: true
-    })
-});
-```
+-   **Compile Schema**: The `compileSchema` function now replaces the previous Draft-Class approach.
+-   **SchemaNode Representation**: All schemas are now represented as `SchemaNode`, which holds the schema and provides an easier way to work with them.
 
-_Draft 2019-09_ requires collection of previous resolved sub-schemas. Thus, an additional type `SchemaNode` had to be introduced, which is used in almost all draft methods defined for draft-configs. The api in draft-instances mostly stayed the same with the following exceptions:
+#### Breaking Changes:
 
--   `step` and resolvers work on and return a `schemaNode`, containing the requested schema
+-   **`compileSchema`** is now a standalone function and replaces the `Draft` class.
+-   All return values for JSON Schema are now `SchemaNode` objects that contain a `schema` property.
 
-A control property `__oneOfIndex: number` is added to resolved oneOf-schema to retrieve the source of the original schema. If this unwanted behaviour you can disabled this behaviour by:
+    **Previously**:
 
-```ts
-import { settings } from "json-schema-library";
-settings.EXPOSE_ONE_OF_INDEX = false;
-```
+    ```ts
+    const draft = new Draft(schema);
+    ```
+
+    **Now**:
+
+    ```ts
+    const node = compileSchema(schema);
+    ```
+
+-   **Renamed Methods**:
+
+    -   `draft.getTemplate(inputData)` → `node.getData(inputData)`
+    -   `draft.each(data, callback)` → `const nodes = node.toDataNodes(data)`
+    -   `draft.eachSchema(callback)` → `const nodes = node.toSchemaNodes()`
+    -   `draft.isValid(data)` → `node.validate(data).valid`
+    -   `draft.getSchema(options)` → `node.getSchema(pointer, data, options)`
+    -   `draft.step(property, data)` → `node.getChild(property, data)`
+    -   `draft.addRemoteSchema(schema)` → `node.addRemote(schema)`
+    -   `draft.createSchemaOf(schema)` → `node.createSchema(schema)`
+
+-   **Draft Customization**: Customizing drafts has changed completely. The previous methods of extending drafts are no longer valid, and draft handling is now centered around `SchemaNode`.
+
+-   **Removed Configuration Option**:  
+    The `templateDefaultOptions` property has been removed from the global settings object. You should now configure it using the `compileSchema` options:
+
+    ```ts
+    compileSchema(schema, {
+        templateDefaultOptions: {
+            addOptionalProps: false,
+            removeInvalidData: false,
+            extendDefaults: true
+        }
+    });
+    ```
+
+This update involves some significant changes in how you work with the library, so please carefully review the migration guide and adjust your implementation accordingly.
+
+This format should help users quickly understand the changes, what has been renamed, and how to adapt to the new API.
 
 ### v9.0.0
 
