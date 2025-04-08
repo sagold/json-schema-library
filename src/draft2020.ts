@@ -1,4 +1,3 @@
-import { additionalItemsKeyword } from "./keywords/additionalItems";
 import { additionalPropertiesKeyword } from "./keywords/additionalProperties";
 import { allOfKeyword } from "./keywords/allOf";
 import { anyOfKeyword } from "./keywords/anyOf";
@@ -82,7 +81,6 @@ export const draft2020 = sanitizeKeywords({
     },
     keywords: [
         refKeyword,
-        additionalItemsKeyword,
         additionalPropertiesKeyword,
         allOfKeyword,
         anyOfKeyword,

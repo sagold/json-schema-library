@@ -1,4 +1,4 @@
-import { additionalItemsKeyword } from "./keywords/additionalItems";
+import { additionalItemsKeyword } from "./draft2019-09/keywords/additionalItems";
 import { additionalPropertiesKeyword } from "./keywords/additionalProperties";
 import { allOfKeyword } from "./keywords/allOf";
 import { anyOfKeyword } from "./keywords/anyOf";

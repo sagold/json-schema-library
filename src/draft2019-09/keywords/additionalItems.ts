@@ -1,8 +1,8 @@
-import { isObject } from "../utils/isObject";
-import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
-import { SchemaNode } from "../types";
-import { getValue } from "../utils/getValue";
-import { validateNode } from "../validateNode";
+import { isObject } from "../../utils/isObject";
+import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../../Keyword";
+import { SchemaNode } from "../../types";
+import { getValue } from "../../utils/getValue";
+import { validateNode } from "../../validateNode";
 
 export const additionalItemsKeyword: Keyword = {
     id: "additionalItems",
