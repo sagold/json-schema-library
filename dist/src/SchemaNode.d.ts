@@ -1,7 +1,6 @@
 import type { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, Keyword, ValidationPath } from "./Keyword";
 import { createSchema } from "./methods/createSchema";
 import { Draft } from "./Draft";
-import { EachCallback } from "./methods/each";
 import { EachSchemaCallback } from "./methods/eachSchema";
 import { JsonSchema, JsonError, ErrorData, OptionalNodeAndError } from "./types";
 import { TemplateOptions } from "./methods/getTemplate";
@@ -96,7 +95,6 @@ export declare const SchemaNodeMethods: {
     readonly compileSchema: (schema: JsonSchema, spointer?: string, schemaId?: string) => SchemaNode;
     readonly createError: <T extends string = "AdditionalItemsError" | "AdditionalPropertiesError" | "AllOfError" | "AnyOfError" | "ConstError" | "ContainsAnyError" | "ContainsArrayError" | "ContainsError" | "ContainsMinError" | "ContainsMaxError" | "EnumError" | "ExclusiveMaximumError" | "ExclusiveMinimumError" | "ForbiddenPropertyError" | "FormatDateError" | "FormatDateTimeError" | "FormatDurationError" | "FormatEmailError" | "FormatHostnameError" | "FormatIPV4Error" | "FormatIPV4LeadingZeroError" | "FormatIPV6Error" | "FormatIPV6LeadingZeroError" | "FormatJsonPointerError" | "FormatRegExError" | "FormatTimeError" | "FormatURIError" | "FormatURIReferenceError" | "FormatURITemplateError" | "FormatURLError" | "FormatUUIDError" | "InvalidDataError" | "InvalidPropertyNameError" | "MaximumError" | "MaxItemsError" | "MaxLengthError" | "MaxPropertiesError" | "MinimumError" | "MinItemsError" | "MinItemsOneError" | "MinLengthError" | "MinLengthOneError" | "MissingOneOfDeclaratorError" | "MinPropertiesError" | "MissingArrayItemError" | "MissingDependencyError" | "MissingOneOfPropertyError" | "MultipleOfError" | "MultipleOneOfError" | "NoAdditionalPropertiesError" | "NotError" | "OneOfError" | "OneOfPropertyError" | "PatternError" | "PatternPropertiesError" | "RequiredPropertyError" | "SchemaWarning" | "TypeError" | "UndefinedValueError" | "UnevaluatedPropertyError" | "UnevaluatedItemsError" | "UniqueItemsError" | "UnknownPropertyError" | "ValueNotEmptyError">(name: T, data: ErrorData, message?: string) => JsonError;
     readonly createSchema: typeof createSchema;
-    readonly each: (data: unknown, callback: EachCallback, pointer?: string) => void;
     readonly eachSchema: (callback: EachSchemaCallback) => void;
     readonly getChildSchemaSelection: (property: string | number) => JsonError | SchemaNode[];
     /**
@@ -121,15 +119,15 @@ export declare const SchemaNodeMethods: {
      */
     readonly getSchema: (pointer: string, data?: unknown, options?: GetSchemaOptions) => OptionalNodeAndError;
     readonly getRef: ($ref: string) => SchemaNode | undefined;
-    readonly get: (key: string | number, data?: unknown, options?: GetSchemaOptions) => SchemaNode | JsonError;
+    readonly getChild: (key: string | number, data?: unknown, options?: GetSchemaOptions) => OptionalNodeAndError;
+    readonly getDraftVersion: () => import("./Draft").DraftVersion;
     /** Creates data that is valid to the schema of this node */
     readonly getTemplate: (data?: unknown, options?: TemplateOptions) => any;
-    readonly getDraftVersion: () => import("./Draft").DraftVersion;
     readonly reduce: (data: unknown, options?: {
         key?: string | number;
         pointer?: string;
         path?: ValidationPath;
-    }) => SchemaNode | JsonError;
+    }) => OptionalNodeAndError;
     /** Creates a new node with all dynamic schema properties merged according to the passed in data */
     readonly validate: (data: unknown, pointer?: string, path?: ValidationPath) => {
         valid: boolean;
@@ -144,6 +142,7 @@ export declare const SchemaNodeMethods: {
      * @returns the current node (not the remote schema-node)
      */
     readonly addRemote: (url: string, schema: JsonSchema) => SchemaNode;
+    readonly toDataNodes: (data: unknown, pointer?: string) => import("..").DataNode[];
     readonly toJSON: () => any;
 };
 export declare function addKeywords(node: SchemaNode): void;

@@ -1,5 +1,4 @@
 import { isObject } from "../utils/isObject";
-import { isSchemaNode } from "../types";
 import { validateNode } from "../validateNode";
 import { isItemEvaluated } from "../isItemEvaluated";
 /**
@@ -36,7 +35,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }) {
             continue;
         }
         const value = data[i];
-        const child = node.get(i, data, { path });
+        const { node: child } = node.getChild(i, data, { path });
         if (child === undefined) {
             if (node.unevaluatedItems) {
                 const result = validateNode(node.unevaluatedItems, value, `${pointer}/${i}`, path);
@@ -52,7 +51,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }) {
                 }));
             }
         }
-        if (isSchemaNode(child) && validateNode(child, value, `${pointer}/${i}`, path).length > 0) {
+        if (child && validateNode(child, value, `${pointer}/${i}`, path).length > 0) {
             // when a single node is invalid
             if (node.unevaluatedItems &&
                 node.unevaluatedItems.validate(value, `${pointer}/${i}`, path).valid === false) {

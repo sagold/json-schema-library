@@ -8,7 +8,7 @@ import { defsKeyword } from "./keywords/defs";
 import { dependenciesKeyword } from "./keywords/dependencies";
 import { dependentRequiredKeyword } from "./keywords/dependentRequired";
 import { dependentSchemasKeyword } from "./keywords/dependentSchemas";
-import { each } from "./methods/each";
+import { toDataNodes } from "./methods/toDataNodes";
 import { enumKeyword } from "./keywords/enum";
 import { exclusiveMaximumKeyword } from "./keywords/exclusiveMaximum";
 import { exclusiveMinimumKeyword } from "./keywords/exclusiveMinimum";
@@ -35,7 +35,7 @@ import { propertiesKeyword } from "./keywords/properties";
 import { propertyNamesKeyword } from "./keywords/propertyNames";
 import { refKeyword } from "./keywords/ref";
 import { requiredKeyword } from "./keywords/required";
-import { sanitizeKeywords } from "./utils/sanitizeKeywords";
+import { sanitizeKeywords } from "./Draft";
 import { typeKeyword } from "./keywords/type";
 import { unevaluatedItemsKeyword } from "./keywords/unevaluatedItems";
 import { unevaluatedPropertiesKeyword } from "./keywords/unevaluatedProperties";
@@ -77,7 +77,7 @@ export const draft2020 = sanitizeKeywords({
         createSchema,
         getTemplate,
         getChildSchemaSelection,
-        each
+        toDataNodes
     },
     keywords: [
         refKeyword,

@@ -63,10 +63,6 @@ export const SchemaNodeMethods = {
         return { type: "error", name, code: dashCase(name), message: errorMessage, data };
     },
     createSchema,
-    each(data, callback, pointer) {
-        const node = this;
-        return node.context.methods.each(node, data, callback, pointer);
-    },
     eachSchema(callback) {
         const node = this;
         return eachSchema(node, callback);
@@ -110,12 +106,15 @@ export const SchemaNodeMethods = {
         let currentNode = node;
         for (let i = 0, l = keys.length; i < l; i += 1) {
             currentPointer = `${currentPointer}/${keys[i]}`;
-            const nextNode = currentNode.get(keys[i], data, { ...options, pointer: currentPointer });
-            if (!isSchemaNode(nextNode)) {
-                return { node: undefined, error: nextNode };
+            const result = currentNode.getChild(keys[i], data, { ...options, pointer: currentPointer });
+            if (result.error) {
+                return result;
             }
+            if (result.node == null) {
+                return result;
+            }
+            currentNode = result.node;
             data = getValue(data, keys[i]);
-            currentNode = nextNode;
         }
         const result = currentNode.resolveRef(options);
         return isJsonError(result) ? { node: undefined, error: result } : { node: result, error: undefined };
@@ -124,7 +123,7 @@ export const SchemaNodeMethods = {
         const node = this;
         return node.compileSchema({ $ref }).resolveRef();
     },
-    get(key, data, options = {}) {
+    getChild(key, data, options = {}) {
         var _a, _b, _c;
         options.path = (_a = options.path) !== null && _a !== void 0 ? _a : [];
         options.withSchemaWarning = (_b = options.withSchemaWarning) !== null && _b !== void 0 ? _b : false;
@@ -133,29 +132,38 @@ export const SchemaNodeMethods = {
         let node = this;
         if (node.reducers.length) {
             const result = node.reduce(data, { key, path, pointer });
-            if (isJsonError(result)) {
+            if (result.error) {
                 return result;
             }
-            if (isSchemaNode(result)) {
-                node = result;
+            if (isSchemaNode(result.node)) {
+                node = result.node;
             }
         }
         for (const resolver of node.resolvers) {
             const schemaNode = resolver({ data, key, node });
-            if (schemaNode) {
-                return schemaNode;
+            if (isSchemaNode(schemaNode)) {
+                return { node: schemaNode, error: undefined };
+            }
+            if (isJsonError(schemaNode)) {
+                return { node: undefined, error: schemaNode };
             }
         }
         const referencedNode = node.resolveRef({ path });
         if (referencedNode !== node) {
-            return referencedNode.get(key, data, options);
+            return referencedNode.getChild(key, data, options);
         }
         if (options.createSchema === true) {
-            return node.compileSchema(createSchema(getValue(data, key)), `${node.spointer}/additional`, `${node.schemaId}/additional`);
+            const newNode = node.compileSchema(createSchema(getValue(data, key)), `${node.spointer}/additional`, `${node.schemaId}/additional`);
+            return { node: newNode, error: undefined };
         }
         if (options.withSchemaWarning === true) {
-            return node.createError("SchemaWarning", { pointer, value: data, schema: node.schema, key });
+            const error = node.createError("SchemaWarning", { pointer, value: data, schema: node.schema, key });
+            return { node: undefined, error };
         }
+        return { node: undefined, error: undefined };
+    },
+    getDraftVersion() {
+        return this.context.version;
     },
     /** Creates data that is valid to the schema of this node */
     getTemplate(data, options) {
@@ -168,9 +176,6 @@ export const SchemaNodeMethods = {
         };
         return node.context.methods.getTemplate(node, data, opts);
     },
-    getDraftVersion() {
-        return this.context.version;
-    },
     reduce(data, options = {}) {
         const { key, pointer, path } = options;
         const resolvedNode = { ...this.resolveRef({ pointer, path }) };
@@ -180,13 +185,13 @@ export const SchemaNodeMethods = {
         // const node = resolvedNode;
         // @ts-expect-error bool schema
         if (node.schema === false) {
-            return node;
+            return { node, error: undefined };
             // @ts-expect-error bool schema
         }
         else if (node.schema === true) {
             const nextNode = node.compileSchema(createSchema(data), node.spointer, node.schemaId);
             path === null || path === void 0 ? void 0 : path.push({ pointer, node });
-            return nextNode;
+            return { node: nextNode, error: undefined };
         }
         let schema;
         let workingNode = node;
@@ -194,7 +199,7 @@ export const SchemaNodeMethods = {
         for (let i = 0; i < reducers.length; i += 1) {
             const result = reducers[i]({ data, key, node, pointer });
             if (isJsonError(result)) {
-                return result;
+                return { node: undefined, error: result };
             }
             if (result) {
                 // @ts-expect-error bool schema - for undefined & false schema return false schema
@@ -210,7 +215,7 @@ export const SchemaNodeMethods = {
         if (schema === false) {
             console.log("return boolean schema `false`");
             // @ts-expect-error bool schema
-            return { ...node, schema: false, reducers: [] };
+            return { node: { ...node, schema: false, reducers: [] }, error: undefined };
         }
         if (workingNode !== node) {
             path === null || path === void 0 ? void 0 : path.push({ pointer, node });
@@ -219,7 +224,7 @@ export const SchemaNodeMethods = {
         workingNode.schema = omit(workingNode.schema, ...DYNAMIC_PROPERTIES);
         // @ts-expect-error string accessing schema props
         DYNAMIC_PROPERTIES.forEach((prop) => (workingNode[prop] = undefined));
-        return workingNode;
+        return { node: workingNode, error: undefined };
     },
     /** Creates a new node with all dynamic schema properties merged according to the passed in data */
     validate(data, pointer = "#", path = []) {
@@ -271,6 +276,10 @@ export const SchemaNodeMethods = {
         node.context.remotes[joinId(url)] = node;
         addKeywords(node);
         return this;
+    },
+    toDataNodes(data, pointer) {
+        const node = this;
+        return node.context.methods.toDataNodes(node, data, pointer);
     },
     toJSON() {
         var _a;

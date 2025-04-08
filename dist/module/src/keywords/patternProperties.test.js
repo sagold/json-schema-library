@@ -1,24 +1,23 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../compileSchema";
-import { isSchemaNode } from "../types";
 describe("keyword : patternProperties : get", () => {
     it("should step into patternProperties", () => {
-        var _a;
+        var _a, _b;
         const node = compileSchema({
             type: "object",
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 1 } }
         });
         // @todo evaluate if we should pass this property to reduce to identify schema without data
-        const schema = (_a = node.get("007", { "007": undefined })) === null || _a === void 0 ? void 0 : _a.schema;
+        const schema = (_b = (_a = node.getChild("007", { "007": undefined })) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
     it("should NOT step into patternProperties", () => {
-        var _a;
+        var _a, _b;
         const node = compileSchema({
             type: "object",
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 1 } }
         });
-        const schema = (_a = node.get("[0-9][0-9]7")) === null || _a === void 0 ? void 0 : _a.schema;
+        const schema = (_b = (_a = node.getChild("[0-9][0-9]7")) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
         assert.deepEqual(schema, undefined);
     });
 });
@@ -119,14 +118,13 @@ describe("keyword : patternProperties : validate", () => {
 });
 describe("keyword : patternProperties : reduce", () => {
     it("should return schema of matching property", () => {
-        const node = compileSchema({
+        const { node } = compileSchema({
             properties: { label: { type: "string", maxLength: 99 } },
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
         }).reduce({
             "007": "match",
             title: "no match"
         });
-        assert(isSchemaNode(node), "should have returned a valid SchemaNode");
         assert.deepEqual(node.schema, {
             properties: {
                 label: { type: "string", maxLength: 99 },
@@ -135,7 +133,7 @@ describe("keyword : patternProperties : reduce", () => {
         });
     });
     it("should merge schema with matching property schema", () => {
-        const node = compileSchema({
+        const { node } = compileSchema({
             properties: { "007": { type: "string", maxLength: 99 } },
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
         }).reduce({
@@ -143,7 +141,6 @@ describe("keyword : patternProperties : reduce", () => {
                 "007": "match"
             }
         });
-        assert(isSchemaNode(node), "should have returned a valid SchemaNode");
         assert.deepEqual(node.schema, {
             properties: {
                 "007": { type: "string", minLength: 2, maxLength: 99 }
@@ -151,11 +148,10 @@ describe("keyword : patternProperties : reduce", () => {
         });
     });
     it("should add patterns to properties per default", () => {
-        const node = compileSchema({
+        const { node } = compileSchema({
             properties: { "007": { type: "string", maxLength: 99 } },
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 2 } }
         }).reduce({});
-        assert(isSchemaNode(node), "should have returned a valid SchemaNode");
         assert.deepEqual(node.schema, {
             properties: {
                 "007": { type: "string", minLength: 2, maxLength: 99 }

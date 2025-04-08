@@ -2,49 +2,49 @@ import { strict as assert } from "assert";
 import { compileSchema } from "../compileSchema";
 describe("keyword : additionalProperties : get", () => {
     it("should step into additionalProperties", () => {
-        var _a;
+        var _a, _b;
         const node = compileSchema({
             type: "object",
             additionalProperties: { type: "string", minLength: 1 }
         });
-        const schema = (_a = node.get("header", { header: "huhu" })) === null || _a === void 0 ? void 0 : _a.schema;
+        const schema = (_b = (_a = node.getChild("header", { header: "huhu" })) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
     it("should NOT step into additionalProperties if false", () => {
-        var _a;
+        var _a, _b;
         const node = compileSchema({
             type: "object",
             additionalProperties: false
         });
-        const schema = (_a = node.get("header", { header: "huhu" })) === null || _a === void 0 ? void 0 : _a.schema;
+        const schema = (_b = (_a = node.getChild("header", { header: "huhu" })) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
         assert.deepEqual(schema, undefined);
     });
     it("should return undefined if additionalProperties is true", () => {
-        var _a;
+        var _a, _b;
         const node = compileSchema({
             type: "object",
             additionalProperties: true
         });
-        const schema = (_a = node.get("header", { header: "huhu" })) === null || _a === void 0 ? void 0 : _a.schema;
+        const schema = (_b = (_a = node.getChild("header", { header: "huhu" })) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
         assert.deepEqual(schema, undefined);
     });
     it("should apply additionalProperties from allOf", () => {
-        var _a;
+        var _a, _b;
         const node = compileSchema({
             type: "object",
             allOf: [{ additionalProperties: true }]
         });
-        const schema = (_a = node.get("header", { header: "huhu" })) === null || _a === void 0 ? void 0 : _a.schema;
+        const schema = (_b = (_a = node.getChild("header", { header: "huhu" })) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
         assert.deepEqual(schema, undefined);
     });
     it("should override additionalProperties from allOf", () => {
-        var _a;
+        var _a, _b;
         const node = compileSchema({
             type: "object",
             additionalProperties: { type: "number" },
             allOf: [{ additionalProperties: { type: "boolean" } }]
         });
-        const schema = (_a = node.get("header")) === null || _a === void 0 ? void 0 : _a.schema;
+        const schema = (_b = (_a = node.getChild("header")) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
         assert.deepEqual(schema, { type: "boolean" });
     });
 });

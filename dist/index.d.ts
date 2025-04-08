@@ -9,7 +9,7 @@ export { draftEditor } from "./src/draftEditor";
 export { oneOfFuzzyKeyword, oneOfKeyword } from "./src/keywords/oneOf";
 export { render } from "./src/errors/render";
 export { dashCase } from "./src/utils/dashCase";
-export type { EachCallback } from "./src/methods/each";
+export type { DataNode } from "./src/methods/toDataNodes";
 export type { EachSchemaCallback } from "./src/methods/eachSchema";
 export { default as getTypeOf } from "./src/utils/getTypeOf";
 export { isReduceable } from "./src/SchemaNode";

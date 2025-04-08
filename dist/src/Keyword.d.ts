@@ -14,6 +14,7 @@ export type JsonSchemaReducerParams = {
 };
 export interface JsonSchemaReducer {
     toJSON?: () => string;
+    order?: number;
     (options: JsonSchemaReducerParams): SchemaNode | JsonError | undefined;
 }
 export type JsonSchemaResolverParams = {
@@ -23,6 +24,7 @@ export type JsonSchemaResolverParams = {
 };
 export interface JsonSchemaResolver {
     toJSON?: () => string;
+    order?: number;
     (options: JsonSchemaResolverParams): SchemaNode | JsonError | undefined;
 }
 export type ValidationResult = JsonError | Promise<JsonError>;
@@ -34,6 +36,7 @@ export type JsonSchemaValidatorParams = {
 };
 export interface JsonSchemaValidator {
     toJSON?: () => string;
+    order?: number;
     (options: JsonSchemaValidatorParams): undefined | JsonError | ValidationResult[];
 }
 export type JsonSchemaDefaultDataResolverParams = {

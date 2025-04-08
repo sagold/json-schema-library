@@ -1,5 +1,4 @@
 import { isObject } from "../../utils/isObject";
-import { isSchemaNode } from "../../types";
 import sanitizeErrors from "../../utils/sanitizeErrors";
 import { validateNode } from "../../validateNode";
 /**
@@ -30,8 +29,8 @@ function validateUnevaluatedItems({ node, data, pointer, path }) {
         return undefined;
     }
     // const reducedNode = node;
-    let reducedNode = node.reduce(data, { pointer, path });
-    reducedNode = isSchemaNode(reducedNode) ? reducedNode : node;
+    let { node: reducedNode } = node.reduce(data, { pointer, path });
+    reducedNode = reducedNode !== null && reducedNode !== void 0 ? reducedNode : node;
     if (reducedNode.schema.unevaluatedItems === true || reducedNode.schema.additionalItems === true) {
         return undefined;
     }
@@ -41,9 +40,9 @@ function validateUnevaluatedItems({ node, data, pointer, path }) {
     // "unevaluatedItems with nested items"
     for (let i = 0; i < data.length; i += 1) {
         const value = data[i];
-        const child = node.get(i, data, { path });
+        const { node: child } = node.getChild(i, data, { path });
         // console.log(`CHILD '${i}':`, data[i], "=>", child?.schema);
-        if (isSchemaNode(child)) {
+        if (child) {
             // when a single node is invalid
             if (validateNode(child, value, `${pointer}/${i}`, path).length > 0) {
                 // nothing should validate, so we validate unevaluated items only

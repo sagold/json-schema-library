@@ -1,12 +1,12 @@
 import type { Keyword } from "./Keyword";
 import { createSchema } from "./methods/createSchema";
-import { each } from "./methods/each";
+import { toDataNodes } from "./methods/toDataNodes";
 import { ErrorConfig } from "./types";
 import { formats } from "./formats/formats";
 import { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
 import { getTemplate } from "./methods/getTemplate";
 export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "draft-2020-12" | "latest";
-export type Draft = {
+export interface Draft {
     /** test-string if draft can be used with $schema-url */
     $schemaRegEx: string;
     /** draft-version of this draft, e.g. draft-2020-12 */
@@ -18,18 +18,19 @@ export type Draft = {
         createSchema: typeof createSchema;
         getChildSchemaSelection: typeof getChildSchemaSelection;
         getTemplate: typeof getTemplate;
-        each: typeof each;
+        toDataNodes: typeof toDataNodes;
     };
     /** meta-schema url associated with this draft */
     $schema?: string;
     /** draft errors (this can still be global) */
     errors: ErrorConfig;
     formats: typeof formats;
-};
+}
 type PartialDraft = Partial<Omit<Draft, "errors" | "formats">> & {
     errors?: Partial<Draft["errors"]>;
     formats?: Partial<Draft["formats"]>;
 };
 export declare function extendDraft(draft: Draft, extension: PartialDraft): Draft;
 export declare function addKeywords(draft: Draft, ...keywords: Keyword[]): Draft;
+export declare function sanitizeKeywords(draft: Draft): Draft;
 export {};

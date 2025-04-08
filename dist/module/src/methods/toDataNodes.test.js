@@ -1,45 +1,41 @@
 import { compileSchema } from "../compileSchema";
 import { strict as assert } from "assert";
-describe("each", () => {
+describe("toDataNodes", () => {
     it("should call callback with schema, value and pointer", () => {
-        const calls = [];
-        compileSchema({ type: "number" }).each(5, (...args) => calls.push(args));
-        assert.deepEqual(calls.length, 1);
-        assert.deepEqual(calls[0][0].schema, { type: "number" });
-        assert.deepEqual(calls[0][1], 5);
-        assert.deepEqual(calls[0][2], "#");
+        const nodes = compileSchema({ type: "number" }).toDataNodes(5);
+        assert.deepEqual(nodes.length, 1);
+        assert.deepEqual(nodes[0].node.schema, { type: "number" });
+        assert.deepEqual(nodes[0].value, 5);
+        assert.deepEqual(nodes[0].pointer, "#");
     });
     it("should callback for array and all array items", () => {
-        const calls = [];
-        compileSchema({ type: "array", items: { type: "number" } }).each([5, 9], (...args) => calls.push(args));
-        assert.deepEqual(calls.length, 3);
-        assert.deepEqual(calls.map((r) => [r[0].schema, r[1], r[2]]), [
+        const nodes = compileSchema({ type: "array", items: { type: "number" } }).toDataNodes([5, 9]);
+        assert.deepEqual(nodes.length, 3);
+        assert.deepEqual(nodes.map((r) => [r.node.schema, r.value, r.pointer]), [
             [{ type: "array", items: { type: "number" } }, [5, 9], "#"],
             [{ type: "number" }, 5, "#/0"],
             [{ type: "number" }, 9, "#/1"]
         ]);
     });
     it("should callback for array and pick correct schema forEach item", () => {
-        const calls = [];
-        compileSchema({
+        const nodes = compileSchema({
             type: "array",
             prefixItems: [{ type: "number" }, { type: "string" }]
-        }).each([5, "nine"], (...args) => calls.push(args));
-        assert.deepEqual(calls.length, 3);
-        assert.deepEqual(calls.map((r) => [r[0].schema, r[1], r[2]]), [
+        }).toDataNodes([5, "nine"]);
+        assert.deepEqual(nodes.length, 3);
+        assert.deepEqual(nodes.map((r) => [r.node.schema, r.value, r.pointer]), [
             [{ type: "array", prefixItems: [{ type: "number" }, { type: "string" }] }, [5, "nine"], "#"],
             [{ type: "number" }, 5, "#/0"],
             [{ type: "string" }, "nine", "#/1"]
         ]);
     });
     it("should callback for object and all properties", () => {
-        const calls = [];
-        compileSchema({
+        const nodes = compileSchema({
             type: "object",
             properties: { a: { type: "number" }, b: { type: "number" } }
-        }).each({ a: 5, b: 9 }, (...args) => calls.push(args));
-        assert.deepEqual(calls.length, 3);
-        assert.deepEqual(calls.map((r) => [r[0].schema, r[1], r[2]]), [
+        }).toDataNodes({ a: 5, b: 9 });
+        assert.deepEqual(nodes.length, 3);
+        assert.deepEqual(nodes.map((r) => [r.node.schema, r.value, r.pointer]), [
             [
                 {
                     type: "object",
@@ -53,13 +49,12 @@ describe("each", () => {
         ]);
     });
     it("should resolve root reference", () => {
-        const calls = [];
-        compileSchema({
+        const nodes = compileSchema({
             $ref: "#/definitions/value",
             definitions: { value: { type: "object", properties: { title: { type: "string" } } } }
-        }).each({ title: "third" }, (node) => calls.push(node));
-        assert.deepEqual(calls.length, 2);
-        assert.deepEqual(calls[0].schema.type, "object");
-        assert.deepEqual(calls[1].schema.type, "string");
+        }).toDataNodes({ title: "third" });
+        assert.deepEqual(nodes.length, 2);
+        assert.deepEqual(nodes[0].node.schema.type, "object");
+        assert.deepEqual(nodes[1].node.schema.type, "string");
     });
 });

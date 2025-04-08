@@ -25,7 +25,8 @@ function additionalItemsResolver({ node, key, data }) {
     if (Array.isArray(data)) {
         // @attention: items, etc should already have been tried
         const value = getValue(data, key);
-        return node.additionalItems.reduce(value);
+        const { node: childNode, error } = node.additionalItems.reduce(value);
+        return childNode !== null && childNode !== void 0 ? childNode : error;
     }
 }
 function validateAdditionalItems({ node, data, pointer, path }) {

@@ -49,9 +49,12 @@ function reduceOneOf({ node, data, pointer, path }) {
     }
     if (matches.length === 1) {
         const { node, index } = matches[0];
-        const reducedNode = node.reduce(data, { pointer, path });
-        reducedNode.oneOfIndex = index; // @evaluation-info
-        return reducedNode;
+        const { node: reducedNode, error } = node.reduce(data, { pointer, path });
+        if (reducedNode) {
+            reducedNode.oneOfIndex = index; // @evaluation-info
+            return reducedNode;
+        }
+        return error;
     }
     if (matches.length === 0) {
         return node.createError("OneOfError", {
@@ -83,7 +86,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }) {
         });
     }
     for (let i = 0; i < node.oneOf.length; i += 1) {
-        const resultNode = node.oneOf[i].get(oneOfProperty, data);
+        const { node: resultNode } = node.oneOf[i].getChild(oneOfProperty, data);
         if (!isSchemaNode(resultNode)) {
             return node.createError("MissingOneOfDeclaratorError", {
                 declarator: DECLARATOR_ONEOF,
@@ -100,9 +103,11 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }) {
             errors.push(...result);
         }
         else {
-            const reducedNode = node.oneOf[i].reduce(data, { pointer, path });
-            reducedNode.oneOfIndex = i; // @evaluation-info
-            return reducedNode;
+            const { node: reducedNode } = node.oneOf[i].reduce(data, { pointer, path });
+            if (reducedNode) {
+                reducedNode.oneOfIndex = i; // @evaluation-info
+                return reducedNode;
+            }
         }
     }
     return node.createError("OneOfPropertyError", {
@@ -179,9 +184,12 @@ export function reduceOneOfFuzzy({ node, data, pointer, path }) {
                 oneOf: node.schema.oneOf
             });
         }
-        const reducedNode = nodeOfItem.reduce(data, { pointer, path });
-        reducedNode.oneOfIndex = schemaOfIndex; // @evaluation-info
-        return reducedNode;
+        const { node: reducedNode, error } = nodeOfItem.reduce(data, { pointer, path });
+        if (reducedNode) {
+            reducedNode.oneOfIndex = schemaOfIndex; // @evaluation-info
+            return reducedNode;
+        }
+        return error;
     }
     return oneOfResult;
 }

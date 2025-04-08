@@ -1,4 +1,3 @@
-import { isJsonError, isSchemaNode } from "../../types";
 /**
  * Returns a list of possible child-schemas for the given property key. In case of a oneOf selection, multiple schemas
  * could be added at the given property (e.g. item-index), thus an array of options is returned. In all other cases
@@ -14,11 +13,11 @@ export function getChildSchemaSelection(node, property) {
     }
     // array.items[] found
     if (node.itemsList && node.itemsList.length > +property) {
-        const childNode = node.get(property);
-        if (isSchemaNode(childNode)) {
+        const { node: childNode, error } = node.getChild(property);
+        if (node) {
             return [childNode];
         }
-        return childNode;
+        return error;
     }
     // array.items[] exceeded (or undefined), but additionalItems specified
     if (node.additionalItems && node.itemsObject == null) {
@@ -33,9 +32,8 @@ export function getChildSchemaSelection(node, property) {
     if (node.itemsList && node.itemsList.length <= +property) {
         return [];
     }
-    const childNode = node.get(property);
-    if (isJsonError(childNode)) {
-        const error = childNode;
+    const { node: childNode, error } = node.getChild(property);
+    if (error) {
         return error;
     }
     return [childNode];

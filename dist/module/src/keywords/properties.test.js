@@ -1,31 +1,30 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../compileSchema";
-import { isJsonError } from "../types";
 describe("keyword : properties : get", () => {
     it("should step into properties without data", () => {
-        var _a;
+        var _a, _b;
         const node = compileSchema({
             type: "object",
             properties: {
                 header: { type: "string", minLength: 1 }
             }
         });
-        const schema = (_a = node.get("header")) === null || _a === void 0 ? void 0 : _a.schema;
+        const schema = (_b = (_a = node.getChild("header")) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
     it("should step into properties", () => {
-        var _a;
+        var _a, _b;
         const node = compileSchema({
             type: "object",
             properties: {
                 header: { type: "string", minLength: 1 }
             }
         });
-        const schema = (_a = node.get("header", { header: "huhu" })) === null || _a === void 0 ? void 0 : _a.schema;
+        const schema = (_b = (_a = node.getChild("header", { header: "huhu" })) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
     it("should step into nested properties", () => {
-        var _a;
+        var _a, _b;
         const node = compileSchema({
             type: "object",
             properties: {
@@ -37,13 +36,12 @@ describe("keyword : properties : get", () => {
                 }
             }
         });
-        const next = node.get("header", { header: { title: "huhu" } });
-        assert(!isJsonError(next));
-        const schema = (_a = next.get("title")) === null || _a === void 0 ? void 0 : _a.schema;
+        const { node: next } = node.getChild("header", { header: { title: "huhu" } });
+        const schema = (_b = (_a = next.getChild("title")) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
     it("should step into properties with if-then present", () => {
-        var _a;
+        var _a, _b;
         const node = compileSchema({
             type: "object",
             properties: {
@@ -52,7 +50,7 @@ describe("keyword : properties : get", () => {
             if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
             then: { allOf: [{ required: ["header"], properties: { header: { type: "string", minLength: 1 } } }] }
         });
-        const schema = (_a = node.get("withHeader", { withHeader: false })) === null || _a === void 0 ? void 0 : _a.schema;
+        const schema = (_b = (_a = node.getChild("withHeader", { withHeader: false })) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
         assert.deepEqual(schema, { type: "boolean", default: true });
     });
 });

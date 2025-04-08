@@ -1,11 +1,8 @@
 import { isSchemaNode } from "./types";
 import { mergeSchema } from "./utils/mergeSchema";
-// dummy sorting validators in reverse (so that additional* is to the end)
-export function sortCb(a, b) {
-    var _a, _b, _c, _d, _e, _f;
-    const aString = (_c = (_b = (_a = a === null || a === void 0 ? void 0 : a.toJSON) === null || _a === void 0 ? void 0 : _a.call(a)) !== null && _b !== void 0 ? _b : a.name) !== null && _c !== void 0 ? _c : "";
-    const bString = (_f = (_e = (_d = b === null || b === void 0 ? void 0 : b.toJSON) === null || _d === void 0 ? void 0 : _d.call(b)) !== null && _e !== void 0 ? _e : b.name) !== null && _f !== void 0 ? _f : "";
-    return bString.localeCompare(aString); // inverted
+function sortCb(a, b) {
+    var _a, _b;
+    return ((_a = b.order) !== null && _a !== void 0 ? _a : 0) - ((_b = a.order) !== null && _b !== void 0 ? _b : 0);
 }
 export function removeDuplicates(fun, funIndex, list) {
     var _a, _b;

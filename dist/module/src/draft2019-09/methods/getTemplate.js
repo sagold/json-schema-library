@@ -166,8 +166,8 @@ const TYPE = {
                 const hasValue = getValue(d, propertyName) !== undefined;
                 if (hasValue && Array.isArray(propertyValue)) {
                     propertyValue.forEach((addProperty) => {
-                        const propertyNode = node.get(addProperty, d);
-                        if (isSchemaNode(propertyNode)) {
+                        const { node: propertyNode } = node.getChild(addProperty, d);
+                        if (propertyNode) {
                             d[addProperty] = propertyNode.getTemplate(getValue(d, addProperty), opts);
                         }
                     });

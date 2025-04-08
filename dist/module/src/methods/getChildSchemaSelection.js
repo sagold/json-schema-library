@@ -1,4 +1,4 @@
-import { isJsonError, isSchemaNode } from "../types";
+import { isSchemaNode } from "../types";
 /**
  * Returns a list of possible child-schemas for the given property key. In case of a oneOf selection, multiple schemas
  * could be added at the given property (e.g. item-index), thus an array of options is returned. In all other cases
@@ -14,11 +14,11 @@ export function getChildSchemaSelection(node, property) {
     }
     // array.items[] found
     if (node.itemsList && node.itemsList.length > +property) {
-        const childNode = node.get(property);
+        const { node: childNode, error } = node.getChild(property);
         if (isSchemaNode(childNode)) {
             return [childNode];
         }
-        return childNode;
+        return error;
     }
     if (node.schema.items === true) {
         return [node.compileSchema({ type: "string" })];
@@ -35,10 +35,6 @@ export function getChildSchemaSelection(node, property) {
     if (node.itemsList && node.itemsList.length <= +property) {
         return [];
     }
-    const childNode = node.get(property);
-    if (isJsonError(childNode)) {
-        const error = childNode;
-        return error;
-    }
-    return [childNode];
+    const { node: childNode, error } = node.getChild(property);
+    return error !== null && error !== void 0 ? error : [childNode];
 }

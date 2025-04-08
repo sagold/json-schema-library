@@ -1,4 +1,4 @@
-import { isJsonError, isSchemaNode } from "../types";
+import { isSchemaNode } from "../types";
 import { isObject } from "../utils/isObject";
 import { getValue } from "../utils/getValue";
 import { validateNode } from "../validateNode";
@@ -22,7 +22,7 @@ function validateUnevaluatedProperties({ node, data, pointer, path }) {
         return undefined;
     }
     // this will break?
-    let reducedNode = node.reduce(data, { pointer, path });
+    let { node: reducedNode } = node.reduce(data, { pointer, path });
     reducedNode = isSchemaNode(reducedNode) ? reducedNode : node;
     if (reducedNode.schema.unevaluatedProperties === true || reducedNode.schema.additionalProperties === true) {
         return undefined;
@@ -34,8 +34,8 @@ function validateUnevaluatedProperties({ node, data, pointer, path }) {
     const errors = [];
     for (let i = 0; i < unevaluated.length; i += 1) {
         const propertyName = unevaluated[i];
-        const child = node.get(propertyName, data, { path });
-        if (isSchemaNode(child)) {
+        const { node: child } = node.getChild(propertyName, data, { path });
+        if (child) {
             if (validateNode(child, data[propertyName], `${pointer}/${propertyName}`, path).length > 0) {
                 errors.push(node.createError("UnevaluatedPropertyError", {
                     pointer: `${pointer}/${propertyName}`,
@@ -66,8 +66,8 @@ function validateUnevaluatedProperties({ node, data, pointer, path }) {
 }
 /** tests if a property is evaluated by the given schema */
 function isPropertyEvaluated(schemaNode, propertyName, data) {
-    const node = schemaNode.get(propertyName, data);
-    if (node == null || isJsonError(node)) {
+    const { node, error } = schemaNode.getChild(propertyName, data);
+    if (node == null || error) {
         return false;
     }
     return node.validate(getValue(data, propertyName)).valid;

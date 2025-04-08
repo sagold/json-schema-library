@@ -18,7 +18,7 @@ export declare function copyDraft(draft: Draft): {
         createSchema: typeof import("../methods/createSchema").createSchema;
         getChildSchemaSelection: typeof import("../methods/getChildSchemaSelection").getChildSchemaSelection;
         getTemplate: typeof import("../methods/getTemplate").getTemplate;
-        each: typeof import("../methods/each").each;
+        toDataNodes: typeof import("../methods/toDataNodes").toDataNodes;
     };
     $schema?: string;
     errors: import("../types").ErrorConfig;

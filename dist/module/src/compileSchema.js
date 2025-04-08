@@ -1,6 +1,5 @@
 import copy from "fast-copy";
 import getRef from "./keywords/ref";
-import settings from "./settings";
 import { draft04 } from "./draft04";
 import { draft06 } from "./draft06";
 import { draft07 } from "./draft07";
@@ -8,7 +7,6 @@ import { draft2019 } from "./draft2019";
 import { draft2020 } from "./draft2020";
 import { pick } from "./utils/pick";
 import { SchemaNodeMethods, addKeywords, isSchemaNode } from "./SchemaNode";
-const { DYNAMIC_PROPERTIES } = settings;
 const defaultDrafts = [draft04, draft06, draft07, draft2019, draft2020];
 function getDraft(drafts, $schema) {
     var _a;
