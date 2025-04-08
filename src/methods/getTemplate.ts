@@ -280,13 +280,13 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
         }
 
         // when items are defined per index
-        if (node.itemsList) {
+        if (node.prefixItems) {
             const input = Array.isArray(data) ? data : [];
 
             // build defined set of items
-            const length = Math.max(minItems ?? 0, node.itemsList.length);
+            const length = Math.max(minItems ?? 0, node.prefixItems.length);
             for (let i = 0; i < length; i += 1) {
-                const childNode = node.itemsList[i] ?? node.itemsObject;
+                const childNode = node.prefixItems[i] ?? node.itemsObject;
                 if ((childNode && canResolveRef(childNode, opts)) || input[i] !== undefined) {
                     const result = childNode.getTemplate(d[i] == null ? template[i] : d[i], opts);
                     if (result !== undefined) {

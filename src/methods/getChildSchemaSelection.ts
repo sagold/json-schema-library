@@ -13,7 +13,7 @@ export function getChildSchemaSelection(node: SchemaNode, property: string | num
         return node.itemsObject.oneOf.map((childNode: SchemaNode) => childNode.resolveRef());
     }
     // array.items[] found
-    if (node.itemsList && node.itemsList.length > +property) {
+    if (node.prefixItems && node.prefixItems.length > +property) {
         const { node: childNode, error } = node.getChild(property);
         if (isSchemaNode(childNode)) {
             return [childNode];
@@ -32,7 +32,7 @@ export function getChildSchemaSelection(node: SchemaNode, property: string | num
         return [node.itemsObject.resolveRef()];
     }
     // array.items[] exceeded
-    if (node.itemsList && node.itemsList.length <= +property) {
+    if (node.prefixItems && node.prefixItems.length <= +property) {
         return [];
     }
 

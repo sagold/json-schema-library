@@ -77,7 +77,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
         }
         // "unevaluatedItems false"
         if (child === undefined) {
-            if (validIf && node.if.itemsList && node.if.itemsList.length > i) {
+            if (validIf && node.if.prefixItems && node.if.prefixItems.length > i) {
                 // evaluated by if -- skip
             } else if (node.unevaluatedItems) {
                 const result = validateNode(node.unevaluatedItems, value, `${pointer}/${i}`, path);

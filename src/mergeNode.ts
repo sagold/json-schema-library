@@ -45,17 +45,17 @@ export function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): Sch
         return a || b;
     }
 
-    // do not merge itemsObject and itemsList (+ additionalItems)
+    // do not merge itemsObject and prefixItems (+ additionalItems)
     const arraySelection: Partial<SchemaNode> = {};
-    if ((a.itemsObject && b.itemsList) || (a.itemsList && b.itemsObject)) {
-        if (b.itemsList) {
-            arraySelection.itemsList = b.itemsList;
+    if ((a.itemsObject && b.prefixItems) || (a.prefixItems && b.itemsObject)) {
+        if (b.prefixItems) {
+            arraySelection.prefixItems = b.prefixItems;
         } else {
             arraySelection.itemsObject = b.itemsObject;
         }
     } else {
-        // itemsList?: SchemaNode[];
-        arraySelection.itemsList = b.itemsList ?? a.itemsList;
+        // prefixItems?: SchemaNode[];
+        arraySelection.prefixItems = b.prefixItems ?? a.prefixItems;
         arraySelection.itemsObject = mergeNode(a.itemsObject, b.itemsObject);
     }
 

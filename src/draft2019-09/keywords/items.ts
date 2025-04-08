@@ -7,7 +7,7 @@ export const itemsKeyword: Keyword = {
     id: "items",
     keyword: "items",
     parse: parseItems,
-    addResolve: (node) => (node.itemsList || node.itemsObject) != null,
+    addResolve: (node) => (node.prefixItems || node.itemsObject) != null,
     resolve: itemsResolver,
     addValidate: ({ schema }) => schema.items != null,
     validate: validateItems
@@ -17,8 +17,8 @@ function itemsResolver({ node, key }: JsonSchemaResolverParams) {
     if (node.itemsObject) {
         return node.itemsObject;
     }
-    if (node.itemsList[key as number]) {
-        return node.itemsList[key as number];
+    if (node.prefixItems[key as number]) {
+        return node.prefixItems[key as number];
     }
 }
 
@@ -28,7 +28,7 @@ export function parseItems(node: SchemaNode) {
         const propertyNode = node.compileSchema(schema.items, `${spointer}/items`, `${node.schemaId}/items`);
         node.itemsObject = propertyNode;
     } else if (Array.isArray(schema.items)) {
-        node.itemsList = schema.items.map((itemSchema, index) =>
+        node.prefixItems = schema.items.map((itemSchema, index) =>
             node.compileSchema(itemSchema, `${spointer}/items/${index}`, `${node.schemaId}/items/${index}`)
         );
     }
@@ -49,12 +49,12 @@ function validateItems({ node, data, pointer = "#", path }: JsonSchemaValidatorP
     }
 
     const errors: ValidationResult[] = [];
-    if (node.itemsList) {
+    if (node.prefixItems) {
         // note: schema is valid when data does not have enough elements as defined by array-list
-        for (let i = 0; i < Math.min(node.itemsList.length, data.length); i += 1) {
+        for (let i = 0; i < Math.min(node.prefixItems.length, data.length); i += 1) {
             const itemData = data[i];
             // @todo v1 reevaluate: incomplete schema is created here?
-            const itemNode = node.itemsList[i];
+            const itemNode = node.prefixItems[i];
             const result = validateNode(itemNode, itemData, `${pointer}/${i}`, path);
             errors.push(...result);
         }

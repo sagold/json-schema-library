@@ -31,7 +31,7 @@ export function toSchemaNodes(node: SchemaNode | unknown, nodeList: SchemaNode[]
     node.else && toSchemaNodes(node.else, nodeList);
     node.then && toSchemaNodes(node.then, nodeList);
     node.itemsObject && toSchemaNodes(node.itemsObject, nodeList);
-    eachItem(nodeList, node.itemsList);
+    eachItem(nodeList, node.prefixItems);
     node.not && toSchemaNodes(node.not, nodeList);
     eachItem(nodeList, node.oneOf);
     node.patternProperties &&

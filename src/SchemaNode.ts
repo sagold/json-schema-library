@@ -91,7 +91,7 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     dependentSchemas?: Record<string, SchemaNode | boolean>;
     else?: SchemaNode;
     if?: SchemaNode;
-    itemsList?: SchemaNode[];
+    prefixItems?: SchemaNode[];
     itemsObject?: SchemaNode;
     not?: SchemaNode;
     oneOf?: SchemaNode[];
