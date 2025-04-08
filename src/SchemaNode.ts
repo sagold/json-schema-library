@@ -15,7 +15,7 @@ import { mergeNode } from "./mergeNode";
 import { omit } from "./utils/omit";
 import { pick } from "./utils/pick";
 import { render } from "./errors/render";
-import { TemplateOptions } from "./methods/getTemplate";
+import { TemplateOptions } from "./methods/getData";
 import { validateNode } from "./validateNode";
 
 const { DYNAMIC_PROPERTIES } = settings;
@@ -59,7 +59,7 @@ export type Context = {
     version: Draft["version"];
     errors: Draft["errors"];
     formats: Draft["formats"];
-    /** [SHARED USING ADD REMOTE] getTemplate default options */
+    /** [SHARED USING ADD REMOTE] getData default options */
     templateDefaultOptions?: TemplateOptions;
 };
 
@@ -276,7 +276,7 @@ export const SchemaNodeMethods = {
     },
 
     /** Creates data that is valid to the schema of this node */
-    getTemplate(data?: unknown, options?: TemplateOptions) {
+    getData(data?: unknown, options?: TemplateOptions) {
         const node = this as SchemaNode;
         const opts = {
             recursionLimit: 1,
@@ -284,7 +284,7 @@ export const SchemaNodeMethods = {
             cache: {},
             ...(options ?? {})
         };
-        return node.context.methods.getTemplate(node, data, opts);
+        return node.context.methods.getData(node, data, opts);
     },
 
     reduce(

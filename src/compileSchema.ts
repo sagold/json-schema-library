@@ -7,7 +7,7 @@ import { draft2019 } from "./draft2019";
 import { draft2020 } from "./draft2020";
 import { pick } from "./utils/pick";
 import { JsonSchema, Draft } from "./types";
-import { TemplateOptions } from "./methods/getTemplate";
+import { TemplateOptions } from "./methods/getData";
 import { SchemaNode, SchemaNodeMethods, addKeywords, isSchemaNode } from "./SchemaNode";
 
 export type CompileOptions = {
@@ -68,7 +68,7 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
             if (formatAssertion === "meta-schema") {
                 formatAssertion = metaSchema.schema.$vocabulary[formatAssertionString] === true;
             }
-            const validKeywords = Object.keys(metaSchema.getTemplate({}, { addOptionalProps: true }));
+            const validKeywords = Object.keys(metaSchema.getData({}, { addOptionalProps: true }));
             if (validKeywords.length > 0) {
                 node.context.keywords = node.context.keywords.filter((f) => validKeywords.includes(f.keyword));
             }

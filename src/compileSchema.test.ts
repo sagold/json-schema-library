@@ -54,7 +54,7 @@ describe("compileSchema vocabulary", () => {
 });
 
 describe("compileSchema templateDefaultOptions", () => {
-    it("should apply `templateDefaultOptions.addOptionalProps` to getTemplate", () => {
+    it("should apply `templateDefaultOptions.addOptionalProps` to getData", () => {
         const schema = {
             properties: {
                 type: { const: "node" },
@@ -62,17 +62,17 @@ describe("compileSchema templateDefaultOptions", () => {
             }
         };
 
-        let data = compileSchema(schema).getTemplate();
+        let data = compileSchema(schema).getData();
         assert.deepEqual(data, {});
 
-        data = compileSchema(schema, { templateDefaultOptions: { addOptionalProps: true } }).getTemplate();
+        data = compileSchema(schema, { templateDefaultOptions: { addOptionalProps: true } }).getData();
         assert.deepEqual(data, {
             type: "node",
             nodes: []
         });
     });
 
-    it("should apply `templateDefaultOptions.recursiveLimit` to getTemplate", () => {
+    it("should apply `templateDefaultOptions.recursiveLimit` to getData", () => {
         const schema = {
             required: ["type", "nodes"],
             properties: {
@@ -81,7 +81,7 @@ describe("compileSchema templateDefaultOptions", () => {
             }
         };
 
-        let data = compileSchema(schema).getTemplate();
+        let data = compileSchema(schema).getData();
         assert.deepEqual(data, {
             type: "node",
             nodes: [
@@ -92,7 +92,7 @@ describe("compileSchema templateDefaultOptions", () => {
             ]
         });
 
-        data = compileSchema(schema, { templateDefaultOptions: { recursionLimit: 2 } }).getTemplate();
+        data = compileSchema(schema, { templateDefaultOptions: { recursionLimit: 2 } }).getData();
         assert.deepEqual(data, {
             type: "node",
             nodes: [

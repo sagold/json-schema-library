@@ -2,7 +2,7 @@ import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
 import { SchemaNode } from "../../types";
 
-describe("issue#32 - getTemplate ignored input data for integer", () => {
+describe("issue#32 - getData ignored input data for integer", () => {
     let node: SchemaNode;
     beforeEach(() => {
         node = compileSchema({
@@ -33,7 +33,7 @@ describe("issue#32 - getTemplate ignored input data for integer", () => {
     });
 
     it("should not override input data", () => {
-        const result = node.getTemplate({
+        const result = node.getData({
             id: "4235809c-bdc7-46c5-be3d-b1b679bb1c13",
             title: "JavaScript Data Structures 101",
             students: [

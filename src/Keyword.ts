@@ -1,4 +1,4 @@
-import type { TemplateOptions } from "./methods/getTemplate";
+import type { TemplateOptions } from "./methods/getData";
 import type { SchemaNode, JsonError } from "./types";
 
 export type ValidationPath = {

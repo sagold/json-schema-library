@@ -23,7 +23,7 @@ describe("docs - remote schema", () => {
         const remoteSchema = node.getRef("https://remote.com/schemas/character")?.schema;
         assert.deepEqual(remoteSchema.title, "character remote schema", "should have resolved remote root schema");
 
-        const data = node.getTemplate({});
+        const data = node.getData({});
         assert.deepEqual(data, { character: "A" }, "should have retrieved default value from remote schema");
     });
 
@@ -48,7 +48,7 @@ describe("docs - remote schema", () => {
         const remoteSchema = node.getRef("character")?.schema;
         assert.deepEqual(remoteSchema.title, "character remote schema", "should have resolved remote root schema");
 
-        const data = node.getTemplate({});
+        const data = node.getData({});
         assert.deepEqual(data, { character: "A" }, "should have retrieved default value from remote schema");
     });
 
@@ -86,7 +86,7 @@ describe("docs - remote schema", () => {
             "should have resolved remote definition"
         );
 
-        const data = node.getTemplate({});
+        const data = node.getData({});
         assert.deepEqual(data, { character: "A" }, "should have retrieved default value from remote schema");
     });
 
@@ -124,7 +124,7 @@ describe("docs - remote schema", () => {
             "should have resolved remote definition"
         );
 
-        const data = node.getTemplate({});
+        const data = node.getData({});
         assert.deepEqual(data, { character: "A" }, "should have retrieved default value from remote schema");
     });
 
@@ -162,7 +162,7 @@ describe("docs - remote schema", () => {
             "should have resolved remote definition"
         );
 
-        const data = node.getTemplate({});
+        const data = node.getData({});
         assert.deepEqual(data, { character: "A" }, "should have retrieved default value from remote schema");
     });
 });

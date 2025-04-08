@@ -1,13 +1,13 @@
 import copy from "fast-copy";
-import getTypeOf from "../../utils/getTypeOf";
-import { getSchemaType } from "../../utils/getSchemaType";
-import { getValue } from "../../utils/getValue";
-import { isEmpty } from "../../utils/isEmpty";
-import { isJsonError } from "../../types";
-import { isObject } from "../../utils/isObject";
-import { isSchemaNode, SchemaNode } from "../../types";
-import { mergeNode } from "../../mergeNode";
-import { reduceOneOfFuzzy } from "../../keywords/oneOf";
+import getTypeOf from "../utils/getTypeOf";
+import { getSchemaType } from "../utils/getSchemaType";
+import { getValue } from "../utils/getValue";
+import { isEmpty } from "../utils/isEmpty";
+import { isJsonError } from "../types";
+import { isObject } from "../utils/isObject";
+import { isSchemaNode, SchemaNode } from "../types";
+import { mergeNode } from "../mergeNode";
+import { reduceOneOfFuzzy } from "../keywords/oneOf";
 
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
@@ -82,7 +82,7 @@ function convertValue(type: string | undefined, value: any) {
     return value;
 }
 
-export function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOptions) {
+export function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions) {
     if (opts?.cache == null) {
         throw new Error("Missing options");
     }
@@ -118,13 +118,13 @@ export function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOpt
     // @keyword allOf
     if (currentNode.allOf?.length) {
         currentNode.allOf.forEach((partialNode) => {
-            defaultData = partialNode.getTemplate(defaultData, opts) ?? defaultData;
+            defaultData = partialNode.getData(defaultData, opts) ?? defaultData;
         });
     }
 
     // @keyword anyOf
     if (currentNode.anyOf?.length > 0) {
-        defaultData = currentNode.anyOf[0].getTemplate(defaultData, opts) ?? defaultData;
+        defaultData = currentNode.anyOf[0].getData(defaultData, opts) ?? defaultData;
     }
 
     // @keyword oneOf
@@ -153,18 +153,9 @@ export function getTemplate(node: SchemaNode, data?: unknown, opts?: TemplateOpt
     }
 
     if (resolvedNode && resolvedNode !== currentNode) {
-        defaultData = resolvedNode.getTemplate(defaultData, opts) ?? defaultData;
+        defaultData = resolvedNode.getData(defaultData, opts) ?? defaultData;
         currentNode = resolvedNode;
     }
-
-    // if (TYPE[type] == null) {
-    //     // in case we could not resolve the type
-    //     // (schema-type could not be resolved and returned an error)
-    //     if (opts.removeInvalidData) {
-    //         return undefined;
-    //     }
-    //     return data;
-    // }
 
     const type = getSchemaType(currentNode, defaultData);
     const templateData = TYPE[type as string]?.(currentNode, defaultData, opts);
@@ -192,7 +183,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
                 const value = data === undefined || input === undefined ? getValue(template, propertyName) : input;
                 // Omit adding a property if it is not required or optional props should be added
                 if (value != null || isRequired || opts.addOptionalProps) {
-                    d[propertyName] = propertyNode.getTemplate(value, opts);
+                    d[propertyName] = propertyNode.getData(value, opts);
                 }
             });
         }
@@ -205,11 +196,11 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
                     propertyValue.forEach((addProperty) => {
                         const { node: propertyNode } = node.getChild(addProperty, d);
                         if (propertyNode) {
-                            d[addProperty] = propertyNode.getTemplate(getValue(d, addProperty), opts);
+                            d[addProperty] = propertyNode.getData(getValue(d, addProperty), opts);
                         }
                     });
                 } else if (d[propertyName] !== undefined && isSchemaNode(propertyValue)) {
-                    const dependencyData = propertyValue.getTemplate(data ?? d, opts);
+                    const dependencyData = propertyValue.getData(data ?? d, opts);
                     Object.assign(d, dependencyData);
                 }
                 // if false and removeInvalidData => remove from data
@@ -221,14 +212,14 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
             Object.keys(node.dependentSchemas).forEach((prop) => {
                 const dependency = node.dependentSchemas[prop];
                 if (d[prop] !== undefined && isSchemaNode(dependency)) {
-                    const dependencyData = dependency.getTemplate(data ?? d, opts);
+                    const dependencyData = dependency.getData(data ?? d, opts);
                     Object.assign(d, dependencyData);
                 }
                 // if false and removeInvalidData => remove from data
             });
         }
 
-        // console.log("getTemplate object", data, opts);
+        // console.log("getData object", data, opts);
         if (data) {
             if (
                 opts.removeInvalidData === true &&
@@ -253,12 +244,12 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
 
         // @keyword if-then-else
         if (node.if) {
-            const { valid } = node.if.validate(d);
-            if (valid && node.then) {
-                const templateData = node.then.getTemplate(d, opts);
+            const { errors } = node.if.validate(d);
+            if (errors.length === 0 && node.then) {
+                const templateData = node.then.getData(d, opts);
                 Object.assign(d, templateData);
-            } else if (!valid && node.else) {
-                const templateData = node.else.getTemplate(d, opts);
+            } else if (errors.length > 0 && node.else) {
+                const templateData = node.else.getData(d, opts);
                 Object.assign(d, templateData);
             }
         }
@@ -274,12 +265,15 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
         const minItems = opts.extendDefaults === false && schema.default !== undefined ? 0 : (schema.minItems ?? 0);
 
         // when there are no array-items are defined
-        if (schema.items == null) {
+        if (schema.prefixItems == null) {
             // => all items are additionalItems
-            if (node.additionalItems) {
+            if (node.items && (canResolveRef(node.items, opts) || d?.length > 0)) {
+                const cache = { ...opts.cache };
                 const itemCount = Math.max(minItems, d.length);
                 for (let i = 0; i < itemCount; i += 1) {
-                    d[i] = node.additionalItems.getTemplate(d[i], opts);
+                    opts.cache = copy(cache);
+                    const options = { ...opts, disableRecusionLimit: true };
+                    d[i] = node.items.getData(d[i] == null ? template[i] : d[i], options);
                 }
             }
             return d || [];
@@ -292,9 +286,9 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
             // build defined set of items
             const length = Math.max(minItems ?? 0, node.prefixItems.length);
             for (let i = 0; i < length; i += 1) {
-                const childNode = node.prefixItems[i] ?? node.additionalItems;
+                const childNode = node.prefixItems[i] ?? node.items;
                 if ((childNode && canResolveRef(childNode, opts)) || input[i] !== undefined) {
-                    const result = childNode.getTemplate(d[i] == null ? template[i] : d[i], opts);
+                    const result = childNode.getData(d[i] == null ? template[i] : d[i], opts);
                     if (result !== undefined) {
                         d[i] = result;
                     }
@@ -318,8 +312,8 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
             for (let i = 0, l = Math.max(minItems, d.length); i < l; i += 1) {
                 opts.cache = copy(cache);
                 const options = { ...opts, disableRecusionLimit: true };
-                const result = node.items.getTemplate(d[i] == null ? template[i] : d[i], options);
-                // @attention if getTemplate aborts recursion it currently returns undefined)
+                const result = node.items.getData(d[i] == null ? template[i] : d[i], options);
+                // @attention if getData aborts recursion it currently returns undefined)
                 if (result === undefined) {
                     return d;
                 } else {

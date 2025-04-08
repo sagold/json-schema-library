@@ -25,7 +25,7 @@ const schema: SchemaNode = compileSchema(myJsonSchema);
 // validate data and collect errors if invalid
 const { valid, errors } = schema.validate(myData);
 // create data which validates to the compiled JSON Schema
-const defaultData = schema.getTemplate();
+const defaultData = schema.getData();
 // access a subschema at a specific JSON Pointer location
 const { node, error } = schema.getSchema("#/image/title");
 node && console.log(node.schema);
@@ -52,7 +52,7 @@ type CompileOptions = {
     remote: SchemaNode;
     // if format-validations should create errors. Defaults to true
     formatAssertion: boolean | "meta-schema";
-    // default options for all calls to node.getTemplate()
+    // default options for all calls to node.getData()
     templateDefaultOptions?: TemplateOptions;
 };
 ```
@@ -72,12 +72,12 @@ compileSchema(mySchema, { remote: anotherSchemaNode });
 // format validation is disabled
 compileSchema(mySchema, { formatAssertion: false });
 
-// for all calls to getTemplate, `addOptionalProps` is `true` per default
+// for all calls to getData, `addOptionalProps` is `true` per default
 compileSchema(mySchema, { templateDefaultOptions: { addOptionalProps: true } });
 ```
 
 Details on _drafts_ are documented in [draft customization](#draft-customization).
-Details on `templateDefaultOptions` are documented in [getTemplate](#gettemplate).
+Details on `templateDefaultOptions` are documented in [getData](#getData).
 
 ### SchemaNode
 
@@ -85,9 +85,9 @@ Details on `templateDefaultOptions` are documented in [getTemplate](#gettemplate
 
 ```ts
 const root = compileSchema(mySchema);
-const rootData = root.getTemplate();
+const rootData = root.getData();
 const { node: titleNode } = root.getSchema("#/image/title");
-const titleData = titleNode?.getTemplate();
+const titleData = titleNode?.getData();
 ```
 
 <details><summary>Each node has an identity</summary>
@@ -163,7 +163,7 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 ## SchemaNode methods
 
-[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getTemplate**](#gettemplate) · [**getSchema**](#getschema) · [**getChild**](#getchild) · [**reduce**](#reduce) · [**toDataNodes**](#todatanodes) · [**toSchemaNodes**](#toschemanodes) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSchemaSelection](#getchildschemaselection)
+[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getData**](#getData) · [**getSchema**](#getschema) · [**getChild**](#getchild) · [**reduce**](#reduce) · [**toDataNodes**](#todatanodes) · [**toSchemaNodes**](#toschemanodes) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSchemaSelection](#getchildschemaselection)
 
 ### validate
 
@@ -227,24 +227,24 @@ compileSchema(mySchema)
     .then(({ valid, error }) => console.log(errors));
 ```
 
-### getTemplate
+### getData
 
-`getTemplate` creates input data from a JSON Schema that is valid to the schema. Where possible, the JSON Schema `default` property will be used to initially setup input data. Otherwise, the first values encountered (enum values, initial values, etc.) are used to build up the json-data.
+`getData` creates input data from a JSON Schema that is valid to the schema. Where possible, the JSON Schema `default` property will be used to initially setup input data. Otherwise, the first values encountered (enum values, initial values, etc.) are used to build up the json-data.
 
 ```ts
-const myData = compileSchema(myJsonSchema).getTemplate();
+const myData = compileSchema(myJsonSchema).getData();
 ```
 
-Additionally, you can pass input data. `getTemplate` will then complement any missing values from the schema, while keeping the initial values.
+Additionally, you can pass input data. `getData` will then complement any missing values from the schema, while keeping the initial values.
 
 ```ts
-const myData = compileSchema(myJsonSchema).getTemplate({ name: "input-data" });
+const myData = compileSchema(myJsonSchema).getData({ name: "input-data" });
 ```
 
-**Note** If you are using references in your schema, `getTemplate` will only resolve the first _$ref_ in each path, ensuring no infinite data structures are created. In case the limit of **1** _$ref_ resolution is too low, you can modify the value globally one by adjusting the json-schema-library settings:
+**Note** If you are using references in your schema, `getData` will only resolve the first _$ref_ in each path, ensuring no infinite data structures are created. In case the limit of **1** _$ref_ resolution is too low, you can modify the value globally one by adjusting the json-schema-library settings:
 
 ```ts
-const myData = compileSchema(myJsonSchema).getTemplate(inputData, { recursionLimit: 2 });
+const myData = compileSchema(myJsonSchema).getData(inputData, { recursionLimit: 2 });
 ```
 
 <details><summary>Example</summary>
@@ -273,7 +273,7 @@ const myJsonSchema: JsonSchema = {
 };
 
 const schemaNode = new compileSchema(myJsonSchema);
-const myData = schemaNode.getTemplate();
+const myData = schemaNode.getData();
 
 expect(myData).to.deep.equal({
   name: ',
@@ -310,7 +310,7 @@ const myJsonSchema: JsonSchema = {
 };
 
 const jsonSchema = compileSchema(myJsonSchema);
-const myData = jsonSchema.getTemplate({ name: "input-data", list: [] });
+const myData = jsonSchema.getData({ name: "input-data", list: [] });
 
 expect(myData).to.deep.equal({
     name: "input-data",
@@ -323,7 +323,7 @@ expect(myData).to.deep.equal({
 
 <details><summary>Option: extendDefaults (default: false)</summary>
 
-Per default, `getTemplate` does try to create data that is valid to the json-schema. Example: array-schemas with `minItems: 1` will add one item to fullfil the validation criteria. You can use the option and pass `{ extendDefaults: false }` to override this behaviour with a default value:
+Per default, `getData` does try to create data that is valid to the json-schema. Example: array-schemas with `minItems: 1` will add one item to fullfil the validation criteria. You can use the option and pass `{ extendDefaults: false }` to override this behaviour with a default value:
 
 ```ts
 import { compileSchema } from "json-schema-library";
@@ -338,7 +338,7 @@ const myJsonSchema = {
     minItems: 1 // usually adds an enty, but default states: []
 };
 
-const myData = compileSchema(myJsonSchema).getTemplate(undefined, { extendDefaults: false });
+const myData = compileSchema(myJsonSchema).getData(undefined, { extendDefaults: false });
 
 expect(myData).to.deep.equal([]);
 ```
@@ -347,7 +347,7 @@ expect(myData).to.deep.equal([]);
 
 <details><summary>Option: addOptionalProps (default: false)</summary>
 
-`getTemplate` will only add required properties per default:
+`getData` will only add required properties per default:
 
 ```ts
 const data = compileSchema({
@@ -356,11 +356,11 @@ const data = compileSchema({
         title: { type: "string" },
         subTitle: { type: "string", default: "sub-title" }
     }
-}).getTemplate(undefined);
+}).getData(undefined);
 console.log(data); // { title: "" }
 ```
 
-With `addOptionalProps:true`, `getTemplate` will also add all optional properties
+With `addOptionalProps:true`, `getData` will also add all optional properties
 
 ```ts
 const data = compileSchema({
@@ -369,7 +369,7 @@ const data = compileSchema({
         title: { type: "string" },
         subTitle: { type: "string", default: "sub-title" }
     }
-}).getTemplate(undefined, { addOptionalProps: true });
+}).getData(undefined, { addOptionalProps: true });
 console.log(data); // { title: "", subTitle: "sub-title" }
 ```
 
@@ -377,13 +377,13 @@ console.log(data); // { title: "", subTitle: "sub-title" }
 
 <details><summary>Option: removeInvalidData (default: false)</summary>
 
-With `removeInvalidData:true`, `getTemplate` will remove data that is invalid to the given schema;
+With `removeInvalidData:true`, `getData` will remove data that is invalid to the given schema;
 
 ```ts
 const data = compileSchema({
     properties: { valid: { type: "string" } },
     additionalProperties: false
-}).getTemplate({ valid: "stays", invalid: "removed" }, { removeInvalidData: true });
+}).getData({ valid: "stays", invalid: "removed" }, { removeInvalidData: true });
 console.log(data); // { valid: "stays" }
 ```
 
@@ -393,7 +393,7 @@ console.log(data); // { valid: "stays" }
 const data = compileSchema({
     properties: { valid: { type: "string" } },
     additionalProperties: true
-}).getTemplate({ valid: "stays", invalid: "removed" }, { removeInvalidData: true });
+}).getData({ valid: "stays", invalid: "removed" }, { removeInvalidData: true });
 console.log(data); // { valid: "stays", invalid: "removed" }
 ```
 
@@ -698,7 +698,7 @@ To access the remote schema, add a $ref within your local schema and the remote 
 
 ```ts
 schemaNode.validate({ character: "AB" }); // maxLength error
-schemaNode.getTemplate({}); // { character: "A" } - default value resolved
+schemaNode.getData({}); // { character: "A" } - default value resolved
 // returns remote schema (from compiled local schema):
 schemaNode.getRef("https://sagold.com/remote");
 ```
@@ -750,7 +750,7 @@ schemaNode.addRemote("https://sagold.com/remote", {
 });
 
 schemaNode.validate("AB"); // maxLength error
-schemaNode.getTemplate("A"); // "A" - default value resolved
+schemaNode.getData("A"); // "A" - default value resolved
 // returns remote schema (from compiled local schema):
 schemaNode.getRef("https://sagold.com/remote#/$defs/character");
 ```
@@ -776,7 +776,7 @@ schemaNode.addRemote("https://sagold.com/remote", {
 });
 
 schemaNode.validate("AB"); // maxLength error
-schemaNode.getTemplate("A"); // "A" - default value resolved
+schemaNode.getData("A"); // "A" - default value resolved
 // returns remote schema (from compiled local schema):
 schemaNode.getRef("https://sagold.com/remote#/properties/character");
 ```
@@ -849,7 +849,7 @@ Methods are a set of SchemaNode functions that differ between draft versions and
 ```ts
 createSchema: typeof createSchema;
 getChildSchemaSelection: typeof getChildSchemaSelection;
-getTemplate: typeof getTemplate;
+getData: typeof getData;
 each: typeof each;
 ```
 
@@ -1061,7 +1061,7 @@ With version `v10.0.0` _draft 2019-09_ is supported and can be used with `import
 
 **breaking changes**:
 
--   removed `templateDefaultOptions` from global settings-object. Instead configure getTemplate per draft instead on `draft.templateDefaultOptions`
+-   removed `templateDefaultOptions` from global settings-object. Instead configure getData per draft instead on `draft.templateDefaultOptions`
 
 ```ts
 new Draft2019(schema, {
@@ -1097,10 +1097,10 @@ settings.EXPOSE_ONE_OF_INDEX = false;
 
 ### v8.0.0
 
-With version `v8.0.0`, _getTemplate_ was improved to better support optional properties and utilize existing core logic, making it more reliable. Breaking changes:
+With version `v8.0.0`, _getData_ was improved to better support optional properties and utilize existing core logic, making it more reliable. Breaking changes:
 
 -   Renamed `JSONError` to `JsonError` and `JSONSchema` to `JsonSchema`
--   `getTemplate` only adds required properties. Behaviour can be changed by [getTemplate default options](#gettemplate-default-options)
+-   `getData` only adds required properties. Behaviour can be changed by [getData default options](#getData-default-options)
 -   Internal schema property `oneOfSchema` has been replaced by `schema.getOneOfOrigin()`
 -   Changed `unique-items-error` to point to error for duplicated item and changed data-properties
 -   Removed `SchemaService` as it was no longer used nor tested
@@ -1128,7 +1128,7 @@ The above documentation reflects all these changes. Just reach out if you have t
 -   changed API of `compileSchema` to have an additional schema-parameter for rootSchema reference
 -   changed `compileSchema` and `addRemote` to work on instance state, instead of global state
 -   `addRemote`, `compileSchema` now requires draft instance as first parameter
--   removed direct export of following functions: `addValidator`, `compileSchema`, `createSchemaOf`, `each`, `eachSchema`, `getChildSchemaSelection`, `getSchema`, `getTemplate`, `isValid`, `step`, `validate`. They are still accessible under the draftConfigs of each draft-version
+-   removed direct export of following functions: `addValidator`, `compileSchema`, `createSchemaOf`, `each`, `eachSchema`, `getChildSchemaSelection`, `getSchema`, `getData`, `isValid`, `step`, `validate`. They are still accessible under the draftConfigs of each draft-version
 -   changed draft version of `JsonEditor` to draft07
 
 </details>

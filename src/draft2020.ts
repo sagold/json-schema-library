@@ -13,7 +13,7 @@ import { exclusiveMaximumKeyword } from "./keywords/exclusiveMaximum";
 import { exclusiveMinimumKeyword } from "./keywords/exclusiveMinimum";
 import { formatKeyword } from "./keywords/format";
 import { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
-import { getTemplate } from "./methods/getTemplate";
+import { getData } from "./methods/getData";
 import { ifKeyword } from "./keywords/ifthenelse";
 import { itemsKeyword } from "./keywords/items";
 import { maximumKeyword } from "./keywords/maximum";
@@ -75,7 +75,7 @@ export const draft2020 = sanitizeKeywords({
     formats,
     methods: {
         createSchema,
-        getTemplate,
+        getData,
         getChildSchemaSelection,
         toDataNodes
     },
