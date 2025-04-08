@@ -54,13 +54,12 @@ describe("issue#19 - getSchema from dependencies", () => {
     );
 
     it("should return correct schema for existing data property 'customField'", () => {
-        const node = rootNode.get("customField", {
+        const { node } = rootNode.get("customField", {
             name: "issue #19",
             generation: "Display Custom Field",
             customField: "mi"
         });
 
-        assert(isSchemaNode(node), "should have return valid SchemaNode");
         assert.deepEqual(node.schema, {
             title: "Custom Field",
             type: "string"
@@ -74,12 +73,10 @@ describe("issue#19 - getSchema from dependencies", () => {
             drafts: [draftEditor]
         });
 
-        const node = modifiedRootNode.get("customField", {
+        const { node } = modifiedRootNode.get("customField", {
             name: "issue #19",
             generation: "Display Custom Field"
         });
-
-        assert(isSchemaNode(node), "should have returned a valid schemaNode");
 
         assert.deepEqual(node.schema, {
             title: "Custom Field",

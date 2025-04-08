@@ -5,7 +5,7 @@ import { isSchemaNode, isJsonError } from "./types";
 describe("compileSchema : get", () => {
     describe("behaviour", () => {
         it("should return node of property", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: {
@@ -19,7 +19,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should return node of property even it type differs", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: {
@@ -33,7 +33,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should return undefined if property is not defined, but allowed", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: {
@@ -45,7 +45,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should return an error when the property is not allowed", () => {
-            const node = compileSchema({
+            const { error } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: {
@@ -54,11 +54,11 @@ describe("compileSchema : get", () => {
                 additionalProperties: false
             }).get("body", { title: "abc" });
 
-            assert(isJsonError(node), "should have return an error");
+            assert(isJsonError(error), "should have return an error");
         });
 
         it("should return the original schema of the property", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: {
@@ -70,7 +70,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should reduce parent schema for returned property", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: {
@@ -91,7 +91,7 @@ describe("compileSchema : get", () => {
 
     describe("array - multiple contains", () => {
         it("should pick correct schema from allOf contains", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 allOf: [{ contains: { multipleOf: 2 } }, { contains: { multipleOf: 3 } }]
             }).get(0, [2, 5]);
 
@@ -103,7 +103,7 @@ describe("compileSchema : get", () => {
 
     describe("object - reduce parent schema when returning child-property", () => {
         it("should reduce parent if-then schema when returning property node", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: { title: { type: "string" } },
@@ -118,7 +118,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should reduce parent if-else schema when returning node", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: { title: { type: "string" } },
@@ -133,7 +133,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should reduce parent anyOf schema when returning property node", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: { title: { type: "string" } },
@@ -146,7 +146,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should reduce all matching parent anyOf schema when returning property node", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: { title: { type: "string" } },
@@ -159,7 +159,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should reduce all allOf schema when returning property node", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: { title: { type: "string" } },
@@ -172,7 +172,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should reduce matching oneOf schema when returning property node", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: { title: { type: "string" } },
@@ -185,7 +185,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should return matching oneOf schema with `additionalProperties=false`", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 oneOf: [
                     { properties: { title: { type: "string" } }, additionalProperties: false },
@@ -198,31 +198,31 @@ describe("compileSchema : get", () => {
         });
 
         it("should return error when multiple oneOf-items match", () => {
-            const node = compileSchema({
+            const { error } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: { title: { type: "string" } },
                 oneOf: [{ properties: { title: { minLength: 1 } } }, { properties: { title: { maxLength: 1 } } }]
             }).get("title", { title: "a" });
 
-            assert(isJsonError(node), "should have returned a valid schema property node");
+            assert(isJsonError(error), "should have returned a valid schema property node");
         });
 
         it("should return error when multiple oneOf-items match", () => {
-            const node = compileSchema({
+            const { error } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: { title: { type: "string" } },
                 oneOf: [{ properties: { title: { minLength: 1 } } }, { properties: { title: { maxLength: 1 } } }]
             }).get("title", { title: "a" });
 
-            assert(isJsonError(node), "should have returned a valid schema property node");
+            assert(isJsonError(error), "should have returned a valid schema property node");
         });
     });
 
     describe("object - get child property from resolved dynamic schema", () => {
         it("should get property from dependentSchemas", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 dependentSchemas: {
@@ -236,7 +236,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should get merged property from patternProperties", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: { title: { type: "string", minLength: 1 } },
@@ -249,7 +249,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should get property from merged allOf schema", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 allOf: [{ properties: { title: { type: "string" } } }, { properties: { title: { minLength: 1 } } }]
@@ -265,7 +265,7 @@ describe("compileSchema : get", () => {
                 { properties: { secondary: { id: "secondary", type: "string" } } },
                 { properties: { tertiary: { id: "tertiary", type: "number" } } }
             ];
-            const res = compileSchema({
+            const { node: res } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: {
@@ -276,7 +276,7 @@ describe("compileSchema : get", () => {
                     }
                 }
             }).get("dynamicSchema");
-            assert(isSchemaNode(res));
+
             const { node } = res.reduce({ trigger: true });
 
             assert.deepEqual(node.schema, {
@@ -290,7 +290,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should get property from matching anyOf schema", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 anyOf: [
@@ -305,7 +305,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should get property from matching oneOf schema", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 oneOf: [
@@ -320,7 +320,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should return `undefined` for valid oneOf property missing the property", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 oneOf: [
@@ -333,7 +333,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should get property from then schema", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 if: { properties: { title: { type: "string", minLength: 1 } } },
@@ -347,7 +347,7 @@ describe("compileSchema : get", () => {
         });
 
         it("should get property from else schema", () => {
-            const node = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 if: { properties: { title: { type: "string", minLength: 1 } } },
@@ -374,7 +374,7 @@ describe("compileSchema : get", () => {
                 allOf: [{ $ref: "#/definitions/object" }, { $ref: "#/definitions/additionalNumber" }]
             });
 
-            const schema = node.get("title", { title: 4, test: 2 })?.schema;
+            const schema = node.get("title", { title: 4, test: 2 })?.node?.schema;
 
             assert.deepEqual(schema, { type: "number", minLength: 2 });
         });
@@ -383,13 +383,14 @@ describe("compileSchema : get", () => {
 
 describe("step", () => {
     it("should return undefined for unknown types", () => {
-        const res = compileSchema({ $schema: "draft-2019-09", type: "unknown" }).get(0, {});
-        assert.equal(res, undefined);
+        const { node, error } = compileSchema({ $schema: "draft-2019-09", type: "unknown" }).get(0, {});
+        assert.equal(node, undefined);
+        assert.equal(error, undefined);
     });
 
     describe("object", () => {
         it("should return object property", () => {
-            const res = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: {
@@ -397,11 +398,11 @@ describe("step", () => {
                 }
             }).get("title");
 
-            assert.deepEqual(res.schema, { type: "string" });
+            assert.deepEqual(node.schema, { type: "string" });
         });
 
         it("should return error undefined for undefined schema", () => {
-            const res = compileSchema({
+            const { node, error } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: {
@@ -409,11 +410,12 @@ describe("step", () => {
                 }
             }).get("wrongkey");
 
-            assert.equal(res, undefined);
+            assert.equal(node, undefined);
+            assert.equal(error, undefined);
         });
 
         it("should return undefined for unresolved then-schema (unknown schema)", () => {
-            const res = compileSchema({
+            const { node, error } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 properties: { test: { type: "string" } },
@@ -431,58 +433,65 @@ describe("step", () => {
                 }
             }).get("thenValue");
 
-            assert.equal(res, undefined);
+            assert.equal(node, undefined);
+            assert.equal(error, undefined);
         });
 
         it("should return undefined for schema matching `additionalProperties=true`", () => {
-            const res = compileSchema({
+            const { node, error } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 additionalProperties: true
             }).get("any", { any: "i am valid" });
-            assert.deepEqual(res, undefined);
+
+            assert.equal(node, undefined);
+            assert.equal(error, undefined);
         });
 
         it("should treat `additionalProperties` as `true` per default", () => {
-            const res = compileSchema({ $schema: "draft-2019-09", type: "object" }).get("any", { any: "i am valid" });
-            assert.deepEqual(res, undefined);
+            const { node, error } = compileSchema({ $schema: "draft-2019-09", type: "object" }).get("any", {
+                any: "i am valid"
+            });
+            assert.equal(node, undefined);
+            assert.equal(error, undefined);
         });
 
         it("should return an error if `additionalProperties=false` and property unknown", () => {
-            const res = compileSchema({ $schema: "draft-2019-09", type: "object", additionalProperties: false }).get(
-                "any",
-                {
-                    any: "i am valid"
-                }
-            );
+            const { error } = compileSchema({
+                $schema: "draft-2019-09",
+                type: "object",
+                additionalProperties: false
+            }).get("any", {
+                any: "i am valid"
+            });
 
-            assert(isJsonError(res));
+            assert(isJsonError(error));
         });
 
         it("should return matching oneOf", () => {
-            const res = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 oneOf: [
                     { type: "object", properties: { title: { type: "string" } } },
                     { type: "object", properties: { title: { type: "number" } } }
                 ]
             }).get("title", { title: 4 });
-            assert.deepEqual(res.schema, { type: "number" });
+            assert.deepEqual(node.schema, { type: "number" });
         });
 
         it("should return matching oneOf, for objects missing properties", () => {
-            const res = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 oneOf: [
                     { type: "object", additionalProperties: { type: "string" } },
                     { type: "object", additionalProperties: { type: "number" } }
                 ]
             }).get("title", { title: 4, test: 2 });
-            assert.deepEqual(res.schema, { type: "number" });
+            assert.deepEqual(node.schema, { type: "number" });
         });
 
         it("should return matching anyOf", () => {
-            const res = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 anyOf: [
                     { type: "object", additionalProperties: { type: "string" } },
@@ -490,11 +499,11 @@ describe("step", () => {
                 ]
             }).get("title", { title: 4, test: 2 });
 
-            assert.deepEqual(res.schema, { type: "number" });
+            assert.deepEqual(node.schema, { type: "number" });
         });
 
         it("should return combined anyOf schema", () => {
-            const res = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 anyOf: [
                     { type: "object", additionalProperties: { type: "string" } },
@@ -503,11 +512,11 @@ describe("step", () => {
                 ]
             }).get("title", { title: 4, test: 2 });
 
-            assert.deepEqual(res.schema, { type: "number", minimum: 2 });
+            assert.deepEqual(node.schema, { type: "number", minimum: 2 });
         });
 
         it("should resolve references from anyOf schema", () => {
-            const res = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 definitions: {
                     string: { type: "object", additionalProperties: { type: "string" } },
@@ -521,20 +530,20 @@ describe("step", () => {
                 ]
             }).get("title", { title: 4, test: 2 });
 
-            assert.deepEqual(res.schema, { type: "number", minimum: 2 });
+            assert.deepEqual(node.schema, { type: "number", minimum: 2 });
         });
 
         it("should return matching allOf schema", () => {
-            const res = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 allOf: [{ type: "object" }, { additionalProperties: { type: "number" } }]
             }).get("title", { title: 4, test: 2 });
 
-            assert.deepEqual(res.schema, { type: "number" });
+            assert.deepEqual(node.schema, { type: "number" });
         });
 
         it("should resolve references in allOf schema", () => {
-            const res = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 definitions: {
                     object: { type: "object" },
@@ -543,11 +552,11 @@ describe("step", () => {
                 allOf: [{ $ref: "#/definitions/object" }, { $ref: "#/definitions/additionalNumber" }]
             }).get("title", { title: 4, test: 2 });
 
-            assert.deepEqual(res.schema, { type: "number" });
+            assert.deepEqual(node.schema, { type: "number" });
         });
 
         it("should return matching patternProperty", () => {
-            const res = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 patternProperties: {
@@ -556,11 +565,11 @@ describe("step", () => {
                 }
             }).get("second");
 
-            assert.deepEqual(res.schema, { type: "string", id: "second" });
+            assert.deepEqual(node.schema, { type: "string", id: "second" });
         });
 
         it("should return additionalProperties schema for not matching patternProperty", () => {
-            const res = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
                 patternProperties: {
@@ -570,33 +579,41 @@ describe("step", () => {
                 additionalProperties: { type: "object" }
             }).get("third");
 
-            assert.deepEqual(res.schema, { type: "object" });
+            assert.deepEqual(node.schema, { type: "object" });
         });
     });
 
     describe("array", () => {
         it("should return undefined for unknown item schema", () => {
-            const res = compileSchema({ $schema: "draft-2019-09", type: "array" }).get(0, []);
-            assert.equal(res, undefined);
+            const { node, error } = compileSchema({
+                $schema: "draft-2019-09",
+                type: "array"
+            }).get(0, []);
+            assert.equal(node, undefined);
+            assert.equal(error, undefined);
         });
 
         it("should return item property", () => {
-            const res = compileSchema({ $schema: "draft-2019-09", type: "array", items: { type: "string" } }).get(0);
-            assert.deepEqual(res.schema, { type: "string" });
+            const { node } = compileSchema({
+                $schema: "draft-2019-09",
+                type: "array",
+                items: { type: "string" }
+            }).get(0);
+            assert.deepEqual(node.schema, { type: "string" });
         });
 
         it("should return item at index", () => {
-            const res = compileSchema({
+            const { node } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "array",
                 items: [{ type: "string" }, { type: "number" }, { type: "boolean" }]
             }).get(1, ["3", 2]);
 
-            assert.deepEqual(res.schema, { type: "number" });
+            assert.deepEqual(node.schema, { type: "number" });
         });
 
         it("should return matching item in oneOf", () => {
-            const res = compileSchema({
+            const { node: res } = compileSchema({
                 $schema: "draft-2019-09",
                 type: "array",
                 items: {
@@ -607,7 +624,6 @@ describe("step", () => {
                 }
             }).get(0, [{ title: 2 }]);
 
-            assert(isSchemaNode(res));
             const { node } = res.reduce({ title: 2 });
 
             assert.deepEqual(node.schema, {
@@ -617,7 +633,7 @@ describe("step", () => {
         });
 
         it("should return matching anyOf", () => {
-            const res = compileSchema({
+            const { node: res } = compileSchema({
                 $schema: "draft-2019-09",
                 items: {
                     anyOf: [
@@ -627,14 +643,13 @@ describe("step", () => {
                 }
             }).get(1, [{ title: "two" }, { title: 4 }]);
 
-            assert(isSchemaNode(res));
             const { node } = res.reduce({ title: 4 });
 
             assert.deepEqual(node.schema, { type: "object", properties: { title: { type: "number" } } });
         });
 
         it("should return combined anyOf schema", () => {
-            const res = compileSchema({
+            const { node: res } = compileSchema({
                 $schema: "draft-2019-09",
                 items: {
                     anyOf: [
@@ -645,14 +660,13 @@ describe("step", () => {
                 }
             }).get(1, [{ title: "two" }, { title: 4 }]);
 
-            assert(isSchemaNode(res));
             const { node } = res.reduce({ title: 4 });
 
             assert.deepEqual(node.schema, { type: "object", properties: { title: { type: "number", minimum: 2 } } });
         });
 
         it("should return combined allOf schema", () => {
-            const res = compileSchema({
+            const { node: res } = compileSchema({
                 $schema: "draft-2019-09",
                 items: {
                     allOf: [
@@ -662,7 +676,6 @@ describe("step", () => {
                 }
             }).get(1, [{ title: "two" }, { title: 4 }]);
 
-            assert(isSchemaNode(res));
             const { node } = res.reduce({ title: "two" });
 
             assert.deepEqual(node.schema, {
@@ -672,10 +685,10 @@ describe("step", () => {
         });
 
         it("should return a generated schema with additionalItems", () => {
-            const res = compileSchema({ $schema: "draft-2019-09", type: "array", additionalItems: true }).get(1, [
-                "3",
-                2
-            ]);
+            const { node: res } = compileSchema({ $schema: "draft-2019-09", type: "array", additionalItems: true }).get(
+                1,
+                ["3", 2]
+            );
             assert(isSchemaNode(res));
             assert.deepEqual(res.schema.type, "number");
         });

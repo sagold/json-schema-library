@@ -46,9 +46,9 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
     const errors: ValidationResult[] = [];
     for (let i = 0; i < unevaluated.length; i += 1) {
         const propertyName = unevaluated[i];
-        const child = node.get(propertyName, data, { path });
+        const { node: child } = node.get(propertyName, data, { path });
 
-        if (isSchemaNode(child)) {
+        if (child) {
             if (validateNode(child, data[propertyName], `${pointer}/${propertyName}`, path).length > 0) {
                 errors.push(
                     node.createError("UnevaluatedPropertyError", {
@@ -88,8 +88,8 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
 
 /** tests if a property is evaluated by the given schema */
 function isPropertyEvaluated(schemaNode: SchemaNode, propertyName: string, data: unknown) {
-    const node = schemaNode.get(propertyName, data);
-    if (node == null || isJsonError(node)) {
+    const { node, error } = schemaNode.get(propertyName, data);
+    if (node == null || error) {
         return false;
     }
     return node.validate(getValue(data, propertyName)).valid;

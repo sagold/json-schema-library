@@ -54,10 +54,10 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
     // "unevaluatedItems with nested items"
     for (let i = 0; i < data.length; i += 1) {
         const value = data[i];
-        const child = node.get(i, data, { path });
+        const { node: child } = node.get(i, data, { path });
         // console.log(`CHILD '${i}':`, data[i], "=>", child?.schema);
 
-        if (isSchemaNode(child)) {
+        if (child) {
             // when a single node is invalid
             if (validateNode(child, value, `${pointer}/${i}`, path).length > 0) {
                 // nothing should validate, so we validate unevaluated items only

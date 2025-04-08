@@ -12,7 +12,7 @@ describe("keyword : properties : get", () => {
             }
         });
 
-        const schema = node.get("header")?.schema;
+        const schema = node.get("header")?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
@@ -25,7 +25,7 @@ describe("keyword : properties : get", () => {
             }
         });
 
-        const schema = node.get("header", { header: "huhu" })?.schema;
+        const schema = node.get("header", { header: "huhu" })?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
@@ -43,9 +43,8 @@ describe("keyword : properties : get", () => {
             }
         });
 
-        const next = node.get("header", { header: { title: "huhu" } });
-        assert(!isJsonError(next));
-        const schema = next.get("title")?.schema;
+        const { node: next } = node.get("header", { header: { title: "huhu" } });
+        const schema = next.get("title")?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
@@ -60,7 +59,7 @@ describe("keyword : properties : get", () => {
             then: { allOf: [{ required: ["header"], properties: { header: { type: "string", minLength: 1 } } }] }
         });
 
-        const schema = node.get("withHeader", { withHeader: false })?.schema;
+        const schema = node.get("withHeader", { withHeader: false })?.node?.schema;
 
         assert.deepEqual(schema, { type: "boolean", default: true });
     });

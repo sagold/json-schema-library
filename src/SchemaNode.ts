@@ -212,12 +212,15 @@ export const SchemaNodeMethods = {
         let currentNode = node;
         for (let i = 0, l = keys.length; i < l; i += 1) {
             currentPointer = `${currentPointer}/${keys[i]}`;
-            const nextNode = currentNode.get(keys[i], data, { ...options, pointer: currentPointer });
-            if (!isSchemaNode(nextNode)) {
-                return { node: undefined, error: nextNode };
+            const result = currentNode.get(keys[i], data, { ...options, pointer: currentPointer });
+            if (result.error) {
+                return result;
             }
+            if (result.node == null) {
+                return result;
+            }
+            currentNode = result.node;
             data = getValue(data, keys[i]);
-            currentNode = nextNode;
         }
         const result = currentNode.resolveRef(options);
         return isJsonError(result) ? { node: undefined, error: result } : { node: result, error: undefined };
@@ -228,7 +231,7 @@ export const SchemaNodeMethods = {
         return node.compileSchema({ $ref }).resolveRef();
     },
 
-    get(key: string | number, data?: unknown, options: GetSchemaOptions = {}): SchemaNode | JsonError {
+    get(key: string | number, data?: unknown, options: GetSchemaOptions = {}): OptionalNodeAndError {
         options.path = options.path ?? [];
 
         options.withSchemaWarning = options.withSchemaWarning ?? false;
@@ -237,19 +240,22 @@ export const SchemaNodeMethods = {
 
         let node = this as SchemaNode;
         if (node.reducers.length) {
-            const { node: reducedNode, error } = node.reduce(data, { key, path, pointer });
-            if (error) {
-                return error;
+            const result = node.reduce(data, { key, path, pointer });
+            if (result.error) {
+                return result;
             }
-            if (isSchemaNode(reducedNode)) {
-                node = reducedNode;
+            if (isSchemaNode(result.node)) {
+                node = result.node;
             }
         }
 
         for (const resolver of node.resolvers) {
             const schemaNode = resolver({ data, key, node });
-            if (schemaNode) {
-                return schemaNode;
+            if (isSchemaNode(schemaNode)) {
+                return { node: schemaNode, error: undefined };
+            }
+            if (isJsonError(schemaNode)) {
+                return { node: undefined, error: schemaNode };
             }
         }
 
@@ -259,16 +265,20 @@ export const SchemaNodeMethods = {
         }
 
         if (options.createSchema === true) {
-            return node.compileSchema(
+            const newNode = node.compileSchema(
                 createSchema(getValue(data, key)),
                 `${node.spointer}/additional`,
                 `${node.schemaId}/additional`
             );
+            return { node: newNode, error: undefined };
         }
 
         if (options.withSchemaWarning === true) {
-            return node.createError("SchemaWarning", { pointer, value: data, schema: node.schema, key });
+            const error = node.createError("SchemaWarning", { pointer, value: data, schema: node.schema, key });
+            return { node: undefined, error };
         }
+
+        return { node: undefined, error: undefined };
     },
     /** Creates data that is valid to the schema of this node */
     getTemplate(data?: unknown, options?: TemplateOptions) {

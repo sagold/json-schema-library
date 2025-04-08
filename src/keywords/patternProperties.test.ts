@@ -9,7 +9,7 @@ describe("keyword : patternProperties : get", () => {
         });
 
         // @todo evaluate if we should pass this property to reduce to identify schema without data
-        const schema = node.get("007", { "007": undefined })?.schema;
+        const schema = node.get("007", { "007": undefined })?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
@@ -20,7 +20,7 @@ describe("keyword : patternProperties : get", () => {
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 1 } }
         });
 
-        const schema = node.get("[0-9][0-9]7")?.schema;
+        const schema = node.get("[0-9][0-9]7")?.node?.schema;
 
         assert.deepEqual(schema, undefined);
     });

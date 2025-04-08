@@ -1,5 +1,5 @@
 import { isObject } from "../utils/isObject";
-import { isSchemaNode, SchemaNode } from "../types";
+import { SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
 import { validateNode } from "../validateNode";
 import { isItemEvaluated } from "../isItemEvaluated";
@@ -48,7 +48,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
         }
 
         const value = data[i];
-        const child = node.get(i, data, { path });
+        const { node: child } = node.get(i, data, { path });
 
         if (child === undefined) {
             if (node.unevaluatedItems) {
@@ -67,7 +67,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
             }
         }
 
-        if (isSchemaNode(child) && validateNode(child, value, `${pointer}/${i}`, path).length > 0) {
+        if (child && validateNode(child, value, `${pointer}/${i}`, path).length > 0) {
             // when a single node is invalid
             if (
                 node.unevaluatedItems &&

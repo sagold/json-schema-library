@@ -1,4 +1,4 @@
-import { isJsonError, isSchemaNode, JsonError, SchemaNode } from "../../types";
+import { JsonError, SchemaNode } from "../../types";
 
 /**
  * Returns a list of possible child-schemas for the given property key. In case of a oneOf selection, multiple schemas
@@ -15,11 +15,11 @@ export function getChildSchemaSelection(node: SchemaNode, property: string | num
 
     // array.items[] found
     if (node.itemsList && node.itemsList.length > +property) {
-        const childNode = node.get(property);
-        if (isSchemaNode(childNode)) {
+        const { node: childNode, error } = node.get(property);
+        if (node) {
             return [childNode];
         }
-        return childNode;
+        return error;
     }
 
     // array.items[] exceeded (or undefined), but additionalItems specified
@@ -37,9 +37,8 @@ export function getChildSchemaSelection(node: SchemaNode, property: string | num
         return [];
     }
 
-    const childNode = node.get(property);
-    if (isJsonError(childNode)) {
-        const error: JsonError = childNode;
+    const { node: childNode, error } = node.get(property);
+    if (error) {
         return error;
     }
 

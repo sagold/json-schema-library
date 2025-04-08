@@ -10,7 +10,7 @@ describe("keyword : items : get", () => {
                 items: { type: "string", minLength: 1 }
             });
 
-            const schema = node.get("0")?.schema;
+            const schema = node.get("0")?.node?.schema;
 
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });
@@ -24,7 +24,7 @@ describe("keyword : items : get", () => {
                 items: [{ type: "number" }, { type: "string", minLength: 1 }]
             });
 
-            const schema = node.get("1")?.schema;
+            const schema = node.get("1")?.node?.schema;
 
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });

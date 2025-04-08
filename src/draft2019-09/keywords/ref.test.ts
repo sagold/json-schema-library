@@ -32,27 +32,26 @@ describe("keyword : ref : resolve", () => {
     });
 
     it("should resolve nested $ref from $defs", () => {
-        const _node = compileSchema({
+        const { node: _node } = compileSchema({
             properties: {
                 header: { $ref: "#/$defs/header" }
             },
             $defs: { header: { type: "string", minLength: 1 } }
         }).get("header");
-        assert(!isJsonError(_node));
+
         const node = _node.resolveRef();
 
         assert.deepEqual(node.schema, { type: "string", minLength: 1 });
     });
 
     it("should resolve root pointer, not merging schema", () => {
-        const _node = compileSchema({
+        const { node: _node } = compileSchema({
             type: "object",
             minProperties: 1,
             properties: {
                 header: { $ref: "#", minProperties: 2 }
             }
         }).get("header");
-        assert(!isJsonError(_node));
 
         const node = _node.resolveRef();
 

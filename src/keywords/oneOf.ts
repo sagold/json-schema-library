@@ -107,7 +107,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaR
     }
 
     for (let i = 0; i < node.oneOf.length; i += 1) {
-        const resultNode = node.oneOf[i].get(oneOfProperty, data);
+        const { node: resultNode } = node.oneOf[i].get(oneOfProperty, data);
         if (!isSchemaNode(resultNode)) {
             return node.createError("MissingOneOfDeclaratorError", {
                 declarator: DECLARATOR_ONEOF,

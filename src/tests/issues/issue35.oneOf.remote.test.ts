@@ -1,6 +1,5 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
-import { isSchemaNode } from "../../types";
 
 describe("issue#35 - reducing ref loses correct remote context", () => {
     // PR #35 https://github.com/sagold/json-schema-library/pull/35/commits/8b6477113bdfce522081473bb0dd8fd6fe680391
@@ -28,11 +27,8 @@ describe("issue#35 - reducing ref loses correct remote context", () => {
             }
         });
 
-        const titleNode = node.get("title", { title: { innerTitle: 111 } });
-        assert(isSchemaNode(titleNode));
-
-        const innerTitleNode = titleNode.get("innerTitle", { innerTitle: 111 });
-        assert(isSchemaNode(innerTitleNode));
+        const { node: titleNode } = node.get("title", { title: { innerTitle: 111 } });
+        const { node: innerTitleNode } = titleNode.get("innerTitle", { innerTitle: 111 });
 
         assert.deepEqual(innerTitleNode.resolveRef().schema, { type: "number", title: "Zahl" });
     });
