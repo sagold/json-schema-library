@@ -7,7 +7,7 @@ export const itemsKeyword: Keyword = {
     id: "items",
     keyword: "items",
     parse: parseItems,
-    addResolve: (node) => node.itemsObject != null,
+    addResolve: (node) => node.items != null,
     resolve: itemsResolver,
     addValidate: ({ schema }) => schema.items != null,
     validate: validateItems
@@ -19,14 +19,14 @@ function itemsResolver({ node, key }: JsonSchemaResolverParams) {
     if (node.prefixItems?.length > +key) {
         return;
     }
-    return node.itemsObject;
+    return node.items;
 }
 
 export function parseItems(node: SchemaNode) {
     const { schema, spointer } = node;
     if (isObject(schema.items)) {
         const propertyNode = node.compileSchema(schema.items, `${spointer}/items`, `${node.schemaId}/items`);
-        node.itemsObject = propertyNode;
+        node.items = propertyNode;
     }
 }
 
@@ -49,10 +49,10 @@ function validateItems({ node, data, pointer = "#", path }: JsonSchemaValidatorP
     }
 
     const errors: ValidationResult[] = [];
-    if (node.itemsObject) {
+    if (node.items) {
         for (let i = schema.prefixItems?.length ?? 0; i < data.length; i += 1) {
             const itemData = data[i];
-            const result = validateNode(node.itemsObject, itemData, `${pointer}/${i}`, path);
+            const result = validateNode(node.items, itemData, `${pointer}/${i}`, path);
             if (result) {
                 errors.push(...result);
             }

@@ -9,8 +9,8 @@ export function getChildSchemaSelection(node: SchemaNode, property: string | num
     if (node.oneOf) {
         return node.oneOf.map((childNode: SchemaNode) => childNode.resolveRef());
     }
-    if (node.itemsObject?.oneOf) {
-        return node.itemsObject.oneOf.map((childNode: SchemaNode) => childNode.resolveRef());
+    if (node.items?.oneOf) {
+        return node.items.oneOf.map((childNode: SchemaNode) => childNode.resolveRef());
     }
 
     // array.items[] found
@@ -23,7 +23,7 @@ export function getChildSchemaSelection(node: SchemaNode, property: string | num
     }
 
     // array.items[] exceeded (or undefined), but additionalItems specified
-    if (node.additionalItems && node.itemsObject == null) {
+    if (node.additionalItems && node.items == null) {
         // we fallback to a string if no schema is defined - might be subject for configuration
         // @ts-expect-error boolean schema
         if (node.additionalItems.schema === true) {

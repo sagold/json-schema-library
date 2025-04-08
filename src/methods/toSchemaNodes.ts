@@ -30,7 +30,7 @@ export function toSchemaNodes(node: SchemaNode | unknown, nodeList: SchemaNode[]
     node.if && toSchemaNodes(node.if, nodeList);
     node.else && toSchemaNodes(node.else, nodeList);
     node.then && toSchemaNodes(node.then, nodeList);
-    node.itemsObject && toSchemaNodes(node.itemsObject, nodeList);
+    node.items && toSchemaNodes(node.items, nodeList);
     eachItem(nodeList, node.prefixItems);
     node.not && toSchemaNodes(node.not, nodeList);
     eachItem(nodeList, node.oneOf);

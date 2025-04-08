@@ -7,15 +7,15 @@ export const itemsKeyword: Keyword = {
     id: "items",
     keyword: "items",
     parse: parseItems,
-    addResolve: (node) => (node.prefixItems || node.itemsObject) != null,
+    addResolve: (node) => (node.prefixItems || node.items) != null,
     resolve: itemsResolver,
     addValidate: ({ schema }) => schema.items != null,
     validate: validateItems
 };
 
 function itemsResolver({ node, key }: JsonSchemaResolverParams) {
-    if (node.itemsObject) {
-        return node.itemsObject;
+    if (node.items) {
+        return node.items;
     }
     if (node.prefixItems[key as number]) {
         return node.prefixItems[key as number];
@@ -26,7 +26,7 @@ export function parseItems(node: SchemaNode) {
     const { schema, spointer } = node;
     if (isObject(schema.items)) {
         const propertyNode = node.compileSchema(schema.items, `${spointer}/items`, `${node.schemaId}/items`);
-        node.itemsObject = propertyNode;
+        node.items = propertyNode;
     } else if (Array.isArray(schema.items)) {
         node.prefixItems = schema.items.map((itemSchema, index) =>
             node.compileSchema(itemSchema, `${spointer}/items/${index}`, `${node.schemaId}/items/${index}`)
@@ -61,10 +61,10 @@ function validateItems({ node, data, pointer = "#", path }: JsonSchemaValidatorP
         return errors;
     }
 
-    if (node.itemsObject) {
+    if (node.items) {
         for (let i = 0; i < data.length; i += 1) {
             const itemData = data[i];
-            const result = validateNode(node.itemsObject, itemData, `${pointer}/${i}`, path);
+            const result = validateNode(node.items, itemData, `${pointer}/${i}`, path);
             if (result) {
                 errors.push(...result);
             }

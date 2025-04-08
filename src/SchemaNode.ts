@@ -92,7 +92,7 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     else?: SchemaNode;
     if?: SchemaNode;
     prefixItems?: SchemaNode[];
-    itemsObject?: SchemaNode;
+    items?: SchemaNode;
     not?: SchemaNode;
     oneOf?: SchemaNode[];
     patternProperties?: { pattern: RegExp; node: SchemaNode }[];

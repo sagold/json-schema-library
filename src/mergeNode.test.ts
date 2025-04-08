@@ -40,7 +40,7 @@ describe("mergeNode", () => {
         const b = compileSchema({ type: "array", items: { type: "number", minimum: 1 } });
         const node = mergeNode(a, b);
         assert(isSchemaNode(node), "should have returned a valid schema node");
-        assert.deepEqual(node.itemsObject?.schema, { type: "number", minimum: 1, minLength: 1 });
+        assert.deepEqual(node.items?.schema, { type: "number", minimum: 1, minLength: 1 });
 
         const { errors } = node.validate([0, 10]);
         assert.deepEqual(errors.length, 1);

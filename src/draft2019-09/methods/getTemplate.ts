@@ -304,21 +304,21 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
         }
 
         // this has to be defined as we checked all other cases
-        if (node.itemsObject == null) {
+        if (node.items == null) {
             return d;
         }
 
         // build data from items-definition
         // @ts-expect-error asd
-        if ((node.itemsObject && canResolveRef(node.itemsObject, opts)) || data?.length > 0) {
+        if ((node.items && canResolveRef(node.items, opts)) || data?.length > 0) {
             // @attention this should disable cache or break intended behaviour as we reset it after loop
-            // @todo test recursion of itemsObject
+            // @todo test recursion of items
             // intention: reset cache after each property. last call will add counters
             const cache = { ...opts.cache };
             for (let i = 0, l = Math.max(minItems, d.length); i < l; i += 1) {
                 opts.cache = copy(cache);
                 const options = { ...opts, disableRecusionLimit: true };
-                const result = node.itemsObject.getTemplate(d[i] == null ? template[i] : d[i], options);
+                const result = node.items.getTemplate(d[i] == null ? template[i] : d[i], options);
                 // @attention if getTemplate aborts recursion it currently returns undefined)
                 if (result === undefined) {
                     return d;

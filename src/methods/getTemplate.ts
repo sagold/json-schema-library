@@ -267,13 +267,13 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
         // when there are no array-items are defined
         if (schema.prefixItems == null) {
             // => all items are additionalItems
-            if (node.itemsObject && (canResolveRef(node.itemsObject, opts) || d?.length > 0)) {
+            if (node.items && (canResolveRef(node.items, opts) || d?.length > 0)) {
                 const cache = { ...opts.cache };
                 const itemCount = Math.max(minItems, d.length);
                 for (let i = 0; i < itemCount; i += 1) {
                     opts.cache = copy(cache);
                     const options = { ...opts, disableRecusionLimit: true };
-                    d[i] = node.itemsObject.getTemplate(d[i] == null ? template[i] : d[i], options);
+                    d[i] = node.items.getTemplate(d[i] == null ? template[i] : d[i], options);
                 }
             }
             return d || [];
@@ -286,7 +286,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
             // build defined set of items
             const length = Math.max(minItems ?? 0, node.prefixItems.length);
             for (let i = 0; i < length; i += 1) {
-                const childNode = node.prefixItems[i] ?? node.itemsObject;
+                const childNode = node.prefixItems[i] ?? node.items;
                 if ((childNode && canResolveRef(childNode, opts)) || input[i] !== undefined) {
                     const result = childNode.getTemplate(d[i] == null ? template[i] : d[i], opts);
                     if (result !== undefined) {
@@ -298,21 +298,21 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
         }
 
         // this has to be defined as we checked all other cases
-        if (node.itemsObject == null) {
+        if (node.items == null) {
             return d;
         }
 
         // build data from items-definition
         // @ts-expect-error asd
-        if ((node.itemsObject && canResolveRef(node.itemsObject, opts)) || data?.length > 0) {
+        if ((node.items && canResolveRef(node.items, opts)) || data?.length > 0) {
             // @attention this should disable cache or break intended behaviour as we reset it after loop
-            // @todo test recursion of itemsObject
+            // @todo test recursion of items
             // intention: reset cache after each property. last call will add counters
             const cache = { ...opts.cache };
             for (let i = 0, l = Math.max(minItems, d.length); i < l; i += 1) {
                 opts.cache = copy(cache);
                 const options = { ...opts, disableRecusionLimit: true };
-                const result = node.itemsObject.getTemplate(d[i] == null ? template[i] : d[i], options);
+                const result = node.items.getTemplate(d[i] == null ? template[i] : d[i], options);
                 // @attention if getTemplate aborts recursion it currently returns undefined)
                 if (result === undefined) {
                     return d;
