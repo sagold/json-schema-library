@@ -105,7 +105,6 @@ export function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): Sch
     };
 
     // this removes any function that has no keyword associated on schema
-    // @todo this might remove default reducers and we need a feature-flag for behaviour
     function filterKeywordsBySchema(fun: SchemaNodeCB) {
         const funName = fun.toJSON?.() ?? fun.name;
         if (mergedNode.schema?.[funName] === undefined) {

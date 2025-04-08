@@ -8,8 +8,7 @@ describe("keyword : patternProperties : get", () => {
             patternProperties: { "[0-9][0-9]7": { type: "string", minLength: 1 } }
         });
 
-        // @todo evaluate if we should pass this property to reduce to identify schema without data
-        const schema = node.getChild("007", { "007": undefined })?.node?.schema;
+        const schema = node.getChild("007")?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
