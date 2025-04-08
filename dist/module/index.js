@@ -9,7 +9,6 @@ export { draftEditor } from "./src/draftEditor";
 export { oneOfFuzzyKeyword, oneOfKeyword } from "./src/keywords/oneOf";
 // errors
 export { render } from "./src/errors/render";
-export { dashCase } from "./src/utils/dashCase";
 // utilities
 export { getTypeOf } from "./src/utils/getTypeOf";
 export { isReduceable } from "./src/SchemaNode";

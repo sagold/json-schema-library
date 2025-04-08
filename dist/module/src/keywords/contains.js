@@ -29,11 +29,11 @@ function validateContains({ node, data, pointer, path }) {
         return;
     }
     if (schema.contains === false) {
-        return node.createError("ContainsArrayError", { pointer, value: data, schema });
+        return node.createError("contains-array-error", { pointer, value: data, schema });
     }
     if (schema.contains === true) {
         if (Array.isArray(data) && data.length === 0) {
-            return node.createError("ContainsAnyError", { pointer, value: data, schema });
+            return node.createError("contains-any-error", { pointer, value: data, schema });
         }
         return undefined;
     }
@@ -55,10 +55,10 @@ function validateContains({ node, data, pointer, path }) {
         return undefined;
     }
     if (max < count) {
-        return node.createError("ContainsMaxError", { pointer, schema, delta: count - max, value: data });
+        return node.createError("contains-max-error", { pointer, schema, delta: count - max, value: data });
     }
     if (min > count) {
-        return node.createError("ContainsMinError", { pointer, schema, delta: min - count, value: data });
+        return node.createError("contains-min-error", { pointer, schema, delta: min - count, value: data });
     }
-    return node.createError("ContainsError", { pointer, schema, value: data });
+    return node.createError("contains-error", { pointer, schema, value: data });
 }

@@ -8,7 +8,7 @@ export const constKeyword = {
 function validateConst({ node, data, pointer }) {
     if (!equal(data, node.schema.const)) {
         return [
-            node.createError("ConstError", { pointer, schema: node.schema, value: data, expected: node.schema.const })
+            node.createError("const-error", { pointer, schema: node.schema, value: data, expected: node.schema.const })
         ];
     }
 }

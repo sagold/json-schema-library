@@ -14,7 +14,7 @@ function validateMinLength({ node, data, pointer = "#" }) {
     if (schema.minLength <= length) {
         return;
     }
-    return node.createError("MinLengthError", {
+    return node.createError("min-length-error", {
         minLength: schema.minLength,
         length,
         pointer,

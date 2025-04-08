@@ -13,7 +13,6 @@ export { draftEditor } from "./src/draftEditor";
 export { oneOfFuzzyKeyword, oneOfKeyword } from "./src/keywords/oneOf";
 export { render } from "./src/errors/render";
 export type { ErrorData, ErrorConfig } from "./src/types";
-export { dashCase } from "./src/utils/dashCase";
 export { getTypeOf } from "./src/utils/getTypeOf";
 export { isReduceable } from "./src/SchemaNode";
 export { isJsonError, isSchemaNode } from "./src/types";

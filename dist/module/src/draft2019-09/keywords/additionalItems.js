@@ -48,7 +48,7 @@ function validateAdditionalItems({ node, data, pointer, path }) {
             validationResult && errors.push(...validationResult);
         }
         else if (schema.additionalItems === false) {
-            errors.push(node.createError("AdditionalItemsError", {
+            errors.push(node.createError("additional-items-error", {
                 key: i,
                 pointer: `${pointer}/${i}`,
                 value: data,

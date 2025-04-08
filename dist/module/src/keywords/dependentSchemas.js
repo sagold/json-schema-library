@@ -73,7 +73,7 @@ export function validateDependentSchemas({ node, data, pointer, path }) {
             return;
         }
         if (dependencies === false) {
-            errors.push(node.createError("MissingDependencyError", { pointer, schema, value: data }));
+            errors.push(node.createError("missing-dependency-error", { pointer, schema, value: data }));
             return;
         }
         if (isSchemaNode(dependencies)) {

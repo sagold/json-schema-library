@@ -7,7 +7,7 @@ export const maxItemsKeyword = {
 function validateMaxItems({ node, data, pointer }) {
     const { schema } = node;
     if (Array.isArray(data) && schema.maxItems < data.length) {
-        return node.createError("MaxItemsError", {
+        return node.createError("max-items-error", {
             maximum: schema.maxItems,
             length: data.length,
             schema,

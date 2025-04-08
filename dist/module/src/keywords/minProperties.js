@@ -11,7 +11,7 @@ function validateMinProperties({ node, data, pointer = "#" }) {
     }
     const propertyCount = Object.keys(data).length;
     if (node.schema.minProperties > propertyCount) {
-        return node.createError("MinPropertiesError", {
+        return node.createError("min-properties-error", {
             minProperties: node.schema.minProperties,
             length: propertyCount,
             pointer,

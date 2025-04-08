@@ -2,7 +2,6 @@ import copy from "fast-copy";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import settings from "./settings";
 import { createSchema } from "./methods/createSchema";
-import { dashCase } from "./utils/dashCase";
 import { toSchemaNodes } from "./methods/toSchemaNodes";
 import { getValue } from "./utils/getValue";
 import { isJsonError } from "./types";
@@ -70,16 +69,16 @@ export const SchemaNodeMethods = {
         addKeywords(node);
         return node;
     },
-    createError(name, data, message) {
+    createError(code, data, message) {
         let errorMessage = message;
         if (errorMessage === undefined) {
-            const error = this.context.errors[name];
+            const error = this.context.errors[code];
             if (typeof error === "function") {
                 return error(data);
             }
             errorMessage = render(error !== null && error !== void 0 ? error : name, data);
         }
-        return { type: "error", code: dashCase(name), message: errorMessage, data };
+        return { type: "error", code, message: errorMessage, data };
     },
     createSchema,
     getChildSchemaSelection(property) {
@@ -171,7 +170,7 @@ export const SchemaNodeMethods = {
             return { node: newNode, error: undefined };
         }
         if (options.withSchemaWarning === true) {
-            const error = node.createError("SchemaWarning", { pointer, value: data, schema: node.schema, key });
+            const error = node.createError("schema-warning", { pointer, value: data, schema: node.schema, key });
             return { node: undefined, error };
         }
         return { node: undefined, error: undefined };

@@ -15,6 +15,6 @@ export function parseNot(node) {
 function validateNot({ node, data, pointer, path }) {
     const { schema } = node;
     if (validateNode(node.not, data, pointer, path).length === 0) {
-        return node.createError("NotError", { value: data, not: schema.not, pointer, schema });
+        return node.createError("not-error", { value: data, not: schema.not, pointer, schema });
     }
 }

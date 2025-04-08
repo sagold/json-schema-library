@@ -80,13 +80,13 @@ function validateDependencies({ node, data, pointer, path }) {
             return;
         }
         if (propertyValue === false) {
-            errors.push(node.createError("MissingDependencyError", { pointer, schema: node.schema, value: data }));
+            errors.push(node.createError("missing-dependency-error", { pointer, schema: node.schema, value: data }));
             return;
         }
         if (Array.isArray(propertyValue)) {
             propertyValue
                 .filter((dependency) => getValue(data, dependency) === undefined)
-                .forEach((missingProperty) => errors.push(node.createError("MissingDependencyError", {
+                .forEach((missingProperty) => errors.push(node.createError("missing-dependency-error", {
                 missingProperty,
                 pointer: `${pointer}/${missingProperty}`,
                 schema: node.schema,

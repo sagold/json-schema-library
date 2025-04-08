@@ -10,7 +10,7 @@ function validateMaximum({ node, data, pointer }) {
     }
     const { schema } = node;
     if (schema.maximum && schema.maximum < data) {
-        return node.createError("MaximumError", {
+        return node.createError("maximum-error", {
             maximum: schema.maximum,
             length: data,
             value: data,
@@ -19,7 +19,7 @@ function validateMaximum({ node, data, pointer }) {
         });
     }
     if (schema.maximum && schema.exclusiveMaximum === true && schema.maximum === data) {
-        return node.createError("MaximumError", {
+        return node.createError("maximum-error", {
             maximum: schema.maximum,
             length: data,
             pointer,

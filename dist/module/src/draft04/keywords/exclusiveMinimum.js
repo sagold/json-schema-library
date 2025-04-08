@@ -9,7 +9,7 @@ function validateExclusiveMinimum({ node, data, pointer }) {
         return undefined;
     }
     if (node.schema.exclusiveMinimum && node.schema.minimum === data) {
-        return node.createError("MinimumError", {
+        return node.createError("minimum-error", {
             minimum: node.schema.exclusiveMinimum,
             length: data,
             pointer,

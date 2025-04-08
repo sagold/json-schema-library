@@ -13,7 +13,7 @@ function validateRequired({ node, data, pointer = "#" }) {
     }
     return schema.required.map((property) => {
         if (!hasProperty(data, property)) {
-            return node.createError("RequiredPropertyError", {
+            return node.createError("required-property-error", {
                 key: property,
                 pointer,
                 schema,

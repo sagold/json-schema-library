@@ -10,16 +10,7 @@ function validateMinItems({ node, data, pointer }) {
     }
     const { schema } = node;
     if (schema.minItems > data.length) {
-        if (schema.minItems === 1) {
-            return node.createError("MinItemsOneError", {
-                minItems: schema.minItems,
-                length: data.length,
-                pointer,
-                schema,
-                value: data
-            });
-        }
-        return node.createError("MinItemsError", {
+        return node.createError("min-items-error", {
             minItems: schema.minItems,
             length: data.length,
             pointer,

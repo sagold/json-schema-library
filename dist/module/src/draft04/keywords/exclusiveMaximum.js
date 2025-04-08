@@ -9,7 +9,7 @@ function validateExclusiveMaximum({ node, data, pointer }) {
         return undefined;
     }
     if (node.schema.exclusiveMaximum && node.schema.maximum === data) {
-        return node.createError("MaximumError", {
+        return node.createError("maximum-error", {
             maximum: node.schema.exclusiveMaximum,
             length: data,
             pointer,

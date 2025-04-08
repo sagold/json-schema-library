@@ -11,7 +11,7 @@ function validatePattern({ node, data, pointer = "#" }) {
     }
     const pattern = new RegExp(schema.pattern, "u");
     if (pattern.test(data) === false) {
-        return node.createError("PatternError", {
+        return node.createError("pattern-error", {
             pattern: schema.pattern,
             description: schema.patternExample || schema.pattern,
             received: data,
