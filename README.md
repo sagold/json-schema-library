@@ -141,7 +141,7 @@ Note that rootNodes will change when working across remote schema (using $ref).
 
 ### Draft Support
 
-_json-schema-library_ fully supports all core features of draft versions draft-04, draft-06, draft-07, draft-2019-09 and draft2020-12. Additionally, most format-validations are supported per default besides the listed format below. You can always override or extend format validation as is documented in [draft customization](#draft-customization).
+_json-schema-library_ fully supports all core features of draft versions draft-04, draft-06, draft-07, draft-2019-09 and draft-2020-12. Additionally, most format-validations are supported per default besides the listed format below. You can always override or extend format validation as is documented in [draft customization](#draft-customization).
 
 <details><summary>Overview draft support</summary>
 
@@ -545,7 +545,7 @@ const localSchema: JsonSchema = {
     ]
 };
 
-const schema = root.step("title", { title: 4 })?.schema;
+const schema = root.getChild("title", { title: 4 })?.schema;
 
 expect(schema).to.deep.eq({ type: "number" });
 ```
