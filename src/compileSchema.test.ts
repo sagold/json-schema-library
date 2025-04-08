@@ -1,6 +1,5 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
-import { isSchemaNode } from "./types";
 import { draftEditor } from "./draftEditor";
 
 describe("compileSchema vocabulary", () => {
@@ -131,7 +130,7 @@ describe("compileSchema `schemaId`", () => {
         const { node } = compileSchema({
             properties: { title: { $ref: "#/$defs/asset" } },
             $defs: { asset: { type: "string" } }
-        }).get("title");
+        }).getChild("title");
 
         // @todo should have returned already resolved node?
         const result = node.resolveRef();
@@ -141,7 +140,7 @@ describe("compileSchema `schemaId`", () => {
     it("should maintain schemaId when resolved by root-ref", () => {
         const { node } = compileSchema({
             properties: { title: { $ref: "#" } }
-        }).get("title");
+        }).getChild("title");
 
         // @todo should have returned already resolved node?
         const result = node.resolveRef();

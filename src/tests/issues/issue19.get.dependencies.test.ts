@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
-import { isSchemaNode, SchemaNode } from "../../types";
+import { SchemaNode } from "../../types";
 import { draftEditor } from "../../draftEditor";
 
 describe("issue#19 - getSchema from dependencies", () => {
@@ -54,7 +54,7 @@ describe("issue#19 - getSchema from dependencies", () => {
     );
 
     it("should return correct schema for existing data property 'customField'", () => {
-        const { node } = rootNode.get("customField", {
+        const { node } = rootNode.getChild("customField", {
             name: "issue #19",
             generation: "Display Custom Field",
             customField: "mi"
@@ -73,7 +73,7 @@ describe("issue#19 - getSchema from dependencies", () => {
             drafts: [draftEditor]
         });
 
-        const { node } = modifiedRootNode.get("customField", {
+        const { node } = modifiedRootNode.getChild("customField", {
             name: "issue #19",
             generation: "Display Custom Field"
         });

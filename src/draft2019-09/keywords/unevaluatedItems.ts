@@ -1,5 +1,5 @@
 import { isObject } from "../../utils/isObject";
-import { isSchemaNode, SchemaNode } from "../../types";
+import { SchemaNode } from "../../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationResult } from "../../Keyword";
 import sanitizeErrors from "../../utils/sanitizeErrors";
 import { validateNode } from "../../validateNode";
@@ -54,7 +54,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
     // "unevaluatedItems with nested items"
     for (let i = 0; i < data.length; i += 1) {
         const value = data[i];
-        const { node: child } = node.get(i, data, { path });
+        const { node: child } = node.getChild(i, data, { path });
         // console.log(`CHILD '${i}':`, data[i], "=>", child?.schema);
 
         if (child) {

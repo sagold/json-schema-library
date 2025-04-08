@@ -194,7 +194,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
                 const hasValue = getValue(d, propertyName) !== undefined;
                 if (hasValue && Array.isArray(propertyValue)) {
                     propertyValue.forEach((addProperty) => {
-                        const { node: propertyNode } = node.get(addProperty, d);
+                        const { node: propertyNode } = node.getChild(addProperty, d);
                         if (propertyNode) {
                             d[addProperty] = propertyNode.getTemplate(getValue(d, addProperty), opts);
                         }

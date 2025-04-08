@@ -9,7 +9,7 @@ describe("keyword : allOf : get", () => {
             allOf: [{ properties: { header: { type: "string", minLength: 1 } } }]
         });
 
-        const schema = node.get("header", { withHeader: true, header: "huhu" })?.node?.schema;
+        const schema = node.getChild("header", { withHeader: true, header: "huhu" })?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
@@ -25,7 +25,7 @@ describe("keyword : allOf : get", () => {
             ]
         });
 
-        const schema = node.get("header", { withHeader: true, header: "huhu" })?.node?.schema;
+        const schema = node.getChild("header", { withHeader: true, header: "huhu" })?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });

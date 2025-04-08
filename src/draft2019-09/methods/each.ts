@@ -10,14 +10,14 @@ export function each(node: SchemaNode, data: unknown, callback: EachCallback, po
 
     if (isObject(data)) {
         Object.keys(data).forEach((key) => {
-            const { node: nextNode } = currentNode.get(key, data);
+            const { node: nextNode } = currentNode.getChild(key, data);
             if (node) {
                 each(nextNode, getValue(data, key), callback, `${pointer}/${key}`);
             }
         });
     } else if (Array.isArray(data)) {
         data.forEach((next: unknown, key: number) => {
-            const { node: nextNode } = currentNode.get(key, data);
+            const { node: nextNode } = currentNode.getChild(key, data);
             if (node) {
                 each(nextNode, getValue(data, key), callback, `${pointer}/${key}`);
             }

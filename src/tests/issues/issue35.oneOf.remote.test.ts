@@ -27,8 +27,8 @@ describe("issue#35 - reducing ref loses correct remote context", () => {
             }
         });
 
-        const { node: titleNode } = node.get("title", { title: { innerTitle: 111 } });
-        const { node: innerTitleNode } = titleNode.get("innerTitle", { innerTitle: 111 });
+        const { node: titleNode } = node.getChild("title", { title: { innerTitle: 111 } });
+        const { node: innerTitleNode } = titleNode.getChild("innerTitle", { innerTitle: 111 });
 
         assert.deepEqual(innerTitleNode.resolveRef().schema, { type: "number", title: "Zahl" });
     });

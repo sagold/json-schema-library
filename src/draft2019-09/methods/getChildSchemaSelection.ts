@@ -15,7 +15,7 @@ export function getChildSchemaSelection(node: SchemaNode, property: string | num
 
     // array.items[] found
     if (node.itemsList && node.itemsList.length > +property) {
-        const { node: childNode, error } = node.get(property);
+        const { node: childNode, error } = node.getChild(property);
         if (node) {
             return [childNode];
         }
@@ -37,7 +37,7 @@ export function getChildSchemaSelection(node: SchemaNode, property: string | num
         return [];
     }
 
-    const { node: childNode, error } = node.get(property);
+    const { node: childNode, error } = node.getChild(property);
     if (error) {
         return error;
     }

@@ -1,7 +1,5 @@
 import { strict as assert } from "assert";
-
 import { compileSchema } from "../../compileSchema";
-import { isJsonError } from "../../types";
 
 describe("keyword : ref : resolve", () => {
     it("should return undefined for missing reference", () => {
@@ -37,7 +35,7 @@ describe("keyword : ref : resolve", () => {
                 header: { $ref: "#/$defs/header" }
             },
             $defs: { header: { type: "string", minLength: 1 } }
-        }).get("header");
+        }).getChild("header");
 
         const node = _node.resolveRef();
 
@@ -51,7 +49,7 @@ describe("keyword : ref : resolve", () => {
             properties: {
                 header: { $ref: "#", minProperties: 2 }
             }
-        }).get("header");
+        }).getChild("header");
 
         const node = _node.resolveRef();
 

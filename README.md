@@ -163,7 +163,7 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 ## SchemaNode methods
 
-[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getTemplate**](#gettemplate) · [**getSchema**](#getschema) · [**reduce**](#reduce) · [**get**](#get) · [**each**](#each) · [**eachSchema**](#eachschema) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSchemaSelection](#getchildschemaselection)
+[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getTemplate**](#gettemplate) · [**getSchema**](#getschema) · [**reduce**](#reduce) · [**getChild**](#getchild) · [**each**](#each) · [**eachSchema**](#eachschema) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSchemaSelection](#getchildschemaselection)
 
 ### validate
 
@@ -514,14 +514,14 @@ if (error) {
 
 `reduce` compiles dynamic schema-keywords of a SchemaNode according to the given data.
 
-### get
+### getChild
 
-`get` retrieves the JSON Schema of a child property or index. Using `get` it is possible to incrementally go through the data, retrieving the schema for each next item.
+`getChild` retrieves the JSON Schema of a child property or index. Using `get` it is possible to incrementally go through the data, retrieving the schema for each next item.
 
 ```ts
 const mySchema = { type: "object", properties: { title: { type: "string" } } };
 const root = compileSchema(mySchema);
-const node = root.get("title", { title: "value" });
+const node = root.getChild("title", { title: "value" });
 if (!isSchemaNode(node)) return;
 console.log(node.schema);
 ```

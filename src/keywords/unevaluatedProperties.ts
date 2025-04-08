@@ -1,4 +1,4 @@
-import { isJsonError, isSchemaNode } from "../types";
+import { isSchemaNode } from "../types";
 import { isObject } from "../utils/isObject";
 import { SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
@@ -46,7 +46,7 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
     const errors: ValidationResult[] = [];
     for (let i = 0; i < unevaluated.length; i += 1) {
         const propertyName = unevaluated[i];
-        const { node: child } = node.get(propertyName, data, { path });
+        const { node: child } = node.getChild(propertyName, data, { path });
 
         if (child) {
             if (validateNode(child, data[propertyName], `${pointer}/${propertyName}`, path).length > 0) {
@@ -88,7 +88,7 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
 
 /** tests if a property is evaluated by the given schema */
 function isPropertyEvaluated(schemaNode: SchemaNode, propertyName: string, data: unknown) {
-    const { node, error } = schemaNode.get(propertyName, data);
+    const { node, error } = schemaNode.getChild(propertyName, data);
     if (node == null || error) {
         return false;
     }

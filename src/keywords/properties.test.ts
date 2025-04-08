@@ -1,7 +1,5 @@
 import { strict as assert } from "assert";
-
 import { compileSchema } from "../compileSchema";
-import { isJsonError } from "../types";
 
 describe("keyword : properties : get", () => {
     it("should step into properties without data", () => {
@@ -12,7 +10,7 @@ describe("keyword : properties : get", () => {
             }
         });
 
-        const schema = node.get("header")?.node?.schema;
+        const schema = node.getChild("header")?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
@@ -25,7 +23,7 @@ describe("keyword : properties : get", () => {
             }
         });
 
-        const schema = node.get("header", { header: "huhu" })?.node?.schema;
+        const schema = node.getChild("header", { header: "huhu" })?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
@@ -43,8 +41,8 @@ describe("keyword : properties : get", () => {
             }
         });
 
-        const { node: next } = node.get("header", { header: { title: "huhu" } });
-        const schema = next.get("title")?.node?.schema;
+        const { node: next } = node.getChild("header", { header: { title: "huhu" } });
+        const schema = next.getChild("title")?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
@@ -59,7 +57,7 @@ describe("keyword : properties : get", () => {
             then: { allOf: [{ required: ["header"], properties: { header: { type: "string", minLength: 1 } } }] }
         });
 
-        const schema = node.get("withHeader", { withHeader: false })?.node?.schema;
+        const schema = node.getChild("withHeader", { withHeader: false })?.node?.schema;
 
         assert.deepEqual(schema, { type: "boolean", default: true });
     });

@@ -212,7 +212,7 @@ export const SchemaNodeMethods = {
         let currentNode = node;
         for (let i = 0, l = keys.length; i < l; i += 1) {
             currentPointer = `${currentPointer}/${keys[i]}`;
-            const result = currentNode.get(keys[i], data, { ...options, pointer: currentPointer });
+            const result = currentNode.getChild(keys[i], data, { ...options, pointer: currentPointer });
             if (result.error) {
                 return result;
             }
@@ -231,7 +231,7 @@ export const SchemaNodeMethods = {
         return node.compileSchema({ $ref }).resolveRef();
     },
 
-    get(key: string | number, data?: unknown, options: GetSchemaOptions = {}): OptionalNodeAndError {
+    getChild(key: string | number, data?: unknown, options: GetSchemaOptions = {}): OptionalNodeAndError {
         options.path = options.path ?? [];
 
         options.withSchemaWarning = options.withSchemaWarning ?? false;
@@ -261,7 +261,7 @@ export const SchemaNodeMethods = {
 
         const referencedNode = node.resolveRef({ path });
         if (referencedNode !== node) {
-            return referencedNode.get(key, data, options);
+            return referencedNode.getChild(key, data, options);
         }
 
         if (options.createSchema === true) {
