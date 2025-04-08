@@ -5,7 +5,6 @@ import type { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, Keywor
 import { createSchema } from "./methods/createSchema";
 import { dashCase } from "./utils/dashCase";
 import { Draft } from "./Draft";
-import { EachCallback } from "./methods/each";
 import { eachSchema, EachSchemaCallback } from "./methods/eachSchema";
 import { getValue } from "./utils/getValue";
 import { isJsonError, JsonSchema, JsonError, ErrorData, DefaultErrors, OptionalNodeAndError } from "./types";
@@ -161,11 +160,6 @@ export const SchemaNodeMethods = {
 
     createSchema,
 
-    each(data: unknown, callback: EachCallback, pointer?: string) {
-        const node = this as SchemaNode;
-        return node.context.methods.each(node, data, callback, pointer);
-    },
-
     eachSchema(callback: EachSchemaCallback) {
         const node = this as SchemaNode;
         return eachSchema(node, callback);
@@ -280,6 +274,11 @@ export const SchemaNodeMethods = {
 
         return { node: undefined, error: undefined };
     },
+
+    getDraftVersion() {
+        return (this as SchemaNode).context.version;
+    },
+
     /** Creates data that is valid to the schema of this node */
     getTemplate(data?: unknown, options?: TemplateOptions) {
         const node = this as SchemaNode;
@@ -290,10 +289,6 @@ export const SchemaNodeMethods = {
             ...(options ?? {})
         };
         return node.context.methods.getTemplate(node, data, opts);
-    },
-
-    getDraftVersion() {
-        return (this as SchemaNode).context.version;
     },
 
     reduce(
@@ -411,6 +406,11 @@ export const SchemaNodeMethods = {
         addKeywords(node);
 
         return this;
+    },
+
+    toDataNodes(data: unknown, pointer?: string) {
+        const node = this as SchemaNode;
+        return node.context.methods.toDataNodes(node, data, pointer);
     },
 
     toJSON() {

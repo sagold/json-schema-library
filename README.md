@@ -1,7 +1,7 @@
 <div align="center">
     <img src="./docs/json-schema-library-10.png" width="128" alt="json-schema-library">
     <p>✨ <b>json-schema-library</b> ✨</p>
-    <div><a href="#overview"><b>Overview</b></a> · <a href="#schemanode-methods"><b>Methods</b></a> · <a href="#keyword-extensions"><b>Extensions</b></a> · <a href="#draft-customization"><b>Customization</b></a> · <a href="#breaking-changes">Breaking Changes</a></div>
+    <div><a href="#overview"><b>Overview</b></a> · <a href="#schemanode-methods"><b>Methods</b></a> · <a href="#draft-customization"><b>Customization</b></a> · <a href="#keyword-extensions"><b>Extensions</b></a> · <a href="#breaking-changes">Breaking Changes</a></div>
 </div>
 
 <div>&nbsp;</div>
@@ -156,7 +156,7 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 <details><summary>Overview format validation support</summary>
 
--   **`❌ supported formats`** iri, iri-reference, idn-hostname
+-   **`❌ unsupported formats`** iri, iri-reference, idn-hostname
 -   **`✅ supported formats`**: date, date-time, date, duration, ecmascript-regex, email, hostname, idn-email, ipv4, ipv6, json-pointer, regex, relative-json-pointer, time, unknown, uri-reference, uri-template, uri, uuid
 
 </details>
@@ -809,42 +809,6 @@ const schema: JsonSchema = schemaNode.createSchema({ title: "initial value" });
 console.log(schema); // { type: "string" }
 ```
 
-## Keyword extensions
-
-### oneOfProperty
-
-For `oneOf` resolution, JSON Schema states that data is valid if it validates against exactly one of those sub-schemas. In some scenarios this is unwanted behaviour, as the actual `oneOf` schema is known and only validation errors of this exact sub-schema should be returned.
-
-For an explicit `oneOf` resolution, the JSON Schema may be extended by a property `oneOfProperty`. This will always associate an entry with a matching value (instead of schema validation) and return only this schema or validation errors, depending on the current task. For example:
-
-```ts
-const schema = {
-    oneOfProperty: "id",
-    oneOf: [
-        {
-            type: "object",
-            properties: { id: { const: "1" }, title: { type: "number" } }
-        },
-        {
-            type: "object",
-            properties: { id: { const: "2" }, title: { type: "number" } }
-        },
-        {
-            type: "object",
-            properties: { id: { const: "3" }, title: { type: "number" } }
-        }
-    ]
-};
-
-const resolvedNode = compileSchema(schema).reduce({ id: "2", title: "not a number" });
-
-// will always return (even if invalid)
-expect(resolvedNode?.schema).to.deep.eq({
-    type: "object",
-    properties: { id: { const: "2" }, title: { type: "number" } }
-});
-```
-
 ## Draft Customization
 
 [**Extending a Draft**](#extending-a-draft) · [**Keyword**](#Keyword)
@@ -1058,7 +1022,45 @@ function reduceType({ node, pointer, data }: JsonSchemaReducerParams): undefined
 
 </details>
 
+## Keyword extensions
+
+### oneOfProperty
+
+For `oneOf` resolution, JSON Schema states that data is valid if it validates against exactly one of those sub-schemas. In some scenarios this is unwanted behaviour, as the actual `oneOf` schema is known and only validation errors of this exact sub-schema should be returned.
+
+For an explicit `oneOf` resolution, the JSON Schema may be extended by a property `oneOfProperty`. This will always associate an entry with a matching value (instead of schema validation) and return only this schema or validation errors, depending on the current task. For example:
+
+```ts
+const schema = {
+    oneOfProperty: "id",
+    oneOf: [
+        {
+            type: "object",
+            properties: { id: { const: "1" }, title: { type: "number" } }
+        },
+        {
+            type: "object",
+            properties: { id: { const: "2" }, title: { type: "number" } }
+        },
+        {
+            type: "object",
+            properties: { id: { const: "3" }, title: { type: "number" } }
+        }
+    ]
+};
+
+const resolvedNode = compileSchema(schema).reduce({ id: "2", title: "not a number" });
+
+// will always return (even if invalid)
+expect(resolvedNode?.schema).to.deep.eq({
+    type: "object",
+    properties: { id: { const: "2" }, title: { type: "number" } }
+});
+```
+
 ## Breaking Changes
+
+-   `each(data, callback)` has been replaced by `const nodes = toDataNodes(data)`
 
 ### v10.0.0
 

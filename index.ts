@@ -18,7 +18,7 @@ export { render } from "./src/errors/render";
 export { dashCase } from "./src/utils/dashCase";
 
 // extra SchemaNode methods
-export type { EachCallback } from "./src/methods/each";
+export type { DataNode } from "./src/methods/toDataNodes";
 export type { EachSchemaCallback } from "./src/methods/eachSchema";
 // export { mergeNode } from "./src/mergeNode"; -- not yet
 

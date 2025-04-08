@@ -8,7 +8,7 @@ import { defsKeyword } from "./keywords/defs";
 import { dependenciesKeyword } from "./keywords/dependencies";
 import { dependentRequiredKeyword } from "./keywords/dependentRequired";
 import { dependentSchemasKeyword } from "./keywords/dependentSchemas";
-import { each } from "./methods/each";
+import { toDataNodes } from "./methods/toDataNodes";
 import { enumKeyword } from "./keywords/enum";
 import { exclusiveMaximumKeyword } from "./keywords/exclusiveMaximum";
 import { exclusiveMinimumKeyword } from "./keywords/exclusiveMinimum";
@@ -78,7 +78,7 @@ export const draft2020 = sanitizeKeywords({
         createSchema,
         getTemplate,
         getChildSchemaSelection,
-        each
+        toDataNodes
     },
     keywords: [
         refKeyword,

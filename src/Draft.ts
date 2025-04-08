@@ -1,7 +1,7 @@
 import type { Keyword } from "./Keyword";
 import { copyDraft } from "./utils/copyDraft";
 import { createSchema } from "./methods/createSchema";
-import { each } from "./methods/each";
+import { toDataNodes } from "./methods/toDataNodes";
 import { ErrorConfig } from "./types";
 import { formats } from "./formats/formats";
 import { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
@@ -21,7 +21,7 @@ export type Draft = {
         createSchema: typeof createSchema;
         getChildSchemaSelection: typeof getChildSchemaSelection;
         getTemplate: typeof getTemplate;
-        each: typeof each;
+        toDataNodes: typeof toDataNodes;
     };
     /** meta-schema url associated with this draft */
     $schema?: string;
