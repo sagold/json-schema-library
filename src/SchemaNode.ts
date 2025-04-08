@@ -66,6 +66,7 @@ export type Context = {
 };
 
 export interface SchemaNode extends SchemaNodeMethodsType {
+    /** shared context across nodes of JSON schema and shared properties across all remotes */
     context: Context;
     /** JSON Schema of node */
     schema: JsonSchema;
@@ -176,7 +177,6 @@ export const SchemaNodeMethods = {
         };
 
         addKeywords(node);
-
         return node;
     },
 
@@ -200,7 +200,7 @@ export const SchemaNodeMethods = {
     },
 
     /**
-     * Returns a node containing JSON Schema of a data-JSON Pointer.
+     * Returns a node containing JSON Schema of a data JSON Pointer.
      *
      * To resolve dynamic schema where the type of JSON Schema is evaluated by
      * its value, a data object has to be passed in options.
@@ -210,14 +210,7 @@ export const SchemaNodeMethods = {
      * receive an error with `code: schema-warning` containing the location of its
      * last evaluated json-schema.
      *
-     * Example:
-     *
-     * ```ts
-     * draft.setSchema({ type: "object", properties: { title: { type: "string" } } });
-     * const result = draft.getSchema({  pointer: "#/title" }, data: { title: "my header" });
-     * const schema = isSchemaNode(result) ? result.schema : undefined;
-     * // schema = { type: "string" }
-     * ```
+     * @returns { node } or { error } where node can also be undefined (valid but undefined)
      */
     getSchema(pointer: string, data?: unknown, options: GetSchemaOptions = {}): OptionalNodeAndError {
         options.path = options.path ?? [];

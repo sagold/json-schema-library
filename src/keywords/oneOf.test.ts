@@ -129,7 +129,7 @@ describe("keyword : oneof-fuzzy : reduce", () => {
         const node = compileSchema({
             oneOf: [{ type: "string" }, { type: "number" }, { type: "object" }]
         });
-        const res = reduceOneOfFuzzy({ node, data: 4 });
+        const res = reduceOneOfFuzzy({ node, data: 4, pointer: "#", path: [] });
         assert.deepEqual(res.schema, { type: "number" });
         // @todo should move oneOfIndex-property to exported node
         assert.equal(res.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
@@ -142,7 +142,7 @@ describe("keyword : oneof-fuzzy : reduce", () => {
                 { type: "string", pattern: "asterix" }
             ]
         });
-        const res = reduceOneOfFuzzy({ node, data: "anasterixcame" });
+        const res = reduceOneOfFuzzy({ node, data: "anasterixcame", pointer: "#", path: [] });
         assert.deepEqual(res.schema, { type: "string", pattern: "asterix" });
         assert.equal(res.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
@@ -155,7 +155,7 @@ describe("keyword : oneof-fuzzy : reduce", () => {
             },
             oneOf: [{ $ref: "#/definitions/a" }, { $ref: "#/definitions/b" }]
         });
-        const res = reduceOneOfFuzzy({ node, data: "anasterixcame" });
+        const res = reduceOneOfFuzzy({ node, data: "anasterixcame", pointer: "#", path: [] });
         assert.deepEqual(res.schema, { type: "string", pattern: "asterix" });
         assert.equal(res.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
@@ -169,7 +169,7 @@ describe("keyword : oneof-fuzzy : reduce", () => {
                     { type: "object", properties: { content: { type: "string" } } }
                 ]
             });
-            const res = reduceOneOfFuzzy({ node, data: { description: "..." } });
+            const res = reduceOneOfFuzzy({ node, data: { description: "..." }, pointer: "#", path: [] });
             assert.deepEqual(res.schema, {
                 type: "object",
                 properties: { description: { type: "string" } }
@@ -183,7 +183,7 @@ describe("keyword : oneof-fuzzy : reduce", () => {
                     { type: "object", properties: { title: { type: "string" } } }
                 ]
             });
-            const res = reduceOneOfFuzzy({ node, data: { title: "asterix" } });
+            const res = reduceOneOfFuzzy({ node, data: { title: "asterix" }, pointer: "#", path: [] });
             assert.deepEqual(res.schema, {
                 type: "object",
                 properties: { title: { type: "string" } }
@@ -199,7 +199,7 @@ describe("keyword : oneof-fuzzy : reduce", () => {
                     { type: "object", properties: { a: t, d: t, e: t } }
                 ]
             });
-            const res = reduceOneOfFuzzy({ node, data: { a: 0, b: 1 } });
+            const res = reduceOneOfFuzzy({ node, data: { a: 0, b: 1 }, pointer: "#", path: [] });
             assert.deepEqual(res.schema, {
                 type: "object",
                 properties: { a: t, b: t, c: t }
@@ -216,7 +216,7 @@ describe("keyword : oneof-fuzzy : reduce", () => {
                     { type: "object", properties: { a: { type: "number" }, b: t, e: t } }
                 ]
             });
-            const res = reduceOneOfFuzzy({ node, data: { a: true, b: 1 } });
+            const res = reduceOneOfFuzzy({ node, data: { a: true, b: 1 }, pointer: "#", path: [] });
             assert.deepEqual(res.schema, {
                 type: "object",
                 properties: { a: { type: "boolean" }, b: t, d: t }
@@ -248,6 +248,8 @@ describe("keyword : oneof-fuzzy : reduce", () => {
                 ]
             });
             const res = reduceOneOfFuzzy({
+                pointer: "#",
+                path: [],
                 node,
                 data: { type: "teaser", redirectUrl: "http://example.com/test/pay/article.html" }
             });
@@ -282,7 +284,7 @@ describe("keyword : oneof-property : reduce", () => {
                     }
                 ]
             });
-            const res = reduceOneOfDeclarator({ node, data: { name: "2", title: 123 } });
+            const res = reduceOneOfDeclarator({ node, data: { name: "2", title: 123 }, pointer: "#", path: [] });
             assert.deepEqual(res.schema, {
                 type: "object",
                 properties: {
@@ -311,7 +313,12 @@ describe("keyword : oneof-property : reduce", () => {
                     }
                 ]
             });
-            const res = reduceOneOfDeclarator({ node, data: { name: "2", title: "not a number" } });
+            const res = reduceOneOfDeclarator({
+                node,
+                data: { name: "2", title: "not a number" },
+                pointer: "#",
+                path: []
+            });
             assert.deepEqual(res.schema, {
                 type: "object",
                 properties: {
@@ -339,7 +346,7 @@ describe("keyword : oneof-property : reduce", () => {
                     }
                 ]
             });
-            const res = reduceOneOfDeclarator({ node, data: { title: "not a number" } });
+            const res = reduceOneOfDeclarator({ node, data: { title: "not a number" }, pointer: "#", path: [] });
             assert(isJsonError(res), "expected result to be an error");
             assert.deepEqual(res.code, "missing-one-of-property-error");
         });
@@ -360,7 +367,12 @@ describe("keyword : oneof-property : reduce", () => {
                     }
                 ]
             });
-            const res = reduceOneOfDeclarator({ node, data: { name: "2", title: "not a number" } });
+            const res = reduceOneOfDeclarator({
+                node,
+                data: { name: "2", title: "not a number" },
+                pointer: "#",
+                path: []
+            });
             assert(isJsonError(res), "expected result to be an error");
             assert.deepEqual(res.code, "missing-one-of-property-error");
         });

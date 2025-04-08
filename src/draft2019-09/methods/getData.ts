@@ -133,7 +133,7 @@ export function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions
             currentNode = mergeNode(currentNode, currentNode.oneOf[0]);
         } else {
             // find correct schema for data
-            const resolvedNode = reduceOneOfFuzzy({ node: currentNode, data: defaultData });
+            const resolvedNode = reduceOneOfFuzzy({ node: currentNode, data: defaultData, path: [], pointer: "#" });
             if (isJsonError(resolvedNode)) {
                 if (defaultData != null && opts.removeInvalidData !== true) {
                     return defaultData;

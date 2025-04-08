@@ -64,7 +64,6 @@ export function resolveRef({ pointer, path } = {}) {
     const node = this;
     if (node.schema.$recursiveRef) {
         const nextNode = resolveRecursiveRef(node, path);
-        console.log("recursive ref:", nextNode.schema);
         path === null || path === void 0 ? void 0 : path.push({ pointer, node: nextNode });
         return nextNode;
     }
