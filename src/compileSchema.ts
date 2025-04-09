@@ -14,7 +14,7 @@ export type CompileOptions = {
     drafts: Draft[];
     remote: SchemaNode;
     formatAssertion: boolean | "meta-schema";
-    templateDefaultOptions?: TemplateOptions;
+    getDataDefaultOptions?: TemplateOptions;
 };
 
 const defaultDrafts: Draft[] = [draft04, draft06, draft07, draft2019, draft2020];
@@ -51,7 +51,7 @@ export function compileSchema(schema: JsonSchema, options: Partial<CompileOption
             anchors: {},
             refs: {},
             ...copy(pick(draft, "methods", "keywords", "version", "formats", "errors")),
-            templateDefaultOptions: options.templateDefaultOptions,
+            getDataDefaultOptions: options.getDataDefaultOptions,
             drafts
         },
         ...SchemaNodeMethods

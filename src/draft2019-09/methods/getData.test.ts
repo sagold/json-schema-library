@@ -1669,7 +1669,7 @@ describe("getData (2019)", () => {
                     additionalProperties: false
                 },
                 {
-                    templateDefaultOptions: { removeInvalidData: true }
+                    getDataDefaultOptions: { removeInvalidData: true }
                 }
             );
             const res = node.getData({ valid: "stays", invalid: "removes" });
@@ -1683,7 +1683,7 @@ describe("getData (2019)", () => {
                     additionalProperties: false
                 },
                 {
-                    templateDefaultOptions: { removeInvalidData: true }
+                    getDataDefaultOptions: { removeInvalidData: true }
                 }
             );
             const res = node.getData({ valid: "stays", invalid: "not removed" }, { removeInvalidData: false });

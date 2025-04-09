@@ -57,7 +57,7 @@ type CompileOptions = {
     // if format-validations should create errors. Defaults to true
     formatAssertion: boolean | "meta-schema";
     // default options for all calls to node.getData()
-    templateDefaultOptions?: TemplateOptions;
+    getDataDefaultOptions?: TemplateOptions;
 };
 ```
 
@@ -77,11 +77,11 @@ compileSchema(mySchema, { remote: anotherSchemaNode });
 compileSchema(mySchema, { formatAssertion: false });
 
 // for all calls to getData, `addOptionalProps` is `true` per default
-compileSchema(mySchema, { templateDefaultOptions: { addOptionalProps: true } });
+compileSchema(mySchema, { getDataDefaultOptions: { addOptionalProps: true } });
 ```
 
 Details on _drafts_ are documented in [draft customization](#draft-customization).
-Details on `templateDefaultOptions` are documented in [getData](#getData).
+Details on `getDataDefaultOptions` are documented in [getData](#getData).
 
 ### SchemaNode
 
@@ -1157,9 +1157,13 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
     -   `draft.addRemoteSchema(schema)` → `node.addRemote(schema)`
     -   `draft.createSchemaOf(schema)` → `node.createSchema(schema)`
 
+-   **Renamed Properties**:
+
+    -   `templateDefaultOptions` → `getDataDefaultOptions`
+
 -   **Draft Customization**: Customizing drafts has changed completely. The previous methods of extending drafts are no longer valid, and draft handling is now centered around `SchemaNode`.
 
--   **Remove Property**:
+-   **Removed Error Property `name`**:
     Error property `name` has been removed from `JsonError` in favor of `code`.
 
 -   **Removed Configuration Option**:  
@@ -1167,7 +1171,7 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
 
     ```ts
     compileSchema(schema, {
-        templateDefaultOptions: {
+        getDataDefaultOptions: {
             addOptionalProps: false,
             removeInvalidData: false,
             extendDefaults: true

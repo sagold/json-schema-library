@@ -61,7 +61,7 @@ export type Context = {
     /** draft formats & validators */
     formats: Draft["formats"];
     /** [SHARED USING ADD REMOTE] getData default options */
-    templateDefaultOptions?: TemplateOptions;
+    getDataDefaultOptions?: TemplateOptions;
 };
 
 export interface SchemaNode extends SchemaNodeMethodsType {
@@ -316,7 +316,7 @@ export const SchemaNodeMethods = {
         const node = this as SchemaNode;
         const opts = {
             recursionLimit: 1,
-            ...node.context.templateDefaultOptions,
+            ...node.context.getDataDefaultOptions,
             cache: {},
             ...(options ?? {})
         };
