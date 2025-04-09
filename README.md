@@ -31,7 +31,7 @@ const { valid, errors } = schema.validate(myData);
 // create data which validates to the compiled JSON Schema
 const defaultData = schema.getData();
 // access a subschema at a specific JSON Pointer location
-const { node, error } = schema.getSchema("#/image/title");
+const { node, error } = schema.getNode("#/image/title");
 node && console.log(node.schema);
 ```
 
@@ -91,14 +91,14 @@ For example:
 ```ts
 const root = compileSchema(mySchema);
 const rootData = root.getData();
-const { node: titleNode } = root.getSchema("#/image/title");
+const { node: titleNode } = root.getNode("#/image/title");
 const titleData = titleNode?.getData();
 ```
 
 <details><summary>Each node has an identity</summary>
 
 ```ts
-const titleNode = compileSchema(mySchema).getSchema("#/image/title");
+const titleNode = compileSchema(mySchema).getNode("#/image/title");
 console.log(titleNode.spointer); // #/properties/image/properties/title
 console.log(titleNode.schemaId); // #/properties/image/properties/title
 ```
@@ -114,7 +114,7 @@ The parent-node can be a sub-schema or intermediary node:
 
 ```ts
 const root = compileSchema(mySchema);
-const { node: childNode } = root.getSchema("#/image");
+const { node: childNode } = root.getNode("#/image");
 assert(root === childNode.parent);
 ```
 
@@ -128,7 +128,7 @@ A context is shared across all nodes of a schema
 
 ```ts
 const root = compileSchema(mySchema);
-const { node: childNode } = root.getSchema("#/image");
+const { node: childNode } = root.getNode("#/image");
 assert(root.context === childNode.context);
 ```
 
@@ -136,7 +136,7 @@ And some context properties are shared across all schema added as remotes. The p
 
 ```ts
 const root = compileSchema(mySchema);
-const { node: childNode } = root.getSchema("#/image");
+const { node: childNode } = root.getNode("#/image");
 assert(root === childNode.context.rootNode);
 ```
 
@@ -168,7 +168,7 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 ## SchemaNode methods
 
-[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getData**](#getdata) · [**getSchema**](#getschema) · [**getChild**](#getchild) · [**reduceSchema**](#reduceschema) · [**toDataNodes**](#todatanodes) · [**toSchemaNodes**](#toschemanodes) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSchemaSelection](#getchildschemaselection)
+[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getData**](#getdata) · [**getNode**](#getnode) · [**getChild**](#getchild) · [**reduceSchema**](#reduceschema) · [**toDataNodes**](#todatanodes) · [**toSchemaNodes**](#toschemanodes) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSchemaSelection](#getchildschemaselection)
 
 ### validate
 
@@ -402,19 +402,19 @@ console.log(data); // { valid: "stays", invalid: "removed" }
 
 </details>
 
-### getSchema
+### getNode
 
-`getSchema` returns the JSON Schema from data location specified by a JSON Pointer. In many cases the JSON Schema can be retrieved without passing any data, but in situations where the schema is dynamic (for example in _oneOf_, _dependencies_, etc.), input-data is required or `getSchema` will return a _JsonError_ as is done when the JSON Pointer path is invalid.
+`getNode` returns the JSON Schema from data location specified by a JSON Pointer. In many cases the JSON Schema can be retrieved without passing any data, but in situations where the schema is dynamic (for example in _oneOf_, _dependencies_, etc.), input-data is required or `getNode` will return a _JsonError_ as is done when the JSON Pointer path is invalid.
 
 ```ts
-const { node, error } = compileSchema(mySchema).getSchema("/list/1/name", myData);
+const { node, error } = compileSchema(mySchema).getNode("/list/1/name", myData);
 if (node) console.log(node.schema);
 ```
 
-**Note** `getSchema` will return a `node=undefined` for paths that lead to valid properties, but miss a schema definition. For example:
+**Note** `getNode` will return a `node=undefined` for paths that lead to valid properties, but miss a schema definition. For example:
 
 ```ts
-const { node, error } = compileSchema({ type: "object" }).getSchema("/name");
+const { node, error } = compileSchema({ type: "object" }).getNode("/name");
 console.log(node, error); // undefined, undefined
 ```
 
@@ -422,15 +422,15 @@ In case this is unwanted behaviour, use the `withSchemaWarning` option to return
 
 ```ts
 const schemaNode = compileSchema({ type: "object" });
-const { node, error } = schemaNode.getSchema("/name", undefined, { withSchemaWarning: true });
+const { node, error } = schemaNode.getNode("/name", undefined, { withSchemaWarning: true });
 console.log(node, error); // undefined, { type: "error", code: "schema-warning" }
 ```
 
-Or set `getSchema` to return a simple JSON Schema for the found data setting `createSchema: true`:
+Or set `getNode` to return a simple JSON Schema for the found data setting `createSchema: true`:
 
 ```ts
 const schemaNode = compileSchema({ type: "object" });
-const { node, error } = schemaNode.getSchema("/name", { name: 123 }, { createSchema: true });
+const { node, error } = schemaNode.getNode("/name", { name: 123 }, { createSchema: true });
 console.log(node, error); // { type: "number" }, undefined
 ```
 
@@ -472,7 +472,7 @@ const mySchema = {
     }
 };
 
-const { node } = compileSchema(mySchema).getSchema("/list/1", {
+const { node } = compileSchema(mySchema).getNode("/list/1", {
     list: [{ description: "..." }, { name: "my-item" }]
 });
 
@@ -499,7 +499,7 @@ All returned json-errors have a data property with the following properties
 -   `value` the data value at this location that could not be resolved
 
 ```ts
-const { error } = schemaNode.getSchema("/list/1");
+const { error } = schemaNode.getNode("/list/1");
 if (error) {
     console.log(Object.keys(error.data)); // [pointer, schema, value]
 }
@@ -1152,7 +1152,7 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
     -   `draft.each(data, callback)` → `const nodes = node.toDataNodes(data)`
     -   `draft.eachSchema(callback)` → `const nodes = node.toSchemaNodes()`
     -   `draft.isValid(data)` → `node.validate(data).valid`
-    -   `draft.getSchema(options)` → `node.getSchema(pointer, data, options)`
+    -   `draft.getNode(options)` → `node.getNode(pointer, data, options)`
     -   `draft.step(property, data)` → `node.getChild(property, data)`
     -   `draft.addRemoteSchema(schema)` → `node.addRemote(schema)`
     -   `draft.createSchemaOf(schema)` → `node.createSchema(schema)`
@@ -1189,7 +1189,7 @@ This format should help users quickly understand the changes, what has been rena
 
 **breaking changes**:
 
--   _getSchema_ signature changed in favour of an options object. Instead of `draft.getSchema(pointer, data)` arguments have to be passed as an object `draft.getSchema({ pointer, data })`. This removes setting unwanted optional arguments and keeps the api more stable in the future (e.g. `withSchemaWarning` option)
+-   _getSchema_ signature changed in favour of an options object. Instead of `draft.getNode(pointer, data)` arguments have to be passed as an object `draft.getNode({ pointer, data })`. This removes setting unwanted optional arguments and keeps the api more stable in the future (e.g. `withSchemaWarning` option)
 -   _JsonError_ now must expose `pointer`, `schema` and `value` consistently on data property
 
 **updates**
@@ -1229,7 +1229,7 @@ The above documentation reflects all these changes. Just reach out if you have t
 -   changed API of `compileSchema` to have an additional schema-parameter for rootSchema reference
 -   changed `compileSchema` and `addRemote` to work on instance state, instead of global state
 -   `addRemote`, `compileSchema` now requires draft instance as first parameter
--   removed direct export of following functions: `addValidator`, `compileSchema`, `createSchemaOf`, `each`, `eachSchema`, `getChildSchemaSelection`, `getSchema`, `getData`, `isValid`, `step`, `validate`. They are still accessible under the draftConfigs of each draft-version
+-   removed direct export of following functions: `addValidator`, `compileSchema`, `createSchemaOf`, `each`, `eachSchema`, `getChildSchemaSelection`, `getNode`, `getData`, `isValid`, `step`, `validate`. They are still accessible under the draftConfigs of each draft-version
 -   changed draft version of `JsonEditor` to draft07
 
 </details>

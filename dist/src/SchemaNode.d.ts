@@ -29,7 +29,7 @@ export type Context = {
     /** draft formats & validators */
     formats: Draft["formats"];
     /** [SHARED USING ADD REMOTE] getData default options */
-    templateDefaultOptions?: TemplateOptions;
+    getDataDefaultOptions?: TemplateOptions;
 };
 export interface SchemaNode extends SchemaNodeMethodsType {
     /** shared context across nodes of JSON schema and shared properties across all remotes */
@@ -84,7 +84,7 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     unevaluatedProperties?: SchemaNode;
 }
 type SchemaNodeMethodsType = typeof SchemaNodeMethods;
-export type GetSchemaOptions = {
+export type GetNodeOptions = {
     /**
      *  Per default `undefined` is returned for valid data, but undefined schema.
      *
@@ -123,7 +123,7 @@ export declare const SchemaNodeMethods: {
      *
      * @returns { node } or { error } where node can also be undefined (valid but undefined)
      */
-    readonly getSchema: (pointer: string, data?: unknown, options?: GetSchemaOptions) => OptionalNodeAndError;
+    readonly getNode: (pointer: string, data?: unknown, options?: GetNodeOptions) => OptionalNodeAndError;
     /**
      * @returns for $ref, the corresponding SchemaNode or undefined
      */
@@ -131,7 +131,7 @@ export declare const SchemaNodeMethods: {
     /**
      * @returns child node identified by property as SchemaNode
      */
-    readonly getChild: (key: string | number, data?: unknown, options?: GetSchemaOptions) => OptionalNodeAndError;
+    readonly getChild: (key: string | number, data?: unknown, options?: GetNodeOptions) => OptionalNodeAndError;
     /**
      * @returns draft version this JSON Schema is evaluated by
      */

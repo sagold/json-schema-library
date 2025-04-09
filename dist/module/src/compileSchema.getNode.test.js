@@ -1,97 +1,71 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
-import { isSchemaNode, isJsonError, SchemaNode } from "./types";
+import { isSchemaNode, isJsonError } from "./types";
 import { pick } from "./utils/pick";
-
-describe("compileSchema : getSchema", () => {
+describe("compileSchema : getNode", () => {
     describe("behaviour", () => {
-        let root: SchemaNode;
-        beforeEach(
-            () =>
-                (root = compileSchema({
+        let root;
+        beforeEach(() => (root = compileSchema({
+            type: "object",
+            additionalProperties: false,
+            properties: {
+                image: {
                     type: "object",
-                    additionalProperties: false,
                     properties: {
-                        image: {
-                            type: "object",
-                            properties: {
-                                title: { name: "title", type: "string" }
-                            }
-                        }
+                        title: { name: "title", type: "string" }
                     }
-                }))
-        );
-
+                }
+            }
+        })));
         it("should find property with json-pointer with fragmentId", () => {
-            const { node } = root.getSchema("#/image/title", { image: { title: "" } });
+            const { node } = root.getNode("#/image/title", { image: { title: "" } });
             assert.deepEqual(node.schema, { name: "title", type: "string" });
         });
-
         it("should find property with json-pointer without fragmentId", () => {
-            const { node } = root.getSchema("/image/title");
+            const { node } = root.getNode("/image/title");
             assert.deepEqual(node.schema, { name: "title", type: "string" });
         });
-
         it("should find property with json-pointer without prefix", () => {
-            const { node } = root.getSchema("image/title");
+            const { node } = root.getNode("image/title");
             assert.deepEqual(node.schema, { name: "title", type: "string" });
         });
-
         it("should return JsonError for invalid path", () => {
-            const { node, error } = root.getSchema("#/audio/file");
-
+            const { node, error } = root.getNode("#/audio/file");
             assert.deepEqual(node, undefined);
             assert(isJsonError(error));
         });
-
         it("should return undefined for valid but unspecified property", () => {
-            const { node, error } = root.getSchema("#/image/size");
-
+            const { node, error } = root.getNode("#/image/size");
             assert.deepEqual(error, undefined);
             assert.deepEqual(node, undefined);
         });
-
         it("should return error schema-warning for valid but unspecified property", () => {
-            const { node, error } = root.getSchema("#/image/size", undefined, { withSchemaWarning: true });
-
+            const { node, error } = root.getNode("#/image/size", undefined, { withSchemaWarning: true });
             assert(isJsonError(error));
             assert(error.code, "schema-warning");
             assert.deepEqual(node, undefined);
         });
-
         it("should return schema for valid but unspecified property", () => {
-            const { node, error } = root.getSchema("#/image/size", undefined, { createSchema: true });
-
+            const { node, error } = root.getNode("#/image/size", undefined, { createSchema: true });
             assert.deepEqual(error, undefined);
             assert.deepEqual(node.schema, {});
         });
-
         it("should return typed schema for valid but unspecified property", () => {
-            const { node, error } = root.getSchema("#/image/size", { image: { size: 1 } }, { createSchema: true });
-
+            const { node, error } = root.getNode("#/image/size", { image: { size: 1 } }, { createSchema: true });
             assert.deepEqual(error, undefined);
             assert.deepEqual(node.schema, { type: "number" });
         });
-
         it("should return typed schema overriding withSchemaWarning", () => {
-            const { node, error } = root.getSchema(
-                "#/image/size",
-                { image: { size: 1 } },
-                { withSchemaWarning: true, createSchema: true }
-            );
-
+            const { node, error } = root.getNode("#/image/size", { image: { size: 1 } }, { withSchemaWarning: true, createSchema: true });
             assert.deepEqual(error, undefined);
             assert.deepEqual(node.schema, { type: "number" });
         });
     });
-
     describe("value", () => {
         it("should return schema of any value", () => {
-            const { node } = compileSchema({ name: "target", type: "*" }).getSchema("#");
-
+            const { node } = compileSchema({ name: "target", type: "*" }).getNode("#");
             assert.deepEqual(node.schema, { name: "target", type: "*" });
         });
-
         it("should resolve property through root $ref", () => {
             const { node } = compileSchema({
                 $ref: "#/$defs/root",
@@ -103,12 +77,10 @@ describe("compileSchema : getSchema", () => {
                         }
                     }
                 }
-            }).getSchema("#/value", { value: 123 });
-
+            }).getNode("#/value", { value: 123 });
             assert.deepEqual(node.schema, { name: "target", type: "number" });
         });
     });
-
     describe("object", () => {
         it("should return schema of valid property", () => {
             const { node } = compileSchema({
@@ -116,61 +88,49 @@ describe("compileSchema : getSchema", () => {
                 properties: {
                     title: { name: "title", type: "string" }
                 }
-            }).getSchema("#/title");
-
+            }).getNode("#/title");
             assert.deepEqual(node.schema, { name: "title", type: "string" });
         });
-
         it("should return `schema-warning` for unknown, but valid property", () => {
-            const { error } = compileSchema({ type: "object" }).getSchema("#/title", undefined, {
+            const { error } = compileSchema({ type: "object" }).getNode("#/title", undefined, {
                 withSchemaWarning: true
             });
-
             assert.deepEqual(pick(error, "code", "type"), { code: "schema-warning", type: "error" });
         });
-
         it("should return `undefined` for unknown, but valid property", () => {
-            const { node, error } = compileSchema({ type: "object" }).getSchema("#/title");
-
+            const { node, error } = compileSchema({ type: "object" }).getNode("#/title");
             assert.deepEqual(node, undefined);
             assert.deepEqual(error, undefined);
         });
-
         it("should return `undefined` for unknown property if data is passed", () => {
-            const { node, error } = compileSchema({ type: "object" }).getSchema("#/title", {
+            const { node, error } = compileSchema({ type: "object" }).getNode("#/title", {
                 title: "value"
             });
-
             assert.deepEqual(node, undefined);
             assert.deepEqual(error, undefined);
         });
-
         it("should return an error for invalid properties", () => {
             const { error } = compileSchema({
                 type: "object",
                 properties: { title: { type: "string" } },
                 additionalProperties: false
-            }).getSchema("#/unknown");
-
+            }).getNode("#/unknown");
             assert.deepEqual(pick(error, "code", "type"), {
                 code: "no-additional-properties-error",
                 type: "error"
             });
         });
-
         it("should return an error for invalid properties, even if value is given", () => {
             const { error } = compileSchema({
                 type: "object",
                 properties: { title: { type: "string" } },
                 additionalProperties: false
-            }).getSchema("#/unknown", { unknown: "value" });
-
+            }).getNode("#/unknown", { unknown: "value" });
             assert.deepEqual(pick(error, "code", "type"), {
                 code: "no-additional-properties-error",
                 type: "error"
             });
         });
-
         it("should return schema for property within nested object", () => {
             const { node } = compileSchema({
                 type: "object",
@@ -182,11 +142,9 @@ describe("compileSchema : getSchema", () => {
                         }
                     }
                 }
-            }).getSchema("#/image/title");
-
+            }).getNode("#/image/title");
             assert.deepEqual(node.schema, { name: "title", type: "string" });
         });
-
         it("should resolve $ref as property", () => {
             const { node } = compileSchema({
                 type: "object",
@@ -200,11 +158,9 @@ describe("compileSchema : getSchema", () => {
                         $ref: "#/definitions/target"
                     }
                 }
-            }).getSchema("#/image");
-
+            }).getNode("#/image");
             assert.deepEqual(node.schema, { name: "target" });
         });
-
         it("should return correct 'oneOf' object definition", () => {
             const { node } = compileSchema({
                 type: "object",
@@ -228,12 +184,11 @@ describe("compileSchema : getSchema", () => {
                         additionalProperties: false
                     }
                 ]
-            }).getSchema("#/second", { second: "string" });
-
+            }).getNode("#/second", { second: "string" });
             assert.deepEqual(node.schema, { name: "target", type: "string" });
         });
-
         it("should return 'one-of-error' if enforced oneOf schema could not be resolved", () => {
+            var _a, _b, _c;
             const oneOf = [
                 {
                     type: "object",
@@ -241,7 +196,6 @@ describe("compileSchema : getSchema", () => {
                     additionalProperties: false
                 }
             ];
-
             const { error } = compileSchema({
                 type: "object",
                 required: ["nested"],
@@ -258,15 +212,13 @@ describe("compileSchema : getSchema", () => {
                         ]
                     }
                 }
-            }).getSchema("#/nested/second", { nested: { second: 123 } });
-
+            }).getNode("#/nested/second", { nested: { second: 123 } });
             assert(isJsonError(error), "should have returned an error");
             assert.deepEqual(error.code, "one-of-error");
-            assert.deepEqual(error.data?.pointer, "#/nested/second", "it should expose location of error");
-            assert.deepEqual(error.data?.schema.oneOf, oneOf, "should have exposed json-schema of error location");
-            assert.deepEqual(error.data?.oneOf, oneOf, "should have exposed oneOf array on data");
+            assert.deepEqual((_a = error.data) === null || _a === void 0 ? void 0 : _a.pointer, "#/nested/second", "it should expose location of error");
+            assert.deepEqual((_b = error.data) === null || _b === void 0 ? void 0 : _b.schema.oneOf, oneOf, "should have exposed json-schema of error location");
+            assert.deepEqual((_c = error.data) === null || _c === void 0 ? void 0 : _c.oneOf, oneOf, "should have exposed oneOf array on data");
         });
-
         it("should return only one-of schema is no data is given", () => {
             const { node } = compileSchema({
                 type: "object",
@@ -284,12 +236,10 @@ describe("compileSchema : getSchema", () => {
                         ]
                     }
                 }
-            }).getSchema("#/nested/second");
-
+            }).getNode("#/nested/second");
             assert(isSchemaNode(node), "should have returned valid node");
             assert.deepEqual(node.schema, { type: "string", name: "target" });
         });
-
         it("should return schema of matching patternProperty", () => {
             const { node } = compileSchema({
                 type: "object",
@@ -297,22 +247,18 @@ describe("compileSchema : getSchema", () => {
                     "^abc$": { type: "string" },
                     "^def$": { type: "number" }
                 }
-            }).getSchema("#/def");
-
+            }).getNode("#/def");
             assert.deepEqual(node.schema, { type: "number" });
         });
-
         it("should return an error if schema could not be resolved", () => {
             const { error } = compileSchema({
                 type: "object",
                 properties: { coffee: { type: "string" } },
                 patternProperties: { "^tee$": { type: "string" } },
                 additionalProperties: false
-            }).getSchema("#/beer");
-
+            }).getNode("#/beer");
             assert.deepEqual(error.code, "no-additional-properties-error");
         });
-
         describe("dependencies", () => {
             // it("should not return schema from dependencies when dependent property is missing", () => {
             //     const node = compileSchema({
@@ -328,7 +274,7 @@ describe("compileSchema : getSchema", () => {
             //             }
             //         }
             //     });
-            //     const {node} = node.getSchema("#/additionalValue");
+            //     const {node} = node.getNode("#/additionalValue");
             //     assert.deepEqual(schema.type,"error");
             // });
             it("should return schema from dependencies when dependent property is present", () => {
@@ -344,12 +290,10 @@ describe("compileSchema : getSchema", () => {
                             }
                         }
                     }
-                }).getSchema("/additionalValue", { test: "is defined" });
-
+                }).getNode("/additionalValue", { test: "is defined" });
                 assert.deepEqual(node.schema, { type: "string" });
             });
         });
-
         describe("if-then-else", () => {
             it("should return then-schema for matching if-schema", () => {
                 const { node } = compileSchema({
@@ -367,8 +311,7 @@ describe("compileSchema : getSchema", () => {
                             additionalValue: { description: "added", type: "string" }
                         }
                     }
-                }).getSchema("/additionalValue", { test: "validates if" });
-
+                }).getNode("/additionalValue", { test: "validates if" });
                 assert.deepEqual(node.schema, { type: "string", description: "added" });
             });
             it("should return else-schema for non-matching if-schema", () => {
@@ -392,8 +335,7 @@ describe("compileSchema : getSchema", () => {
                             elseValue: { description: "else", type: "string" }
                         }
                     }
-                }).getSchema("/elseValue", { test: "" });
-
+                }).getNode("/elseValue", { test: "" });
                 assert.deepEqual(node.schema, { type: "string", description: "else" });
             });
             it("should return correct schema for duplicate property", () => {
@@ -417,32 +359,26 @@ describe("compileSchema : getSchema", () => {
                             dynamicValue: { description: "else", type: "string" }
                         }
                     }
-                }).getSchema("/dynamicValue", { test: "" });
-
+                }).getNode("/dynamicValue", { test: "" });
                 assert.deepEqual(node.schema, { type: "string", description: "else" });
             });
         });
     });
-
     describe("array", () => {
         it("should return item schema", () => {
             const { node } = compileSchema({
                 type: "array",
                 items: { name: "title", type: "string" }
-            }).getSchema("#/0");
-
+            }).getNode("#/0");
             assert.deepEqual(node.schema, { name: "title", type: "string" });
         });
-
         it("should return item schema based on index", () => {
             const { node } = compileSchema({
                 type: "array",
                 prefixItems: [{ type: "number" }, { name: "target", type: "string" }, { type: "number" }]
-            }).getSchema("#/1");
-
+            }).getNode("#/1");
             assert.deepEqual(node.schema, { name: "target", type: "string" });
         });
-
         it("should return schema for matching 'oneOf' item", () => {
             const { node } = compileSchema({
                 type: "array",
@@ -467,12 +403,11 @@ describe("compileSchema : getSchema", () => {
                         }
                     ]
                 }
-            }).getSchema("#/0/second", [{ second: "second" }]);
-
+            }).getNode("#/0/second", [{ second: "second" }]);
             assert.deepEqual(node.schema, { type: "string", name: "target" });
         });
-
         it("should return error if no matching 'oneOf' item was found", () => {
+            var _a;
             const schema = {
                 type: "array",
                 items: {
@@ -499,12 +434,11 @@ describe("compileSchema : getSchema", () => {
                     ]
                 }
             };
-            const { error } = compileSchema(schema).getSchema("#/0/second", []);
-
+            const { error } = compileSchema(schema).getNode("#/0/second", []);
             assert(isJsonError(error));
             assert.deepEqual(error.code, "one-of-error");
             assert.deepEqual(error.data.schema, schema.items, "should have exposed json-schema of error location");
-            assert.deepEqual(error.data?.oneOf, schema.items.oneOf, "should have exposed oneOf array on data");
+            assert.deepEqual((_a = error.data) === null || _a === void 0 ? void 0 : _a.oneOf, schema.items.oneOf, "should have exposed oneOf array on data");
         });
     });
 });

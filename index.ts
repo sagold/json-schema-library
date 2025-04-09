@@ -1,6 +1,6 @@
 export { compileSchema } from "./src/compileSchema";
 export type { CompileOptions } from "./src/compileSchema";
-export type { Context, SchemaNode, GetSchemaOptions } from "./src/SchemaNode";
+export type { Context, SchemaNode, GetNodeOptions } from "./src/SchemaNode";
 export type { DataNode } from "./src/methods/toDataNodes";
 export type { Draft, DraftVersion } from "./src/Draft";
 export type { JsonError, JsonPointer, JsonSchema, OptionalNodeAndError } from "./src/types";

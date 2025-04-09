@@ -1,6 +1,6 @@
 import { Draft } from "./Draft";
 import { errors } from "./errors/errors";
-import { SchemaNode, isSchemaNode, GetSchemaOptions } from "./SchemaNode";
+import { SchemaNode, isSchemaNode, GetNodeOptions } from "./SchemaNode";
 
 export type JsonBooleanSchema = boolean;
 export interface JsonSchema {
@@ -12,7 +12,7 @@ export type DefaultErrors = keyof typeof errors;
 export type ErrorConfig = Record<DefaultErrors, string | ((error: ErrorData) => void)>;
 export type OptionalNodeAndError = { node?: SchemaNode; error: undefined } | { node: undefined; error?: JsonError };
 
-export type { SchemaNode, GetSchemaOptions, Draft };
+export type { SchemaNode, GetNodeOptions, Draft };
 export { isSchemaNode };
 
 export type ErrorData<T extends Record<string, unknown> = { [p: string]: unknown }> = T & {

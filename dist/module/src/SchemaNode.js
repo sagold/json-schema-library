@@ -98,7 +98,7 @@ export const SchemaNodeMethods = {
      *
      * @returns { node } or { error } where node can also be undefined (valid but undefined)
      */
-    getSchema(pointer, data, options = {}) {
+    getNode(pointer, data, options = {}) {
         var _a, _b, _c;
         options.path = (_a = options.path) !== null && _a !== void 0 ? _a : [];
         options.withSchemaWarning = (_b = options.withSchemaWarning) !== null && _b !== void 0 ? _b : false;
@@ -188,7 +188,7 @@ export const SchemaNodeMethods = {
         const node = this;
         const opts = {
             recursionLimit: 1,
-            ...node.context.templateDefaultOptions,
+            ...node.context.getDataDefaultOptions,
             cache: {},
             ...(options !== null && options !== void 0 ? options : {})
         };

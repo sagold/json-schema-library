@@ -115,7 +115,7 @@ export interface SchemaNode extends SchemaNodeMethodsType {
 
 type SchemaNodeMethodsType = typeof SchemaNodeMethods;
 
-export type GetSchemaOptions = {
+export type GetNodeOptions = {
     /**
      *  Per default `undefined` is returned for valid data, but undefined schema.
      *
@@ -211,7 +211,7 @@ export const SchemaNodeMethods = {
      *
      * @returns { node } or { error } where node can also be undefined (valid but undefined)
      */
-    getSchema(pointer: string, data?: unknown, options: GetSchemaOptions = {}): OptionalNodeAndError {
+    getNode(pointer: string, data?: unknown, options: GetNodeOptions = {}): OptionalNodeAndError {
         options.path = options.path ?? [];
 
         options.withSchemaWarning = options.withSchemaWarning ?? false;
@@ -252,7 +252,7 @@ export const SchemaNodeMethods = {
     /**
      * @returns child node identified by property as SchemaNode
      */
-    getChild(key: string | number, data?: unknown, options: GetSchemaOptions = {}): OptionalNodeAndError {
+    getChild(key: string | number, data?: unknown, options: GetNodeOptions = {}): OptionalNodeAndError {
         options.path = options.path ?? [];
 
         options.withSchemaWarning = options.withSchemaWarning ?? false;

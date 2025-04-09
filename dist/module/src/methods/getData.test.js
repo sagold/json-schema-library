@@ -1419,7 +1419,7 @@ describe("getData", () => {
                 properties: { valid: { type: "string" } },
                 additionalProperties: false
             }, {
-                templateDefaultOptions: { removeInvalidData: true }
+                getDataDefaultOptions: { removeInvalidData: true }
             });
             const res = node.getData({ valid: "stays", invalid: "removes" });
             assert.deepEqual(res, { valid: "stays" });
@@ -1430,7 +1430,7 @@ describe("getData", () => {
                 properties: { valid: { type: "string" } },
                 additionalProperties: false
             }, {
-                templateDefaultOptions: { removeInvalidData: true }
+                getDataDefaultOptions: { removeInvalidData: true }
             });
             const res = node.getData({ valid: "stays", invalid: "not removed" }, { removeInvalidData: false });
             assert.deepEqual(res, { valid: "stays", invalid: "not removed" });

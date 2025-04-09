@@ -5,7 +5,7 @@ export type CompileOptions = {
     drafts: Draft[];
     remote: SchemaNode;
     formatAssertion: boolean | "meta-schema";
-    templateDefaultOptions?: TemplateOptions;
+    getDataDefaultOptions?: TemplateOptions;
 };
 /**
  * With compileSchema we replace the schema and all sub-schemas with a schemaNode,

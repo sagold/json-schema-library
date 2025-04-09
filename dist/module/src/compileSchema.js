@@ -40,7 +40,7 @@ export function compileSchema(schema, options = {}) {
             anchors: {},
             refs: {},
             ...copy(pick(draft, "methods", "keywords", "version", "formats", "errors")),
-            templateDefaultOptions: options.templateDefaultOptions,
+            getDataDefaultOptions: options.getDataDefaultOptions,
             drafts
         },
         ...SchemaNodeMethods
