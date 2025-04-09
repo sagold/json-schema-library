@@ -23,6 +23,10 @@ export function parseAllOf(node: SchemaNode) {
 }
 
 function reduceAllOf({ node, data, key, pointer, path }: JsonSchemaReducerParams) {
+    if (node.allOf == null) {
+        return;
+    }
+
     // note: parts of schemas could be merged, e.g. if they do not include
     // dynamic schema parts
     let mergedSchema = {};
@@ -38,6 +42,7 @@ function reduceAllOf({ node, data, key, pointer, path }: JsonSchemaReducerParams
             mergedSchema = mergeSchema(mergedSchema, schema, "allOf", "contains");
         }
     }
+
     return node.compileSchema(
         mergedSchema,
         `${node.spointer}/${dynamicId}`,
