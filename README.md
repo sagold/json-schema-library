@@ -3,7 +3,7 @@
 <h1 align="center">
     <img src="./docs/json-schema-library-10.png" width="192" alt="json-schema-library">
     <br/>
-    ✨ json-schema-library ✨
+    json-schema-library
 </h1>
 
 > **json-schema-library** provides tools and utilities for working with JSON Schema - enabling creation, validation, and schema exploration. Unlike most validators and editors, which hide the inner workings, this library is designed for developers building custom tools around JSON Schema. It runs in both Node and browser environments, prioritizing flexibility and extensibility over minimal memory footprint or raw performance.
@@ -695,7 +695,6 @@ expect(childNodes.map((n) => n.schema)).to.deep.equal([{ type: "string" }, { typ
 `addRemote` lets you add additional schemas that can be referenced by an URL using `$ref`. Use this to combine multiple schemas without changing the actual schema.
 
 Each schemas is referenced by their unique `$id` (since draft-06, previously `id`). Usually an `$id` is specified as an url, for example `https://mydomain.com/schema/schema-name` or with a file extension like `https://mydomain.com/schema/schema-name.json`.
-~~At least in _json-schema-library_ you can use any name, just ensure the `$id` is unique across all schemas.~
 
 On a compiled schema
 
@@ -1139,15 +1138,11 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
 -   **`compileSchema`** is now a standalone function and replaces the `Draft` class.
 -   All return values for JSON Schema are now `SchemaNode` objects that contain a `schema` property.
 
-    **Previously**:
-
     ```ts
+    // PREVIOUSLY
     const draft = new Draft(schema);
-    ```
 
-    **Now**:
-
-    ```ts
+    // NOW
     const node = compileSchema(schema);
     ```
 
@@ -1179,6 +1174,8 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
         }
     });
     ```
+
+-   **Changed remote $id support** in `addRemote`. An `$id` has to be a valid url (previously any value was accepted)
 
 This update involves some significant changes in how you work with the library, so please carefully review the migration guide and adjust your implementation accordingly.
 
