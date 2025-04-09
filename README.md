@@ -878,12 +878,8 @@ A regex string that identifies whether a draft should be used for a given schema
 
 ```ts
 draft.$schemaRegEx === "draft[-/]2020-12";
-```
-
-This would match:
-
-```json
-"$schema": "https://json-schema.org/draft/2020-12/schema"
+// matches "$schema": "https://json-schema.org/draft/2020-12/schema"
+// matches "$schema": "draft-2020-12"
 ```
 
 When compiling, drafts are matched from left to right — the first one that matches is used. If no match is found, the **last draft** in the list is used as a fallback. If you're only using one draft, the `$schemaRegEx` check is skipped.
