@@ -2,7 +2,7 @@ import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
 import { isJsonError } from "../../types";
 
-describe("getChildSchemaSelection (2019)", () => {
+describe("getChildSelection (2019)", () => {
     it("should return a single object-schema as list", () => {
         const result = compileSchema({
             $schema: "draft-2019-09",
@@ -11,7 +11,7 @@ describe("getChildSchemaSelection (2019)", () => {
                 a: { type: "string" },
                 b: { type: "number" }
             }
-        }).getChildSchemaSelection("b");
+        }).getChildSelection("b");
 
         assert(!isJsonError(result));
         assert.deepEqual(result.length, 1);
@@ -26,7 +26,7 @@ describe("getChildSchemaSelection (2019)", () => {
             $schema: "draft-2019-09",
             type: "array",
             items: [{ type: "string" }, { type: "number" }]
-        }).getChildSchemaSelection(0);
+        }).getChildSelection(0);
 
         assert(!isJsonError(result));
         assert.deepEqual(result.length, 1);
@@ -41,7 +41,7 @@ describe("getChildSchemaSelection (2019)", () => {
             $schema: "draft-2019-09",
             type: "array",
             items: [{ type: "string" }, { type: "number" }]
-        }).getChildSchemaSelection(2);
+        }).getChildSelection(2);
 
         assert(!isJsonError(result));
         assert.deepEqual(result.length, 0);
@@ -54,7 +54,7 @@ describe("getChildSchemaSelection (2019)", () => {
             items: {
                 oneOf: [{ type: "string" }, { type: "number" }]
             }
-        }).getChildSchemaSelection("b");
+        }).getChildSelection("b");
 
         assert(!isJsonError(result));
         assert.deepEqual(result.length, 2);
@@ -75,7 +75,7 @@ describe("getChildSchemaSelection (2019)", () => {
                 number: { type: "number" },
                 string: { type: "string" }
             }
-        }).getChildSchemaSelection("b");
+        }).getChildSelection("b");
 
         assert(!isJsonError(result));
         assert.deepEqual(result.length, 2);
@@ -92,7 +92,7 @@ describe("getChildSchemaSelection (2019)", () => {
                 type: "array",
                 items: [{ type: "string" }],
                 additionalItems: false
-            }).getChildSchemaSelection(1);
+            }).getChildSelection(1);
 
             assert(!isJsonError(result));
             assert.deepEqual(result.length, 0);
@@ -104,7 +104,7 @@ describe("getChildSchemaSelection (2019)", () => {
                 type: "array",
                 items: [{ type: "string" }],
                 additionalItems: undefined
-            }).getChildSchemaSelection(1);
+            }).getChildSelection(1);
 
             assert.deepEqual(result.length, 0);
         });
@@ -115,7 +115,7 @@ describe("getChildSchemaSelection (2019)", () => {
                 type: "array",
                 items: [{ type: "string" }],
                 additionalItems: true
-            }).getChildSchemaSelection(1);
+            }).getChildSelection(1);
 
             assert(!isJsonError(result));
             assert.deepEqual(result.length, 1);
@@ -130,7 +130,7 @@ describe("getChildSchemaSelection (2019)", () => {
                 $schema: "draft-2019-09",
                 type: "array",
                 additionalItems: { id: "number", type: "number", default: 2 }
-            }).getChildSchemaSelection(1);
+            }).getChildSelection(1);
 
             assert(!isJsonError(result));
             assert.deepEqual(result.length, 1);
@@ -146,7 +146,7 @@ describe("getChildSchemaSelection (2019)", () => {
                 type: "array",
                 items: [{ type: "string" }],
                 additionalItems: { id: "number", type: "number", default: 2 }
-            }).getChildSchemaSelection(1);
+            }).getChildSelection(1);
 
             assert(!isJsonError(result));
             assert.deepEqual(result.length, 1);
@@ -162,7 +162,7 @@ describe("getChildSchemaSelection (2019)", () => {
                 type: "array",
                 items: [{ type: "string" }, { type: "string" }],
                 additionalItems: { id: "number", type: "number", default: 2 }
-            }).getChildSchemaSelection(1);
+            }).getChildSelection(1);
 
             assert(!isJsonError(result));
             assert.deepEqual(result.length, 1);
@@ -178,7 +178,7 @@ describe("getChildSchemaSelection (2019)", () => {
                 type: "array",
                 items: { type: "string" },
                 additionalItems: { id: "number", type: "number", default: 2 }
-            }).getChildSchemaSelection(1);
+            }).getChildSelection(1);
 
             assert(!isJsonError(result));
             assert.deepEqual(result.length, 1);

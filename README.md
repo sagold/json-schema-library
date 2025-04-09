@@ -168,7 +168,7 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 ## SchemaNode methods
 
-[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getData**](#getdata) · [**getNode**](#getnode) · [**getChild**](#getchild) · [**reduceSchema**](#reduceschema) · [**toDataNodes**](#todatanodes) · [**toSchemaNodes**](#toschemanodes) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSchemaSelection](#getchildschemaselection)
+[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getData**](#getdata) · [**getNode**](#getnode) · [**getChild**](#getchild) · [**reduceSchema**](#reduceschema) · [**toDataNodes**](#todatanodes) · [**toSchemaNodes**](#toschemanodes) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSelection](#getchildselection)
 
 ### validate
 
@@ -660,13 +660,13 @@ expect(calls).to.deep.equal([
 
 </details>
 
-### getChildSchemaSelection
+### getChildSelection
 
-`getChildSchemaSelection` returns a list of available sub-schemas for the given property. In many cases, a single schema will be returned. For _oneOf_-schemas, a list of possible options is returned. This helper always returns a list of schemas.
+`getChildSelection` returns a list of available sub-schemas for the given property. In many cases, a single schema will be returned. For _oneOf_-schemas, a list of possible options is returned. This helper always returns a list of schemas.
 
 ```ts
 const schemaNode = compileSchema(mySchema);
-const schemas: SchemaNode[] = schemaNode.getChildSchemaSelection("content");
+const schemas: SchemaNode[] = schemaNode.getChildSelection("content");
 ```
 
 <details><summary>Example</summary>
@@ -683,7 +683,7 @@ const jsonSchema = compileSchema({
     }
 });
 
-const childNodes: JsonSchema[] = jsonSchema.getChildSchemaSelection("content");
+const childNodes: JsonSchema[] = jsonSchema.getChildSelection("content");
 
 expect(childNodes.map((n) => n.schema)).to.deep.equal([{ type: "string" }, { type: "number" }]);
 ```
@@ -909,7 +909,7 @@ Draft-specific implementations for certain core behaviors in `SchemaNode`, such 
 
 ```ts
 createSchema: typeof createSchema;
-getChildSchemaSelection: typeof getChildSchemaSelection;
+getChildSelection: typeof getChildSelection;
 getData: typeof getData;
 toDataNodes: typeof toDataNodes;
 ```
@@ -1144,14 +1144,15 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
 
 -   **Renamed Methods**:
 
-    -   `draft.getTemplate(inputData)` → `node.getData(inputData)`
-    -   `draft.each(data, callback)` → `const nodes = node.toDataNodes(data)`
-    -   `draft.eachSchema(callback)` → `const nodes = node.toSchemaNodes()`
-    -   `draft.isValid(data)` → `node.validate(data).valid`
-    -   `draft.getNode(options)` → `node.getNode(pointer, data, options)`
-    -   `draft.step(property, data)` → `node.getChild(property, data)`
     -   `draft.addRemoteSchema(schema)` → `node.addRemote(schema)`
     -   `draft.createSchemaOf(schema)` → `node.createSchema(schema)`
+    -   `draft.each(data, callback)` → `const nodes = node.toDataNodes(data)`
+    -   `draft.eachSchema(callback)` → `const nodes = node.toSchemaNodes()`
+    -   `draft.getChildSchemaSelection(property)` → `node.getChildSelection(property)`
+    -   `draft.getNode(options)` → `node.getNode(pointer, data, options)`
+    -   `draft.getTemplate(inputData)` → `node.getData(inputData)`
+    -   `draft.isValid(data)` → `node.validate(data).valid`
+    -   `draft.step(property, data)` → `node.getChild(property, data)`
 
 -   **Renamed Properties**:
 

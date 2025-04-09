@@ -5,7 +5,7 @@ import { JsonError, SchemaNode } from "../../types";
  * could be added at the given property (e.g. item-index), thus an array of options is returned. In all other cases
  * a list with a single item will be returned
  */
-export function getChildSchemaSelection(node: SchemaNode, property: string | number): SchemaNode[] | JsonError {
+export function getChildSelection(node: SchemaNode, property: string | number): SchemaNode[] | JsonError {
     if (node.oneOf) {
         return node.oneOf.map((childNode: SchemaNode) => childNode.resolveRef());
     }

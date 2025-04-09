@@ -193,9 +193,9 @@ export const SchemaNodeMethods = {
 
     createSchema,
 
-    getChildSchemaSelection(property: string | number): JsonError | SchemaNode[] {
+    getChildSelection(property: string | number): JsonError | SchemaNode[] {
         const node = this as SchemaNode;
-        return node.context.methods.getChildSchemaSelection(node, property);
+        return node.context.methods.getChildSelection(node, property);
     },
 
     /**

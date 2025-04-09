@@ -12,7 +12,7 @@ import { enumKeyword } from "./keywords/enum";
 import { exclusiveMaximumKeyword } from "./keywords/exclusiveMaximum";
 import { exclusiveMinimumKeyword } from "./keywords/exclusiveMinimum";
 import { formatKeyword } from "./keywords/format";
-import { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
+import { getChildSelection } from "./methods/getChildSelection";
 import { getData } from "./methods/getData";
 import { ifKeyword } from "./keywords/ifthenelse";
 import { itemsKeyword } from "./keywords/items";
@@ -76,7 +76,7 @@ export const draft2020 = sanitizeKeywords({
     methods: {
         createSchema,
         getData,
-        getChildSchemaSelection,
+        getChildSelection,
         toDataNodes
     },
     keywords: [
