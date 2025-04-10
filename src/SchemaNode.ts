@@ -16,6 +16,7 @@ import { pick } from "./utils/pick";
 import { render } from "./errors/render";
 import { TemplateOptions } from "./methods/getData";
 import { validateNode } from "./validateNode";
+import { hasProperty } from "./utils/hasProperty";
 
 const { DYNAMIC_PROPERTIES } = settings;
 
