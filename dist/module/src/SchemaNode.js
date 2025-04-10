@@ -6,13 +6,15 @@ import { toSchemaNodes } from "./methods/toSchemaNodes";
 import { getValue } from "./utils/getValue";
 import { isJsonError } from "./types";
 import { isObject } from "./utils/isObject";
-import { join, split } from "@sagold/json-pointer";
+import { join } from "@sagold/json-pointer";
 import { joinId } from "./utils/joinId";
 import { mergeNode } from "./mergeNode";
 import { omit } from "./utils/omit";
 import { pick } from "./utils/pick";
 import { render } from "./errors/render";
 import { validateNode } from "./validateNode";
+import { hasProperty } from "./utils/hasProperty";
+import { getNode } from "./getNode";
 const { DYNAMIC_PROPERTIES } = settings;
 export function isSchemaNode(value) {
     return isObject(value) && Array.isArray(value === null || value === void 0 ? void 0 : value.reducers) && Array.isArray(value === null || value === void 0 ? void 0 : value.resolvers);
@@ -81,62 +83,26 @@ export const SchemaNodeMethods = {
         return { type: "error", code, message: errorMessage, data };
     },
     createSchema,
-    getChildSchemaSelection(property) {
+    getChildSelection(property) {
         const node = this;
-        return node.context.methods.getChildSchemaSelection(node, property);
+        return node.context.methods.getChildSelection(node, property);
     },
-    /**
-     * Returns a node containing JSON Schema of a data JSON Pointer.
-     *
-     * To resolve dynamic schema where the type of JSON Schema is evaluated by
-     * its value, a data object has to be passed in options.
-     *
-     * Per default this function will return `undefined` schema for valid properties
-     * that do not have a defined schema. Use the option `withSchemaWarning: true` to
-     * receive an error with `code: schema-warning` containing the location of its
-     * last evaluated json-schema.
-     *
-     * @returns { node } or { error } where node can also be undefined (valid but undefined)
-     */
-    getNode(pointer, data, options = {}) {
-        var _a, _b, _c;
-        options.path = (_a = options.path) !== null && _a !== void 0 ? _a : [];
-        options.withSchemaWarning = (_b = options.withSchemaWarning) !== null && _b !== void 0 ? _b : false;
-        options.pointer = (_c = options.pointer) !== null && _c !== void 0 ? _c : "#";
-        const node = this;
-        const keys = split(pointer);
-        if (keys.length === 0) {
-            const result = node.resolveRef(options);
-            return isJsonError(result) ? { node: undefined, error: result } : { node: result, error: undefined };
-        }
-        let currentPointer = "#";
-        let currentNode = node;
-        for (let i = 0, l = keys.length; i < l; i += 1) {
-            currentPointer = `${currentPointer}/${keys[i]}`;
-            const result = currentNode.getChild(keys[i], data, { ...options, pointer: currentPointer });
-            if (result.error) {
-                return result;
-            }
-            if (result.node == null) {
-                return result;
-            }
-            currentNode = result.node;
-            data = getValue(data, keys[i]);
-        }
-        const result = currentNode.resolveRef(options);
-        return isJsonError(result) ? { node: undefined, error: result } : { node: result, error: undefined };
-    },
+    getNode,
     /**
      * @returns for $ref, the corresponding SchemaNode or undefined
      */
-    getRef($ref) {
+    getNodeRef($ref) {
         const node = this;
         return node.compileSchema({ $ref }).resolveRef();
+    },
+    getNodeRoot() {
+        const node = this;
+        return node.context.rootNode;
     },
     /**
      * @returns child node identified by property as SchemaNode
      */
-    getChild(key, data, options = {}) {
+    getNodeChild(key, data, options = {}) {
         var _a, _b, _c;
         options.path = (_a = options.path) !== null && _a !== void 0 ? _a : [];
         options.withSchemaWarning = (_b = options.withSchemaWarning) !== null && _b !== void 0 ? _b : false;
@@ -144,7 +110,7 @@ export const SchemaNodeMethods = {
         const { path, pointer } = options;
         let node = this;
         if (node.reducers.length) {
-            const result = node.reduceSchema(data, { key, path, pointer });
+            const result = node.reduceNode(data, { key, path, pointer });
             if (result.error) {
                 return result;
             }
@@ -163,7 +129,7 @@ export const SchemaNodeMethods = {
         }
         const referencedNode = node.resolveRef({ path });
         if (referencedNode !== node) {
-            return referencedNode.getChild(key, data, options);
+            return referencedNode.getNodeChild(key, data, options);
         }
         if (options.createSchema === true) {
             const newNode = node.compileSchema(createSchema(getValue(data, key)), `${node.spointer}/additional`, `${node.schemaId}/additional`);
@@ -197,7 +163,7 @@ export const SchemaNodeMethods = {
     /**
      * @returns SchemaNode with a reduced JSON Schema matching the given data
      */
-    reduceSchema(data, options = {}) {
+    reduceNode(data, options = {}) {
         const node = this;
         const { key, pointer, path } = options;
         // @ts-expect-error bool schema
@@ -273,7 +239,7 @@ export const SchemaNodeMethods = {
      * Register a JSON Schema as a remote-schema to be resolved by $ref, $anchor, etc
      * @returns the current node (not the remote schema-node)
      */
-    addRemote(url, schema) {
+    addRemoteSchema(url, schema) {
         var _a;
         // @draft >= 6
         schema.$id = joinId(schema.$id || url);

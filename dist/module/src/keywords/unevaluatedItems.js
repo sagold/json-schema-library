@@ -35,7 +35,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }) {
             continue;
         }
         const value = data[i];
-        const { node: child } = node.getChild(i, data, { path });
+        const { node: child } = node.getNodeChild(i, data, { path });
         if (child === undefined) {
             if (node.unevaluatedItems) {
                 const result = validateNode(node.unevaluatedItems, value, `${pointer}/${i}`, path);

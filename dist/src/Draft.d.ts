@@ -3,7 +3,7 @@ import { createSchema } from "./methods/createSchema";
 import { toDataNodes } from "./methods/toDataNodes";
 import { ErrorConfig } from "./types";
 import { formats } from "./formats/formats";
-import { getChildSchemaSelection } from "./methods/getChildSchemaSelection";
+import { getChildSelection } from "./methods/getChildSelection";
 import { getData } from "./methods/getData";
 export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "draft-2020-12" | "latest";
 export interface Draft {
@@ -16,7 +16,7 @@ export interface Draft {
     /** draft-dependent methods */
     methods: {
         createSchema: typeof createSchema;
-        getChildSchemaSelection: typeof getChildSchemaSelection;
+        getChildSelection: typeof getChildSelection;
         getData: typeof getData;
         toDataNodes: typeof toDataNodes;
     };

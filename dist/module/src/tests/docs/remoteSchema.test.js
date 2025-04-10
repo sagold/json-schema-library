@@ -12,14 +12,14 @@ describe("docs - remote schema", () => {
                     $ref: "https://remote.com/schemas/character"
                 }
             }
-        }).addRemote("https://remote.com/schemas/character", {
+        }).addRemoteSchema("https://remote.com/schemas/character", {
             title: "character remote schema",
             type: "string",
             default: "A",
             maxLength: 1,
             minLength: 1
         });
-        const remoteSchema = (_a = node.getRef("https://remote.com/schemas/character")) === null || _a === void 0 ? void 0 : _a.schema;
+        const remoteSchema = (_a = node.getNodeRef("https://remote.com/schemas/character")) === null || _a === void 0 ? void 0 : _a.schema;
         assert.deepEqual(remoteSchema.title, "character remote schema", "should have resolved remote root schema");
         const data = node.getData({});
         assert.deepEqual(data, { character: "A" }, "should have retrieved default value from remote schema");
@@ -35,14 +35,14 @@ describe("docs - remote schema", () => {
                     $ref: "character"
                 }
             }
-        }).addRemote("character", {
+        }).addRemoteSchema("character", {
             title: "character remote schema",
             type: "string",
             default: "A",
             maxLength: 1,
             minLength: 1
         });
-        const remoteSchema = (_a = node.getRef("character")) === null || _a === void 0 ? void 0 : _a.schema;
+        const remoteSchema = (_a = node.getNodeRef("character")) === null || _a === void 0 ? void 0 : _a.schema;
         assert.deepEqual(remoteSchema.title, "character remote schema", "should have resolved remote root schema");
         const data = node.getData({});
         assert.deepEqual(data, { character: "A" }, "should have retrieved default value from remote schema");
@@ -58,7 +58,7 @@ describe("docs - remote schema", () => {
                     $ref: "https://remote.com/schema.json#/$defs/character"
                 }
             }
-        }).addRemote("https://remote.com/schema.json", {
+        }).addRemoteSchema("https://remote.com/schema.json", {
             title: "$defs remote schema",
             $defs: {
                 character: {
@@ -69,7 +69,7 @@ describe("docs - remote schema", () => {
                 }
             }
         });
-        const remoteSchema = (_a = node.getRef("https://remote.com/schema.json#/$defs/character")) === null || _a === void 0 ? void 0 : _a.schema;
+        const remoteSchema = (_a = node.getNodeRef("https://remote.com/schema.json#/$defs/character")) === null || _a === void 0 ? void 0 : _a.schema;
         assert.deepEqual(remoteSchema, {
             type: "string",
             default: "A",
@@ -90,7 +90,7 @@ describe("docs - remote schema", () => {
                     $ref: "remote#/$defs/character"
                 }
             }
-        }).addRemote("remote", {
+        }).addRemoteSchema("remote", {
             title: "$defs remote schema",
             $defs: {
                 character: {
@@ -101,7 +101,7 @@ describe("docs - remote schema", () => {
                 }
             }
         });
-        const remoteSchema = (_a = node.getRef("remote#/$defs/character")) === null || _a === void 0 ? void 0 : _a.schema;
+        const remoteSchema = (_a = node.getNodeRef("remote#/$defs/character")) === null || _a === void 0 ? void 0 : _a.schema;
         assert.deepEqual(remoteSchema, {
             type: "string",
             default: "A",
@@ -122,7 +122,7 @@ describe("docs - remote schema", () => {
                     $ref: "remote#/properties/character"
                 }
             }
-        }).addRemote("remote", {
+        }).addRemoteSchema("remote", {
             type: "object",
             properties: {
                 character: {
@@ -133,7 +133,7 @@ describe("docs - remote schema", () => {
                 }
             }
         });
-        const remoteSchema = (_a = node.getRef("remote#/properties/character")) === null || _a === void 0 ? void 0 : _a.schema;
+        const remoteSchema = (_a = node.getNodeRef("remote#/properties/character")) === null || _a === void 0 ? void 0 : _a.schema;
         assert.deepEqual(remoteSchema, {
             type: "string",
             default: "A",

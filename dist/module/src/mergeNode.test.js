@@ -51,8 +51,28 @@ describe("mergeNode", () => {
             });
             const node = mergeNode(a, a, "oneOf");
             assert(isSchemaNode(node), "should have returned a valid schema node");
+            const oneOf = (f) => f.toJSON() === "oneOf";
             assert.deepEqual(node.schema.oneOf, undefined);
             assert.deepEqual(node.oneOf, undefined);
+            assert.deepEqual(node.reducers.find(oneOf), undefined);
+            assert.deepEqual(node.resolvers.find(oneOf), undefined);
+            assert.deepEqual(node.validators.find(oneOf), undefined);
+        });
+        it("should omit allOf node- and schema-property", () => {
+            const a = compileSchema({
+                allOf: [
+                    { type: "string", minLength: 1 },
+                    { type: "number", minimum: 2 }
+                ]
+            });
+            const node = mergeNode(a, a, "allOf");
+            assert(isSchemaNode(node), "should have returned a valid schema node");
+            const allOf = (f) => f.toJSON() === "allOf";
+            assert.deepEqual(node.schema.allOf, undefined);
+            assert.deepEqual(node.allOf, undefined);
+            assert.deepEqual(node.reducers.find(allOf), undefined);
+            assert.deepEqual(node.resolvers.find(allOf), undefined);
+            assert.deepEqual(node.validators.find(allOf), undefined);
         });
     });
 });

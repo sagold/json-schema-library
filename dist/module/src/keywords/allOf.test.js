@@ -7,7 +7,7 @@ describe("keyword : allOf : get", () => {
             type: "object",
             allOf: [{ properties: { header: { type: "string", minLength: 1 } } }]
         });
-        const schema = (_b = (_a = node.getChild("header", { withHeader: true, header: "huhu" })) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
+        const schema = (_b = (_a = node.getNodeChild("header", { withHeader: true, header: "huhu" })) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
     it("should recursively resolve allOf schema", () => {
@@ -21,7 +21,7 @@ describe("keyword : allOf : get", () => {
                 }
             ]
         });
-        const schema = (_b = (_a = node.getChild("header", { withHeader: true, header: "huhu" })) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
+        const schema = (_b = (_a = node.getNodeChild("header", { withHeader: true, header: "huhu" })) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
 });

@@ -29,7 +29,7 @@ function validateUnevaluatedProperties({ node, data, pointer, path }) {
         if (isPropertyEvaluated({ node, data, key: propertyName, pointer, path })) {
             continue;
         }
-        const { node: child } = node.getChild(propertyName, data, { pointer, path });
+        const { node: child } = node.getNodeChild(propertyName, data, { pointer, path });
         if (child === undefined) {
             if (node.unevaluatedProperties) {
                 const validationResult = validateNode(node.unevaluatedProperties, data[propertyName], `${pointer}/${propertyName}`, path);

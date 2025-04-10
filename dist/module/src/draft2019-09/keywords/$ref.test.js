@@ -28,7 +28,7 @@ describe("keyword : $ref : resolve", () => {
                 header: { $ref: "#/$defs/header" }
             },
             $defs: { header: { type: "string", minLength: 1 } }
-        }).getChild("header");
+        }).getNodeChild("header");
         const node = _node.resolveRef();
         assert.deepEqual(node.schema, { type: "string", minLength: 1 });
     });
@@ -39,7 +39,7 @@ describe("keyword : $ref : resolve", () => {
             properties: {
                 header: { $ref: "#", minProperties: 2 }
             }
-        }).getChild("header");
+        }).getNodeChild("header");
         const node = _node.resolveRef();
         assert.deepEqual(node.schema, {
             type: "object",
@@ -93,7 +93,7 @@ describe("keyword : $ref : resolve", () => {
             const node = compileSchema({
                 $ref: "https://remote.schema"
             })
-                .addRemote("https://remote.schema", { type: "object", minProperties: 1 })
+                .addRemoteSchema("https://remote.schema", { type: "object", minProperties: 1 })
                 .resolveRef();
             assert.deepEqual(node.$id, "https://remote.schema");
             assert.deepEqual(node.schema, {
@@ -105,7 +105,7 @@ describe("keyword : $ref : resolve", () => {
             const node = compileSchema({
                 $ref: "https://remote.schema#/$defs/header"
             })
-                .addRemote("https://remote.schema", { $defs: { header: { type: "object", minProperties: 1 } } })
+                .addRemoteSchema("https://remote.schema", { $defs: { header: { type: "object", minProperties: 1 } } })
                 .resolveRef();
             assert.deepEqual(node.schema, { type: "object", minProperties: 1 });
         });
@@ -113,8 +113,8 @@ describe("keyword : $ref : resolve", () => {
             const node = compileSchema({
                 $ref: "https://remoteB.schema#/$defs/header"
             })
-                .addRemote("https://remoteA.schema", { $defs: { header: { type: "string", minLength: 1 } } })
-                .addRemote("https://remoteB.schema", { $defs: { header: { type: "object", minProperties: 1 } } })
+                .addRemoteSchema("https://remoteA.schema", { $defs: { header: { type: "string", minLength: 1 } } })
+                .addRemoteSchema("https://remoteB.schema", { $defs: { header: { type: "object", minProperties: 1 } } })
                 .resolveRef();
             assert.deepEqual(node.schema, { type: "object", minProperties: 1 });
         });
@@ -122,8 +122,8 @@ describe("keyword : $ref : resolve", () => {
             const node = compileSchema({
                 $ref: "https://remoteA.schema"
             })
-                .addRemote("https://remoteA.schema", { $ref: "https://remoteB.schema#/$defs/header" })
-                .addRemote("https://remoteB.schema", { $defs: { header: { type: "object", minProperties: 1 } } })
+                .addRemoteSchema("https://remoteA.schema", { $ref: "https://remoteB.schema#/$defs/header" })
+                .addRemoteSchema("https://remoteB.schema", { $defs: { header: { type: "object", minProperties: 1 } } })
                 .resolveRef()
                 .resolveRef()
                 .resolveRef();
@@ -133,7 +133,7 @@ describe("keyword : $ref : resolve", () => {
             const node = compileSchema({
                 $ref: "https://remote.schema"
             })
-                .addRemote("https://remote.schema", {
+                .addRemoteSchema("https://remote.schema", {
                 $ref: "#/$defs/header",
                 $defs: { header: { type: "object", minProperties: 1 } }
             })
@@ -147,7 +147,7 @@ describe("keyword : $ref : resolve", () => {
                 $ref: "https://remote.schema/",
                 $defs: { header: { type: "object", minProperties: 1 } }
             })
-                .addRemote("https://remote.schema", {
+                .addRemoteSchema("https://remote.schema", {
                 $ref: "https://root.schema#/$defs/header"
             })
                 .resolveRef()
@@ -194,7 +194,7 @@ describe("keyword : ref : validate", () => {
             }
         });
         // console.log("\nADD REMOTE\n");
-        node.addRemote("http://localhost:1234/draft2019-09/baseUriChangeFolder/folderInteger.json", {
+        node.addRemoteSchema("http://localhost:1234/draft2019-09/baseUriChangeFolder/folderInteger.json", {
             $schema: "https://json-schema.org/draft/2019-09/schema",
             type: "integer"
         });
@@ -213,7 +213,7 @@ describe("keyword : ref : validate", () => {
                 }
             }
         })
-            .addRemote("http://localhost:1234/draft2019-09/baseUriChange/folderInteger.json", {
+            .addRemoteSchema("http://localhost:1234/draft2019-09/baseUriChange/folderInteger.json", {
             type: "integer"
         })
             .validate([[1]]);
@@ -225,7 +225,7 @@ describe("keyword : ref : validate", () => {
             $schema: "https://json-schema.org/draft/2019-09/schema",
             $ref: "http://localhost:1234/draft2019-09/locationIndependentIdentifier.json#/$defs/refToInteger"
         })
-            .addRemote("http://localhost:1234/draft2019-09/locationIndependentIdentifier.json", {
+            .addRemoteSchema("http://localhost:1234/draft2019-09/locationIndependentIdentifier.json", {
             $schema: "https://json-schema.org/draft/2019-09/schema",
             $defs: {
                 refToInteger: {

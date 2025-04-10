@@ -35,6 +35,9 @@ function patternPropertyResolver({ node, key }) {
 function reducePatternProperties({ node, data, key }) {
     var _a;
     const { patternProperties } = node;
+    if (patternProperties == null) {
+        return;
+    }
     let mergedSchema;
     const dataProperties = Object.keys(data !== null && data !== void 0 ? data : {});
     if (key) {

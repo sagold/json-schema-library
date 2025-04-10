@@ -9,7 +9,7 @@ export function toDataNodes(node, data, pointer = "#", dataNodes = []) {
     });
     if (isObject(data)) {
         Object.keys(data).forEach((key) => {
-            const { node: nextNode } = currentNode.getChild(key, data);
+            const { node: nextNode } = currentNode.getNodeChild(key, data);
             if (nextNode) {
                 toDataNodes(nextNode, getValue(data, key), `${pointer}/${key}`, dataNodes);
             }
@@ -17,7 +17,7 @@ export function toDataNodes(node, data, pointer = "#", dataNodes = []) {
     }
     else if (Array.isArray(data)) {
         data.forEach((next, key) => {
-            const { node: nextNode } = currentNode.getChild(key, data);
+            const { node: nextNode } = currentNode.getNodeChild(key, data);
             if (nextNode) {
                 toDataNodes(nextNode, getValue(data, key), `${pointer}/${key}`, dataNodes);
             }

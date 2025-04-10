@@ -2,6 +2,30 @@ import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
 import { draftEditor } from "./draftEditor";
 describe("compileSchema vocabulary", () => {
+    let root;
+    beforeEach(() => (root = compileSchema({
+        type: "object",
+        additionalProperties: false,
+        properties: {
+            image: {
+                type: "object",
+                properties: {
+                    title: { name: "title", type: "string" }
+                }
+            }
+        }
+    })));
+    it("should return rootNode from rootNode", () => {
+        const node = root.getNodeRoot();
+        assert(node === root);
+    });
+    it("should return rootNode from childNode", () => {
+        const { node } = root.getNode("/image/title");
+        assert(node);
+        assert(node.getNodeRoot() === root);
+    });
+});
+describe("compileSchema vocabulary", () => {
     it("should add remote schema on compile", () => {
         const remote = compileSchema({
             $id: "https://remote/schema",
@@ -106,7 +130,7 @@ describe("compileSchema `schemaId`", () => {
         const { node } = compileSchema({
             properties: { title: { $ref: "#/$defs/asset" } },
             $defs: { asset: { type: "string" } }
-        }).getChild("title");
+        }).getNodeChild("title");
         // @todo should have returned already resolved node?
         const result = node.resolveRef();
         assert.deepEqual(result.schemaId, "#/$defs/asset");
@@ -114,7 +138,7 @@ describe("compileSchema `schemaId`", () => {
     it("should maintain schemaId when resolved by root-ref", () => {
         const { node } = compileSchema({
             properties: { title: { $ref: "#" } }
-        }).getChild("title");
+        }).getNodeChild("title");
         // @todo should have returned already resolved node?
         const result = node.resolveRef();
         assert.deepEqual(result.schemaId, "#");

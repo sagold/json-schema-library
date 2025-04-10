@@ -9,7 +9,7 @@ describe("keyword : items : get", () => {
                 type: "array",
                 items: { type: "string", minLength: 1 }
             });
-            const schema = (_b = (_a = node.getChild("0")) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
+            const schema = (_b = (_a = node.getNodeChild("0")) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });
     });
@@ -21,7 +21,7 @@ describe("keyword : items : get", () => {
                 type: "array",
                 items: [{ type: "number" }, { type: "string", minLength: 1 }]
             });
-            const schema = (_b = (_a = node.getChild("1")) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
+            const schema = (_b = (_a = node.getNodeChild("1")) === null || _a === void 0 ? void 0 : _a.node) === null || _b === void 0 ? void 0 : _b.schema;
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });
     });

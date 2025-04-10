@@ -17,11 +17,14 @@ export function parseAnyOf(node) {
 }
 function reduceAnyOf({ node, data, pointer, path }) {
     var _a, _b;
+    if (node.anyOf == null) {
+        return;
+    }
     let mergedSchema = {};
     let dynamicId = "";
     for (let i = 0; i < node.anyOf.length; i += 1) {
         if (validateNode(node.anyOf[i], data, pointer, path).length === 0) {
-            const { node: schemaNode } = node.anyOf[i].reduceSchema(data);
+            const { node: schemaNode } = node.anyOf[i].reduceNode(data);
             if (schemaNode) {
                 const nestedDynamicId = (_b = (_a = schemaNode.dynamicId) === null || _a === void 0 ? void 0 : _a.replace(node.dynamicId, "")) !== null && _b !== void 0 ? _b : "";
                 const localDynamicId = nestedDynamicId === "" ? `anyOf/${i}` : nestedDynamicId;

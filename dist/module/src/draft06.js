@@ -31,7 +31,7 @@ import { requiredKeyword } from "./keywords/required";
 import { sanitizeKeywords } from "./Draft";
 import { typeKeyword } from "./keywords/type";
 import { uniqueItemsKeyword } from "./keywords/uniqueItems";
-import { getChildSchemaSelection } from "./draft2019-09/methods/getChildSchemaSelection";
+import { getChildSelection } from "./draft2019-09/methods/getChildSelection";
 import { getData } from "./draft2019-09/methods/getData";
 import { toDataNodes } from "./methods/toDataNodes";
 import { createSchema } from "./methods/createSchema";
@@ -67,7 +67,7 @@ export const draft06 = sanitizeKeywords({
     methods: {
         createSchema,
         getData,
-        getChildSchemaSelection,
+        getChildSelection,
         toDataNodes
     },
     keywords: [

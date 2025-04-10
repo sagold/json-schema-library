@@ -16,7 +16,7 @@ describe("issue#35 - reducing ref loses correct remote context", () => {
                     ]
                 }
             }
-        }).addRemote("https://my-other-schema.com/schema.json", {
+        }).addRemoteSchema("https://my-other-schema.com/schema.json", {
             type: "object",
             properties: {
                 innerTitle: { $ref: "#/definitions/number" }
@@ -25,8 +25,8 @@ describe("issue#35 - reducing ref loses correct remote context", () => {
                 number: { type: "number", title: "Zahl" }
             }
         });
-        const { node: titleNode } = node.getChild("title", { title: { innerTitle: 111 } });
-        const { node: innerTitleNode } = titleNode.getChild("innerTitle", { innerTitle: 111 });
+        const { node: titleNode } = node.getNodeChild("title", { title: { innerTitle: 111 } });
+        const { node: innerTitleNode } = titleNode.getNodeChild("innerTitle", { innerTitle: 111 });
         assert.deepEqual(innerTitleNode.resolveRef().schema, { type: "number", title: "Zahl" });
     });
 });

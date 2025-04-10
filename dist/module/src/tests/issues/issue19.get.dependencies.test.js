@@ -48,7 +48,7 @@ describe("issue#19 - getSchema from dependencies", () => {
         }
     })));
     it("should return correct schema for existing data property 'customField'", () => {
-        const { node } = rootNode.getChild("customField", {
+        const { node } = rootNode.getNodeChild("customField", {
             name: "issue #19",
             generation: "Display Custom Field",
             customField: "mi"
@@ -64,7 +64,7 @@ describe("issue#19 - getSchema from dependencies", () => {
         const modifiedRootNode = compileSchema(rootNode.schema, {
             drafts: [draftEditor]
         });
-        const { node } = modifiedRootNode.getChild("customField", {
+        const { node } = modifiedRootNode.getNodeChild("customField", {
             name: "issue #19",
             generation: "Display Custom Field"
         });

@@ -16,7 +16,7 @@ export declare function copyDraft(draft: Draft): {
     version: import("../Draft").DraftVersion;
     methods: {
         createSchema: typeof import("../methods/createSchema").createSchema;
-        getChildSchemaSelection: typeof import("../methods/getChildSchemaSelection").getChildSchemaSelection;
+        getChildSelection: typeof import("../methods/getChildSelection").getChildSelection;
         getData: typeof import("../methods/getData").getData;
         toDataNodes: typeof import("../methods/toDataNodes").toDataNodes;
     };

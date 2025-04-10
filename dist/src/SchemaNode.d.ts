@@ -1,8 +1,9 @@
 import type { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, Keyword, ValidationPath } from "./Keyword";
 import { createSchema } from "./methods/createSchema";
 import { Draft } from "./Draft";
-import { JsonSchema, JsonError, ErrorData, OptionalNodeAndError } from "./types";
+import { JsonSchema, JsonError, ErrorData, OptionalNodeOrError } from "./types";
 import { TemplateOptions } from "./methods/getData";
+import { getNode } from "./getNode";
 export declare function isSchemaNode(value: unknown): value is SchemaNode;
 export declare function isReduceable(node: SchemaNode): boolean;
 export type Context = {
@@ -109,29 +110,17 @@ export declare const SchemaNodeMethods: {
     readonly compileSchema: (schema: JsonSchema, spointer?: string, schemaId?: string, dynamicId?: string) => SchemaNode;
     readonly createError: <T extends string = "additional-items-error" | "additional-properties-error" | "all-of-error" | "any-of-error" | "const-error" | "contains-any-error" | "contains-array-error" | "contains-error" | "contains-min-error" | "contains-max-error" | "enum-error" | "exclusive-maximum-error" | "exclusive-minimum-error" | "forbidden-property-error" | "format-date-error" | "format-date-time-error" | "format-duration-error" | "format-email-error" | "format-hostname-error" | "format-ipv4-error" | "format-ipv4-leading-zero-error" | "format-ipv6-error" | "format-ipv6-leading-zero-error" | "format-json-pointer-error" | "format-regex-error" | "format-time-error" | "format-uri-error" | "format-uri-reference-error" | "format-uri-template-error" | "format-url-error" | "format-uuid-error" | "invalid-data-error" | "invalid-property-name-error" | "maximum-error" | "max-items-error" | "max-length-error" | "max-properties-error" | "minimum-error" | "min-items-error" | "min-items-one-error" | "min-length-error" | "min-length-one-error" | "missing-one-of-declarator-error" | "min-properties-error" | "missing-array-item-error" | "missing-dependency-error" | "missing-one-of-property-error" | "multiple-of-error" | "multiple-one-of-error" | "no-additional-properties-error" | "not-error" | "one-of-error" | "one-of-property-error" | "pattern-error" | "pattern-properties-error" | "required-property-error" | "schema-warning" | "type-error" | "undefined-value-error" | "unevaluated-property-error" | "unevaluated-items-error" | "unique-items-error" | "unknown-property-error" | "value-not-empty-error">(code: T, data: ErrorData, message?: string) => JsonError;
     readonly createSchema: typeof createSchema;
-    readonly getChildSchemaSelection: (property: string | number) => JsonError | SchemaNode[];
-    /**
-     * Returns a node containing JSON Schema of a data JSON Pointer.
-     *
-     * To resolve dynamic schema where the type of JSON Schema is evaluated by
-     * its value, a data object has to be passed in options.
-     *
-     * Per default this function will return `undefined` schema for valid properties
-     * that do not have a defined schema. Use the option `withSchemaWarning: true` to
-     * receive an error with `code: schema-warning` containing the location of its
-     * last evaluated json-schema.
-     *
-     * @returns { node } or { error } where node can also be undefined (valid but undefined)
-     */
-    readonly getNode: (pointer: string, data?: unknown, options?: GetNodeOptions) => OptionalNodeAndError;
+    readonly getChildSelection: (property: string | number) => JsonError | SchemaNode[];
+    readonly getNode: typeof getNode;
     /**
      * @returns for $ref, the corresponding SchemaNode or undefined
      */
-    readonly getRef: ($ref: string) => SchemaNode | undefined;
+    readonly getNodeRef: ($ref: string) => SchemaNode | undefined;
+    readonly getNodeRoot: () => SchemaNode;
     /**
      * @returns child node identified by property as SchemaNode
      */
-    readonly getChild: (key: string | number, data?: unknown, options?: GetNodeOptions) => OptionalNodeAndError;
+    readonly getNodeChild: (key: string | number, data?: unknown, options?: GetNodeOptions) => OptionalNodeOrError;
     /**
      * @returns draft version this JSON Schema is evaluated by
      */
@@ -143,11 +132,11 @@ export declare const SchemaNodeMethods: {
     /**
      * @returns SchemaNode with a reduced JSON Schema matching the given data
      */
-    readonly reduceSchema: (data: unknown, options?: {
+    readonly reduceNode: (data: unknown, options?: {
         key?: string | number;
         pointer?: string;
         path?: ValidationPath;
-    }) => OptionalNodeAndError;
+    }) => OptionalNodeOrError;
     /**
      * @returns validation result of data validated by this node's JSON Schema
      */
@@ -166,7 +155,7 @@ export declare const SchemaNodeMethods: {
      * Register a JSON Schema as a remote-schema to be resolved by $ref, $anchor, etc
      * @returns the current node (not the remote schema-node)
      */
-    readonly addRemote: (url: string, schema: JsonSchema) => SchemaNode;
+    readonly addRemoteSchema: (url: string, schema: JsonSchema) => SchemaNode;
     /**
      * @returns a list of all sub-schema as SchemaNode
      */

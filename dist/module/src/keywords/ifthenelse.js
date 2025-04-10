@@ -30,7 +30,7 @@ function reduceIf({ node, data, pointer, path }) {
     if (validateNode(node.if, data, pointer, [...(path !== null && path !== void 0 ? path : [])]).length === 0) {
         if (node.then) {
             // reduce creates a new node
-            const { node: schemaNode } = node.then.reduceSchema(data);
+            const { node: schemaNode } = node.then.reduceNode(data);
             if (schemaNode) {
                 const nestedDynamicId = (_b = (_a = schemaNode.dynamicId) === null || _a === void 0 ? void 0 : _a.replace(node.dynamicId, "").replace(/^#/, "")) !== null && _b !== void 0 ? _b : "";
                 const dynamicId = nestedDynamicId === "" ? `(then)` : nestedDynamicId;
@@ -40,7 +40,7 @@ function reduceIf({ node, data, pointer, path }) {
         }
     }
     else if (node.else) {
-        const { node: schemaNode } = node.else.reduceSchema(data);
+        const { node: schemaNode } = node.else.reduceNode(data);
         if (schemaNode) {
             const nestedDynamicId = (_d = (_c = schemaNode.dynamicId) === null || _c === void 0 ? void 0 : _c.replace(node.dynamicId, "")) !== null && _d !== void 0 ? _d : "";
             const dynamicId = nestedDynamicId === "" ? `(else)` : nestedDynamicId;

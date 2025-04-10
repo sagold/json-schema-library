@@ -3,7 +3,7 @@ export type { CompileOptions } from "./src/compileSchema";
 export type { Context, SchemaNode, GetNodeOptions } from "./src/SchemaNode";
 export type { DataNode } from "./src/methods/toDataNodes";
 export type { Draft, DraftVersion } from "./src/Draft";
-export type { JsonError, JsonPointer, JsonSchema, OptionalNodeAndError } from "./src/types";
+export type { JsonError, JsonPointer, JsonSchema, OptionalNodeOrError, NodeOrError } from "./src/types";
 export type { Keyword, ValidationPath, JsonSchemaReducerParams, JsonSchemaReducer, JsonSchemaResolverParams, JsonSchemaResolver, JsonSchemaValidatorParams, JsonSchemaValidator } from "./src/Keyword";
 export { draft04 } from "./src/draft04";
 export { draft06 } from "./src/draft06";

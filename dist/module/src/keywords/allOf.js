@@ -17,12 +17,15 @@ export function parseAllOf(node) {
 }
 function reduceAllOf({ node, data, key, pointer, path }) {
     var _a, _b;
+    if (node.allOf == null) {
+        return;
+    }
     // note: parts of schemas could be merged, e.g. if they do not include
     // dynamic schema parts
     let mergedSchema = {};
     let dynamicId = "";
     for (let i = 0; i < node.allOf.length; i += 1) {
-        const { node: schemaNode } = node.allOf[i].reduceSchema(data, { key, pointer, path });
+        const { node: schemaNode } = node.allOf[i].reduceNode(data, { key, pointer, path });
         if (schemaNode) {
             const nestedDynamicId = (_b = (_a = schemaNode.dynamicId) === null || _a === void 0 ? void 0 : _a.replace(node.dynamicId, "")) !== null && _b !== void 0 ? _b : "";
             const localDynamicId = nestedDynamicId === "" ? `allOf/${i}` : nestedDynamicId;
