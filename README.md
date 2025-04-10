@@ -168,14 +168,14 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 ## SchemaNode methods
 
-[**addRemoteSchema**](#addremote) ·
+[**addRemoteSchema**](#addremoteschema) ·
 [**compileSchema**](#compileSchema-1) ·
 [**createSchema**](#createSchema) ·
 [**getChildSelection**](#getchildselection) ·
 [**getData**](#getdata) ·
 [**getNode**](#getnode) ·
-[**getNodeChild**](#getchild) ·
-[**getNodeRef**](#getref) ·
+[**getNodeChild**](#getnodechild) ·
+[**getNodeRef**](#getnoderef) ·
 [**getNodeRoot**](#getnoderoot) ·
 [**reduceNode**](#reducenode) ·
 [**toDataNodes**](#todatanodes) ·
@@ -226,7 +226,7 @@ To access the remote schema, add a $ref within your local schema and the remote 
 schemaNode.validate({ character: "AB" }); // maxLength error
 schemaNode.getData({}); // { character: "A" } - default value resolved
 // returns remote schema (from compiled local schema):
-schemaNode.getNodeRef("https://sagold.com/remote");
+const { node, error } = schemaNode.getNodeRef("https://sagold.com/remote");
 ```
 
 **Note** the support for $ref resolution has additional complexities, if you add nested $ids to you schema. Here, json-schema-library has only partial support ([@see integration test result](https://github.com/sagold/json-schema-library/actions/runs/4037856805/jobs/6941448741)). Thus, it is recommended to omit the features of changing scopes by nested $ids. For more details, see [json-schema.org: Structuring a complex schema](https://json-schema.org/understanding-json-schema/structuring.html#base-uri).
@@ -278,7 +278,7 @@ schemaNode.addRemoteSchema("https://sagold.com/remote", {
 schemaNode.validate("AB"); // maxLength error
 schemaNode.getData("A"); // "A" - default value resolved
 // returns remote schema (from compiled local schema):
-schemaNode.getNodeRef("https://sagold.com/remote#/$defs/character");
+const { node, error } = schemaNode.getNodeRef("https://sagold.com/remote#/$defs/character");
 ```
 
 **Note** JSON Pointer are not restricted to `$defs` (definitions), but can reference any subschema. For example:
@@ -354,6 +354,8 @@ const childNodes: JsonSchema[] = jsonSchema.getChildSelection("content");
 
 expect(childNodes.map((n) => n.schema)).to.deep.equal([{ type: "string" }, { type: "number" }]);
 ```
+
+</details>
 
 ### getData
 
@@ -645,8 +647,8 @@ if (error) {
 ```ts
 const mySchema = { type: "object", properties: { title: { type: "string" } } };
 const root = compileSchema(mySchema);
-const node = root.getNodeChild("title", { title: "value" });
-if (!isSchemaNode(node)) return;
+const { node } = root.getNodeChild("title", { title: "value" });
+if (node == null) return;
 console.log(node.schema);
 ```
 
@@ -669,10 +671,12 @@ const localSchema: JsonSchema = {
     ]
 };
 
-const schema = root.getNodeChild("title", { title: 4 })?.schema;
+const schema = root.getNodeChild("title", { title: 4 }).node?.schema;
 
 expect(schema).to.deep.eq({ type: "number" });
 ```
+
+</details>
 
 ### getNodeRef
 
@@ -692,10 +696,10 @@ root.getNodeRef("https://remote.com/schema"); // remoteSchema
 
 ```ts
 const root = compileSchema(mySchema);
-const { node: childNode } = root.getNode("/image/title");
+const { node } = root.getNode("/image/title");
 
-if (childNode) {
-    assert(childNode.getNodeRoot() === root); // success
+if (node) {
+    assert(node.getNodeRoot() === root); // success
 }
 ```
 
@@ -708,7 +712,7 @@ This utility helps walking down the schema-tree with a set of data and it helps 
 complete json-schema for a specific data-value.
 
 ```ts
-const reducedNode = compileSchema({
+const { node: reducedNode } = compileSchema({
     properties: {
         trigger: { type: "boolean"}
     }
