@@ -45,6 +45,10 @@ export function parseOneOf(node: SchemaNode) {
 }
 
 function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
+    if (node.oneOf == null) {
+        return;
+    }
+
     // !keyword: oneOfProperty
     // an additional <DECLARATOR_ONEOF> (default `oneOfProperty`) on the schema will exactly determine the
     // oneOf value (if set in data)

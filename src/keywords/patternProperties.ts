@@ -49,8 +49,11 @@ function patternPropertyResolver({ node, key }: JsonSchemaResolverParams) {
 
 function reducePatternProperties({ node, data, key }: JsonSchemaReducerParams) {
     const { patternProperties } = node;
-    let mergedSchema: JsonSchema;
+    if (patternProperties == null) {
+        return;
+    }
 
+    let mergedSchema: JsonSchema;
     const dataProperties = Object.keys(data ?? {});
     if (key) {
         dataProperties.push(`${key}`);

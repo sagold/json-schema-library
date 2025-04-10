@@ -23,6 +23,10 @@ export function parseAnyOf(node: SchemaNode) {
 }
 
 function reduceAnyOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
+    if (node.anyOf == null) {
+        return;
+    }
+
     let mergedSchema = {};
     let dynamicId = "";
     for (let i = 0; i < node.anyOf.length; i += 1) {
