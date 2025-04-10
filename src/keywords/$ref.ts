@@ -79,7 +79,7 @@ export function reduceRef({ node, data, key, pointer, path }: JsonSchemaReducerP
         return resolvedNode;
     }
     const merged = mergeNode(node, resolvedNode);
-    const { node: reducedNode, error } = merged.reduceSchema(data, { key, pointer, path });
+    const { node: reducedNode, error } = merged.reduceNode(data, { key, pointer, path });
     return reducedNode ?? error;
 }
 

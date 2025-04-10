@@ -52,7 +52,7 @@ export function reduceDependencies({ node, data, key, path }: JsonSchemaReducerP
     let required = workingNode.schema.required ?? [];
     Object.keys(dependencies).forEach((propertyName) => {
         if (isSchemaNode(dependencies[propertyName])) {
-            const reducedDependency = dependencies[propertyName].reduceSchema(data, { key, path }).node;
+            const reducedDependency = dependencies[propertyName].reduceNode(data, { key, path }).node;
             workingNode = mergeNode(workingNode, reducedDependency);
         } else if (Array.isArray(dependencies[propertyName]) && data[propertyName] !== undefined) {
             required.push(...dependencies[propertyName]);
@@ -64,7 +64,7 @@ export function reduceDependencies({ node, data, key, path }: JsonSchemaReducerP
     }
 
     // mergedSchema = mergeSchema(node.schema, mergedSchema, "dependencies");
-    // const { node: childNode, error } = node.compileSchema(mergedSchema, node.spointer).reduceSchema(data, { path });
+    // const { node: childNode, error } = node.compileSchema(mergedSchema, node.spointer).reduceNode(data, { path });
     // return childNode ?? error;
 
     if (required.length === 0) {

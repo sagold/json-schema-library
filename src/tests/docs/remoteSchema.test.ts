@@ -12,7 +12,7 @@ describe("docs - remote schema", () => {
                     $ref: "https://remote.com/schemas/character"
                 }
             }
-        }).addRemote("https://remote.com/schemas/character", {
+        }).addRemoteSchema("https://remote.com/schemas/character", {
             title: "character remote schema",
             type: "string",
             default: "A",
@@ -20,7 +20,7 @@ describe("docs - remote schema", () => {
             minLength: 1
         });
 
-        const remoteSchema = node.getRef("https://remote.com/schemas/character")?.schema;
+        const remoteSchema = node.getNodeRef("https://remote.com/schemas/character")?.schema;
         assert.deepEqual(remoteSchema.title, "character remote schema", "should have resolved remote root schema");
 
         const data = node.getData({});
@@ -37,7 +37,7 @@ describe("docs - remote schema", () => {
                     $ref: "character"
                 }
             }
-        }).addRemote("character", {
+        }).addRemoteSchema("character", {
             title: "character remote schema",
             type: "string",
             default: "A",
@@ -45,7 +45,7 @@ describe("docs - remote schema", () => {
             minLength: 1
         });
 
-        const remoteSchema = node.getRef("character")?.schema;
+        const remoteSchema = node.getNodeRef("character")?.schema;
         assert.deepEqual(remoteSchema.title, "character remote schema", "should have resolved remote root schema");
 
         const data = node.getData({});
@@ -62,7 +62,7 @@ describe("docs - remote schema", () => {
                     $ref: "https://remote.com/schema.json#/$defs/character"
                 }
             }
-        }).addRemote("https://remote.com/schema.json", {
+        }).addRemoteSchema("https://remote.com/schema.json", {
             title: "$defs remote schema",
             $defs: {
                 character: {
@@ -74,7 +74,7 @@ describe("docs - remote schema", () => {
             }
         });
 
-        const remoteSchema = node.getRef("https://remote.com/schema.json#/$defs/character")?.schema;
+        const remoteSchema = node.getNodeRef("https://remote.com/schema.json#/$defs/character")?.schema;
         assert.deepEqual(
             remoteSchema,
             {
@@ -100,7 +100,7 @@ describe("docs - remote schema", () => {
                     $ref: "remote#/$defs/character"
                 }
             }
-        }).addRemote("remote", {
+        }).addRemoteSchema("remote", {
             title: "$defs remote schema",
             $defs: {
                 character: {
@@ -112,7 +112,7 @@ describe("docs - remote schema", () => {
             }
         });
 
-        const remoteSchema = node.getRef("remote#/$defs/character")?.schema;
+        const remoteSchema = node.getNodeRef("remote#/$defs/character")?.schema;
         assert.deepEqual(
             remoteSchema,
             {
@@ -138,7 +138,7 @@ describe("docs - remote schema", () => {
                     $ref: "remote#/properties/character"
                 }
             }
-        }).addRemote("remote", {
+        }).addRemoteSchema("remote", {
             type: "object",
             properties: {
                 character: {
@@ -150,7 +150,7 @@ describe("docs - remote schema", () => {
             }
         });
 
-        const remoteSchema = node.getRef("remote#/properties/character")?.schema;
+        const remoteSchema = node.getNodeRef("remote#/properties/character")?.schema;
         assert.deepEqual(
             remoteSchema,
             {

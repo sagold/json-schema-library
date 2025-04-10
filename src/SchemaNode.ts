@@ -205,12 +205,12 @@ export const SchemaNodeMethods = {
     /**
      * @returns for $ref, the corresponding SchemaNode or undefined
      */
-    getRef($ref: string): SchemaNode | undefined {
+    getNodeRef($ref: string): SchemaNode | undefined {
         const node = this as SchemaNode;
         return node.compileSchema({ $ref }).resolveRef();
     },
 
-    getRootNode() {
+    getNodeRoot() {
         const node = this as SchemaNode;
         return node.context.rootNode;
     },
@@ -218,7 +218,7 @@ export const SchemaNodeMethods = {
     /**
      * @returns child node identified by property as SchemaNode
      */
-    getChild(key: string | number, data?: unknown, options: GetNodeOptions = {}): OptionalNodeOrError {
+    getNodeChild(key: string | number, data?: unknown, options: GetNodeOptions = {}): OptionalNodeOrError {
         options.path = options.path ?? [];
 
         options.withSchemaWarning = options.withSchemaWarning ?? false;
@@ -227,7 +227,7 @@ export const SchemaNodeMethods = {
 
         let node = this as SchemaNode;
         if (node.reducers.length) {
-            const result = node.reduceSchema(data, { key, path, pointer });
+            const result = node.reduceNode(data, { key, path, pointer });
             if (result.error) {
                 return result;
             }
@@ -248,7 +248,7 @@ export const SchemaNodeMethods = {
 
         const referencedNode = node.resolveRef({ path });
         if (referencedNode !== node) {
-            return referencedNode.getChild(key, data, options);
+            return referencedNode.getNodeChild(key, data, options);
         }
 
         if (options.createSchema === true) {
@@ -292,7 +292,7 @@ export const SchemaNodeMethods = {
     /**
      * @returns SchemaNode with a reduced JSON Schema matching the given data
      */
-    reduceSchema(
+    reduceNode(
         data: unknown,
         options: { key?: string | number; pointer?: string; path?: ValidationPath } = {}
     ): OptionalNodeOrError {
@@ -381,7 +381,7 @@ export const SchemaNodeMethods = {
      * Register a JSON Schema as a remote-schema to be resolved by $ref, $anchor, etc
      * @returns the current node (not the remote schema-node)
      */
-    addRemote(url: string, schema: JsonSchema): SchemaNode {
+    addRemoteSchema(url: string, schema: JsonSchema): SchemaNode {
         // @draft >= 6
         schema.$id = joinId(schema.$id || url);
         const { context } = this as SchemaNode;

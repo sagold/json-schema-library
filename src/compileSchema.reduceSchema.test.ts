@@ -2,14 +2,14 @@ import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
 import { isSchemaNode } from "./types";
 
-describe("compileSchema : reduceSchema", () => {
+describe("compileSchema : reduceNode", () => {
     describe("behaviour", () => {});
 
     it("should return schema for boolean schema true", () => {
         // @ts-expect-error boolean schema still untyped
         const node = compileSchema(true);
 
-        const schema = node.reduceSchema(123)?.node?.schema;
+        const schema = node.reduceNode(123)?.node?.schema;
 
         assert.deepEqual(schema, { type: "number" });
     });
@@ -24,7 +24,7 @@ describe("compileSchema : reduceSchema", () => {
             }
         });
 
-        const dataNode = node.reduceSchema({ withHeader: true });
+        const dataNode = node.reduceNode({ withHeader: true });
 
         assert.deepEqual(dataNode?.node?.schema, {
             type: "object",
@@ -44,7 +44,7 @@ describe("compileSchema : reduceSchema", () => {
             allOf: [{ required: ["date"], properties: { date: { type: "string", format: "date" } } }]
         });
 
-        const schema = node.reduceSchema({ withHeader: true, header: "huhu" })?.node?.schema;
+        const schema = node.reduceNode({ withHeader: true, header: "huhu" })?.node?.schema;
 
         assert.deepEqual(schema, {
             type: "object",
@@ -72,7 +72,7 @@ describe("compileSchema : reduceSchema", () => {
     //         }
     //     });
 
-    //     const dataNode = node.reduceSchema({ article: { withHeader: true } } );
+    //     const dataNode = node.reduceNode({ article: { withHeader: true } } );
 
     //     assert.deepEqual(dataNode?.node?.schema, {
     //         type: "object",
@@ -93,7 +93,7 @@ describe("compileSchema : reduceSchema", () => {
                 patternProperties: { "[0-1][0-1]7": { type: "string", minLength: 1 } }
             });
 
-            const schema = node.reduceSchema({ "107": undefined })?.node?.schema;
+            const schema = node.reduceNode({ "107": undefined })?.node?.schema;
 
             assert.deepEqual(schema, { properties: { "107": { type: "string", minLength: 1, maxLength: 99 } } });
         });
@@ -113,7 +113,7 @@ describe("compileSchema : reduceSchema", () => {
                     two: { required: ["three"], properties: { three: { type: "number" } } }
                 }
             });
-            const { node: reduced } = node.reduceSchema({ one: "" });
+            const { node: reduced } = node.reduceNode({ one: "" });
             assert.deepEqual(reduced.schema, {
                 type: "object",
                 required: ["one", "two", "three"],
@@ -131,7 +131,7 @@ describe("compileSchema : reduceSchema", () => {
                         dependencies: { one: ["two"] }
                     }
                 }
-            }).reduceSchema({});
+            }).reduceNode({});
             assert.deepEqual(node.schema, {
                 type: "object",
                 required: [],
@@ -155,7 +155,7 @@ describe("compileSchema : reduceSchema", () => {
                         dependencies: { two: { properties: { four: { type: "boolean" } } } }
                     }
                 }
-            }).reduceSchema({ one: "" });
+            }).reduceNode({ one: "" });
 
             assert.deepEqual(node.schema, {
                 type: "object",
@@ -184,7 +184,7 @@ describe("compileSchema : reduceSchema", () => {
                     },
                     then: { required: ["two"], properties: { two: { type: "string" } } }
                 }
-            }).reduceSchema({ one: "" });
+            }).reduceNode({ one: "" });
             assert.deepEqual(node.schema, {
                 type: "object",
                 required: ["one", "two"],
@@ -208,7 +208,7 @@ describe("compileSchema : reduceSchema", () => {
                         then: { required: ["two"], properties: { two: { type: "string" } } }
                     }
                 }
-            }).reduceSchema({ one: "" });
+            }).reduceNode({ one: "" });
             assert.deepEqual(node.schema, {
                 type: "object",
                 required: ["one", "two"],
@@ -234,7 +234,7 @@ describe("compileSchema : reduceSchema", () => {
                     one: { required: ["one"] },
                     two: { required: ["two"], properties: { two: { type: "number" } } }
                 }
-            }).reduceSchema({});
+            }).reduceNode({});
             assert.deepEqual(node.schema, {
                 type: "object",
                 required: ["one", "two"],
@@ -251,7 +251,7 @@ describe("compileSchema : reduceSchema", () => {
                 required: ["one"],
                 properties: { one: { type: "string" } },
                 allOf: []
-            }).reduceSchema({});
+            }).reduceNode({});
             assert.deepEqual(node.schema, {
                 type: "object",
                 required: ["one"],
@@ -272,7 +272,7 @@ describe("compileSchema : reduceSchema", () => {
                     one: { required: ["one"] },
                     two: { required: ["two"], allOf: [{ properties: { two: { type: "number" } } }] }
                 }
-            }).reduceSchema({});
+            }).reduceNode({});
             assert.deepEqual(node.schema, {
                 type: "object",
                 required: ["one", "two"],
@@ -286,7 +286,7 @@ describe("compileSchema : reduceSchema", () => {
             const { node } = compileSchema({
                 type: "object",
                 oneOf: [{ properties: { one: { type: "number" } } }, { properties: { two: { type: "string" } } }]
-            }).reduceSchema({ one: "string" });
+            }).reduceNode({ one: "string" });
             assert.deepEqual(node.schema, { type: "object", properties: { two: { type: "string" } } });
         });
 
@@ -298,7 +298,7 @@ describe("compileSchema : reduceSchema", () => {
                     { properties: { id: { const: "first" }, one: { type: "number" } } },
                     { properties: { id: { const: "second" }, one: { type: "number" } } }
                 ]
-            }).reduceSchema({ id: "second" });
+            }).reduceNode({ id: "second" });
             assert.deepEqual(node.schema, {
                 type: "object",
                 oneOfProperty: "id",
@@ -312,7 +312,7 @@ describe("compileSchema : reduceSchema", () => {
             const { node } = compileSchema({
                 type: "object",
                 anyOf: [{ properties: { id: { const: "first" } } }]
-            }).reduceSchema({ id: "second" });
+            }).reduceNode({ id: "second" });
 
             assert.deepEqual(node.schema, { type: "object" });
         });
@@ -321,7 +321,7 @@ describe("compileSchema : reduceSchema", () => {
             const { node } = compileSchema({
                 type: "object",
                 anyOf: [{ properties: { id: { const: "second" } } }]
-            }).reduceSchema({ data: { id: "second" } });
+            }).reduceNode({ data: { id: "second" } });
             assert.deepEqual(node.schema, { type: "object", properties: { id: { const: "second" } } });
         });
 
@@ -333,7 +333,7 @@ describe("compileSchema : reduceSchema", () => {
                     { properties: { id: { minLength: 4 } } },
                     { properties: { id: { maxLength: 4 } } }
                 ]
-            }).reduceSchema({ id: "second" });
+            }).reduceNode({ id: "second" });
 
             assert.deepEqual(node.schema, { type: "object", properties: { id: { const: "second", minLength: 4 } } });
         });
@@ -342,7 +342,7 @@ describe("compileSchema : reduceSchema", () => {
             const { node } = compileSchema({
                 prefixItems: [{ const: "foo" }],
                 anyOf: [{ prefixItems: [true, { const: "bar" }] }, { prefixItems: [true, true, { const: "baz" }] }]
-            }).reduceSchema(["foo", "bar"]);
+            }).reduceNode(["foo", "bar"]);
 
             assert.deepEqual(node.schema, { prefixItems: [true, true, { const: "baz" }] });
         });
@@ -353,7 +353,7 @@ describe("compileSchema : reduceSchema", () => {
             const { node } = compileSchema({
                 type: "string",
                 allOf: [{ minLength: 10 }, { pattern: /a-.*/ }]
-            }).reduceSchema("a-value");
+            }).reduceNode("a-value");
             assert.deepEqual(node.schema, {
                 type: "string",
                 minLength: 10,
@@ -369,7 +369,7 @@ describe("compileSchema : reduceSchema", () => {
                     min: { minLength: 10 },
                     pattern: { format: "html" }
                 }
-            }).reduceSchema("a-value");
+            }).reduceNode("a-value");
             assert.deepEqual(node.schema, {
                 type: "string",
                 minLength: 10,
@@ -396,7 +396,7 @@ describe("compileSchema : reduceSchema", () => {
                         }
                     }
                 ]
-            }).reduceSchema("a-value");
+            }).reduceNode("a-value");
             assert.deepEqual(node.schema, {
                 type: "object",
                 minProperties: 2,
@@ -429,7 +429,7 @@ describe("compileSchema : reduceSchema", () => {
                         }
                     }
                 ]
-            }).reduceSchema("a-value");
+            }).reduceNode("a-value");
             assert.deepEqual(node.schema, {
                 type: "object",
                 required: ["trigger", "title"],
@@ -456,7 +456,7 @@ describe("compileSchema : reduceSchema", () => {
                         }
                     }
                 ]
-            }).reduceSchema("a-value");
+            }).reduceNode("a-value");
             assert.deepEqual(node.schema, {
                 type: "object",
                 required: ["trigger", "title"],
@@ -471,7 +471,7 @@ describe("compileSchema : reduceSchema", () => {
             it("should resolve allOf-contains schema to array-item schema", () => {
                 const { node } = compileSchema({
                     allOf: [{ contains: { multipleOf: 2 } }, { contains: { multipleOf: 3 } }]
-                }).reduceSchema([2, 5]);
+                }).reduceNode([2, 5]);
 
                 assert.deepEqual(node.schema, { items: { anyOf: [{ multipleOf: 2 }, { multipleOf: 3 }] } });
             });
@@ -489,7 +489,7 @@ describe("compileSchema : reduceSchema", () => {
                             then: { properties: { additionalSchema: { type: "string", default: "additional" } } }
                         }
                     ]
-                }).reduceSchema({ trigger: false });
+                }).reduceNode({ trigger: false });
                 assert.deepEqual(node.schema, {
                     type: "object",
                     required: ["trigger"],
@@ -510,7 +510,7 @@ describe("compileSchema : reduceSchema", () => {
                             then: { properties: { additionalSchema: { type: "string", default: "additional" } } }
                         }
                     ]
-                }).reduceSchema({ trigger: true });
+                }).reduceNode({ trigger: true });
                 assert.deepEqual(node.schema, {
                     type: "object",
                     required: ["trigger"],
@@ -536,7 +536,7 @@ describe("compileSchema : reduceSchema", () => {
                             then: { properties: { anotherSchema: { type: "string", default: "another" } } }
                         }
                     ]
-                }).reduceSchema({ trigger: true });
+                }).reduceNode({ trigger: true });
                 assert.deepEqual(node.schema, {
                     type: "object",
                     required: ["trigger"],
@@ -566,7 +566,7 @@ describe("compileSchema : reduceSchema", () => {
                             then: { properties: { anotherSchema: { type: "string", default: "another" } } }
                         }
                     ]
-                }).reduceSchema({ trigger: true });
+                }).reduceNode({ trigger: true });
                 assert.deepEqual(node.schema, {
                     type: "object",
                     required: ["trigger"],
@@ -598,7 +598,7 @@ describe("compileSchema : reduceSchema", () => {
                             }
                         }
                     ]
-                }).reduceSchema({ trigger: true, additionalSchema: "12345" });
+                }).reduceNode({ trigger: true, additionalSchema: "12345" });
                 assert.deepEqual(node.schema, {
                     type: "object",
                     required: ["trigger", "additionalSchema", "anotherSchema"],
@@ -625,7 +625,7 @@ describe("compileSchema : reduceSchema", () => {
                 ]
             });
 
-            const schema = node.reduceSchema(123)?.node?.schema;
+            const schema = node.reduceNode(123)?.node?.schema;
 
             assert.deepEqual(schema, { type: "number", minimum: 1 });
         });
@@ -635,7 +635,7 @@ describe("compileSchema : reduceSchema", () => {
                 oneOf: [{ allOf: [{ type: "string", minLength: 1 }] }, { allOf: [{ type: "number", minimum: 1 }] }]
             });
 
-            const schema = node.reduceSchema(123)?.node?.schema;
+            const schema = node.reduceNode(123)?.node?.schema;
 
             assert.deepEqual(schema, { type: "number", minimum: 1 });
         });
@@ -666,7 +666,7 @@ describe("compileSchema : reduceSchema", () => {
                         }
                     }
                 ]
-            }).reduceSchema({ trigger: true });
+            }).reduceNode({ trigger: true });
 
             assert(isSchemaNode(node));
             assert.deepEqual(node.schema, {
@@ -685,7 +685,7 @@ describe("compileSchema : reduceSchema", () => {
                 $defs: {
                     one: { type: "boolean", title: "one" }
                 }
-            }).reduceSchema(3);
+            }).reduceNode(3);
 
             assert.deepEqual(node.schema, { type: "boolean", title: "one" });
         });
@@ -697,7 +697,7 @@ describe("compileSchema : reduceSchema", () => {
                     one: { $ref: "/$defs/two" },
                     two: { type: "boolean", title: "two" }
                 }
-            }).reduceSchema(3);
+            }).reduceNode(3);
 
             assert.deepEqual(node.schema, { type: "boolean", title: "two" });
         });
@@ -710,7 +710,7 @@ describe("compileSchema : reduceSchema", () => {
                     one: { default: "from one", $ref: "/$defs/two" },
                     two: { type: "boolean", title: "from two" }
                 }
-            }).reduceSchema(3);
+            }).reduceNode(3);
 
             assert.deepEqual(node.schema, {
                 description: "from root",
@@ -725,7 +725,7 @@ describe("compileSchema : reduceSchema", () => {
         it("should add dynamicId based on merge anyOf schema", () => {
             const { node } = compileSchema({
                 anyOf: [{ type: "string" }, { minimum: 1 }]
-            }).reduceSchema(3);
+            }).reduceNode(3);
 
             assert.deepEqual(node.dynamicId, "#(anyOf/1)");
         });
@@ -733,7 +733,7 @@ describe("compileSchema : reduceSchema", () => {
         it("should add dynamicId based on all merged anyOf schema", () => {
             const { node } = compileSchema({
                 anyOf: [{ type: "number" }, { minimum: 1 }]
-            }).reduceSchema(3);
+            }).reduceNode(3);
 
             assert.deepEqual(node.dynamicId, "#(anyOf/0,anyOf/1)");
         });
@@ -741,7 +741,7 @@ describe("compileSchema : reduceSchema", () => {
         it("should add dynamicId based on merge anyOf schema", () => {
             const { node } = compileSchema({
                 allOf: [{ type: "number" }, { title: "dynamic id" }]
-            }).reduceSchema(3);
+            }).reduceNode(3);
 
             assert.deepEqual(node.dynamicId, "#(allOf/0,allOf/1)");
         });
@@ -750,7 +750,7 @@ describe("compileSchema : reduceSchema", () => {
             const { node } = compileSchema({
                 allOf: [{ type: "number" }, { title: "dynamic id" }],
                 anyOf: [{ minimum: 1 }]
-            }).reduceSchema(3);
+            }).reduceNode(3);
 
             assert.deepEqual(node.dynamicId, "#(allOf/0,allOf/1)+#(anyOf/0)");
         });
@@ -759,7 +759,7 @@ describe("compileSchema : reduceSchema", () => {
             const { node } = compileSchema({
                 if: { const: 3 },
                 then: { type: "string" }
-            }).reduceSchema(3);
+            }).reduceNode(3);
 
             assert.deepEqual(node.dynamicId, "#(then)");
         });
@@ -769,7 +769,7 @@ describe("compileSchema : reduceSchema", () => {
                 if: { const: 3 },
                 then: { type: "string" },
                 else: { type: "number" }
-            }).reduceSchema(2);
+            }).reduceNode(2);
 
             assert.deepEqual(node.dynamicId, "#(else)");
         });
@@ -780,7 +780,7 @@ describe("compileSchema : reduceSchema", () => {
                     muh: { type: "string" },
                     rooar: { type: "bolean" }
                 }
-            }).reduceSchema({ muh: "" });
+            }).reduceNode({ muh: "" });
 
             assert.deepEqual(node.dynamicId, "#(patternProperties/muh)");
         });
@@ -791,7 +791,7 @@ describe("compileSchema : reduceSchema", () => {
                     muh: { properties: { title: { type: "string" } } },
                     rooar: { properties: { header: { type: "boolean" } } }
                 }
-            }).reduceSchema({ muh: "", rooar: true });
+            }).reduceNode({ muh: "", rooar: true });
 
             assert.deepEqual(node.dynamicId, "#(dependentSchemas/muh,dependentSchemas/rooar)");
         });
@@ -803,8 +803,8 @@ describe("compileSchema : reduceSchema", () => {
                         counter: { anyOf: [{ type: "number" }, { minimum: 1 }] }
                     }
                 })
-                    .getChild("counter", { counter: 3 })
-                    .node?.reduceSchema(3) ?? {};
+                    .getNodeChild("counter", { counter: 3 })
+                    .node?.reduceNode(3) ?? {};
 
             assert.deepEqual(node.dynamicId, "#/properties/counter(anyOf/0,anyOf/1)");
         });
@@ -820,8 +820,8 @@ describe("compileSchema : reduceSchema", () => {
                         }
                     ]
                 })
-                    .getChild("counter", { counter: 3 })
-                    .node?.reduceSchema(3) ?? {};
+                    .getNodeChild("counter", { counter: 3 })
+                    .node?.reduceNode(3) ?? {};
 
             assert.deepEqual(node.dynamicId, "#(allOf/0)+#/properties/counter(anyOf/0,anyOf/1)");
         });
@@ -833,7 +833,7 @@ describe("compileSchema : reduceSchema", () => {
                         anyOf: [{ type: "string" }, { minimum: 1 }]
                     }
                 ]
-            }).reduceSchema(2);
+            }).reduceNode(2);
 
             assert.deepEqual(node.dynamicId, "#(#/allOf/0(anyOf/1))");
         });
@@ -845,7 +845,7 @@ describe("compileSchema : reduceSchema", () => {
                         allOf: [{ type: "number" }, { minimum: 1 }]
                     }
                 ]
-            }).reduceSchema(2);
+            }).reduceNode(2);
 
             assert.deepEqual(node.dynamicId, "#(#/anyOf/0(allOf/0,allOf/1))");
         });
@@ -856,7 +856,7 @@ describe("compileSchema : reduceSchema", () => {
                 then: {
                     allOf: [{ type: "number" }, { title: "order" }]
                 }
-            }).reduceSchema(2);
+            }).reduceNode(2);
 
             assert.deepEqual(node.dynamicId, "#/then(allOf/0,allOf/1)");
         });

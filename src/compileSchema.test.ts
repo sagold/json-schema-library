@@ -22,14 +22,14 @@ describe("compileSchema vocabulary", () => {
     );
 
     it("should return rootNode from rootNode", () => {
-        const node = root.getRootNode();
+        const node = root.getNodeRoot();
         assert(node === root);
     });
 
     it("should return rootNode from childNode", () => {
         const { node } = root.getNode("/image/title");
         assert(node);
-        assert(node.getRootNode() === root);
+        assert(node.getNodeRoot() === root);
     });
 });
 
@@ -161,7 +161,7 @@ describe("compileSchema `schemaId`", () => {
         const { node } = compileSchema({
             properties: { title: { $ref: "#/$defs/asset" } },
             $defs: { asset: { type: "string" } }
-        }).getChild("title");
+        }).getNodeChild("title");
 
         // @todo should have returned already resolved node?
         const result = node.resolveRef();
@@ -171,7 +171,7 @@ describe("compileSchema `schemaId`", () => {
     it("should maintain schemaId when resolved by root-ref", () => {
         const { node } = compileSchema({
             properties: { title: { $ref: "#" } }
-        }).getChild("title");
+        }).getNodeChild("title");
 
         // @todo should have returned already resolved node?
         const result = node.resolveRef();

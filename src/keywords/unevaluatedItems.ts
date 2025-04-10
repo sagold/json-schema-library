@@ -48,7 +48,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
         }
 
         const value = data[i];
-        const { node: child } = node.getChild(i, data, { path });
+        const { node: child } = node.getNodeChild(i, data, { path });
 
         if (child === undefined) {
             if (node.unevaluatedItems) {

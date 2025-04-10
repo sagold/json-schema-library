@@ -11,7 +11,7 @@ export function addRemotes(
 ) {
     // add meta schema
     schemaList.forEach((schema) => {
-        node.addRemote(schema.$id ?? schema.id, schema);
+        node.addRemoteSchema(schema.$id ?? schema.id, schema);
     });
     // add remote files
     const remotesPattern = path.join(
@@ -29,6 +29,6 @@ export function addRemotes(
     remotes.forEach((filepath: string) => {
         const file = require(filepath); // eslint-disable-line
         const remoteId = `${baseURI}/${filepath.split("/remotes/").pop()}`;
-        node.addRemote(remoteId, { $schema, ...file });
+        node.addRemoteSchema(remoteId, { $schema, ...file });
     });
 }

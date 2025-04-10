@@ -35,7 +35,7 @@ function additionalItemsResolver({ node, key, data }: JsonSchemaResolverParams) 
     if (Array.isArray(data)) {
         // @attention: items, etc should already have been tried
         const value = getValue(data, key);
-        const { node: childNode, error } = node.additionalItems.reduceSchema(value);
+        const { node: childNode, error } = node.additionalItems.reduceNode(value);
         return childNode ?? error;
     }
 }

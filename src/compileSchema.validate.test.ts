@@ -699,7 +699,7 @@ describe("compileSchema.validate", () => {
                     $ref: "http://json-schema.org/draft-04/schema#",
                     _id: "input"
                 })
-                    .addRemote("http://json-schema.org/draft-04/schema", draft04Meta)
+                    .addRemoteSchema("http://json-schema.org/draft-04/schema", draft04Meta)
                     .validate({ minLength: -1 });
                 assert.deepEqual(errors.length, 1);
                 assert.deepEqual(errors[0].code, "minimum-error");
@@ -710,7 +710,7 @@ describe("compileSchema.validate", () => {
                     $ref: "http://localhost:1234/integer.json",
                     _id: "input"
                 })
-                    .addRemote(
+                    .addRemoteSchema(
                         "http://localhost:1234/integer.json",
                         // eslint-disable-next-line @typescript-eslint/no-var-requires
                         require("json-schema-test-suite/remotes/integer.json")

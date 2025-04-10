@@ -62,10 +62,10 @@ export function parseRef(node: SchemaNode) {
 //     if (resolvedNode.schemaId === node.schemaId) {
 //         return resolvedNode;
 //     }
-//     const result = resolvedNode.reduceSchema(data, { key, pointer, path });
+//     const result = resolvedNode.reduceNode(data, { key, pointer, path });
 //     return result.node ?? result.error;
 //     // const merged = mergeNode({ ...node, $ref: undefined, schema: { ...node.schema, $ref: undefined } }, resolvedNode);
-//     // const { node: reducedNode, error } = merged.reduceSchema(data, { key, pointer, path });
+//     // const { node: reducedNode, error } = merged.reduceNode(data, { key, pointer, path });
 //     // return reducedNode ?? error;
 // }
 

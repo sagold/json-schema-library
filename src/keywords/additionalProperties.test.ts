@@ -9,7 +9,7 @@ describe("keyword : additionalProperties : get", () => {
             additionalProperties: { type: "string", minLength: 1 }
         });
 
-        const schema = node.getChild("header", { header: "huhu" })?.node?.schema;
+        const schema = node.getNodeChild("header", { header: "huhu" })?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
@@ -20,7 +20,7 @@ describe("keyword : additionalProperties : get", () => {
             additionalProperties: false
         });
 
-        const schema = node.getChild("header", { header: "huhu" })?.node?.schema;
+        const schema = node.getNodeChild("header", { header: "huhu" })?.node?.schema;
 
         assert.deepEqual(schema, undefined);
     });
@@ -31,7 +31,7 @@ describe("keyword : additionalProperties : get", () => {
             additionalProperties: true
         });
 
-        const schema = node.getChild("header", { header: "huhu" })?.node?.schema;
+        const schema = node.getNodeChild("header", { header: "huhu" })?.node?.schema;
 
         assert.deepEqual(schema, undefined);
     });
@@ -42,7 +42,7 @@ describe("keyword : additionalProperties : get", () => {
             allOf: [{ additionalProperties: true }]
         });
 
-        const schema = node.getChild("header", { header: "huhu" })?.node?.schema;
+        const schema = node.getNodeChild("header", { header: "huhu" })?.node?.schema;
 
         assert.deepEqual(schema, undefined);
     });
@@ -54,7 +54,7 @@ describe("keyword : additionalProperties : get", () => {
             allOf: [{ additionalProperties: { type: "boolean" } }]
         });
 
-        const schema = node.getChild("header")?.node?.schema;
+        const schema = node.getNodeChild("header")?.node?.schema;
 
         assert.deepEqual(schema, { type: "boolean" });
     });

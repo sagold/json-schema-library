@@ -41,7 +41,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
     }
 
     // const reducedNode = node;
-    let { node: reducedNode } = node.reduceSchema(data, { pointer, path });
+    let { node: reducedNode } = node.reduceNode(data, { pointer, path });
     reducedNode = reducedNode ?? node;
     if (reducedNode.schema.unevaluatedItems === true || reducedNode.schema.additionalItems === true) {
         return undefined;
@@ -54,7 +54,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
     // "unevaluatedItems with nested items"
     for (let i = 0; i < data.length; i += 1) {
         const value = data[i];
-        const { node: child } = node.getChild(i, data, { path });
+        const { node: child } = node.getNodeChild(i, data, { path });
         // console.log(`CHILD '${i}':`, data[i], "=>", child?.schema);
 
         if (child) {

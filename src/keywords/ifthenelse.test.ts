@@ -11,7 +11,7 @@ describe("keyword : if-then-else : get", () => {
                 then: { required: ["header"], properties: { header: { type: "string", minLength: 1 } } }
             });
 
-            const schema = node.getChild("header", { withHeader: true, header: "huhu" })?.node?.schema;
+            const schema = node.getNodeChild("header", { withHeader: true, header: "huhu" })?.node?.schema;
 
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });
@@ -24,7 +24,7 @@ describe("keyword : if-then-else : get", () => {
                 additionalProperties: false
             });
 
-            const schema = node.getChild("header", { withHeader: false, header: "huhu" })?.node?.schema;
+            const schema = node.getNodeChild("header", { withHeader: false, header: "huhu" })?.node?.schema;
 
             assert.deepEqual(schema, undefined);
         });
@@ -36,7 +36,7 @@ describe("keyword : if-then-else : get", () => {
                 else: { required: ["header"], properties: { header: { type: "string", minLength: 1 } } }
             });
 
-            const schema = node.getChild("header", { withHeader: false, header: "huhu" })?.node?.schema;
+            const schema = node.getNodeChild("header", { withHeader: false, header: "huhu" })?.node?.schema;
 
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });
@@ -48,7 +48,7 @@ describe("keyword : if-then-else : get", () => {
                 then: { allOf: [{ required: ["header"], properties: { header: { type: "string", minLength: 1 } } }] }
             });
 
-            const schema = node.getChild("header", { withHeader: true, header: "huhu" })?.node?.schema;
+            const schema = node.getNodeChild("header", { withHeader: true, header: "huhu" })?.node?.schema;
 
             assert.deepEqual(schema, { type: "string", minLength: 1 });
         });

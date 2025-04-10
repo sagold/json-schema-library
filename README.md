@@ -168,66 +168,191 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 ## SchemaNode methods
 
-[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getData**](#getdata) · [**getNode**](#getnode) · [**getRef**](#getref)· [**getRootNode**](#getrootnode) · [**getChild**](#getchild) · [**reduceSchema**](#reduceschema) · [**toDataNodes**](#todatanodes) · [**toSchemaNodes**](#toschemanodes) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSelection](#getchildselection)
-
-### validate
-
-`validate` is a complete _JSON Schema validator_ for your input data. Calling _validate_ will return a list of validation errors for the passed data.
-
-```ts
-const { valid, errors } = compileSchema(myJsonSchema).validate(myData);
-// { valid: boolean, errors: JsonError[] }
-```
-
-<details><summary>About type JsonError</summary>
-
-In _json-schema-library_ all errors are in the format of a `JsonError`:
-
-```ts
-type JsonError = {
-    type: "error";
-    code: string;
-    message: string;
-    data?: { [p: string]: any };
-};
-```
-
-In almost all cases, a JSON Pointer is given on _error.data.pointer_, which points to the source within data where the error occured. For more details on how to work with errors, refer to section [custom errors](#extending-a-draft).
+[**addRemoteSchema**](#addremote) ·
+[**compileSchema**](#compileSchema-1) ·
+[**createSchema**](#createSchema) ·
+[**getChildSelection**](#getchildselection) ·
+[**getData**](#getdata) ·
+[**getNode**](#getnode) ·
+[**getNodeChild**](#getchild) ·
+[**getNodeRef**](#getref) ·
+[**getNodeRoot**](#getnoderoot) ·
+[**reduceNode**](#reducenode) ·
+[**toDataNodes**](#todatanodes) ·
+[**toSchemaNodes**](#toschemanodes) ·
+[**validate**](#validate) ·
+[**validateAsync**](#validateasync)
 
 </details>
+
+### addRemoteSchema
+
+`addRemoteSchema` lets you add additional schemas that can be referenced by an URL using `$ref`. Use this to combine multiple schemas without changing the actual schema.
+
+Each schemas is referenced by their unique `$id` (since draft-06, previously `id`). Usually an `$id` is specified as an url, for example `https://mydomain.com/schema/schema-name` or with a file extension like `https://mydomain.com/schema/schema-name.json`.
+
+On a compiled schema
+
+```ts
+const schemaNode = compileSchema({
+    $id: "https://sagold.com/local",
+    type: "object",
+    required: ["character"],
+    properties: {
+        character: {
+            $ref: "https://sagold.com/remote"
+        }
+    }
+});
+```
+
+use the exposed method `addRemoteSchema` to add a remote schema for $ref-resolution:
+
+```ts
+schemaNode.addRemoteSchema("https://sagold.com/remote", {
+    $id: "https://sagold.com/remote",
+    title: "A character",
+    type: "string",
+    minLength: 1,
+    maxLength: 1
+});
+```
+
+**Note** the given _url_ and `$id` on the root schema should match. If `$id` is omitted it will be added from the passed url.
+
+To access the remote schema, add a $ref within your local schema and the remote schema will be resolved automatically:
+
+```ts
+schemaNode.validate({ character: "AB" }); // maxLength error
+schemaNode.getData({}); // { character: "A" } - default value resolved
+// returns remote schema (from compiled local schema):
+schemaNode.getNodeRef("https://sagold.com/remote");
+```
+
+**Note** the support for $ref resolution has additional complexities, if you add nested $ids to you schema. Here, json-schema-library has only partial support ([@see integration test result](https://github.com/sagold/json-schema-library/actions/runs/4037856805/jobs/6941448741)). Thus, it is recommended to omit the features of changing scopes by nested $ids. For more details, see [json-schema.org: Structuring a complex schema](https://json-schema.org/understanding-json-schema/structuring.html#base-uri).
+
+<details><summary>Adding remote schema to compileSchema</summary>
+
+It is possible to pass remoteSchema on compileSchema by passing a SchemaNode (with all its remote schemas) in `remote`:
+
+```ts
+const remote = compileSchema({
+    $id: "https://sagold.com/remote",
+    $defs: {
+        character: {
+            title: "A character",
+            type: "string",
+            minLength: 1,
+            maxLength: 1
+        }
+    }
+});
+
+const schemaNode = compileSchema({ $ref: "https://sagold.com/remote#/defs/character" }, { remote });
+```
+
+</details>
+
+<details><summary>Access local subschemas in remote schemas</summary>
+
+You can add a local uri reference to the remote schema by using the `#` separator. The following example resolves hte local path `/$defs/character` in the remote schema `https://sagold.com/remote` throught the combined url:
+`https://sagold.com/remote#/$defs/character`
+
+```ts
+const schemaNode = compileSchema({
+    $id: "https://sagold.com/local",
+    $ref: "https://sagold.com/remote#/$defs/character"
+});
+
+schemaNode.addRemoteSchema("https://sagold.com/remote", {
+    $defs: {
+        character: {
+            title: "A character",
+            type: "string",
+            minLength: 1,
+            maxLength: 1
+        }
+    }
+});
+
+schemaNode.validate("AB"); // maxLength error
+schemaNode.getData("A"); // "A" - default value resolved
+// returns remote schema (from compiled local schema):
+schemaNode.getNodeRef("https://sagold.com/remote#/$defs/character");
+```
+
+**Note** JSON Pointer are not restricted to `$defs` (definitions), but can reference any subschema. For example:
+
+```ts
+const schemaNode = compileSchema({
+    $id: "https://sagold.com/local",
+    $ref: "https://sagold.com/remote#/properties/character"
+});
+
+schemaNode.addRemoteSchema("https://sagold.com/remote", {
+    type: "object",
+    properties: {
+        character: {
+            title: "A character",
+            type: "string",
+            minLength: 1,
+            maxLength: 1
+        }
+    }
+});
+
+schemaNode.validate("AB"); // maxLength error
+schemaNode.getData("A"); // "A" - default value resolved
+// returns remote schema (from compiled local schema):
+schemaNode.getNodeRef("https://sagold.com/remote#/properties/character");
+```
+
+</details>
+
+### compileSchema
+
+`node.compileSchema` creates a new schema node in the same context as node. With this, the created node will be able to resolve local `$ref` and remote `$ref` correctly. Note, the created schema will not be part of (linked) from any nodes in the schema-tree.
+
+```ts
+const someNode = node.compileSchema({ prefixItems: [{ type: "string" }, { $ref: "#/$defs/string" }] });
+```
+
+### createSchema
+
+`createSchema` returns a simple JSON Schema for the input data.
+
+```ts
+const schemaNode = compileSchema(mySchema);
+const schema: JsonSchema = schemaNode.createSchema({ title: "initial value" });
+console.log(schema); // { type: "string" }
+```
+
+### getChildSelection
+
+`getChildSelection` returns a list of available sub-schemas for the given property. In many cases, a single schema will be returned. For _oneOf_-schemas, a list of possible options is returned. This helper always returns a list of schemas.
+
+```ts
+const schemaNode = compileSchema(mySchema);
+const schemas: SchemaNode[] = schemaNode.getChildSelection("content");
+```
 
 <details><summary>Example</summary>
 
 ```ts
-const myJsonSchema: JsonSchema = {
+import { compileSchema, JsonSchema } from "json-schema-library";
+
+const jsonSchema = compileSchema({
     type: "object",
-    additionalProperties: false
-};
-
-const { errors } = compileSchema(myJsonSchema).validate({ name: "my-data" });
-
-expect(errors).to.deep.equal([
-    {
-        type: "error",
-        code: "no-additional-properties-error",
-        message: "Additional property `name` in `#` is not allowed",
-        data: { property: "name", properties: [], pointer: "#" }
+    properties: {
+        content: {
+            oneOf: [{ type: "string" }, { type: "number" }]
+        }
     }
-]);
-```
+});
 
-</details>
+const childNodes: JsonSchema[] = jsonSchema.getChildSelection("content");
 
-### validateAsync
-
-Per default all _json-schema-library_ validators are sync, but adding custom async validators is supported. To resolve async validators use `validateAsync`:
-
-~~Optional support for `onError` helper, which is invoked for each error (after being resolved)~~
-
-```ts
-compileSchema(mySchema)
-    .validateAsync(myData)
-    .then(({ valid, error }) => console.log(errors));
+expect(childNodes.map((n) => n.schema)).to.deep.equal([{ type: "string" }, { type: "number" }]);
 ```
 
 ### getData
@@ -513,39 +638,14 @@ if (error) {
 
 </details>
 
-### getRef
+### getNodeChild
 
-`getRef` retrieves the SchemaNode of a `$ref` string.
-
-```ts
-const root = compileSchema(mySchema);
-root.addRemote("https://remote.com/schema", remoteSchema);
-
-root.getRef("#/$defs/title"); // title-schema of mySchema
-root.getRef("https://remote.com/schema"); // remoteSchema
-```
-
-### getRootNode
-
-`getRootNode` returns the rootNode containing the initial JSON Schema
-
-```ts
-const root = compileSchema(mySchema);
-const { node: childNode } = root.getNode("/image/title");
-
-if (childNode) {
-    assert(childNode.getRootNode() === root); // success
-}
-```
-
-### getChild
-
-`getChild` retrieves the SchemaNode of a child property or index. Using `get` it is possible to incrementally go through the data, retrieving the schema for each next item.
+`getNodeChild` retrieves the SchemaNode of a child property or index. Using `get` it is possible to incrementally go through the data, retrieving the schema for each next item.
 
 ```ts
 const mySchema = { type: "object", properties: { title: { type: "string" } } };
 const root = compileSchema(mySchema);
-const node = root.getChild("title", { title: "value" });
+const node = root.getNodeChild("title", { title: "value" });
 if (!isSchemaNode(node)) return;
 console.log(node.schema);
 ```
@@ -569,16 +669,41 @@ const localSchema: JsonSchema = {
     ]
 };
 
-const schema = root.getChild("title", { title: 4 })?.schema;
+const schema = root.getNodeChild("title", { title: 4 })?.schema;
 
 expect(schema).to.deep.eq({ type: "number" });
 ```
 
+### getNodeRef
+
+`getNodeRef` retrieves the SchemaNode of a `$ref` string.
+
+```ts
+const root = compileSchema(mySchema);
+root.addRemoteSchema("https://remote.com/schema", remoteSchema);
+
+root.getNodeRef("#/$defs/title"); // title-schema of mySchema
+root.getNodeRef("https://remote.com/schema"); // remoteSchema
+```
+
+### getNodeRoot
+
+`getNodeRoot` returns the rootNode containing the initial JSON Schema
+
+```ts
+const root = compileSchema(mySchema);
+const { node: childNode } = root.getNode("/image/title");
+
+if (childNode) {
+    assert(childNode.getNodeRoot() === root); // success
+}
+```
+
 </details>
 
-### reduceSchema
+### reduceNode
 
-`reduceSchema` compiles dynamic JSON schema keywords of a SchemaNode according to the given data.
+`reduceNode` compiles dynamic JSON schema keywords of a SchemaNode according to the given data.
 This utility helps walking down the schema-tree with a set of data and it helps getting a mostly
 complete json-schema for a specific data-value.
 
@@ -595,7 +720,7 @@ const reducedNode = compileSchema({
             }
         }
     }
-}).reduceSchema({ trigger: true });
+}).reduceNode({ trigger: true });
 
 expect(reducedNode.schema).to.deep.eq({
     required: ["title"],
@@ -685,176 +810,64 @@ expect(calls).to.deep.equal([
 
 </details>
 
-### getChildSelection
+### validate
 
-`getChildSelection` returns a list of available sub-schemas for the given property. In many cases, a single schema will be returned. For _oneOf_-schemas, a list of possible options is returned. This helper always returns a list of schemas.
+`validate` is a complete _JSON Schema validator_ for your input data. Calling _validate_ will return a list of validation errors for the passed data.
 
 ```ts
-const schemaNode = compileSchema(mySchema);
-const schemas: SchemaNode[] = schemaNode.getChildSelection("content");
+const { valid, errors } = compileSchema(myJsonSchema).validate(myData);
+// { valid: boolean, errors: JsonError[] }
 ```
+
+<details><summary>About type JsonError</summary>
+
+In _json-schema-library_ all errors are in the format of a `JsonError`:
+
+```ts
+type JsonError = {
+    type: "error";
+    code: string;
+    message: string;
+    data?: { [p: string]: any };
+};
+```
+
+In almost all cases, a JSON Pointer is given on _error.data.pointer_, which points to the source within data where the error occured. For more details on how to work with errors, refer to section [custom errors](#extending-a-draft).
+
+</details>
 
 <details><summary>Example</summary>
 
 ```ts
-import { compileSchema, JsonSchema } from "json-schema-library";
-
-const jsonSchema = compileSchema({
+const myJsonSchema: JsonSchema = {
     type: "object",
-    properties: {
-        content: {
-            oneOf: [{ type: "string" }, { type: "number" }]
-        }
+    additionalProperties: false
+};
+
+const { errors } = compileSchema(myJsonSchema).validate({ name: "my-data" });
+
+expect(errors).to.deep.equal([
+    {
+        type: "error",
+        code: "no-additional-properties-error",
+        message: "Additional property `name` in `#` is not allowed",
+        data: { property: "name", properties: [], pointer: "#" }
     }
-});
-
-const childNodes: JsonSchema[] = jsonSchema.getChildSelection("content");
-
-expect(childNodes.map((n) => n.schema)).to.deep.equal([{ type: "string" }, { type: "number" }]);
+]);
 ```
 
 </details>
 
-### addRemote
+### validateAsync
 
-`addRemote` lets you add additional schemas that can be referenced by an URL using `$ref`. Use this to combine multiple schemas without changing the actual schema.
+Per default all _json-schema-library_ validators are sync, but adding custom async validators is supported. To resolve async validators use `validateAsync`:
 
-Each schemas is referenced by their unique `$id` (since draft-06, previously `id`). Usually an `$id` is specified as an url, for example `https://mydomain.com/schema/schema-name` or with a file extension like `https://mydomain.com/schema/schema-name.json`.
-
-On a compiled schema
+~~Optional support for `onError` helper, which is invoked for each error (after being resolved)~~
 
 ```ts
-const schemaNode = compileSchema({
-    $id: "https://sagold.com/local",
-    type: "object",
-    required: ["character"],
-    properties: {
-        character: {
-            $ref: "https://sagold.com/remote"
-        }
-    }
-});
-```
-
-use the exposed method `addRemote` to add a remote schema for $ref-resolution:
-
-```ts
-schemaNode.addRemote("https://sagold.com/remote", {
-    $id: "https://sagold.com/remote",
-    title: "A character",
-    type: "string",
-    minLength: 1,
-    maxLength: 1
-});
-```
-
-**Note** the given _url_ and `$id` on the root schema should match. If `$id` is omitted it will be added from the passed url.
-
-To access the remote schema, add a $ref within your local schema and the remote schema will be resolved automatically:
-
-```ts
-schemaNode.validate({ character: "AB" }); // maxLength error
-schemaNode.getData({}); // { character: "A" } - default value resolved
-// returns remote schema (from compiled local schema):
-schemaNode.getRef("https://sagold.com/remote");
-```
-
-**Note** the support for $ref resolution has additional complexities, if you add nested $ids to you schema. Here, json-schema-library has only partial support ([@see integration test result](https://github.com/sagold/json-schema-library/actions/runs/4037856805/jobs/6941448741)). Thus, it is recommended to omit the features of changing scopes by nested $ids. For more details, see [json-schema.org: Structuring a complex schema](https://json-schema.org/understanding-json-schema/structuring.html#base-uri).
-
-<details><summary>Adding remote schema to compileSchema</summary>
-
-It is possible to pass remoteSchema on compileSchema by passing a SchemaNode (with all its remote schemas) in `remote`:
-
-```ts
-const remote = compileSchema({
-    $id: "https://sagold.com/remote",
-    $defs: {
-        character: {
-            title: "A character",
-            type: "string",
-            minLength: 1,
-            maxLength: 1
-        }
-    }
-});
-
-const schemaNode = compileSchema({ $ref: "https://sagold.com/remote#/defs/character" }, { remote });
-```
-
-</details>
-
-<details><summary>Access local subschemas in remote schemas</summary>
-
-You can add a local uri reference to the remote schema by using the `#` separator. The following example resolves hte local path `/$defs/character` in the remote schema `https://sagold.com/remote` throught the combined url:
-`https://sagold.com/remote#/$defs/character`
-
-```ts
-const schemaNode = compileSchema({
-    $id: "https://sagold.com/local",
-    $ref: "https://sagold.com/remote#/$defs/character"
-});
-
-schemaNode.addRemote("https://sagold.com/remote", {
-    $defs: {
-        character: {
-            title: "A character",
-            type: "string",
-            minLength: 1,
-            maxLength: 1
-        }
-    }
-});
-
-schemaNode.validate("AB"); // maxLength error
-schemaNode.getData("A"); // "A" - default value resolved
-// returns remote schema (from compiled local schema):
-schemaNode.getRef("https://sagold.com/remote#/$defs/character");
-```
-
-**Note** JSON Pointer are not restricted to `$defs` (definitions), but can reference any subschema. For example:
-
-```ts
-const schemaNode = compileSchema({
-    $id: "https://sagold.com/local",
-    $ref: "https://sagold.com/remote#/properties/character"
-});
-
-schemaNode.addRemote("https://sagold.com/remote", {
-    type: "object",
-    properties: {
-        character: {
-            title: "A character",
-            type: "string",
-            minLength: 1,
-            maxLength: 1
-        }
-    }
-});
-
-schemaNode.validate("AB"); // maxLength error
-schemaNode.getData("A"); // "A" - default value resolved
-// returns remote schema (from compiled local schema):
-schemaNode.getRef("https://sagold.com/remote#/properties/character");
-```
-
-</details>
-
-### compileSchema
-
-`node.compileSchema` creates a new schema node in the same context as node. With this, the created node will be able to resolve local `$ref` and remote `$ref` correctly. Note, the created schema will not be part of (linked) from any nodes in the schema-tree.
-
-```ts
-const someNode = node.compileSchema({ prefixItems: [{ type: "string" }, { $ref: "#/$defs/string" }] });
-```
-
-### createSchema
-
-`createSchema` returns a simple JSON Schema for the input data.
-
-```ts
-const schemaNode = compileSchema(mySchema);
-const schema: JsonSchema = schemaNode.createSchema({ title: "initial value" });
-console.log(schema); // { type: "string" }
+compileSchema(mySchema)
+    .validateAsync(myData)
+    .then(({ valid, error }) => console.log(errors));
 ```
 
 ## Draft Customization
@@ -1167,9 +1180,8 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
     const node = compileSchema(schema);
     ```
 
--   **Renamed Methods**:
+-   **Changed Methods**:
 
-    -   `draft.addRemoteSchema(schema)` → `node.addRemote(schema)`
     -   `draft.createSchemaOf(schema)` → `node.createSchema(schema)`
     -   `draft.each(data, callback)` → `const nodes = node.toDataNodes(data)`
     -   `draft.eachSchema(callback)` → `const nodes = node.toSchemaNodes()`
@@ -1177,7 +1189,7 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
     -   `draft.getNode(options)` → `node.getNode(pointer, data, options)`
     -   `draft.getTemplate(inputData)` → `node.getData(inputData)`
     -   `draft.isValid(data)` → `node.validate(data).valid`
-    -   `draft.step(property, data)` → `node.getChild(property, data)`
+    -   `draft.step(property, data)` → `node.getNodeChild(property, data)`
 
 -   **Renamed Properties**:
 
@@ -1201,7 +1213,7 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
     });
     ```
 
--   **Changed remote $id support** in `addRemote`. An `$id` has to be a valid url (previously any value was accepted)
+-   **Changed remote $id support** in `addRemoteSchema`. An `$id` has to be a valid url (previously any value was accepted)
 
 This update involves some significant changes in how you work with the library, so please carefully review the migration guide and adjust your implementation accordingly.
 
@@ -1231,7 +1243,7 @@ With version `v8.0.0`, _getData_ was improved to better support optional propert
 <details><summary>Exposed new helper functions</summary>
 
 -   `mergeSchema` - Merges to two json schema
--   `reduceSchema` - Reduce schema by merging dynamic constructs into a static json schema omitting those properties
+-   `reduceNode` - Reduce schema by merging dynamic constructs into a static json schema omitting those properties
 -   `isDynamicSchema` - Returns true if the passed schema contains dynamic properties (_if_, _dependencies_, _allOf_, etc)
 -   `resolveDynamicSchema` - Resolves all dynamic schema definitions for the given input data and returns the resulting JSON Schema without any dynamic schema definitions.
 
@@ -1247,11 +1259,11 @@ The above documentation reflects all these changes. Just reach out if you have t
 
 -   replaced `Core` interface by new `Draft` interface
 -   changed export of `Interface` to `Draft`
--   renamed `addSchema` to `addRemote`
+-   renamed `addSchema` to `addRemoteSchema`
 -   changed API of `compileSchema` to have an additional schema-parameter for rootSchema reference
--   changed `compileSchema` and `addRemote` to work on instance state, instead of global state
--   `addRemote`, `compileSchema` now requires draft instance as first parameter
--   removed direct export of following functions: `addValidator`, `compileSchema`, `createSchemaOf`, `each`, `eachSchema`, `getChildSchemaSelection`, `getNode`, `getData`, `isValid`, `step`, `validate`. They are still accessible under the draftConfigs of each draft-version
+-   changed `compileSchema` and `addRemoteSchema` to work on instance state, instead of global state
+-   `addRemoteSchema`, `compileSchema` now requires draft instance as first parameter
+-   removed direct export of following functions: `addValidator`, `compileSchema`, `createSchemaOf`, `each`, `eachSchema`, `getNodeChildSchemaSelection`, `getNode`, `getData`, `isValid`, `step`, `validate`. They are still accessible under the draftConfigs of each draft-version
 -   changed draft version of `JsonEditor` to draft07
 
 </details>

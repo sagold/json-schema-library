@@ -14,7 +14,7 @@ export function getChildSelection(node: SchemaNode, property: string | number): 
     }
     // array.items[] found
     if (node.prefixItems && node.prefixItems.length > +property) {
-        const { node: childNode, error } = node.getChild(property);
+        const { node: childNode, error } = node.getNodeChild(property);
         if (isSchemaNode(childNode)) {
             return [childNode];
         }
@@ -36,6 +36,6 @@ export function getChildSelection(node: SchemaNode, property: string | number): 
         return [];
     }
 
-    const { node: childNode, error } = node.getChild(property);
+    const { node: childNode, error } = node.getNodeChild(property);
     return error ?? [childNode];
 }

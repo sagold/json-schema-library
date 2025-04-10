@@ -37,7 +37,7 @@ export function getNode(
     let currentNode = node;
     for (let i = 0, l = keys.length; i < l; i += 1) {
         currentPointer = `${currentPointer}/${keys[i]}`;
-        const result = currentNode.getChild(keys[i], data, { ...options, pointer: currentPointer });
+        const result = currentNode.getNodeChild(keys[i], data, { ...options, pointer: currentPointer });
         if (result.error) {
             return result;
         }

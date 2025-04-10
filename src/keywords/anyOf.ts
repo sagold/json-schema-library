@@ -31,7 +31,7 @@ function reduceAnyOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     let dynamicId = "";
     for (let i = 0; i < node.anyOf.length; i += 1) {
         if (validateNode(node.anyOf[i], data, pointer, path).length === 0) {
-            const { node: schemaNode } = node.anyOf[i].reduceSchema(data);
+            const { node: schemaNode } = node.anyOf[i].reduceNode(data);
 
             if (schemaNode) {
                 const nestedDynamicId = schemaNode.dynamicId?.replace(node.dynamicId, "") ?? "";

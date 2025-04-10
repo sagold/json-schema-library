@@ -14,14 +14,14 @@ export function toDataNodes(node: SchemaNode, data: unknown, pointer = "#", data
 
     if (isObject(data)) {
         Object.keys(data).forEach((key) => {
-            const { node: nextNode } = currentNode.getChild(key, data);
+            const { node: nextNode } = currentNode.getNodeChild(key, data);
             if (nextNode) {
                 toDataNodes(nextNode, getValue(data, key), `${pointer}/${key}`, dataNodes);
             }
         });
     } else if (Array.isArray(data)) {
         data.forEach((next: unknown, key: number) => {
-            const { node: nextNode } = currentNode.getChild(key, data);
+            const { node: nextNode } = currentNode.getNodeChild(key, data);
             if (nextNode) {
                 toDataNodes(nextNode, getValue(data, key), `${pointer}/${key}`, dataNodes);
             }

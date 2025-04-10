@@ -10,7 +10,7 @@ describe("keyword : properties : get", () => {
             }
         });
 
-        const schema = node.getChild("header")?.node?.schema;
+        const schema = node.getNodeChild("header")?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
@@ -23,7 +23,7 @@ describe("keyword : properties : get", () => {
             }
         });
 
-        const schema = node.getChild("header", { header: "huhu" })?.node?.schema;
+        const schema = node.getNodeChild("header", { header: "huhu" })?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
@@ -41,8 +41,8 @@ describe("keyword : properties : get", () => {
             }
         });
 
-        const { node: next } = node.getChild("header", { header: { title: "huhu" } });
-        const schema = next.getChild("title")?.node?.schema;
+        const { node: next } = node.getNodeChild("header", { header: { title: "huhu" } });
+        const schema = next.getNodeChild("title")?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });
@@ -57,7 +57,7 @@ describe("keyword : properties : get", () => {
             then: { allOf: [{ required: ["header"], properties: { header: { type: "string", minLength: 1 } } }] }
         });
 
-        const schema = node.getChild("withHeader", { withHeader: false })?.node?.schema;
+        const schema = node.getNodeChild("withHeader", { withHeader: false })?.node?.schema;
 
         assert.deepEqual(schema, { type: "boolean", default: true });
     });

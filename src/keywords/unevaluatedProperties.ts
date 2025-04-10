@@ -42,7 +42,7 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
             continue;
         }
 
-        const { node: child } = node.getChild(propertyName, data, { pointer, path });
+        const { node: child } = node.getNodeChild(propertyName, data, { pointer, path });
 
         if (child === undefined) {
             if (node.unevaluatedProperties) {
