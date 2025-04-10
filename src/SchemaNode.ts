@@ -6,9 +6,9 @@ import { createSchema } from "./methods/createSchema";
 import { Draft } from "./Draft";
 import { toSchemaNodes } from "./methods/toSchemaNodes";
 import { getValue } from "./utils/getValue";
-import { isJsonError, JsonSchema, JsonError, ErrorData, DefaultErrors, OptionalNodeAndError } from "./types";
+import { isJsonError, JsonSchema, JsonError, ErrorData, DefaultErrors, OptionalNodeOrError } from "./types";
 import { isObject } from "./utils/isObject";
-import { join, split } from "@sagold/json-pointer";
+import { join } from "@sagold/json-pointer";
 import { joinId } from "./utils/joinId";
 import { mergeNode } from "./mergeNode";
 import { omit } from "./utils/omit";
@@ -17,6 +17,7 @@ import { render } from "./errors/render";
 import { TemplateOptions } from "./methods/getData";
 import { validateNode } from "./validateNode";
 import { hasProperty } from "./utils/hasProperty";
+import { getNode } from "./getNode";
 
 const { DYNAMIC_PROPERTIES } = settings;
 
@@ -199,48 +200,7 @@ export const SchemaNodeMethods = {
         return node.context.methods.getChildSelection(node, property);
     },
 
-    /**
-     * Returns a node containing JSON Schema of a data JSON Pointer.
-     *
-     * To resolve dynamic schema where the type of JSON Schema is evaluated by
-     * its value, a data object has to be passed in options.
-     *
-     * Per default this function will return `undefined` schema for valid properties
-     * that do not have a defined schema. Use the option `withSchemaWarning: true` to
-     * receive an error with `code: schema-warning` containing the location of its
-     * last evaluated json-schema.
-     *
-     * @returns { node } or { error } where node can also be undefined (valid but undefined)
-     */
-    getNode(pointer: string, data?: unknown, options: GetNodeOptions = {}): OptionalNodeAndError {
-        options.path = options.path ?? [];
-
-        options.withSchemaWarning = options.withSchemaWarning ?? false;
-        options.pointer = options.pointer ?? "#";
-
-        const node = this as SchemaNode;
-        const keys = split(pointer);
-        if (keys.length === 0) {
-            const result = node.resolveRef(options);
-            return isJsonError(result) ? { node: undefined, error: result } : { node: result, error: undefined };
-        }
-        let currentPointer = "#";
-        let currentNode = node;
-        for (let i = 0, l = keys.length; i < l; i += 1) {
-            currentPointer = `${currentPointer}/${keys[i]}`;
-            const result = currentNode.getChild(keys[i], data, { ...options, pointer: currentPointer });
-            if (result.error) {
-                return result;
-            }
-            if (result.node == null) {
-                return result;
-            }
-            currentNode = result.node;
-            data = getValue(data, keys[i]);
-        }
-        const result = currentNode.resolveRef(options);
-        return isJsonError(result) ? { node: undefined, error: result } : { node: result, error: undefined };
-    },
+    getNode,
 
     /**
      * @returns for $ref, the corresponding SchemaNode or undefined
@@ -258,7 +218,7 @@ export const SchemaNodeMethods = {
     /**
      * @returns child node identified by property as SchemaNode
      */
-    getChild(key: string | number, data?: unknown, options: GetNodeOptions = {}): OptionalNodeAndError {
+    getChild(key: string | number, data?: unknown, options: GetNodeOptions = {}): OptionalNodeOrError {
         options.path = options.path ?? [];
 
         options.withSchemaWarning = options.withSchemaWarning ?? false;
@@ -335,7 +295,7 @@ export const SchemaNodeMethods = {
     reduceSchema(
         data: unknown,
         options: { key?: string | number; pointer?: string; path?: ValidationPath } = {}
-    ): OptionalNodeAndError {
+    ): OptionalNodeOrError {
         const node = this as SchemaNode;
         const { key, pointer, path } = options;
 

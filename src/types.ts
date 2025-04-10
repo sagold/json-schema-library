@@ -10,7 +10,8 @@ export type JsonPointer = string;
 
 export type DefaultErrors = keyof typeof errors;
 export type ErrorConfig = Record<DefaultErrors | string, string | ((error: ErrorData) => void)>;
-export type OptionalNodeAndError = { node?: SchemaNode; error: undefined } | { node: undefined; error?: JsonError };
+export type OptionalNodeOrError = { node?: SchemaNode; error: undefined } | { node: undefined; error?: JsonError };
+export type NodeOrError = { node: SchemaNode; error: undefined } | { node: undefined; error?: JsonError };
 
 export type { SchemaNode, GetNodeOptions, Draft };
 export { isSchemaNode };
