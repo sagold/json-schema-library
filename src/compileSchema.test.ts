@@ -1,6 +1,37 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
 import { draftEditor } from "./draftEditor";
+import { SchemaNode } from "./SchemaNode";
+
+describe("compileSchema vocabulary", () => {
+    let root: SchemaNode;
+    beforeEach(
+        () =>
+            (root = compileSchema({
+                type: "object",
+                additionalProperties: false,
+                properties: {
+                    image: {
+                        type: "object",
+                        properties: {
+                            title: { name: "title", type: "string" }
+                        }
+                    }
+                }
+            }))
+    );
+
+    it("should return rootNode from rootNode", () => {
+        const node = root.getRootNode();
+        assert(node === root);
+    });
+
+    it("should return rootNode from childNode", () => {
+        const { node } = root.getNode("/image/title");
+        assert(node);
+        assert(node.getRootNode() === root);
+    });
+});
 
 describe("compileSchema vocabulary", () => {
     it("should add remote schema on compile", () => {

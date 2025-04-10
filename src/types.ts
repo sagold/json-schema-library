@@ -9,7 +9,7 @@ export interface JsonSchema {
 export type JsonPointer = string;
 
 export type DefaultErrors = keyof typeof errors;
-export type ErrorConfig = Record<DefaultErrors, string | ((error: ErrorData) => void)>;
+export type ErrorConfig = Record<DefaultErrors | string, string | ((error: ErrorData) => void)>;
 export type OptionalNodeAndError = { node?: SchemaNode; error: undefined } | { node: undefined; error?: JsonError };
 
 export type { SchemaNode, GetNodeOptions, Draft };

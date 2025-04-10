@@ -168,7 +168,7 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 ## SchemaNode methods
 
-[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getData**](#getdata) · [**getNode**](#getnode) · [**getRef**](#getref) · [**getChild**](#getchild) · [**reduceSchema**](#reduceschema) · [**toDataNodes**](#todatanodes) · [**toSchemaNodes**](#toschemanodes) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSelection](#getchildselection)
+[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getData**](#getdata) · [**getNode**](#getnode) · [**getRef**](#getref)· [**getRootNode**](#getrootnode) · [**getChild**](#getchild) · [**reduceSchema**](#reduceschema) · [**toDataNodes**](#todatanodes) · [**toSchemaNodes**](#toschemanodes) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSelection](#getchildselection)
 
 ### validate
 
@@ -523,6 +523,19 @@ root.addRemote("https://remote.com/schema", remoteSchema);
 
 root.getRef("#/$defs/title"); // title-schema of mySchema
 root.getRef("https://remote.com/schema"); // remoteSchema
+```
+
+### getRootNode
+
+`getRootNode` returns the rootNode containing the initial JSON Schema
+
+```ts
+const root = compileSchema(mySchema);
+const { node: childNode } = root.getNode("/image/title");
+
+if (childNode) {
+    assert(childNode.getRootNode() === root); // success
+}
 ```
 
 ### getChild

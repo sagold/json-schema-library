@@ -249,6 +249,11 @@ export const SchemaNodeMethods = {
         return node.compileSchema({ $ref }).resolveRef();
     },
 
+    getRootNode() {
+        const node = this as SchemaNode;
+        return node.context.rootNode;
+    },
+
     /**
      * @returns child node identified by property as SchemaNode
      */
