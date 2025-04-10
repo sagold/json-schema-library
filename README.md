@@ -168,7 +168,7 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 ## SchemaNode methods
 
-[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getData**](#getdata) · [**getNode**](#getnode) · [**getChild**](#getchild) · [**reduceSchema**](#reduceschema) · [**toDataNodes**](#todatanodes) · [**toSchemaNodes**](#toschemanodes) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSelection](#getchildselection)
+[**validate**](#validate) · [**validateAsync**](#validateasync) · [**getData**](#getdata) · [**getNode**](#getnode) · [**getRef**](#getref) · [**getChild**](#getchild) · [**reduceSchema**](#reduceschema) · [**toDataNodes**](#todatanodes) · [**toSchemaNodes**](#toschemanodes) · [**addRemote**](#addremote) · [**compileSchema**](#compileSchema-1) · [createSchema](#createSchema) · [getChildSelection](#getchildselection)
 
 ### validate
 
@@ -513,9 +513,21 @@ if (error) {
 
 </details>
 
+### getRef
+
+`getRef` retrieves the SchemaNode of a `$ref` string.
+
+```ts
+const root = compileSchema(mySchema);
+root.addRemote("https://remote.com/schema", remoteSchema);
+
+root.getRef("#/$defs/title"); // title-schema of mySchema
+root.getRef("https://remote.com/schema"); // remoteSchema
+```
+
 ### getChild
 
-`getChild` retrieves the JSON Schema of a child property or index. Using `get` it is possible to incrementally go through the data, retrieving the schema for each next item.
+`getChild` retrieves the SchemaNode of a child property or index. Using `get` it is possible to incrementally go through the data, retrieving the schema for each next item.
 
 ```ts
 const mySchema = { type: "object", properties: { title: { type: "string" } } };
