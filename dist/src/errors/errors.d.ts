@@ -55,6 +55,7 @@ export declare const errors: {
     "pattern-error": string;
     "pattern-properties-error": string;
     "required-property-error": string;
+    /** return schema-warning with createSchemaWarning:true when a valid, but undefined  property was found */
     "schema-warning": string;
     "type-error": string;
     "undefined-value-error": string;

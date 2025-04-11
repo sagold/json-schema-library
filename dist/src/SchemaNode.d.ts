@@ -4,6 +4,7 @@ import { Draft } from "./Draft";
 import { JsonSchema, JsonError, ErrorData, OptionalNodeOrError } from "./types";
 import { TemplateOptions } from "./methods/getData";
 import { getNode } from "./getNode";
+import { getNodeChild } from "./getNodeChild";
 export declare function isSchemaNode(value: unknown): value is SchemaNode;
 export declare function isReduceable(node: SchemaNode): boolean;
 export type Context = {
@@ -112,15 +113,12 @@ export declare const SchemaNodeMethods: {
     readonly createSchema: typeof createSchema;
     readonly getChildSelection: (property: string | number) => JsonError | SchemaNode[];
     readonly getNode: typeof getNode;
+    readonly getNodeChild: typeof getNodeChild;
     /**
      * @returns for $ref, the corresponding SchemaNode or undefined
      */
     readonly getNodeRef: ($ref: string) => SchemaNode | undefined;
     readonly getNodeRoot: () => SchemaNode;
-    /**
-     * @returns child node identified by property as SchemaNode
-     */
-    readonly getNodeChild: (key: string | number, data?: unknown, options?: GetNodeOptions) => OptionalNodeOrError;
     /**
      * @returns draft version this JSON Schema is evaluated by
      */

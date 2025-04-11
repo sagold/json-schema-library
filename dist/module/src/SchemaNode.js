@@ -3,7 +3,6 @@ import sanitizeErrors from "./utils/sanitizeErrors";
 import settings from "./settings";
 import { createSchema } from "./methods/createSchema";
 import { toSchemaNodes } from "./methods/toSchemaNodes";
-import { getValue } from "./utils/getValue";
 import { isJsonError } from "./types";
 import { isObject } from "./utils/isObject";
 import { join } from "@sagold/json-pointer";
@@ -15,6 +14,7 @@ import { render } from "./errors/render";
 import { validateNode } from "./validateNode";
 import { hasProperty } from "./utils/hasProperty";
 import { getNode } from "./getNode";
+import { getNodeChild } from "./getNodeChild";
 const { DYNAMIC_PROPERTIES } = settings;
 export function isSchemaNode(value) {
     return isObject(value) && Array.isArray(value === null || value === void 0 ? void 0 : value.reducers) && Array.isArray(value === null || value === void 0 ? void 0 : value.resolvers);
@@ -88,6 +88,7 @@ export const SchemaNodeMethods = {
         return node.context.methods.getChildSelection(node, property);
     },
     getNode,
+    getNodeChild,
     /**
      * @returns for $ref, the corresponding SchemaNode or undefined
      */
@@ -98,48 +99,6 @@ export const SchemaNodeMethods = {
     getNodeRoot() {
         const node = this;
         return node.context.rootNode;
-    },
-    /**
-     * @returns child node identified by property as SchemaNode
-     */
-    getNodeChild(key, data, options = {}) {
-        var _a, _b, _c;
-        options.path = (_a = options.path) !== null && _a !== void 0 ? _a : [];
-        options.withSchemaWarning = (_b = options.withSchemaWarning) !== null && _b !== void 0 ? _b : false;
-        options.pointer = (_c = options.pointer) !== null && _c !== void 0 ? _c : "#";
-        const { path, pointer } = options;
-        let node = this;
-        if (node.reducers.length) {
-            const result = node.reduceNode(data, { key, path, pointer });
-            if (result.error) {
-                return result;
-            }
-            if (isSchemaNode(result.node)) {
-                node = result.node;
-            }
-        }
-        for (const resolver of node.resolvers) {
-            const schemaNode = resolver({ data, key, node });
-            if (isSchemaNode(schemaNode)) {
-                return { node: schemaNode, error: undefined };
-            }
-            if (isJsonError(schemaNode)) {
-                return { node: undefined, error: schemaNode };
-            }
-        }
-        const referencedNode = node.resolveRef({ path });
-        if (referencedNode !== node) {
-            return referencedNode.getNodeChild(key, data, options);
-        }
-        if (options.createSchema === true) {
-            const newNode = node.compileSchema(createSchema(getValue(data, key)), `${node.spointer}/additional`, `${node.schemaId}/additional`);
-            return { node: newNode, error: undefined };
-        }
-        if (options.withSchemaWarning === true) {
-            const error = node.createError("schema-warning", { pointer, value: data, schema: node.schema, key });
-            return { node: undefined, error };
-        }
-        return { node: undefined, error: undefined };
     },
     /**
      * @returns draft version this JSON Schema is evaluated by
