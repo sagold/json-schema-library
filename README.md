@@ -550,7 +550,7 @@ In case this is unwanted behaviour, use the `withSchemaWarning` option to return
 ```ts
 const schemaNode = compileSchema({ type: "object" });
 const { node, error } = schemaNode.getNode("/name", undefined, { withSchemaWarning: true });
-console.log(node, error); // undefined, { type: "error", code: "schema-warning" }
+console.log(node?.schema, error); // undefined, { type: "error", code: "schema-warning" }
 ```
 
 Or set `getNode` to return a simple JSON Schema for the found data setting `createSchema: true`:
@@ -558,7 +558,7 @@ Or set `getNode` to return a simple JSON Schema for the found data setting `crea
 ```ts
 const schemaNode = compileSchema({ type: "object" });
 const { node, error } = schemaNode.getNode("/name", { name: 123 }, { createSchema: true });
-console.log(node, error); // { type: "number" }, undefined
+console.log(node?.schema, error); // { type: "number" }, undefined
 ```
 
 <details><summary>Example</summary>

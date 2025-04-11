@@ -3,6 +3,8 @@ import { isJsonError, NodeOrError, OptionalNodeOrError } from "./types";
 import { split } from "@sagold/json-pointer";
 import { getValue } from "./utils/getValue";
 
+// prettier-ignore
+export function getNode(pointer: string, data: unknown, options: { withSchemaWarning: true } & GetNodeOptions): NodeOrError;
 export function getNode(pointer: string, data: unknown, options: { createSchema: true } & GetNodeOptions): NodeOrError;
 export function getNode(pointer: string, data?: unknown, options?: GetNodeOptions): OptionalNodeOrError;
 /**

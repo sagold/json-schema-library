@@ -62,6 +62,7 @@ export const errors = {
     "pattern-properties-error":
         "Property `{{key}}` does not match any patterns in `{{pointer}}`. Valid patterns are: {{patterns}}",
     "required-property-error": "The required property `{{key}}` is missing at `{{pointer}}`",
+    /** return schema-warning with createSchemaWarning:true when a valid, but undefined  property was found */
     "schema-warning": "Failed retrieving a schema from '{{pointer}}' to key '{{key}}'",
     "type-error": "Expected `{{value}}` ({{received}}) in `{{pointer}}` to be of type `{{expected}}`",
     "undefined-value-error": "Value must not be undefined in `{{pointer}}`",

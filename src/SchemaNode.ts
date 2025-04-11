@@ -5,7 +5,6 @@ import type { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, Keywor
 import { createSchema } from "./methods/createSchema";
 import { Draft } from "./Draft";
 import { toSchemaNodes } from "./methods/toSchemaNodes";
-import { getValue } from "./utils/getValue";
 import { isJsonError, JsonSchema, JsonError, ErrorData, DefaultErrors, OptionalNodeOrError } from "./types";
 import { isObject } from "./utils/isObject";
 import { join } from "@sagold/json-pointer";
@@ -18,6 +17,7 @@ import { TemplateOptions } from "./methods/getData";
 import { validateNode } from "./validateNode";
 import { hasProperty } from "./utils/hasProperty";
 import { getNode } from "./getNode";
+import { getNodeChild } from "./getNodeChild";
 
 const { DYNAMIC_PROPERTIES } = settings;
 
@@ -201,6 +201,7 @@ export const SchemaNodeMethods = {
     },
 
     getNode,
+    getNodeChild,
 
     /**
      * @returns for $ref, the corresponding SchemaNode or undefined
@@ -213,59 +214,6 @@ export const SchemaNodeMethods = {
     getNodeRoot() {
         const node = this as SchemaNode;
         return node.context.rootNode;
-    },
-
-    /**
-     * @returns child node identified by property as SchemaNode
-     */
-    getNodeChild(key: string | number, data?: unknown, options: GetNodeOptions = {}): OptionalNodeOrError {
-        options.path = options.path ?? [];
-
-        options.withSchemaWarning = options.withSchemaWarning ?? false;
-        options.pointer = options.pointer ?? "#";
-        const { path, pointer } = options;
-
-        let node = this as SchemaNode;
-        if (node.reducers.length) {
-            const result = node.reduceNode(data, { key, path, pointer });
-            if (result.error) {
-                return result;
-            }
-            if (isSchemaNode(result.node)) {
-                node = result.node;
-            }
-        }
-
-        for (const resolver of node.resolvers) {
-            const schemaNode = resolver({ data, key, node });
-            if (isSchemaNode(schemaNode)) {
-                return { node: schemaNode, error: undefined };
-            }
-            if (isJsonError(schemaNode)) {
-                return { node: undefined, error: schemaNode };
-            }
-        }
-
-        const referencedNode = node.resolveRef({ path });
-        if (referencedNode !== node) {
-            return referencedNode.getNodeChild(key, data, options);
-        }
-
-        if (options.createSchema === true) {
-            const newNode = node.compileSchema(
-                createSchema(getValue(data, key)),
-                `${node.spointer}/additional`,
-                `${node.schemaId}/additional`
-            );
-            return { node: newNode, error: undefined };
-        }
-
-        if (options.withSchemaWarning === true) {
-            const error = node.createError("schema-warning", { pointer, value: data, schema: node.schema, key });
-            return { node: undefined, error };
-        }
-
-        return { node: undefined, error: undefined };
     },
 
     /**
