@@ -35,6 +35,7 @@ export { isReduceable } from "./src/SchemaNode";
 export { isJsonError, isSchemaNode } from "./src/types";
 export { extendDraft, addKeywords } from "./src/Draft";
 export { mergeNode } from "./src/mergeNode";
+export { mergeSchema } from "./src/utils/mergeSchema";
 
 // remotes
 export { remotes } from "./remotes";
