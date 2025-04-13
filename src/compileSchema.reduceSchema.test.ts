@@ -810,6 +810,17 @@ describe("compileSchema : reduceNode", () => {
             assert.deepEqual(node.dynamicId, "#(dependentSchemas/muh,dependentSchemas/rooar)");
         });
 
+        it("should add dynamicId based on selected `dependencies`", () => {
+            const { node } = compileSchema({
+                dependencies: {
+                    one: ["two"],
+                    two: { properties: { header: { type: "boolean" } } }
+                }
+            }).reduceNode({ one: true });
+
+            assert.deepEqual(node.dynamicId, "#(dependencies/one,dependencies/two)");
+        });
+
         it("should prefix with schemaId", () => {
             const { node } =
                 compileSchema({
