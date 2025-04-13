@@ -197,20 +197,17 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
             });
         }
 
-        if (isObject(node.dependencies)) {
-            Object.keys(node.dependencies).forEach((propertyName) => {
-                const propertyValue = node.dependencies[propertyName];
+        if (isObject(node.dependentRequired)) {
+            Object.keys(node.dependentRequired).forEach((propertyName) => {
+                const propertyValue = node.dependentRequired[propertyName];
                 const hasValue = getValue(d, propertyName) !== undefined;
-                if (hasValue && Array.isArray(propertyValue)) {
+                if (hasValue) {
                     propertyValue.forEach((addProperty) => {
                         const { node: propertyNode } = node.getNodeChild(addProperty, d);
                         if (propertyNode) {
                             d[addProperty] = propertyNode.getData(getValue(d, addProperty), opts);
                         }
                     });
-                } else if (d[propertyName] !== undefined && isSchemaNode(propertyValue)) {
-                    const dependencyData = propertyValue.getData(data ?? d, opts);
-                    Object.assign(d, dependencyData);
                 }
                 // if false and removeInvalidData => remove from data
             });

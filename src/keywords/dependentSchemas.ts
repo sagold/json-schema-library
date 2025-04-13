@@ -74,7 +74,7 @@ export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) 
 
 export function validateDependentSchemas({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     const { schema, dependentSchemas } = node;
-    if (!isObject(data)) {
+    if (!isObject(data) || dependentSchemas == null) {
         return undefined;
     }
     const errors: ValidationResult[] = [];
