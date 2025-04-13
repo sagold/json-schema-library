@@ -17,7 +17,7 @@ export function validateNode(node: SchemaNode, data: unknown, pointer: string, p
             })
         ];
     }
-    const errors: ValidationResult[] = [];
+    const errors: (undefined | ValidationResult | ValidationResult)[] = [];
     for (const validate of node.validators) {
         const result = validate({ node, data, pointer, path });
         if (Array.isArray(result)) {

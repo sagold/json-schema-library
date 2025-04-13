@@ -1,9 +1,8 @@
-import type { Keyword } from "./Keyword";
+import type { JsonSchemaValidator, Keyword } from "./Keyword";
 import { copyDraft } from "./utils/copyDraft";
 import { createSchema } from "./methods/createSchema";
 import { toDataNodes } from "./methods/toDataNodes";
 import { ErrorConfig } from "./types";
-import { formats } from "./formats/formats";
 import { getChildSelection } from "./methods/getChildSelection";
 import { getData } from "./methods/getData";
 
@@ -27,7 +26,7 @@ export interface Draft {
     $schema?: string;
     /** draft errors (this can still be global) */
     errors: ErrorConfig;
-    formats: typeof formats;
+    formats: Record<string, JsonSchemaValidator>;
 }
 
 type PartialDraft = Partial<Omit<Draft, "errors" | "formats">> & {

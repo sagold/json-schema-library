@@ -36,7 +36,7 @@ export type JsonSchemaValidatorParams = { pointer?: string; data: unknown; node:
 export interface JsonSchemaValidator {
     toJSON?: () => string;
     order?: number;
-    (options: JsonSchemaValidatorParams): undefined | JsonError | ValidationResult[];
+    (options: JsonSchemaValidatorParams): undefined | ValidationResult | ValidationResult[];
 }
 
 export type Keyword = {

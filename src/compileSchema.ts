@@ -11,9 +11,9 @@ import { TemplateOptions } from "./methods/getData";
 import { SchemaNode, SchemaNodeMethods, addKeywords, isSchemaNode } from "./SchemaNode";
 
 export type CompileOptions = {
-    drafts: Draft[];
-    remote: SchemaNode;
-    formatAssertion: boolean | "meta-schema";
+    drafts?: Draft[];
+    remote?: SchemaNode;
+    formatAssertion?: boolean | "meta-schema";
     getDataDefaultOptions?: TemplateOptions;
 };
 
@@ -28,7 +28,7 @@ function getDraft(drafts: Draft[], $schema: string) {
  * wrapping each schema with utilities and as much preevaluation is possible. Each
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
-export function compileSchema(schema: JsonSchema, options: Partial<CompileOptions> = {}) {
+export function compileSchema(schema: JsonSchema, options: CompileOptions = {}) {
     /** @todo this option has to be passed to all drafts (remotes) */
     let formatAssertion = options.formatAssertion ?? true;
     const drafts = options.drafts ?? defaultDrafts;

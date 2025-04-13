@@ -1,4 +1,4 @@
-[![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) [![CI](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) ![Types](https://badgen.net/npm/types/json-schema-library)
+injectWorkspacePackages: true[![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) [![CI](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) ![Types](https://badgen.net/npm/types/json-schema-library)
 
 <h1 align="center">
     <img src="./docs/json-schema-library-10.png" width="192" alt="json-schema-library">
@@ -180,8 +180,7 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 [**reduceNode**](#reducenode) ·
 [**toDataNodes**](#todatanodes) ·
 [**toSchemaNodes**](#toschemanodes) ·
-[**validate**](#validate) ·
-[**validateAsync**](#validateasync)
+[**validate**](#validate)
 
 </details>
 
@@ -862,17 +861,69 @@ expect(errors).to.deep.equal([
 
 </details>
 
-### validateAsync
-
-Per default all _json-schema-library_ validators are sync, but adding custom async validators is supported. To resolve async validators use `validateAsync`:
-
-~~Optional support for `onError` helper, which is invoked for each error (after being resolved)~~
+You can also use async validators to validate data with json-schema. For this, another property asyncErrors is exposed on validate:
 
 ```ts
-compileSchema(mySchema)
-    .validateAsync(myData)
-    .then(({ valid, error }) => console.log(errors));
+const { isValid, errors, errorsAsync } = compileSchema(myJsonSchema).validate(myData);
+
+if (errorsAsync.length > 0) {
+    const additionalErrors = (await Promise.all(errorsAsync)).filter((err) => err != null);
+}
 ```
+
+Per default _json-schema-library_ does not have async validators, so `errorsAsync` is always empty. If you add async validators, a list of `Promise<JsonError|undefined>` is return and you need to resolve and filter non-errors (undefined) yourself.
+
+> **Note** `isValid` only refers to errors. `errorsAsync` has to be evaluated separately
+
+<details><summary>Example Async Validation</summary>
+
+```ts
+import { JsonSchemaValidator, draft2020 } from "json-schema-library";
+// return Promise<JsonError>
+const customValidator: JsonSchemaValidator = async ({ node, pointer, data }) => {
+    return node.createError("type-error", {
+        schema: {},
+        pointer,
+        value: data
+    });
+};
+
+const draftList = [
+    extendDraft(jsonEditorDraft, {
+        keywords: {
+            custom: customValidator
+        }
+    })
+];
+
+const { isValid, errorsAsync } = compileSchema({ custom: true }).validate("data");
+console.log(isValid, errors.length); // true, 0
+
+const errors = await Promise.all(errorsAsync);
+console.log(errors); /// [{ code: "type-error", value: "data", pointer: "#", ... }]
+```
+
+</details>
+
+```ts
+const myJsonSchema: JsonSchema = {
+    type: "object",
+    additionalProperties: false
+};
+
+const { errors } = compileSchema(myJsonSchema).validate({ name: "my-data" });
+
+expect(errors).to.deep.equal([
+    {
+        type: "error",
+        code: "no-additional-properties-error",
+        message: "Additional property `name` in `#` is not allowed",
+        data: { property: "name", properties: [], pointer: "#" }
+    }
+]);
+```
+
+</details>
 
 ## Draft Customization
 

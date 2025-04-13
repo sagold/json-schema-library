@@ -2,6 +2,7 @@ import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
 import { Draft, JsonError, SchemaNode } from "./types";
 import { draft2020 } from "./draft2020";
+import { ValidationResult } from "./Keyword";
 
 describe("compileSchema.validate", () => {
     describe("integer", () => {
@@ -948,29 +949,13 @@ describe("compileSchema.validate : format", () => {
     });
 });
 
-describe("compileSchema.validateAsync", () => {
-    it("should return a promise", () => {
-        const promise = compileSchema({
-            type: "number"
-        }).validateAsync(4);
-        assert(promise instanceof Promise);
-    });
-
+describe("compileSchema.validate - errorsAsync", () => {
     it("should resolve successfull with an empty error", async () => {
-        const promise = compileSchema({
+        const { errorsAsync } = compileSchema({
             type: "number"
-        }).validateAsync(4);
-        const { errors } = await promise;
-        assert.deepEqual(errors.length, 0);
-    });
-
-    it("should resolve with errors for a failed validation", async () => {
-        const promise = compileSchema({
-            type: "number"
-        }).validateAsync("4");
-        const { errors } = await promise;
-        assert.deepEqual(errors.length, 1);
-        assert.deepEqual(errors[0].code, "type-error");
+        }).validate(4);
+        const asyncErrors = await Promise.all(errorsAsync);
+        assert.deepEqual(asyncErrors.length, 0);
     });
 
     describe("async validation", () => {
@@ -979,92 +964,44 @@ describe("compileSchema.validateAsync", () => {
             draft = {
                 ...draft2020,
                 keywords: [
-                    // @ts-expect-error asd
                     ...draft2020.keywords,
                     {
                         id: "async",
                         keyword: "async-error",
                         addValidate: (node) => node.schema.asyncError != null,
-                        // @ts-expect-error asd
-                        validate: ({ node }) => {
+                        validate: async ({ node }): Promise<JsonError> => {
                             if (node.schema.asyncError === false) {
-                                return;
+                                return undefined;
                             }
-                            return new Promise((resolve) =>
-                                resolve([
-                                    node.createError("type-error", {
-                                        schema: {},
-                                        pointer: "",
-                                        value: ""
-                                    })
-                                ])
-                            ) as Promise<JsonError[]>;
+                            return node.createError("type-error", {
+                                schema: {},
+                                pointer: "",
+                                value: ""
+                            });
                         }
                     }
                 ]
             };
 
             it("should resolve async validation returning no error", async () => {
-                const { errors } = await compileSchema(
+                const { errors, errorsAsync } = compileSchema(
                     { type: "number", asyncError: false },
                     { drafts: [draft] }
-                ).validateAsync(4);
+                ).validate(4);
+                const asyncErrors = await Promise.all(errorsAsync);
                 assert.deepEqual(errors.length, 0);
+                assert.deepEqual(asyncErrors.length, 0);
             });
 
             it("should resolve async validation errors", async () => {
-                const { errors } = await compileSchema(
+                const { errorsAsync } = compileSchema(
                     { type: "number", asyncError: true },
                     { drafts: [draft] }
-                ).validateAsync(4);
-                assert.deepEqual(errors.length, 1);
-                assert.deepEqual(errors[0].code, "type-error");
+                ).validate(4);
+                const asyncErrors = await Promise.all(errorsAsync);
+                assert.deepEqual(asyncErrors.length, 1);
+                assert.deepEqual(asyncErrors[0].code, "type-error");
             });
         });
     });
-
-    // describe("on-error", () => {
-    //     before(() => {
-    //         // adds an async validation helper to { type: 'string', asyncError: true }
-    //         // @ts-expect-error type mismatch of vladation function
-    //         addValidator.keyword(draft, "string", "async-error", (node) => {
-    //             return node.schema.asyncError
-    //                 ? new Promise((resolve) =>
-    //                       // eslint-disable-next-line max-nested-callbacks
-    //                       resolve({
-    //                           type: "error",
-    //                           name: "async-error",
-    //                           code: "test-async-error",
-    //                           message: "custom test error"
-    //                       })
-    //                   )
-    //                 : Promise.resolve();
-    //         });
-    //     });
-
-    //     it("should call onProgress immediately with error", async () => {
-    //         const errors: JsonError[] = [];
-    //         return validateAsync(
-    //             draft,
-    //             {
-    //                 async: "test async progres",
-    //                 anotherError: 44
-    //             },
-    //             {
-    //                 schema: {
-    //                     type: "object",
-    //                     properties: {
-    //                         async: { type: "string", asyncError: true },
-    //                         anotherError: { type: "string" }
-    //                     }
-    //                 },
-    //                 onError: (err) => errors.push(err)
-    //             }
-    //         ).then(() => {
-    //             assert.deepEqual(errors.length, 2);
-    //             assert.deepEqual(errors[0].name).to.eq("type-error");
-    //             assert.deepEqual(errors[1].name).to.eq("async-error");
-    //         });
-    //     });
-    // });
 });

@@ -1,7 +1,14 @@
 import copy from "fast-copy";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import settings from "./settings";
-import type { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, Keyword, ValidationPath } from "./Keyword";
+import type {
+    JsonSchemaReducer,
+    JsonSchemaResolver,
+    JsonSchemaValidator,
+    Keyword,
+    ValidationPath,
+    ValidationResult
+} from "./Keyword";
 import { createSchema } from "./methods/createSchema";
 import { Draft } from "./Draft";
 import { toSchemaNodes } from "./methods/toSchemaNodes";
@@ -299,30 +306,27 @@ export const SchemaNodeMethods = {
     /**
      * @returns validation result of data validated by this node's JSON Schema
      */
-    validate(data: unknown, pointer = "#", path: ValidationPath = []): { valid: boolean; errors: JsonError[] } {
+    validate(data: unknown, pointer = "#", path: ValidationPath = []) {
         const errors = validateNode(this, data, pointer, path) ?? [];
+        const syncErrors: JsonError[] = [];
         const flatErrorList = sanitizeErrors(Array.isArray(errors) ? errors : [errors]).filter(isJsonError);
-        return {
-            valid: flatErrorList.length === 0,
-            errors: flatErrorList
-        };
-    },
 
-    /**
-     * @returns a promise which resolves to validation-result
-     */
-    async validateAsync(
-        data: unknown,
-        pointer = "#",
-        path: ValidationPath = []
-    ): Promise<{ valid: boolean; errors: JsonError[] }> {
-        const errors = validateNode(this, data, pointer, path) ?? [];
-        let resolvedErrors = await Promise.all(sanitizeErrors(Array.isArray(errors) ? errors : [errors]));
-        resolvedErrors = sanitizeErrors(resolvedErrors) as JsonError[];
-        return {
-            valid: resolvedErrors.length === 0,
-            errors: resolvedErrors
+        const errorsAsync: Promise<JsonError | undefined>[] = [];
+        sanitizeErrors(Array.isArray(errors) ? errors : [errors]).forEach((error) => {
+            if (isJsonError(error)) {
+                syncErrors.push(error);
+            } else if (error instanceof Promise) {
+                errorsAsync.push(error);
+            }
+        });
+
+        const result: { valid: boolean; errors: JsonError[]; errorsAsync: Promise<JsonError | undefined>[] } = {
+            valid: flatErrorList.length === 0,
+            errors: syncErrors,
+            errorsAsync
         };
+
+        return result;
     },
 
     /**

@@ -1,11 +1,11 @@
-import { isJsonError } from "../types";
+import { isJsonError, JsonError } from "../types";
 import { ValidationResult, JsonSchemaValidator } from "../Keyword";
 
 type MaybeNestedErrors = ReturnType<JsonSchemaValidator>;
 
 export default function sanitizeErrors(
     list: MaybeNestedErrors | MaybeNestedErrors[],
-    result: ValidationResult[] = []
+    result: (undefined | JsonError | Promise<JsonError> | ValidationResult)[] = []
 ): ValidationResult[] {
     if (!Array.isArray(list)) {
         return [list];
