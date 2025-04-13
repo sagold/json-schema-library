@@ -1,4 +1,4 @@
-injectWorkspacePackages: true[![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) [![CI](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) ![Types](https://badgen.net/npm/types/json-schema-library)
+[![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) [![CI](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) ![Types](https://badgen.net/npm/types/json-schema-library)
 
 <h1 align="center">
     <img src="./docs/json-schema-library-10.png" width="192" alt="json-schema-library">
@@ -734,7 +734,7 @@ expect(reducedNode.schema).to.deep.eq({
 });
 ```
 
-⚠️ Please be aware that certain schema-definitions are lost when resolving or merging sub-schemas.
+> ⚠️ Please be aware that certain schema-definitions are lost when resolving or merging sub-schemas.
 This mainly refers to validation-properties, but also some ambigiuous schema might get overriden.
 
 ### toDataNodes
@@ -901,26 +901,6 @@ console.log(isValid, errors.length); // true, 0
 
 const errors = await Promise.all(errorsAsync);
 console.log(errors); /// [{ code: "type-error", value: "data", pointer: "#", ... }]
-```
-
-</details>
-
-```ts
-const myJsonSchema: JsonSchema = {
-    type: "object",
-    additionalProperties: false
-};
-
-const { errors } = compileSchema(myJsonSchema).validate({ name: "my-data" });
-
-expect(errors).to.deep.equal([
-    {
-        type: "error",
-        code: "no-additional-properties-error",
-        message: "Additional property `name` in `#` is not allowed",
-        data: { property: "name", properties: [], pointer: "#" }
-    }
-]);
 ```
 
 </details>
