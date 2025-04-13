@@ -66,7 +66,7 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     allOf?: SchemaNode[];
     anyOf?: SchemaNode[];
     contains?: SchemaNode;
-    dependencies?: Record<string, SchemaNode | boolean | string[]>;
+    dependentRequired?: Record<string, string[]>;
     dependentSchemas?: Record<string, SchemaNode | boolean>;
     else?: SchemaNode;
     if?: SchemaNode;

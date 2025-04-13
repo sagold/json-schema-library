@@ -107,6 +107,19 @@ describe("compileSchema : reduceNode", () => {
                 properties: { one: { type: "string" }, two: { type: "string" }, three: { type: "number" } }
             });
         });
+        it("should NOT merge dependency when it is not defined", () => {
+            const node = compileSchema({
+                type: "object",
+                properties: { one: { type: "string" } },
+                dependencies: { one: ["two"], two: { type: "number" } }
+            });
+            const { node: reduced } = node.reduceNode({});
+            console.log("reudced schema", reduced.schema);
+            assert.deepEqual(reduced.schema, {
+                type: "object",
+                properties: { one: { type: "string" } }
+            });
+        });
         it("should NOT add dynamic schema if no data matches dependency", () => {
             const { node } = compileSchema({
                 $ref: "#/$defs/schema",

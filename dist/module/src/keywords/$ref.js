@@ -64,7 +64,13 @@ export function parseRef(node) {
     }
 }
 export function reduceRef({ node, data, key, pointer, path }) {
+    if (node == null) {
+        return;
+    }
     const resolvedNode = node.resolveRef({ pointer, path });
+    if (resolvedNode == null) {
+        return;
+    }
     if (resolvedNode.schemaId === node.schemaId) {
         return resolvedNode;
     }

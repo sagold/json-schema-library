@@ -1,15 +1,17 @@
 import { isSchemaNode } from "../types";
-import { getValue } from "../utils/getValue";
 import { isObject } from "../utils/isObject";
-import { validateNode } from "../validateNode";
 import { mergeNode } from "../mergeNode";
+import { hasProperty } from "../utils/hasProperty";
+import { validateDependentRequired } from "./dependentRequired";
+import { validateDependentSchemas } from "./dependentSchemas";
 export const dependenciesKeyword = {
     id: "dependencies",
     keyword: "dependencies",
     parse: parseDependencies,
-    addReduce: (node) => node.dependencies != null,
+    order: -9,
+    addReduce: (node) => node.schema.dependencies != null,
     reduce: reduceDependencies,
-    addValidate: (node) => node.dependencies != null,
+    addValidate: (node) => node.schema.dependencies != null,
     validate: validateDependencies
 };
 export function parseDependencies(node) {
@@ -18,40 +20,63 @@ export function parseDependencies(node) {
         return;
     }
     const schemas = Object.keys(dependencies);
-    if (schemas.length === 0) {
-        return;
-    }
-    node.dependencies = {};
     schemas.forEach((property) => {
+        var _a, _b;
         const schema = dependencies[property];
         if (isObject(schema) || typeof schema === "boolean") {
-            node.dependencies[property] = node.compileSchema(
-            // @ts-expect-error boolean schema
-            schema, `${node.spointer}/dependencies/${property}`, `${node.schemaId}/dependencies/${property}`);
+            node.dependentSchemas = (_a = node.dependentSchemas) !== null && _a !== void 0 ? _a : {};
+            node.dependentSchemas[property] = node.compileSchema(schema, `${node.spointer}/dependencies/${property}`, `${node.schemaId}/dependencies/${property}`);
         }
-        else if (Array.isArray(schema)) {
-            node.dependencies[property] = schema;
+        else {
+            node.dependentRequired = (_b = node.dependentRequired) !== null && _b !== void 0 ? _b : {};
+            node.dependentRequired[property] = schema;
         }
     });
 }
 export function reduceDependencies({ node, data, key, path }) {
     var _a;
-    if (!isObject(data) || node.dependencies == null) {
+    if (!isObject(data)) {
         // @todo remove dependentSchemas
         return node;
     }
+    if (node.dependentRequired == null && node.dependentSchemas == null) {
+        return node;
+    }
     let workingNode = node.compileSchema(node.schema, node.spointer, node.schemaId);
-    const { dependencies } = node;
     let required = (_a = workingNode.schema.required) !== null && _a !== void 0 ? _a : [];
-    Object.keys(dependencies).forEach((propertyName) => {
-        if (isSchemaNode(dependencies[propertyName])) {
-            const reducedDependency = dependencies[propertyName].reduceNode(data, { key, path }).node;
+    if (node.dependentRequired) {
+        Object.keys(node.dependentRequired).forEach((propertyName) => {
+            if (!hasProperty(data, propertyName) && !required.includes(propertyName)) {
+                console.log(propertyName, "abort", required);
+                return;
+            }
+            if (node.dependentRequired[propertyName] == null) {
+                return;
+            }
+            required.push(...node.dependentRequired[propertyName]);
+        });
+    }
+    if (node.dependentSchemas) {
+        Object.keys(node.dependentSchemas).forEach((propertyName) => {
+            if (!hasProperty(data, propertyName) && !required.includes(propertyName)) {
+                return true;
+            }
+            const dependency = node.dependentSchemas[propertyName];
+            if (!isSchemaNode(dependency)) {
+                return true;
+            }
+            // @note pass on updated required-list to resolve nested dependencies. This is currently supported,
+            // but probably not how json-schema spec defines this behaviour (resolve only within sub-schema)
+            const reducedDependency = { ...dependency, schema: { ...dependency.schema, required } }.reduceNode(data, {
+                key,
+                path
+            }).node;
             workingNode = mergeNode(workingNode, reducedDependency);
-        }
-        else if (Array.isArray(dependencies[propertyName]) && data[propertyName] !== undefined) {
-            required.push(...dependencies[propertyName]);
-        }
-    });
+            if (workingNode.schema.required) {
+                required.push(...workingNode.schema.required);
+            }
+        });
+    }
     if (workingNode === node) {
         return node;
     }
@@ -62,43 +87,25 @@ export function reduceDependencies({ node, data, key, path }) {
         return workingNode;
     }
     required = workingNode.schema.required ? workingNode.schema.required.concat(...required) : required;
+    required = required.filter((r, index, list) => list.indexOf(r) === index);
+    workingNode = mergeNode(workingNode, workingNode, "dependencies");
     return workingNode.compileSchema({ ...workingNode.schema, required }, workingNode.spointer, workingNode.schemaId);
 }
 function validateDependencies({ node, data, pointer, path }) {
+    var _a;
     if (!isObject(data)) {
         return undefined;
     }
-    const errors = [];
-    const dependencies = node.dependencies;
-    Object.keys(data).forEach((property) => {
-        const propertyValue = dependencies[property];
-        if (propertyValue === undefined) {
-            return;
+    let errors;
+    if (node.dependentRequired) {
+        errors = (_a = validateDependentRequired({ node, data, pointer, path })) !== null && _a !== void 0 ? _a : [];
+    }
+    if (node.dependentSchemas) {
+        const schemaErrors = validateDependentSchemas({ node, data, pointer, path });
+        if (schemaErrors) {
+            errors = errors !== null && errors !== void 0 ? errors : [];
+            errors.push(...schemaErrors);
         }
-        // @draft >= 6 boolean schema
-        if (propertyValue === true) {
-            return;
-        }
-        if (propertyValue === false) {
-            errors.push(node.createError("missing-dependency-error", { pointer, schema: node.schema, value: data }));
-            return;
-        }
-        if (Array.isArray(propertyValue)) {
-            propertyValue
-                .filter((dependency) => getValue(data, dependency) === undefined)
-                .forEach((missingProperty) => errors.push(node.createError("missing-dependency-error", {
-                missingProperty,
-                pointer: `${pointer}/${missingProperty}`,
-                schema: node.schema,
-                value: data
-            })));
-        }
-        else if (isSchemaNode(propertyValue)) {
-            errors.push(...validateNode(propertyValue, data, pointer, path));
-        }
-        else {
-            throw new Error(`Invalid dependency definition for ${pointer}/${property}. Must be string[] or schema`);
-        }
-    });
+    }
     return errors;
 }

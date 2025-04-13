@@ -62,7 +62,7 @@ export function reduceDependentSchemas({ node, data }) {
 }
 export function validateDependentSchemas({ node, data, pointer, path }) {
     const { schema, dependentSchemas } = node;
-    if (!isObject(data)) {
+    if (!isObject(data) || dependentSchemas == null) {
         return undefined;
     }
     const errors = [];

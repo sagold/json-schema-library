@@ -20,7 +20,7 @@ export type NodeOrError = {
     error: undefined;
 } | {
     node: undefined;
-    error?: JsonError;
+    error: JsonError;
 };
 export type { SchemaNode, GetNodeOptions, Draft };
 export { isSchemaNode };

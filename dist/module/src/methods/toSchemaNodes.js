@@ -20,7 +20,6 @@ export function toSchemaNodes(node, nodeList = []) {
     eachItem(nodeList, node.allOf);
     eachItem(nodeList, node.anyOf);
     node.contains && toSchemaNodes(node.contains, nodeList);
-    eachProperty(nodeList, node.dependencies);
     eachProperty(nodeList, node.dependentSchemas);
     node.if && toSchemaNodes(node.if, nodeList);
     node.else && toSchemaNodes(node.else, nodeList);
