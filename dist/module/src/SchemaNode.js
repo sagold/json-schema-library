@@ -175,24 +175,23 @@ export const SchemaNodeMethods = {
     validate(data, pointer = "#", path = []) {
         var _a;
         const errors = (_a = validateNode(this, data, pointer, path)) !== null && _a !== void 0 ? _a : [];
+        const syncErrors = [];
         const flatErrorList = sanitizeErrors(Array.isArray(errors) ? errors : [errors]).filter(isJsonError);
-        return {
+        const errorsAsync = [];
+        sanitizeErrors(Array.isArray(errors) ? errors : [errors]).forEach((error) => {
+            if (isJsonError(error)) {
+                syncErrors.push(error);
+            }
+            else if (error instanceof Promise) {
+                errorsAsync.push(error);
+            }
+        });
+        const result = {
             valid: flatErrorList.length === 0,
-            errors: flatErrorList
+            errors: syncErrors,
+            errorsAsync
         };
-    },
-    /**
-     * @returns a promise which resolves to validation-result
-     */
-    async validateAsync(data, pointer = "#", path = []) {
-        var _a;
-        const errors = (_a = validateNode(this, data, pointer, path)) !== null && _a !== void 0 ? _a : [];
-        let resolvedErrors = await Promise.all(sanitizeErrors(Array.isArray(errors) ? errors : [errors]));
-        resolvedErrors = sanitizeErrors(resolvedErrors);
-        return {
-            valid: resolvedErrors.length === 0,
-            errors: resolvedErrors
-        };
+        return result;
     },
     /**
      * Register a JSON Schema as a remote-schema to be resolved by $ref, $anchor, etc

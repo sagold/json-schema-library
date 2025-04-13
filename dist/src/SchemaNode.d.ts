@@ -141,14 +141,8 @@ export declare const SchemaNodeMethods: {
     readonly validate: (data: unknown, pointer?: string, path?: ValidationPath) => {
         valid: boolean;
         errors: JsonError[];
+        errorsAsync: Promise<JsonError | undefined>[];
     };
-    /**
-     * @returns a promise which resolves to validation-result
-     */
-    readonly validateAsync: (data: unknown, pointer?: string, path?: ValidationPath) => Promise<{
-        valid: boolean;
-        errors: JsonError[];
-    }>;
     /**
      * Register a JSON Schema as a remote-schema to be resolved by $ref, $anchor, etc
      * @returns the current node (not the remote schema-node)

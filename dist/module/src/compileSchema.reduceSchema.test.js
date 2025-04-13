@@ -114,7 +114,6 @@ describe("compileSchema : reduceNode", () => {
                 dependencies: { one: ["two"], two: { type: "number" } }
             });
             const { node: reduced } = node.reduceNode({});
-            console.log("reudced schema", reduced.schema);
             assert.deepEqual(reduced.schema, {
                 type: "object",
                 properties: { one: { type: "string" } }

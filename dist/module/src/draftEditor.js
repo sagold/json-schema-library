@@ -23,7 +23,7 @@ export const draftEditor = extendDraft(draft2019, {
             return {
                 type: "error",
                 code: "min-length-error",
-                message: render("Value in `{{pointer}}` is `{{length}}`, but should be `{{minimum}}` at minimum", data),
+                message: render("Value in `{{pointer}}` is `{{length}}`, but should be `{{minLength}}` at minimum", data),
                 data
             };
         }

@@ -22,5 +22,5 @@ export declare function copyDraft(draft: Draft): {
     };
     $schema?: string;
     errors: import("../types").ErrorConfig;
-    formats: typeof import("../formats/formats").formats;
+    formats: Record<string, import("../Keyword").JsonSchemaValidator>;
 };

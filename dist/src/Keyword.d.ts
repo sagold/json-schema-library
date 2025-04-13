@@ -40,7 +40,7 @@ export type JsonSchemaValidatorParams = {
 export interface JsonSchemaValidator {
     toJSON?: () => string;
     order?: number;
-    (options: JsonSchemaValidatorParams): undefined | JsonError | ValidationResult[];
+    (options: JsonSchemaValidatorParams): undefined | ValidationResult | ValidationResult[];
 }
 export type Keyword = {
     id: string;

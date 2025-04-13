@@ -47,7 +47,6 @@ export function reduceDependencies({ node, data, key, path }) {
     if (node.dependentRequired) {
         Object.keys(node.dependentRequired).forEach((propertyName) => {
             if (!hasProperty(data, propertyName) && !required.includes(propertyName)) {
-                console.log(propertyName, "abort", required);
                 return;
             }
             if (node.dependentRequired[propertyName] == null) {
