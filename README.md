@@ -8,11 +8,15 @@
 
 > **json-schema-library** provides tools and utilities for working with JSON Schema - enabling creation, validation, and schema exploration. Unlike most validators and editors, which hide the inner workings, this library is designed for developers building custom tools around JSON Schema. It runs in both Node and browser environments, prioritizing flexibility and extensibility over minimal memory footprint or raw performance.
 
+---
+
 <div align="center">
     <a href="#overview"><b>Overview</b></a> · <a href="#schemanode-methods"><b>Methods</b></a> · <a href="#draft-customization"><b>Customization</b></a> · <a href="#keyword-extensions"><b>Extensions</b></a> · <a href="#breaking-changes">Breaking Changes</a>
 </div>
 
-<div>&nbsp;</div>
+---
+
+> ⚠️ This **documentation** refers to the upcoming release **version 10**, which can be installed by `npm install json-schema-library@10.0.0-rc9`. For the latest release please refer to the **[documentation of version 9.3.5](https://github.com/sagold/json-schema-library/tree/v9.3.5)**.
 
 **Quick start**
 
