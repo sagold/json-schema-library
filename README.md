@@ -228,7 +228,7 @@ schemaNode.getData({}); // { character: "A" } - default value resolved
 const { node, error } = schemaNode.getNodeRef("https://sagold.com/remote");
 ```
 
-**Note** the support for $ref resolution has additional complexities, if you add nested $ids to you schema. Here, json-schema-library has only partial support ([@see integration test result](https://github.com/sagold/json-schema-library/actions/runs/4037856805/jobs/6941448741)). Thus, it is recommended to omit the features of changing scopes by nested $ids. For more details, see [json-schema.org: Structuring a complex schema](https://json-schema.org/understanding-json-schema/structuring.html#base-uri).
+**Note** JSON Schema $ref-keyword can become tricky when combined with $ids in sub-schemas. For more details, see [json-schema.org: Structuring a complex schema](https://json-schema.org/understanding-json-schema/structuring.html#base-uri).
 
 <details><summary>Adding remote schema to compileSchema</summary>
 
@@ -735,7 +735,7 @@ expect(reducedNode.schema).to.deep.eq({
 ```
 
 > ⚠️ Please be aware that certain schema-definitions are lost when resolving or merging sub-schemas.
-This mainly refers to validation-properties, but also some ambigiuous schema might get overriden.
+> This mainly refers to validation-properties, but also some ambigiuous schema might get overriden.
 
 ### toDataNodes
 
@@ -1193,6 +1193,8 @@ expect(resolvedNode?.schema).to.deep.eq({
 
 ### v10.0.0
 
+> This update involves some significant changes in how you work with the library, so please carefully review the migration guide and adjust your implementation accordingly.
+
 In version v10.0.0, we've made significant changes to the library’s API, particularly in how we handle drafts and schemas. These changes are required to support features like `dynamicAnchor`, `unevaluatedItems`, and `oneOfIndex` and to integrate with the headless-json-editor. The previous approach of directly working with JSON schema objects lacked the flexibility needed for more advanced features and extensibility.
 
 The new implementation revolves around compiling schemas into a **SchemaNode** tree. This change offers a more fitting, simpler, and extensible approach to working with JSON schemas.
@@ -1204,8 +1206,7 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
 
 #### Breaking Changes:
 
--   **`compileSchema`** is now a standalone function and replaces the `Draft` class.
--   All return values for JSON Schema are now `SchemaNode` objects that contain a `schema` property.
+**`compileSchema`** is now a standalone function and replaces the `Draft` class. All return values for JSON Schema are now `SchemaNode` objects that contain a `schema` property.
 
     ```ts
     // PREVIOUSLY
@@ -1215,44 +1216,36 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
     const node = compileSchema(schema);
     ```
 
--   **Changed Methods**:
+**Changed Methods**:
 
-    -   `draft.createSchemaOf(schema)` → `node.createSchema(schema)`
-    -   `draft.each(data, callback)` → `const nodes = node.toDataNodes(data)`
-    -   `draft.eachSchema(callback)` → `const nodes = node.toSchemaNodes()`
-    -   `draft.getChildSchemaSelection(property)` → `node.getChildSelection(property)`
-    -   `draft.getNode(options)` → `node.getNode(pointer, data, options)`
-    -   `draft.getTemplate(inputData)` → `node.getData(inputData)`
-    -   `draft.isValid(data)` → `node.validate(data).valid`
-    -   `draft.step(property, data)` → `node.getNodeChild(property, data)`
+-   `draft.createSchemaOf(schema)` → `node.createSchema(schema)`
+-   `draft.each(data, callback)` → `const nodes = node.toDataNodes(data)`
+-   `draft.eachSchema(callback)` → `const nodes = node.toSchemaNodes()`
+-   `draft.getChildSchemaSelection(property)` → `node.getChildSelection(property)`
+-   `draft.getNode(options)` → `node.getNode(pointer, data, options)`
+-   `draft.getTemplate(inputData)` → `node.getData(inputData)`
+-   `draft.isValid(data)` → `node.validate(data).valid`
+-   `draft.step(property, data)` → `node.getNodeChild(property, data)`
 
--   **Renamed Properties**:
+**Renamed Properties**: `templateDefaultOptions` → `getDataDefaultOptions`
 
-    -   `templateDefaultOptions` → `getDataDefaultOptions`
+**Draft Customization**: Customizing drafts has changed completely. The previous methods of extending drafts are no longer valid, and draft handling is now centered around `SchemaNode`.
 
--   **Draft Customization**: Customizing drafts has changed completely. The previous methods of extending drafts are no longer valid, and draft handling is now centered around `SchemaNode`.
+**Removed Error Property `name`**: Error property `name` has been removed from `JsonError` in favor of `code`.
 
--   **Removed Error Property `name`**:
-    Error property `name` has been removed from `JsonError` in favor of `code`.
+**Removed Configuration Option**: The `templateDefaultOptions` property has been removed from the global settings object. You should now configure it using the `compileSchema` options:
 
--   **Removed Configuration Option**:  
-    The `templateDefaultOptions` property has been removed from the global settings object. You should now configure it using the `compileSchema` options:
+```ts
+compileSchema(schema, {
+    getDataDefaultOptions: {
+        addOptionalProps: false,
+        removeInvalidData: false,
+        extendDefaults: true
+    }
+});
+```
 
-    ```ts
-    compileSchema(schema, {
-        getDataDefaultOptions: {
-            addOptionalProps: false,
-            removeInvalidData: false,
-            extendDefaults: true
-        }
-    });
-    ```
-
--   **Changed remote $id support** in `addRemoteSchema`. An `$id` has to be a valid url (previously any value was accepted)
-
-This update involves some significant changes in how you work with the library, so please carefully review the migration guide and adjust your implementation accordingly.
-
-This format should help users quickly understand the changes, what has been renamed, and how to adapt to the new API.
+**Changed remote $id support** in `addRemoteSchema`. An `$id` has to be a valid url (previously any value was accepted)
 
 ### v9.0.0
 
@@ -1283,34 +1276,3 @@ With version `v8.0.0`, _getData_ was improved to better support optional propert
 -   `resolveDynamicSchema` - Resolves all dynamic schema definitions for the given input data and returns the resulting JSON Schema without any dynamic schema definitions.
 
 </details>
-
-### v7.0.0
-
-With version `v7.0.0`, library export and Draft API has changed heavily. The API is now more consistent across draft-versions and offers a simple and consistent configuration interface for existing and custom drafts. In addition, most standalone functions are no longer exposed separately, but under its current _draftConfigs_ and mainly on each draft-instance. This will help to reduce confusion when consuming this API.
-
-The above documentation reflects all these changes. Just reach out if you have troubles migrating to the latest version.
-
-<details><summary>Details of breaking changes</summary>
-
--   replaced `Core` interface by new `Draft` interface
--   changed export of `Interface` to `Draft`
--   renamed `addSchema` to `addRemoteSchema`
--   changed API of `compileSchema` to have an additional schema-parameter for rootSchema reference
--   changed `compileSchema` and `addRemoteSchema` to work on instance state, instead of global state
--   `addRemoteSchema`, `compileSchema` now requires draft instance as first parameter
--   removed direct export of following functions: `addValidator`, `compileSchema`, `createSchemaOf`, `each`, `eachSchema`, `getNodeChildSchemaSelection`, `getNode`, `getData`, `isValid`, `step`, `validate`. They are still accessible under the draftConfigs of each draft-version
--   changed draft version of `JsonEditor` to draft07
-
-</details>
-
-### v6.0.0
-
-With version `v6.0.0` supported json schema drafts are exported directly as `Draft04`, `Draft06`, `Draft07`. Example use: `import { Draft07 } from "json-schema-library"`.
-
-### v5.0.0
-
-With version `v5.0.0` the API has changed to es6 modules, where there is no `default` export, only named exports. Additionally all code has been rewritten in TypeScript. When directly accessing files, switch to `dist/module/*.js`-files for plain js-modules.
-
-### v4.0.0
-
-With version `v4.0.0` the API has changed in order to use the defined (root) schema in draft as default where possible. This means most methods have a changed signature, where `data` is passed before an optional `schema` argument.
