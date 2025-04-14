@@ -44,6 +44,7 @@ export function reduceDependencies({ node, data, key, path }) {
     }
     let workingNode = node.compileSchema(node.schema, node.spointer, node.schemaId);
     let required = (_a = workingNode.schema.required) !== null && _a !== void 0 ? _a : [];
+    let dynamicId = "";
     if (node.dependentRequired) {
         Object.keys(node.dependentRequired).forEach((propertyName) => {
             if (!hasProperty(data, propertyName) && !required.includes(propertyName)) {
@@ -53,10 +54,14 @@ export function reduceDependencies({ node, data, key, path }) {
                 return;
             }
             required.push(...node.dependentRequired[propertyName]);
+            // @dynamicId
+            const localDynamicId = `dependencies/${propertyName}`;
+            dynamicId += `${dynamicId === "" ? "" : ","}${localDynamicId}`;
         });
     }
     if (node.dependentSchemas) {
         Object.keys(node.dependentSchemas).forEach((propertyName) => {
+            var _a, _b;
             if (!hasProperty(data, propertyName) && !required.includes(propertyName)) {
                 return true;
             }
@@ -74,6 +79,10 @@ export function reduceDependencies({ node, data, key, path }) {
             if (workingNode.schema.required) {
                 required.push(...workingNode.schema.required);
             }
+            // @dynamicId
+            const nestedDynamicId = (_b = (_a = reducedDependency.dynamicId) === null || _a === void 0 ? void 0 : _a.replace(node.dynamicId, "")) !== null && _b !== void 0 ? _b : "";
+            const localDynamicId = nestedDynamicId === "" ? `dependencies/${propertyName}` : nestedDynamicId;
+            dynamicId += `${dynamicId === "" ? "" : ","}${localDynamicId}`;
         });
     }
     if (workingNode === node) {
@@ -88,7 +97,7 @@ export function reduceDependencies({ node, data, key, path }) {
     required = workingNode.schema.required ? workingNode.schema.required.concat(...required) : required;
     required = required.filter((r, index, list) => list.indexOf(r) === index);
     workingNode = mergeNode(workingNode, workingNode, "dependencies");
-    return workingNode.compileSchema({ ...workingNode.schema, required }, workingNode.spointer, workingNode.schemaId);
+    return workingNode.compileSchema({ ...workingNode.schema, required }, workingNode.spointer, workingNode.schemaId, `${node.schemaId}(${dynamicId})`);
 }
 function validateDependencies({ node, data, pointer, path }) {
     var _a;
