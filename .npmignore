@@ -1,7 +1,5 @@
 *.dat
 *.gz
-*.js
-*.log
 *.log
 *.out
 *.pid
