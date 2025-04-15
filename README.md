@@ -752,7 +752,7 @@ expect(reducedNode.schema).to.deep.eq({
 
 ### toDataNodes
 
-`each` iterates over each data-item (_object_, _array_ and _value_) and emits the data-item, schema and location to a callback.
+`toDataNodes` collects all data-items (_object_, _array_ and _value_) and their SchemaNode and return them as a list of **DataNodes**:
 
 ```ts
 type DataNode = { pointer: string; value: unknown; node: SchemaNode };
@@ -788,7 +788,7 @@ expect(calls).to.deep.equal([
 
 ### toSchemaNodes
 
-`eachSchema` emits each sub-schema definition to a callback. A sub-schema is any schema-definition like in `properties["property"]`, `anyOf[1]`, `contains`, `$defs["name"]`, etc.
+`toSchemaNodes` collects all sub-schema definitions, like in `properties["property"]`, `anyOf[1]`, `contains`, `$defs["name"]`, etc. and returns them as a list of **SchemaNodes**:
 
 ```ts
 const nodes: SchemaNode[] = compileSchema(mySchema).toSchemaNodes();
@@ -1233,13 +1233,13 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
 
 **`compileSchema`** is now a standalone function and replaces the `Draft` class. All return values for JSON Schema are now `SchemaNode` objects that contain a `schema` property.
 
-    ```ts
-    // PREVIOUSLY
-    const draft = new Draft(schema);
+```ts
+// PREVIOUSLY
+const draft = new Draft(schema);
 
-    // NOW
-    const node = compileSchema(schema);
-    ```
+// NOW
+const node = compileSchema(schema);
+```
 
 **Changed Methods**:
 
