@@ -155,6 +155,22 @@ export type GetNodeOptions = {
     pointer?: string;
 };
 
+export type ValidateReturnType = {
+    /**
+     * True, if data is valid to the compiled schema.
+     * Does not include async errors.
+     */
+    valid: boolean;
+    /**
+     * List of validation errors or empty
+     */
+    errors: JsonError[];
+    /**
+     * List of Promises resolving to `JsonError|undefined` or empty.
+     */
+    errorsAsync: Promise<JsonError | undefined>[];
+};
+
 export function joinDynamicId(a?: string, b?: string) {
     if (a == b) {
         return a ?? "";
@@ -334,7 +350,7 @@ export const SchemaNodeMethods = {
             }
         });
 
-        const result: { valid: boolean; errors: JsonError[]; errorsAsync: Promise<JsonError | undefined>[] } = {
+        const result: ValidateReturnType = {
             valid: flatErrorList.length === 0,
             errors: syncErrors,
             errorsAsync
