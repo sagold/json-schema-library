@@ -1,14 +1,7 @@
 import copy from "fast-copy";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import settings from "./settings";
-import type {
-    JsonSchemaReducer,
-    JsonSchemaResolver,
-    JsonSchemaValidator,
-    Keyword,
-    ValidationPath,
-    ValidationResult
-} from "./Keyword";
+import type { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, Keyword, ValidationPath } from "./Keyword";
 import { createSchema } from "./methods/createSchema";
 import { Draft } from "./Draft";
 import { toSchemaNodes } from "./methods/toSchemaNodes";
@@ -43,6 +36,12 @@ export function isReduceable(node: SchemaNode) {
 }
 
 function getDraft(drafts: Draft[], $schema: string) {
+    if (!Array.isArray(drafts) || drafts.length === 0) {
+        throw new Error(`Missing drafts in 'compileSchema({ $schema: "${$schema}" })'`);
+    }
+    if (drafts.length === 1) {
+        return drafts[0];
+    }
     return drafts.find((d) => new RegExp(d.$schemaRegEx).test($schema)) ?? drafts[drafts.length - 1];
 }
 
