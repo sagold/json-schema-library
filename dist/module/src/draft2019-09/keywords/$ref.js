@@ -27,16 +27,16 @@ export function parseRef(node) {
     const currentId = joinId((_a = node.parent) === null || _a === void 0 ? void 0 : _a.$id, (_b = node.schema) === null || _b === void 0 ? void 0 : _b.$id);
     node.$id = currentId;
     node.lastIdPointer = (_d = (_c = node.parent) === null || _c === void 0 ? void 0 : _c.lastIdPointer) !== null && _d !== void 0 ? _d : "#";
-    if (currentId !== ((_e = node.parent) === null || _e === void 0 ? void 0 : _e.$id) && node.spointer !== "#") {
-        node.lastIdPointer = node.spointer;
+    if (currentId !== ((_e = node.parent) === null || _e === void 0 ? void 0 : _e.$id) && node.evaluationPath !== "#") {
+        node.lastIdPointer = node.evaluationPath;
     }
     // store this node for retrieval by $id + json-pointer from $id
-    if (node.lastIdPointer !== "#" && node.spointer.startsWith(node.lastIdPointer)) {
-        const localPointer = `#${node.spointer.replace(node.lastIdPointer, "")}`;
+    if (node.lastIdPointer !== "#" && node.evaluationPath.startsWith(node.lastIdPointer)) {
+        const localPointer = `#${node.evaluationPath.replace(node.lastIdPointer, "")}`;
         register(node, joinId(currentId, localPointer));
     }
     // store $rootId + json-pointer to this node
-    register(node, joinId(node.context.rootNode.$id, node.spointer));
+    register(node, joinId(node.context.rootNode.$id, node.evaluationPath));
     // store this node for retrieval by $id + anchor
     if (node.schema.$anchor) {
         node.context.anchors[`${currentId.replace(/#$/, "")}#${node.schema.$anchor}`] = node;
@@ -51,7 +51,7 @@ export function parseRef(node) {
 }
 // export function reduceRef({ node, data, key, pointer, path }: JsonSchemaReducerParams) {
 //     const resolvedNode = node.resolveRef({ pointer, path });
-//     if (resolvedNode.schemaId === node.schemaId) {
+//     if (resolvedNode.schemaLocation === node.schemaLocation) {
 //         return resolvedNode;
 //     }
 //     const result = resolvedNode.reduceNode(data, { key, pointer, path });
@@ -113,24 +113,24 @@ function resolveRecursiveRef(node, path) {
     const nextNode = getRef(node, joinId(node.$id, node.schema.$recursiveRef));
     return nextNode;
 }
-function compileNext(referencedNode, spointer = referencedNode.spointer) {
+function compileNext(referencedNode, evaluationPath = referencedNode.evaluationPath) {
     const referencedSchema = isObject(referencedNode.schema)
         ? omit(referencedNode.schema, "$id")
         : referencedNode.schema;
-    return referencedNode.compileSchema(referencedSchema, `${spointer}/$ref`, referencedNode.schemaId);
+    return referencedNode.compileSchema(referencedSchema, `${evaluationPath}/$ref`, referencedNode.schemaLocation);
 }
 export default function getRef(node, $ref = node === null || node === void 0 ? void 0 : node.$ref) {
     var _a;
     if ($ref == null) {
         return node;
     }
-    // resolve $ref by json-spointer
+    // resolve $ref by json-evaluationPath
     if (node.context.refs[$ref]) {
-        return compileNext(node.context.refs[$ref], node.spointer);
+        return compileNext(node.context.refs[$ref], node.evaluationPath);
     }
     // resolve $ref from $anchor
     if (node.context.anchors[$ref]) {
-        return compileNext(node.context.anchors[$ref], node.spointer);
+        return compileNext(node.context.anchors[$ref], node.evaluationPath);
     }
     // check for remote-host + pointer pair to switch rootSchema
     const fragments = splitRef($ref);
@@ -143,7 +143,7 @@ export default function getRef(node, $ref = node === null || node === void 0 ? v
         const $ref = fragments[0];
         // this is a reference to remote-host root node
         if (node.context.remotes[$ref]) {
-            return compileNext(node.context.remotes[$ref], node.spointer);
+            return compileNext(node.context.remotes[$ref], node.evaluationPath);
         }
         if ($ref[0] === "#") {
             // @todo there is a bug joining multiple fragments to e.g. #/base#/examples/0
@@ -153,7 +153,7 @@ export default function getRef(node, $ref = node === null || node === void 0 ? v
             const rootSchema = node.context.rootNode.schema;
             const targetSchema = get(rootSchema, ref);
             if (targetSchema) {
-                return node.compileSchema(targetSchema, `${node.spointer}/$ref`, ref);
+                return node.compileSchema(targetSchema, `${node.evaluationPath}/$ref`, ref);
             }
         }
         // console.error("REF: UNFOUND 1", $ref);

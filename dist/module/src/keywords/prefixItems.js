@@ -14,9 +14,9 @@ function prefixItemsResolver({ node, key }) {
     }
 }
 export function parseItems(node) {
-    const { schema, spointer } = node;
+    const { schema, evaluationPath } = node;
     if (Array.isArray(schema.prefixItems)) {
-        node.prefixItems = schema.prefixItems.map((itemSchema, index) => node.compileSchema(itemSchema, `${spointer}/prefixItems/${index}`, `${node.schemaId}/prefixItems/${index}`));
+        node.prefixItems = schema.prefixItems.map((itemSchema, index) => node.compileSchema(itemSchema, `${evaluationPath}/prefixItems/${index}`, `${node.schemaLocation}/prefixItems/${index}`));
     }
 }
 function validatePrefixItems({ node, data, pointer = "#", path }) {

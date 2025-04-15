@@ -30,6 +30,12 @@ export function isReduceable(node) {
 }
 function getDraft(drafts, $schema) {
     var _a;
+    if (!Array.isArray(drafts) || drafts.length === 0) {
+        throw new Error(`Missing drafts in 'compileSchema({ $schema: "${$schema}" })'`);
+    }
+    if (drafts.length === 1) {
+        return drafts[0];
+    }
     return (_a = drafts.find((d) => new RegExp(d.$schemaRegEx).test($schema))) !== null && _a !== void 0 ? _a : drafts[drafts.length - 1];
 }
 export function joinDynamicId(a, b) {
@@ -52,16 +58,16 @@ export const SchemaNodeMethods = {
      * Compiles a child-schema of this node to its context
      * @returns SchemaNode representing the passed JSON Schema
      */
-    compileSchema(schema, spointer = this.spointer, schemaId, dynamicId) {
-        const nextFragment = spointer.split("/$ref")[0];
+    compileSchema(schema, evaluationPath = this.evaluationPath, schemaLocation, dynamicId) {
+        const nextFragment = evaluationPath.split("/$ref")[0];
         const parentNode = this;
         const node = {
             lastIdPointer: parentNode.lastIdPointer, // ref helper
             context: parentNode.context,
             parent: parentNode,
-            spointer,
+            evaluationPath,
             dynamicId: joinDynamicId(parentNode.dynamicId, dynamicId),
-            schemaId: schemaId !== null && schemaId !== void 0 ? schemaId : join(parentNode.schemaId, nextFragment),
+            schemaLocation: schemaLocation !== null && schemaLocation !== void 0 ? schemaLocation : join(parentNode.schemaLocation, nextFragment),
             reducers: [],
             resolvers: [],
             validators: [],
@@ -131,14 +137,14 @@ export const SchemaNodeMethods = {
             // @ts-expect-error bool schema
         }
         else if (node.schema === true) {
-            const nextNode = node.compileSchema(createSchema(data), node.spointer, node.schemaId);
+            const nextNode = node.compileSchema(createSchema(data), node.evaluationPath, node.schemaLocation);
             path === null || path === void 0 ? void 0 : path.push({ pointer, node });
             return { node: nextNode, error: undefined };
         }
         let schema;
         // we need to copy node to prevent modification of source
         // @todo does mergeNode break immutability?
-        let workingNode = node.compileSchema(node.schema, node.spointer, node.schemaId);
+        let workingNode = node.compileSchema(node.schema, node.evaluationPath, node.schemaLocation);
         const reducers = node.reducers;
         for (let i = 0; i < reducers.length; i += 1) {
             const result = reducers[i]({ data, key, node, pointer, path });
@@ -204,9 +210,9 @@ export const SchemaNodeMethods = {
         const { context } = this;
         const draft = getDraft(context.drafts, (_a = schema === null || schema === void 0 ? void 0 : schema.$schema) !== null && _a !== void 0 ? _a : this.context.rootNode.$schema);
         const node = {
-            spointer: "#",
+            evaluationPath: "#",
             lastIdPointer: "#",
-            schemaId: "#",
+            schemaLocation: "#",
             dynamicId: "",
             reducers: [],
             resolvers: [],
@@ -240,7 +246,7 @@ export const SchemaNodeMethods = {
     },
     toJSON() {
         var _a;
-        return { ...this, context: undefined, errors: undefined, parent: (_a = this.parent) === null || _a === void 0 ? void 0 : _a.spointer };
+        return { ...this, context: undefined, errors: undefined, parent: (_a = this.parent) === null || _a === void 0 ? void 0 : _a.evaluationPath };
     }
 };
 const whitelist = ["$ref", "if", "$defs"];

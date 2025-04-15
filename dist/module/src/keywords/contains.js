@@ -12,15 +12,15 @@ export const containsKeyword = {
             items: {
                 anyOf: [node.contains.schema]
             }
-        }, node.spointer, node.schemaId);
+        }, node.evaluationPath, node.schemaLocation);
     }
 };
 export function parseContains(node) {
-    const { schema, spointer } = node;
+    const { schema, evaluationPath } = node;
     if (schema.contains == null) {
         return;
     }
-    node.contains = node.compileSchema(schema.contains, `${spointer}/contains`);
+    node.contains = node.compileSchema(schema.contains, `${evaluationPath}/contains`);
 }
 function validateContains({ node, data, pointer, path }) {
     var _a, _b;

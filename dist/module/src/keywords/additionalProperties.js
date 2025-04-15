@@ -18,9 +18,9 @@ export const additionalPropertiesKeyword = {
 };
 // must come as last resolver
 export function parseAdditionalProperties(node) {
-    const { schema, spointer, schemaId } = node;
+    const { schema, evaluationPath, schemaLocation } = node;
     if (isObject(schema.additionalProperties)) {
-        node.additionalProperties = node.compileSchema(schema.additionalProperties, `${spointer}/additionalProperties`, `${schemaId}/additionalProperties`);
+        node.additionalProperties = node.compileSchema(schema.additionalProperties, `${evaluationPath}/additionalProperties`, `${schemaLocation}/additionalProperties`);
     }
 }
 function additionalPropertyResolver({ node, data, key }) {

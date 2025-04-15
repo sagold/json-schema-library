@@ -13,7 +13,7 @@ export function parsePropertyNames(node) {
         return;
     }
     if (isObject(propertyNames)) {
-        node.propertyNames = node.compileSchema(propertyNames, `${node.spointer}/propertyNames`, `${node.schemaId}/propertyNames`);
+        node.propertyNames = node.compileSchema(propertyNames, `${node.evaluationPath}/propertyNames`, `${node.schemaLocation}/propertyNames`);
     }
 }
 function validatePropertyNames({ node, data, pointer, path }) {

@@ -106,6 +106,7 @@ describe("compileSchema : reduceNode", () => {
                 required: ["one", "two", "three"],
                 properties: { one: { type: "string" }, two: { type: "string" }, three: { type: "number" } }
             });
+            assert.deepEqual(reduced.dynamicId, "#/$defs/schema(dependencies/one,dependencies/two)");
         });
         it("should NOT merge dependency when it is not defined", () => {
             const node = compileSchema({
@@ -118,6 +119,7 @@ describe("compileSchema : reduceNode", () => {
                 type: "object",
                 properties: { one: { type: "string" } }
             });
+            assert.deepEqual(node.dynamicId, "");
         });
         it("should NOT add dynamic schema if no data matches dependency", () => {
             const { node } = compileSchema({
@@ -136,6 +138,7 @@ describe("compileSchema : reduceNode", () => {
                 required: [],
                 properties: { one: { type: "string" }, two: { type: "string" } }
             });
+            assert.deepEqual(node.dynamicId, "");
         });
         it("should resolve nested dependencies schema", () => {
             const { node } = compileSchema({
@@ -164,6 +167,7 @@ describe("compileSchema : reduceNode", () => {
                     four: { type: "boolean" }
                 }
             });
+            assert.deepEqual(node.dynamicId, "#/$defs/two(dependencies/two)+#/$defs/schema(dependencies/one,#/$defs/two(dependencies/two))");
         });
     });
     describe("if-then-else", () => {
@@ -747,7 +751,7 @@ describe("compileSchema : reduceNode", () => {
             }).reduceNode({ one: true });
             assert.deepEqual(node.dynamicId, "#(dependencies/one,dependencies/two)");
         });
-        it("should prefix with schemaId", () => {
+        it("should prefix with schemaLocation", () => {
             var _a, _b;
             const { node } = (_b = (_a = compileSchema({
                 properties: {

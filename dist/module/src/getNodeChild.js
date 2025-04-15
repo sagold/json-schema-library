@@ -34,7 +34,7 @@ export function getNodeChild(key, data, options = {}) {
         return referencedNode.getNodeChild(key, data, options);
     }
     if (options.createSchema === true) {
-        const newNode = node.compileSchema(node.createSchema(getValue(data, key)), `${node.spointer}/additional`, `${node.schemaId}/additional`);
+        const newNode = node.compileSchema(node.createSchema(getValue(data, key)), `${node.evaluationPath}/additional`, `${node.schemaLocation}/additional`);
         return { node: newNode, error: undefined };
     }
     if (options.withSchemaWarning === true) {

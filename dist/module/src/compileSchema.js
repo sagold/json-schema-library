@@ -24,9 +24,9 @@ export function compileSchema(schema, options = {}) {
     const drafts = (_b = options.drafts) !== null && _b !== void 0 ? _b : defaultDrafts;
     const draft = getDraft(drafts, schema === null || schema === void 0 ? void 0 : schema.$schema);
     const node = {
-        spointer: "#",
+        evaluationPath: "#",
         lastIdPointer: "#",
-        schemaId: "#",
+        schemaLocation: "#",
         dynamicId: "",
         reducers: [],
         resolvers: [],

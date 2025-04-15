@@ -10,9 +10,9 @@ export const anyOfKeyword = {
     validate: validateAnyOf
 };
 export function parseAnyOf(node) {
-    const { schema, spointer, schemaId } = node;
+    const { schema, evaluationPath, schemaLocation } = node;
     if (Array.isArray(schema.anyOf) && schema.anyOf.length) {
-        node.anyOf = schema.anyOf.map((s, index) => node.compileSchema(s, `${spointer}/anyOf/${index}`, `${schemaId}/anyOf/${index}`));
+        node.anyOf = schema.anyOf.map((s, index) => node.compileSchema(s, `${evaluationPath}/anyOf/${index}`, `${schemaLocation}/anyOf/${index}`));
     }
 }
 function reduceAnyOf({ node, data, pointer, path }) {
@@ -34,7 +34,7 @@ function reduceAnyOf({ node, data, pointer, path }) {
             }
         }
     }
-    return node.compileSchema(mergedSchema, `${node.spointer}${dynamicId}`, node.schemaId, `${node.schemaId}(${dynamicId})`);
+    return node.compileSchema(mergedSchema, `${node.evaluationPath}${dynamicId}`, node.schemaLocation, `${node.schemaLocation}(${dynamicId})`);
 }
 function validateAnyOf({ node, data, pointer, path }) {
     for (let i = 0; i < node.anyOf.length; i += 1) {

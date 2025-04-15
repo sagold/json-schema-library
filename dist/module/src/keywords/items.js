@@ -19,9 +19,9 @@ function itemsResolver({ node, key }) {
     return node.items;
 }
 export function parseItems(node) {
-    const { schema, spointer } = node;
+    const { schema, evaluationPath } = node;
     if (isObject(schema.items)) {
-        const propertyNode = node.compileSchema(schema.items, `${spointer}/items`, `${node.schemaId}/items`);
+        const propertyNode = node.compileSchema(schema.items, `${evaluationPath}/items`, `${node.schemaLocation}/items`);
         node.items = propertyNode;
     }
 }

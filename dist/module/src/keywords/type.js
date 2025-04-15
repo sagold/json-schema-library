@@ -10,7 +10,7 @@ export const typeKeyword = {
 function reduceType({ node, pointer, data }) {
     const dataType = getJsonSchemaType(data, node.schema.type);
     if (dataType !== "undefined" && Array.isArray(node.schema.type) && node.schema.type.includes(dataType)) {
-        return node.compileSchema({ ...node.schema, pointer, type: dataType }, node.spointer);
+        return node.compileSchema({ ...node.schema, pointer, type: dataType }, node.evaluationPath);
     }
     return undefined;
 }

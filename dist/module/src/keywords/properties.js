@@ -15,11 +15,11 @@ function propertyResolver({ node, key }) {
     return (_a = node.properties) === null || _a === void 0 ? void 0 : _a[key];
 }
 export function parseProperties(node) {
-    const { schema, spointer, schemaId } = node;
+    const { schema, evaluationPath, schemaLocation } = node;
     if (schema.properties) {
         node.properties = {};
         Object.keys(schema.properties).forEach((propertyName) => {
-            const propertyNode = node.compileSchema(schema.properties[propertyName], `${spointer}/properties/${propertyName}`, `${schemaId}/properties/${propertyName}`);
+            const propertyNode = node.compileSchema(schema.properties[propertyName], `${evaluationPath}/properties/${propertyName}`, `${schemaLocation}/properties/${propertyName}`);
             node.properties[propertyName] = propertyNode;
         });
     }

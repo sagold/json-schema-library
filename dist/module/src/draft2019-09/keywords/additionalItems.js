@@ -16,9 +16,9 @@ export const additionalItemsKeyword = {
 };
 // must come as last resolver
 export function parseAdditionalItems(node) {
-    const { schema, spointer, schemaId } = node;
+    const { schema, evaluationPath, schemaLocation } = node;
     if (isObject(schema.additionalItems) || schema.additionalItems === true) {
-        node.additionalItems = node.compileSchema(schema.additionalItems, `${spointer}/additionalItems`, `${schemaId}/additionalItems`);
+        node.additionalItems = node.compileSchema(schema.additionalItems, `${evaluationPath}/additionalItems`, `${schemaLocation}/additionalItems`);
     }
 }
 function additionalItemsResolver({ node, key, data }) {

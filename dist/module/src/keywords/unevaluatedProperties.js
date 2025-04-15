@@ -12,7 +12,7 @@ export function parseUnevaluatedProperties(node) {
     if (!isObject(node.schema.unevaluatedProperties)) {
         return;
     }
-    node.unevaluatedProperties = node.compileSchema(node.schema.unevaluatedProperties, `${node.spointer}/unevaluatedProperties`, `${node.schemaId}/unevaluatedProperties`);
+    node.unevaluatedProperties = node.compileSchema(node.schema.unevaluatedProperties, `${node.evaluationPath}/unevaluatedProperties`, `${node.schemaLocation}/unevaluatedProperties`);
 }
 // @todo we should use collected annotation to evaluated unevaluate properties
 function validateUnevaluatedProperties({ node, data, pointer, path }) {

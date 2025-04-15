@@ -38,10 +38,25 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     context: Context;
     /** JSON Schema of node */
     schema: JsonSchema;
-    /** absolute path into JSON Schema, includes $ref for resolved schema */
-    spointer: string;
-    /** local path within JSON Schema (not extended by resolving ref) */
-    schemaId: string;
+    /**
+     * Evaluation Path - The location of the keyword that produced the annotation or error.
+     * The purpose of this data is to show the resolution path which resulted in the subschema
+     * that contains the keyword.
+     *
+     * - relative to the root of the principal schema; should include (inline) any $ref segments in the path
+     * - JSON pointer
+     */
+    evaluationPath: string;
+    /**
+     * Schema Location - The direct location to the keyword that produced the annotation
+     * or error. This is provided as a convenience to the user so that they don't have to resolve
+     * the keyword's subschema, which may not be trivial task. It is only provided if the relative
+     * location contains $refs (otherwise, the two locations will be the same).
+     *
+     * - absolute URI
+     * - may not have any association to the principal schema
+     */
+    schemaLocation: string;
     /** id created when combining subschemas */
     dynamicId: string;
     /** reference to parent node (node used to compile this node) */
@@ -102,13 +117,28 @@ export type GetNodeOptions = {
     path?: ValidationPath;
     pointer?: string;
 };
+export type ValidateReturnType = {
+    /**
+     * True, if data is valid to the compiled schema.
+     * Does not include async errors.
+     */
+    valid: boolean;
+    /**
+     * List of validation errors or empty
+     */
+    errors: JsonError[];
+    /**
+     * List of Promises resolving to `JsonError|undefined` or empty.
+     */
+    errorsAsync: Promise<JsonError | undefined>[];
+};
 export declare function joinDynamicId(a?: string, b?: string): string;
 export declare const SchemaNodeMethods: {
     /**
      * Compiles a child-schema of this node to its context
      * @returns SchemaNode representing the passed JSON Schema
      */
-    readonly compileSchema: (schema: JsonSchema, spointer?: string, schemaId?: string, dynamicId?: string) => SchemaNode;
+    readonly compileSchema: (schema: JsonSchema, evaluationPath?: string, schemaLocation?: string, dynamicId?: string) => SchemaNode;
     readonly createError: <T extends string = "additional-items-error" | "additional-properties-error" | "all-of-error" | "any-of-error" | "const-error" | "contains-any-error" | "contains-array-error" | "contains-error" | "contains-min-error" | "contains-max-error" | "enum-error" | "exclusive-maximum-error" | "exclusive-minimum-error" | "forbidden-property-error" | "format-date-error" | "format-date-time-error" | "format-duration-error" | "format-email-error" | "format-hostname-error" | "format-ipv4-error" | "format-ipv4-leading-zero-error" | "format-ipv6-error" | "format-ipv6-leading-zero-error" | "format-json-pointer-error" | "format-regex-error" | "format-time-error" | "format-uri-error" | "format-uri-reference-error" | "format-uri-template-error" | "format-url-error" | "format-uuid-error" | "invalid-data-error" | "invalid-property-name-error" | "maximum-error" | "max-items-error" | "max-length-error" | "max-properties-error" | "minimum-error" | "min-items-error" | "min-items-one-error" | "min-length-error" | "min-length-one-error" | "missing-one-of-declarator-error" | "min-properties-error" | "missing-array-item-error" | "missing-dependency-error" | "missing-one-of-property-error" | "multiple-of-error" | "multiple-one-of-error" | "no-additional-properties-error" | "not-error" | "one-of-error" | "one-of-property-error" | "pattern-error" | "pattern-properties-error" | "required-property-error" | "schema-warning" | "type-error" | "undefined-value-error" | "unevaluated-property-error" | "unevaluated-items-error" | "unique-items-error" | "unknown-property-error" | "value-not-empty-error">(code: T, data: ErrorData, message?: string) => JsonError;
     readonly createSchema: typeof createSchema;
     readonly getChildSelection: (property: string | number) => JsonError | SchemaNode[];
@@ -138,11 +168,7 @@ export declare const SchemaNodeMethods: {
     /**
      * @returns validation result of data validated by this node's JSON Schema
      */
-    readonly validate: (data: unknown, pointer?: string, path?: ValidationPath) => {
-        valid: boolean;
-        errors: JsonError[];
-        errorsAsync: Promise<JsonError | undefined>[];
-    };
+    readonly validate: (data: unknown, pointer?: string, path?: ValidationPath) => ValidateReturnType;
     /**
      * Register a JSON Schema as a remote-schema to be resolved by $ref, $anchor, etc
      * @returns the current node (not the remote schema-node)

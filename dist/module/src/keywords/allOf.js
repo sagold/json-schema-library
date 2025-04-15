@@ -10,9 +10,9 @@ export const allOfKeyword = {
     validate: validateAllOf
 };
 export function parseAllOf(node) {
-    const { schema, spointer } = node;
+    const { schema, evaluationPath } = node;
     if (Array.isArray(schema.allOf) && schema.allOf.length) {
-        node.allOf = schema.allOf.map((s, index) => node.compileSchema(s, `${spointer}/allOf/${index}`, `${node.schemaId}/allOf/${index}`));
+        node.allOf = schema.allOf.map((s, index) => node.compileSchema(s, `${evaluationPath}/allOf/${index}`, `${node.schemaLocation}/allOf/${index}`));
     }
 }
 function reduceAllOf({ node, data, key, pointer, path }) {
@@ -34,7 +34,7 @@ function reduceAllOf({ node, data, key, pointer, path }) {
             mergedSchema = mergeSchema(mergedSchema, schema, "allOf", "contains");
         }
     }
-    return node.compileSchema(mergedSchema, `${node.spointer}/${dynamicId}`, node.schemaId, `${node.schemaId}(${dynamicId})`);
+    return node.compileSchema(mergedSchema, `${node.evaluationPath}/${dynamicId}`, node.schemaLocation, `${node.schemaLocation}(${dynamicId})`);
 }
 function validateAllOf({ node, data, pointer, path }) {
     if (!Array.isArray(node.allOf) || node.allOf.length === 0) {

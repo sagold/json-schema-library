@@ -25,7 +25,7 @@ export function parseDependencies(node) {
         const schema = dependencies[property];
         if (isObject(schema) || typeof schema === "boolean") {
             node.dependentSchemas = (_a = node.dependentSchemas) !== null && _a !== void 0 ? _a : {};
-            node.dependentSchemas[property] = node.compileSchema(schema, `${node.spointer}/dependencies/${property}`, `${node.schemaId}/dependencies/${property}`);
+            node.dependentSchemas[property] = node.compileSchema(schema, `${node.evaluationPath}/dependencies/${property}`, `${node.schemaLocation}/dependencies/${property}`);
         }
         else {
             node.dependentRequired = (_b = node.dependentRequired) !== null && _b !== void 0 ? _b : {};
@@ -42,7 +42,7 @@ export function reduceDependencies({ node, data, key, pointer, path }) {
     if (node.dependentRequired == null && node.dependentSchemas == null) {
         return node;
     }
-    let workingNode = node.compileSchema(node.schema, node.spointer, node.schemaId);
+    let workingNode = node.compileSchema(node.schema, node.evaluationPath, node.schemaLocation);
     let required = (_a = workingNode.schema.required) !== null && _a !== void 0 ? _a : [];
     let dynamicId = "";
     if (node.dependentRequired) {
@@ -90,7 +90,7 @@ export function reduceDependencies({ node, data, key, pointer, path }) {
         return node;
     }
     // mergedSchema = mergeSchema(node.schema, mergedSchema, "dependencies");
-    // const { node: childNode, error } = node.compileSchema(mergedSchema, node.spointer).reduceNode(data, { path });
+    // const { node: childNode, error } = node.compileSchema(mergedSchema, node.evaluationPath).reduceNode(data, { path });
     // return childNode ?? error;
     if (required.length === 0) {
         return workingNode;
@@ -98,7 +98,7 @@ export function reduceDependencies({ node, data, key, pointer, path }) {
     required = workingNode.schema.required ? workingNode.schema.required.concat(...required) : required;
     required = required.filter((r, index, list) => list.indexOf(r) === index);
     workingNode = mergeNode(workingNode, workingNode, "dependencies");
-    return workingNode.compileSchema({ ...workingNode.schema, required }, workingNode.spointer, workingNode.schemaId, `${node.schemaId}(${dynamicId})`);
+    return workingNode.compileSchema({ ...workingNode.schema, required }, workingNode.evaluationPath, workingNode.schemaLocation, `${node.schemaLocation}(${dynamicId})`);
 }
 function validateDependencies({ node, data, pointer, path }) {
     var _a;

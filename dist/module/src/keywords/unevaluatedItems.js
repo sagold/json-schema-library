@@ -17,7 +17,7 @@ export function parseUnevaluatedItems(node) {
     if (!isObject(node.schema.unevaluatedItems)) {
         return;
     }
-    node.unevaluatedItems = node.compileSchema(node.schema.unevaluatedItems, `${node.spointer}/unevaluatedItems`, `${node.schemaId}/unevaluatedItems`);
+    node.unevaluatedItems = node.compileSchema(node.schema.unevaluatedItems, `${node.evaluationPath}/unevaluatedItems`, `${node.schemaLocation}/unevaluatedItems`);
 }
 function validateUnevaluatedItems({ node, data, pointer, path }) {
     const { schema } = node;

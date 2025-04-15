@@ -14,7 +14,7 @@ function safeResolveRef(node, options) {
         return undefined;
     }
     const { cache, recursionLimit = 1 } = options;
-    const origin = node.schemaId;
+    const origin = node.schemaLocation;
     cache[origin] = (_a = cache[origin]) !== null && _a !== void 0 ? _a : {};
     cache[origin][node.$ref] = (_b = cache[origin][node.$ref]) !== null && _b !== void 0 ? _b : 0;
     const value = cache[origin][node.$ref];
@@ -31,7 +31,7 @@ function safeResolveRef(node, options) {
 }
 function canResolveRef(node, options) {
     var _a, _b, _c;
-    const counter = (_c = (_b = (_a = options.cache) === null || _a === void 0 ? void 0 : _a[node.schemaId]) === null || _b === void 0 ? void 0 : _b[node.$ref]) !== null && _c !== void 0 ? _c : -1;
+    const counter = (_c = (_b = (_a = options.cache) === null || _a === void 0 ? void 0 : _a[node.schemaLocation]) === null || _b === void 0 ? void 0 : _b[node.$ref]) !== null && _c !== void 0 ? _c : -1;
     return counter < options.recursionLimit;
 }
 // only convert values where we do not lose original data

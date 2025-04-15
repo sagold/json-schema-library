@@ -25,9 +25,9 @@ export const oneOfFuzzyKeyword = {
     validate: oneOfValidator
 };
 export function parseOneOf(node) {
-    const { schema, spointer, schemaId } = node;
+    const { schema, evaluationPath, schemaLocation } = node;
     if (Array.isArray(schema.oneOf) && schema.oneOf.length) {
-        node.oneOf = schema.oneOf.map((s, index) => node.compileSchema(s, `${spointer}/oneOf/${index}`, `${schemaId}/oneOf/${index}`));
+        node.oneOf = schema.oneOf.map((s, index) => node.compileSchema(s, `${evaluationPath}/oneOf/${index}`, `${schemaLocation}/oneOf/${index}`));
     }
 }
 function reduceOneOf({ node, data, pointer, path }) {
@@ -59,7 +59,7 @@ function reduceOneOf({ node, data, pointer, path }) {
             const nestedDynamicId = (_b = (_a = reducedNode.dynamicId) === null || _a === void 0 ? void 0 : _a.replace(node.dynamicId, "")) !== null && _b !== void 0 ? _b : "";
             const dynamicId = nestedDynamicId === "" ? `oneOf/${index}` : nestedDynamicId;
             reducedNode.oneOfIndex = index; // @evaluation-info
-            reducedNode.dynamicId = joinDynamicId(reducedNode.dynamicId, `+${node.schemaId}(${dynamicId})`);
+            reducedNode.dynamicId = joinDynamicId(reducedNode.dynamicId, `+${node.schemaLocation}(${dynamicId})`);
             return reducedNode;
         }
         return error;
@@ -99,7 +99,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }) {
             return node.createError("missing-one-of-declarator-error", {
                 declarator: DECLARATOR_ONEOF,
                 oneOfProperty,
-                schemaPointer: node.oneOf[i].schemaId,
+                schemaPointer: node.oneOf[i].schemaLocation,
                 pointer: `${pointer}/oneOf/${i}`,
                 schema: node.schema,
                 value: data

@@ -7,9 +7,9 @@ export const notKeyword = {
     validate: validateNot
 };
 export function parseNot(node) {
-    const { schema, spointer, schemaId } = node;
+    const { schema, evaluationPath, schemaLocation } = node;
     if (schema.not != null) {
-        node.not = node.compileSchema(schema.not, `${spointer}/not`, `${schemaId}/not`);
+        node.not = node.compileSchema(schema.not, `${evaluationPath}/not`, `${schemaLocation}/not`);
     }
 }
 function validateNot({ node, data, pointer, path }) {

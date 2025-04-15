@@ -36,9 +36,9 @@ function mergePatternProperties(a, b) {
         return a || b;
     }
     const result = [...a];
-    const pointerList = a.map((p) => p.node.spointer);
+    const pointerList = a.map((p) => p.node.evaluationPath);
     b.forEach((p) => {
-        if (!pointerList.includes(p.node.spointer)) {
+        if (!pointerList.includes(p.node.evaluationPath)) {
             result.push(p);
         }
     });
