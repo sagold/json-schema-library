@@ -39,7 +39,7 @@ export function parseDependencies(node: SchemaNode) {
     });
 }
 
-export function reduceDependencies({ node, data, key, path }: JsonSchemaReducerParams) {
+export function reduceDependencies({ node, data, key, pointer, path }: JsonSchemaReducerParams) {
     if (!isObject(data)) {
         // @todo remove dependentSchemas
         return node;
@@ -83,6 +83,7 @@ export function reduceDependencies({ node, data, key, path }: JsonSchemaReducerP
             // but probably not how json-schema spec defines this behaviour (resolve only within sub-schema)
             const reducedDependency = { ...dependency, schema: { ...dependency.schema, required } }.reduceNode(data, {
                 key,
+                pointer: `${pointer}/dependencies/${propertyName}`,
                 path
             }).node;
 

@@ -122,7 +122,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaR
                 declarator: DECLARATOR_ONEOF,
                 oneOfProperty,
                 schemaPointer: node.oneOf[i].schemaId,
-                pointer,
+                pointer: `${pointer}/oneOf/${i}`,
                 schema: node.schema,
                 value: data
             });
