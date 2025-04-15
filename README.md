@@ -61,7 +61,16 @@ type CompileOptions = {
     // if format-validations should create errors. Defaults to true
     formatAssertion: boolean | "meta-schema";
     // default options for all calls to node.getData()
-    getDataDefaultOptions?: TemplateOptions;
+    getDataDefaultOptions?: {
+        // Add all properties (required and optional) to the generated data
+        addOptionalProps?: boolean;
+        // Remove data that does not match input schema. Defaults to false
+        removeInvalidData?: boolean;
+        // Set to false to take default values as they are and not extend them. Defaults to true
+        extendDefaults?: boolean;
+        // Limits how often a $ref should be followed before aborting. Prevents infinite data-structure. Defaults to 1
+        recursionLimit?: number;
+    };
 };
 ```
 
@@ -172,19 +181,19 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 ## SchemaNode methods
 
-[**addRemoteSchema**](#addremoteschema) ·
-[**compileSchema**](#compileSchema-1) ·
-[**createSchema**](#createSchema) ·
-[**getChildSelection**](#getchildselection) ·
-[**getData**](#getdata) ·
-[**getNode**](#getnode) ·
-[**getNodeChild**](#getnodechild) ·
-[**getNodeRef**](#getnoderef) ·
-[**getNodeRoot**](#getnoderoot) ·
-[**reduceNode**](#reducenode) ·
-[**toDataNodes**](#todatanodes) ·
-[**toSchemaNodes**](#toschemanodes) ·
-[**validate**](#validate)
+[addRemoteSchema](#addremoteschema) ·
+[compileSchema](#compileSchema-1) ·
+[createSchema](#createSchema) ·
+[getChildSelection](#getchildselection) ·
+[getData](#getdata) ·
+[getNode](#getnode) ·
+[getNodeChild](#getnodechild) ·
+[getNodeRef](#getnoderef) ·
+[getNodeRoot](#getnoderoot) ·
+[reduceNode](#reducenode) ·
+[toDataNodes](#todatanodes) ·
+[toSchemaNodes](#toschemanodes) ·
+[validate](#validate)
 
 </details>
 
@@ -192,7 +201,7 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 `addRemoteSchema` lets you add additional schemas that can be referenced by an URL using `$ref`. Use this to combine multiple schemas without changing the actual schema.
 
-Each schemas is referenced by their unique `$id` (since draft-06, previously `id`). Usually an `$id` is specified as an url, for example `https://mydomain.com/schema/schema-name` or with a file extension like `https://mydomain.com/schema/schema-name.json`.
+Each schema is referenced by their unique `$id` (since draft-06, previously `id`). Usually an `$id` is specified as an url, for example `https://mydomain.com/schema/schema-name` or with a file extension like `https://mydomain.com/schema/schema-name.json`.
 
 On a compiled schema
 
@@ -383,35 +392,35 @@ const myData = compileSchema(myJsonSchema).getData(inputData, { recursionLimit: 
 <details><summary>Example</summary>
 
 ```ts
-import { compileSchema, JsonSchema } from 'json-schema-library';
+import { compileSchema, JsonSchema } from "json-schema-library";
 
 const myJsonSchema: JsonSchema = {
-  type: 'object',
-  required: ['name', 'option', 'list'],
-  properties: {
-    name: { type: 'string' },
-    option: {
-      type: 'string',
-      enum: ['first-option', 'second-option']
-    },
-    list: {
-      type: 'array',
-      items: {
-        type: 'string',
-        default: 'new item'
-      },
-      minItems: 1
+    type: "object",
+    required: ["name", "option", "list"],
+    properties: {
+        name: { type: "string" },
+        option: {
+            type: "string",
+            enum: ["first-option", "second-option"]
+        },
+        list: {
+            type: "array",
+            items: {
+                type: "string",
+                default: "new item"
+            },
+            minItems: 1
+        }
     }
-  }
 };
 
 const schemaNode = new compileSchema(myJsonSchema);
 const myData = schemaNode.getData();
 
 expect(myData).to.deep.equal({
-  name: ',
-  option: 'first-option',
-  list: ['new item']
+    name: "",
+    option: "first-option",
+    list: ["new item"]
 });
 ```
 
@@ -846,10 +855,7 @@ In almost all cases, a JSON Pointer is given on _error.data.pointer_, which poin
 <details><summary>Example</summary>
 
 ```ts
-const myJsonSchema: JsonSchema = {
-    type: "object",
-    additionalProperties: false
-};
+const myJsonSchema: JsonSchema = { type: "object", additionalProperties: false };
 
 const { errors } = compileSchema(myJsonSchema).validate({ name: "my-data" });
 
@@ -868,14 +874,14 @@ expect(errors).to.deep.equal([
 You can also use async validators to validate data with json-schema. For this, another property asyncErrors is exposed on validate:
 
 ```ts
-const { isValid, errors, errorsAsync } = compileSchema(myJsonSchema).validate(myData);
+const { errorsAsync } = compileSchema(myJsonSchema).validate(myData);
 
 if (errorsAsync.length > 0) {
     const additionalErrors = (await Promise.all(errorsAsync)).filter((err) => err != null);
 }
 ```
 
-Per default _json-schema-library_ does not have async validators, so `errorsAsync` is always empty. If you add async validators, a list of `Promise<JsonError|undefined>` is return and you need to resolve and filter non-errors (undefined) yourself.
+Per default _json-schema-library_ does not contain async validators, so `errorsAsync` is always empty. If you add async validators, a list of `Promise<JsonError|undefined>` is return and you need to resolve and filter non-errors (undefined) yourself.
 
 > **Note** `isValid` only refers to errors. `errorsAsync` has to be evaluated separately
 
@@ -1051,17 +1057,9 @@ const myDraft = extendDraft(draft2020, {
 });
 ```
 
-<details><summary>About `oneOfFuzzyKeyword`</summary>
-
-If you're working with complex schemas that use the `oneOf` keyword to validate multiple options, `oneOfFuzzyKeyword` offers an alternative approach. It scores the schemas to return the best match, even if none of the schemas fully validate the input data. This makes error messages more readable and helps identify the most appropriate schema when multiple options exist.
-
-`oneOfFuzzyKeyword` helps when no schema fully validates the data but you want to prioritize schemas based on how well they fit the input. This makes it easier to interpret validation results for complex conditions.
-
-</details>
-
 ### Keyword
 
-`Keywords` hold the main logic for JSON Schema functionality. Each `Keyword` corresponds to a JSON Schema keyword like `properties`, `prefixItems`, `oneOf`, etc and offers implementations to `parse`, `validate`, `resolve` and `reduce`. Note that support for each implementation is optional, dependending on the feature requirements. The main properties of a `Keyword`:
+**Keywords** hold the main logic for JSON Schema functionality. Each `Keyword` corresponds to a JSON Schema keyword like `properties`, `prefixItems`, `oneOf`, etc and offers implementations to `parse`, `validate`, `resolve` and `reduce`. Note that support for each implementation is optional, dependending on the feature requirements. The main properties of a `Keyword`:
 
 -   a `Keyword` is only processed if the specified `keyword` is available as property on the JSON Schema
 -   an optional `order` property may be added as order of keyword execution is sometimes important (`additionalItems` last, `$ref` evaluation first)
@@ -1157,6 +1155,13 @@ function reduceType({ node, pointer, data }: JsonSchemaReducerParams): undefined
 
 </details>
 
+Currently **keywords** are not exposed per default. You can still access any keyword implementation by retrieving them from a draft:
+
+```ts
+import { draft07 } from "json-schema-library";
+const dependentSchemasKeyword = draft2020.keywords.find((f) => f.keyword === "dependentSchemas");
+```
+
 ## Keyword extensions
 
 ### oneOfProperty
@@ -1190,6 +1195,22 @@ const resolvedNode = compileSchema(schema).reduce({ id: "2", title: "not a numbe
 expect(resolvedNode?.schema).to.deep.eq({
     type: "object",
     properties: { id: { const: "2" }, title: { type: "number" } }
+});
+```
+
+### oneOfFuzzyKeyword
+
+If you're working with complex schemas that use the `oneOf` keyword to validate multiple options, `oneOfFuzzyKeyword` offers an alternative approach. It scores the schemas to return the best match, even if none of the schemas fully validate the input data. This makes error messages more readable and helps identify the most appropriate schema when multiple options exist.
+
+`oneOfFuzzyKeyword` helps when no schema fully validates the data but you want to prioritize schemas based on how well they fit the input. This makes it easier to interpret validation results for complex conditions.
+
+`oneOfFuzzyKeyword` is exposed by _json-schema-library_ and can be used to extend any draft.
+
+```ts
+import { extendDraft, oneOfFuzzyKeyword, draft2020 } from "json-schema-library";
+
+const myDraft = extendDraft(draft2020, {
+    keywords: [oneOfFuzzyKeyword]
 });
 ```
 
