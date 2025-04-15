@@ -100,7 +100,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }) {
                 declarator: DECLARATOR_ONEOF,
                 oneOfProperty,
                 schemaPointer: node.oneOf[i].schemaId,
-                pointer,
+                pointer: `${pointer}/oneOf/${i}`,
                 schema: node.schema,
                 value: data
             });
