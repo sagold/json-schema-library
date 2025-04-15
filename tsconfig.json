@@ -11,5 +11,6 @@
         "noImplicitAny": true,
         "lib": ["DOM", "ES2018"]
     },
+    "exclude": ["src/**/*.test.ts"],
     "include": ["index.ts", "src/**/*"]
 }

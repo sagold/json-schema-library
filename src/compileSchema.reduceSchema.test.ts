@@ -56,36 +56,6 @@ describe("compileSchema : reduceNode", () => {
         });
     });
 
-    // we do not reduce recursively in v2
-    // it.only("should recursively compile schema with current data", () => {
-    //     const node = compileSchema({
-    //         type: "object",
-    //         properties: {
-    //             article: {
-    //                 type: "object",
-    //                 if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
-    //                 then: {
-    //                     required: ["header"],
-    //                     properties: { header: { type: "string", minLength: 1 } }
-    //                 }
-    //             }
-    //         }
-    //     });
-
-    //     const dataNode = node.reduceNode({ article: { withHeader: true } } );
-
-    //     assert.deepEqual(dataNode?.node?.schema, {
-    //         type: "object",
-    //         properties: {
-    //             article: {
-    //                 type: "object",
-    //                 required: ["header"],
-    //                 properties: { header: { type: "string", minLength: 1 } }
-    //             }
-    //         }
-    //     });
-    // });
-
     describe("object - merge all reduced dynamic schema", () => {
         it("should reduce patternProperties and allOf", () => {
             const node = compileSchema({
