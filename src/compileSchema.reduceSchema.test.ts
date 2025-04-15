@@ -92,6 +92,16 @@ describe("compileSchema : reduceNode", () => {
             assert.deepEqual(reduced.dynamicId, "#/$defs/schema(dependencies/one,dependencies/two)");
         });
 
+        it("should add required-property from dependency", () => {
+            const node: any = compileSchema({
+                type: "object",
+                properties: { one: { title: "Property One", type: "string" } },
+                dependencies: { one: { required: ["two"], properties: { two: { type: "string" } } } }
+            });
+            const { node: reduced } = node.reduceNode({ one: "" });
+            assert.deepEqual(reduced.schema.required, ["two"]);
+        });
+
         it("should NOT merge dependency when it is not defined", () => {
             const node: any = compileSchema({
                 type: "object",
