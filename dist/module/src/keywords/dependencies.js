@@ -69,6 +69,9 @@ export function reduceDependencies({ node, data, key, pointer, path }) {
             if (!isSchemaNode(dependency)) {
                 return true;
             }
+            if (Array.isArray(dependency.schema.required)) {
+                required.push(...dependency.schema.required);
+            }
             // @note pass on updated required-list to resolve nested dependencies. This is currently supported,
             // but probably not how json-schema spec defines this behaviour (resolve only within sub-schema)
             const reducedDependency = { ...dependency, schema: { ...dependency.schema, required } }.reduceNode(data, {
@@ -77,9 +80,6 @@ export function reduceDependencies({ node, data, key, pointer, path }) {
                 path
             }).node;
             workingNode = mergeNode(workingNode, reducedDependency);
-            if (workingNode.schema.required) {
-                required.push(...workingNode.schema.required);
-            }
             // @dynamicId
             const nestedDynamicId = (_b = (_a = reducedDependency.dynamicId) === null || _a === void 0 ? void 0 : _a.replace(node.dynamicId, "")) !== null && _b !== void 0 ? _b : "";
             const localDynamicId = nestedDynamicId === "" ? `dependencies/${propertyName}` : nestedDynamicId;
@@ -89,9 +89,6 @@ export function reduceDependencies({ node, data, key, pointer, path }) {
     if (workingNode === node) {
         return node;
     }
-    // mergedSchema = mergeSchema(node.schema, mergedSchema, "dependencies");
-    // const { node: childNode, error } = node.compileSchema(mergedSchema, node.evaluationPath).reduceNode(data, { path });
-    // return childNode ?? error;
     if (required.length === 0) {
         return workingNode;
     }
