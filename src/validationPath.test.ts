@@ -24,7 +24,7 @@ describe("validate - path", () => {
             "#",
             path
         );
-        // console.log(path.map((v) => ({ ptr: v.pointer, sptr: v.node.spointer })));
+        // console.log(path.map((v) => ({ ptr: v.pointer, sptr: v.node.evaluationPath })));
         assert(path.length > 0);
     });
 });

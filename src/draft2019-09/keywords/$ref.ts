@@ -32,17 +32,17 @@ export function parseRef(node: SchemaNode) {
     const currentId = joinId(node.parent?.$id, node.schema?.$id);
     node.$id = currentId;
     node.lastIdPointer = node.parent?.lastIdPointer ?? "#";
-    if (currentId !== node.parent?.$id && node.spointer !== "#") {
-        node.lastIdPointer = node.spointer;
+    if (currentId !== node.parent?.$id && node.evaluationPath !== "#") {
+        node.lastIdPointer = node.evaluationPath;
     }
 
     // store this node for retrieval by $id + json-pointer from $id
-    if (node.lastIdPointer !== "#" && node.spointer.startsWith(node.lastIdPointer)) {
-        const localPointer = `#${node.spointer.replace(node.lastIdPointer, "")}`;
+    if (node.lastIdPointer !== "#" && node.evaluationPath.startsWith(node.lastIdPointer)) {
+        const localPointer = `#${node.evaluationPath.replace(node.lastIdPointer, "")}`;
         register(node, joinId(currentId, localPointer));
     }
     // store $rootId + json-pointer to this node
-    register(node, joinId(node.context.rootNode.$id, node.spointer));
+    register(node, joinId(node.context.rootNode.$id, node.evaluationPath));
     // store this node for retrieval by $id + anchor
     if (node.schema.$anchor) {
         node.context.anchors[`${currentId.replace(/#$/, "")}#${node.schema.$anchor}`] = node;
@@ -59,7 +59,7 @@ export function parseRef(node: SchemaNode) {
 
 // export function reduceRef({ node, data, key, pointer, path }: JsonSchemaReducerParams) {
 //     const resolvedNode = node.resolveRef({ pointer, path });
-//     if (resolvedNode.schemaId === node.schemaId) {
+//     if (resolvedNode.schemaLocation === node.schemaLocation) {
 //         return resolvedNode;
 //     }
 //     const result = resolvedNode.reduceNode(data, { key, pointer, path });
@@ -128,12 +128,12 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     return nextNode;
 }
 
-function compileNext(referencedNode: SchemaNode, spointer = referencedNode.spointer) {
+function compileNext(referencedNode: SchemaNode, evaluationPath = referencedNode.evaluationPath) {
     const referencedSchema = isObject(referencedNode.schema)
         ? omit(referencedNode.schema, "$id")
         : referencedNode.schema;
 
-    return referencedNode.compileSchema(referencedSchema, `${spointer}/$ref`, referencedNode.schemaId);
+    return referencedNode.compileSchema(referencedSchema, `${evaluationPath}/$ref`, referencedNode.schemaLocation);
 }
 
 export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefined {
@@ -141,13 +141,13 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
         return node;
     }
 
-    // resolve $ref by json-spointer
+    // resolve $ref by json-evaluationPath
     if (node.context.refs[$ref]) {
-        return compileNext(node.context.refs[$ref], node.spointer);
+        return compileNext(node.context.refs[$ref], node.evaluationPath);
     }
     // resolve $ref from $anchor
     if (node.context.anchors[$ref]) {
-        return compileNext(node.context.anchors[$ref], node.spointer);
+        return compileNext(node.context.anchors[$ref], node.evaluationPath);
     }
 
     // check for remote-host + pointer pair to switch rootSchema
@@ -162,7 +162,7 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
         const $ref = fragments[0];
         // this is a reference to remote-host root node
         if (node.context.remotes[$ref]) {
-            return compileNext(node.context.remotes[$ref], node.spointer);
+            return compileNext(node.context.remotes[$ref], node.evaluationPath);
         }
         if ($ref[0] === "#") {
             // @todo there is a bug joining multiple fragments to e.g. #/base#/examples/0
@@ -172,7 +172,7 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
             const rootSchema = node.context.rootNode.schema;
             const targetSchema = get(rootSchema, ref);
             if (targetSchema) {
-                return node.compileSchema(targetSchema, `${node.spointer}/$ref`, ref);
+                return node.compileSchema(targetSchema, `${node.evaluationPath}/$ref`, ref);
             }
         }
         // console.error("REF: UNFOUND 1", $ref);

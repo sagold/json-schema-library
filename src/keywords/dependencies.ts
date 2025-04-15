@@ -29,8 +29,8 @@ export function parseDependencies(node: SchemaNode) {
             node.dependentSchemas = node.dependentSchemas ?? {};
             node.dependentSchemas[property] = node.compileSchema(
                 schema,
-                `${node.spointer}/dependencies/${property}`,
-                `${node.schemaId}/dependencies/${property}`
+                `${node.evaluationPath}/dependencies/${property}`,
+                `${node.schemaLocation}/dependencies/${property}`
             );
         } else {
             node.dependentRequired = node.dependentRequired ?? {};
@@ -49,7 +49,7 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
         return node;
     }
 
-    let workingNode = node.compileSchema(node.schema, node.spointer, node.schemaId);
+    let workingNode = node.compileSchema(node.schema, node.evaluationPath, node.schemaLocation);
     let required = workingNode.schema.required ?? [];
 
     let dynamicId = "";
@@ -104,7 +104,7 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
     }
 
     // mergedSchema = mergeSchema(node.schema, mergedSchema, "dependencies");
-    // const { node: childNode, error } = node.compileSchema(mergedSchema, node.spointer).reduceNode(data, { path });
+    // const { node: childNode, error } = node.compileSchema(mergedSchema, node.evaluationPath).reduceNode(data, { path });
     // return childNode ?? error;
 
     if (required.length === 0) {
@@ -116,9 +116,9 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
     workingNode = mergeNode(workingNode, workingNode, "dependencies");
     return workingNode.compileSchema(
         { ...workingNode.schema, required },
-        workingNode.spointer,
-        workingNode.schemaId,
-        `${node.schemaId}(${dynamicId})`
+        workingNode.evaluationPath,
+        workingNode.schemaLocation,
+        `${node.schemaLocation}(${dynamicId})`
     );
 }
 

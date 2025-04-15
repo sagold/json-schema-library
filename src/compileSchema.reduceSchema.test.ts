@@ -821,7 +821,7 @@ describe("compileSchema : reduceNode", () => {
             assert.deepEqual(node.dynamicId, "#(dependencies/one,dependencies/two)");
         });
 
-        it("should prefix with schemaId", () => {
+        it("should prefix with schemaLocation", () => {
             const { node } =
                 compileSchema({
                     properties: {

@@ -77,10 +77,25 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     context: Context;
     /** JSON Schema of node */
     schema: JsonSchema;
-    /** absolute path into JSON Schema, includes $ref for resolved schema */
-    spointer: string;
-    /** local path within JSON Schema (not extended by resolving ref) */
-    schemaId: string;
+    /**
+     * Evaluation Path - The location of the keyword that produced the annotation or error.
+     * The purpose of this data is to show the resolution path which resulted in the subschema
+     * that contains the keyword.
+     *
+     * - relative to the root of the principal schema; should include (inline) any $ref segments in the path
+     * - JSON pointer
+     */
+    evaluationPath: string;
+    /**
+     * Schema Location - The direct location to the keyword that produced the annotation
+     * or error. This is provided as a convenience to the user so that they don't have to resolve
+     * the keyword's subschema, which may not be trivial task. It is only provided if the relative
+     * location contains $refs (otherwise, the two locations will be the same).
+     *
+     * - absolute URI
+     * - may not have any association to the principal schema
+     */
+    schemaLocation: string;
     /** id created when combining subschemas */
     dynamicId: string;
     /** reference to parent node (node used to compile this node) */
@@ -163,19 +178,19 @@ export const SchemaNodeMethods = {
      */
     compileSchema(
         schema: JsonSchema,
-        spointer: string = this.spointer,
-        schemaId?: string,
+        evaluationPath: string = this.evaluationPath,
+        schemaLocation?: string,
         dynamicId?: string
     ): SchemaNode {
-        const nextFragment = spointer.split("/$ref")[0];
+        const nextFragment = evaluationPath.split("/$ref")[0];
         const parentNode = this as SchemaNode;
         const node: SchemaNode = {
             lastIdPointer: parentNode.lastIdPointer, // ref helper
             context: parentNode.context,
             parent: parentNode,
-            spointer,
+            evaluationPath,
             dynamicId: joinDynamicId(parentNode.dynamicId, dynamicId),
-            schemaId: schemaId ?? join(parentNode.schemaId, nextFragment),
+            schemaLocation: schemaLocation ?? join(parentNode.schemaLocation, nextFragment),
             reducers: [],
             resolvers: [],
             validators: [],
@@ -258,7 +273,7 @@ export const SchemaNodeMethods = {
             return { node, error: undefined };
             // @ts-expect-error bool schema
         } else if (node.schema === true) {
-            const nextNode = node.compileSchema(createSchema(data), node.spointer, node.schemaId);
+            const nextNode = node.compileSchema(createSchema(data), node.evaluationPath, node.schemaLocation);
             path?.push({ pointer, node });
             return { node: nextNode, error: undefined };
         }
@@ -266,7 +281,7 @@ export const SchemaNodeMethods = {
         let schema;
         // we need to copy node to prevent modification of source
         // @todo does mergeNode break immutability?
-        let workingNode = node.compileSchema(node.schema, node.spointer, node.schemaId);
+        let workingNode = node.compileSchema(node.schema, node.evaluationPath, node.schemaLocation);
         const reducers = node.reducers;
         for (let i = 0; i < reducers.length; i += 1) {
             const result = reducers[i]({ data, key, node, pointer, path });
@@ -339,9 +354,9 @@ export const SchemaNodeMethods = {
         const draft = getDraft(context.drafts, schema?.$schema ?? this.context.rootNode.$schema);
 
         const node: SchemaNode = {
-            spointer: "#",
+            evaluationPath: "#",
             lastIdPointer: "#",
-            schemaId: "#",
+            schemaLocation: "#",
             dynamicId: "",
             reducers: [],
             resolvers: [],
@@ -379,7 +394,7 @@ export const SchemaNodeMethods = {
     },
 
     toJSON() {
-        return { ...this, context: undefined, errors: undefined, parent: this.parent?.spointer };
+        return { ...this, context: undefined, errors: undefined, parent: this.parent?.evaluationPath };
     }
 } as const;
 

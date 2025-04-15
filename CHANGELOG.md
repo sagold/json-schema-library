@@ -1,5 +1,7 @@
 ## Changelog
 
+-   reference for error-format: https://json-schema.org/blog/posts/fixing-json-schema-output
+
 ### v9.0.0
 
 -   [Breaking] error data to always contain `schema` and `value`

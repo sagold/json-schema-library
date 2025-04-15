@@ -25,7 +25,7 @@ function parseRef(node: SchemaNode) {
     let currentId = node.parent?.$id;
     if (node.schema?.$ref == null && node.schema?.id) {
         currentId = joinId(node.parent?.$id, node.schema.id);
-        // console.log("create id", node.spointer, ":", node.parent?.$id, node.schema?.id, "=>", currentId);
+        // console.log("create id", node.evaluationPath, ":", node.parent?.$id, node.schema?.id, "=>", currentId);
     }
     node.$id = currentId;
     node.lastIdPointer = node.parent?.lastIdPointer ?? "#";
@@ -40,17 +40,17 @@ function parseRef(node: SchemaNode) {
 
     const idChanged = currentId !== node.parent?.$id;
     if (idChanged) {
-        node.lastIdPointer = node.spointer;
+        node.lastIdPointer = node.evaluationPath;
     }
 
     // store this node for retrieval by id + json-pointer from id
-    if (node.lastIdPointer !== "#" && node.spointer.startsWith(node.lastIdPointer)) {
-        const localPointer = `#${node.spointer.replace(node.lastIdPointer, "")}`;
+    if (node.lastIdPointer !== "#" && node.evaluationPath.startsWith(node.lastIdPointer)) {
+        const localPointer = `#${node.evaluationPath.replace(node.lastIdPointer, "")}`;
         register(node, joinId(currentId, localPointer));
     } else {
-        register(node, joinId(currentId, node.spointer));
+        register(node, joinId(currentId, node.evaluationPath));
     }
-    register(node, joinId(node.context.rootNode.$id, node.spointer));
+    register(node, joinId(node.context.rootNode.$id, node.evaluationPath));
 
     // precompile reference
     if (node.schema.$ref) {
@@ -76,11 +76,11 @@ function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath
     return resolvedNode;
 }
 
-function compileNext(referencedNode: SchemaNode, spointer = referencedNode.spointer) {
+function compileNext(referencedNode: SchemaNode, evaluationPath = referencedNode.evaluationPath) {
     const referencedSchema = isObject(referencedNode.schema)
         ? omit(referencedNode.schema, "id")
         : referencedNode.schema;
-    return referencedNode.compileSchema(referencedSchema, `${spointer}/$ref`, referencedSchema.schemaId);
+    return referencedNode.compileSchema(referencedSchema, `${evaluationPath}/$ref`, referencedSchema.schemaLocation);
 }
 
 function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefined {
@@ -88,15 +88,15 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefined {
         return node;
     }
 
-    // resolve $ref by json-spointer
+    // resolve $ref by json-evaluationPath
     if (node.context.refs[$ref]) {
         // console.log(`ref resolve ${$ref} from refs`, node.context.refs[$ref].ref);
-        return compileNext(node.context.refs[$ref], node.spointer);
+        return compileNext(node.context.refs[$ref], node.evaluationPath);
     }
 
     if (node.context.anchors[$ref]) {
         // console.log(`ref resolve ${$ref} from anchors`, node.context.anchors[$ref].ref);
-        return compileNext(node.context.anchors[$ref], node.spointer);
+        return compileNext(node.context.anchors[$ref], node.evaluationPath);
     }
 
     // check for remote-host + pointer pair to switch rootSchema
@@ -111,7 +111,7 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefined {
         const $ref = fragments[0];
         // this is a reference to remote-host root node
         if (node.context.remotes[$ref]) {
-            return compileNext(node.context.remotes[$ref], node.spointer);
+            return compileNext(node.context.remotes[$ref], node.evaluationPath);
         }
         // console.error("REF: UNFOUND 1", $ref, Object.keys(node.context.remotes));
         return undefined;

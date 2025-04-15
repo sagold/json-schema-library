@@ -36,10 +36,10 @@ export const oneOfFuzzyKeyword: Keyword = {
 };
 
 export function parseOneOf(node: SchemaNode) {
-    const { schema, spointer, schemaId } = node;
+    const { schema, evaluationPath, schemaLocation } = node;
     if (Array.isArray(schema.oneOf) && schema.oneOf.length) {
         node.oneOf = schema.oneOf.map((s, index) =>
-            node.compileSchema(s, `${spointer}/oneOf/${index}`, `${schemaId}/oneOf/${index}`)
+            node.compileSchema(s, `${evaluationPath}/oneOf/${index}`, `${schemaLocation}/oneOf/${index}`)
         );
     }
 }
@@ -76,7 +76,7 @@ function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
             const dynamicId = nestedDynamicId === "" ? `oneOf/${index}` : nestedDynamicId;
 
             reducedNode.oneOfIndex = index; // @evaluation-info
-            reducedNode.dynamicId = joinDynamicId(reducedNode.dynamicId, `+${node.schemaId}(${dynamicId})`);
+            reducedNode.dynamicId = joinDynamicId(reducedNode.dynamicId, `+${node.schemaLocation}(${dynamicId})`);
             return reducedNode;
         }
         return error;
@@ -121,7 +121,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaR
             return node.createError("missing-one-of-declarator-error", {
                 declarator: DECLARATOR_ONEOF,
                 oneOfProperty,
-                schemaPointer: node.oneOf[i].schemaId,
+                schemaPointer: node.oneOf[i].schemaLocation,
                 pointer: `${pointer}/oneOf/${i}`,
                 schema: node.schema,
                 value: data

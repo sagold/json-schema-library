@@ -31,17 +31,17 @@ function parseRef(node: SchemaNode) {
 
     const idChanged = currentId !== node.parent?.$id;
     if (idChanged) {
-        node.lastIdPointer = node.spointer;
+        node.lastIdPointer = node.evaluationPath;
     }
 
     // store this node for retrieval by $id + json-pointer from $id
-    if (node.lastIdPointer !== "#" && node.spointer.startsWith(node.lastIdPointer)) {
-        const localPointer = `#${node.spointer.replace(node.lastIdPointer, "")}`;
+    if (node.lastIdPointer !== "#" && node.evaluationPath.startsWith(node.lastIdPointer)) {
+        const localPointer = `#${node.evaluationPath.replace(node.lastIdPointer, "")}`;
         node.context.refs[joinId(currentId, localPointer)] = node;
     } else {
-        node.context.refs[joinId(currentId, node.spointer)] = node;
+        node.context.refs[joinId(currentId, node.evaluationPath)] = node;
     }
-    node.context.refs[joinId(node.context.rootNode.$id, node.spointer)] = node;
+    node.context.refs[joinId(node.context.rootNode.$id, node.evaluationPath)] = node;
 
     // precompile reference
     if (node.schema.$ref) {

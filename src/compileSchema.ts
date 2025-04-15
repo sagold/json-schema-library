@@ -35,9 +35,9 @@ export function compileSchema(schema: JsonSchema, options: CompileOptions = {}) 
     const draft = getDraft(drafts, schema?.$schema);
 
     const node: SchemaNode = {
-        spointer: "#",
+        evaluationPath: "#",
         lastIdPointer: "#",
-        schemaId: "#",
+        schemaLocation: "#",
         dynamicId: "",
         reducers: [],
         resolvers: [],

@@ -51,8 +51,8 @@ export function getNodeChild(
     if (options.createSchema === true) {
         const newNode = node.compileSchema(
             node.createSchema(getValue(data, key)),
-            `${node.spointer}/additional`,
-            `${node.schemaId}/additional`
+            `${node.evaluationPath}/additional`,
+            `${node.schemaLocation}/additional`
         );
         return { node: newNode, error: undefined };
     }

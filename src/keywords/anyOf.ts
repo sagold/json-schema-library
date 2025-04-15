@@ -14,10 +14,10 @@ export const anyOfKeyword: Keyword = {
 };
 
 export function parseAnyOf(node: SchemaNode) {
-    const { schema, spointer, schemaId } = node;
+    const { schema, evaluationPath, schemaLocation } = node;
     if (Array.isArray(schema.anyOf) && schema.anyOf.length) {
         node.anyOf = schema.anyOf.map((s, index) =>
-            node.compileSchema(s, `${spointer}/anyOf/${index}`, `${schemaId}/anyOf/${index}`)
+            node.compileSchema(s, `${evaluationPath}/anyOf/${index}`, `${schemaLocation}/anyOf/${index}`)
         );
     }
 }
@@ -45,9 +45,9 @@ function reduceAnyOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     }
     return node.compileSchema(
         mergedSchema,
-        `${node.spointer}${dynamicId}`,
-        node.schemaId,
-        `${node.schemaId}(${dynamicId})`
+        `${node.evaluationPath}${dynamicId}`,
+        node.schemaLocation,
+        `${node.schemaLocation}(${dynamicId})`
     );
 }
 

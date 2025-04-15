@@ -141,8 +141,8 @@ describe("compileSchema getDataDefaultOptions", () => {
     });
 });
 
-describe("compileSchema `schemaId`", () => {
-    it("should store path from rootSchema as schemaId", () => {
+describe("compileSchema `schemaLocation`", () => {
+    it("should store path from rootSchema as schemaLocation", () => {
         const node = compileSchema({
             if: { type: "string" },
             then: { type: "string" },
@@ -150,14 +150,14 @@ describe("compileSchema `schemaId`", () => {
             $defs: { asset: { type: "string" } }
         });
 
-        assert.deepEqual(node.schemaId, "#");
-        assert.deepEqual(node.if.schemaId, "#/if");
-        assert.deepEqual(node.then.schemaId, "#/then");
-        assert.deepEqual(node.properties.title.schemaId, "#/properties/title");
-        assert.deepEqual(node.$defs.asset.schemaId, "#/$defs/asset");
+        assert.deepEqual(node.schemaLocation, "#");
+        assert.deepEqual(node.if.schemaLocation, "#/if");
+        assert.deepEqual(node.then.schemaLocation, "#/then");
+        assert.deepEqual(node.properties.title.schemaLocation, "#/properties/title");
+        assert.deepEqual(node.$defs.asset.schemaLocation, "#/$defs/asset");
     });
 
-    it("should maintain schemaId when resolved by ref", () => {
+    it("should maintain schemaLocation when resolved by ref", () => {
         const { node } = compileSchema({
             properties: { title: { $ref: "#/$defs/asset" } },
             $defs: { asset: { type: "string" } }
@@ -165,17 +165,17 @@ describe("compileSchema `schemaId`", () => {
 
         // @todo should have returned already resolved node?
         const result = node.resolveRef();
-        assert.deepEqual(result.schemaId, "#/$defs/asset");
+        assert.deepEqual(result.schemaLocation, "#/$defs/asset");
     });
 
-    it("should maintain schemaId when resolved by root-ref", () => {
+    it("should maintain schemaLocation when resolved by root-ref", () => {
         const { node } = compileSchema({
             properties: { title: { $ref: "#" } }
         }).getNodeChild("title");
 
         // @todo should have returned already resolved node?
         const result = node.resolveRef();
-        assert.deepEqual(result.schemaId, "#");
+        assert.deepEqual(result.schemaLocation, "#");
     });
 });
 

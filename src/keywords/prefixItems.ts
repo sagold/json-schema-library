@@ -19,10 +19,14 @@ function prefixItemsResolver({ node, key }: JsonSchemaResolverParams) {
 }
 
 export function parseItems(node: SchemaNode) {
-    const { schema, spointer } = node;
+    const { schema, evaluationPath } = node;
     if (Array.isArray(schema.prefixItems)) {
         node.prefixItems = schema.prefixItems.map((itemSchema, index) =>
-            node.compileSchema(itemSchema, `${spointer}/prefixItems/${index}`, `${node.schemaId}/prefixItems/${index}`)
+            node.compileSchema(
+                itemSchema,
+                `${evaluationPath}/prefixItems/${index}`,
+                `${node.schemaLocation}/prefixItems/${index}`
+            )
         );
     }
 }

@@ -23,13 +23,17 @@ function itemsResolver({ node, key }: JsonSchemaResolverParams) {
 }
 
 export function parseItems(node: SchemaNode) {
-    const { schema, spointer } = node;
+    const { schema, evaluationPath } = node;
     if (isObject(schema.items)) {
-        const propertyNode = node.compileSchema(schema.items, `${spointer}/items`, `${node.schemaId}/items`);
+        const propertyNode = node.compileSchema(
+            schema.items,
+            `${evaluationPath}/items`,
+            `${node.schemaLocation}/items`
+        );
         node.items = propertyNode;
     } else if (Array.isArray(schema.items)) {
         node.prefixItems = schema.items.map((itemSchema, index) =>
-            node.compileSchema(itemSchema, `${spointer}/items/${index}`, `${node.schemaId}/items/${index}`)
+            node.compileSchema(itemSchema, `${evaluationPath}/items/${index}`, `${node.schemaLocation}/items/${index}`)
         );
     }
 }

@@ -18,8 +18,8 @@ export function parseUnevaluatedProperties(node: SchemaNode) {
     }
     node.unevaluatedProperties = node.compileSchema(
         node.schema.unevaluatedProperties,
-        `${node.spointer}/unevaluatedProperties`,
-        `${node.schemaId}/unevaluatedProperties`
+        `${node.evaluationPath}/unevaluatedProperties`,
+        `${node.schemaLocation}/unevaluatedProperties`
     );
 }
 

@@ -26,7 +26,7 @@ describe("toSchemaNodes", () => {
         const nodes = toSchemaNodes(rootSchema);
 
         assert.deepEqual(nodes.length, 2);
-        assert.deepEqual(nodes[1].spointer, "#/properties/title");
+        assert.deepEqual(nodes[1].evaluationPath, "#/properties/title");
     });
 
     it("should call on each property schema", () => {
@@ -42,9 +42,9 @@ describe("toSchemaNodes", () => {
 
         assert.deepEqual(nodes.length, 3);
         assert.deepEqual(nodes[1].schema, rootSchema.schema.properties.first);
-        assert.deepEqual(nodes[1].spointer, "#/properties/first");
+        assert.deepEqual(nodes[1].evaluationPath, "#/properties/first");
         assert.deepEqual(nodes[2].schema, rootSchema.schema.properties.second);
-        assert.deepEqual(nodes[2].spointer, "#/properties/second");
+        assert.deepEqual(nodes[2].evaluationPath, "#/properties/second");
     });
 
     it("should call on each property schema if type is missing", () => {
@@ -72,9 +72,9 @@ describe("toSchemaNodes", () => {
 
         assert.deepEqual(nodes.length, 3);
         assert.deepEqual(nodes[1].schema, rootSchema.schema.items[0]);
-        assert.deepEqual(nodes[1].spointer, "#/items/0");
+        assert.deepEqual(nodes[1].evaluationPath, "#/items/0");
         assert.deepEqual(nodes[2].schema, rootSchema.schema.items[1]);
-        assert.deepEqual(nodes[2].spointer, "#/items/1");
+        assert.deepEqual(nodes[2].evaluationPath, "#/items/1");
     });
 
     it("should call on each prefixItem", () => {
@@ -87,9 +87,9 @@ describe("toSchemaNodes", () => {
 
         assert.deepEqual(nodes.length, 3);
         assert.deepEqual(nodes[1].schema, rootSchema.schema.prefixItems[0]);
-        assert.deepEqual(nodes[1].spointer, "#/prefixItems/0");
+        assert.deepEqual(nodes[1].evaluationPath, "#/prefixItems/0");
         assert.deepEqual(nodes[2].schema, rootSchema.schema.prefixItems[1]);
-        assert.deepEqual(nodes[2].spointer, "#/prefixItems/1");
+        assert.deepEqual(nodes[2].evaluationPath, "#/prefixItems/1");
     });
 
     it("should call on each item property", () => {
@@ -108,9 +108,9 @@ describe("toSchemaNodes", () => {
 
         assert.deepEqual(nodes.length, 4);
         assert.deepEqual(nodes[2].schema, rootSchema.schema.items.properties.first);
-        assert.deepEqual(nodes[2].spointer, "#/items/properties/first");
+        assert.deepEqual(nodes[2].evaluationPath, "#/items/properties/first");
         assert.deepEqual(nodes[3].schema, rootSchema.schema.items.properties.second);
-        assert.deepEqual(nodes[3].spointer, "#/items/properties/second");
+        assert.deepEqual(nodes[3].evaluationPath, "#/items/properties/second");
     });
 
     it("should call on each oneOf-schema", () => {
@@ -122,9 +122,9 @@ describe("toSchemaNodes", () => {
 
         assert.deepEqual(nodes.length, 3);
         assert.deepEqual(nodes[1].schema, rootSchema.schema.oneOf[0]);
-        assert.deepEqual(nodes[1].spointer, "#/oneOf/0");
+        assert.deepEqual(nodes[1].evaluationPath, "#/oneOf/0");
         assert.deepEqual(nodes[2].schema, rootSchema.schema.oneOf[1]);
-        assert.deepEqual(nodes[2].spointer, "#/oneOf/1");
+        assert.deepEqual(nodes[2].evaluationPath, "#/oneOf/1");
     });
 
     it("should call on each oneOf-schema in items", () => {
@@ -139,11 +139,11 @@ describe("toSchemaNodes", () => {
 
         assert.deepEqual(nodes.length, 4);
         assert.deepEqual(nodes[1].schema, rootSchema.schema.items);
-        assert.deepEqual(nodes[1].spointer, "#/items");
+        assert.deepEqual(nodes[1].evaluationPath, "#/items");
         assert.deepEqual(nodes[2].schema, rootSchema.schema.items.oneOf[0]);
-        assert.deepEqual(nodes[2].spointer, "#/items/oneOf/0");
+        assert.deepEqual(nodes[2].evaluationPath, "#/items/oneOf/0");
         assert.deepEqual(nodes[3].schema, rootSchema.schema.items.oneOf[1]);
-        assert.deepEqual(nodes[3].spointer, "#/items/oneOf/1");
+        assert.deepEqual(nodes[3].evaluationPath, "#/items/oneOf/1");
     });
 
     it("should call on each anyOf-schema", () => {
@@ -155,9 +155,9 @@ describe("toSchemaNodes", () => {
 
         assert.deepEqual(nodes.length, 3);
         assert.deepEqual(nodes[1].schema, rootSchema.schema.anyOf[0]);
-        assert.deepEqual(nodes[1].spointer, "#/anyOf/0");
+        assert.deepEqual(nodes[1].evaluationPath, "#/anyOf/0");
         assert.deepEqual(nodes[2].schema, rootSchema.schema.anyOf[1]);
-        assert.deepEqual(nodes[2].spointer, "#/anyOf/1");
+        assert.deepEqual(nodes[2].evaluationPath, "#/anyOf/1");
     });
 
     it("should call on each allOf-schema", () => {

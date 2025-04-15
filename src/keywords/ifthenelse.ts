@@ -14,15 +14,15 @@ export const ifKeyword: Keyword = {
 };
 
 export function parseIfThenElse(node: SchemaNode) {
-    const { schema, spointer } = node;
+    const { schema, evaluationPath } = node;
     if (schema.if != null) {
-        node.if = node.compileSchema(schema.if, `${spointer}/if`);
+        node.if = node.compileSchema(schema.if, `${evaluationPath}/if`);
     }
     if (schema.then != null) {
-        node.then = node.compileSchema(schema.then, `${spointer}/then`);
+        node.then = node.compileSchema(schema.then, `${evaluationPath}/then`);
     }
     if (schema.else != null) {
-        node.else = node.compileSchema(schema.else, `${spointer}/else`);
+        node.else = node.compileSchema(schema.else, `${evaluationPath}/else`);
     }
 }
 
@@ -41,7 +41,12 @@ function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
                 const dynamicId = nestedDynamicId === "" ? `(then)` : nestedDynamicId;
 
                 const schema = mergeSchema(node.then.schema, schemaNode.schema, "if", "then", "else");
-                return node.compileSchema(schema, node.then.spointer, node.schemaId, `${node.schemaId}${dynamicId}`);
+                return node.compileSchema(
+                    schema,
+                    node.then.evaluationPath,
+                    node.schemaLocation,
+                    `${node.schemaLocation}${dynamicId}`
+                );
             }
         }
     } else if (node.else) {
@@ -51,7 +56,12 @@ function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
             const dynamicId = nestedDynamicId === "" ? `(else)` : nestedDynamicId;
 
             const schema = mergeSchema(node.else.schema, schemaNode.schema, "if", "then", "else");
-            return node.compileSchema(schema, node.else.spointer, node.schemaId, `${node.schemaId}${dynamicId}`);
+            return node.compileSchema(
+                schema,
+                node.else.evaluationPath,
+                node.schemaLocation,
+                `${node.schemaLocation}${dynamicId}`
+            );
         }
     }
     return undefined;

@@ -112,12 +112,12 @@ const titleData = titleNode?.getData();
 
 ```ts
 const titleNode = compileSchema(mySchema).getNode("#/image/title");
-console.log(titleNode.spointer); // #/properties/image/properties/title
-console.log(titleNode.schemaId); // #/properties/image/properties/title
+console.log(titleNode.evaluationPath); // #/properties/image/properties/title
+console.log(titleNode.schemaLocation); // #/properties/image/properties/title
 ```
 
--   `spointer` refers to the path in schema and is extended by `$ref`, e.g. if image is defined on `$defs`: `#/properties/image/$ref/properties/title`
--   `schemaId` refers to the absolute path within the schema and will not change, e.g. `#/$defs/properties/title`
+-   `evaluationPath` refers to the path in schema and is extended by `$ref`, e.g. if image is defined on `$defs`: `#/properties/image/$ref/properties/title`
+-   `schemaLocation` refers to the absolute path within the schema and will not change, e.g. `#/$defs/properties/title`
 
 </details>
 
@@ -1097,9 +1097,9 @@ export const notKeyword: Keyword = {
 };
 
 export function parseNot(node: SchemaNode) {
-    const { schema, spointer, schemaId } = node;
+    const { schema, evaluationPath, schemaLocation } = node;
     if (schema.not != null) {
-        node.not = node.compileSchema(schema.not, `${spointer}/not`, `${schemaId}/not`);
+        node.not = node.compileSchema(schema.not, `${evaluationPath}/not`, `${schemaLocation}/not`);
     }
 }
 ```
@@ -1147,7 +1147,7 @@ export const typeKeyword: Keyword = {
 function reduceType({ node, pointer, data }: JsonSchemaReducerParams): undefined | SchemaNode {
     const dataType = getJsonSchemaType(data, node.schema.type);
     if (dataType !== "undefined" && Array.isArray(node.schema.type) && node.schema.type.includes(dataType)) {
-        return node.compileSchema({ ...node.schema, pointer, type: dataType }, node.spointer);
+        return node.compileSchema({ ...node.schema, pointer, type: dataType }, node.evaluationPath);
     }
     return undefined;
 }

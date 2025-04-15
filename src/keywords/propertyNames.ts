@@ -20,8 +20,8 @@ export function parsePropertyNames(node: SchemaNode) {
     if (isObject(propertyNames)) {
         node.propertyNames = node.compileSchema(
             propertyNames,
-            `${node.spointer}/propertyNames`,
-            `${node.schemaId}/propertyNames`
+            `${node.evaluationPath}/propertyNames`,
+            `${node.schemaLocation}/propertyNames`
         );
     }
 }

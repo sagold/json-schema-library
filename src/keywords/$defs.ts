@@ -1,7 +1,7 @@
 import { Keyword } from "../Keyword";
 import { SchemaNode } from "../types";
 
-// @todo this should be done with every added property in spointer
+// @todo this should be done with every added property in evaluationPath
 // @todo this creates a mixed schema, where $defs, etc are not uri-encoded (would be %24defs)
 function urlEncodeJsonPointerProperty(property: string) {
     property = property.replace(/~/g, "~0");
@@ -21,8 +21,8 @@ export function parseDefs(node: SchemaNode) {
         Object.keys(node.schema.$defs).forEach((property) => {
             node.$defs[property] = node.compileSchema(
                 node.schema.$defs[property],
-                `${node.spointer}/$defs/${urlEncodeJsonPointerProperty(property)}`,
-                `${node.schemaId}/$defs/${property}`
+                `${node.evaluationPath}/$defs/${urlEncodeJsonPointerProperty(property)}`,
+                `${node.schemaLocation}/$defs/${property}`
             );
         });
     }
@@ -31,8 +31,8 @@ export function parseDefs(node: SchemaNode) {
         Object.keys(node.schema.definitions).forEach((property) => {
             node.$defs[property] = node.compileSchema(
                 node.schema.definitions[property],
-                `${node.spointer}/definitions/${urlEncodeJsonPointerProperty(property)}`,
-                `${node.schemaId}/definitions/${urlEncodeJsonPointerProperty(property)}`
+                `${node.evaluationPath}/definitions/${urlEncodeJsonPointerProperty(property)}`,
+                `${node.schemaLocation}/definitions/${urlEncodeJsonPointerProperty(property)}`
             );
         });
     }

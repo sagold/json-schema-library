@@ -11,9 +11,9 @@ export const notKeyword: Keyword = {
 };
 
 export function parseNot(node: SchemaNode) {
-    const { schema, spointer, schemaId } = node;
+    const { schema, evaluationPath, schemaLocation } = node;
     if (schema.not != null) {
-        node.not = node.compileSchema(schema.not, `${spointer}/not`, `${schemaId}/not`);
+        node.not = node.compileSchema(schema.not, `${evaluationPath}/not`, `${schemaLocation}/not`);
     }
 }
 

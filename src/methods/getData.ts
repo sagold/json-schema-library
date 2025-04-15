@@ -37,7 +37,7 @@ function safeResolveRef(node: SchemaNode, options: TemplateOptions) {
     }
     const { cache, recursionLimit = 1 } = options;
 
-    const origin = node.schemaId;
+    const origin = node.schemaLocation;
     cache[origin] = cache[origin] ?? {};
     cache[origin][node.$ref] = cache[origin][node.$ref] ?? 0;
     const value = cache[origin][node.$ref];
@@ -55,7 +55,7 @@ function safeResolveRef(node: SchemaNode, options: TemplateOptions) {
 }
 
 function canResolveRef(node: SchemaNode, options: TemplateOptions) {
-    const counter = options.cache?.[node.schemaId]?.[node.$ref] ?? -1;
+    const counter = options.cache?.[node.schemaLocation]?.[node.$ref] ?? -1;
     return counter < options.recursionLimit;
 }
 

@@ -23,12 +23,12 @@ export const additionalPropertiesKeyword: Keyword = {
 
 // must come as last resolver
 export function parseAdditionalProperties(node: SchemaNode) {
-    const { schema, spointer, schemaId } = node;
+    const { schema, evaluationPath, schemaLocation } = node;
     if (isObject(schema.additionalProperties)) {
         node.additionalProperties = node.compileSchema(
             schema.additionalProperties,
-            `${spointer}/additionalProperties`,
-            `${schemaId}/additionalProperties`
+            `${evaluationPath}/additionalProperties`,
+            `${schemaLocation}/additionalProperties`
         );
     }
 }

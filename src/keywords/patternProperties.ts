@@ -37,8 +37,8 @@ export function parsePatternProperties(node: SchemaNode) {
         pattern: new RegExp(pattern, "u"),
         node: node.compileSchema(
             schema.patternProperties[pattern],
-            `${node.spointer}/patternProperties/${pattern}`,
-            `${node.schemaId}/patternProperties/${pattern}`
+            `${node.evaluationPath}/patternProperties/${pattern}`,
+            `${node.schemaLocation}/patternProperties/${pattern}`
         )
     }));
 }
@@ -59,7 +59,7 @@ function reducePatternProperties({ node, data, key }: JsonSchemaReducerParams) {
         dataProperties.push(`${key}`);
     }
 
-    let dynamicId = `${node.schemaId}(`;
+    let dynamicId = `${node.schemaLocation}(`;
     dataProperties.push(...Object.keys(node.schema.properties ?? {}));
     dataProperties.forEach((propertyName, index, list) => {
         if (list.indexOf(propertyName) !== index) {
@@ -82,7 +82,7 @@ function reducePatternProperties({ node, data, key }: JsonSchemaReducerParams) {
     }
 
     mergedSchema = mergeSchema(node.schema, mergedSchema, "patternProperties");
-    return node.compileSchema(mergedSchema, node.spointer, node.schemaId, `${dynamicId})`);
+    return node.compileSchema(mergedSchema, node.evaluationPath, node.schemaLocation, `${dynamicId})`);
 }
 
 function validatePatternProperties({ node, data, pointer, path }: JsonSchemaValidatorParams) {

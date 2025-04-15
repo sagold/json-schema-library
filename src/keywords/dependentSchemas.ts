@@ -31,8 +31,8 @@ export function parseDependentSchemas(node: SchemaNode) {
         if (isObject(schema)) {
             node.dependentSchemas[property] = node.compileSchema(
                 schema,
-                `${node.spointer}/dependentSchemas/${property}`,
-                `${node.schemaId}/dependentSchemas/${property}`
+                `${node.evaluationPath}/dependentSchemas/${property}`,
+                `${node.schemaLocation}/dependentSchemas/${property}`
             );
         } else if (typeof schema === "boolean") {
             node.dependentSchemas[property] = schema;
@@ -49,7 +49,7 @@ export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) 
     let mergedSchema: JsonSchema;
     const { dependentSchemas } = node;
     let added = 0;
-    let dynamicId = `${node.schemaId}(`;
+    let dynamicId = `${node.schemaLocation}(`;
     Object.keys(data).forEach((propertyName) => {
         if (dependentSchemas[propertyName] == null) {
             return;
@@ -69,7 +69,7 @@ export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) 
     }
 
     mergedSchema = mergeSchema(node.schema, mergedSchema, "dependentSchemas");
-    return node.compileSchema(mergedSchema, node.spointer, node.schemaId, `${dynamicId})`);
+    return node.compileSchema(mergedSchema, node.evaluationPath, node.schemaLocation, `${dynamicId})`);
 }
 
 export function validateDependentSchemas({ node, data, pointer, path }: JsonSchemaValidatorParams) {

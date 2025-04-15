@@ -23,8 +23,8 @@ export function parseUnevaluatedItems(node: SchemaNode) {
     }
     node.unevaluatedItems = node.compileSchema(
         node.schema.unevaluatedItems,
-        `${node.spointer}/unevaluatedItems`,
-        `${node.schemaId}/unevaluatedItems`
+        `${node.evaluationPath}/unevaluatedItems`,
+        `${node.schemaLocation}/unevaluatedItems`
     );
 }
 
