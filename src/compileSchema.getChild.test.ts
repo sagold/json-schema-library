@@ -14,7 +14,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema node");
 
-            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
+            assert.deepEqual(node?.schema, { type: "string", minLength: 1 });
         });
 
         it("should return node of property even it type differs", () => {
@@ -27,7 +27,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema node");
 
-            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
+            assert.deepEqual(node?.schema, { type: "string", minLength: 1 });
         });
 
         it("should return undefined if property is not defined, but allowed", () => {
@@ -61,7 +61,7 @@ describe("compileSchema : getNodeChild", () => {
                 }
             }).getNodeChild("title", { body: "abc" });
 
-            assert.deepEqual(node.schema, { type: "string", allOf: [{ minLength: 1 }] });
+            assert.deepEqual(node?.schema, { type: "string", allOf: [{ minLength: 1 }] });
         });
 
         it("should reduce parent schema for returned property", () => {
@@ -79,7 +79,7 @@ describe("compileSchema : getNodeChild", () => {
                 ]
             }).getNodeChild("title", { body: "abc" });
 
-            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
+            assert.deepEqual(node?.schema, { type: "string", minLength: 1 });
         });
     });
 
@@ -91,7 +91,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { anyOf: [{ multipleOf: 2 }, { multipleOf: 3 }] });
+            assert.deepEqual(node?.schema, { anyOf: [{ multipleOf: 2 }, { multipleOf: 3 }] });
         });
     });
 
@@ -107,7 +107,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { type: "string", maxLength: 3 });
+            assert.deepEqual(node?.schema, { type: "string", maxLength: 3 });
         });
 
         it("should reduce parent if-else schema when returning node", () => {
@@ -121,7 +121,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { type: "string", minLength: 4 });
+            assert.deepEqual(node?.schema, { type: "string", minLength: 4 });
         });
 
         it("should reduce parent anyOf schema when returning property node", () => {
@@ -133,7 +133,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
+            assert.deepEqual(node?.schema, { type: "string", minLength: 1 });
         });
 
         it("should reduce all matching parent anyOf schema when returning property node", () => {
@@ -145,7 +145,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { type: "string", minLength: 1, maxLength: 1 });
+            assert.deepEqual(node?.schema, { type: "string", minLength: 1, maxLength: 1 });
         });
 
         it("should reduce all allOf schema when returning property node", () => {
@@ -157,7 +157,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { type: "string", minLength: 1, maxLength: 1 });
+            assert.deepEqual(node?.schema, { type: "string", minLength: 1, maxLength: 1 });
         });
 
         it("should reduce matching oneOf schema when returning property node", () => {
@@ -169,7 +169,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { type: "string", maxLength: 1 });
+            assert.deepEqual(node?.schema, { type: "string", maxLength: 1 });
         });
 
         it("should return matching oneOf schema with `additionalProperties=false`", () => {
@@ -181,7 +181,7 @@ describe("compileSchema : getNodeChild", () => {
             }).getNodeChild("title", { title: "" });
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { type: "string" });
+            assert.deepEqual(node?.schema, { type: "string" });
         });
 
         it("should return error when multiple oneOf-items match", () => {
@@ -216,7 +216,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
+            assert.deepEqual(node?.schema, { type: "string", minLength: 1 });
         });
 
         it("should get merged property from patternProperties", () => {
@@ -228,7 +228,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { type: "string", minLength: 1, maxLength: 3 });
+            assert.deepEqual(node?.schema, { type: "string", minLength: 1, maxLength: 3 });
         });
 
         it("should get property from merged allOf schema", () => {
@@ -239,7 +239,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { type: "string", minLength: 1 });
+            assert.deepEqual(node?.schema, { type: "string", minLength: 1 });
         });
 
         it("should return combined allOf schema", () => {
@@ -260,7 +260,7 @@ describe("compileSchema : getNodeChild", () => {
 
             const { node } = res.reduceNode({ trigger: true });
 
-            assert.deepEqual(node.schema, {
+            assert.deepEqual(node?.schema, {
                 type: "object",
                 properties: {
                     trigger: { type: "boolean" },
@@ -281,7 +281,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { type: "number", minimum: 1 });
+            assert.deepEqual(node?.schema, { type: "number", minimum: 1 });
         });
 
         it("should get property from matching oneOf schema", () => {
@@ -295,7 +295,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { type: "string", minLength: 2 });
+            assert.deepEqual(node?.schema, { type: "string", minLength: 2 });
         });
 
         it("should return `undefined` for valid oneOf property missing the property", () => {
@@ -320,7 +320,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { type: "string", maxLength: 2 });
+            assert.deepEqual(node?.schema, { type: "string", maxLength: 2 });
         });
 
         it("should get property from else schema", () => {
@@ -333,7 +333,7 @@ describe("compileSchema : getNodeChild", () => {
 
             assert(isSchemaNode(node), "should have returned a valid schema property node");
 
-            assert.deepEqual(node.schema, { type: "number", minimum: 1 });
+            assert.deepEqual(node?.schema, { type: "number", minimum: 1 });
         });
     });
 
@@ -372,7 +372,7 @@ describe("step", () => {
                 }
             }).getNodeChild("title");
 
-            assert.deepEqual(node.schema, { type: "string" });
+            assert.deepEqual(node?.schema, { type: "string" });
         });
 
         it("should return error undefined for undefined schema", () => {
@@ -445,7 +445,7 @@ describe("step", () => {
                     { type: "object", properties: { title: { type: "number" } } }
                 ]
             }).getNodeChild("title", { title: 4 });
-            assert.deepEqual(node.schema, { type: "number" });
+            assert.deepEqual(node?.schema, { type: "number" });
         });
 
         it("should return matching oneOf, for objects missing properties", () => {
@@ -455,7 +455,7 @@ describe("step", () => {
                     { type: "object", additionalProperties: { type: "number" } }
                 ]
             }).getNodeChild("title", { title: 4, test: 2 });
-            assert.deepEqual(node.schema, { type: "number" });
+            assert.deepEqual(node?.schema, { type: "number" });
         });
 
         it("should return matching anyOf", () => {
@@ -466,7 +466,7 @@ describe("step", () => {
                 ]
             }).getNodeChild("title", { title: 4, test: 2 });
 
-            assert.deepEqual(node.schema, { type: "number" });
+            assert.deepEqual(node?.schema, { type: "number" });
         });
 
         it("should return combined anyOf schema", () => {
@@ -478,7 +478,7 @@ describe("step", () => {
                 ]
             }).getNodeChild("title", { title: 4, test: 2 });
 
-            assert.deepEqual(node.schema, { type: "number", minimum: 2 });
+            assert.deepEqual(node?.schema, { type: "number", minimum: 2 });
         });
 
         it("should resolve references from anyOf schema", () => {
@@ -495,7 +495,7 @@ describe("step", () => {
                 ]
             }).getNodeChild("title", { title: 4, test: 2 });
 
-            assert.deepEqual(node.schema, { type: "number", minimum: 2 });
+            assert.deepEqual(node?.schema, { type: "number", minimum: 2 });
         });
 
         it("should return matching allOf schema", () => {
@@ -503,7 +503,7 @@ describe("step", () => {
                 allOf: [{ type: "object" }, { additionalProperties: { type: "number" } }]
             }).getNodeChild("title", { title: 4, test: 2 });
 
-            assert.deepEqual(node.schema, { type: "number" });
+            assert.deepEqual(node?.schema, { type: "number" });
         });
 
         it("should resolve references in allOf schema", () => {
@@ -515,7 +515,7 @@ describe("step", () => {
                 allOf: [{ $ref: "#/definitions/object" }, { $ref: "#/definitions/additionalNumber" }]
             }).getNodeChild("title", { title: 4, test: 2 });
 
-            assert.deepEqual(node.schema, { type: "number" });
+            assert.deepEqual(node?.schema, { type: "number" });
         });
 
         it("should return matching patternProperty", () => {
@@ -527,7 +527,7 @@ describe("step", () => {
                 }
             }).getNodeChild("second");
 
-            assert.deepEqual(node.schema, { type: "string", id: "second" });
+            assert.deepEqual(node?.schema, { type: "string", id: "second" });
         });
 
         it("should return additionalProperties schema for not matching patternProperty", () => {
@@ -540,7 +540,7 @@ describe("step", () => {
                 additionalProperties: { type: "object" }
             }).getNodeChild("third");
 
-            assert.deepEqual(node.schema, { type: "object" });
+            assert.deepEqual(node?.schema, { type: "object" });
         });
     });
 
@@ -558,16 +558,16 @@ describe("step", () => {
                 type: "array",
                 items: { type: "string" }
             }).getNodeChild(0);
-            assert.deepEqual(node.schema, { type: "string" });
+            assert.deepEqual(node?.schema, { type: "string" });
         });
 
         it("should return item at index", () => {
-            const { node, error } = compileSchema({
+            const { node } = compileSchema({
                 type: "array",
                 prefixItems: [{ type: "string" }, { type: "number" }, { type: "boolean" }]
             }).getNodeChild(1, ["3", 2]);
 
-            assert.deepEqual(node.schema, { type: "number" });
+            assert.deepEqual(node?.schema, { type: "number" });
         });
 
         it("should return matching item in oneOf", () => {
@@ -583,7 +583,7 @@ describe("step", () => {
 
             const { node } = res.reduceNode({ title: 2 });
 
-            assert.deepEqual(node.schema, {
+            assert.deepEqual(node?.schema, {
                 type: "object",
                 properties: { title: { type: "number" } }
             });
@@ -599,9 +599,10 @@ describe("step", () => {
                 }
             }).getNodeChild(1, [{ title: "two" }, { title: 4 }]);
 
+            assert(res, "should have returned node");
             const { node } = res.reduceNode({ title: 4 });
 
-            assert.deepEqual(node.schema, { type: "object", properties: { title: { type: "number" } } });
+            assert.deepEqual(node?.schema, { type: "object", properties: { title: { type: "number" } } });
         });
 
         it("should return combined anyOf schema", () => {
@@ -615,9 +616,10 @@ describe("step", () => {
                 }
             }).getNodeChild(1, [{ title: "two" }, { title: 4 }]);
 
+            assert(res, "should have returned node");
             const { node } = res.reduceNode({ title: 4 });
 
-            assert.deepEqual(node.schema, { type: "object", properties: { title: { type: "number", minimum: 2 } } });
+            assert.deepEqual(node?.schema, { type: "object", properties: { title: { type: "number", minimum: 2 } } });
         });
 
         it("should return combined allOf schema", () => {
@@ -630,9 +632,10 @@ describe("step", () => {
                 }
             }).getNodeChild(1, [{ title: "two" }, { title: 4 }]);
 
+            assert(res, "should have returned node");
             const { node } = res.reduceNode({ title: "two" });
 
-            assert.deepEqual(node.schema, {
+            assert.deepEqual(node?.schema, {
                 type: "object",
                 properties: { title: { type: "number", minimum: 3 } }
             });

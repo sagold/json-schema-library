@@ -2,7 +2,6 @@ import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
 import { Draft, JsonError, SchemaNode } from "./types";
 import { draft2020 } from "./draft2020";
-import { ValidationResult } from "./Keyword";
 
 describe("compileSchema.validate", () => {
     describe("integer", () => {
