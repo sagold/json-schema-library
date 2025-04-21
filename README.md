@@ -16,7 +16,7 @@
 
 ---
 
-> ⚠️ This **documentation** refers to the upcoming release **version 10**, which can be installed by `npm install json-schema-library@10.0.0-rc12`. For the latest release please refer to the **[documentation of version 9.3.5](https://github.com/sagold/json-schema-library/tree/v9.3.5)**. If you are on v10-rc refer to [documentation of version 10.0.0-rc8 or lower](https://github.com/sagold/json-schema-library/tree/v10.0.0-rc8)
+> ⚠️ This **documentation** refers to the upcoming release **version 10**, which can be installed by `npm install json-schema-library@10.0.0-rc13`. For the latest release please refer to the **[documentation of version 9.3.5](https://github.com/sagold/json-schema-library/tree/v9.3.5)**. If you are on v10-rc refer to [documentation of version 10.0.0-rc8 or lower](https://github.com/sagold/json-schema-library/tree/v10.0.0-rc8)
 
 **Quick start**
 
@@ -1214,7 +1214,7 @@ const myDraft = extendDraft(draft2020, {
 });
 ```
 
-### errors
+### errorMessages
 
 You can set custom errors messages locally by using the errors-keyword:
 
