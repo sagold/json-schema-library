@@ -78,9 +78,10 @@ export const SchemaNodeMethods = {
         return node;
     },
     createError(code, data, message) {
+        var _a, _b, _c;
         let errorMessage = message;
         if (errorMessage === undefined) {
-            const error = this.context.errors[code];
+            const error = (_c = (_b = (_a = this.schema) === null || _a === void 0 ? void 0 : _a.errorMessages) === null || _b === void 0 ? void 0 : _b[code]) !== null && _c !== void 0 ? _c : this.context.errors[code];
             if (typeof error === "function") {
                 return error(data);
             }
