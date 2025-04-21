@@ -1004,3 +1004,35 @@ describe("compileSchema.validate - errorsAsync", () => {
         });
     });
 });
+
+describe("compileSchema.validate - custom errors", () => {
+    it("should return custom error message for minItems", () => {
+        const { errors } = compileSchema({
+            type: "array",
+            minItems: 2,
+            errorMessages: {
+                "min-items-error": "Custom error {{minItems}}"
+            }
+        }).validate([1]);
+        assert.deepEqual(errors.length, 1);
+        assert.deepEqual(errors[0].message, "Custom error 2");
+    });
+
+    it("should return custom error for oneOf-error", () => {
+        const { errors } = compileSchema({
+            type: "array",
+            items: {
+                errorMessages: {
+                    "one-of-error": "{{value}} does not match any of the options"
+                },
+                oneOf: [
+                    { type: "number" },
+                    { type: "object", properties: { a: { type: "string" } }, additionalProperties: false }
+                ]
+            },
+            additionalItems: false
+        }).validate([100, { a: "correct", b: "not correct" }]);
+        assert.deepEqual(errors.length, 1);
+        assert.deepEqual(errors[0].message, '{"a":"correct","b":"not correct"} does not match any of the options');
+    });
+});

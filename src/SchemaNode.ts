@@ -221,7 +221,7 @@ export const SchemaNodeMethods = {
     createError<T extends string = DefaultErrors>(code: T, data: ErrorData, message?: string): JsonError {
         let errorMessage = message;
         if (errorMessage === undefined) {
-            const error = this.context.errors[code];
+            const error = this.schema?.errorMessages?.[code] ?? this.context.errors[code];
             if (typeof error === "function") {
                 return error(data);
             }

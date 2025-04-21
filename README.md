@@ -1214,6 +1214,22 @@ const myDraft = extendDraft(draft2020, {
 });
 ```
 
+### errors
+
+You can set custom errors messages locally by using the errors-keyword:
+
+```ts
+const { errors } = compileSchema({
+    type: "array",
+    minItems: 2,
+    errorMessages: {
+        "min-items-error": "Custom error {{minItems}}"
+    }
+}).validate([1]);
+
+assert.deepEqual(errors[0].message, "Custom error 2");
+```
+
 ## Breaking Changes
 
 ### v10.0.0
