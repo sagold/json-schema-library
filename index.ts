@@ -20,6 +20,7 @@ export { draft04 } from "./src/draft04";
 export { draft06 } from "./src/draft06";
 export { draft07 } from "./src/draft07";
 export { draft2019 } from "./src/draft2019";
+export { draft2020 } from "./src/draft2020";
 export { draftEditor } from "./src/draftEditor";
 
 // keywords
@@ -36,6 +37,7 @@ export { isJsonError, isSchemaNode } from "./src/types";
 export { extendDraft, addKeywords } from "./src/Draft";
 export { mergeNode } from "./src/mergeNode";
 export { mergeSchema } from "./src/utils/mergeSchema";
+export { getSchemaType } from "./src/utils/getSchemaType";
 
 // remotes
 export { remotes } from "./remotes";

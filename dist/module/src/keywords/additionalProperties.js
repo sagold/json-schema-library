@@ -40,6 +40,14 @@ function additionalPropertyResolver({ node, data, key }) {
         });
     }
 }
+/**
+ * @additionalProperties only checks properties and additionalProperties
+ *
+ * The additionalProperties keyword is used to control the handling of extra stuff, that is,
+ * properties whose names are not listed in the properties keyword or match any of the regular
+ * expressions in the patternProperties keyword. By default any additional properties are allowed.
+ * https://json-schema.org/understanding-json-schema/reference/object
+ */
 function validateAdditionalProperty({ node, data, pointer = "#", path }) {
     if (!isObject(data)) {
         return;
