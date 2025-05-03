@@ -145,5 +145,6 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefined {
         // console.error("REF: UNFOUND 2", $ref);
         return undefined;
     }
-    console.error("REF: UNHANDLED", $ref);
+
+    console.error("REF: INVALID", $ref);
 }

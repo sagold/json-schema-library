@@ -79,4 +79,12 @@ describe("joinId", () => {
 
         assert.equal(url, "https://example.com/absref/foobar.json");
     });
+
+    it("should ignore relative origin when next id starts with fragment url", () => {
+        // there is a bug joining multiple fragments to e.g. #/base#/examples/0
+        // from "$id": "/base" +  $ref "#/examples/0" (in refOfUnknownKeyword spec)
+        const url = joinId("/base", "#/examples/0");
+
+        assert.equal(url, "#/examples/0");
+    });
 });

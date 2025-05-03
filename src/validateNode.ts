@@ -1,10 +1,10 @@
-import { JsonSchema, SchemaNode } from "./types";
+import { BooleanSchema, JsonSchema, SchemaNode } from "./types";
 import { ValidationPath, ValidationResult } from "./Keyword";
 import sanitizeErrors from "./utils/sanitizeErrors";
 
 export function validateNode(node: SchemaNode, data: unknown, pointer: string, path?: ValidationPath) {
     path?.push({ pointer, node });
-    const schema = node.schema as boolean | JsonSchema;
+    const schema = node.schema as BooleanSchema | JsonSchema;
     if (schema === true) {
         return [];
     }

@@ -1,6 +1,6 @@
 import { getTypeOf } from "./getTypeOf";
 import { isObject } from "../utils/isObject";
-import { SchemaNode } from "../types";
+import { BooleanSchema, JsonSchema, SchemaNode } from "../types";
 
 export const SCHEMA_TYPES = ["string", "number", "integer", "boolean", "null", "array", "object"];
 const OBJECT_PROPERTIES = [
@@ -45,22 +45,22 @@ const ARRAY_PROPERTIES = [
  */
 export function getSchemaType(node: SchemaNode, data: unknown): keyof typeof SCHEMA_TYPES | undefined {
     const dataType = getTypeOf(data);
-    // @ts-expect-error boolean schema true
-    if (node.schema === true) {
+    const schema = node.schema as JsonSchema | BooleanSchema;
+    if (schema === true) {
         return SCHEMA_TYPES.includes(dataType) ? (dataType as keyof typeof SCHEMA_TYPES) : undefined;
     }
     // boolean schema false or invalid schema
-    if (!isObject(node.schema)) {
+    if (!isObject(schema)) {
         return undefined;
     }
-    const schemaType = node.schema.type;
+    const schemaType = schema.type;
 
     // type: []
     if (Array.isArray(schemaType)) {
         if (schemaType.includes(dataType)) {
             return dataType as keyof typeof SCHEMA_TYPES;
         }
-        const defaultType = getTypeOf(node.schema.default);
+        const defaultType = getTypeOf(schema.default);
         if (schemaType.includes(defaultType)) {
             return defaultType as keyof typeof SCHEMA_TYPES;
         }
@@ -73,13 +73,13 @@ export function getSchemaType(node: SchemaNode, data: unknown): keyof typeof SCH
     }
 
     // type: undefined, enum: []
-    if (Array.isArray(node.schema.enum)) {
-        const schemaEnum: unknown[] = node.schema.enum;
+    if (Array.isArray(schema.enum)) {
+        const schemaEnum: unknown[] = schema.enum;
         const enumSchemaType = schemaEnum.map((value) => getTypeOf(value)).filter((p, i, l) => l.indexOf(p) === i);
         if (enumSchemaType.includes(dataType)) {
             return dataType as keyof typeof SCHEMA_TYPES;
         }
-        const defaultType = getTypeOf(node.schema.default);
+        const defaultType = getTypeOf(schema.default);
         if (enumSchemaType.includes(defaultType)) {
             return defaultType as keyof typeof SCHEMA_TYPES;
         }

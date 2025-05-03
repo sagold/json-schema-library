@@ -6,7 +6,7 @@ import { draft07 } from "./draft07";
 import { draft2019 } from "./draft2019";
 import { draft2020 } from "./draft2020";
 import { pick } from "./utils/pick";
-import { JsonSchema, Draft } from "./types";
+import { JsonSchema, Draft, BooleanSchema } from "./types";
 import { TemplateOptions } from "./methods/getData";
 import { SchemaNode, SchemaNodeMethods, addKeywords, isSchemaNode } from "./SchemaNode";
 
@@ -29,7 +29,6 @@ function getDraft(drafts: Draft[], $schema: string) {
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
 export function compileSchema(schema: JsonSchema, options: CompileOptions = {}) {
-    /** @todo this option has to be passed to all drafts (remotes) */
     let formatAssertion = options.formatAssertion ?? true;
     const drafts = options.drafts ?? defaultDrafts;
     const draft = getDraft(drafts, schema?.$schema);

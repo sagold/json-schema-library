@@ -309,7 +309,6 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
         // @ts-expect-error asd
         if ((node.items && canResolveRef(node.items, opts)) || data?.length > 0) {
             // @attention this should disable cache or break intended behaviour as we reset it after loop
-            // @todo test recursion of items
             // intention: reset cache after each property. last call will add counters
             const cache = { ...opts.cache };
             for (let i = 0, l = Math.max(minItems, d.length); i < l; i += 1) {

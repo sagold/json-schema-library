@@ -1,14 +1,6 @@
 import { Keyword } from "../Keyword";
 import { SchemaNode } from "../types";
 
-// @todo this should be done with every added property in evaluationPath
-// @todo this creates a mixed schema, where $defs, etc are not uri-encoded (would be %24defs)
-function urlEncodeJsonPointerProperty(property: string) {
-    property = property.replace(/~/g, "~0");
-    property = property.replace(/\//g, "~1");
-    return encodeURIComponent(property);
-}
-
 export const $defsKeyword: Keyword = {
     id: "$defs",
     keyword: "$defs",
@@ -36,4 +28,10 @@ export function parseDefs(node: SchemaNode) {
             );
         });
     }
+}
+
+function urlEncodeJsonPointerProperty(property: string) {
+    property = property.replace(/~/g, "~0");
+    property = property.replace(/\//g, "~1");
+    return encodeURIComponent(property);
 }

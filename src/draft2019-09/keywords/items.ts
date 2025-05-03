@@ -57,7 +57,6 @@ function validateItems({ node, data, pointer = "#", path }: JsonSchemaValidatorP
         // note: schema is valid when data does not have enough elements as defined by array-list
         for (let i = 0; i < Math.min(node.prefixItems.length, data.length); i += 1) {
             const itemData = data[i];
-            // @todo v1 reevaluate: incomplete schema is created here?
             const itemNode = node.prefixItems[i];
             const result = validateNode(itemNode, itemData, `${pointer}/${i}`, path);
             errors.push(...result);
