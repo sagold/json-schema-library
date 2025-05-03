@@ -19,7 +19,6 @@ function getDraft(drafts, $schema) {
  */
 export function compileSchema(schema, options = {}) {
     var _a, _b, _c, _d, _e;
-    /** @todo this option has to be passed to all drafts (remotes) */
     let formatAssertion = (_a = options.formatAssertion) !== null && _a !== void 0 ? _a : true;
     const drafts = (_b = options.drafts) !== null && _b !== void 0 ? _b : defaultDrafts;
     const draft = getDraft(drafts, schema === null || schema === void 0 ? void 0 : schema.$schema);

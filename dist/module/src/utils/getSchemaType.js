@@ -42,21 +42,21 @@ const ARRAY_PROPERTIES = [
  */
 export function getSchemaType(node, data) {
     const dataType = getTypeOf(data);
-    // @ts-expect-error boolean schema true
-    if (node.schema === true) {
+    const schema = node.schema;
+    if (schema === true) {
         return SCHEMA_TYPES.includes(dataType) ? dataType : undefined;
     }
     // boolean schema false or invalid schema
-    if (!isObject(node.schema)) {
+    if (!isObject(schema)) {
         return undefined;
     }
-    const schemaType = node.schema.type;
+    const schemaType = schema.type;
     // type: []
     if (Array.isArray(schemaType)) {
         if (schemaType.includes(dataType)) {
             return dataType;
         }
-        const defaultType = getTypeOf(node.schema.default);
+        const defaultType = getTypeOf(schema.default);
         if (schemaType.includes(defaultType)) {
             return defaultType;
         }
@@ -67,13 +67,13 @@ export function getSchemaType(node, data) {
         return schemaType;
     }
     // type: undefined, enum: []
-    if (Array.isArray(node.schema.enum)) {
-        const schemaEnum = node.schema.enum;
+    if (Array.isArray(schema.enum)) {
+        const schemaEnum = schema.enum;
         const enumSchemaType = schemaEnum.map((value) => getTypeOf(value)).filter((p, i, l) => l.indexOf(p) === i);
         if (enumSchemaType.includes(dataType)) {
             return dataType;
         }
-        const defaultType = getTypeOf(node.schema.default);
+        const defaultType = getTypeOf(schema.default);
         if (enumSchemaType.includes(defaultType)) {
             return defaultType;
         }

@@ -19,6 +19,9 @@ function _joinScope(previous, id) {
         return id.replace(trailingHash, "");
     }
     if (id[0] === "#") {
+        if (previous[0] === "/") {
+            return id;
+        }
         return `${previous.replace(idAndPointer, "")}${id.replace(suffixes, "")}`;
     }
     if (isDomain.test(id)) {

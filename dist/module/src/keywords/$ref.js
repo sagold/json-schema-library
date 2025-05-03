@@ -136,7 +136,6 @@ function compileNext(referencedNode, evaluationPath = referencedNode.evaluationP
     return referencedNode.compileSchema(referencedSchema, `${evaluationPath}/$ref`, referencedNode.schemaLocation);
 }
 export function getRef(node, $ref = node === null || node === void 0 ? void 0 : node.$ref) {
-    var _a;
     if ($ref == null) {
         return node;
     }
@@ -166,14 +165,11 @@ export function getRef(node, $ref = node === null || node === void 0 ? void 0 : 
             return compileNext(node.context.remotes[$ref], node.evaluationPath);
         }
         if ($ref[0] === "#") {
-            // @todo there is a bug joining multiple fragments to e.g. #/base#/examples/0
-            // from "$id": "/base" +  $ref "#/examples/0" (in refOfUnknownKeyword spec)
-            const ref = (_a = $ref.match(/#[^#]*$/)) === null || _a === void 0 ? void 0 : _a.pop(); // sanitize pointer
             // support refOfUnknownKeyword
             const rootSchema = node.context.rootNode.schema;
-            const targetSchema = get(rootSchema, ref);
+            const targetSchema = get(rootSchema, $ref);
             if (targetSchema) {
-                return node.compileSchema(targetSchema, `${node.evaluationPath}/$ref`, ref);
+                return node.compileSchema(targetSchema, `${node.evaluationPath}/$ref`, $ref);
             }
         }
         // console.error("REF: UNFOUND 1", $ref);

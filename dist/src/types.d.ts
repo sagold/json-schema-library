@@ -1,7 +1,7 @@
 import { Draft } from "./Draft";
 import { errors } from "./errors/errors";
 import { SchemaNode, isSchemaNode, GetNodeOptions } from "./SchemaNode";
-export type JsonBooleanSchema = boolean;
+export type BooleanSchema = boolean;
 export interface JsonSchema {
     [p: string]: any;
 }
