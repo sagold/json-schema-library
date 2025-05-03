@@ -14,10 +14,6 @@
     <a href="#overview"><b>Overview</b></a> · <a href="#schemanode-methods"><b>Methods</b></a> · <a href="#draft-customization"><b>Customization</b></a> · <a href="#keyword-extensions"><b>Extensions</b></a> · <a href="#breaking-changes">Breaking Changes</a>
 </div>
 
----
-
-> ⚠️ This **documentation** refers to the upcoming release **version 10**, which can be installed by `npm install json-schema-library@10.0.0-rc13`. For the latest release please refer to the **[documentation of version 9.3.5](https://github.com/sagold/json-schema-library/tree/v9.3.5)**. If you are on v10-rc refer to [documentation of version 10.0.0-rc8 or lower](https://github.com/sagold/json-schema-library/tree/v10.0.0-rc8)
-
 **Quick start**
 
 `npm install json-schema-library`
@@ -1057,9 +1053,10 @@ const myDraft = extendDraft(draft2020, {
 });
 ```
 
-
 ### Overwrite a format validator
+
 The built-in format validators may not always align with your specific requirements. For instance, you might need to validate the output of an `<input type="time" />`, which produces values in formats like `HH:MM` or `HH:MM:SS`. In such cases, you can customize or overwrite the format validators to suit your needs using `extendDraft`
+
 <details>
 <summary>Example of overwriting a format validator</summary>
 
@@ -1069,7 +1066,7 @@ import { extendDraft, draft2020 } from "json-schema-library";
 /**
  * A Regexp that extends http://tools.ietf.org/html/rfc3339#section-5.6 spec.
  * The specification requires seconds and timezones to be a valid date format.
- * 
+ *
  * matchTimeSecondsAndTimeOptional matches:
  * - HH:MM:SSz
  * - HH:MM:SS(+/-)HH:MM
@@ -1078,41 +1075,42 @@ import { extendDraft, draft2020 } from "json-schema-library";
  * - HH:MM(+/-)HH:MM
  * - HH:MM
  */
-const matchTimeSecondsAndTimeOptional = 
+const matchTimeSecondsAndTimeOptional =
     /^(?<time>(?:([0-1]\d|2[0-3]):[0-5]\d(:(?<second>[0-5]\d|60))?))(?:\.\d+)?(?<offset>(?:z|[+-]([0-1]\d|2[0-3])(?::?[0-5]\d)?)?)$/i;
-    
 
 const customTimeFormatDraft = extendDraft(draft2020, {
-  formats: {
-    // This example extends the default time formatter which validates against RFC3339
-    time: ({ node, pointer, data }) => {
-        const { schema } = node;
-        if (typeof data !== "string" || data === "") {
+    formats: {
+        // This example extends the default time formatter which validates against RFC3339
+        time: ({ node, pointer, data }) => {
+            const { schema } = node;
+            if (typeof data !== "string" || data === "") {
+                return undefined;
+            }
+
+            // Use the Custom Regex to validate the date and time.
+            const matches = data.match(matchTimeSecondsAndTimeOptional);
+            if (!matches) {
+                return node.createError("format-date-time-error", { value: data, pointer, schema });
+            }
+
+            // leap second
+            if (matches.groups.second === "60") {
+                // Omitted the code here for brevity.
+            }
+
             return undefined;
         }
-
-        // Use the Custom Regex to validate the date and time.
-        const matches = data.match(matchTimeSecondsAndTimeOptional);
-        if (!matches) {
-            return node.createError("format-date-time-error", { value: data, pointer, schema });
-        }
-
-        // leap second
-        if (matches.groups.second === "60") {
-          // Omitted the code here for brevity.
-        }
-
-        return undefined;
-    },
-
-  },
+    }
 });
 
-const { errors, valid } = compileSchema({
-    type: "string",
-    format: "time",
-    $schema: "https://json-schema.org/draft/2020-12/schema",
-}, { drafts: [customTimeFormatDraft]}).validate("15:31:12");
+const { errors, valid } = compileSchema(
+    {
+        type: "string",
+        format: "time",
+        $schema: "https://json-schema.org/draft/2020-12/schema"
+    },
+    { drafts: [customTimeFormatDraft] }
+).validate("15:31:12");
 
 console.assert(valid, errors.at(0)?.message);
 ```
