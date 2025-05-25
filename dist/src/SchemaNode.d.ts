@@ -75,8 +75,6 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     $id?: string;
     $defs?: Record<string, SchemaNode>;
     $ref?: string;
-    /** only used for draft <= 2019-09 */
-    additionalItems?: SchemaNode;
     additionalProperties?: SchemaNode;
     allOf?: SchemaNode[];
     anyOf?: SchemaNode[];
@@ -85,7 +83,40 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     dependentSchemas?: Record<string, SchemaNode | boolean>;
     else?: SchemaNode;
     if?: SchemaNode;
+    /**
+     * # Items-array schema - for all drafts
+     *
+     * - for drafts prior 2020-12 `schema.items[]`-schema stored as `node.prefixItems`
+     *
+     * Validation succeeds if each element of the instance validates against the schema at the
+     * same position, if any.
+     *
+     * The `prefixItems` keyword restricts a number of items from the start of an array instance
+     * to validate against the given sequence of subschemas, where the item at a given index in
+     * the array instance is evaluated against the subschema at the given index in the `prefixItems`
+     * array, if any. Array items outside the range described by the `prefixItems` keyword is
+     * evaluated against the items keyword, if present.
+     *
+     * [Docs](https://www.learnjsonschema.com/2020-12/applicator/prefixitems/)
+     * | [Examples](https://json-schema.org/understanding-json-schema/reference/array#tupleValidation)
+     */
     prefixItems?: SchemaNode[];
+    /**
+     * # Items-object schema for additional array item - for all drafts
+     *
+     * - for drafts prior 2020-12 `schema.additionalItems` object-schema stored as `node.items`
+     *
+     * Validation succeeds if each element of the instance not covered by `prefixItems` validates
+     * against this schema.
+     *
+     * The items keyword restricts array instance items not described by the sibling `prefixItems`
+     * keyword (if any), to validate against the given subschema. Whetherthis keyword was evaluated
+     * against any item of the array instance is reported using annotations.
+     *
+     * [Docs](https://www.learnjsonschema.com/2020-12/applicator/items/)
+     * | [Examples](https://json-schema.org/understanding-json-schema/reference/array#items)
+     * | [AdditionalItems Specification](https://json-schema.org/draft/2019-09/draft-handrews-json-schema-02#additionalItems)
+     */
     items?: SchemaNode;
     not?: SchemaNode;
     oneOf?: SchemaNode[];

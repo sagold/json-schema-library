@@ -15,7 +15,6 @@ export function toSchemaNodes(node, nodeList = []) {
     }
     nodeList.push(node);
     eachProperty(nodeList, node.$defs);
-    node.additionalItems && toSchemaNodes(node.additionalItems, nodeList);
     node.additionalProperties && toSchemaNodes(node.additionalProperties, nodeList);
     eachItem(nodeList, node.allOf);
     eachItem(nodeList, node.anyOf);

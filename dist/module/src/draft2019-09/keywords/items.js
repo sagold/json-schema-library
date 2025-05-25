@@ -10,11 +10,12 @@ export const itemsKeyword = {
     validate: validateItems
 };
 function itemsResolver({ node, key }) {
+    var _a;
+    if ((_a = node.prefixItems) === null || _a === void 0 ? void 0 : _a[key]) {
+        return node.prefixItems[key];
+    }
     if (node.items) {
         return node.items;
-    }
-    if (node.prefixItems[key]) {
-        return node.prefixItems[key];
     }
 }
 export function parseItems(node) {

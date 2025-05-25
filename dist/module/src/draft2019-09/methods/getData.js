@@ -232,10 +232,10 @@ const TYPE = {
         // when there are no array-items are defined
         if (schema.items == null) {
             // => all items are additionalItems
-            if (node.additionalItems) {
+            if (node.items) {
                 const itemCount = Math.max(minItems, d.length);
                 for (let i = 0; i < itemCount; i += 1) {
-                    d[i] = node.additionalItems.getData(d[i], opts);
+                    d[i] = node.items.getData(d[i], opts);
                 }
             }
             return d || [];
@@ -246,7 +246,7 @@ const TYPE = {
             // build defined set of items
             const length = Math.max(minItems !== null && minItems !== void 0 ? minItems : 0, node.prefixItems.length);
             for (let i = 0; i < length; i += 1) {
-                const childNode = (_b = node.prefixItems[i]) !== null && _b !== void 0 ? _b : node.additionalItems;
+                const childNode = (_b = node.prefixItems[i]) !== null && _b !== void 0 ? _b : node.items;
                 if ((childNode && canResolveRef(childNode, opts)) || input[i] !== undefined) {
                     const result = childNode.getData(d[i] == null ? template[i] : d[i], opts);
                     if (result !== undefined) {
@@ -261,8 +261,7 @@ const TYPE = {
             return d;
         }
         // build data from items-definition
-        // @ts-expect-error asd
-        if ((node.items && canResolveRef(node.items, opts)) || (data === null || data === void 0 ? void 0 : data.length) > 0) {
+        if ((node.items && canResolveRef(node.items, opts)) || (Array.isArray(data) && (data === null || data === void 0 ? void 0 : data.length) > 0)) {
             // @attention this should disable cache or break intended behaviour as we reset it after loop
             // intention: reset cache after each property. last call will add counters
             const cache = { ...opts.cache };

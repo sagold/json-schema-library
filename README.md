@@ -114,8 +114,8 @@ console.log(titleNode.evaluationPath); // #/properties/image/properties/title
 console.log(titleNode.schemaLocation); // #/properties/image/properties/title
 ```
 
-- `evaluationPath` refers to the path in schema and is extended by `$ref`, e.g. if image is defined on `$defs`: `#/properties/image/$ref/properties/title`
-- `schemaLocation` refers to the absolute path within the schema and will not change, e.g. `#/$defs/properties/title`
+-   `evaluationPath` refers to the path in schema and is extended by `$ref`, e.g. if image is defined on `$defs`: `#/properties/image/$ref/properties/title`
+-   `schemaLocation` refers to the absolute path within the schema and will not change, e.g. `#/$defs/properties/title`
 
 </details>
 
@@ -163,8 +163,8 @@ _json-schema-library_ fully supports all core features of draft versions draft-0
 
 Draft support is defined by running a validator against the official [json-schema-test-suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite).
 
-- Test results for _json-schema-library_ can be inspected in [github actions](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml)
-- A comparison to other validators is listed on [json-schema-benchmark](https://github.com/sagold/json-schema-benchmark)
+-   Test results for _json-schema-library_ can be inspected in [github actions](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml)
+-   A comparison to other validators is listed on [json-schema-benchmark](https://github.com/sagold/json-schema-benchmark)
 
 Please note that these benchmarks refer to validation only. _json-schema-library_ offers tooling outside of validation and strives to be as spec-compliant as possible.
 
@@ -172,8 +172,8 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 <details><summary>Overview format validation support</summary>
 
-- **`❌ unsupported formats`** iri, iri-reference, idn-hostname
-- **`✅ supported formats`**: date, date-time, date, duration, ecmascript-regex, email, hostname, idn-email, ipv4, ipv6, json-pointer, regex, relative-json-pointer, time, unknown, uri-reference, uri-template, uri, uuid
+-   **`❌ unsupported formats`** iri, iri-reference, idn-hostname
+-   **`✅ supported formats`**: date, date-time, date, duration, ecmascript-regex, email, hostname, idn-email, ipv4, ipv6, json-pointer, regex, relative-json-pointer, time, unknown, uri-reference, uri-template, uri, uuid
 
 </details>
 
@@ -631,9 +631,9 @@ expect(node.schema).to.deep.equal({
 
 All returned json-errors have a data property with the following properties
 
-- `pointer` JSON Pointer to the location where the error occured. In case of omitted data, this is the last JSON Schema location that could be resolved
-- `schema` the JSON Schema of the last resolved location and the source of the error
-- `value` the data value at this location that could not be resolved
+-   `pointer` JSON Pointer to the location where the error occured. In case of omitted data, this is the last JSON Schema location that could be resolved
+-   `schema` the JSON Schema of the last resolved location and the source of the error
+-   `value` the data value at this location that could not be resolved
 
 ```ts
 const { error } = schemaNode.getNode("/list/1");
@@ -921,10 +921,10 @@ _json-schema-library_ uses the concept of **drafts** to support different versio
 
 Each **draft** describes how a schema should be parsed, validated, and interpreted. Drafts can also be extended or modified to change or enhance behavior, such as:
 
-- Replacing or adding new keywords (`oneOf`, `if/then`, custom ones, etc.)
-- Defining or overriding format validators (`format: "email"`, etc.)
-- Customizing or localizing error messages
-- Tweaking how schema nodes behave during parsing or resolution
+-   Replacing or adding new keywords (`oneOf`, `if/then`, custom ones, etc.)
+-   Defining or overriding format validators (`format: "email"`, etc.)
+-   Customizing or localizing error messages
+-   Tweaking how schema nodes behave during parsing or resolution
 
 Out of the box, the library exports all compliant JSON Schema drafts:
 
@@ -1123,10 +1123,10 @@ console.assert(valid, errors.at(0)?.message);
 
 **Keywords** hold the main logic for JSON Schema functionality. Each `Keyword` corresponds to a JSON Schema keyword like `properties`, `prefixItems`, `oneOf`, etc and offers implementations to `parse`, `validate`, `resolve` and `reduce`. Note that support for each implementation is optional, dependending on the feature requirements. The main properties of a `Keyword`:
 
-- a `Keyword` is only processed if the specified `keyword` is available as property on the JSON Schema
-- an optional `order` property may be added as order of keyword execution is sometimes important (`additionalItems` last, `$ref` evaluation first)
-- the list of keywords is unique by property-value `keyword`
-- for a given function `addX`, a function `X` must be present
+-   a `Keyword` is only processed if the specified `keyword` is available as property on the JSON Schema
+-   an optional `order` property may be added as order of keyword execution is sometimes important (`additionalItems` last, `$ref` evaluation first)
+-   the list of keywords is unique by property-value `keyword`
+-   for a given function `addX`, a function `X` must be present
 
 ```ts
 type Keyword = {
@@ -1294,6 +1294,11 @@ assert.deepEqual(errors[0].message, "Custom error 2");
 
 ## Breaking Changes
 
+### v10.1.0
+
+-   replaced `node.additionalItems` by `node.items` for drafts below 2020-12
+-   fixed `additionalItems` behaviour to be ignored when `schema.items` is not an array
+
 ### v10.0.0
 
 > This update involves some significant changes in how you work with the library, so please carefully review the migration guide and adjust your implementation accordingly.
@@ -1304,8 +1309,8 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
 
 #### Key Changes:
 
-- **Compile Schema**: The `compileSchema` function now replaces the previous Draft-Class approach.
-- **SchemaNode Representation**: All schemas are now represented as `SchemaNode`, which holds the schema and provides an easier way to work with them.
+-   **Compile Schema**: The `compileSchema` function now replaces the previous Draft-Class approach.
+-   **SchemaNode Representation**: All schemas are now represented as `SchemaNode`, which holds the schema and provides an easier way to work with them.
 
 #### Breaking Changes:
 
@@ -1321,14 +1326,14 @@ const node = compileSchema(schema);
 
 **Changed Methods**:
 
-- `draft.createSchemaOf(schema)` → `node.createSchema(schema)`
-- `draft.each(data, callback)` → `const nodes = node.toDataNodes(data)`
-- `draft.eachSchema(callback)` → `const nodes = node.toSchemaNodes()`
-- `draft.getChildSchemaSelection(property)` → `node.getChildSelection(property)`
-- `draft.getNode(options)` → `node.getNode(pointer, data, options)`
-- `draft.getTemplate(inputData)` → `node.getData(inputData)`
-- `draft.isValid(data)` → `node.validate(data).valid`
-- `draft.step(property, data)` → `node.getNodeChild(property, data)`
+-   `draft.createSchemaOf(schema)` → `node.createSchema(schema)`
+-   `draft.each(data, callback)` → `const nodes = node.toDataNodes(data)`
+-   `draft.eachSchema(callback)` → `const nodes = node.toSchemaNodes()`
+-   `draft.getChildSchemaSelection(property)` → `node.getChildSelection(property)`
+-   `draft.getNode(options)` → `node.getNode(pointer, data, options)`
+-   `draft.getTemplate(inputData)` → `node.getData(inputData)`
+-   `draft.isValid(data)` → `node.validate(data).valid`
+-   `draft.step(property, data)` → `node.getNodeChild(property, data)`
 
 **Renamed Properties**: `templateDefaultOptions` → `getDataDefaultOptions`
 
@@ -1354,28 +1359,28 @@ compileSchema(schema, {
 
 **breaking changes**:
 
-- _getSchema_ signature changed in favour of an options object. Instead of `draft.getNode(pointer, data)` arguments have to be passed as an object `draft.getNode({ pointer, data })`. This removes setting unwanted optional arguments and keeps the api more stable in the future (e.g. `withSchemaWarning` option)
-- _JsonError_ now must expose `pointer`, `schema` and `value` consistently on data property
+-   _getSchema_ signature changed in favour of an options object. Instead of `draft.getNode(pointer, data)` arguments have to be passed as an object `draft.getNode({ pointer, data })`. This removes setting unwanted optional arguments and keeps the api more stable in the future (e.g. `withSchemaWarning` option)
+-   _JsonError_ now must expose `pointer`, `schema` and `value` consistently on data property
 
 **updates**
 
-- _getSchema_ consistently returns errors and can return errors for empty schema using `withSchemaWarning` option
+-   _getSchema_ consistently returns errors and can return errors for empty schema using `withSchemaWarning` option
 
 ### v8.0.0
 
 With version `v8.0.0`, _getData_ was improved to better support optional properties and utilize existing core logic, making it more reliable. Breaking changes:
 
-- Renamed `JSONError` to `JsonError` and `JSONSchema` to `JsonSchema`
-- `getData` only adds required properties. Behaviour can be changed by [getData default options](#getData-default-options)
-- Internal schema property `oneOfSchema` has been replaced by `schema.getOneOfOrigin()`
-- Changed `unique-items-error` to point to error for duplicated item and changed data-properties
-- Removed `SchemaService` as it was no longer used nor tested
+-   Renamed `JSONError` to `JsonError` and `JSONSchema` to `JsonSchema`
+-   `getData` only adds required properties. Behaviour can be changed by [getData default options](#getData-default-options)
+-   Internal schema property `oneOfSchema` has been replaced by `schema.getOneOfOrigin()`
+-   Changed `unique-items-error` to point to error for duplicated item and changed data-properties
+-   Removed `SchemaService` as it was no longer used nor tested
 
 <details><summary>Exposed new helper functions</summary>
 
-- `mergeSchema` - Merges to two json schema
-- `reduceNode` - Reduce schema by merging dynamic constructs into a static json schema omitting those properties
-- `isDynamicSchema` - Returns true if the passed schema contains dynamic properties (_if_, _dependencies_, _allOf_, etc)
-- `resolveDynamicSchema` - Resolves all dynamic schema definitions for the given input data and returns the resulting JSON Schema without any dynamic schema definitions.
+-   `mergeSchema` - Merges to two json schema
+-   `reduceNode` - Reduce schema by merging dynamic constructs into a static json schema omitting those properties
+-   `isDynamicSchema` - Returns true if the passed schema contains dynamic properties (_if_, _dependencies_, _allOf_, etc)
+-   `resolveDynamicSchema` - Resolves all dynamic schema definitions for the given input data and returns the resulting JSON Schema without any dynamic schema definitions.
 
 </details>
