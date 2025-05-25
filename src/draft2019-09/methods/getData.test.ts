@@ -835,6 +835,7 @@ describe("getData (2019)", () => {
                     $schema: "draft-2019-09",
                     type: "array",
                     minItems: 2,
+                    items: [],
                     additionalItems: {
                         type: "number",
                         default: 2

@@ -114,7 +114,18 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     $id?: string;
     $defs?: Record<string, SchemaNode>;
     $ref?: string;
-    /** only used for draft <= 2019-09 */
+    /**
+     * # Items-object schema for additional items for drafts <= 2019-09
+     *
+     * - `additionalItems` is ignored when items-schema is not an array
+     *
+     *  If `items` is present, and its annotation result is a number, validation succeeds if every
+     *  instance element at an index greater than that number validates against "additionalItems".
+     *  Otherwise, if `items` is absent or its annotation result is the boolean true,
+     * `additionalItems` is ignored.
+     *
+     * [Specification](https://json-schema.org/draft/2019-09/draft-handrews-json-schema-02#additionalItems)
+     */
     additionalItems?: SchemaNode;
     additionalProperties?: SchemaNode;
     allOf?: SchemaNode[];
@@ -124,7 +135,39 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     dependentSchemas?: Record<string, SchemaNode | boolean>;
     else?: SchemaNode;
     if?: SchemaNode;
+    /**
+     * # Items-array schema for all drafts
+     *
+     * - for drafts prior 2020-12 items[]-schema stored as `prefixItems`
+     *
+     * Validation succeeds if each element of the instance validates against the schema at the
+     * same position, if any.
+     *
+     * The `prefixItems` keyword restricts a number of items from the start of an array instance
+     * to validate against the given sequence of subschemas, where the item at a given index in
+     * the array instance is evaluated against the subschema at the given index in the `prefixItems`
+     * array, if any. Array items outside the range described by the `prefixItems` keyword is
+     * evaluated against the items keyword, if present.
+     *
+     * [Docs](https://www.learnjsonschema.com/2020-12/applicator/prefixitems/)
+     * | [Examples](https://json-schema.org/understanding-json-schema/reference/array#tupleValidation)
+     */
     prefixItems?: SchemaNode[];
+    /**
+     * # Items-object schema
+     *
+     * - ⚠️ For drafts < 2020-12, `additionalItems` is still used and must be referenced by `node.additionalItems`
+     *
+     * Validation succeeds if each element of the instance not covered by `prefixItems` validates
+     * against this schema.
+     *
+     * The items keyword restricts array instance items not described by the sibling `prefixItems`
+     * keyword (if any), to validate against the given subschema. Whetherthis keyword was evaluated
+     * against any item of the array instance is reported using annotations.
+     *
+     * [Docs](https://www.learnjsonschema.com/2020-12/applicator/items/)
+     * | [Examples](https://json-schema.org/understanding-json-schema/reference/array#items)
+     */
     items?: SchemaNode;
     not?: SchemaNode;
     oneOf?: SchemaNode[];

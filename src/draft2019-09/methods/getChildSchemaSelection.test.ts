@@ -129,6 +129,7 @@ describe("getChildSelection (2019)", () => {
             const result = compileSchema({
                 $schema: "draft-2019-09",
                 type: "array",
+                items: [],
                 additionalItems: { id: "number", type: "number", default: 2 }
             }).getChildSelection(1);
 

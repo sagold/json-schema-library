@@ -12,17 +12,14 @@ export const additionalItemsKeyword: Keyword = {
     addResolve: (node: SchemaNode) => node.additionalItems != null,
     resolve: additionalItemsResolver,
     addValidate: ({ schema }) =>
-        schema.additionalItems != null &&
-        schema.additionalItems !== true &&
-        schema.items != null &&
-        !isObject(schema.items),
+        schema.additionalItems != null && schema.additionalItems !== true && Array.isArray(schema.items),
     validate: validateAdditionalItems
 };
 
 // must come as last resolver
 export function parseAdditionalItems(node: SchemaNode) {
     const { schema, evaluationPath, schemaLocation } = node;
-    if (isObject(schema.additionalItems) || schema.additionalItems === true) {
+    if ((isObject(schema.additionalItems) || schema.additionalItems === true) && Array.isArray(schema.items)) {
         node.additionalItems = node.compileSchema(
             schema.additionalItems,
             `${evaluationPath}/additionalItems`,
