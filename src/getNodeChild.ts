@@ -36,6 +36,12 @@ export function getNodeChild(
     for (const resolver of node.resolvers) {
         const schemaNode = resolver({ data, key, node });
         if (isSchemaNode(schemaNode)) {
+            // @ts-expect-error boolean schema
+            if (schemaNode.schema === true) {
+                const generatedNode = schemaNode.compileSchema(schemaNode.createSchema(getValue(data, key)));
+                return { node: generatedNode, error: undefined };
+            }
+
             return { node: schemaNode, error: undefined };
         }
         if (isJsonError(schemaNode)) {

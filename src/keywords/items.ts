@@ -1,6 +1,5 @@
 import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
 import { SchemaNode } from "../types";
-import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
 
 export const itemsKeyword: Keyword = {
@@ -24,7 +23,7 @@ function itemsResolver({ node, key }: JsonSchemaResolverParams) {
 
 export function parseItems(node: SchemaNode) {
     const { schema, evaluationPath } = node;
-    if (isObject(schema.items)) {
+    if (schema.items != null) {
         const propertyNode = node.compileSchema(
             schema.items,
             `${evaluationPath}/items`,

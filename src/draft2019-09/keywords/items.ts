@@ -1,6 +1,5 @@
 import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../../Keyword";
 import { SchemaNode } from "../../types";
-import { isObject } from "../../utils/isObject";
 import { validateNode } from "../../validateNode";
 
 export const itemsKeyword: Keyword = {
@@ -24,17 +23,17 @@ function itemsResolver({ node, key }: JsonSchemaResolverParams) {
 
 export function parseItems(node: SchemaNode) {
     const { schema, evaluationPath } = node;
-    if (isObject(schema.items)) {
+    if (Array.isArray(schema.items)) {
+        node.prefixItems = schema.items.map((itemSchema, index) =>
+            node.compileSchema(itemSchema, `${evaluationPath}/items/${index}`, `${node.schemaLocation}/items/${index}`)
+        );
+    } else if (schema.items != null) {
         const propertyNode = node.compileSchema(
             schema.items,
             `${evaluationPath}/items`,
             `${node.schemaLocation}/items`
         );
         node.items = propertyNode;
-    } else if (Array.isArray(schema.items)) {
-        node.prefixItems = schema.items.map((itemSchema, index) =>
-            node.compileSchema(itemSchema, `${evaluationPath}/items/${index}`, `${node.schemaLocation}/items/${index}`)
-        );
     }
 }
 
@@ -64,7 +63,8 @@ function validateItems({ node, data, pointer = "#", path }: JsonSchemaValidatorP
         return errors;
     }
 
-    if (node.items) {
+    // @ts-expect-error boolean schema
+    if (node.items.schema !== true) {
         for (let i = 0; i < data.length; i += 1) {
             const itemData = data[i];
             const result = validateNode(node.items, itemData, `${pointer}/${i}`, path);

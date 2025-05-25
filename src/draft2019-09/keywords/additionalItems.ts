@@ -1,4 +1,3 @@
-import { isObject } from "../../utils/isObject";
 import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../../Keyword";
 import { SchemaNode } from "../../types";
 import { getValue } from "../../utils/getValue";
@@ -19,7 +18,7 @@ export const additionalItemsKeyword: Keyword = {
 // must come as last resolver
 export function parseAdditionalItems(node: SchemaNode) {
     const { schema, evaluationPath, schemaLocation } = node;
-    if ((isObject(schema.additionalItems) || schema.additionalItems === true) && Array.isArray(schema.items)) {
+    if (schema.additionalItems != null && Array.isArray(schema.items)) {
         node.items = node.compileSchema(
             schema.additionalItems,
             `${evaluationPath}/additionalItems`,
@@ -39,7 +38,7 @@ function additionalItemsResolver({ node, key, data }: JsonSchemaResolverParams) 
 
 function validateAdditionalItems({ node, data, pointer, path }: JsonSchemaValidatorParams) {
     const { schema } = node;
-    if (!Array.isArray(data) || data.length === 0) {
+    if (!Array.isArray(data) || data.length === 0 || node.items == null) {
         // - no items to validate
         return;
     }
@@ -51,10 +50,8 @@ function validateAdditionalItems({ node, data, pointer, path }: JsonSchemaValida
     const errors: ValidationResult[] = [];
     for (let i = startIndex; i < data.length; i += 1) {
         const item = data[i];
-        if (node.items) {
-            const validationResult = validateNode(node.items, item, `${pointer}/${i}`, path);
-            validationResult && errors.push(...validationResult);
-        } else if (schema.additionalItems === false) {
+        // @ts-expect-error boolean-schema
+        if (node.items?.schema === false) {
             errors.push(
                 node.createError("additional-items-error", {
                     key: i,
@@ -63,6 +60,10 @@ function validateAdditionalItems({ node, data, pointer, path }: JsonSchemaValida
                     schema
                 })
             );
+            // @ts-expect-error boolean-schema
+        } else if (node.items.schema !== true) {
+            const validationResult = validateNode(node.items, item, `${pointer}/${i}`, path);
+            validationResult && errors.push(...validationResult);
         }
     }
     return errors;
