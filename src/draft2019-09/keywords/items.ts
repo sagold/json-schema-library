@@ -14,11 +14,11 @@ export const itemsKeyword: Keyword = {
 };
 
 function itemsResolver({ node, key }: JsonSchemaResolverParams) {
+    if (node.prefixItems?.[key as number]) {
+        return node.prefixItems[key as number];
+    }
     if (node.items) {
         return node.items;
-    }
-    if (node.prefixItems[key as number]) {
-        return node.prefixItems[key as number];
     }
 }
 

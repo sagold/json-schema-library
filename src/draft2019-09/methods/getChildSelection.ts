@@ -23,13 +23,12 @@ export function getChildSelection(node: SchemaNode, property: string | number): 
     }
 
     // array.items[] exceeded (or undefined), but additionalItems specified
-    if (node.additionalItems && node.items == null) {
+    if (node.schema.additionalItems) {
         // we fallback to a string if no schema is defined - might be subject for configuration
-        // @ts-expect-error boolean schema
-        if (node.additionalItems.schema === true) {
+        if (node.schema.additionalItems === true) {
             return [node.compileSchema({ type: "string" })];
         }
-        return [node.additionalItems.resolveRef()];
+        return [node.items.resolveRef()];
     }
 
     // array.items[] exceeded

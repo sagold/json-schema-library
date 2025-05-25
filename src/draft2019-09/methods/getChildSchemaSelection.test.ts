@@ -167,6 +167,7 @@ describe("getChildSelection (2019)", () => {
 
             assert(!isJsonError(result));
             assert.deepEqual(result.length, 1);
+
             assert.deepEqual(
                 result.map((n) => n.schema),
                 [{ type: "string" }]

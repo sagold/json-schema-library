@@ -114,19 +114,6 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     $id?: string;
     $defs?: Record<string, SchemaNode>;
     $ref?: string;
-    /**
-     * # Items-object schema for additional items for drafts <= 2019-09
-     *
-     * - `additionalItems` is ignored when items-schema is not an array
-     *
-     *  If `items` is present, and its annotation result is a number, validation succeeds if every
-     *  instance element at an index greater than that number validates against "additionalItems".
-     *  Otherwise, if `items` is absent or its annotation result is the boolean true,
-     * `additionalItems` is ignored.
-     *
-     * [Specification](https://json-schema.org/draft/2019-09/draft-handrews-json-schema-02#additionalItems)
-     */
-    additionalItems?: SchemaNode;
     additionalProperties?: SchemaNode;
     allOf?: SchemaNode[];
     anyOf?: SchemaNode[];
@@ -136,9 +123,9 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     else?: SchemaNode;
     if?: SchemaNode;
     /**
-     * # Items-array schema for all drafts
+     * # Items-array schema - for all drafts
      *
-     * - for drafts prior 2020-12 items[]-schema stored as `prefixItems`
+     * - for drafts prior 2020-12 `schema.items[]`-schema stored as `node.prefixItems`
      *
      * Validation succeeds if each element of the instance validates against the schema at the
      * same position, if any.
@@ -154,9 +141,9 @@ export interface SchemaNode extends SchemaNodeMethodsType {
      */
     prefixItems?: SchemaNode[];
     /**
-     * # Items-object schema
+     * # Items-object schema for additional array item - for all drafts
      *
-     * - ⚠️ For drafts < 2020-12, `additionalItems` is still used and must be referenced by `node.additionalItems`
+     * - for drafts prior 2020-12 `schema.additionalItems` object-schema stored as `node.items`
      *
      * Validation succeeds if each element of the instance not covered by `prefixItems` validates
      * against this schema.
@@ -167,6 +154,7 @@ export interface SchemaNode extends SchemaNodeMethodsType {
      *
      * [Docs](https://www.learnjsonschema.com/2020-12/applicator/items/)
      * | [Examples](https://json-schema.org/understanding-json-schema/reference/array#items)
+     * | [AdditionalItems Specification](https://json-schema.org/draft/2019-09/draft-handrews-json-schema-02#additionalItems)
      */
     items?: SchemaNode;
     not?: SchemaNode;

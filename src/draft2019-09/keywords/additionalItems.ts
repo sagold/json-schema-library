@@ -9,7 +9,7 @@ export const additionalItemsKeyword: Keyword = {
     keyword: "additionalItems",
     order: -10,
     parse: parseAdditionalItems,
-    addResolve: (node: SchemaNode) => node.additionalItems != null,
+    addResolve: (node: SchemaNode) => node.items != null,
     resolve: additionalItemsResolver,
     addValidate: ({ schema }) =>
         schema.additionalItems != null && schema.additionalItems !== true && Array.isArray(schema.items),
@@ -20,7 +20,7 @@ export const additionalItemsKeyword: Keyword = {
 export function parseAdditionalItems(node: SchemaNode) {
     const { schema, evaluationPath, schemaLocation } = node;
     if ((isObject(schema.additionalItems) || schema.additionalItems === true) && Array.isArray(schema.items)) {
-        node.additionalItems = node.compileSchema(
+        node.items = node.compileSchema(
             schema.additionalItems,
             `${evaluationPath}/additionalItems`,
             `${schemaLocation}/additionalItems`
@@ -32,7 +32,7 @@ function additionalItemsResolver({ node, key, data }: JsonSchemaResolverParams) 
     if (Array.isArray(data)) {
         // @attention: items, etc should already have been tried
         const value = getValue(data, key);
-        const { node: childNode, error } = node.additionalItems.reduceNode(value);
+        const { node: childNode, error } = node.items.reduceNode(value);
         return childNode ?? error;
     }
 }
@@ -51,8 +51,8 @@ function validateAdditionalItems({ node, data, pointer, path }: JsonSchemaValida
     const errors: ValidationResult[] = [];
     for (let i = startIndex; i < data.length; i += 1) {
         const item = data[i];
-        if (node.additionalItems) {
-            const validationResult = validateNode(node.additionalItems, item, `${pointer}/${i}`, path);
+        if (node.items) {
+            const validationResult = validateNode(node.items, item, `${pointer}/${i}`, path);
             validationResult && errors.push(...validationResult);
         } else if (schema.additionalItems === false) {
             errors.push(

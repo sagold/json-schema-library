@@ -89,7 +89,6 @@ export function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): Sch
         reducers: a.reducers.concat(b.reducers).filter(removeDuplicates).sort(sortCb),
         validators: a.validators.concat(b.validators).filter(removeDuplicates).sort(sortCb),
 
-        additionalItems: mergeNode(a.additionalItems, b.additionalItems),
         additionalProperties: mergeNode(a.additionalProperties, b.additionalProperties),
         contains: mergeNode(a.contains, b.contains),
         if: mergeNode(a.if, b.if),
