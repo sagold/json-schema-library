@@ -8,6 +8,7 @@ import { isObject } from "../utils/isObject";
 import { isSchemaNode } from "../types";
 import { mergeNode } from "../mergeNode";
 import { reduceOneOfFuzzy } from "../keywords/oneOf";
+import { isFile } from "../utils/isFile";
 function safeResolveRef(node, options) {
     var _a, _b;
     if (node.$ref == null) {
@@ -65,7 +66,7 @@ export function getData(node, data, opts) {
         return data;
     }
     // @attention - very special case to support file instances
-    if (data instanceof File) {
+    if (isFile(data)) {
         return data;
     }
     if (((_a = node.schema) === null || _a === void 0 ? void 0 : _a.const) !== undefined) {

@@ -8,6 +8,7 @@ import { isObject } from "../../utils/isObject";
 import { isSchemaNode, SchemaNode } from "../../types";
 import { mergeNode } from "../../mergeNode";
 import { reduceOneOfFuzzy } from "../../keywords/oneOf";
+import { isFile } from "../../utils/isFile";
 
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
@@ -92,7 +93,7 @@ export function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions
         return data;
     }
     // @attention - very special case to support file instances
-    if (data instanceof File) {
+    if (isFile(data)) {
         return data;
     }
 
