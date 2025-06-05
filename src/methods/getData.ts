@@ -10,8 +10,6 @@ import { mergeNode } from "../mergeNode";
 import { reduceOneOfFuzzy } from "../keywords/oneOf";
 import { isFile } from "../utils/isFile";
 
-
-
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
     addOptionalProps?: boolean;
@@ -108,7 +106,7 @@ export function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions
 
     if (Array.isArray(node.schema.enum) && node.schema.enum.length > 0) {
         if (data === undefined) {
-            return node.schema.enum[0];
+            return node.schema.default ?? node.schema.enum[0];
         }
     }
 

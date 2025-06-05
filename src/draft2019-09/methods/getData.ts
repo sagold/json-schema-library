@@ -106,7 +106,7 @@ export function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions
 
     if (Array.isArray(node.schema.enum) && node.schema.enum.length > 0) {
         if (data === undefined) {
-            return node.schema.enum[0];
+            return node.schema.default ?? node.schema.enum[0];
         }
     }
 

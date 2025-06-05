@@ -174,6 +174,15 @@ describe("getData (2019)", () => {
                 const data = compileSchema({ $schema: "draft-2019-09", enum: ["first", "second"] }).getData();
                 assert.deepEqual(data, "first");
             });
+
+            it("should use default value in any case", () => {
+                const data = compileSchema({
+                    $schema: "draft-2019-09",
+                    enum: ["first", "second"],
+                    default: ""
+                }).getData();
+                assert.deepEqual(data, "");
+            });
         });
 
         describe("file", () => {

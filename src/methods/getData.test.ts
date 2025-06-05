@@ -168,6 +168,11 @@ describe("getData", () => {
                 const data = compileSchema({ enum: ["first", "second"] }).getData();
                 assert.deepEqual(data, "first");
             });
+
+            it("should use default value in any case", () => {
+                const data = compileSchema({ enum: ["first", "second"], default: "" }).getData();
+                assert.deepEqual(data, "");
+            });
         });
 
         describe("file", () => {
