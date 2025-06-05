@@ -806,6 +806,20 @@ describe("getData", () => {
                 }).getData([43]);
                 assert.deepEqual(data, [43, 2]);
             });
+
+            it("should add prefixItems with `addOptionalProps: true`", () => {
+                const data = compileSchema(
+                    {
+                        type: "array",
+                        prefixItems: [{ type: "boolean", default: true }],
+                        items: { type: "number", default: 2 }
+                    },
+                    {
+                        getDataDefaultOptions: { addOptionalProps: true }
+                    }
+                ).getData();
+                assert.deepEqual(data, [true]);
+            });
         });
 
         describe("oneOf", () => {
