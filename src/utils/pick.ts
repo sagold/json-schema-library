@@ -5,6 +5,10 @@ export function pick<T extends { [P in keyof T]: unknown }, K extends keyof T>(v
         return value;
     }
     const result = {} as Pick<T, K>;
-    properties.forEach((property) => (result[property] = value[property]));
+    properties.forEach((property) => {
+        if (value[property] !== undefined) {
+            result[property] = value[property];
+        }
+    });
     return result;
 }

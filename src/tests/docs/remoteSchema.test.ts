@@ -63,7 +63,6 @@ describe("docs - remote schema", () => {
                 }
             }
         }).addRemoteSchema("https://remote.com/schema.json", {
-            title: "$defs remote schema",
             $defs: {
                 character: {
                     type: "string",

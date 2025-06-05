@@ -7,6 +7,7 @@ import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
 import { get, split } from "@sagold/json-pointer";
 import { mergeNode } from "../mergeNode";
+import { pick } from "../utils/pick";
 
 export const $refKeyword: Keyword = {
     id: "$ref",
@@ -108,6 +109,7 @@ export function resolveRef({ pointer, path }: { pointer?: string; path?: Validat
     if (resolvedNode != null) {
         path?.push({ pointer, node: resolvedNode });
     }
+
     return resolvedNode;
 }
 
@@ -128,14 +130,14 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     const nonMatchingDynamicAnchor = node.context.dynamicAnchors[refInCurrentScope] == null;
     if (nonMatchingDynamicAnchor) {
         if (node.context.anchors[refInCurrentScope]) {
-            return compileNext(node.context.anchors[refInCurrentScope], node.evaluationPath);
+            return compileNext(node.context.anchors[refInCurrentScope], node);
         }
     }
 
     for (let i = 0; i < history.length; i += 1) {
         // A $dynamicRef that initially resolves to a schema with a matching $dynamicAnchor resolves to the first $dynamicAnchor in the dynamic scope
         if (history[i].node.schema.$dynamicAnchor) {
-            return compileNext(history[i].node, node.evaluationPath);
+            return compileNext(history[i].node, node);
         }
 
         // A $dynamicRef only stops at a $dynamicAnchor if it is in the same dynamic scope.
@@ -143,7 +145,7 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
         const ref = joinId(history[i].node.$id, `#${refWithoutScope}`);
         const anchorNode = node.context.dynamicAnchors[ref];
         if (anchorNode) {
-            return compileNext(node.context.dynamicAnchors[ref], node.evaluationPath);
+            return compileNext(node.context.dynamicAnchors[ref], node);
         }
     }
 
@@ -153,12 +155,21 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     return nextNode;
 }
 
-function compileNext(referencedNode: SchemaNode, evaluationPath = referencedNode.evaluationPath) {
-    const referencedSchema = isObject(referencedNode.schema)
-        ? omit(referencedNode.schema, "$id")
-        : referencedNode.schema;
+const PROPERTIES_TO_MERGE = ["title", "description", "options", "readOnly", "writeOnly"];
 
-    return referencedNode.compileSchema(referencedSchema, `${evaluationPath}/$ref`, referencedNode.schemaLocation);
+function compileNext(referencedNode: SchemaNode, sourceNode: SchemaNode) {
+    let referencedSchema = referencedNode.schema;
+    if (isObject(referencedNode.schema)) {
+        referencedSchema = {
+            ...omit(referencedNode.schema, "$id"),
+            ...pick(sourceNode.schema, ...PROPERTIES_TO_MERGE)
+        };
+    }
+    return referencedNode.compileSchema(
+        referencedSchema,
+        `${sourceNode.evaluationPath}/$ref`,
+        referencedNode.schemaLocation
+    );
 }
 
 export function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefined {
@@ -168,16 +179,16 @@ export function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefi
 
     // resolve $ref by json-evaluationPath
     if (node.context.refs[$ref]) {
-        return compileNext(node.context.refs[$ref], node.evaluationPath);
+        return compileNext(node.context.refs[$ref], node);
     }
     // resolve $ref from $anchor
     if (node.context.anchors[$ref]) {
-        return compileNext(node.context.anchors[$ref], node.evaluationPath);
+        return compileNext(node.context.anchors[$ref], node);
     }
     // resolve $ref from $dynamicAnchor
     if (node.context.dynamicAnchors[$ref]) {
         // A $ref to a $dynamicAnchor in the same schema resource behaves like a normal $ref to an $anchor
-        return compileNext(node.context.dynamicAnchors[$ref], node.evaluationPath);
+        return compileNext(node.context.dynamicAnchors[$ref], node);
     }
 
     // check for remote-host + pointer pair to switch rootSchema
@@ -191,7 +202,7 @@ export function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefi
         const $ref = fragments[0];
         // this is a reference to remote-host root node
         if (node.context.remotes[$ref]) {
-            return compileNext(node.context.remotes[$ref], node.evaluationPath);
+            return compileNext(node.context.remotes[$ref], node);
         }
         if ($ref[0] === "#") {
             // support refOfUnknownKeyword
