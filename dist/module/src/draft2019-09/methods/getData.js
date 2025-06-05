@@ -57,7 +57,7 @@ function convertValue(type, value) {
     return value;
 }
 export function getData(node, data, opts) {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
     if ((opts === null || opts === void 0 ? void 0 : opts.cache) == null) {
         throw new Error("Missing options");
     }
@@ -76,7 +76,7 @@ export function getData(node, data, opts) {
     let defaultData = data;
     if (Array.isArray(node.schema.enum) && node.schema.enum.length > 0) {
         if (data === undefined) {
-            return node.schema.enum[0];
+            return (_c = node.schema.default) !== null && _c !== void 0 ? _c : node.schema.enum[0];
         }
     }
     if (node.schema.default !== undefined) {
@@ -85,18 +85,18 @@ export function getData(node, data, opts) {
         }
     }
     // @keyword allOf
-    if ((_c = currentNode.allOf) === null || _c === void 0 ? void 0 : _c.length) {
+    if ((_d = currentNode.allOf) === null || _d === void 0 ? void 0 : _d.length) {
         currentNode.allOf.forEach((partialNode) => {
             var _a;
             defaultData = (_a = partialNode.getData(defaultData, opts)) !== null && _a !== void 0 ? _a : defaultData;
         });
     }
     // @keyword anyOf
-    if (((_d = currentNode.anyOf) === null || _d === void 0 ? void 0 : _d.length) > 0) {
-        defaultData = (_e = currentNode.anyOf[0].getData(defaultData, opts)) !== null && _e !== void 0 ? _e : defaultData;
+    if (((_e = currentNode.anyOf) === null || _e === void 0 ? void 0 : _e.length) > 0) {
+        defaultData = (_f = currentNode.anyOf[0].getData(defaultData, opts)) !== null && _f !== void 0 ? _f : defaultData;
     }
     // @keyword oneOf
-    if (((_f = currentNode.oneOf) === null || _f === void 0 ? void 0 : _f.length) > 0) {
+    if (((_g = currentNode.oneOf) === null || _g === void 0 ? void 0 : _g.length) > 0) {
         if (isEmpty(defaultData)) {
             currentNode = mergeNode(currentNode, currentNode.oneOf[0]);
         }
@@ -121,7 +121,7 @@ export function getData(node, data, opts) {
         return defaultData;
     }
     if (resolvedNode && resolvedNode !== currentNode) {
-        defaultData = (_g = resolvedNode.getData(defaultData, opts)) !== null && _g !== void 0 ? _g : defaultData;
+        defaultData = (_h = resolvedNode.getData(defaultData, opts)) !== null && _h !== void 0 ? _h : defaultData;
         currentNode = resolvedNode;
     }
     // if (TYPE[type] == null) {
@@ -133,7 +133,7 @@ export function getData(node, data, opts) {
     //     return data;
     // }
     const type = getSchemaType(currentNode, defaultData);
-    const templateData = (_h = TYPE[type]) === null || _h === void 0 ? void 0 : _h.call(TYPE, currentNode, defaultData, opts);
+    const templateData = (_j = TYPE[type]) === null || _j === void 0 ? void 0 : _j.call(TYPE, currentNode, defaultData, opts);
     return templateData === undefined ? defaultData : templateData;
 }
 const TYPE = {
