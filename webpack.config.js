@@ -26,7 +26,7 @@ const config = {
         extensions: [".tsx", ".ts", ".js"],
         extensionAlias: {
         '.js': ['.js', '.ts'],
-    },
+        },
     },
 
     module: {

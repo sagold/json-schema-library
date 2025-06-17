@@ -9,7 +9,8 @@
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "import": "./dist/module/index.js"
+            "import": "./dist/module/index.js",
+            "require": "./dist/jsonSchemaLibrary.js"
         }
     },
     "scripts": {
