@@ -5,7 +5,7 @@ import { createSchema } from "./methods/createSchema.js";
 import { toSchemaNodes } from "./methods/toSchemaNodes.js";
 import { isJsonError } from "./types.js";
 import { isObject } from "./utils/isObject.js";
-import { join } from "@sagold/json-pointer";
+import jsonPointer from "@sagold/json-pointer";
 import { joinId } from "./utils/joinId.js";
 import { mergeNode } from "./mergeNode.js";
 import { omit } from "./utils/omit.js";
@@ -15,6 +15,7 @@ import { validateNode } from "./validateNode.js";
 import { hasProperty } from "./utils/hasProperty.js";
 import { getNode } from "./getNode.js";
 import { getNodeChild } from "./getNodeChild.js";
+const { join } = jsonPointer;
 const { DYNAMIC_PROPERTIES } = settings;
 export function isSchemaNode(value) {
     return isObject(value) && Array.isArray(value === null || value === void 0 ? void 0 : value.reducers) && Array.isArray(value === null || value === void 0 ? void 0 : value.resolvers);

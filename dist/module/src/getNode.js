@@ -1,6 +1,7 @@
 import { isJsonError } from "./types.js";
-import { split } from "@sagold/json-pointer";
+import pkg from "@sagold/json-pointer";
 import { getValue } from "./utils/getValue.js";
+const { split } = pkg;
 /**
  * Returns a node containing JSON Schema of a data JSON Pointer.
  *

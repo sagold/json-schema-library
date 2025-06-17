@@ -1,7 +1,9 @@
 import { GetNodeOptions, SchemaNode } from "./SchemaNode.js";
 import { isJsonError, NodeOrError, OptionalNodeOrError } from "./types.js";
-import { split } from "@sagold/json-pointer";
+import pkg from "@sagold/json-pointer";
 import { getValue } from "./utils/getValue.js";
+
+const {split} = pkg;
 
 // prettier-ignore
 export function getNode(pointer: string, data: unknown, options: { withSchemaWarning: true } & GetNodeOptions): NodeOrError;

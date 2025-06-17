@@ -3,8 +3,9 @@ import splitRef from "../../utils/splitRef.js";
 import { omit } from "../../utils/omit.js";
 import { isObject } from "../../utils/isObject.js";
 import { validateNode } from "../../validateNode.js";
-import { get } from "@sagold/json-pointer";
+import jsonPointer from "@sagold/json-pointer";
 import { reduceRef } from "../../keywords/$ref.js";
+const { get } = jsonPointer;
 export const $refKeyword = {
     id: "$ref",
     keyword: "$ref",
