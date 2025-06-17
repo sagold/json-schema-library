@@ -1,8 +1,8 @@
 import { strict as assert } from "assert";
-import { compileSchema } from "../compileSchema";
-import { isJsonError } from "../types";
-import { reduceOneOfDeclarator, reduceOneOfFuzzy } from "./oneOf";
-import settings from "../settings";
+import { compileSchema } from "../compileSchema.js";
+import { isJsonError } from "../types.js";
+import { reduceOneOfDeclarator, reduceOneOfFuzzy } from "./oneOf.js";
+import settings from "../settings.js";
 const DECLARATOR_ONEOF = settings.DECLARATOR_ONEOF;
 
 describe("keyword : oneof : validate", () => {

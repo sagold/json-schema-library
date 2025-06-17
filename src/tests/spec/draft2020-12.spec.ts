@@ -1,13 +1,13 @@
-import draft2020Meta from "../../../remotes/draft2020-12.json";
-import draft2020MetaApplicator from "../../../remotes/draft2020-12_meta_applicator.json";
-import draft2020MetaContent from "../../../remotes/draft2020-12_meta_content.json";
-import draft2020MetaCore from "../../../remotes/draft2020-12_meta_core.json";
-import draft2020MetaFormatAnnotation from "../../../remotes/draft2020-12_meta_format_annotation.json";
-import draft2020MetaFormatAssertion from "../../../remotes/draft2020-12_meta_format_assertion.json";
-import draft2020MetaMetaData from "../../../remotes/draft2020-12_meta_meta_data.json";
-import draft2020MetaUnevaluated from "../../../remotes/draft2020-12_meta_unevaluated.json";
-import draft2020MetaValidation from "../../../remotes/draft2020-12_meta_validation.json";
-import runAllTestCases from "../utils/runTestCases";
+import draft2020Meta from "../../../remotes/draft2020-12.js";
+import draft2020MetaApplicator from "../../../remotes/draft2020-12_meta_applicator.js";
+import draft2020MetaContent from "../../../remotes/draft2020-12_meta_content.js";
+import draft2020MetaCore from "../../../remotes/draft2020-12_meta_core.js";
+import draft2020MetaFormatAnnotation from "../../../remotes/draft2020-12_meta_format_annotation.js";
+import draft2020MetaFormatAssertion from "../../../remotes/draft2020-12_meta_format_assertion.js";
+import draft2020MetaMetaData from "../../../remotes/draft2020-12_meta_meta_data.js";
+import draft2020MetaUnevaluated from "../../../remotes/draft2020-12_meta_unevaluated.js";
+import draft2020MetaValidation from "../../../remotes/draft2020-12_meta_validation.js";
+import runAllTestCases from "../utils/runTestCases.js";
 
 /**
  * @draft-2020-12 https://json-schema.org/draft/2020-12/release-notes

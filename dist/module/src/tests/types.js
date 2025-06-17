@@ -1,4 +1,4 @@
-import { compileSchema } from "../compileSchema";
+import { compileSchema } from "../compileSchema.js";
 export function shouldReturnTypeNode(schema) {
     const root = compileSchema(schema);
     // eslint-disable-next-line

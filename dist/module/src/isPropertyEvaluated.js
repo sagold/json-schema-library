@@ -1,6 +1,6 @@
-import { hasProperty } from "./utils/hasProperty";
+import { hasProperty } from "./utils/hasProperty.js";
 // import { getValue } from "./utils/getValue";
-import { validateNode } from "./validateNode";
+import { validateNode } from "./validateNode.js";
 /**
  * Returns true if an item is evaluated
  *

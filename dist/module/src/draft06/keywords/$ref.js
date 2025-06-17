@@ -1,6 +1,6 @@
-import { resolveRef } from "../../keywords/$ref";
-import { joinId } from "../../utils/joinId";
-import { validateNode } from "../../validateNode";
+import { resolveRef } from "../../keywords/$ref.js";
+import { joinId } from "../../utils/joinId.js";
+import { validateNode } from "../../validateNode.js";
 export const $refKeyword = {
     id: "$ref",
     keyword: "$ref",

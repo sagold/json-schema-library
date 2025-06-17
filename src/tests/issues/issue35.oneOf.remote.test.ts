@@ -1,5 +1,5 @@
 import { strict as assert } from "assert";
-import { compileSchema } from "../../compileSchema";
+import { compileSchema } from "../../compileSchema.js";
 
 describe("issue#35 - reducing ref loses correct remote context", () => {
     // PR #35 https://github.com/sagold/json-schema-library/pull/35/commits/8b6477113bdfce522081473bb0dd8fd6fe680391

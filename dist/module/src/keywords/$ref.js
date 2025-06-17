@@ -1,10 +1,11 @@
-import { joinId } from "../utils/joinId";
-import splitRef from "../utils/splitRef";
-import { omit } from "../utils/omit";
-import { isObject } from "../utils/isObject";
-import { validateNode } from "../validateNode";
-import { get, split } from "@sagold/json-pointer";
-import { mergeNode } from "../mergeNode";
+import { joinId } from "../utils/joinId.js";
+import splitRef from "../utils/splitRef.js";
+import { omit } from "../utils/omit.js";
+import { isObject } from "../utils/isObject.js";
+import { validateNode } from "../validateNode.js";
+import jsonPointer from "@sagold/json-pointer";
+import { mergeNode } from "../mergeNode.js";
+const { get, split } = jsonPointer;
 export const $refKeyword = {
     id: "$ref",
     keyword: "$ref",

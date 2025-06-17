@@ -1,4 +1,4 @@
-import type { SchemaNode, JsonError } from "./types";
+import type { SchemaNode, JsonError } from "./types.js";
 
 export type ValidationPath = {
     pointer: string;

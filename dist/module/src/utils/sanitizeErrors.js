@@ -1,4 +1,4 @@
-import { isJsonError } from "../types";
+import { isJsonError } from "../types.js";
 export default function sanitizeErrors(list, result = []) {
     if (!Array.isArray(list)) {
         return [list];

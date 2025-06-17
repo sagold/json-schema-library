@@ -1,7 +1,7 @@
 import { strict as assert } from "assert";
-import { compileSchema } from "../../compileSchema";
-import { SchemaNode } from "../../types";
-import { draftEditor } from "../../draftEditor";
+import { compileSchema } from "../../compileSchema.js";
+import { SchemaNode } from "../../types.js";
+import { draftEditor } from "../../draftEditor.js";
 
 describe("issue#19 - getSchema from dependencies", () => {
     let rootNode: SchemaNode;

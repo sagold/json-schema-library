@@ -1,5 +1,5 @@
-import { compileSchema } from "../compileSchema";
-import { JsonSchema } from "../types";
+import { compileSchema } from "../compileSchema.js";
+import { JsonSchema } from "../types.js";
 
 export function shouldReturnTypeNode(schema: JsonSchema) {
     const root = compileSchema(schema);

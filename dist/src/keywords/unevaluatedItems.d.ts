@@ -1,5 +1,5 @@
-import { SchemaNode } from "../types";
-import { Keyword } from "../Keyword";
+import { SchemaNode } from "../types.js";
+import { Keyword } from "../Keyword.js";
 /**
  * @draft >= 2019-09
  * Similar to additionalItems, but can "see" into subschemas and across references

@@ -1,8 +1,8 @@
-import { mergeSchema } from "../utils/mergeSchema";
-import { isObject } from "../utils/isObject";
-import { isSchemaNode, SchemaNode, JsonSchema } from "../types";
-import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
-import { validateNode } from "../validateNode";
+import { mergeSchema } from "../utils/mergeSchema.js";
+import { isObject } from "../utils/isObject.js";
+import { isSchemaNode, SchemaNode, JsonSchema } from "../types.js";
+import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword.js";
+import { validateNode } from "../validateNode.js";
 
 export const dependentSchemasKeyword: Keyword = {
     id: "dependentSchemas",

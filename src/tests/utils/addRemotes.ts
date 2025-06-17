@@ -1,6 +1,6 @@
 import { globSync } from "glob";
-import { JsonSchema } from "../../types";
-import { SchemaNode } from "../../types";
+import { JsonSchema } from "../../types.js";
+import { SchemaNode } from "../../types.js";
 import path from "path";
 
 export function addRemotes(

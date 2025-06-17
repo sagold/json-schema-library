@@ -1,4 +1,4 @@
-import { JsonSchema } from "../types";
+import { JsonSchema } from "../types.js";
 
 export function getDefaultValue(schema: JsonSchema, inputData: any, initValue: any) {
     if (inputData != null) {

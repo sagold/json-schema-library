@@ -1,7 +1,7 @@
-import { compileSchema } from "./compileSchema";
+import { compileSchema } from "./compileSchema.js";
 import { strict as assert } from "assert";
-import { isSchemaNode } from "./types";
-import { mergeNode, removeDuplicates } from "./mergeNode";
+import { isSchemaNode } from "./types.js";
+import { mergeNode, removeDuplicates } from "./mergeNode.js";
 
 describe("removeDuplicates", () => {
     it("should remove duplicate functions", () => {

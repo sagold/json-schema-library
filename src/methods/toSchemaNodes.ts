@@ -1,4 +1,4 @@
-import { isSchemaNode, SchemaNode } from "../types";
+import { isSchemaNode, SchemaNode } from "../types.js";
 
 function eachProperty(nodeList: SchemaNode[], o?: Record<string, SchemaNode | unknown>) {
     if (o != null) {

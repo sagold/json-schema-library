@@ -1,5 +1,5 @@
-import draft07Meta from "../../../remotes/draft07.json";
-import runAllTestCases from "../utils/runTestCases";
+import draft07Meta from "../../../remotes/draft07.js";
+import runAllTestCases from "../utils/runTestCases.js";
 
 runAllTestCases({
     // only: {

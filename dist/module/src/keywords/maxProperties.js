@@ -1,4 +1,4 @@
-import { isObject } from "../utils/isObject";
+import { isObject } from "../utils/isObject.js";
 export const maxPropertiesKeyword = {
     id: "maxProperties",
     keyword: "maxProperties",

@@ -1,4 +1,4 @@
-import { SchemaNode } from "../types";
+import { SchemaNode } from "../types.js";
 export type DataNode = {
     node: SchemaNode;
     value: unknown;

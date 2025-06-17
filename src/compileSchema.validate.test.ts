@@ -1,7 +1,7 @@
-import { compileSchema } from "./compileSchema";
+import { compileSchema } from "./compileSchema.js";
 import { strict as assert } from "assert";
-import { Draft, JsonError, SchemaNode } from "./types";
-import { draft2020 } from "./draft2020";
+import { Draft, JsonError, SchemaNode } from "./types.js";
+import { draft2020 } from "./draft2020.js";
 
 describe("compileSchema.validate", () => {
     describe("integer", () => {

@@ -1,4 +1,4 @@
-import { isSchemaNode } from "./SchemaNode";
+import { isSchemaNode } from "./SchemaNode.js";
 export { isSchemaNode };
 /**
  * ts type guard for json error

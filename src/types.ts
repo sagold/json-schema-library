@@ -1,6 +1,6 @@
-import { Draft } from "./Draft";
-import { errors } from "./errors/errors";
-import { SchemaNode, isSchemaNode, GetNodeOptions } from "./SchemaNode";
+import { Draft } from "./Draft.js";
+import { errors } from "./errors/errors.js";
+import { SchemaNode, isSchemaNode, GetNodeOptions } from "./SchemaNode.js";
 
 export type BooleanSchema = boolean;
 export interface JsonSchema {

@@ -1,6 +1,6 @@
-import { isSchemaNode, SchemaNode } from "./types";
-import { mergeSchema } from "./utils/mergeSchema";
-import { joinDynamicId } from "./SchemaNode";
+import { isSchemaNode, SchemaNode } from "./types.js";
+import { mergeSchema } from "./utils/mergeSchema.js";
+import { joinDynamicId } from "./SchemaNode.js";
 
 interface SchemaNodeCB {
     toJSON?: () => string;

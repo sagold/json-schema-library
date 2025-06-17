@@ -1,7 +1,7 @@
 /* eslint quote-props: 0, no-unused-expressions: 0 */
 import { strict as assert } from "assert";
-import { toSchemaNodes } from "./toSchemaNodes";
-import { compileSchema } from "../compileSchema";
+import { toSchemaNodes } from "./toSchemaNodes.js";
+import { compileSchema } from "../compileSchema.js";
 
 describe("toSchemaNodes", () => {
     it("should execute callback on root-schema", () => {

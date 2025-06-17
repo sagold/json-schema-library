@@ -1,2 +1,2 @@
-import { Keyword } from "../Keyword";
+import { Keyword } from "../Keyword.js";
 export declare const patternKeyword: Keyword;

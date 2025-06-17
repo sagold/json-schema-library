@@ -1,4 +1,4 @@
-import { isObject } from "../utils/isObject";
+import { isObject } from "../utils/isObject.js";
 
 export function pick<T extends { [P in keyof T]: unknown }, K extends keyof T>(value: T, ...properties: K[]) {
     if (!isObject(value) || properties.length === 0) {

@@ -1,7 +1,7 @@
-import { compileSchema } from "./compileSchema";
+import { compileSchema } from "./compileSchema.js";
 import { strict as assert } from "assert";
-import { extendDraft } from "./Draft";
-import { draft2020 } from "./draft2020";
+import { extendDraft } from "./Draft.js";
+import { draft2020 } from "./draft2020.js";
 
 describe("Draft.extendDraft", () => {
     it("should add format validator", () => {

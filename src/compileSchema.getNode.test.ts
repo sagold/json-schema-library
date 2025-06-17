@@ -1,7 +1,7 @@
-import { compileSchema } from "./compileSchema";
+import { compileSchema } from "./compileSchema.js";
 import { strict as assert } from "assert";
-import { isSchemaNode, isJsonError, SchemaNode } from "./types";
-import { pick } from "./utils/pick";
+import { isSchemaNode, isJsonError, SchemaNode } from "./types.js";
+import { pick } from "./utils/pick.js";
 
 describe("compileSchema : getNode", () => {
     describe("behaviour", () => {

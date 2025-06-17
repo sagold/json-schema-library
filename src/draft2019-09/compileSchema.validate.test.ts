@@ -1,7 +1,7 @@
-import { compileSchema } from "../compileSchema";
+import { compileSchema } from "../compileSchema.js";
 import { strict as assert } from "assert";
-import { Draft, JsonError, SchemaNode } from "../types";
-import { draft2019 } from "../draft2019";
+import { Draft, JsonError, SchemaNode } from "../types.js";
+import { draft2019 } from "../draft2019.js";
 
 const $schema = "draft-2019-09";
 

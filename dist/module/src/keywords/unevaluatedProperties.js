@@ -1,6 +1,6 @@
-import { isObject } from "../utils/isObject";
-import { validateNode } from "../validateNode";
-import { isPropertyEvaluated } from "../isPropertyEvaluated";
+import { isObject } from "../utils/isObject.js";
+import { validateNode } from "../validateNode.js";
+import { isPropertyEvaluated } from "../isPropertyEvaluated.js";
 export const unevaluatedPropertiesKeyword = {
     id: "unevaluatedProperties",
     keyword: "unevaluatedProperties",

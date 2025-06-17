@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
-import { compileSchema } from "../../compileSchema";
-import { SchemaNode } from "../../types";
+import { compileSchema } from "../../compileSchema.js";
+import { SchemaNode } from "../../types.js";
 
 describe("issue#52 - mutiple typeIds [not, oneOf] matched in subschema", () => {
     let node: SchemaNode;

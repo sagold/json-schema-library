@@ -1,5 +1,5 @@
-import { Keyword } from "../Keyword";
-import { SchemaNode } from "../types";
+import { Keyword } from "../Keyword.js";
+import { SchemaNode } from "../types.js";
 
 export const $defsKeyword: Keyword = {
     id: "$defs",

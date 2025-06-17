@@ -1,6 +1,6 @@
-import { isObject } from "../utils/isObject";
-import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
-import { hasProperty } from "../utils/hasProperty";
+import { isObject } from "../utils/isObject.js";
+import { Keyword, JsonSchemaValidatorParams } from "../Keyword.js";
+import { hasProperty } from "../utils/hasProperty.js";
 
 export const requiredKeyword: Keyword = {
     id: "required",

@@ -1,5 +1,5 @@
-import { ValidationPath } from "./Keyword";
-import { SchemaNode } from "./types";
+import { ValidationPath } from "./Keyword.js";
+import { SchemaNode } from "./types.js";
 type Options = {
     /** array node */
     node: SchemaNode;

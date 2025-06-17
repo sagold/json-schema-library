@@ -1,7 +1,7 @@
-import { isObject } from "../utils/isObject";
-import { SchemaNode } from "../types";
-import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
-import { validateNode } from "../validateNode";
+import { isObject } from "../utils/isObject.js";
+import { SchemaNode } from "../types.js";
+import { Keyword, JsonSchemaValidatorParams } from "../Keyword.js";
+import { validateNode } from "../validateNode.js";
 
 export const containsKeyword: Keyword = {
     id: "contains",

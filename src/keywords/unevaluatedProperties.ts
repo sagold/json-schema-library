@@ -1,8 +1,8 @@
-import { isObject } from "../utils/isObject";
-import { SchemaNode } from "../types";
-import { Keyword, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
-import { validateNode } from "../validateNode";
-import { isPropertyEvaluated } from "../isPropertyEvaluated";
+import { isObject } from "../utils/isObject.js";
+import { SchemaNode } from "../types.js";
+import { Keyword, JsonSchemaValidatorParams, ValidationResult } from "../Keyword.js";
+import { validateNode } from "../validateNode.js";
+import { isPropertyEvaluated } from "../isPropertyEvaluated.js";
 
 export const unevaluatedPropertiesKeyword: Keyword = {
     id: "unevaluatedProperties",

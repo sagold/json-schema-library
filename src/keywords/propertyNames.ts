@@ -1,8 +1,8 @@
-import { JsonError } from "../types";
-import { isObject } from "../utils/isObject";
-import { SchemaNode } from "../types";
-import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
-import { validateNode } from "../validateNode";
+import { JsonError } from "../types.js";
+import { isObject } from "../utils/isObject.js";
+import { SchemaNode } from "../types.js";
+import { Keyword, JsonSchemaValidatorParams } from "../Keyword.js";
+import { validateNode } from "../validateNode.js";
 
 export const propertyNamesKeyword: Keyword = {
     id: "propertyNames",

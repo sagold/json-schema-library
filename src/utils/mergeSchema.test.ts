@@ -1,5 +1,5 @@
 import { strict as assert } from "assert";
-import { mergeSchema } from "./mergeSchema";
+import { mergeSchema } from "./mergeSchema.js";
 
 describe("mergeSchema", () => {
     it("should merge required statements", () => {

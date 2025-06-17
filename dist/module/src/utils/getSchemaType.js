@@ -1,5 +1,5 @@
-import { getTypeOf } from "./getTypeOf";
-import { isObject } from "../utils/isObject";
+import { getTypeOf } from "./getTypeOf.js";
+import { isObject } from "../utils/isObject.js";
 export const SCHEMA_TYPES = ["string", "number", "integer", "boolean", "null", "array", "object"];
 const OBJECT_PROPERTIES = [
     "additionalProperties",

@@ -1,4 +1,4 @@
-import { compileSchema } from "../compileSchema";
+import { compileSchema } from "../compileSchema.js";
 import { strict as assert } from "assert";
 
 describe("keyword : string : validation", () => {

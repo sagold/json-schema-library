@@ -1,5 +1,5 @@
-import { getValue } from "./utils/getValue";
-import { validateNode } from "./validateNode";
+import { getValue } from "./utils/getValue.js";
+import { validateNode } from "./validateNode.js";
 /**
  * Returns true if an item is evaluated
  *

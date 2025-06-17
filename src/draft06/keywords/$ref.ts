@@ -1,8 +1,8 @@
-import { Keyword, JsonSchemaValidatorParams, ValidationPath } from "../../Keyword";
-import { resolveRef } from "../../keywords/$ref";
-import { SchemaNode } from "../../types";
-import { joinId } from "../../utils/joinId";
-import { validateNode } from "../../validateNode";
+import { Keyword, JsonSchemaValidatorParams, ValidationPath } from "../../Keyword.js";
+import { resolveRef } from "../../keywords/$ref.js";
+import { SchemaNode } from "../../types.js";
+import { joinId } from "../../utils/joinId.js";
+import { validateNode } from "../../validateNode.js";
 
 export const $refKeyword: Keyword = {
     id: "$ref",

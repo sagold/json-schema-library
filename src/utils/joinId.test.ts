@@ -1,5 +1,5 @@
 import { strict as assert } from "assert";
-import { joinId } from "./joinId";
+import { joinId } from "./joinId.js";
 
 describe("joinId", () => {
     it("should return initial base", () => {

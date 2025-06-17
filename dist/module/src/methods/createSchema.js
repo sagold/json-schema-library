@@ -1,5 +1,5 @@
-import { getTypeOf } from "../utils/getTypeOf";
-import { isObject } from "../utils/isObject";
+import { getTypeOf } from "../utils/getTypeOf.js";
+import { isObject } from "../utils/isObject.js";
 /**
  * Create a simple json schema for the given input data
  * @param  data - data to get json schema for

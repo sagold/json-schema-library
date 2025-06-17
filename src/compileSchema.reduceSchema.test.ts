@@ -1,6 +1,6 @@
-import { compileSchema } from "./compileSchema";
+import { compileSchema } from "./compileSchema.js";
 import { strict as assert } from "assert";
-import { isSchemaNode } from "./types";
+import { isSchemaNode } from "./types.js";
 
 describe("compileSchema : reduceNode", () => {
     describe("behaviour", () => {});

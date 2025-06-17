@@ -1,6 +1,6 @@
-import { getTypeOf, JSType } from "../utils/getTypeOf";
-import { SchemaNode } from "../types";
-import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams } from "../Keyword";
+import { getTypeOf, JSType } from "../utils/getTypeOf.js";
+import { SchemaNode } from "../types.js";
+import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams } from "../Keyword.js";
 
 export const typeKeyword: Keyword = {
     id: "type",

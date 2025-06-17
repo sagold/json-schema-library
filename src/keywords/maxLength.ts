@@ -1,5 +1,5 @@
-import ucs2decode from "../utils/punycode.ucs2decode";
-import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import ucs2decode from "../utils/punycode.ucs2decode.js";
+import { Keyword, JsonSchemaValidatorParams } from "../Keyword.js";
 
 export const maxLengthKeyword: Keyword = {
     id: "maxLength",

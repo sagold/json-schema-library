@@ -1,6 +1,6 @@
-import { getValue } from "../utils/getValue";
-import { isObject } from "../utils/isObject";
-import { validateNode } from "../validateNode";
+import { getValue } from "../utils/getValue.js";
+import { isObject } from "../utils/isObject.js";
+import { validateNode } from "../validateNode.js";
 export const propertiesKeyword = {
     id: "property",
     keyword: "properties",

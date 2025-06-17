@@ -1,4 +1,4 @@
-import { SchemaNode } from "../../types";
+import { SchemaNode } from "../../types.js";
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */
     addOptionalProps?: boolean;

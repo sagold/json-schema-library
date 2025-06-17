@@ -1,8 +1,8 @@
-import { Draft } from "../types";
+import { Draft } from "../types.js";
 
 export function copyDraft(draft: Draft) {
     return {
         ...draft,
-        keywords: [...draft.keywords.map((f) => ({ ...f }))]
+        keywords: [...draft.keywords.map((f: any) => ({ ...f }))]
     };
 }

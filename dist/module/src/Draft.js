@@ -1,4 +1,4 @@
-import { copyDraft } from "./utils/copyDraft";
+import { copyDraft } from "./utils/copyDraft.js";
 export function extendDraft(draft, extension) {
     var _a, _b, _c;
     const { keywords } = addKeywords(draft, ...((_a = extension.keywords) !== null && _a !== void 0 ? _a : []));

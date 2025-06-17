@@ -1,4 +1,4 @@
-import sanitizeErrors from "./utils/sanitizeErrors";
+import sanitizeErrors from "./utils/sanitizeErrors.js";
 export function validateNode(node, data, pointer, path) {
     path === null || path === void 0 ? void 0 : path.push({ pointer, node });
     const schema = node.schema;

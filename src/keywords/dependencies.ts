@@ -1,10 +1,10 @@
-import { isSchemaNode, SchemaNode } from "../types";
-import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
-import { isObject } from "../utils/isObject";
-import { mergeNode } from "../mergeNode";
-import { hasProperty } from "../utils/hasProperty";
-import { validateDependentRequired } from "./dependentRequired";
-import { validateDependentSchemas } from "./dependentSchemas";
+import { isSchemaNode, SchemaNode } from "../types.js";
+import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword.js";
+import { isObject } from "../utils/isObject.js";
+import { mergeNode } from "../mergeNode.js";
+import { hasProperty } from "../utils/hasProperty.js";
+import { validateDependentRequired } from "./dependentRequired.js";
+import { validateDependentSchemas } from "./dependentSchemas.js";
 
 export const dependenciesKeyword: Keyword = {
     id: "dependencies",

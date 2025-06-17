@@ -1,4 +1,4 @@
-import { SchemaNode } from "../types";
+import { SchemaNode } from "../types.js";
 export declare const SCHEMA_TYPES: string[];
 /**
  * @helper for getData

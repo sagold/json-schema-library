@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
-import { compileSchema } from "../../compileSchema";
-import { SchemaNode } from "../../types";
+import { compileSchema } from "../../compileSchema.js";
+import { SchemaNode } from "../../types.js";
 
 describe("issue#38 - getData anyOf should not modify valid default value", () => {
     let node: SchemaNode;

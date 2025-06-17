@@ -1,5 +1,5 @@
-import { GetNodeOptions } from "./SchemaNode";
-import { NodeOrError, OptionalNodeOrError } from "./types";
+import { GetNodeOptions } from "./SchemaNode.js";
+import { NodeOrError, OptionalNodeOrError } from "./types.js";
 export declare function getNodeChild(key: string | number, data: unknown, options: {
     withSchemaWarning: true;
 } & GetNodeOptions): NodeOrError;

@@ -1,8 +1,8 @@
 import { strict as assert } from "assert";
-import { getDraftTests } from "./getDraftTests";
-import { addRemotes } from "./addRemotes";
-import { compileSchema } from "../../compileSchema";
-import { isObject } from "../../utils/isObject";
+import { getDraftTests } from "./getDraftTests.js";
+import { addRemotes } from "./addRemotes.js";
+import { compileSchema } from "../../compileSchema.js";
+import { isObject } from "../../utils/isObject.js";
 let measurements = {
     start: 0,
     validationDuration: 0,

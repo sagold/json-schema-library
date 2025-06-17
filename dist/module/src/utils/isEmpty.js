@@ -1,4 +1,4 @@
-import { getTypeOf } from "./getTypeOf";
+import { getTypeOf } from "./getTypeOf.js";
 export function isEmpty(v) {
     const type = getTypeOf(v);
     switch (type) {

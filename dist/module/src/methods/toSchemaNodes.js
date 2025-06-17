@@ -1,4 +1,4 @@
-import { isSchemaNode } from "../types";
+import { isSchemaNode } from "../types.js";
 function eachProperty(nodeList, o) {
     if (o != null) {
         Object.values(o).forEach((node) => toSchemaNodes(node, nodeList));

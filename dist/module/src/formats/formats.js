@@ -1,5 +1,5 @@
 /* eslint-disable max-len, no-control-regex */
-import { getTypeOf } from "../utils/getTypeOf";
+import { getTypeOf } from "../utils/getTypeOf.js";
 import validUrl from "valid-url";
 import { parse as parseIdnEmail } from "smtp-address-parser";
 const isValidIPV4 = /^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$/;

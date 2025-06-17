@@ -1,8 +1,8 @@
-import { isObject } from "../../utils/isObject";
-import { SchemaNode } from "../../types";
-import { Keyword, JsonSchemaValidatorParams, ValidationResult } from "../../Keyword";
-import sanitizeErrors from "../../utils/sanitizeErrors";
-import { validateNode } from "../../validateNode";
+import { isObject } from "../../utils/isObject.js";
+import { SchemaNode } from "../../types.js";
+import { Keyword, JsonSchemaValidatorParams, ValidationResult } from "../../Keyword.js";
+import sanitizeErrors from "../../utils/sanitizeErrors.js";
+import { validateNode } from "../../validateNode.js";
 
 /**
  * @draft >= 2019-09

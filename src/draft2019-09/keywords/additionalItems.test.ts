@@ -1,5 +1,5 @@
 import { strict as assert } from "assert";
-import { compileSchema } from "../../compileSchema";
+import { compileSchema } from "../../compileSchema.js";
 
 describe("keyword : additionalItems : validate", () => {
     it("should allow any additional item when set to 'true'", () => {
