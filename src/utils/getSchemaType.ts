@@ -1,6 +1,6 @@
-import { getTypeOf } from "./getTypeOf";
-import { isObject } from "../utils/isObject";
-import { BooleanSchema, JsonSchema, SchemaNode } from "../types";
+import { getTypeOf } from "./getTypeOf.js";
+import { isObject } from "../utils/isObject.js";
+import { BooleanSchema, JsonSchema, SchemaNode } from "../types.js";
 
 export const SCHEMA_TYPES = ["string", "number", "integer", "boolean", "null", "array", "object"];
 const OBJECT_PROPERTIES = [

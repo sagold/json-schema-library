@@ -1,5 +1,5 @@
-import { mergeSchema } from "../utils/mergeSchema";
-import { validateNode } from "../validateNode";
+import { mergeSchema } from "../utils/mergeSchema.js";
+import { validateNode } from "../validateNode.js";
 export const anyOfKeyword = {
     id: "anyOf",
     keyword: "anyOf",

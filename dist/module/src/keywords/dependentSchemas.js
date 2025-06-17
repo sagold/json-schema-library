@@ -1,7 +1,7 @@
-import { mergeSchema } from "../utils/mergeSchema";
-import { isObject } from "../utils/isObject";
-import { isSchemaNode } from "../types";
-import { validateNode } from "../validateNode";
+import { mergeSchema } from "../utils/mergeSchema.js";
+import { isObject } from "../utils/isObject.js";
+import { isSchemaNode } from "../types.js";
+import { validateNode } from "../validateNode.js";
 export const dependentSchemasKeyword = {
     id: "dependentSchemas",
     keyword: "dependentSchemas",

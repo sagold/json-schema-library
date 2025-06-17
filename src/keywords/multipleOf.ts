@@ -1,5 +1,5 @@
-import { getPrecision } from "../utils/getPrecision";
-import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import { getPrecision } from "../utils/getPrecision.js";
+import { Keyword, JsonSchemaValidatorParams } from "../Keyword.js";
 
 export const multipleOfKeyword: Keyword = {
     id: "multipleOf",

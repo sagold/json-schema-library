@@ -1,4 +1,4 @@
-import { isSchemaNode, JsonError, SchemaNode } from "../types";
+import { isSchemaNode, JsonError, SchemaNode } from "../types.js";
 
 /**
  * Returns a list of possible child-schemas for the given property key. In case of a oneOf selection, multiple schemas

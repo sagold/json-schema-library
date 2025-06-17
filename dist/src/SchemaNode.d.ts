@@ -1,10 +1,10 @@
-import type { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, Keyword, ValidationPath } from "./Keyword";
-import { createSchema } from "./methods/createSchema";
-import { Draft } from "./Draft";
-import { JsonSchema, JsonError, ErrorData, OptionalNodeOrError } from "./types";
-import { TemplateOptions } from "./methods/getData";
-import { getNode } from "./getNode";
-import { getNodeChild } from "./getNodeChild";
+import type { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, Keyword, ValidationPath } from "./Keyword.js";
+import { createSchema } from "./methods/createSchema.js";
+import { Draft } from "./Draft.js";
+import { JsonSchema, JsonError, ErrorData, OptionalNodeOrError } from "./types.js";
+import { TemplateOptions } from "./methods/getData.js";
+import { getNode } from "./getNode.js";
+import { getNodeChild } from "./getNodeChild.js";
 export declare function isSchemaNode(value: unknown): value is SchemaNode;
 export declare function isReduceable(node: SchemaNode): boolean;
 export type Context = {
@@ -183,7 +183,7 @@ export declare const SchemaNodeMethods: {
     /**
      * @returns draft version this JSON Schema is evaluated by
      */
-    readonly getDraftVersion: () => import("./Draft").DraftVersion;
+    readonly getDraftVersion: () => import("./Draft.js").DraftVersion;
     /**
      * @returns data that is valid to the schema of this node
      */
@@ -212,7 +212,7 @@ export declare const SchemaNodeMethods: {
     /**
      * @returns a list of values (including objects and arrays) and their corresponding JSON Schema as SchemaNode
      */
-    readonly toDataNodes: (data: unknown, pointer?: string) => import("..").DataNode[];
+    readonly toDataNodes: (data: unknown, pointer?: string) => import("./methods/toDataNodes.js").DataNode[];
     readonly toJSON: () => any;
 };
 export declare function addKeywords(node: SchemaNode): void;

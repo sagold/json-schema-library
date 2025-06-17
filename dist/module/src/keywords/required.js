@@ -1,5 +1,5 @@
-import { isObject } from "../utils/isObject";
-import { hasProperty } from "../utils/hasProperty";
+import { isObject } from "../utils/isObject.js";
+import { hasProperty } from "../utils/hasProperty.js";
 export const requiredKeyword = {
     id: "required",
     keyword: "required",

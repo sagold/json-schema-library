@@ -1,9 +1,9 @@
-import { isSchemaNode } from "../types";
-import { isObject } from "../utils/isObject";
-import { mergeNode } from "../mergeNode";
-import { hasProperty } from "../utils/hasProperty";
-import { validateDependentRequired } from "./dependentRequired";
-import { validateDependentSchemas } from "./dependentSchemas";
+import { isSchemaNode } from "../types.js";
+import { isObject } from "../utils/isObject.js";
+import { mergeNode } from "../mergeNode.js";
+import { hasProperty } from "../utils/hasProperty.js";
+import { validateDependentRequired } from "./dependentRequired.js";
+import { validateDependentSchemas } from "./dependentSchemas.js";
 export const dependenciesKeyword = {
     id: "dependencies",
     keyword: "dependencies",

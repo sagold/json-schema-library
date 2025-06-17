@@ -1,5 +1,5 @@
 import { strict as assert } from "assert";
-import splitRef from "./splitRef";
+import splitRef from "./splitRef.js";
 
 describe("compile.splitRef", () => {
     it("should return empty list for empty string", () => {

@@ -12,4 +12,4 @@
  * - $ref
  * - dependencies has been split into dependentSchemas and dependentRequired
  */
-export declare const draft2019: import("./Draft").Draft;
+export declare const draft2019: import("./Draft.js").Draft;

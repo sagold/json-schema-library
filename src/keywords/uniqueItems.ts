@@ -1,5 +1,5 @@
-import { JsonError } from "../types";
-import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import { JsonError } from "../types.js";
+import { Keyword, JsonSchemaValidatorParams } from "../Keyword.js";
 import deepEqual from "fast-deep-equal";
 
 export const uniqueItemsKeyword: Keyword = {

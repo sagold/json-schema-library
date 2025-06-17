@@ -1,6 +1,6 @@
-import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
-import { SchemaNode } from "../types";
-import { validateNode } from "../validateNode";
+import { Keyword, JsonSchemaValidatorParams } from "../Keyword.js";
+import { SchemaNode } from "../types.js";
+import { validateNode } from "../validateNode.js";
 
 export const notKeyword: Keyword = {
     id: "not",

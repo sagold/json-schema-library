@@ -1,8 +1,8 @@
-import { joinId } from "../../utils/joinId";
-import { isObject } from "../../utils/isObject";
-import { omit } from "../../utils/omit";
-import splitRef from "../../utils/splitRef";
-import { $refKeyword as draft06Keyword } from "../../draft06/keywords/$ref";
+import { joinId } from "../../utils/joinId.js";
+import { isObject } from "../../utils/isObject.js";
+import { omit } from "../../utils/omit.js";
+import splitRef from "../../utils/splitRef.js";
+import { $refKeyword as draft06Keyword } from "../../draft06/keywords/$ref.js";
 export const $refKeyword = {
     id: "$ref",
     keyword: "$ref",

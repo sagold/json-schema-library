@@ -1,5 +1,5 @@
 import { strict as assert } from "assert";
-import { compileSchema } from "../../compileSchema";
+import { compileSchema } from "../../compileSchema.js";
 
 describe("issue#22 - toDataNodes on root $ref", () => {
     it("should call for each properties", () => {

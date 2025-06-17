@@ -1,5 +1,5 @@
-import { isObject } from "../utils/isObject";
-import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import { isObject } from "../utils/isObject.js";
+import { Keyword, JsonSchemaValidatorParams } from "../Keyword.js";
 
 export const maxPropertiesKeyword: Keyword = {
     id: "maxProperties",

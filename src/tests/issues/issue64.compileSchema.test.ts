@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
-import { compileSchema } from "../../compileSchema";
-import { JsonSchema } from "../../types";
+import { compileSchema } from "../../compileSchema.js";
+import { JsonSchema } from "../../types.js";
 
 describe("issue#64 - should not fail compiling schema", () => {
     let schema: JsonSchema;

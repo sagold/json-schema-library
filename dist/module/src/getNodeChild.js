@@ -1,6 +1,6 @@
-import { isSchemaNode } from "./SchemaNode";
-import { isJsonError } from "./types";
-import { getValue } from "./utils/getValue";
+import { isSchemaNode } from "./SchemaNode.js";
+import { isJsonError } from "./types.js";
+import { getValue } from "./utils/getValue.js";
 /**
  * @returns child node identified by property as SchemaNode
  */

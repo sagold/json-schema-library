@@ -1,6 +1,6 @@
-import { JsonSchema, Draft } from "./types";
-import { TemplateOptions } from "./methods/getData";
-import { SchemaNode } from "./SchemaNode";
+import { JsonSchema, Draft } from "./types.js";
+import { TemplateOptions } from "./methods/getData.js";
+import { SchemaNode } from "./SchemaNode.js";
 export type CompileOptions = {
     drafts?: Draft[];
     remote?: SchemaNode;

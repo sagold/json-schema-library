@@ -1,4 +1,4 @@
-import { JsonSchema } from "../../types";
+import { JsonSchema } from "../../types.js";
 export type DraftVersion = "4" | "6" | "7" | "2019-09" | "2020-12";
 export type FeatureTest = {
     /** name of feature being tests, e.g. additionalItems */

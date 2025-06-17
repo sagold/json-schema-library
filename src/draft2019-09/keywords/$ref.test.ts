@@ -1,5 +1,5 @@
 import { strict as assert } from "assert";
-import { compileSchema } from "../../compileSchema";
+import { compileSchema } from "../../compileSchema.js";
 
 describe("keyword : $ref : resolve", () => {
     it("should return undefined for missing reference", () => {

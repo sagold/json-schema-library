@@ -1,4 +1,4 @@
-import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import { Keyword, JsonSchemaValidatorParams } from "../Keyword.js";
 
 export const exclusiveMinimumKeyword: Keyword = {
     id: "exclusiveMinimum",

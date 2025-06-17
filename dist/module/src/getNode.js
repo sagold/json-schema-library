@@ -1,6 +1,6 @@
-import { isJsonError } from "./types";
+import { isJsonError } from "./types.js";
 import { split } from "@sagold/json-pointer";
-import { getValue } from "./utils/getValue";
+import { getValue } from "./utils/getValue.js";
 /**
  * Returns a node containing JSON Schema of a data JSON Pointer.
  *

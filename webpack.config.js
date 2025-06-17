@@ -1,7 +1,10 @@
-const path = require("path"); // eslint-disable-line
-const TerserPlugin = require("terser-webpack-plugin"); // eslint-disable-line
+import path from "path"; // eslint-disable-line
+import TerserPlugin from "terser-webpack-plugin"; // eslint-disable-line
 const PRODUCTION = process.env.NODE_ENV === "production";
 
+const __dirname = import.meta.dirname;
+
+console.log(`Dirname: ${__dirname}`);
 
 const config = {
     entry: "./index.ts",
@@ -20,13 +23,16 @@ const config = {
     },
 
     resolve: {
-        extensions: [".tsx", ".ts", ".js"]
+        extensions: [".tsx", ".ts", ".js"],
+        extensionAlias: {
+        '.js': ['.js', '.ts'],
+    },
     },
 
     module: {
         rules: [
             {
-                test: /\.tsx?$/,
+                test: /\.([cm]?ts|tsx)$/,
                 use: {
                     loader: "ts-loader",
                     options: {
@@ -46,4 +52,4 @@ const config = {
     }
 };
 
-module.exports = config;
+export default config;

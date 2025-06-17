@@ -1,9 +1,9 @@
-import settings from "../settings";
-import { isObject } from "../utils/isObject";
-import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
-import { SchemaNode } from "../types";
-import { getValue } from "../utils/getValue";
-import { validateNode } from "../validateNode";
+import settings from "../settings.js";
+import { isObject } from "../utils/isObject.js";
+import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword.js";
+import { SchemaNode } from "../types.js";
+import { getValue } from "../utils/getValue.js";
+import { validateNode } from "../validateNode.js";
 
 export const additionalPropertiesKeyword: Keyword = {
     id: "additionalProperties",

@@ -1,5 +1,5 @@
 import { strict as assert } from "assert";
-import { getTypeOf } from "./getTypeOf";
+import { getTypeOf } from "./getTypeOf.js";
 
 describe("getTypeOf", () => {
     it("should return 'string' for \"\"", () => {

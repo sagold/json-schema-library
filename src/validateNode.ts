@@ -1,6 +1,6 @@
-import { BooleanSchema, JsonSchema, SchemaNode } from "./types";
-import { ValidationPath, ValidationResult } from "./Keyword";
-import sanitizeErrors from "./utils/sanitizeErrors";
+import { BooleanSchema, JsonSchema, SchemaNode } from "./types.js";
+import { ValidationPath, ValidationResult } from "./Keyword.js";
+import sanitizeErrors from "./utils/sanitizeErrors.js";
 
 export function validateNode(node: SchemaNode, data: unknown, pointer: string, path?: ValidationPath) {
     path?.push({ pointer, node });

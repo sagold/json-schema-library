@@ -1,9 +1,9 @@
-import type { JsonSchemaValidator, Keyword } from "./Keyword";
-import { createSchema } from "./methods/createSchema";
-import { toDataNodes } from "./methods/toDataNodes";
-import { ErrorConfig } from "./types";
-import { getChildSelection } from "./methods/getChildSelection";
-import { getData } from "./methods/getData";
+import type { JsonSchemaValidator, Keyword } from "./Keyword.js";
+import { createSchema } from "./methods/createSchema.js";
+import { toDataNodes } from "./methods/toDataNodes.js";
+import { ErrorConfig } from "./types.js";
+import { getChildSelection } from "./methods/getChildSelection.js";
+import { getData } from "./methods/getData.js";
 export type DraftVersion = "draft-04" | "draft-06" | "draft-07" | "draft-2019-09" | "draft-2020-12" | "latest";
 export interface Draft {
     /** test-string if draft can be used with $schema-url */

@@ -1,14 +1,14 @@
 import copy from "fast-copy";
-import { getRef } from "./keywords/$ref";
-import { draft04 } from "./draft04";
-import { draft06 } from "./draft06";
-import { draft07 } from "./draft07";
-import { draft2019 } from "./draft2019";
-import { draft2020 } from "./draft2020";
-import { pick } from "./utils/pick";
-import { JsonSchema, Draft, BooleanSchema } from "./types";
-import { TemplateOptions } from "./methods/getData";
-import { SchemaNode, SchemaNodeMethods, addKeywords, isSchemaNode } from "./SchemaNode";
+import { getRef } from "./keywords/$ref.js";
+import { draft04 } from "./draft04.js";
+import { draft06 } from "./draft06.js";
+import { draft07 } from "./draft07.js";
+import { draft2019 } from "./draft2019.js";
+import { draft2020 } from "./draft2020.js";
+import { pick } from "./utils/pick.js";
+import { JsonSchema, Draft, BooleanSchema } from "./types.js";
+import { TemplateOptions } from "./methods/getData.js";
+import { SchemaNode, SchemaNodeMethods, addKeywords, isSchemaNode } from "./SchemaNode.js";
 
 export type CompileOptions = {
     drafts?: Draft[];

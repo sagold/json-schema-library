@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 
-import { compileSchema } from "../compileSchema";
+import { compileSchema } from "../compileSchema.js";
 
 describe("keyword : const : validate", () => {
     it("should return error if const does not match", () => {

@@ -1,11 +1,11 @@
-import draft2019Meta from "../../../remotes/draft2019-09.json";
-import draft2019MetaApplicator from "../../../remotes/draft2019-09_meta_applicator.json";
-import draft2019MetaContent from "../../../remotes/draft2019-09_meta_content.json";
-import draft2019MetaCore from "../../../remotes/draft2019-09_meta_core.json";
-import draft2019MetaFormat from "../../../remotes/draft2019-09_meta_format.json";
-import draft2019MetaMetaData from "../../../remotes/draft2019-09_meta_meta-data.json";
-import draft2019MetaValidation from "../../../remotes/draft2019-09_meta_validation.json";
-import runAllTestCases from "../utils/runTestCases";
+import draft2019Meta from "../../../remotes/draft2019-09.js";
+import draft2019MetaApplicator from "../../../remotes/draft2019-09_meta_applicator.js";
+import draft2019MetaContent from "../../../remotes/draft2019-09_meta_content.js";
+import draft2019MetaCore from "../../../remotes/draft2019-09_meta_core.js";
+import draft2019MetaFormat from "../../../remotes/draft2019-09_meta_format.js";
+import draft2019MetaMetaData from "../../../remotes/draft2019-09_meta_meta-data.js";
+import draft2019MetaValidation from "../../../remotes/draft2019-09_meta_validation.js";
+import runAllTestCases from "../utils/runTestCases.js";
 
 runAllTestCases({
     // only: {

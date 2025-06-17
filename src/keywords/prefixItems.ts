@@ -1,6 +1,6 @@
-import { SchemaNode } from "../types";
-import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
-import { validateNode } from "../validateNode";
+import { SchemaNode } from "../types.js";
+import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword.js";
+import { validateNode } from "../validateNode.js";
 
 export const prefixItemsKeyword: Keyword = {
     id: "prefixItems",

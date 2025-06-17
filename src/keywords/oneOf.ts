@@ -4,14 +4,14 @@ import {
     JsonSchemaValidatorParams,
     ValidationPath,
     ValidationResult
-} from "../Keyword";
-import { isSchemaNode, SchemaNode } from "../types";
-import settings from "../settings";
-import { getValue } from "../utils/getValue";
-import sanitizeErrors from "../utils/sanitizeErrors";
-import { isObject } from "../utils/isObject";
-import { validateNode } from "../validateNode";
-import { joinDynamicId } from "../SchemaNode";
+} from "../Keyword.js";
+import { isSchemaNode, SchemaNode } from "../types.js";
+import settings from "../settings.js";
+import { getValue } from "../utils/getValue.js";
+import sanitizeErrors from "../utils/sanitizeErrors.js";
+import { isObject } from "../utils/isObject.js";
+import { validateNode } from "../validateNode.js";
+import { joinDynamicId } from "../SchemaNode.js";
 
 const { DECLARATOR_ONEOF } = settings;
 

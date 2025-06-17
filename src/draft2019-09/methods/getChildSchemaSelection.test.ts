@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
-import { compileSchema } from "../../compileSchema";
-import { isJsonError } from "../../types";
+import { compileSchema } from "../../compileSchema.js";
+import { isJsonError } from "../../types.js";
 
 describe("getChildSelection (2019)", () => {
     it("should return a single object-schema as list", () => {

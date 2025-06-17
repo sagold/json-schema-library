@@ -1,7 +1,7 @@
-import { mergeSchema } from "../utils/mergeSchema";
-import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams } from "../Keyword";
-import { SchemaNode } from "../types";
-import { validateNode } from "../validateNode";
+import { mergeSchema } from "../utils/mergeSchema.js";
+import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams } from "../Keyword.js";
+import { SchemaNode } from "../types.js";
+import { validateNode } from "../validateNode.js";
 
 export const anyOfKeyword: Keyword = {
     id: "anyOf",

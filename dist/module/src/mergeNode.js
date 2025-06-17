@@ -1,6 +1,6 @@
-import { isSchemaNode } from "./types";
-import { mergeSchema } from "./utils/mergeSchema";
-import { joinDynamicId } from "./SchemaNode";
+import { isSchemaNode } from "./types.js";
+import { mergeSchema } from "./utils/mergeSchema.js";
+import { joinDynamicId } from "./SchemaNode.js";
 function sortCb(a, b) {
     var _a, _b;
     return ((_a = b.order) !== null && _a !== void 0 ? _a : 0) - ((_b = a.order) !== null && _b !== void 0 ? _b : 0);

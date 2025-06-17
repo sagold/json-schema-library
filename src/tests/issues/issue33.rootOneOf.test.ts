@@ -1,5 +1,5 @@
 import { strict as assert } from "assert";
-import { compileSchema } from "../../compileSchema";
+import { compileSchema } from "../../compileSchema.js";
 
 describe("issue#33 - root oneOf changes type", () => {
     it("should return false for root array", () => {

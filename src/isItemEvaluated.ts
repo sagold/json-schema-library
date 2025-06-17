@@ -1,7 +1,7 @@
-import { ValidationPath } from "./Keyword";
-import { SchemaNode } from "./types";
-import { getValue } from "./utils/getValue";
-import { validateNode } from "./validateNode";
+import { ValidationPath } from "./Keyword.js";
+import { SchemaNode } from "./types.js";
+import { getValue } from "./utils/getValue.js";
+import { validateNode } from "./validateNode.js";
 
 type Options = {
     /** array node */

@@ -1,4 +1,4 @@
-import ucs2decode from "../utils/punycode.ucs2decode";
+import ucs2decode from "../utils/punycode.ucs2decode.js";
 export const maxLengthKeyword = {
     id: "maxLength",
     keyword: "maxLength",

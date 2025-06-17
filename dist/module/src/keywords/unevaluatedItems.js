@@ -1,6 +1,6 @@
-import { isObject } from "../utils/isObject";
-import { validateNode } from "../validateNode";
-import { isItemEvaluated } from "../isItemEvaluated";
+import { isObject } from "../utils/isObject.js";
+import { validateNode } from "../validateNode.js";
+import { isItemEvaluated } from "../isItemEvaluated.js";
 /**
  * @draft >= 2019-09
  * Similar to additionalItems, but can "see" into subschemas and across references

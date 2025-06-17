@@ -1,7 +1,7 @@
-import { compileSchema } from "./compileSchema";
+import { compileSchema } from "./compileSchema.js";
 import { strict as assert } from "assert";
-import { draftEditor } from "./draftEditor";
-import { SchemaNode } from "./SchemaNode";
+import { draftEditor } from "./draftEditor.js";
+import { SchemaNode } from "./SchemaNode.js";
 
 describe("compileSchema vocabulary", () => {
     let root: SchemaNode;

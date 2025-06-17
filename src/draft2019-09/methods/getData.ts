@@ -1,14 +1,14 @@
 import copy from "fast-copy";
-import { getTypeOf } from "../../utils/getTypeOf";
-import { getSchemaType } from "../../utils/getSchemaType";
-import { getValue } from "../../utils/getValue";
-import { isEmpty } from "../../utils/isEmpty";
-import { isJsonError } from "../../types";
-import { isObject } from "../../utils/isObject";
-import { isSchemaNode, SchemaNode } from "../../types";
-import { mergeNode } from "../../mergeNode";
-import { reduceOneOfFuzzy } from "../../keywords/oneOf";
-import { isFile } from "../../utils/isFile";
+import { getTypeOf } from "../../utils/getTypeOf.js";
+import { getSchemaType } from "../../utils/getSchemaType.js";
+import { getValue } from "../../utils/getValue.js";
+import { isEmpty } from "../../utils/isEmpty.js";
+import { isJsonError } from "../../types.js";
+import { isObject } from "../../utils/isObject.js";
+import { isSchemaNode, SchemaNode } from "../../types.js";
+import { mergeNode } from "../../mergeNode.js";
+import { reduceOneOfFuzzy } from "../../keywords/oneOf.js";
+import { isFile } from "../../utils/isFile.js";
 
 export type TemplateOptions = {
     /** Add all properties (required and optional) to the generated data */

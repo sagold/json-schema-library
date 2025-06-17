@@ -1,6 +1,6 @@
-import { GetNodeOptions, isSchemaNode, SchemaNode } from "./SchemaNode";
-import { isJsonError, NodeOrError, OptionalNodeOrError } from "./types";
-import { getValue } from "./utils/getValue";
+import { GetNodeOptions, isSchemaNode, SchemaNode } from "./SchemaNode.js";
+import { isJsonError, NodeOrError, OptionalNodeOrError } from "./types.js";
+import { getValue } from "./utils/getValue.js";
 
 // prettier-ignore
 export function getNodeChild(key: string | number, data: unknown, options: { withSchemaWarning: true } & GetNodeOptions): NodeOrError;

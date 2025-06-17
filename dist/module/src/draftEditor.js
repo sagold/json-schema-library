@@ -1,7 +1,7 @@
-import { extendDraft } from "./Draft";
-import { draft2019 } from "./draft2019";
-import { oneOfFuzzyKeyword } from "./keywords/oneOf";
-import { render } from "./errors/render";
+import { extendDraft } from "./Draft.js";
+import { draft2019 } from "./draft2019.js";
+import { oneOfFuzzyKeyword } from "./keywords/oneOf.js";
+import { render } from "./errors/render.js";
 /**
  * @draft-editor https://json-schema.org/draft/2019-09/release-notes
  *

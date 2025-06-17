@@ -1,4 +1,4 @@
-import { getPrecision } from "../utils/getPrecision";
+import { getPrecision } from "../utils/getPrecision.js";
 export const multipleOfKeyword = {
     id: "multipleOf",
     keyword: "multipleOf",

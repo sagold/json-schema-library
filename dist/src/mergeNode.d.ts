@@ -1,4 +1,4 @@
-import { SchemaNode } from "./types";
+import { SchemaNode } from "./types.js";
 interface SchemaNodeCB {
     toJSON?: () => string;
     order?: number;

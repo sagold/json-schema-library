@@ -1,5 +1,5 @@
 import { strict as assert } from "assert";
-import { getPrecision } from "./getPrecision";
+import { getPrecision } from "./getPrecision.js";
 
 describe("getPrecision", () => {
     it("should return decimal precision", () => {

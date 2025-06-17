@@ -1,7 +1,7 @@
-import { mergeSchema } from "../utils/mergeSchema";
-import { isObject } from "../utils/isObject";
-import { getValue } from "../utils/getValue";
-import { validateNode } from "../validateNode";
+import { mergeSchema } from "../utils/mergeSchema.js";
+import { isObject } from "../utils/isObject.js";
+import { getValue } from "../utils/getValue.js";
+import { validateNode } from "../validateNode.js";
 export const patternPropertiesKeyword = {
     id: "patternProperties",
     keyword: "patternProperties",

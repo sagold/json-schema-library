@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 
-import { compileSchema } from "../compileSchema";
+import { compileSchema } from "../compileSchema.js";
 
 describe("keyword : properties : get", () => {
     it("shoud return errors for missing `required` properties", () => {

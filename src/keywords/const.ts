@@ -1,4 +1,4 @@
-import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import { Keyword, JsonSchemaValidatorParams } from "../Keyword.js";
 import equal from "fast-deep-equal";
 
 export const constKeyword: Keyword = {

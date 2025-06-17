@@ -1,6 +1,6 @@
-import { Keyword, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
-import { JsonError, SchemaNode } from "../types";
-import { isObject } from "../utils/isObject";
+import { Keyword, JsonSchemaValidatorParams, ValidationResult } from "../Keyword.js";
+import { JsonError, SchemaNode } from "../types.js";
+import { isObject } from "../utils/isObject.js";
 
 export const dependentRequiredKeyword: Keyword = {
     id: "dependentRequired",

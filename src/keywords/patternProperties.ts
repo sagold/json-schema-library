@@ -1,15 +1,15 @@
-import { mergeSchema } from "../utils/mergeSchema";
-import { JsonSchema, SchemaNode } from "../types";
-import { isObject } from "../utils/isObject";
+import { mergeSchema } from "../utils/mergeSchema.js";
+import { JsonSchema, SchemaNode } from "../types.js";
+import { isObject } from "../utils/isObject.js";
 import {
     Keyword,
     JsonSchemaReducerParams,
     JsonSchemaResolverParams,
     JsonSchemaValidatorParams,
     ValidationResult
-} from "../Keyword";
-import { getValue } from "../utils/getValue";
-import { validateNode } from "../validateNode";
+} from "../Keyword.js";
+import { getValue } from "../utils/getValue.js";
+import { validateNode } from "../validateNode.js";
 
 export const patternPropertiesKeyword: Keyword = {
     id: "patternProperties",

@@ -1,9 +1,9 @@
 import { strict as assert } from "assert";
-import { DraftVersion, FeatureTest, getDraftTests, Setup } from "./getDraftTests";
-import { addRemotes } from "./addRemotes";
-import { compileSchema } from "../../compileSchema";
-import { isObject } from "../../utils/isObject";
-import { SchemaNode } from "../../types";
+import { DraftVersion, FeatureTest, getDraftTests, Setup } from "./getDraftTests.js";
+import { addRemotes } from "./addRemotes.js";
+import { compileSchema } from "../../compileSchema.js";
+import { isObject } from "../../utils/isObject.js";
+import { SchemaNode } from "../../types.js";
 
 let measurements = {
     start: 0,

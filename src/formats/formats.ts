@@ -1,9 +1,9 @@
 /* eslint-disable max-len, no-control-regex */
-import { getTypeOf } from "../utils/getTypeOf";
+import { getTypeOf } from "../utils/getTypeOf.js";
 import validUrl from "valid-url";
-import { JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
+import { JsonSchemaValidatorParams, ValidationResult } from "../Keyword.js";
 import { parse as parseIdnEmail } from "smtp-address-parser";
-import { JsonError } from "../types";
+import { JsonError } from "../types.js";
 
 const isValidIPV4 = /^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$/;
 const isValidIPV6 =

@@ -1,4 +1,4 @@
-import { validateNode } from "../validateNode";
+import { validateNode } from "../validateNode.js";
 export const notKeyword = {
     id: "not",
     keyword: "not",

@@ -1,12 +1,12 @@
-import { Keyword, JsonSchemaValidatorParams, ValidationPath } from "../../Keyword";
-import { joinId } from "../../utils/joinId";
-import splitRef from "../../utils/splitRef";
-import { omit } from "../../utils/omit";
-import { isObject } from "../../utils/isObject";
-import { validateNode } from "../../validateNode";
-import { SchemaNode } from "../../types";
+import { Keyword, JsonSchemaValidatorParams, ValidationPath } from "../../Keyword.js";
+import { joinId } from "../../utils/joinId.js";
+import splitRef from "../../utils/splitRef.js";
+import { omit } from "../../utils/omit.js";
+import { isObject } from "../../utils/isObject.js";
+import { validateNode } from "../../validateNode.js";
+import { SchemaNode } from "../../types.js";
 import { get } from "@sagold/json-pointer";
-import { reduceRef } from "../../keywords/$ref";
+import { reduceRef } from "../../keywords/$ref.js";
 
 export const $refKeyword: Keyword = {
     id: "$ref",

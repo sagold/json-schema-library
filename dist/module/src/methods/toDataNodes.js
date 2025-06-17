@@ -1,5 +1,5 @@
-import { getValue } from "../utils/getValue";
-import { isObject } from "../utils/isObject";
+import { getValue } from "../utils/getValue.js";
+import { isObject } from "../utils/isObject.js";
 export function toDataNodes(node, data, pointer = "#", dataNodes = []) {
     const currentNode = node.resolveRef();
     dataNodes.push({

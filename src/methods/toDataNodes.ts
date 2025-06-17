@@ -1,6 +1,6 @@
-import { getValue } from "../utils/getValue";
-import { isObject } from "../utils/isObject";
-import { SchemaNode } from "../types";
+import { getValue } from "../utils/getValue.js";
+import { isObject } from "../utils/isObject.js";
+import { SchemaNode } from "../types.js";
 
 export type DataNode = { node: SchemaNode; value: unknown; pointer: string };
 
