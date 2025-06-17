@@ -8,10 +8,8 @@
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "import": "./dist/module/index.js",
-            "require": "./dist/jsonSchemaLibrary.js"
-        },
-        "./package.json": "./package.json"
+            "import": "./dist/module/index.js"
+        }
     },
     "scripts": {
         "analyze": "NODE_ENV=production webpack --json | webpack-bundle-size-analyzer",
