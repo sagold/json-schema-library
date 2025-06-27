@@ -1614,4 +1614,91 @@ describe("getData", () => {
             assert.deepEqual(res, { valid: "stays", invalid: "not removed" });
         });
     });
+    describe("defaultTemplateOptions.initialValues", () => {
+        it("should omit properties without default values when 'initialValues:false' even if required", () => {
+            const node = compileSchema({
+                type: "object",
+                required: ["name", "age", "country"],
+                properties: {
+                    name: { type: "string", default: "John Doe" },
+                    age: { type: "number" },
+                    country: { type: "string", default: "USA" }
+                }
+            });
+            const res = node.getData(undefined, {
+                extendDefaults: false, initialValues: false
+            });
+
+            assert.deepEqual(res, { name: "John Doe", country: "USA" });
+        });
+
+        it("should omit properties without default values when 'initialValues:false' even if required in nested", () => {
+            const node = compileSchema({
+                type: "object",
+                properties: {
+                    user: {
+                        type: "object",
+                        required: ["id", "username"],
+                        properties: {
+                            id: { type: "string" },
+                            username: { type: "string", default: "guest" },
+                            profile: {
+                                type: "object",
+                                properties: {
+                                    bio: { type: "string" },
+                                    theme: { type: "string", default: "light" }
+                                }
+                            }
+                        }
+                    },
+                    active: { type: "boolean", default: true }
+                }
+            });
+            const res = node.getData({}, { addOptionalProps: true, initialValues: false});
+
+            assert.deepEqual(JSON.stringify(res), JSON.stringify({
+                user: {
+                    username: "guest",
+                    profile: {
+                        theme: "light"
+                    }
+                },
+                active: true
+            }));
+        });
+
+       it("should handle type string with default value and 'initialValues:false'", () => {
+            const node = compileSchema({
+                type: "string",
+                default: "default value"
+            });
+            const res = node.getData(undefined, {
+                initialValues: false
+            });
+            assert.deepEqual(res, "default value");
+        });
+
+        it("should handle type string without default value and 'initialValues:false'", () => {
+            const node = compileSchema({
+                type: "string",
+            });
+            const res = node.getData(undefined, {initialValues: false});
+            assert.deepEqual(res, undefined);
+        });
+
+        it("should handle array without default value and 'initialValues:false'", () => {
+            const node = compileSchema({
+                type: "object",
+                required: ["title"],
+                properties: {
+                    title: { 
+                        type: "array",
+                        items: { type: "string" }
+                    }
+                }
+            });
+            const res = node.getData(undefined, {initialValues: false});
+            assert.deepEqual(res, { title: [] });
+        });
+    });
 });

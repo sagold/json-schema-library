@@ -22,6 +22,10 @@ export type TemplateOptions = {
      */
     extendDefaults?: boolean;
     /**
+     * Set to false to not use type specific initial values.Defaults to true
+     */
+    initialValues?: boolean;
+    /**
      * Limits how often a $ref should be followed before aborting. Prevents infinite data-structure.
      * Defaults to 1
      */
@@ -173,11 +177,11 @@ export function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions
 }
 
 const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptions) => unknown> = {
-    null: (node, data) => getDefault(node, data, null),
-    string: (node, data) => getDefault(node, data, ""),
-    number: (node, data) => getDefault(node, data, 0),
-    integer: (node, data) => getDefault(node, data, 0),
-    boolean: (node, data) => getDefault(node, data, false),
+    null: (node, data, opts) => getDefault(node, data, null, opts.initialValues),
+    string: (node, data,opts) => getDefault(node, data, "", opts.initialValues),
+    number: (node, data,opts) => getDefault(node, data, 0, opts.initialValues),
+    integer: (node, data,opts) => getDefault(node, data, 0, opts.initialValues),
+    boolean: (node, data,opts) => getDefault(node, data, false, opts.initialValues),
     // object: (draft, schema, data: Record<string, unknown> | undefined, pointer: JsonPointer, opts: TemplateOptions) => {
     object: (node, data, opts) => {
         const schema = node.schema;
@@ -193,7 +197,10 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
                 const value = data === undefined || input === undefined ? getValue(template, propertyName) : input;
                 // Omit adding a property if it is not required or optional props should be added
                 if (value != null || isRequired || opts.addOptionalProps) {
-                    d[propertyName] = propertyNode.getData(value, opts);
+                    const propertyValue =  propertyNode.getData(value, opts);
+                    if(propertyValue !== undefined){
+                        d[propertyName] = propertyValue;
+                    }
                 }
             });
         }
@@ -328,14 +335,14 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
     }
 };
 
-function getDefault({ schema }: SchemaNode, templateValue: any, initValue: any) {
+function getDefault({ schema }: SchemaNode, templateValue: any, initValue: any, initialValues: boolean) {
     if (templateValue !== undefined) {
         return convertValue(schema.type, templateValue);
     } else if (schema.const) {
         return schema.const;
     } else if (schema.default === undefined && Array.isArray(schema.enum)) {
         return schema.enum[0];
-    } else if (schema.default === undefined) {
+    } else if (schema.default === undefined && initialValues !== false) {
         return initValue;
     }
     return schema.default;
