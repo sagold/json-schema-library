@@ -506,5 +506,31 @@ describe("compileSchema : getNode", () => {
             assert.deepEqual(error.data.schema, schema.items, "should have exposed json-schema of error location");
             assert.deepEqual(error.data?.oneOf, schema.items.oneOf, "should have exposed oneOf array on data");
         });
+
+        describe("$ref", () => {
+            it("should resolve $ref", () => {
+                const { node } = compileSchema({
+                    type: "array",
+                    prefixItems: [{ $ref: "/$defs/target" }],
+                    $defs: {
+                        target: { type: "array", minItems: 2 }
+                    }
+                }).getNode("#/0");
+
+                assert.deepEqual(node.schema, { type: "array", minItems: 2 });
+            });
+
+            it("should mrege title from local schema", () => {
+                const { node } = compileSchema({
+                    type: "array",
+                    prefixItems: [{ title: "from ref", $ref: "/$defs/target" }],
+                    $defs: {
+                        target: { title: "from $defs", type: "array", minItems: 2 }
+                    }
+                }).getNode("#/0");
+
+                assert.deepEqual(node.schema, { title: "from ref", type: "array", minItems: 2 });
+            });
+        });
     });
 });

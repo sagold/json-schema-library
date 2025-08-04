@@ -681,6 +681,19 @@ describe("getData", () => {
                     { first: "first", second: "second" }
                 ]);
             });
+
+            it("should resolve $ref in items-object", () => {
+                const data = compileSchema({
+                    minItems: 1,
+                    items: { $ref: "/$defs/bool" },
+                    $defs: {
+                        bool: { type: "boolean", default: true }
+                    }
+                }).getData();
+                assert(Array.isArray(data));
+                assert.deepEqual(data.length, 1);
+                assert.deepEqual(data, [true]);
+            });
         });
 
         describe("prefixItems: []", () => {
@@ -805,6 +818,35 @@ describe("getData", () => {
                     items: { type: "number", default: 2 }
                 }).getData([43]);
                 assert.deepEqual(data, [43, 2]);
+            });
+
+            it("should add prefixItems with `addOptionalProps: true`", () => {
+                const data = compileSchema(
+                    {
+                        type: "array",
+                        prefixItems: [{ type: "boolean", default: true }],
+                        items: { type: "number", default: 2 }
+                    },
+                    {
+                        getDataDefaultOptions: { addOptionalProps: true }
+                    }
+                ).getData();
+                assert.deepEqual(data, [true]);
+            });
+
+            it("should resolve $ref in prefixItems", () => {
+                const node = compileSchema({
+                    type: "array",
+                    minItems: 2,
+                    prefixItems: [{ $ref: "/$defs/bool" }, { $ref: "/$defs/string" }],
+                    $defs: {
+                        bool: { type: "boolean" },
+                        string: { type: "string" }
+                    }
+                });
+                const res = node.getData([]);
+
+                assert.deepEqual(res, [false, ""]);
             });
         });
 
