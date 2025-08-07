@@ -1700,8 +1700,8 @@ describe("getData (2019)", () => {
             assert.deepEqual(res, { valid: "stays", invalid: "not removed" });
         });
     });
-    describe("defaultTemplateOptions.initialValues", () => {
-        it("should omit properties without default values when 'initialValues:false' even if required", () => {
+    describe("defaultTemplateOptions.useTypeDefaults", () => {
+        it("should omit properties without default values when 'useTypeDefaults:false' even if required", () => {
             const node = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
@@ -1713,13 +1713,13 @@ describe("getData (2019)", () => {
                 }
             });
             const res = node.getData(undefined, {
-                extendDefaults: false, initialValues: false
+                extendDefaults: false, useTypeDefaults: false
             });
 
             assert.deepEqual(res, { name: "John Doe", country: "USA" });
         });
 
-        it("should omit properties without default values when 'initialValues:false' even if required in nested", () => {
+        it("should omit properties without default values when 'useTypeDefaults:false' even if required in nested", () => {
             const node = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
@@ -1742,7 +1742,7 @@ describe("getData (2019)", () => {
                     active: { type: "boolean", default: true }
                 }
             });
-            const res = node.getData({}, { addOptionalProps: true, initialValues: false});
+            const res = node.getData({}, { addOptionalProps: true, useTypeDefaults: false});
 
             assert.deepEqual(JSON.stringify(res), JSON.stringify({
                 user: {
@@ -1755,26 +1755,26 @@ describe("getData (2019)", () => {
             }));
         });
 
-       it("should handle type string with default value and 'initialValues:false'", () => {
+       it("should handle type string with default value and 'useTypeDefaults:false'", () => {
             const node = compileSchema({
                 type: "string",
                 default: "default value"
             });
             const res = node.getData(undefined, {
-                initialValues: false
+                useTypeDefaults: false
             });
             assert.deepEqual(res, "default value");
         });
 
-        it("should handle type string without default value and 'initialValues:false'", () => {
+        it("should handle type string without default value and 'useTypeDefaults:false'", () => {
             const node = compileSchema({
                 type: "string",
             });
-            const res = node.getData(undefined, {initialValues: false});
+            const res = node.getData(undefined, {useTypeDefaults: false});
             assert.deepEqual(res, undefined);
         });
 
-        it("should handle array without default value and 'initialValues:false'", () => {
+        it("should handle array without default value and 'useTypeDefaults:false'", () => {
             const node = compileSchema({
                 $schema: "draft-2019-09",
                 type: "object",
@@ -1786,7 +1786,7 @@ describe("getData (2019)", () => {
                     }
                 }
             });
-            const res = node.getData(undefined, {initialValues: false});
+            const res = node.getData(undefined, {useTypeDefaults: false});
             assert.deepEqual(res, { title: [] });
         });
     });

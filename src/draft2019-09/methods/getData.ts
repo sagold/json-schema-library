@@ -24,7 +24,7 @@ export type TemplateOptions = {
     /**
      * Set to false to not use type specific initial values.Defaults to true
      */
-    initialValues?: boolean;
+    useTypeDefaults?: boolean;
     /**
      * Limits how often a $ref should be followed before aborting. Prevents infinite data-structure.
      * Defaults to 1
@@ -177,11 +177,11 @@ export function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions
 }
 
 const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptions) => unknown> = {
-    null: (node, data, opts) => getDefault(node, data, null, opts.initialValues),
-    string: (node, data,opts) => getDefault(node, data, "", opts.initialValues),
-    number: (node, data,opts) => getDefault(node, data, 0, opts.initialValues),
-    integer: (node, data,opts) => getDefault(node, data, 0, opts.initialValues),
-    boolean: (node, data,opts) => getDefault(node, data, false, opts.initialValues),
+    null: (node, data, opts) => getDefault(node, data, null, opts.useTypeDefaults),
+    string: (node, data,opts) => getDefault(node, data, "", opts.useTypeDefaults),
+    number: (node, data,opts) => getDefault(node, data, 0, opts.useTypeDefaults),
+    integer: (node, data,opts) => getDefault(node, data, 0, opts.useTypeDefaults),
+    boolean: (node, data,opts) => getDefault(node, data, false, opts.useTypeDefaults),
     // object: (draft, schema, data: Record<string, unknown> | undefined, pointer: JsonPointer, opts: TemplateOptions) => {
     object: (node, data, opts) => {
         const schema = node.schema;
@@ -198,7 +198,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
                 // Omit adding a property if it is not required or optional props should be added
                 if (value != null || isRequired || opts.addOptionalProps) {
                     const propertyValue =  propertyNode.getData(value, opts);
-                    if(propertyValue !== undefined){
+                    if (propertyValue !== undefined || opts.useTypeDefaults !== false) {
                         d[propertyName] = propertyValue;
                     }
                 }
@@ -335,14 +335,14 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
     }
 };
 
-function getDefault({ schema }: SchemaNode, templateValue: any, initValue: any, initialValues: boolean) {
+function getDefault({ schema }: SchemaNode, templateValue: any, initValue: any, useTypeDefaults: boolean) {
     if (templateValue !== undefined) {
         return convertValue(schema.type, templateValue);
     } else if (schema.const) {
         return schema.const;
     } else if (schema.default === undefined && Array.isArray(schema.enum)) {
         return schema.enum[0];
-    } else if (schema.default === undefined && initialValues !== false) {
+    } else if (schema.default === undefined && useTypeDefaults !== false) {
         return initValue;
     }
     return schema.default;
