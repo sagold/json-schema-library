@@ -11,6 +11,10 @@ export type TemplateOptions = {
      */
     extendDefaults?: boolean;
     /**
+     * Set to false to not use type specific initial values.Defaults to true
+     */
+    useTypeDefaults?: boolean;
+    /**
      * Limits how often a $ref should be followed before aborting. Prevents infinite data-structure.
      * Defaults to 1
      */

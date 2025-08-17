@@ -137,11 +137,11 @@ export function getData(node, data, opts) {
     return templateData === undefined ? defaultData : templateData;
 }
 const TYPE = {
-    null: (node, data) => getDefault(node, data, null),
-    string: (node, data) => getDefault(node, data, ""),
-    number: (node, data) => getDefault(node, data, 0),
-    integer: (node, data) => getDefault(node, data, 0),
-    boolean: (node, data) => getDefault(node, data, false),
+    null: (node, data, opts) => getDefault(node, data, null, opts.useTypeDefaults),
+    string: (node, data, opts) => getDefault(node, data, "", opts.useTypeDefaults),
+    number: (node, data, opts) => getDefault(node, data, 0, opts.useTypeDefaults),
+    integer: (node, data, opts) => getDefault(node, data, 0, opts.useTypeDefaults),
+    boolean: (node, data, opts) => getDefault(node, data, false, opts.useTypeDefaults),
     // object: (draft, schema, data: Record<string, unknown> | undefined, pointer: JsonPointer, opts: TemplateOptions) => {
     object: (node, data, opts) => {
         var _a;
@@ -157,7 +157,10 @@ const TYPE = {
                 const value = data === undefined || input === undefined ? getValue(template, propertyName) : input;
                 // Omit adding a property if it is not required or optional props should be added
                 if (value != null || isRequired || opts.addOptionalProps) {
-                    d[propertyName] = propertyNode.getData(value, opts);
+                    const propertyValue = propertyNode.getData(value, opts);
+                    if (propertyValue !== undefined || opts.useTypeDefaults !== false) {
+                        d[propertyName] = propertyValue;
+                    }
                 }
             });
         }
@@ -282,7 +285,7 @@ const TYPE = {
         return d;
     }
 };
-function getDefault({ schema }, templateValue, initValue) {
+function getDefault({ schema }, templateValue, initValue, useTypeDefaults) {
     if (templateValue !== undefined) {
         return convertValue(schema.type, templateValue);
     }
@@ -292,7 +295,7 @@ function getDefault({ schema }, templateValue, initValue) {
     else if (schema.default === undefined && Array.isArray(schema.enum)) {
         return schema.enum[0];
     }
-    else if (schema.default === undefined) {
+    else if (schema.default === undefined && useTypeDefaults !== false) {
         return initValue;
     }
     return schema.default;

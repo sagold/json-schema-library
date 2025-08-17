@@ -4,6 +4,10 @@ export function pick(value, ...properties) {
         return value;
     }
     const result = {};
-    properties.forEach((property) => (result[property] = value[property]));
+    properties.forEach((property) => {
+        if (value[property] !== undefined) {
+            result[property] = value[property];
+        }
+    });
     return result;
 }
