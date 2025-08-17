@@ -539,6 +539,50 @@ console.log(data); // { valid: "stays", invalid: "removed" }
 
 </details>
 
+<details><summary>Option: useTypeDefaults (default: true)</summary>
+
+With `useTypeDefaults:true`, `getData` will return initial values for all primitives (non-objects/arrays) that do not have a default-property set:
+
+```ts
+const data = compileSchema({
+    required: ["valid"],
+    properties: { valid: { type: "string" } }
+}).getData(null, { useTypeDefaults: true });
+console.log(data); // { valid: "" }
+```
+
+Setting `useTypeDefaults:false` will _not_ remove data that is valid, but unspecified:
+
+```ts
+const data = compileSchema({
+    required: ["valid"],
+    properties: { valid: { type: "string" } }
+}).getData(null, { useTypeDefaults: false });
+console.log(data); // {}
+```
+
+_Note_ object and array-properties will still be added if required:
+
+```ts
+const data = compileSchema({
+    required: ["valid"],
+    properties: { valid: { type: "object" } }
+}).getData(null, { useTypeDefaults: true });
+console.log(data); // { valid: {} }
+```
+
+_Note_ enforced array-items will be `undefined` if required and `initialValues: false`
+
+```ts
+const data = compileSchema({
+    required: ["valid"],
+    properties: { valid: { type: "array", items: { type: "string" }, minItems: 1 } }
+}).getData(null, { useTypeDefaults: false });
+console.log(data); // { valid: [undefined] }
+```
+
+</details>
+
 ### getNode
 
 `getNode` returns the JSON Schema from data location specified by a JSON Pointer. In many cases the JSON Schema can be retrieved without passing any data, but in situations where the schema is dynamic (for example in _oneOf_, _dependencies_, etc.), input-data is required or `getNode` will return a _JsonError_ as is done when the JSON Pointer path is invalid.
