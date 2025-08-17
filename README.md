@@ -561,7 +561,7 @@ const data = compileSchema({
 console.log(data); // {}
 ```
 
-_Note_ object and array-properties will still be added if required:
+**Note** object and array-properties will still be added if required:
 
 ```ts
 const data = compileSchema({
@@ -571,7 +571,7 @@ const data = compileSchema({
 console.log(data); // { valid: {} }
 ```
 
-_Note_ enforced array-items will be `undefined` if required and `initialValues: false`
+**Note** enforced array-items will be `undefined` if required and `initialValues: false`
 
 ```ts
 const data = compileSchema({
