@@ -5,7 +5,7 @@ import { omit } from "../../utils/omit";
 import { isObject } from "../../utils/isObject";
 import { validateNode } from "../../validateNode";
 import { SchemaNode } from "../../types";
-import { get } from "@sagold/json-pointer";
+import { get, split } from "@sagold/json-pointer";
 import { reduceRef } from "../../keywords/$ref";
 
 export const $refKeyword: Keyword = {
@@ -195,6 +195,25 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
                 return nextNode;
             }
         }
+
+        // resolve by json-pointer (optional dynamicRef)
+        if (node.context.refs[$remoteHostRef]) {
+            const parentNode = node.context.refs[$remoteHostRef];
+            const path = split(fragments[1]);
+            // @todo add utility to resolve schema-pointer to schema
+            let currentNode = parentNode;
+            for (let i = 0; i < path.length; i += 1) {
+                const property = path[i] === "definitions" ? "$defs" : path[i];
+                // @ts-expect-error random path
+                currentNode = currentNode[property];
+                if (currentNode == null) {
+                    console.error("REF: FAILED RESOLVING ref json-pointer", fragments[1]);
+                    return undefined;
+                }
+            }
+            return currentNode;
+        }
+
         // console.error("REF: UNFOUND 2", $ref);
         return undefined;
     }
