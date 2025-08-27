@@ -2,7 +2,7 @@ import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
 import CSNSchema from "./csn-interop-effective.schema.json";
 
-describe.only("issue#79 - csn ref resolution from defintions", () => {
+describe("issue#79 - csn ref resolution from defintions", () => {
     it("should compile as draft-07", () => {
         const node = compileSchema(CSNSchema);
         assert.equal(node.getDraftVersion(), "draft-07");
@@ -13,16 +13,27 @@ describe.only("issue#79 - csn ref resolution from defintions", () => {
         assert(node.$defs?.["@EndUserText.label"] != null);
     });
 
-    it.skip("should resolve $ref '#/$defs/@EndUserText.label'", () => {
+    it("should resolve $ref '#/$defs/@EndUserText.label'", () => {
         const node = compileSchema(CSNSchema);
         const childSchema = node.getNodeRef("#/$defs/@EndUserText.label");
         assert(childSchema != null);
     });
 
-    it.skip("should resolve $ref '#/definitions/@EndUserText.label'", () => {
+    it("should resolve uri-encoded $ref '#/%24defs/%40EndUserText.label'", () => {
+        const node = compileSchema(CSNSchema);
+        const childSchema = node.getNodeRef("#/%24defs/%40EndUserText.label");
+        assert(childSchema != null);
+    });
+
+    it("should resolve $ref '#/definitions/@EndUserText.label'", () => {
         const node = compileSchema(CSNSchema);
         const childSchema = node.getNodeRef("#/definitions/@EndUserText.label");
-        console.log("childSchema", childSchema);
+        assert(childSchema != null);
+    });
+
+    it("should resolve uri-encoded $ref '#/definitions/%40EndUserText.label'", () => {
+        const node = compileSchema(CSNSchema);
+        const childSchema = node.getNodeRef("#/definitions/%40EndUserText.label");
         assert(childSchema != null);
     });
 
