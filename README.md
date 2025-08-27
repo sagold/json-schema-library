@@ -1336,6 +1336,26 @@ const { errors } = compileSchema({
 assert.deepEqual(errors[0].message, "Custom error 2");
 ```
 
+### regexFlags
+
+In order to allow customization of regular expressions a schema property `regexFlags` is supported for `pattern`, `patternProperties` and format `regex`:
+
+```ts
+const { errors } = compileSchema({
+    type: "string",
+    pattern: "^[a-zA-Z0-9+_.\-]+"
+    regexFlags: "v"
+}).validate("-");
+```
+
+Per default, a regexFlags `"u"` is used. To change this setting globally, change `REGEX_FLAGS` in settings:
+
+```ts
+import settings from "json-schema-library";
+
+settings.REGEX_FLAGS = "v";
+```
+
 ## Breaking Changes
 
 ### v10.1.0

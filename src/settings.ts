@@ -15,5 +15,6 @@ export default {
         "definitions",
         "dependencies",
         "patternProperties"
-    ]
+    ],
+    REGEX_FLAGS: "u"
 };

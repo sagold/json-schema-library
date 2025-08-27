@@ -9,6 +9,9 @@ import { pick } from "./utils/pick";
 import { JsonSchema, Draft } from "./types";
 import { TemplateOptions } from "./methods/getData";
 import { SchemaNode, SchemaNodeMethods, addKeywords, isSchemaNode } from "./SchemaNode";
+import settings from "./settings";
+
+const { REGEX_FLAGS } = settings;
 
 export type CompileOptions = {
     drafts?: Draft[];
@@ -20,7 +23,7 @@ export type CompileOptions = {
 const defaultDrafts: Draft[] = [draft04, draft06, draft07, draft2019, draft2020];
 
 function getDraft(drafts: Draft[], $schema: string) {
-    return drafts.find((d) => new RegExp(d.$schemaRegEx).test($schema)) ?? drafts[drafts.length - 1];
+    return drafts.find((d) => new RegExp(d.$schemaRegEx, REGEX_FLAGS).test($schema)) ?? drafts[drafts.length - 1];
 }
 
 /**

@@ -19,7 +19,7 @@ import { hasProperty } from "./utils/hasProperty";
 import { getNode } from "./getNode";
 import { getNodeChild } from "./getNodeChild";
 
-const { DYNAMIC_PROPERTIES } = settings;
+const { DYNAMIC_PROPERTIES, REGEX_FLAGS } = settings;
 
 export function isSchemaNode(value: unknown): value is SchemaNode {
     return isObject(value) && Array.isArray(value?.reducers) && Array.isArray(value?.resolvers);
@@ -42,7 +42,7 @@ function getDraft(drafts: Draft[], $schema: string) {
     if (drafts.length === 1) {
         return drafts[0];
     }
-    return drafts.find((d) => new RegExp(d.$schemaRegEx).test($schema)) ?? drafts[drafts.length - 1];
+    return drafts.find((d) => new RegExp(d.$schemaRegEx, REGEX_FLAGS).test($schema)) ?? drafts[drafts.length - 1];
 }
 
 export type Context = {

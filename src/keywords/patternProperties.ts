@@ -10,6 +10,9 @@ import {
 } from "../Keyword";
 import { getValue } from "../utils/getValue";
 import { validateNode } from "../validateNode";
+import settings from "../settings";
+
+const { REGEX_FLAGS } = settings;
 
 export const patternPropertiesKeyword: Keyword = {
     id: "patternProperties",
@@ -32,9 +35,10 @@ export function parsePatternProperties(node: SchemaNode) {
     if (patterns.length === 0) {
         return;
     }
+
     node.patternProperties = patterns.map((pattern) => ({
         name: pattern,
-        pattern: new RegExp(pattern, "u"),
+        pattern: new RegExp(pattern, schema.regexFlags ?? REGEX_FLAGS),
         node: node.compileSchema(
             schema.patternProperties[pattern],
             `${node.evaluationPath}/patternProperties/${pattern}`,
