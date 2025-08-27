@@ -101,7 +101,7 @@ export const SchemaNodeMethods = {
      */
     getNodeRef($ref) {
         const node = this;
-        return node.compileSchema({ $ref }).resolveRef();
+        return node.compileSchema({ $ref }, "$dynamic").resolveRef();
     },
     getNodeRoot() {
         const node = this;

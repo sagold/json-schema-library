@@ -204,8 +204,9 @@ export function getRef(node, $ref = node === null || node === void 0 ? void 0 : 
             // @todo add utility to resolve schema-pointer to schema
             let currentNode = parentNode;
             for (let i = 0; i < path.length; i += 1) {
+                const property = path[i] === "definitions" ? "$defs" : path[i];
                 // @ts-expect-error random path
-                currentNode = currentNode[path[i]];
+                currentNode = currentNode[property];
                 if (currentNode == null) {
                     console.error("REF: FAILED RESOLVING ref json-pointer", fragments[1]);
                     return undefined;

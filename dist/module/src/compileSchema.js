@@ -31,7 +31,7 @@ export function compileSchema(schema, options = {}) {
         resolvers: [],
         validators: [],
         schema,
-        // @ts-expect-error self-reference add edlater
+        // @ts-expect-error self-reference added later
         context: {
             remotes: {},
             dynamicAnchors: {},
