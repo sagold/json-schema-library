@@ -1343,7 +1343,7 @@ In order to allow customization of regular expressions a schema property `regexF
 ```ts
 const { errors } = compileSchema({
     type: "string",
-    pattern: "^[a-zA-Z0-9+_.\-]+"
+    pattern: "^[a-zA-Z0-9+_.-]+",
     regexFlags: "v"
 }).validate("-");
 ```
