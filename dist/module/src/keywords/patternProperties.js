@@ -2,6 +2,8 @@ import { mergeSchema } from "../utils/mergeSchema";
 import { isObject } from "../utils/isObject";
 import { getValue } from "../utils/getValue";
 import { validateNode } from "../validateNode";
+import settings from "../settings";
+const { REGEX_FLAGS } = settings;
 export const patternPropertiesKeyword = {
     id: "patternProperties",
     keyword: "patternProperties",
@@ -22,11 +24,14 @@ export function parsePatternProperties(node) {
     if (patterns.length === 0) {
         return;
     }
-    node.patternProperties = patterns.map((pattern) => ({
-        name: pattern,
-        pattern: new RegExp(pattern, "u"),
-        node: node.compileSchema(schema.patternProperties[pattern], `${node.evaluationPath}/patternProperties/${pattern}`, `${node.schemaLocation}/patternProperties/${pattern}`)
-    }));
+    node.patternProperties = patterns.map((pattern) => {
+        var _a;
+        return ({
+            name: pattern,
+            pattern: new RegExp(pattern, (_a = schema.regexFlags) !== null && _a !== void 0 ? _a : REGEX_FLAGS),
+            node: node.compileSchema(schema.patternProperties[pattern], `${node.evaluationPath}/patternProperties/${pattern}`, `${node.schemaLocation}/patternProperties/${pattern}`)
+        });
+    });
 }
 function patternPropertyResolver({ node, key }) {
     var _a, _b;

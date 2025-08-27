@@ -7,10 +7,12 @@ import { draft2019 } from "./draft2019";
 import { draft2020 } from "./draft2020";
 import { pick } from "./utils/pick";
 import { SchemaNodeMethods, addKeywords, isSchemaNode } from "./SchemaNode";
+import settings from "./settings";
+const { REGEX_FLAGS } = settings;
 const defaultDrafts = [draft04, draft06, draft07, draft2019, draft2020];
 function getDraft(drafts, $schema) {
     var _a;
-    return (_a = drafts.find((d) => new RegExp(d.$schemaRegEx).test($schema))) !== null && _a !== void 0 ? _a : drafts[drafts.length - 1];
+    return (_a = drafts.find((d) => new RegExp(d.$schemaRegEx, REGEX_FLAGS).test($schema))) !== null && _a !== void 0 ? _a : drafts[drafts.length - 1];
 }
 /**
  * With compileSchema we replace the schema and all sub-schemas with a schemaNode,

@@ -15,7 +15,7 @@ import { validateNode } from "./validateNode";
 import { hasProperty } from "./utils/hasProperty";
 import { getNode } from "./getNode";
 import { getNodeChild } from "./getNodeChild";
-const { DYNAMIC_PROPERTIES } = settings;
+const { DYNAMIC_PROPERTIES, REGEX_FLAGS } = settings;
 export function isSchemaNode(value) {
     return isObject(value) && Array.isArray(value === null || value === void 0 ? void 0 : value.reducers) && Array.isArray(value === null || value === void 0 ? void 0 : value.resolvers);
 }
@@ -36,7 +36,7 @@ function getDraft(drafts, $schema) {
     if (drafts.length === 1) {
         return drafts[0];
     }
-    return (_a = drafts.find((d) => new RegExp(d.$schemaRegEx).test($schema))) !== null && _a !== void 0 ? _a : drafts[drafts.length - 1];
+    return (_a = drafts.find((d) => new RegExp(d.$schemaRegEx, REGEX_FLAGS).test($schema))) !== null && _a !== void 0 ? _a : drafts[drafts.length - 1];
 }
 export function joinDynamicId(a, b) {
     if (a == b) {
