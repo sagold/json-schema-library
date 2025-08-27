@@ -1358,6 +1358,16 @@ settings.REGEX_FLAGS = "v";
 
 ## Breaking Changes
 
+### v10.3.0
+
+-   introduce setting `REGEX_FLAGS` and schema-property `regexFlags` to customize regex flags to use evaluating regex
+-   fixed an issue resolving non-URI compatible $ref-targets containing `#/definitions`
+
+### v10.2.0
+
+-   introduce getData setting `useTypeDefaults`
+-   introduce support to merge meta-properties using $ref-resolution
+
 ### v10.1.0
 
 -   replaced `node.additionalItems` by `node.items` for drafts below 2020-12
