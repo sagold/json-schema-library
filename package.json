@@ -1,6 +1,6 @@
 {
     "name": "json-schema-library",
-    "version": "10.2.1",
+    "version": "10.3.0",
     "description": "Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation",
     "module": "dist/module/index.js",
     "types": "dist/index.d.ts",
