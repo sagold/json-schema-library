@@ -13,9 +13,8 @@
         "./package.json": "./package.json"
     },
     "scripts": {
-        "analyze": "NODE_ENV=production webpack --json | webpack-bundle-size-analyzer",
         "coverage": "nyc npm run test --reporter=lcov",
-        "dist": "rm -rf dist; tsdown --format esm --format cjs --format iife --minify",
+        "dist": "rm -rf dist; tsdown -f esm -f cjs -f iife --minify; mv dist/index.iife.js dist/jlib.js",
         "lint": "eslint src",
         "prepublishOnly": "yarn dist",
         "tdd": "watch \"npm run test:unit\" src/ tests/",
@@ -76,14 +75,11 @@
         "json-schema-test-suite": "https://github.com/json-schema-org/JSON-Schema-Test-Suite#83e866b46c9f9e7082fd51e83a61c5f2145a1ab7",
         "mocha": "^10.4.0",
         "nyc": "^15.1.0",
-        "terser-webpack-plugin": "^5.3.11",
         "ts-loader": "^9.5.2",
         "ts-node": "^10.9.2",
         "tsdown": "^0.15.10",
         "typescript": "^5.7.3",
-        "watch": "^1.0.1",
-        "webpack": "^5.97.1",
-        "webpack-cli": "^6.0.1"
+        "watch": "^1.0.1"
     },
     "devDependencies": {
         "@sagold/json-pointer": "^7.0.0",
