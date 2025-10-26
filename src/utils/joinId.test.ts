@@ -50,6 +50,12 @@ describe("joinId", () => {
         assert.equal(url, "https://localhost.com/root#bar");
     });
 
+    it.skip("should append id without fragment to url", () => {
+        const url = joinId("https://localhost.com/root", "bar");
+
+        assert.equal(url, "https://localhost.com/root/bar");
+    });
+
     it("should append id to url/", () => {
         const url = joinId("https://localhost.com/root/", "#bar");
 
