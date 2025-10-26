@@ -1618,8 +1618,8 @@
     </script>
 
     <script type="text/javascript">
-        console.log(jlib);
+        console.log(jlib, jlib.compileSchema({ type: "string" }).validate(123));
         const draft = jlib.compileSchema({ ...window.schema, $schema: "draft-04" });
-        console.log("validation errors:", draft.validate(window.data));
+        console.log("test schema errors:", draft.validate(window.data));
     </script>
 </html>
