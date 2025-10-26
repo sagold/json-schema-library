@@ -31,7 +31,7 @@ export type TemplateOptions = {
      */
     recursionLimit?: number;
     /** @internal disables recursion limit for next call */
-    disableRecusionLimit?: boolean;
+    disableRecursionLimit?: boolean;
     /** @internal context to track recursion limit */
     cache?: Record<string, Record<string, number>>;
 };
@@ -46,10 +46,10 @@ function safeResolveRef(node: SchemaNode, options: TemplateOptions) {
     cache[origin] = cache[origin] ?? {};
     cache[origin][node.$ref] = cache[origin][node.$ref] ?? 0;
     const value = cache[origin][node.$ref];
-    if (value >= recursionLimit && options.disableRecusionLimit !== true) {
+    if (value >= recursionLimit && options.disableRecursionLimit !== true) {
         return false;
     }
-    options.disableRecusionLimit = false;
+    options.disableRecursionLimit = false;
     cache[origin][node.$ref] += 1;
     const resolvedNode = node.resolveRef();
     if (resolvedNode && resolvedNode !== node) {
@@ -178,10 +178,10 @@ export function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions
 
 const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptions) => unknown> = {
     null: (node, data, opts) => getDefault(node, data, null, opts.useTypeDefaults),
-    string: (node, data,opts) => getDefault(node, data, "", opts.useTypeDefaults),
-    number: (node, data,opts) => getDefault(node, data, 0, opts.useTypeDefaults),
-    integer: (node, data,opts) => getDefault(node, data, 0, opts.useTypeDefaults),
-    boolean: (node, data,opts) => getDefault(node, data, false, opts.useTypeDefaults),
+    string: (node, data, opts) => getDefault(node, data, "", opts.useTypeDefaults),
+    number: (node, data, opts) => getDefault(node, data, 0, opts.useTypeDefaults),
+    integer: (node, data, opts) => getDefault(node, data, 0, opts.useTypeDefaults),
+    boolean: (node, data, opts) => getDefault(node, data, false, opts.useTypeDefaults),
     // object: (draft, schema, data: Record<string, unknown> | undefined, pointer: JsonPointer, opts: TemplateOptions) => {
     object: (node, data, opts) => {
         const schema = node.schema;
@@ -197,7 +197,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
                 const value = data === undefined || input === undefined ? getValue(template, propertyName) : input;
                 // Omit adding a property if it is not required or optional props should be added
                 if (value != null || isRequired || opts.addOptionalProps) {
-                    const propertyValue =  propertyNode.getData(value, opts);
+                    const propertyValue = propertyNode.getData(value, opts);
                     if (propertyValue !== undefined || opts.useTypeDefaults !== false) {
                         d[propertyName] = propertyValue;
                     }
@@ -320,7 +320,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
             const cache = { ...opts.cache };
             for (let i = 0, l = Math.max(minItems, d.length); i < l; i += 1) {
                 opts.cache = copy(cache);
-                const options = { ...opts, disableRecusionLimit: true };
+                const options = { ...opts, disableRecursionLimit: true };
                 const result = node.items.getData(d[i] == null ? template[i] : d[i], options);
                 // @attention if getData aborts recursion it currently returns undefined)
                 if (result === undefined) {
