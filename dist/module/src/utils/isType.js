@@ -1,1 +1,0 @@
-export const isType = (schemaType, type) => { var _a; return schemaType === type || ((_a = schemaType === null || schemaType === void 0 ? void 0 : schemaType.includes) === null || _a === void 0 ? void 0 : _a.call(schemaType, type)); };
