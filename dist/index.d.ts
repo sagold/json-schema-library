@@ -106,7 +106,7 @@ type TemplateOptions = {
    */
   recursionLimit?: number;
   /** @internal disables recursion limit for next call */
-  disableRecusionLimit?: boolean;
+  disableRecursionLimit?: boolean;
   /** @internal context to track recursion limit */
   cache?: Record<string, Record<string, number>>;
 };
@@ -435,7 +435,7 @@ declare const SchemaNodeMethods: {
   /**
    * @returns a list of values (including objects and arrays) and their corresponding JSON Schema as SchemaNode
    */
-  readonly toDataNodes: (data: unknown, pointer?: string) => DataNode[];
+  readonly toDataNodes: (data: unknown, pointer?: string) => void 0[];
   readonly toJSON: () => any;
 };
 //#endregion
