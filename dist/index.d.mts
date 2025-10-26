@@ -489,7 +489,7 @@ type CompileOptions = {
 };
 /**
  * With compileSchema we replace the schema and all sub-schemas with a schemaNode,
- * wrapping each schema with utilities and as much preevaluation is possible. Each
+ * wrapping each schema with utilities and as much preevaluation as possible. Each
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
 declare function compileSchema(schema: JsonSchema, options?: CompileOptions): SchemaNode;

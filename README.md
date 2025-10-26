@@ -52,23 +52,23 @@ Use `compileSchema` once to turn a JSON Schema into a tree of SchemaNodes. After
 
 ```ts
 type CompileOptions = {
-    // set of drafts to use
-    drafts: Draft[];
-    // a context to share
-    remote: SchemaNode;
-    // if format-validations should create errors. Defaults to true
-    formatAssertion: boolean | "meta-schema";
-    // default options for all calls to node.getData()
-    getDataDefaultOptions?: {
-        // Add all properties (required and optional) to the generated data
-        addOptionalProps?: boolean;
-        // Remove data that does not match input schema. Defaults to false
-        removeInvalidData?: boolean;
-        // Set to false to take default values as they are and not extend them. Defaults to true
-        extendDefaults?: boolean;
-        // Limits how often a $ref should be followed before aborting. Prevents infinite data-structure. Defaults to 1
-        recursionLimit?: number;
-    };
+  // set of drafts to use
+  drafts: Draft[];
+  // a context to share
+  remote: SchemaNode;
+  // if format-validations should create errors. Defaults to true
+  formatAssertion: boolean | "meta-schema";
+  // default options for all calls to node.getData()
+  getDataDefaultOptions?: {
+    // Add all properties (required and optional) to the generated data
+    addOptionalProps?: boolean;
+    // Remove data that does not match input schema. Defaults to false
+    removeInvalidData?: boolean;
+    // Set to false to take default values as they are and not extend them. Defaults to true
+    extendDefaults?: boolean;
+    // Limits how often a $ref should be followed before aborting. Prevents infinite data-structure. Defaults to 1
+    recursionLimit?: number;
+  };
 };
 ```
 
@@ -114,8 +114,8 @@ console.log(titleNode.evaluationPath); // #/properties/image/properties/title
 console.log(titleNode.schemaLocation); // #/properties/image/properties/title
 ```
 
--   `evaluationPath` refers to the path in schema and is extended by `$ref`, e.g. if image is defined on `$defs`: `#/properties/image/$ref/properties/title`
--   `schemaLocation` refers to the absolute path within the schema and will not change, e.g. `#/$defs/properties/title`
+- `evaluationPath` refers to the path in schema and is extended by `$ref`, e.g. if image is defined on `$defs`: `#/properties/image/$ref/properties/title`
+- `schemaLocation` refers to the absolute path within the schema and will not change, e.g. `#/$defs/properties/title`
 
 </details>
 
@@ -163,8 +163,8 @@ _json-schema-library_ fully supports all core features of draft versions draft-0
 
 Draft support is defined by running a validator against the official [json-schema-test-suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite).
 
--   Test results for _json-schema-library_ can be inspected in [github actions](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml)
--   A comparison to other validators is listed on [json-schema-benchmark](https://github.com/sagold/json-schema-benchmark)
+- Test results for _json-schema-library_ can be inspected in [github actions](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml)
+- A comparison to other validators is listed on [json-schema-benchmark](https://github.com/sagold/json-schema-benchmark)
 
 Please note that these benchmarks refer to validation only. _json-schema-library_ offers tooling outside of validation and strives to be as spec-compliant as possible.
 
@@ -172,8 +172,8 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 
 <details><summary>Overview format validation support</summary>
 
--   **`❌ unsupported formats`** iri, iri-reference, idn-hostname
--   **`✅ supported formats`**: date, date-time, date, duration, ecmascript-regex, email, hostname, idn-email, ipv4, ipv6, json-pointer, regex, relative-json-pointer, time, unknown, uri-reference, uri-template, uri, uuid
+- **`❌ unsupported formats`** iri, iri-reference, idn-hostname
+- **`✅ supported formats`**: date, date-time, date, duration, ecmascript-regex, email, hostname, idn-email, ipv4, ipv6, json-pointer, regex, relative-json-pointer, time, unknown, uri-reference, uri-template, uri, uuid
 
 </details>
 
@@ -205,14 +205,14 @@ On a compiled schema
 
 ```ts
 const schemaNode = compileSchema({
-    $id: "https://sagold.com/local",
-    type: "object",
-    required: ["character"],
-    properties: {
-        character: {
-            $ref: "https://sagold.com/remote"
-        }
+  $id: "https://sagold.com/local",
+  type: "object",
+  required: ["character"],
+  properties: {
+    character: {
+      $ref: "https://sagold.com/remote"
     }
+  }
 });
 ```
 
@@ -220,11 +220,11 @@ use the exposed method `addRemoteSchema` to add a remote schema for $ref-resolut
 
 ```ts
 schemaNode.addRemoteSchema("https://sagold.com/remote", {
-    $id: "https://sagold.com/remote",
-    title: "A character",
-    type: "string",
-    minLength: 1,
-    maxLength: 1
+  $id: "https://sagold.com/remote",
+  title: "A character",
+  type: "string",
+  minLength: 1,
+  maxLength: 1
 });
 ```
 
@@ -247,15 +247,15 @@ It is possible to pass remoteSchema on compileSchema by passing a SchemaNode (wi
 
 ```ts
 const remote = compileSchema({
-    $id: "https://sagold.com/remote",
-    $defs: {
-        character: {
-            title: "A character",
-            type: "string",
-            minLength: 1,
-            maxLength: 1
-        }
+  $id: "https://sagold.com/remote",
+  $defs: {
+    character: {
+      title: "A character",
+      type: "string",
+      minLength: 1,
+      maxLength: 1
     }
+  }
 });
 
 const schemaNode = compileSchema({ $ref: "https://sagold.com/remote#/defs/character" }, { remote });
@@ -270,19 +270,19 @@ You can add a local uri reference to the remote schema by using the `#` separato
 
 ```ts
 const schemaNode = compileSchema({
-    $id: "https://sagold.com/local",
-    $ref: "https://sagold.com/remote#/$defs/character"
+  $id: "https://sagold.com/local",
+  $ref: "https://sagold.com/remote#/$defs/character"
 });
 
 schemaNode.addRemoteSchema("https://sagold.com/remote", {
-    $defs: {
-        character: {
-            title: "A character",
-            type: "string",
-            minLength: 1,
-            maxLength: 1
-        }
+  $defs: {
+    character: {
+      title: "A character",
+      type: "string",
+      minLength: 1,
+      maxLength: 1
     }
+  }
 });
 
 schemaNode.validate("AB"); // maxLength error
@@ -295,20 +295,20 @@ const { node, error } = schemaNode.getNodeRef("https://sagold.com/remote#/$defs/
 
 ```ts
 const schemaNode = compileSchema({
-    $id: "https://sagold.com/local",
-    $ref: "https://sagold.com/remote#/properties/character"
+  $id: "https://sagold.com/local",
+  $ref: "https://sagold.com/remote#/properties/character"
 });
 
 schemaNode.addRemoteSchema("https://sagold.com/remote", {
-    type: "object",
-    properties: {
-        character: {
-            title: "A character",
-            type: "string",
-            minLength: 1,
-            maxLength: 1
-        }
+  type: "object",
+  properties: {
+    character: {
+      title: "A character",
+      type: "string",
+      minLength: 1,
+      maxLength: 1
     }
+  }
 });
 
 schemaNode.validate("AB"); // maxLength error
@@ -352,12 +352,12 @@ const schemas: SchemaNode[] = schemaNode.getChildSelection("content");
 import { compileSchema, JsonSchema } from "json-schema-library";
 
 const jsonSchema = compileSchema({
-    type: "object",
-    properties: {
-        content: {
-            oneOf: [{ type: "string" }, { type: "number" }]
-        }
+  type: "object",
+  properties: {
+    content: {
+      oneOf: [{ type: "string" }, { type: "number" }]
     }
+  }
 });
 
 const childNodes: JsonSchema[] = jsonSchema.getChildSelection("content");
@@ -393,32 +393,32 @@ const myData = compileSchema(myJsonSchema).getData(inputData, { recursionLimit: 
 import { compileSchema, JsonSchema } from "json-schema-library";
 
 const myJsonSchema: JsonSchema = {
-    type: "object",
-    required: ["name", "option", "list"],
-    properties: {
-        name: { type: "string" },
-        option: {
-            type: "string",
-            enum: ["first-option", "second-option"]
-        },
-        list: {
-            type: "array",
-            items: {
-                type: "string",
-                default: "new item"
-            },
-            minItems: 1
-        }
+  type: "object",
+  required: ["name", "option", "list"],
+  properties: {
+    name: { type: "string" },
+    option: {
+      type: "string",
+      enum: ["first-option", "second-option"]
+    },
+    list: {
+      type: "array",
+      items: {
+        type: "string",
+        default: "new item"
+      },
+      minItems: 1
     }
+  }
 };
 
 const schemaNode = new compileSchema(myJsonSchema);
 const myData = schemaNode.getData();
 
 expect(myData).to.deep.equal({
-    name: "",
-    option: "first-option",
-    list: ["new item"]
+  name: "",
+  option: "first-option",
+  list: ["new item"]
 });
 ```
 
@@ -430,32 +430,32 @@ expect(myData).to.deep.equal({
 import { compileSchema, JsonSchema } from "json-schema-library";
 
 const myJsonSchema: JsonSchema = {
-    type: "object",
-    required: ["name", "option", "list"],
-    properties: {
-        name: { type: "string" },
-        option: {
-            type: "string",
-            enum: ["first-option", "second-option"]
-        },
-        list: {
-            type: "array",
-            items: {
-                type: "string",
-                default: "new item"
-            },
-            minItems: 1
-        }
+  type: "object",
+  required: ["name", "option", "list"],
+  properties: {
+    name: { type: "string" },
+    option: {
+      type: "string",
+      enum: ["first-option", "second-option"]
+    },
+    list: {
+      type: "array",
+      items: {
+        type: "string",
+        default: "new item"
+      },
+      minItems: 1
     }
+  }
 };
 
 const jsonSchema = compileSchema(myJsonSchema);
 const myData = jsonSchema.getData({ name: "input-data", list: [] });
 
 expect(myData).to.deep.equal({
-    name: "input-data",
-    option: "first-option",
-    list: ["new item"]
+  name: "input-data",
+  option: "first-option",
+  list: ["new item"]
 });
 ```
 
@@ -469,13 +469,13 @@ Per default, `getData` does try to create data that is valid to the json-schema.
 import { compileSchema } from "json-schema-library";
 
 const myJsonSchema = {
-    type: "array",
-    default: [], // if omitted will add an array item
-    items: {
-        type: "string",
-        enum: ["one", "two"]
-    },
-    minItems: 1 // usually adds an enty, but default states: []
+  type: "array",
+  default: [], // if omitted will add an array item
+  items: {
+    type: "string",
+    enum: ["one", "two"]
+  },
+  minItems: 1 // usually adds an enty, but default states: []
 };
 
 const myData = compileSchema(myJsonSchema).getData(undefined, { extendDefaults: false });
@@ -491,11 +491,11 @@ expect(myData).to.deep.equal([]);
 
 ```ts
 const data = compileSchema({
-    required: ["title"],
-    properties: {
-        title: { type: "string" },
-        subTitle: { type: "string", default: "sub-title" }
-    }
+  required: ["title"],
+  properties: {
+    title: { type: "string" },
+    subTitle: { type: "string", default: "sub-title" }
+  }
 }).getData(undefined);
 console.log(data); // { title: "" }
 ```
@@ -504,11 +504,11 @@ With `addOptionalProps:true`, `getData` will also add all optional properties
 
 ```ts
 const data = compileSchema({
-    required: ["title"],
-    properties: {
-        title: { type: "string" },
-        subTitle: { type: "string", default: "sub-title" }
-    }
+  required: ["title"],
+  properties: {
+    title: { type: "string" },
+    subTitle: { type: "string", default: "sub-title" }
+  }
 }).getData(undefined, { addOptionalProps: true });
 console.log(data); // { title: "", subTitle: "sub-title" }
 ```
@@ -521,8 +521,8 @@ With `removeInvalidData:true`, `getData` will remove data that is invalid to the
 
 ```ts
 const data = compileSchema({
-    properties: { valid: { type: "string" } },
-    additionalProperties: false
+  properties: { valid: { type: "string" } },
+  additionalProperties: false
 }).getData({ valid: "stays", invalid: "removed" }, { removeInvalidData: true });
 console.log(data); // { valid: "stays" }
 ```
@@ -531,8 +531,8 @@ console.log(data); // { valid: "stays" }
 
 ```ts
 const data = compileSchema({
-    properties: { valid: { type: "string" } },
-    additionalProperties: true
+  properties: { valid: { type: "string" } },
+  additionalProperties: true
 }).getData({ valid: "stays", invalid: "removed" }, { removeInvalidData: true });
 console.log(data); // { valid: "stays", invalid: "removed" }
 ```
@@ -545,8 +545,8 @@ With `useTypeDefaults:true`, `getData` will return initial values for all primit
 
 ```ts
 const data = compileSchema({
-    required: ["valid"],
-    properties: { valid: { type: "string" } }
+  required: ["valid"],
+  properties: { valid: { type: "string" } }
 }).getData(null, { useTypeDefaults: true });
 console.log(data); // { valid: "" }
 ```
@@ -555,8 +555,8 @@ Setting `useTypeDefaults:false` will _not_ remove data that is valid, but unspec
 
 ```ts
 const data = compileSchema({
-    required: ["valid"],
-    properties: { valid: { type: "string" } }
+  required: ["valid"],
+  properties: { valid: { type: "string" } }
 }).getData(null, { useTypeDefaults: false });
 console.log(data); // {}
 ```
@@ -565,8 +565,8 @@ console.log(data); // {}
 
 ```ts
 const data = compileSchema({
-    required: ["valid"],
-    properties: { valid: { type: "object" } }
+  required: ["valid"],
+  properties: { valid: { type: "object" } }
 }).getData(null, { useTypeDefaults: true });
 console.log(data); // { valid: {} }
 ```
@@ -575,8 +575,8 @@ console.log(data); // { valid: {} }
 
 ```ts
 const data = compileSchema({
-    required: ["valid"],
-    properties: { valid: { type: "array", items: { type: "string" }, minItems: 1 } }
+  required: ["valid"],
+  properties: { valid: { type: "array", items: { type: "string" }, minItems: 1 } }
 }).getData(null, { useTypeDefaults: false });
 console.log(data); // { valid: [undefined] }
 ```
@@ -621,51 +621,51 @@ console.log(node?.schema, error); // { type: "number" }, undefined
 import { compileSchema } from "json-schema-library";
 
 const mySchema = {
-    type: "object",
-    properties: {
-        list: {
-            type: "array",
-            items: {
-                oneOf: [
-                    {
-                        type: "object",
-                        required: ["name"],
-                        properties: {
-                            name: {
-                                type: "string",
-                                title: "name of item"
-                            }
-                        }
-                    },
-                    {
-                        type: "object",
-                        required: ["description"],
-                        properties: {
-                            description: {
-                                type: "string",
-                                title: "description of item"
-                            }
-                        }
-                    }
-                ]
+  type: "object",
+  properties: {
+    list: {
+      type: "array",
+      items: {
+        oneOf: [
+          {
+            type: "object",
+            required: ["name"],
+            properties: {
+              name: {
+                type: "string",
+                title: "name of item"
+              }
             }
-        }
+          },
+          {
+            type: "object",
+            required: ["description"],
+            properties: {
+              description: {
+                type: "string",
+                title: "description of item"
+              }
+            }
+          }
+        ]
+      }
     }
+  }
 };
 
 const { node } = compileSchema(mySchema).getNode("/list/1", {
-    list: [{ description: "..." }, { name: "my-item" }]
+  list: [{ description: "..." }, { name: "my-item" }]
 });
 
 expect(node.schema).to.deep.equal({
-    type: "object",
-    required: ["name"],
-    properties: {
-        name: {
-            type: "string",
-            title: "name of item"
-        }
+  type: "object",
+  required: ["name"],
+  properties: {
+    name: {
+      type: "string",
+      title: "name of item"
     }
+  }
 });
 ```
 
@@ -675,14 +675,14 @@ expect(node.schema).to.deep.equal({
 
 All returned json-errors have a data property with the following properties
 
--   `pointer` JSON Pointer to the location where the error occured. In case of omitted data, this is the last JSON Schema location that could be resolved
--   `schema` the JSON Schema of the last resolved location and the source of the error
--   `value` the data value at this location that could not be resolved
+- `pointer` JSON Pointer to the location where the error occured. In case of omitted data, this is the last JSON Schema location that could be resolved
+- `schema` the JSON Schema of the last resolved location and the source of the error
+- `value` the data value at this location that could not be resolved
 
 ```ts
 const { error } = schemaNode.getNode("/list/1");
 if (error) {
-    console.log(Object.keys(error.data)); // [pointer, schema, value]
+  console.log(Object.keys(error.data)); // [pointer, schema, value]
 }
 ```
 
@@ -713,16 +713,16 @@ import { compileSchema, JsonSchema } from "json-schema-library";
 
 const root = compileSchema(mySchema);
 const localSchema: JsonSchema = {
-    oneOf: [
-        {
-            type: "object",
-            properties: { title: { type: "string" } }
-        },
-        {
-            type: "object",
-            properties: { title: { type: "number" } }
-        }
-    ]
+  oneOf: [
+    {
+      type: "object",
+      properties: { title: { type: "string" } }
+    },
+    {
+      type: "object",
+      properties: { title: { type: "number" } }
+    }
+  ]
 };
 
 const schema = root.getNodeChild("title", { title: 4 }).node?.schema;
@@ -753,7 +753,7 @@ const root = compileSchema(mySchema);
 const { node } = root.getNode("/image/title");
 
 if (node) {
-    assert(node.getNodeRoot() === root); // success
+  assert(node.getNodeRoot() === root); // success
 }
 ```
 
@@ -808,21 +808,21 @@ const nodes: DataNode[] = schemaNode.toDataNodes(myData);
 import { compileSchema, JsonSchema, JsonPointer } from "json-schema-library";
 
 const mySchema: JsonSchema = {
-    type: "array",
-    items: [{ type: "number" }, { type: "string" }]
+  type: "array",
+  items: [{ type: "number" }, { type: "string" }]
 };
 
 const schemaNode = compileSchema(mySchema);
 schemaNode.toDataNodes([5, "nine"]).map((dataNode) => ({
-    schema: dataNode.node.schema,
-    value: dataNode.value,
-    pointer: dataNode.pointer
+  schema: dataNode.node.schema,
+  value: dataNode.value,
+  pointer: dataNode.pointer
 }));
 
 expect(calls).to.deep.equal([
-    { schema: mySchema, value: [5, "nine"], pointer: "#" },
-    { schema: { type: "number" }, value: 5, pointer: "#/0" },
-    { schema: { type: "string" }, value: "nine", pointer: "#/1" }
+  { schema: mySchema, value: [5, "nine"], pointer: "#" },
+  { schema: { type: "number" }, value: 5, pointer: "#/0" },
+  { schema: { type: "string" }, value: "nine", pointer: "#/1" }
 ]);
 ```
 
@@ -842,27 +842,27 @@ const nodes: SchemaNode[] = compileSchema(mySchema).toSchemaNodes();
 import { compileSchema, JsonSchema, SchemaNode } from "json-schema-library";
 
 const mySchema: JsonSchema = {
-    type: "array",
-    items: {
-        oneOf: [{ type: "number" }, { $ref: "#/$defs/value" }]
-    },
-    $defs: {
-        value: { type: "string" },
-        object: { type: "object" }
-    }
+  type: "array",
+  items: {
+    oneOf: [{ type: "number" }, { $ref: "#/$defs/value" }]
+  },
+  $defs: {
+    value: { type: "string" },
+    object: { type: "object" }
+  }
 };
 
 const nodes = compileSchema(mySchema)
-    .toSchemaNodes(myCallback)
-    .map((node) => node.schema);
+  .toSchemaNodes(myCallback)
+  .map((node) => node.schema);
 
 expect(calls).to.deep.equal([
-    mySchema,
-    { oneOf: [{ type: "number" }, { $ref: "#/$defs/value" }] },
-    { type: "number" },
-    { $ref: "#/$defs/value" },
-    { type: "string" },
-    { type: "object" }
+  mySchema,
+  { oneOf: [{ type: "number" }, { $ref: "#/$defs/value" }] },
+  { type: "number" },
+  { $ref: "#/$defs/value" },
+  { type: "string" },
+  { type: "object" }
 ]);
 ```
 
@@ -883,10 +883,10 @@ In _json-schema-library_ all errors are in the format of a `JsonError`:
 
 ```ts
 type JsonError = {
-    type: "error";
-    code: string;
-    message: string;
-    data?: { [p: string]: any };
+  type: "error";
+  code: string;
+  message: string;
+  data?: { [p: string]: any };
 };
 ```
 
@@ -902,12 +902,12 @@ const myJsonSchema: JsonSchema = { type: "object", additionalProperties: false }
 const { errors } = compileSchema(myJsonSchema).validate({ name: "my-data" });
 
 expect(errors).to.deep.equal([
-    {
-        type: "error",
-        code: "no-additional-properties-error",
-        message: "Additional property `name` in `#` is not allowed",
-        data: { property: "name", properties: [], pointer: "#" }
-    }
+  {
+    type: "error",
+    code: "no-additional-properties-error",
+    message: "Additional property `name` in `#` is not allowed",
+    data: { property: "name", properties: [], pointer: "#" }
+  }
 ]);
 ```
 
@@ -919,7 +919,7 @@ You can also use async validators to validate data with json-schema. For this, a
 const { errorsAsync } = compileSchema(myJsonSchema).validate(myData);
 
 if (errorsAsync.length > 0) {
-    const additionalErrors = (await Promise.all(errorsAsync)).filter((err) => err != null);
+  const additionalErrors = (await Promise.all(errorsAsync)).filter((err) => err != null);
 }
 ```
 
@@ -933,19 +933,19 @@ Per default _json-schema-library_ does not contain async validators, so `errorsA
 import { JsonSchemaValidator, draft2020 } from "json-schema-library";
 // return Promise<JsonError>
 const customValidator: JsonSchemaValidator = async ({ node, pointer, data }) => {
-    return node.createError("type-error", {
-        schema: {},
-        pointer,
-        value: data
-    });
+  return node.createError("type-error", {
+    schema: {},
+    pointer,
+    value: data
+  });
 };
 
 const draftList = [
-    extendDraft(jsonEditorDraft, {
-        keywords: {
-            custom: customValidator
-        }
-    })
+  extendDraft(jsonEditorDraft, {
+    keywords: {
+      custom: customValidator
+    }
+  })
 ];
 
 const { isValid, errorsAsync } = compileSchema({ custom: true }).validate("data");
@@ -965,10 +965,10 @@ _json-schema-library_ uses the concept of **drafts** to support different versio
 
 Each **draft** describes how a schema should be parsed, validated, and interpreted. Drafts can also be extended or modified to change or enhance behavior, such as:
 
--   Replacing or adding new keywords (`oneOf`, `if/then`, custom ones, etc.)
--   Defining or overriding format validators (`format: "email"`, etc.)
--   Customizing or localizing error messages
--   Tweaking how schema nodes behave during parsing or resolution
+- Replacing or adding new keywords (`oneOf`, `if/then`, custom ones, etc.)
+- Defining or overriding format validators (`format: "email"`, etc.)
+- Customizing or localizing error messages
+- Tweaking how schema nodes behave during parsing or resolution
 
 Out of the box, the library exports all compliant JSON Schema drafts:
 
@@ -986,12 +986,12 @@ A `Draft` is an object that defines the core behavior and extensions for a schem
 
 ```ts
 type Draft = {
-    $schemaRegEx: string;
-    version: DraftVersion;
-    keywords: Keyword[];
-    errors: ErrorConfig;
-    formats: typeof formats;
-    methods: {};
+  $schemaRegEx: string;
+  version: DraftVersion;
+  keywords: Keyword[];
+  errors: ErrorConfig;
+  formats: typeof formats;
+  methods: {};
 };
 ```
 
@@ -1051,51 +1051,51 @@ Examples:
 import { extendDraft, draft2020, oneOfFuzzyKeyword, createCustomError, render, ErrorData } from "json-schema-library";
 
 const myDraft = extendDraft(draft2020, {
-    // Match all $schema
-    $schemaRegEx: "",
+  // Match all $schema
+  $schemaRegEx: "",
 
-    // Register a custom "oneOf" keyword, replacing the existing one
-    keywords: [oneOfFuzzyKeyword],
+  // Register a custom "oneOf" keyword, replacing the existing one
+  keywords: [oneOfFuzzyKeyword],
 
-    formats: {
-        // Add a new "format": "test", which returns an error when the value is "test"
-        test: ({ data, node, pointer }) => {
-            if (data === "test") {
-                return node.createError("test-error", {
-                    schema: node.schema,
-                    pointer: pointer,
-                    value: data,
-                    customValue: "test"
-                });
-            }
-        }
-    },
-
-    errors: {
-        // Add a new custom error "test-error"
-        "test-error": "Test error for value {{value}} - {{customValue}}",
-
-        // Overwrite the existing MaxLengthError message
-        "max-length-error": "Too many characters",
-
-        // Add a dynamic MinLengthError with custom logic
-        "min-length-error": (data: ErrorData) => {
-            if (data.minLength === 1) {
-                return {
-                    type: "error",
-                    code: "min-length-one-error",
-                    message: "Input is required",
-                    data
-                };
-            }
-            return {
-                type: "error",
-                code: "min-length-error",
-                message: render("Value in `{{pointer}}` is `{{length}}`, but should be `{{minimum}}` at minimum", data),
-                data
-            };
-        }
+  formats: {
+    // Add a new "format": "test", which returns an error when the value is "test"
+    test: ({ data, node, pointer }) => {
+      if (data === "test") {
+        return node.createError("test-error", {
+          schema: node.schema,
+          pointer: pointer,
+          value: data,
+          customValue: "test"
+        });
+      }
     }
+  },
+
+  errors: {
+    // Add a new custom error "test-error"
+    "test-error": "Test error for value {{value}} - {{customValue}}",
+
+    // Overwrite the existing MaxLengthError message
+    "max-length-error": "Too many characters",
+
+    // Add a dynamic MinLengthError with custom logic
+    "min-length-error": (data: ErrorData) => {
+      if (data.minLength === 1) {
+        return {
+          type: "error",
+          code: "min-length-one-error",
+          message: "Input is required",
+          data
+        };
+      }
+      return {
+        type: "error",
+        code: "min-length-error",
+        message: render("Value in `{{pointer}}` is `{{length}}`, but should be `{{minimum}}` at minimum", data),
+        data
+      };
+    }
+  }
 });
 ```
 
@@ -1122,40 +1122,40 @@ import { extendDraft, draft2020 } from "json-schema-library";
  * - HH:MM
  */
 const matchTimeSecondsAndTimeOptional =
-    /^(?<time>(?:([0-1]\d|2[0-3]):[0-5]\d(:(?<second>[0-5]\d|60))?))(?:\.\d+)?(?<offset>(?:z|[+-]([0-1]\d|2[0-3])(?::?[0-5]\d)?)?)$/i;
+  /^(?<time>(?:([0-1]\d|2[0-3]):[0-5]\d(:(?<second>[0-5]\d|60))?))(?:\.\d+)?(?<offset>(?:z|[+-]([0-1]\d|2[0-3])(?::?[0-5]\d)?)?)$/i;
 
 const customTimeFormatDraft = extendDraft(draft2020, {
-    formats: {
-        // This example extends the default time formatter which validates against RFC3339
-        time: ({ node, pointer, data }) => {
-            const { schema } = node;
-            if (typeof data !== "string" || data === "") {
-                return undefined;
-            }
+  formats: {
+    // This example extends the default time formatter which validates against RFC3339
+    time: ({ node, pointer, data }) => {
+      const { schema } = node;
+      if (typeof data !== "string" || data === "") {
+        return undefined;
+      }
 
-            // Use the Custom Regex to validate the date and time.
-            const matches = data.match(matchTimeSecondsAndTimeOptional);
-            if (!matches) {
-                return node.createError("format-date-time-error", { value: data, pointer, schema });
-            }
+      // Use the Custom Regex to validate the date and time.
+      const matches = data.match(matchTimeSecondsAndTimeOptional);
+      if (!matches) {
+        return node.createError("format-date-time-error", { value: data, pointer, schema });
+      }
 
-            // leap second
-            if (matches.groups.second === "60") {
-                // Omitted the code here for brevity.
-            }
+      // leap second
+      if (matches.groups.second === "60") {
+        // Omitted the code here for brevity.
+      }
 
-            return undefined;
-        }
+      return undefined;
     }
+  }
 });
 
 const { errors, valid } = compileSchema(
-    {
-        type: "string",
-        format: "time",
-        $schema: "https://json-schema.org/draft/2020-12/schema"
-    },
-    { drafts: [customTimeFormatDraft] }
+  {
+    type: "string",
+    format: "time",
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+  },
+  { drafts: [customTimeFormatDraft] }
 ).validate("15:31:12");
 
 console.assert(valid, errors.at(0)?.message);
@@ -1167,23 +1167,23 @@ console.assert(valid, errors.at(0)?.message);
 
 **Keywords** hold the main logic for JSON Schema functionality. Each `Keyword` corresponds to a JSON Schema keyword like `properties`, `prefixItems`, `oneOf`, etc and offers implementations to `parse`, `validate`, `resolve` and `reduce`. Note that support for each implementation is optional, dependending on the feature requirements. The main properties of a `Keyword`:
 
--   a `Keyword` is only processed if the specified `keyword` is available as property on the JSON Schema
--   an optional `order` property may be added as order of keyword execution is sometimes important (`additionalItems` last, `$ref` evaluation first)
--   the list of keywords is unique by property-value `keyword`
--   for a given function `addX`, a function `X` must be present
+- a `Keyword` is only processed if the specified `keyword` is available as property on the JSON Schema
+- an optional `order` property may be added as order of keyword execution is sometimes important (`additionalItems` last, `$ref` evaluation first)
+- the list of keywords is unique by property-value `keyword`
+- for a given function `addX`, a function `X` must be present
 
 ```ts
 type Keyword = {
-    id: string;
-    keyword: string;
-    order?: number;
-    parse?: (node: SchemaNode) => void;
-    addResolve?: (node: SchemaNode) => boolean;
-    resolve?: JsonSchemaResolver;
-    addValidate?: (node: SchemaNode) => boolean;
-    validate?: JsonSchemaValidator;
-    addReduce?: (node: SchemaNode) => boolean;
-    reduce?: JsonSchemaReducer;
+  id: string;
+  keyword: string;
+  order?: number;
+  parse?: (node: SchemaNode) => void;
+  addResolve?: (node: SchemaNode) => boolean;
+  resolve?: JsonSchemaResolver;
+  addValidate?: (node: SchemaNode) => boolean;
+  validate?: JsonSchemaValidator;
+  addReduce?: (node: SchemaNode) => boolean;
+  reduce?: JsonSchemaReducer;
 };
 ```
 
@@ -1197,16 +1197,16 @@ For examples on keyword implementations refer to [./src/keywords](./src/keywords
 
 ```ts
 export const notKeyword: Keyword = {
-    id: "not",
-    keyword: "not",
-    parse: parseNot
+  id: "not",
+  keyword: "not",
+  parse: parseNot
 };
 
 export function parseNot(node: SchemaNode) {
-    const { schema, evaluationPath, schemaLocation } = node;
-    if (schema.not != null) {
-        node.not = node.compileSchema(schema.not, `${evaluationPath}/not`, `${schemaLocation}/not`);
-    }
+  const { schema, evaluationPath, schemaLocation } = node;
+  if (schema.not != null) {
+    node.not = node.compileSchema(schema.not, `${evaluationPath}/not`, `${schemaLocation}/not`);
+  }
 }
 ```
 
@@ -1220,15 +1220,15 @@ A resolver returns a child-schema for a property-key, item-index or undefined if
 
 ```ts
 export const propertiesKeyword: Keyword = {
-    id: "property",
-    keyword: "properties",
-    parse: parseProperties,
-    addResolve: (node: SchemaNode) => node.properties != null,
-    resolve: propertyResolver
+  id: "property",
+  keyword: "properties",
+  parse: parseProperties,
+  addResolve: (node: SchemaNode) => node.properties != null,
+  resolve: propertyResolver
 };
 
 function propertyResolver({ node, key }: JsonSchemaResolverParams) {
-    return node.properties?.[key];
+  return node.properties?.[key];
 }
 ```
 
@@ -1242,20 +1242,20 @@ A reducer replaces the JSON Schema keyword to a simple, static JSON Schema based
 
 ```ts
 export const typeKeyword: Keyword = {
-    id: "type",
-    keyword: "type",
-    addReduce: (node) => Array.isArray(node.schema.type),
-    reduce: reduceType,
-    addValidate: ({ schema }) => schema.type != null,
-    validate: validateType
+  id: "type",
+  keyword: "type",
+  addReduce: (node) => Array.isArray(node.schema.type),
+  reduce: reduceType,
+  addValidate: ({ schema }) => schema.type != null,
+  validate: validateType
 };
 
 function reduceType({ node, pointer, data }: JsonSchemaReducerParams): undefined | SchemaNode {
-    const dataType = getJsonSchemaType(data, node.schema.type);
-    if (dataType !== "undefined" && Array.isArray(node.schema.type) && node.schema.type.includes(dataType)) {
-        return node.compileSchema({ ...node.schema, pointer, type: dataType }, node.evaluationPath);
-    }
-    return undefined;
+  const dataType = getJsonSchemaType(data, node.schema.type);
+  if (dataType !== "undefined" && Array.isArray(node.schema.type) && node.schema.type.includes(dataType)) {
+    return node.compileSchema({ ...node.schema, pointer, type: dataType }, node.evaluationPath);
+  }
+  return undefined;
 }
 ```
 
@@ -1278,29 +1278,29 @@ For an explicit `oneOf` resolution, the JSON Schema may be extended by a propert
 
 ```ts
 const schema = {
-    oneOfProperty: "id",
-    oneOf: [
-        {
-            type: "object",
-            properties: { id: { const: "1" }, title: { type: "number" } }
-        },
-        {
-            type: "object",
-            properties: { id: { const: "2" }, title: { type: "number" } }
-        },
-        {
-            type: "object",
-            properties: { id: { const: "3" }, title: { type: "number" } }
-        }
-    ]
+  oneOfProperty: "id",
+  oneOf: [
+    {
+      type: "object",
+      properties: { id: { const: "1" }, title: { type: "number" } }
+    },
+    {
+      type: "object",
+      properties: { id: { const: "2" }, title: { type: "number" } }
+    },
+    {
+      type: "object",
+      properties: { id: { const: "3" }, title: { type: "number" } }
+    }
+  ]
 };
 
 const resolvedNode = compileSchema(schema).reduce({ id: "2", title: "not a number" });
 
 // will always return (even if invalid)
 expect(resolvedNode?.schema).to.deep.eq({
-    type: "object",
-    properties: { id: { const: "2" }, title: { type: "number" } }
+  type: "object",
+  properties: { id: { const: "2" }, title: { type: "number" } }
 });
 ```
 
@@ -1316,7 +1316,7 @@ If you're working with complex schemas that use the `oneOf` keyword to validate 
 import { extendDraft, oneOfFuzzyKeyword, draft2020 } from "json-schema-library";
 
 const myDraft = extendDraft(draft2020, {
-    keywords: [oneOfFuzzyKeyword]
+  keywords: [oneOfFuzzyKeyword]
 });
 ```
 
@@ -1326,11 +1326,11 @@ You can set custom errors messages locally by using the errors-keyword:
 
 ```ts
 const { errors } = compileSchema({
-    type: "array",
-    minItems: 2,
-    errorMessages: {
-        "min-items-error": "Custom error {{minItems}}"
-    }
+  type: "array",
+  minItems: 2,
+  errorMessages: {
+    "min-items-error": "Custom error {{minItems}}"
+  }
 }).validate([1]);
 
 assert.deepEqual(errors[0].message, "Custom error 2");
@@ -1342,9 +1342,9 @@ In order to allow customization of regular expressions a schema property `regexF
 
 ```ts
 const { errors } = compileSchema({
-    type: "string",
-    pattern: "^[a-zA-Z0-9+_.-]+",
-    regexFlags: "v"
+  type: "string",
+  pattern: "^[a-zA-Z0-9+_.-]+",
+  regexFlags: "v"
 }).validate("-");
 ```
 
@@ -1358,20 +1358,26 @@ settings.REGEX_FLAGS = "v";
 
 ## Breaking Changes
 
+### v10.4.0
+
+- introduced esm module export
+- fixed typo in argument ~~disableRecusionLimit~~ disableRecursionLimit
+- added settings to exports for global changes of settings
+
 ### v10.3.0
 
--   introduce setting `REGEX_FLAGS` and schema-property `regexFlags` to customize regex flags to use evaluating regex
--   fixed an issue resolving non-URI compatible $ref-targets containing `#/definitions`
+- introduce setting `REGEX_FLAGS` and schema-property `regexFlags` to customize regex flags to use evaluating regex
+- fixed an issue resolving non-URI compatible $ref-targets containing `#/definitions`
 
 ### v10.2.0
 
--   introduce getData setting `useTypeDefaults`
--   introduce support to merge meta-properties using $ref-resolution
+- introduce getData setting `useTypeDefaults`
+- introduce support to merge meta-properties using $ref-resolution
 
 ### v10.1.0
 
--   replaced `node.additionalItems` by `node.items` for drafts below 2020-12
--   fixed `additionalItems` behaviour to be ignored when `schema.items` is not an array
+- replaced `node.additionalItems` by `node.items` for drafts below 2020-12
+- fixed `additionalItems` behaviour to be ignored when `schema.items` is not an array
 
 ### v10.0.0
 
@@ -1383,8 +1389,8 @@ The new implementation revolves around compiling schemas into a **SchemaNode** t
 
 #### Key Changes:
 
--   **Compile Schema**: The `compileSchema` function now replaces the previous Draft-Class approach.
--   **SchemaNode Representation**: All schemas are now represented as `SchemaNode`, which holds the schema and provides an easier way to work with them.
+- **Compile Schema**: The `compileSchema` function now replaces the previous Draft-Class approach.
+- **SchemaNode Representation**: All schemas are now represented as `SchemaNode`, which holds the schema and provides an easier way to work with them.
 
 #### Breaking Changes:
 
@@ -1400,14 +1406,14 @@ const node = compileSchema(schema);
 
 **Changed Methods**:
 
--   `draft.createSchemaOf(schema)` → `node.createSchema(schema)`
--   `draft.each(data, callback)` → `const nodes = node.toDataNodes(data)`
--   `draft.eachSchema(callback)` → `const nodes = node.toSchemaNodes()`
--   `draft.getChildSchemaSelection(property)` → `node.getChildSelection(property)`
--   `draft.getNode(options)` → `node.getNode(pointer, data, options)`
--   `draft.getTemplate(inputData)` → `node.getData(inputData)`
--   `draft.isValid(data)` → `node.validate(data).valid`
--   `draft.step(property, data)` → `node.getNodeChild(property, data)`
+- `draft.createSchemaOf(schema)` → `node.createSchema(schema)`
+- `draft.each(data, callback)` → `const nodes = node.toDataNodes(data)`
+- `draft.eachSchema(callback)` → `const nodes = node.toSchemaNodes()`
+- `draft.getChildSchemaSelection(property)` → `node.getChildSelection(property)`
+- `draft.getNode(options)` → `node.getNode(pointer, data, options)`
+- `draft.getTemplate(inputData)` → `node.getData(inputData)`
+- `draft.isValid(data)` → `node.validate(data).valid`
+- `draft.step(property, data)` → `node.getNodeChild(property, data)`
 
 **Renamed Properties**: `templateDefaultOptions` → `getDataDefaultOptions`
 
@@ -1419,11 +1425,11 @@ const node = compileSchema(schema);
 
 ```ts
 compileSchema(schema, {
-    getDataDefaultOptions: {
-        addOptionalProps: false,
-        removeInvalidData: false,
-        extendDefaults: true
-    }
+  getDataDefaultOptions: {
+    addOptionalProps: false,
+    removeInvalidData: false,
+    extendDefaults: true
+  }
 });
 ```
 
@@ -1433,28 +1439,28 @@ compileSchema(schema, {
 
 **breaking changes**:
 
--   _getSchema_ signature changed in favour of an options object. Instead of `draft.getNode(pointer, data)` arguments have to be passed as an object `draft.getNode({ pointer, data })`. This removes setting unwanted optional arguments and keeps the api more stable in the future (e.g. `withSchemaWarning` option)
--   _JsonError_ now must expose `pointer`, `schema` and `value` consistently on data property
+- _getSchema_ signature changed in favour of an options object. Instead of `draft.getNode(pointer, data)` arguments have to be passed as an object `draft.getNode({ pointer, data })`. This removes setting unwanted optional arguments and keeps the api more stable in the future (e.g. `withSchemaWarning` option)
+- _JsonError_ now must expose `pointer`, `schema` and `value` consistently on data property
 
 **updates**
 
--   _getSchema_ consistently returns errors and can return errors for empty schema using `withSchemaWarning` option
+- _getSchema_ consistently returns errors and can return errors for empty schema using `withSchemaWarning` option
 
 ### v8.0.0
 
 With version `v8.0.0`, _getData_ was improved to better support optional properties and utilize existing core logic, making it more reliable. Breaking changes:
 
--   Renamed `JSONError` to `JsonError` and `JSONSchema` to `JsonSchema`
--   `getData` only adds required properties. Behaviour can be changed by [getData default options](#getData-default-options)
--   Internal schema property `oneOfSchema` has been replaced by `schema.getOneOfOrigin()`
--   Changed `unique-items-error` to point to error for duplicated item and changed data-properties
--   Removed `SchemaService` as it was no longer used nor tested
+- Renamed `JSONError` to `JsonError` and `JSONSchema` to `JsonSchema`
+- `getData` only adds required properties. Behaviour can be changed by [getData default options](#getData-default-options)
+- Internal schema property `oneOfSchema` has been replaced by `schema.getOneOfOrigin()`
+- Changed `unique-items-error` to point to error for duplicated item and changed data-properties
+- Removed `SchemaService` as it was no longer used nor tested
 
 <details><summary>Exposed new helper functions</summary>
 
--   `mergeSchema` - Merges to two json schema
--   `reduceNode` - Reduce schema by merging dynamic constructs into a static json schema omitting those properties
--   `isDynamicSchema` - Returns true if the passed schema contains dynamic properties (_if_, _dependencies_, _allOf_, etc)
--   `resolveDynamicSchema` - Resolves all dynamic schema definitions for the given input data and returns the resulting JSON Schema without any dynamic schema definitions.
+- `mergeSchema` - Merges to two json schema
+- `reduceNode` - Reduce schema by merging dynamic constructs into a static json schema omitting those properties
+- `isDynamicSchema` - Returns true if the passed schema contains dynamic properties (_if_, _dependencies_, _allOf_, etc)
+- `resolveDynamicSchema` - Resolves all dynamic schema definitions for the given input data and returns the resulting JSON Schema without any dynamic schema definitions.
 
 </details>
