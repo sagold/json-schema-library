@@ -28,7 +28,7 @@ function getDraft(drafts: Draft[], $schema: string) {
 
 /**
  * With compileSchema we replace the schema and all sub-schemas with a schemaNode,
- * wrapping each schema with utilities and as much preevaluation is possible. Each
+ * wrapping each schema with utilities and as much preevaluation as possible. Each
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
 export function compileSchema(schema: JsonSchema, options: CompileOptions = {}) {
