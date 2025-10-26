@@ -14,6 +14,7 @@ export type {
     JsonSchemaValidatorParams,
     JsonSchemaValidator
 } from "./src/Keyword";
+export { default as settings } from "./src/settings";
 
 // drafts
 export { draft04 } from "./src/draft04";
