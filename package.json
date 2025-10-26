@@ -1,109 +1,109 @@
 {
-  "name": "json-schema-library",
-  "version": "10.3.0",
-  "description": "Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "main": "./dist/index.js",
-  "scripts": {
-    "analyze": "NODE_ENV=production webpack --json | webpack-bundle-size-analyzer",
-    "coverage": "nyc npm run test --reporter=lcov",
-    "dist": "rm -rf dist; tsdown --format esm --format cjs --format iife --minify",
-    "lint": "eslint src",
-    "prepublishOnly": "yarn dist",
-    "tdd": "watch \"npm run test:unit\" src/ tests/",
-    "test": "mocha 'src/**/*.{test,spec}.ts'",
-    "test:2019": "mocha 'src/tests/spec/draft2019-09.spec.ts'",
-    "test:2019:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft2019-09.spec.ts' > test-result-spec2019-09.json; exit 0",
-    "test:2020": "mocha 'src/tests/spec/draft2020-12.spec.ts'",
-    "test:2020:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft2020-12.spec.ts' > test-result-spec2020-12.json; exit 0",
-    "test:4": "mocha 'src/tests/spec/draft04.spec.ts'",
-    "test:4:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft04.spec.ts' > test-result-spec4.json; exit 0",
-    "test:6": "mocha 'src/tests/spec/draft06.spec.ts'",
-    "test:6:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft06.spec.ts' > test-result-spec6.json; exit 0",
-    "test:7": "mocha 'src/tests/spec/draft07.spec.ts'",
-    "test:7:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft07.spec.ts' > test-result-spec7.json; exit 0",
-    "test:inspect": "yarn test:2019 --inspect-brk",
-    "test:spec": "mocha 'src/tests/spec/*.spec.ts'",
-    "test:unit": "mocha 'src/**/*.test.ts'",
-    "test:unit:ci": "DISABLE_LOG=true mocha -R json 'src/**/*.test.ts' -R json > test-result-unit.json; exit 0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sagold/json-schema-library.git"
-  },
-  "keywords": [
-    "JSON",
-    "schema",
-    "customize",
-    "library",
-    "tools",
-    "utilities",
-    "validator",
-    "validation",
-    "jsonschema",
-    "json-schema",
-    "json-schema-validator",
-    "json-schema-validation",
-    "make my day"
-  ],
-  "author": "Sascha Goldhofer <github@saschagoldhofer.de> (https://github.com/sagold/)",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/sagold/json-schema-library/issues"
-  },
-  "homepage": "https://github.com/sagold/json-schema-library",
-  "dependencies": {
-    "@types/glob": "^8.1.0",
-    "@types/mocha": "^10.0.6",
-    "@types/node": "^22.13.1",
-    "@types/valid-url": "^1.0.7",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
-    "eslint": "^8.57.1",
-    "eslint-plugin-array-func": "^4.0.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-optimize-regex": "^1.2.0",
-    "eslint-plugin-promise": "^6.6.0",
-    "glob": "^10.4.5",
-    "json-schema-test-suite": "https://github.com/json-schema-org/JSON-Schema-Test-Suite#83e866b46c9f9e7082fd51e83a61c5f2145a1ab7",
-    "mocha": "^10.4.0",
-    "nyc": "^15.1.0",
-    "terser-webpack-plugin": "^5.3.11",
-    "ts-loader": "^9.5.2",
-    "ts-node": "^10.9.2",
-    "tsdown": "^0.15.10",
-    "typescript": "^5.7.3",
-    "watch": "^1.0.1",
-    "webpack": "^5.97.1",
-    "webpack-cli": "^6.0.1"
-  },
-  "devDependencies": {
-    "@sagold/json-pointer": "^7.0.0",
-    "@sagold/json-query": "^6.2.0",
-    "deepmerge": "^4.3.1",
-    "fast-copy": "^3.0.2",
-    "fast-deep-equal": "^3.1.3",
-    "smtp-address-parser": "1.0.10",
-    "valid-url": "^1.0.9"
-  },
-  "resolutions": {
-    "braces": ">=3.0.3",
-    "cross-spawn": ">=7.0.6",
-    "json5": ">=2.2.3",
-    "lodash": ">=4",
-    "merge": ">=2",
-    "micromatch": ">=4.0.8",
-    "string-width": "4.2.3"
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  },
-  "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+    "name": "json-schema-library",
+    "version": "10.3.0",
+    "description": "Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation",
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.js"
+        },
+        "./package.json": "./package.json"
     },
-    "./package.json": "./package.json"
-  }
+    "scripts": {
+        "analyze": "NODE_ENV=production webpack --json | webpack-bundle-size-analyzer",
+        "coverage": "nyc npm run test --reporter=lcov",
+        "dist": "rm -rf dist; tsdown --format esm --format cjs --format iife --minify",
+        "lint": "eslint src",
+        "prepublishOnly": "yarn dist",
+        "tdd": "watch \"npm run test:unit\" src/ tests/",
+        "test": "mocha 'src/**/*.{test,spec}.ts'",
+        "test:2019": "mocha 'src/tests/spec/draft2019-09.spec.ts'",
+        "test:2019:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft2019-09.spec.ts' > test-result-spec2019-09.json; exit 0",
+        "test:2020": "mocha 'src/tests/spec/draft2020-12.spec.ts'",
+        "test:2020:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft2020-12.spec.ts' > test-result-spec2020-12.json; exit 0",
+        "test:4": "mocha 'src/tests/spec/draft04.spec.ts'",
+        "test:4:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft04.spec.ts' > test-result-spec4.json; exit 0",
+        "test:6": "mocha 'src/tests/spec/draft06.spec.ts'",
+        "test:6:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft06.spec.ts' > test-result-spec6.json; exit 0",
+        "test:7": "mocha 'src/tests/spec/draft07.spec.ts'",
+        "test:7:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft07.spec.ts' > test-result-spec7.json; exit 0",
+        "test:inspect": "yarn test:2019 --inspect-brk",
+        "test:spec": "mocha 'src/tests/spec/*.spec.ts'",
+        "test:unit": "mocha 'src/**/*.test.ts'",
+        "test:unit:ci": "DISABLE_LOG=true mocha -R json 'src/**/*.test.ts' -R json > test-result-unit.json; exit 0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/sagold/json-schema-library.git"
+    },
+    "keywords": [
+        "JSON",
+        "schema",
+        "customize",
+        "library",
+        "tools",
+        "utilities",
+        "validator",
+        "validation",
+        "jsonschema",
+        "json-schema",
+        "json-schema-validator",
+        "json-schema-validation",
+        "make my day"
+    ],
+    "author": "Sascha Goldhofer <github@saschagoldhofer.de> (https://github.com/sagold/)",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/sagold/json-schema-library/issues"
+    },
+    "homepage": "https://github.com/sagold/json-schema-library",
+    "dependencies": {
+        "@types/glob": "^8.1.0",
+        "@types/mocha": "^10.0.6",
+        "@types/node": "^22.13.1",
+        "@types/valid-url": "^1.0.7",
+        "@typescript-eslint/eslint-plugin": "^7.18.0",
+        "@typescript-eslint/parser": "^7.18.0",
+        "eslint": "^8.57.1",
+        "eslint-plugin-array-func": "^4.0.0",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-optimize-regex": "^1.2.0",
+        "eslint-plugin-promise": "^6.6.0",
+        "glob": "^10.4.5",
+        "json-schema-test-suite": "https://github.com/json-schema-org/JSON-Schema-Test-Suite#83e866b46c9f9e7082fd51e83a61c5f2145a1ab7",
+        "mocha": "^10.4.0",
+        "nyc": "^15.1.0",
+        "terser-webpack-plugin": "^5.3.11",
+        "ts-loader": "^9.5.2",
+        "ts-node": "^10.9.2",
+        "tsdown": "^0.15.10",
+        "typescript": "^5.7.3",
+        "watch": "^1.0.1",
+        "webpack": "^5.97.1",
+        "webpack-cli": "^6.0.1"
+    },
+    "devDependencies": {
+        "@sagold/json-pointer": "^7.0.0",
+        "@sagold/json-query": "^6.2.0",
+        "deepmerge": "^4.3.1",
+        "fast-copy": "^3.0.2",
+        "fast-deep-equal": "^3.1.3",
+        "smtp-address-parser": "1.0.10",
+        "valid-url": "^1.0.9"
+    },
+    "resolutions": {
+        "braces": ">=3.0.3",
+        "cross-spawn": ">=7.0.6",
+        "json5": ">=2.2.3",
+        "lodash": ">=4",
+        "merge": ">=2",
+        "micromatch": ">=4.0.8",
+        "string-width": "4.2.3"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org"
+    }
 }
