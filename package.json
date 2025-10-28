@@ -14,7 +14,8 @@
   },
   "scripts": {
     "coverage": "nyc npm run test --reporter=lcov",
-    "dist": "rm -rf dist; tsdown -f esm -f cjs -f iife --minify; mv dist/index.iife.js dist/jlib.js",
+    "dist": "tsdown -f esm -f cjs --minify; yarn dist:iife",
+    "dist:iife": "tsdown --config tsdown.iife.config.ts --no-clean --minify; mv dist/index.iife.js dist/jlib.js",
     "lint": "eslint src",
     "prepublishOnly": "yarn dist",
     "tdd": "watch \"npm run test:unit\" src/ tests/",
@@ -59,7 +60,7 @@
     "url": "https://github.com/sagold/json-schema-library/issues"
   },
   "homepage": "https://github.com/sagold/json-schema-library",
-  "dependencies": {
+  "devDependencies": {
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "^22.13.1",
@@ -75,13 +76,12 @@
     "json-schema-test-suite": "https://github.com/json-schema-org/JSON-Schema-Test-Suite#83e866b46c9f9e7082fd51e83a61c5f2145a1ab7",
     "mocha": "^10.4.0",
     "nyc": "^15.1.0",
-    "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsdown": "^0.15.10",
     "typescript": "^5.7.3",
     "watch": "^1.0.1"
   },
-  "devDependencies": {
+  "dependencies": {
     "@sagold/json-pointer": "^7.0.0",
     "@sagold/json-query": "^6.2.0",
     "deepmerge": "^4.3.1",
