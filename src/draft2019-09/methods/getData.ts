@@ -1,6 +1,6 @@
 import copy from "fast-copy";
 import { getTypeOf } from "../../utils/getTypeOf";
-import { getSchemaType } from "../../utils/getSchemaType";
+import { getSchemaType, SchemaType } from "../../utils/getSchemaType";
 import { getValue } from "../../utils/getValue";
 import { isEmpty } from "../../utils/isEmpty";
 import { isJsonError } from "../../types";
@@ -172,11 +172,11 @@ export function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions
     // }
 
     const type = getSchemaType(currentNode, defaultData);
-    const templateData = TYPE[type as string]?.(currentNode, defaultData, opts);
+    const templateData = TYPE[type]?.(currentNode, defaultData, opts);
     return templateData === undefined ? defaultData : templateData;
 }
 
-const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptions) => unknown> = {
+const TYPE: Record<SchemaType, (node: SchemaNode, data: unknown, opts: TemplateOptions) => unknown> = {
     null: (node, data, opts) => getDefault(node, data, null, opts.useTypeDefaults),
     string: (node, data, opts) => getDefault(node, data, "", opts.useTypeDefaults),
     number: (node, data, opts) => getDefault(node, data, 0, opts.useTypeDefaults),

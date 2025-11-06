@@ -2,7 +2,8 @@ import { getTypeOf } from "./getTypeOf";
 import { isObject } from "../utils/isObject";
 import { BooleanSchema, JsonSchema, SchemaNode } from "../types";
 
-export const SCHEMA_TYPES = ["string", "number", "integer", "boolean", "null", "array", "object"];
+export const SCHEMA_TYPES = ["string", "number", "integer", "boolean", "null", "array", "object"] as const;
+export type SchemaType = (typeof SCHEMA_TYPES)[number];
 const OBJECT_PROPERTIES = [
     "additionalProperties",
     // "allOf",
@@ -43,11 +44,14 @@ const ARRAY_PROPERTIES = [
  * returns schema type, which might be an educated guess based on defined schema
  * properties if an exact type cannot be retried from type.
  */
-export function getSchemaType(node: SchemaNode, data: unknown): keyof typeof SCHEMA_TYPES | undefined {
+export function getSchemaType(node: SchemaNode, data: unknown): SchemaType | undefined {
     const dataType = getTypeOf(data);
     const schema = node.schema as JsonSchema | BooleanSchema;
     if (schema === true) {
-        return SCHEMA_TYPES.includes(dataType) ? (dataType as keyof typeof SCHEMA_TYPES) : undefined;
+        if (dataType === "bigint") {
+            return "number";
+        }
+        return SCHEMA_TYPES.some((schemaType) => schemaType === dataType) ? (dataType as SchemaType) : undefined;
     }
     // boolean schema false or invalid schema
     if (!isObject(schema)) {
@@ -58,18 +62,18 @@ export function getSchemaType(node: SchemaNode, data: unknown): keyof typeof SCH
     // type: []
     if (Array.isArray(schemaType)) {
         if (schemaType.includes(dataType)) {
-            return dataType as keyof typeof SCHEMA_TYPES;
+            return dataType as SchemaType;
         }
         const defaultType = getTypeOf(schema.default);
         if (schemaType.includes(defaultType)) {
-            return defaultType as keyof typeof SCHEMA_TYPES;
+            return defaultType as SchemaType;
         }
         return schemaType[0];
     }
 
     // type: ""
     if (schemaType) {
-        return schemaType as keyof typeof SCHEMA_TYPES;
+        return schemaType as SchemaType;
     }
 
     // type: undefined, enum: []
@@ -77,13 +81,13 @@ export function getSchemaType(node: SchemaNode, data: unknown): keyof typeof SCH
         const schemaEnum: unknown[] = schema.enum;
         const enumSchemaType = schemaEnum.map((value) => getTypeOf(value)).filter((p, i, l) => l.indexOf(p) === i);
         if (enumSchemaType.includes(dataType)) {
-            return dataType as keyof typeof SCHEMA_TYPES;
+            return dataType as SchemaType;
         }
         const defaultType = getTypeOf(schema.default);
         if (enumSchemaType.includes(defaultType)) {
-            return defaultType as keyof typeof SCHEMA_TYPES;
+            return defaultType as SchemaType;
         }
-        return enumSchemaType[0] as keyof typeof SCHEMA_TYPES;
+        return enumSchemaType[0] as SchemaType;
     }
 
     // type: undefined, enum: undefined -- define type by schema-properties
@@ -93,11 +97,11 @@ export function getSchemaType(node: SchemaNode, data: unknown): keyof typeof SCH
     const arrayProperties = schemaProperties.filter((p) => ARRAY_PROPERTIES.includes(p));
 
     if (objectProperties.length > 0 && objectProperties.length > arrayProperties.length) {
-        return "object" as keyof typeof SCHEMA_TYPES;
+        return "object";
     }
 
     if (arrayProperties.length > 0 && arrayProperties.length > objectProperties.length) {
-        return "array" as keyof typeof SCHEMA_TYPES;
+        return "array";
     }
 
     // nothing found yet check dynamic properties for a type

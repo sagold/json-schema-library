@@ -1110,13 +1110,14 @@ declare function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): Sc
 declare function mergeSchema<T extends JsonSchema>(a: T, b: T, ...omit: string[]): T;
 //#endregion
 //#region src/utils/getSchemaType.d.ts
-declare const SCHEMA_TYPES: string[];
+declare const SCHEMA_TYPES: readonly ["string", "number", "integer", "boolean", "null", "array", "object"];
+type SchemaType = (typeof SCHEMA_TYPES)[number];
 /**
  * @helper for getData
  * returns schema type, which might be an educated guess based on defined schema
  * properties if an exact type cannot be retried from type.
  */
-declare function getSchemaType(node: SchemaNode, data: unknown): keyof typeof SCHEMA_TYPES | undefined;
+declare function getSchemaType(node: SchemaNode, data: unknown): SchemaType | undefined;
 //#endregion
 //#region remotes/index.d.ts
 /** remote meta-schema stored by schema $id */
