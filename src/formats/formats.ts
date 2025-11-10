@@ -40,7 +40,7 @@ export const formats: Record<
         // full-date from http://tools.ietf.org/html/rfc3339#section-5.6
         const matches = data.match(matchDate);
         if (!matches) {
-            return node.createError("format-date-time-error", { value: data, pointer, schema });
+            return node.createError("format-date-error", { value: data, pointer, schema });
         }
         const year = +matches[1];
         const month = +matches[2];
