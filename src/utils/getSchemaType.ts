@@ -106,12 +106,12 @@ export function getSchemaType(node: SchemaNode, data: unknown): SchemaType | und
 
     // nothing found yet check dynamic properties for a type
     if (node.if) {
-        return getSchemaType(node.if.getNode("#").node ?? node.if, data);
+        return getSchemaType(node.if.resolveRef?.() ?? node.if, data);
     }
 
     if (node.allOf) {
         for (let i = 0; i < node.allOf.length; i += 1) {
-            const type = getSchemaType(node.allOf[i].getNode("#").node ?? node.allOf[i], data);
+            const type = getSchemaType(node.allOf[i].resolveRef?.() ?? node.allOf[i], data);
             if (type) {
                 return type;
             }
@@ -120,7 +120,7 @@ export function getSchemaType(node: SchemaNode, data: unknown): SchemaType | und
 
     if (node.oneOf) {
         for (let i = 0; i < node.oneOf.length; i += 1) {
-            const type = getSchemaType(node.oneOf[i].getNode("#").node ?? node.oneOf[i], data);
+            const type = getSchemaType(node.oneOf[i].resolveRef?.() ?? node.oneOf[i], data);
             if (type) {
                 return type;
             }
@@ -129,7 +129,7 @@ export function getSchemaType(node: SchemaNode, data: unknown): SchemaType | und
 
     if (node.anyOf) {
         for (let i = 0; i < node.anyOf.length; i += 1) {
-            const type = getSchemaType(node.anyOf[i].getNode("#").node ?? node.anyOf[i], data);
+            const type = getSchemaType(node.anyOf[i].resolveRef?.() ?? node.anyOf[i], data);
             if (type) {
                 return type;
             }
