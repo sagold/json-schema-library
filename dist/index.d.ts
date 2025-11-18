@@ -435,7 +435,7 @@ declare const SchemaNodeMethods: {
   /**
    * @returns a list of values (including objects and arrays) and their corresponding JSON Schema as SchemaNode
    */
-  readonly toDataNodes: (data: unknown, pointer?: string) => void 0[];
+  readonly toDataNodes: (data: unknown, pointer?: string) => DataNode[];
   readonly toJSON: () => any;
 };
 //#endregion

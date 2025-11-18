@@ -1,7 +1,3 @@
-import { createRequire } from "node:module";
-
-//#region rolldown:runtime
-//#endregion
 //#region src/Keyword.d.ts
 type ValidationPath = {
   pointer: string;
@@ -213,6 +209,8 @@ declare const errors: {
   "unknown-property-error": string;
   "value-not-empty-error": string;
 };
+//#endregion
+//#region src/getNode.d.ts
 declare function getNode(pointer: string, data: unknown, options: {
   withSchemaWarning: true;
 } & GetNodeOptions): NodeOrError;
@@ -395,7 +393,7 @@ declare const SchemaNodeMethods: {
    * @returns SchemaNode representing the passed JSON Schema
    */
   readonly compileSchema: (schema: JsonSchema, evaluationPath?: string, schemaLocation?: string, dynamicId?: string) => SchemaNode;
-  readonly createError: <T$1 extends string = "additional-items-error" | "additional-properties-error" | "all-of-error" | "any-of-error" | "const-error" | "contains-any-error" | "contains-array-error" | "contains-error" | "contains-min-error" | "contains-max-error" | "enum-error" | "exclusive-maximum-error" | "exclusive-minimum-error" | "forbidden-property-error" | "format-date-error" | "format-date-time-error" | "format-duration-error" | "format-email-error" | "format-hostname-error" | "format-ipv4-error" | "format-ipv4-leading-zero-error" | "format-ipv6-error" | "format-ipv6-leading-zero-error" | "format-json-pointer-error" | "format-regex-error" | "format-time-error" | "format-uri-error" | "format-uri-reference-error" | "format-uri-template-error" | "format-url-error" | "format-uuid-error" | "invalid-data-error" | "invalid-property-name-error" | "maximum-error" | "max-items-error" | "max-length-error" | "max-properties-error" | "minimum-error" | "min-items-error" | "min-items-one-error" | "min-length-error" | "min-length-one-error" | "missing-one-of-declarator-error" | "min-properties-error" | "missing-array-item-error" | "missing-dependency-error" | "missing-one-of-property-error" | "multiple-of-error" | "multiple-one-of-error" | "no-additional-properties-error" | "not-error" | "one-of-error" | "one-of-property-error" | "pattern-error" | "pattern-properties-error" | "required-property-error" | "schema-warning" | "type-error" | "undefined-value-error" | "unevaluated-property-error" | "unevaluated-items-error" | "unique-items-error" | "unknown-property-error" | "value-not-empty-error">(code: T$1, data: ErrorData, message?: string) => JsonError;
+  readonly createError: <T extends string = "additional-items-error" | "additional-properties-error" | "all-of-error" | "any-of-error" | "const-error" | "contains-any-error" | "contains-array-error" | "contains-error" | "contains-min-error" | "contains-max-error" | "enum-error" | "exclusive-maximum-error" | "exclusive-minimum-error" | "forbidden-property-error" | "format-date-error" | "format-date-time-error" | "format-duration-error" | "format-email-error" | "format-hostname-error" | "format-ipv4-error" | "format-ipv4-leading-zero-error" | "format-ipv6-error" | "format-ipv6-leading-zero-error" | "format-json-pointer-error" | "format-regex-error" | "format-time-error" | "format-uri-error" | "format-uri-reference-error" | "format-uri-template-error" | "format-url-error" | "format-uuid-error" | "invalid-data-error" | "invalid-property-name-error" | "maximum-error" | "max-items-error" | "max-length-error" | "max-properties-error" | "minimum-error" | "min-items-error" | "min-items-one-error" | "min-length-error" | "min-length-one-error" | "missing-one-of-declarator-error" | "min-properties-error" | "missing-array-item-error" | "missing-dependency-error" | "missing-one-of-property-error" | "multiple-of-error" | "multiple-one-of-error" | "no-additional-properties-error" | "not-error" | "one-of-error" | "one-of-property-error" | "pattern-error" | "pattern-properties-error" | "required-property-error" | "schema-warning" | "type-error" | "undefined-value-error" | "unevaluated-property-error" | "unevaluated-items-error" | "unique-items-error" | "unknown-property-error" | "value-not-empty-error">(code: T, data: ErrorData, message?: string) => JsonError;
   readonly createSchema: typeof createSchema;
   readonly getChildSelection: (property: string | number) => JsonError | SchemaNode[];
   readonly getNode: typeof getNode;
@@ -437,7 +435,7 @@ declare const SchemaNodeMethods: {
   /**
    * @returns a list of values (including objects and arrays) and their corresponding JSON Schema as SchemaNode
    */
-  readonly toDataNodes: (data: unknown, pointer?: string) => import_dist.DataNode[];
+  readonly toDataNodes: (data: unknown, pointer?: string) => DataNode[];
   readonly toJSON: () => any;
 };
 //#endregion
@@ -462,18 +460,18 @@ type NodeOrError = {
   node: undefined;
   error: JsonError;
 };
-type ErrorData<T$1 extends Record<string, unknown> = {
+type ErrorData<T extends Record<string, unknown> = {
   [p: string]: unknown;
-}> = T$1 & {
+}> = T & {
   pointer: string;
   schema: JsonSchema;
   value: unknown;
 };
-type JsonError<T$1 extends ErrorData = ErrorData> = {
+type JsonError<T extends ErrorData = ErrorData> = {
   type: "error";
   code: ErrorConfig | string;
   message: string;
-  data: T$1;
+  data: T;
   [p: string]: unknown;
 };
 /**
@@ -635,7 +633,7 @@ declare function getTypeOf(value: unknown): JSType;
 declare function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): SchemaNode | undefined;
 //#endregion
 //#region src/utils/mergeSchema.d.ts
-declare function mergeSchema<T$1 extends JsonSchema>(a: T$1, b: T$1, ...omit: string[]): T$1;
+declare function mergeSchema<T extends JsonSchema>(a: T, b: T, ...omit: string[]): T;
 //#endregion
 //#region src/utils/getSchemaType.d.ts
 declare const SCHEMA_TYPES: string[];
