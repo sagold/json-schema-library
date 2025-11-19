@@ -1,5 +1,5 @@
-import { compileSchema } from "../../compileSchema";
-import { getSchemaType } from "../../utils/getSchemaType";
+import { compileSchema } from "../compileSchema";
+import { getSchemaType } from "./getSchemaType";
 import { strict as assert } from "assert";
 
 describe("issue#90 - types or refs", () => {
