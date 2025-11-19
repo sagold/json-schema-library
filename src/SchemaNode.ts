@@ -18,6 +18,7 @@ import { validateNode } from "./validateNode";
 import { hasProperty } from "./utils/hasProperty";
 import { getNode } from "./getNode";
 import { getNodeChild } from "./getNodeChild";
+import { DataNode } from "./methods/toDataNodes";
 
 const { DYNAMIC_PROPERTIES, REGEX_FLAGS } = settings;
 
@@ -435,7 +436,7 @@ export const SchemaNodeMethods = {
     /**
      * @returns a list of values (including objects and arrays) and their corresponding JSON Schema as SchemaNode
      */
-    toDataNodes(data: unknown, pointer?: string) {
+    toDataNodes(data: unknown, pointer?: string): DataNode[] {
         const node = this as SchemaNode;
         return node.context.methods.toDataNodes(node, data, pointer);
     },
