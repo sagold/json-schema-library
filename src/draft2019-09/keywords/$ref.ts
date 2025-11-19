@@ -72,7 +72,7 @@ export function parseRef(node: SchemaNode) {
 export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
     const node = this as SchemaNode;
     if (node.schema.$recursiveRef) {
-        const nextNode = resolveRecursiveRef(node, path);
+        const nextNode = resolveRecursiveRef(node, path ?? []);
         path?.push({ pointer, node: nextNode });
         return nextNode;
     }
