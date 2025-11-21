@@ -1358,6 +1358,10 @@ settings.REGEX_FLAGS = "v";
 
 ## Breaking Changes
 
+### v10.5.0
+
+- added support for ref resolution in getSchemaType
+
 ### v10.4.0
 
 - introduced esm module export
