@@ -2,7 +2,7 @@ import { compileSchema } from "../compileSchema";
 import { getSchemaType } from "./getSchemaType";
 import { strict as assert } from "assert";
 
-describe("issue#90 - types or refs", () => {
+describe("getSchemaType", () => {
     it("should get correct type for simple ref", () => {
         const schema = compileSchema({
             type: "object",
@@ -17,7 +17,8 @@ describe("issue#90 - types or refs", () => {
         });
         const nameProp = schema.getNodeChild("name").node;
         assert(nameProp != null);
-        assert(getSchemaType(nameProp, undefined) === "string");
+
+        assert.equal(getSchemaType(nameProp, undefined), "string");
     });
 
     it("should handle oneOf refs", () => {
@@ -42,7 +43,8 @@ describe("issue#90 - types or refs", () => {
         });
         const oneOfProp = schema.getNodeChild("oneOf").node;
         assert(oneOfProp != null);
-        assert(getSchemaType(oneOfProp, undefined) === "string");
+
+        assert.equal(getSchemaType(oneOfProp, undefined), "string");
     });
     it("should handle anyOf refs", () => {
         const schema = compileSchema({
@@ -59,8 +61,10 @@ describe("issue#90 - types or refs", () => {
         });
         const anyOfProp = schema.getNodeChild("anyOf").node;
         assert(anyOfProp != null);
-        assert(getSchemaType(anyOfProp, undefined) === "string");
+
+        assert.equal(getSchemaType(anyOfProp, undefined), "string");
     });
+
     it("should handle allOf refs", () => {
         const schema = compileSchema({
             type: "object",
@@ -76,8 +80,10 @@ describe("issue#90 - types or refs", () => {
         });
         const allOfProp = schema.getNodeChild("allOf").node;
         assert(allOfProp != null);
-        assert(getSchemaType(allOfProp, undefined) === "object");
+
+        assert.equal(getSchemaType(allOfProp, undefined), "object");
     });
+
     it("should handle if/then/else refs", () => {
         const schema = compileSchema({
             type: "object",
@@ -96,6 +102,7 @@ describe("issue#90 - types or refs", () => {
         });
         const conditionalProp = schema.getNodeChild("conditional").node;
         assert(conditionalProp != null);
-        assert(getSchemaType(conditionalProp, undefined) === "string");
+
+        assert.equal(getSchemaType(conditionalProp, undefined), "string");
     });
 });
