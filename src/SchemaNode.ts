@@ -8,7 +8,7 @@ import { toSchemaNodes } from "./methods/toSchemaNodes";
 import { isJsonError, JsonSchema, JsonError, ErrorData, DefaultErrors, OptionalNodeOrError } from "./types";
 import { isObject } from "./utils/isObject";
 import { join } from "@sagold/json-pointer";
-import { joinId } from "./utils/joinId";
+import { resolveUri } from "./utils/resolveUri";
 import { mergeNode } from "./mergeNode";
 import { omit } from "./utils/omit";
 import { pick } from "./utils/pick";
@@ -397,7 +397,7 @@ export const SchemaNodeMethods = {
      */
     addRemoteSchema(url: string, schema: JsonSchema): SchemaNode {
         // @draft >= 6
-        schema.$id = joinId(schema.$id || url);
+        schema.$id = resolveUri(schema.$id || url);
         const { context } = this as SchemaNode;
         const draft = getDraft(context.drafts, schema?.$schema ?? this.context.rootNode.$schema);
 
@@ -420,7 +420,7 @@ export const SchemaNodeMethods = {
         } as SchemaNode;
 
         node.context.rootNode = node;
-        node.context.remotes[joinId(url)] = node;
+        node.context.remotes[resolveUri(url)] = node;
         addKeywords(node);
 
         return this;

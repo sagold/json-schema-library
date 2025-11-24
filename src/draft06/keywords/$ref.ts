@@ -1,7 +1,7 @@
 import { Keyword, JsonSchemaValidatorParams, ValidationPath } from "../../Keyword";
 import { resolveRef } from "../../keywords/$ref";
 import { SchemaNode } from "../../types";
-import { joinId } from "../../utils/joinId";
+import { resolveUri } from "../../utils/resolveUri";
 import { validateNode } from "../../validateNode";
 
 export const $refKeyword: Keyword = {
@@ -16,7 +16,7 @@ function parseRef(node: SchemaNode) {
     // get and store current $id of node - this may be the same as parent $id
     let currentId = node.parent?.$id;
     if (node.schema?.$ref == null) {
-        currentId = joinId(node.parent?.$id, node.schema?.$id);
+        currentId = resolveUri(node.parent?.$id, node.schema?.$id);
     }
     node.$id = currentId;
     node.lastIdPointer = node.parent?.lastIdPointer ?? "#";
@@ -37,15 +37,15 @@ function parseRef(node: SchemaNode) {
     // store this node for retrieval by $id + json-pointer from $id
     if (node.lastIdPointer !== "#" && node.evaluationPath.startsWith(node.lastIdPointer)) {
         const localPointer = `#${node.evaluationPath.replace(node.lastIdPointer, "")}`;
-        node.context.refs[joinId(currentId, localPointer)] = node;
+        node.context.refs[resolveUri(currentId, localPointer)] = node;
     } else {
-        node.context.refs[joinId(currentId, node.evaluationPath)] = node;
+        node.context.refs[resolveUri(currentId, node.evaluationPath)] = node;
     }
-    node.context.refs[joinId(node.context.rootNode.$id, node.evaluationPath)] = node;
+    node.context.refs[resolveUri(node.context.rootNode.$id, node.evaluationPath)] = node;
 
     // precompile reference
     if (node.schema.$ref) {
-        node.$ref = joinId(currentId, node.schema.$ref);
+        node.$ref = resolveUri(currentId, node.schema.$ref);
     }
 }
 

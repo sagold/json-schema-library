@@ -543,10 +543,10 @@
   resolved "https://registry.npmjs.org/@sagold/json-pointer/-/json-pointer-5.1.2.tgz"
   integrity sha512-+wAhJZBXa6MNxRScg6tkqEbChEHMgVZAhTHVJ60Y7sbtXtu9XA49KfUkdWlS2x78D6H9nryiKePiYozumauPfA==
 
-"@sagold/json-pointer@^7.0.0":
-  version "7.0.0"
-  resolved "https://registry.npmjs.org/@sagold/json-pointer/-/json-pointer-7.0.0.tgz#50169c76e5bd90fa9d9bd96577cbd212c9e54ad7"
-  integrity sha512-MYdN8K9Ag7AIW18WPcXNETh7hFn6WKWhy/Cu/KkXPf4yxMdVhDaWb8N88SyBVonqcfC2Jrj+LFc/MnLX7ghILA==
+"@sagold/json-pointer@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.npmjs.org/@sagold/json-pointer/-/json-pointer-7.2.0.tgz#2de75ef410b0ea13514bbf4a69f30ea56c4bf7dc"
+  integrity sha512-RZpwGl1yhNuzQVKOADJx65TrWL7T6HTGs2Rpv7KlbFY0CfbFWNAKsisvC/uGfchknCGJEnoxz9uPAdmgoAE3IA==
 
 "@sagold/json-query@^6.2.0":
   version "6.2.0"
@@ -1353,6 +1353,11 @@ fast-levenshtein@^2.0.6:
   version "2.0.6"
   resolved "https://registry.npmjs.org/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz"
   integrity sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==
+
+fast-uri@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.npmjs.org/fast-uri/-/fast-uri-3.1.0.tgz#66eecff6c764c0df9b762e62ca7edcfb53b4edfa"
+  integrity sha512-iPeeDKJSWf4IEOasVVrknXpaBV0IApz/gp7S2bb7Z4Lljbl2MGJRqInZiUrQwV16cpzw/D3S5j5Julj/gT52AA==
 
 fastq@^1.6.0:
   version "1.17.1"
@@ -2748,6 +2753,13 @@ update-browserslist-db@^1.0.13:
 uri-js@^4.2.2:
   version "4.4.1"
   resolved "https://registry.npmjs.org/uri-js/-/uri-js-4.4.1.tgz"
+  integrity sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==
+  dependencies:
+    punycode "^2.1.0"
+
+uri-js@^4.4.1:
+  version "4.4.1"
+  resolved "https://registry.npmjs.org/uri-js/-/uri-js-4.4.1.tgz#9b1a52595225859e55f669d928f88c6c57f2a77e"
   integrity sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==
   dependencies:
     punycode "^2.1.0"

@@ -1,5 +1,5 @@
 import { Keyword, ValidationPath } from "../../Keyword";
-import { joinId } from "../../utils/joinId";
+import { resolveUri } from "../../utils/resolveUri";
 import { isObject } from "../../utils/isObject";
 import { omit } from "../../utils/omit";
 import splitRef from "../../utils/splitRef";
@@ -24,7 +24,7 @@ function parseRef(node: SchemaNode) {
     // get and store current id of node - this may be the same as parent id
     let currentId = node.parent?.$id;
     if (node.schema?.$ref == null && node.schema?.id) {
-        currentId = joinId(node.parent?.$id, node.schema.id);
+        currentId = resolveUri(node.parent?.$id, node.schema.id);
         // console.log("create id", node.evaluationPath, ":", node.parent?.$id, node.schema?.id, "=>", currentId);
     }
     node.$id = currentId;
@@ -46,15 +46,15 @@ function parseRef(node: SchemaNode) {
     // store this node for retrieval by id + json-pointer from id
     if (node.lastIdPointer !== "#" && node.evaluationPath.startsWith(node.lastIdPointer)) {
         const localPointer = `#${node.evaluationPath.replace(node.lastIdPointer, "")}`;
-        register(node, joinId(currentId, localPointer));
+        register(node, resolveUri(currentId, localPointer));
     } else {
-        register(node, joinId(currentId, node.evaluationPath));
+        register(node, resolveUri(currentId, node.evaluationPath));
     }
-    register(node, joinId(node.context.rootNode.$id, node.evaluationPath));
+    register(node, resolveUri(node.context.rootNode.$id, node.evaluationPath));
 
     // precompile reference
     if (node.schema.$ref) {
-        node.$ref = joinId(currentId, node.schema.$ref);
+        node.$ref = resolveUri(currentId, node.schema.$ref);
     }
 }
 

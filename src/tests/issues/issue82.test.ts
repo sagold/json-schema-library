@@ -4,7 +4,7 @@ import { compileSchema } from "../../compileSchema";
 // @todo investigate different requirements on joining url and id
 // here json-schemer://schema + stock-assembly is joined to json-schemer://stock-assembly
 // in joinId: const trailingFragments = /\/\/*$/; will fix this issue but fail spec tests
-describe.skip("issue#82", () => {
+describe("issue#82", () => {
     it("should return validation errors for number", () => {
         const schema = compileSchema({
             $schema: "https://json-schema.org/draft/2020-12/schema",
@@ -15,7 +15,7 @@ describe.skip("issue#82", () => {
                     $ref: "stock-assembly"
                 }
             },
-            $id: "json-schemer://schema", // this works only if a trailing slash
+            $id: "json-schemer://schema", // this works only for a trailing slash
             $defs: {
                 "json-schemer://schema/stock-assembly": {
                     $schema: "http://json-schema.org/draft-07/schema#",
@@ -34,6 +34,44 @@ describe.skip("issue#82", () => {
         const { valid, errors } = schema.validate({
             "stock-assembly": 1
         });
+
+        console.log(errors);
+
+        assert.equal(valid, false);
+    });
+
+    it("should return validation error for initial example", () => {
+        const schema = compileSchema({
+            $schema: "https://json-schema.org/draft/2020-12/schema",
+            type: "object",
+            properties: {
+                "1c_list_Document_СборкаЗапасов": {
+                    $ref: "1c_list_Document_%D0%A1%D0%B1%D0%BE%D1%80%D0%BA%D0%B0%D0%97%D0%B0%D0%BF%D0%B0%D1%81%D0%BE%D0%B2"
+                }
+            },
+            required: ["1c_list_Document_СборкаЗапасов"],
+            $id: "json-schemer://schema",
+            $defs: {
+                "json-schemer://schema/1c_list_Document_%D0%A1%D0%B1%D0%BE%D1%80%D0%BA%D0%B0%D0%97%D0%B0%D0%BF%D0%B0%D1%81%D0%BE%D0%B2":
+                    {
+                        $schema: "http://json-schema.org/draft-07/schema#",
+                        type: "object",
+                        properties: {
+                            $filter: {
+                                type: "string",
+                                title: "Фильтр"
+                            }
+                        },
+                        $id: "json-schemer://schema/1c_list_Document_%D0%A1%D0%B1%D0%BE%D1%80%D0%BA%D0%B0%D0%97%D0%B0%D0%BF%D0%B0%D1%81%D0%BE%D0%B2"
+                    }
+            }
+        });
+
+        const { valid, errors } = schema.validate({
+            "1c_list_Document_СборкаЗапасов": 1
+        });
+
+        console.log(errors);
 
         assert.equal(valid, false);
     });

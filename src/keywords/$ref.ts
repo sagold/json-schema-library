@@ -1,6 +1,6 @@
 import { SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationPath, JsonSchemaReducerParams } from "../Keyword";
-import { joinId } from "../utils/joinId";
+import { resolveUri } from "../utils/resolveUri";
 import splitRef from "../utils/splitRef";
 import { omit } from "../utils/omit";
 import { isObject } from "../utils/isObject";
@@ -31,7 +31,7 @@ export function parseRef(node: SchemaNode) {
     node.resolveRef = resolveRef;
 
     // get and store current $id of node - this may be the same as parent $id
-    const currentId = joinId(node.parent?.$id, node.schema?.$id);
+    const currentId = resolveUri(node.parent?.$id, node.schema?.$id);
     node.$id = currentId;
     node.lastIdPointer = node.parent?.lastIdPointer ?? "#";
     if (currentId !== node.parent?.$id && node.evaluationPath !== "#") {
@@ -41,10 +41,10 @@ export function parseRef(node: SchemaNode) {
     // store this node for retrieval by $id + json-pointer from $id
     if (node.lastIdPointer !== "#" && node.evaluationPath.startsWith(node.lastIdPointer)) {
         const localPointer = `#${node.evaluationPath.replace(node.lastIdPointer, "")}`;
-        register(node, joinId(currentId, localPointer));
+        register(node, resolveUri(currentId, localPointer));
     }
     // store $rootId + json-pointer to this node
-    register(node, joinId(node.context.rootNode.$id, node.evaluationPath));
+    register(node, resolveUri(node.context.rootNode.$id, node.evaluationPath));
 
     // @draft-2020:  A $dynamicRef to a $dynamicAnchor in the same schema resource behaves like a normal $ref to an $anchor
     const anchor = node.schema.$anchor;
@@ -67,7 +67,7 @@ export function parseRef(node: SchemaNode) {
 
     // precompile reference
     if (node.schema.$ref) {
-        node.$ref = joinId(currentId, node.schema.$ref);
+        node.$ref = resolveUri(currentId, node.schema.$ref);
         if (node.$ref.startsWith("/")) {
             node.$ref = `#${node.$ref}`;
         }
@@ -124,7 +124,7 @@ function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorPar
 // 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
 function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode {
     const history = path;
-    const refInCurrentScope = joinId(node.$id, node.schema.$dynamicRef);
+    const refInCurrentScope = resolveUri(node.$id, node.schema.$dynamicRef);
 
     // A $dynamicRef with a non-matching $dynamicAnchor in the same schema resource behaves like a normal $ref to $anchor
     const nonMatchingDynamicAnchor = node.context.dynamicAnchors[refInCurrentScope] == null;
@@ -142,7 +142,7 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
 
         // A $dynamicRef only stops at a $dynamicAnchor if it is in the same dynamic scope.
         const refWithoutScope = node.schema.$dynamicRef.split("#").pop();
-        const ref = joinId(history[i].node.$id, `#${refWithoutScope}`);
+        const ref = resolveUri(history[i].node.$id, `#${refWithoutScope}`);
         const anchorNode = node.context.dynamicAnchors[ref];
         if (anchorNode) {
             return compileNext(node.context.dynamicAnchors[ref], node);
