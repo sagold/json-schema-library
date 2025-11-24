@@ -1,9 +1,6 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
 
-// @todo investigate different requirements on joining url and id
-// here json-schemer://schema + stock-assembly is joined to json-schemer://stock-assembly
-// in joinId: const trailingFragments = /\/\/*$/; will fix this issue but fail spec tests
 describe("issue#82", () => {
     it("should return validation errors for number", () => {
         const schema = compileSchema({
@@ -34,8 +31,6 @@ describe("issue#82", () => {
         const { valid, errors } = schema.validate({
             "stock-assembly": 1
         });
-
-        console.log(errors);
 
         assert.equal(valid, false);
     });
@@ -70,8 +65,6 @@ describe("issue#82", () => {
         const { valid, errors } = schema.validate({
             "1c_list_Document_СборкаЗапасов": 1
         });
-
-        console.log(errors);
 
         assert.equal(valid, false);
     });
