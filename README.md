@@ -1,4 +1,4 @@
-[![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) [![CI](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) ![Types](https://badgen.net/npm/types/json-schema-library)
+[![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://www.npmjs.com/package/json-schema-library) [![CI](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) ![Types](https://badgen.net/npm/types/json-schema-library)
 
 <h1 align="center">
     <img src="./docs/json-schema-library-10.png" width="192" alt="json-schema-library">
