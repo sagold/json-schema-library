@@ -2,6 +2,7 @@
 type ValidationPath = {
   pointer: string;
   node: SchemaNode;
+  meta?: Record<string, any>;
 }[];
 type JsonSchemaReducerParams = {
   /** data of current node */
@@ -30,7 +31,7 @@ interface JsonSchemaResolver {
   order?: number;
   (options: JsonSchemaResolverParams): SchemaNode | JsonError | undefined;
 }
-type ValidationResult = JsonError | Promise<JsonError>;
+type ValidationResult = JsonError | Promise<JsonError | undefined>;
 type JsonSchemaValidatorParams = {
   pointer?: string;
   data: unknown;
