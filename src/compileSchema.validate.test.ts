@@ -2,6 +2,7 @@ import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
 import { Draft, JsonError, SchemaNode } from "./types";
 import { draft2020 } from "./draft2020";
+import { ValidationPath } from "./Keyword";
 
 describe("compileSchema.validate", () => {
     describe("integer", () => {
@@ -966,9 +967,9 @@ describe("compileSchema.validate - errorsAsync", () => {
                     ...draft2020.keywords,
                     {
                         id: "async",
-                        keyword: "async-error",
+                        keyword: "asyncError",
                         addValidate: (node) => node.schema.asyncError != null,
-                        validate: async ({ node }): Promise<JsonError> => {
+                        validate: async ({ node }) => {
                             if (node.schema.asyncError === false) {
                                 return undefined;
                             }
@@ -981,26 +982,65 @@ describe("compileSchema.validate - errorsAsync", () => {
                     }
                 ]
             };
+        });
 
-            it("should resolve async validation returning no error", async () => {
-                const { errors, errorsAsync } = compileSchema(
-                    { type: "number", asyncError: false },
-                    { drafts: [draft] }
-                ).validate(4);
-                const asyncErrors = await Promise.all(errorsAsync);
-                assert.deepEqual(errors.length, 0);
-                assert.deepEqual(asyncErrors.length, 0);
-            });
+        it("should resolve async validation returning no error", async () => {
+            const { errors, errorsAsync } = compileSchema(
+                { type: "number", asyncError: false },
+                { drafts: [draft] }
+            ).validate(4);
 
-            it("should resolve async validation errors", async () => {
-                const { errorsAsync } = compileSchema(
-                    { type: "number", asyncError: true },
-                    { drafts: [draft] }
-                ).validate(4);
-                const asyncErrors = await Promise.all(errorsAsync);
-                assert.deepEqual(asyncErrors.length, 1);
-                assert.deepEqual(asyncErrors[0].code, "type-error");
-            });
+            const asyncErrors = (await Promise.all(errorsAsync)).filter((e) => e != null);
+
+            assert.deepEqual(errors.length, 0);
+            assert.deepEqual(asyncErrors.length, 0);
+        });
+
+        it("should resolve async validation errors", async () => {
+            const { errorsAsync } = compileSchema({ type: "number", asyncError: true }, { drafts: [draft] }).validate(
+                4
+            );
+
+            const asyncErrors = (await Promise.all(errorsAsync)).filter((e) => e != null);
+
+            assert(asyncErrors.length === 1);
+
+            const error = asyncErrors[0];
+            assert(error != null);
+            assert.deepEqual(error.code, "type-error");
+        });
+    });
+
+    describe("async validation - returned metadata", () => {
+        let draft: Draft;
+        beforeEach(() => {
+            draft = {
+                ...draft2020,
+                keywords: [
+                    ...draft2020.keywords,
+                    {
+                        id: "async",
+                        keyword: "asyncError",
+                        addValidate: (node) => node.schema.asyncError != null,
+                        validate: async ({ path }) => {
+                            return new Promise((resolve) => {
+                                if (path) {
+                                    path[path.length - 1].meta = {
+                                        test: "yay"
+                                    };
+                                }
+                                resolve(undefined);
+                            });
+                        }
+                    }
+                ]
+            };
+        });
+
+        it("should expose meta object on path", async () => {
+            const path: ValidationPath = [];
+            compileSchema({ type: "number", asyncError: true }, { drafts: [draft] }).validate(4, "#", path);
+            assert.deepEqual(path[path.length - 1].meta?.test, "yay");
         });
     });
 });

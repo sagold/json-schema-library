@@ -3,6 +3,7 @@ import type { SchemaNode, JsonError } from "./types";
 export type ValidationPath = {
     pointer: string;
     node: SchemaNode;
+    meta?: Record<string, any>;
 }[];
 
 export type JsonSchemaReducerParams = {
@@ -30,7 +31,7 @@ export interface JsonSchemaResolver {
     (options: JsonSchemaResolverParams): SchemaNode | JsonError | undefined;
 }
 
-export type ValidationResult = JsonError | Promise<JsonError>;
+export type ValidationResult = JsonError | Promise<JsonError | undefined>;
 
 export type JsonSchemaValidatorParams = { pointer?: string; data: unknown; node: SchemaNode; path?: ValidationPath };
 export interface JsonSchemaValidator {
