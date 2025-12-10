@@ -40,7 +40,7 @@ type JsonSchemaValidatorParams = {
 interface JsonSchemaValidator {
   toJSON?: () => string;
   order?: number;
-  (options: JsonSchemaValidatorParams): undefined | ValidationResult | ValidationResult[];
+  (options: JsonSchemaValidatorParams): undefined | Promise<undefined> | ValidationResult | ValidationResult[];
 }
 type Keyword = {
   id: string;
