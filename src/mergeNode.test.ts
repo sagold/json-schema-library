@@ -32,7 +32,7 @@ describe("mergeNode", () => {
         const b = compileSchema({ type: "object", properties: { title: { type: "string", maxLength: 20 } } });
         const node = mergeNode(a, b);
         assert(isSchemaNode(node), "should have returned a valid schema node");
-        assert.deepEqual(node.properties?.title!.schema, { type: "string", minLength: 1, maxLength: 20 });
+        assert.deepEqual(node.properties?.title.schema, { type: "string", minLength: 1, maxLength: 20 });
     });
 
     it("should should merge items (object)", () => {

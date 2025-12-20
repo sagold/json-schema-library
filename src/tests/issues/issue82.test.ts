@@ -28,7 +28,7 @@ describe("issue#82", () => {
             }
         });
 
-        const { valid, errors } = schema.validate({
+        const { valid } = schema.validate({
             "stock-assembly": 1
         });
 
@@ -62,7 +62,7 @@ describe("issue#82", () => {
             }
         });
 
-        const { valid, errors } = schema.validate({
+        const { valid } = schema.validate({
             "1c_list_Document_СборкаЗапасов": 1
         });
 

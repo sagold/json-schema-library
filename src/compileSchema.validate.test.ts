@@ -693,7 +693,6 @@ describe("compileSchema.validate", () => {
             });
 
             it("should correctly validate combination of remote, allOf, and allOf-$ref", () => {
-                // eslint-disable-next-line @typescript-eslint/no-var-requires
                 const draft04Meta = require("../remotes/draft04.json");
                 const { errors } = compileSchema({
                     $ref: "http://json-schema.org/draft-04/schema#",
@@ -712,7 +711,6 @@ describe("compileSchema.validate", () => {
                 })
                     .addRemoteSchema(
                         "http://localhost:1234/integer.json",
-                        // eslint-disable-next-line @typescript-eslint/no-var-requires
                         require("json-schema-test-suite/remotes/integer.json")
                     )
                     .validate("not an integer");

@@ -1,4 +1,4 @@
-import copy from "fast-copy";
+import { copy } from "fast-copy";
 import { getTypeOf } from "../../utils/getTypeOf";
 import { getSchemaType, SchemaType } from "../../utils/getSchemaType";
 import { getValue } from "../../utils/getValue";
@@ -82,7 +82,7 @@ function convertValue(type: string | undefined, value: any) {
         if (getTypeOf(parsedValue) === type) {
             return parsedValue;
         }
-    } catch (e) {} // eslint-disable-line no-empty
+    } catch (e) {} // eslint-disable-line @typescript-eslint/no-unused-vars, no-empty
 
     return value;
 }

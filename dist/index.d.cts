@@ -460,9 +460,7 @@ type NodeOrError = {
   node: undefined;
   error: JsonError;
 };
-type ErrorData<T extends Record<string, unknown> = {
-  [p: string]: unknown;
-}> = T & {
+type ErrorData<T extends Record<string, unknown> = Record<string, unknown>> = T & {
   pointer: string;
   schema: JsonSchema;
   value: unknown;
@@ -621,9 +619,7 @@ declare const oneOfKeyword: Keyword;
 declare const oneOfFuzzyKeyword: Keyword;
 //#endregion
 //#region src/errors/render.d.ts
-declare function render(template: string, data?: {
-  [p: string]: any;
-}): string;
+declare function render(template: string, data?: Record<string, any>): string;
 //#endregion
 //#region src/utils/getTypeOf.d.ts
 type JSType = "array" | "bigint" | "boolean" | "function" | "null" | "number" | "object" | "string" | "symbol" | "undefined";

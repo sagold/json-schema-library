@@ -3,6 +3,7 @@ import { errors } from "./errors/errors";
 import { SchemaNode, isSchemaNode, GetNodeOptions } from "./SchemaNode";
 
 export type BooleanSchema = boolean;
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
 export interface JsonSchema {
     [p: string]: any;
 }
@@ -16,7 +17,7 @@ export type NodeOrError = { node: SchemaNode; error: undefined } | { node: undef
 export type { SchemaNode, GetNodeOptions, Draft };
 export { isSchemaNode };
 
-export type ErrorData<T extends Record<string, unknown> = { [p: string]: unknown }> = T & {
+export type ErrorData<T extends Record<string, unknown> = Record<string, unknown>> = T & {
     /* json-pointer to location of error */
     pointer: string;
     /* json-schema of error location */

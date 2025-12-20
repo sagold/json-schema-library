@@ -3,56 +3,56 @@ import { strict as assert } from "assert";
 import { isSchemaNode } from "./types";
 
 describe("compileSchema : reduceNode", () => {
-    describe("behaviour", () => {});
+    describe("behaviour", () => {
+        it("should return schema for boolean schema true", () => {
+            // @ts-expect-error boolean schema still untyped
+            const node = compileSchema(true);
 
-    it("should return schema for boolean schema true", () => {
-        // @ts-expect-error boolean schema still untyped
-        const node = compileSchema(true);
+            const schema = node.reduceNode(123)?.node?.schema;
 
-        const schema = node.reduceNode(123)?.node?.schema;
+            assert.deepEqual(schema, { type: "number" });
+        });
 
-        assert.deepEqual(schema, { type: "number" });
-    });
+        it("should compile schema with current data", () => {
+            const node = compileSchema({
+                type: "object",
+                if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
+                then: {
+                    required: ["header"],
+                    properties: { header: { type: "string", minLength: 1 } }
+                }
+            });
 
-    it("should compile schema with current data", () => {
-        const node = compileSchema({
-            type: "object",
-            if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
-            then: {
+            const dataNode = node.reduceNode({ withHeader: true });
+
+            assert.deepEqual(dataNode?.node?.schema, {
+                type: "object",
                 required: ["header"],
                 properties: { header: { type: "string", minLength: 1 } }
-            }
+            });
         });
 
-        const dataNode = node.reduceNode({ withHeader: true });
+        it("should resolve both if-then-else and allOf schema", () => {
+            const node = compileSchema({
+                type: "object",
+                if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
+                then: {
+                    required: ["header"],
+                    properties: { header: { type: "string", minLength: 1 } }
+                },
+                allOf: [{ required: ["date"], properties: { date: { type: "string", format: "date" } } }]
+            });
 
-        assert.deepEqual(dataNode?.node?.schema, {
-            type: "object",
-            required: ["header"],
-            properties: { header: { type: "string", minLength: 1 } }
-        });
-    });
+            const schema = node.reduceNode({ withHeader: true, header: "huhu" })?.node?.schema;
 
-    it("should resolve both if-then-else and allOf schema", () => {
-        const node = compileSchema({
-            type: "object",
-            if: { required: ["withHeader"], properties: { withHeader: { const: true } } },
-            then: {
-                required: ["header"],
-                properties: { header: { type: "string", minLength: 1 } }
-            },
-            allOf: [{ required: ["date"], properties: { date: { type: "string", format: "date" } } }]
-        });
-
-        const schema = node.reduceNode({ withHeader: true, header: "huhu" })?.node?.schema;
-
-        assert.deepEqual(schema, {
-            type: "object",
-            required: ["date", "header"],
-            properties: {
-                header: { type: "string", minLength: 1 },
-                date: { type: "string", format: "date" }
-            }
+            assert.deepEqual(schema, {
+                type: "object",
+                required: ["date", "header"],
+                properties: {
+                    header: { type: "string", minLength: 1 },
+                    date: { type: "string", format: "date" }
+                }
+            });
         });
     });
 

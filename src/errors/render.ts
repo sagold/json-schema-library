@@ -1,4 +1,4 @@
-export function render(template: string, data: { [p: string]: any } = {}): string {
+export function render(template: string, data: Record<string, any> = {}): string {
     return template.replace(/\{\{(\w+)\}\}/g, (_, key) => {
         const variable = data[key];
         if (variable === null || variable === undefined) return ""; // optional

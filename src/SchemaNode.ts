@@ -1,4 +1,4 @@
-import copy from "fast-copy";
+import { copy } from "fast-copy";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import settings from "./settings";
 import type { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, Keyword, ValidationPath } from "./Keyword";

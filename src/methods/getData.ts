@@ -1,4 +1,4 @@
-import copy from "fast-copy";
+import { copy } from "fast-copy";
 import { getTypeOf } from "../utils/getTypeOf";
 import { getSchemaType } from "../utils/getSchemaType";
 import { getValue } from "../utils/getValue";
@@ -82,7 +82,7 @@ function convertValue(type: string | undefined, value: any) {
         if (getTypeOf(parsedValue) === type) {
             return parsedValue;
         }
-    } catch (e) {} // eslint-disable-line no-empty
+    } catch (e) {} // eslint-disable-line @typescript-eslint/no-unused-vars, no-empty
 
     return value;
 }
@@ -308,7 +308,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
         }
 
         // build data from items-definition
-        // @ts-expect-error asd
+        // @ts-expect-error testing length of unknown type of data
         if ((node.items && canResolveRef(node.items, opts)) || data?.length > 0) {
             // @attention this should disable cache or break intended behaviour as we reset it after loop
             // @todo test recursion of items
