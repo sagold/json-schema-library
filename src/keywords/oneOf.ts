@@ -56,7 +56,7 @@ function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
         return reduceOneOfDeclarator({ node, data, pointer, path });
     }
 
-    const matches = [];
+    const matches: { index: number; node: SchemaNode }[] = [];
     const errors: ValidationResult[] = [];
     for (let i = 0; i < node.oneOf.length; i += 1) {
         const validationErrors = validateNode(node.oneOf[i], data, pointer, path);
@@ -102,7 +102,11 @@ function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
 }
 
 export function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaReducerParams) {
-    const errors = [];
+    if (node.oneOf == null) {
+        return;
+    }
+
+    const errors: ValidationResult[] = [];
     const oneOfProperty = node.schema[DECLARATOR_ONEOF];
     const oneOfValue = getValue(data, oneOfProperty);
 
@@ -165,8 +169,7 @@ function fuzzyObjectValue(node: SchemaNode, data: Record<string, unknown>, point
     }
     let value = 0;
     const keys = Object.keys(node.properties ?? {});
-    for (let i = 0; i < keys.length; i += 1) {
-        const key = keys[i];
+    for (const key of keys) {
         if (data[key]) {
             if (validateNode(node.properties[key], data[key], pointer, path).length === 0) {
                 value += 1;
@@ -198,7 +201,7 @@ export function reduceOneOfFuzzy({ node, data, pointer, path }: JsonSchemaReduce
 
     // fuzzy match oneOf
     if (isObject(data)) {
-        let nodeOfItem;
+        let nodeOfItem: SchemaNode | undefined;
         let schemaOfIndex = -1;
         let fuzzyGreatest = 0;
 
@@ -238,8 +241,8 @@ function oneOfValidator({ node, data, pointer = "#", path }: JsonSchemaValidator
     if (!oneOf) {
         return;
     }
-    const matches = [];
-    const errors = [];
+    const matches: { index: number; node: SchemaNode }[] = [];
+    const errors: ValidationResult[] = [];
     for (let i = 0; i < oneOf.length; i += 1) {
         const validationResult = validateNode(oneOf[i], data, pointer, path);
         if (validationResult.length > 0) {

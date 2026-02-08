@@ -25,29 +25,30 @@ export function parseDependentSchemas(node: SchemaNode) {
         return;
     }
 
-    node.dependentSchemas = {};
+    const parsedSchemas: Record<string, boolean | SchemaNode> = {};
     schemas.forEach((property) => {
         const schema = dependentSchemas[property];
         if (isObject(schema)) {
-            node.dependentSchemas[property] = node.compileSchema(
+            parsedSchemas[property] = node.compileSchema(
                 schema,
                 `${node.evaluationPath}/dependentSchemas/${property}`,
                 `${node.schemaLocation}/dependentSchemas/${property}`
             );
         } else if (typeof schema === "boolean") {
-            node.dependentSchemas[property] = schema;
+            parsedSchemas[property] = schema;
         }
     });
+    node.dependentSchemas = parsedSchemas;
 }
 
 export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) {
-    if (!isObject(data)) {
+    const { dependentSchemas } = node;
+    if (!isObject(data) || dependentSchemas == null) {
         // @todo remove dependentSchemas
         return node;
     }
 
-    let mergedSchema: JsonSchema;
-    const { dependentSchemas } = node;
+    let mergedSchema: JsonSchema | undefined;
     let added = 0;
     let dynamicId = `${node.schemaLocation}(`;
     Object.keys(data).forEach((propertyName) => {

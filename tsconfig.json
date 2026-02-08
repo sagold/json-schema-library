@@ -1,15 +1,15 @@
 {
     "compilerOptions": {
+        "strict": true,
         "declaration": false,
         "outDir": "./dist/",
         "target": "ESNext",
         "module": "ESNext",
-        "allowJs": true,
         "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
         "moduleResolution": "node",
-        "noImplicitAny": true,
-        "lib": ["DOM", "ES2018"]
+        "lib": ["DOM", "ES2018"],
+        "exactOptionalPropertyTypes": true
     },
     "exclude": ["src/**/*.test.ts"],
     "include": ["index.ts", "src/**/*"]

@@ -35,9 +35,7 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
     }
 
     const errors: ValidationResult[] = [];
-    for (let i = 0; i < unevaluated.length; i += 1) {
-        const propertyName = unevaluated[i];
-
+    for (const propertyName of unevaluated) {
         if (isPropertyEvaluated({ node, data, key: propertyName, pointer, path })) {
             continue;
         }

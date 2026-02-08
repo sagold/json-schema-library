@@ -52,8 +52,11 @@ function reduceAnyOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
 }
 
 function validateAnyOf({ node, data, pointer, path }: JsonSchemaValidatorParams) {
-    for (let i = 0; i < node.anyOf.length; i += 1) {
-        if (validateNode(node.anyOf[i], data, pointer, path).length === 0) {
+    if (node.anyOf == null) {
+        return;
+    }
+    for (const anyOf of node.anyOf) {
+        if (validateNode(anyOf, data, pointer, path).length === 0) {
             return undefined;
         }
     }

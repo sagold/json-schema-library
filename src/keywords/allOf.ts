@@ -32,7 +32,8 @@ function reduceAllOf({ node, data, key, pointer, path }: JsonSchemaReducerParams
     let mergedSchema = {};
     let dynamicId = "";
     for (let i = 0; i < node.allOf.length; i += 1) {
-        const { node: schemaNode } = node.allOf[i].reduceNode(data, { key, pointer, path });
+        // @todo no-null-assertion
+        const { node: schemaNode } = node.allOf[i].reduceNode(data, { key: key!, pointer, path });
         if (schemaNode) {
             const nestedDynamicId = schemaNode.dynamicId?.replace(node.dynamicId, "") ?? "";
             const localDynamicId = nestedDynamicId === "" ? `allOf/${i}` : nestedDynamicId;

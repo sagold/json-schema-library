@@ -40,6 +40,7 @@ function safeResolveRef(node: SchemaNode, options: TemplateOptions) {
     if (node.$ref == null) {
         return undefined;
     }
+    options.cache = options.cache ?? {};
     const { cache, recursionLimit = 1 } = options;
 
     const origin = node.schemaLocation;
@@ -60,12 +61,13 @@ function safeResolveRef(node: SchemaNode, options: TemplateOptions) {
 }
 
 function canResolveRef(node: SchemaNode, options: TemplateOptions) {
+    // @ts-expect-error unknown index
     const counter = options.cache?.[node.schemaLocation]?.[node.$ref] ?? -1;
-    return counter < options.recursionLimit;
+    return counter < (options.recursionLimit ?? 1);
 }
 
 // only convert values where we do not lose original data
-function convertValue(type: string | undefined, value: any) {
+function convertValue(type: string | undefined, value: unknown) {
     const valueType = getTypeOf(value);
     if (type === undefined || value == null || valueType === type || (valueType === "number" && type === "integer")) {
         return value;
@@ -78,7 +80,7 @@ function convertValue(type: string | undefined, value: any) {
     }
 
     try {
-        const parsedValue = JSON.parse(value);
+        const parsedValue = JSON.parse(value as string);
         if (getTypeOf(parsedValue) === type) {
             return parsedValue;
         }
@@ -128,14 +130,14 @@ export function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions
     }
 
     // @keyword anyOf
-    if (currentNode.anyOf?.length > 0) {
+    if (currentNode.anyOf && currentNode.anyOf?.length > 0) {
         defaultData = currentNode.anyOf[0].getData(defaultData, opts) ?? defaultData;
     }
 
     // @keyword oneOf
-    if (currentNode.oneOf?.length > 0) {
+    if (currentNode.oneOf && currentNode.oneOf?.length > 0) {
         if (isEmpty(defaultData)) {
-            currentNode = mergeNode(currentNode, currentNode.oneOf[0]);
+            currentNode = mergeNode(currentNode, currentNode.oneOf[0]) as SchemaNode;
         } else {
             // find correct schema for data
             const resolvedNode = reduceOneOfFuzzy({ node: currentNode, data: defaultData, path: [], pointer: "#" });
@@ -147,7 +149,7 @@ export function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions
                 currentNode = currentNode.oneOf[0];
                 defaultData = undefined;
             } else {
-                currentNode = mergeNode(currentNode, resolvedNode);
+                currentNode = mergeNode(currentNode, resolvedNode) as SchemaNode;
             }
         }
     }
@@ -177,12 +179,13 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
     object: (node, data, opts) => {
         const schema = node.schema;
         const template = schema.default === undefined ? {} : schema.default;
-        const d: Record<string, any> = {}; // do not assign data here, to keep ordering from json-schema
+        const d: Record<string, unknown> = {}; // do not assign data here, to keep ordering from json-schema
         const required = opts.extendDefaults === false && schema.default !== undefined ? [] : (schema.required ?? []);
 
-        if (node.properties) {
-            Object.keys(node.properties).forEach((propertyName) => {
-                const propertyNode = node.properties[propertyName];
+        const properties = node.properties;
+        if (properties) {
+            Object.keys(properties).forEach((propertyName) => {
+                const propertyNode = properties[propertyName];
                 const isRequired = required.includes(propertyName);
                 const input = getValue(data, propertyName);
                 const value = data === undefined || input === undefined ? getValue(template, propertyName) : input;
@@ -196,9 +199,10 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
             });
         }
 
-        if (isObject(node.dependentRequired)) {
-            Object.keys(node.dependentRequired).forEach((propertyName) => {
-                const propertyValue = node.dependentRequired[propertyName];
+        const dependentRequired = node.dependentRequired;
+        if (isObject(dependentRequired)) {
+            Object.keys(dependentRequired).forEach((propertyName) => {
+                const propertyValue = dependentRequired[propertyName];
                 const hasValue = getValue(d, propertyName) !== undefined;
                 if (hasValue) {
                     propertyValue.forEach((addProperty) => {
@@ -213,9 +217,10 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
         }
 
         // @keyword dependencies - has to be done after resolving properties so dependency may trigger
-        if (node.dependentSchemas) {
-            Object.keys(node.dependentSchemas).forEach((prop) => {
-                const dependency = node.dependentSchemas[prop];
+        const dependentSchemas = node.dependentSchemas;
+        if (dependentSchemas) {
+            Object.keys(dependentSchemas).forEach((prop) => {
+                const dependency = dependentSchemas[prop];
                 if (d[prop] !== undefined && isSchemaNode(dependency)) {
                     const dependencyData = dependency.getData(data ?? d, opts);
                     Object.assign(d, dependencyData);
@@ -235,7 +240,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
                         if (d[key] == null) {
                             // merge valid missing data (additionals) to resulting object
                             const value = getValue(data, key);
-                            if (node.additionalProperties.validate(value).valid) {
+                            if (node.additionalProperties?.validate(value).valid) {
                                 d[key] = value;
                             }
                         }
@@ -331,7 +336,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
     }
 };
 
-function getDefault({ schema }: SchemaNode, templateValue: any, initValue: any, useTypeDefaults: boolean) {
+function getDefault({ schema }: SchemaNode, templateValue: unknown, initValue: unknown, useTypeDefaults?: boolean) {
     if (templateValue !== undefined) {
         return convertValue(schema.type, templateValue);
     } else if (schema.const) {

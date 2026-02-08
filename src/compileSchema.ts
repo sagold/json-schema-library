@@ -16,7 +16,7 @@ const { REGEX_FLAGS } = settings;
 export type CompileOptions = {
     drafts?: Draft[];
     remote?: SchemaNode;
-    formatAssertion?: boolean | "meta-schema";
+    formatAssertion?: boolean | "meta-schema" | undefined;
     getDataDefaultOptions?: TemplateOptions;
 };
 
@@ -68,10 +68,10 @@ export function compileSchema(schema: JsonSchema, options: CompileOptions = {}) 
             const vocabs = Object.keys(metaSchema.schema.$vocabulary);
             // const withAnnotations = vocabs.find((vocab) => vocab.includes("vocab/format-annotation"));
             const formatAssertionString = vocabs.find((vocab) => vocab.includes("vocab/format-assertion"));
-            if (formatAssertion === "meta-schema") {
+            if (formatAssertionString && formatAssertion === "meta-schema") {
                 formatAssertion = metaSchema.schema.$vocabulary[formatAssertionString] === true;
             }
-            const validKeywords = Object.keys(metaSchema.getData({}, { addOptionalProps: true }));
+            const validKeywords = Object.keys(metaSchema.getData({}, { addOptionalProps: true }) as object);
             if (validKeywords.length > 0) {
                 node.context.keywords = node.context.keywords.filter((f) => validKeywords.includes(f.keyword));
             }

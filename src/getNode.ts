@@ -28,7 +28,7 @@ export function getNode(
     options.path = options.path ?? [];
     options.withSchemaWarning = options.withSchemaWarning ?? false;
     options.pointer = options.pointer ?? "#";
-
+    // @ts-expect-error explicitely any
     const node = this as SchemaNode;
     const keys = split(pointer);
     if (keys.length === 0) {

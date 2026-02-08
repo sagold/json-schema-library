@@ -104,7 +104,7 @@ export default function runAllTestCases(setup: Setup) {
 
         after(() => {
             measurements.end = Date.now();
-            process.env.DISABLE_LOG !== "true" &&
+            if (process.env.DISABLE_LOG !== "true") {
                 console.log(
                     "\n",
                     "time overall:",
@@ -116,6 +116,7 @@ export default function runAllTestCases(setup: Setup) {
                     "average validation time:",
                     measurements.validationDuration / measurements.testCount
                 );
+            }
             // console.log("max time:", measurements.max);
         });
     });

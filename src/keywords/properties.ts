@@ -21,15 +21,16 @@ function propertyResolver({ node, key }: JsonSchemaResolverParams) {
 export function parseProperties(node: SchemaNode) {
     const { schema, evaluationPath, schemaLocation } = node;
     if (schema.properties) {
-        node.properties = {};
+        const parsedProperties: Record<string, SchemaNode> = {};
         Object.keys(schema.properties).forEach((propertyName) => {
             const propertyNode = node.compileSchema(
                 schema.properties[propertyName],
                 `${evaluationPath}/properties/${propertyName}`,
                 `${schemaLocation}/properties/${propertyName}`
             );
-            node.properties[propertyName] = propertyNode;
+            parsedProperties[propertyName] = propertyNode;
         });
+        node.properties = parsedProperties;
     }
 }
 
@@ -39,11 +40,12 @@ function validateProperties({ node, data, pointer, path }: JsonSchemaValidatorPa
     }
     // move validation through properties
     const errors: ValidationResult[] = [];
+    const properties = node.properties ?? {};
     Object.keys(data).forEach((propertyName) => {
-        if (node.properties[propertyName] == null) {
+        if (properties[propertyName] == null) {
             return;
         }
-        const propertyNode = node.properties[propertyName];
+        const propertyNode = properties[propertyName];
         const result = validateNode(propertyNode, getValue(data, propertyName), `${pointer}/${propertyName}`, path);
         errors.push(...result);
     });

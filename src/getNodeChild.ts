@@ -15,13 +15,14 @@ export function getNodeChild(
     key: string | number,
     data?: unknown,
     options: GetNodeOptions = {}
-): OptionalNodeOrError | NodeOrError {
+): OptionalNodeOrError | NodeOrError | object {
     options.path = options.path ?? [];
 
     options.withSchemaWarning = options.withSchemaWarning ?? false;
     options.pointer = options.pointer ?? "#";
     const { path, pointer } = options;
 
+    // @ts-expect-error implicitely any
     let node = this as SchemaNode;
     if (node.reducers.length) {
         const result = node.reduceNode(data, { key, path, pointer });
@@ -62,5 +63,6 @@ export function getNodeChild(
         return { node: undefined, error };
     }
 
-    return { node: undefined, error: undefined };
+    // throw new Error("getNodeChild failed retrieving node or error");
+    return {};
 }

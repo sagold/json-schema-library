@@ -1,4 +1,5 @@
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import { isNumber } from "../types";
 
 export const maximumKeyword: Keyword = {
     id: "maximum",
@@ -8,9 +9,10 @@ export const maximumKeyword: Keyword = {
 };
 
 function validateMaximum({ node, data, pointer }: JsonSchemaValidatorParams) {
-    if (isNaN(data as number)) {
+    if (!isNumber(data)) {
         return undefined;
     }
+
     const { schema } = node;
     if (schema.maximum && schema.maximum < data) {
         return node.createError("maximum-error", {

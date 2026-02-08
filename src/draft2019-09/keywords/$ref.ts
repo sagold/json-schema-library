@@ -25,7 +25,7 @@ function register(node: SchemaNode, path: string) {
 }
 
 export function parseRef(node: SchemaNode) {
-    // add ref resolution method to node
+    // @ts-expect-error add ref resolution method to node
     node.resolveRef = resolveRef;
 
     // get and store current $id of node - this may be the same as parent $id
@@ -70,21 +70,20 @@ export function parseRef(node: SchemaNode) {
 //     // return reducedNode ?? error;
 // }
 
-export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
-    const node = this as SchemaNode;
-    if (node.schema.$recursiveRef) {
-        const nextNode = resolveRecursiveRef(node, path ?? []);
-        path?.push({ pointer, node: nextNode });
+export function resolveRef(this: SchemaNode, { pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
+    if (this.schema.$recursiveRef) {
+        const nextNode = resolveRecursiveRef(this, path ?? []);
+        path?.push({ pointer: pointer!, node: nextNode! });
         return nextNode;
     }
 
-    if (node.$ref == null) {
-        return node;
+    if (this.$ref == null) {
+        return this;
     }
 
-    const resolvedNode = getRef(node);
+    const resolvedNode = getRef(this);
     if (resolvedNode != null) {
-        path?.push({ pointer, node: resolvedNode });
+        path?.push({ pointer: pointer!, node: resolvedNode });
     } else {
         // console.log("failed resolving", node.$ref, "from", Object.keys(node.context.refs));
     }
@@ -100,7 +99,7 @@ function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorPar
 }
 
 // 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
-function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode {
+function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode | undefined {
     const history = path;
 
     // RESTRICT BY CHANGE IN BASE-URL
@@ -109,8 +108,7 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     for (let i = history.length - 1; i >= 0; i--) {
         if (history[i].node.schema.$recursiveAnchor === false) {
             // $recursiveRef with $recursiveAnchor: false works like $ref
-            const nextNode = getRef(node, resolveUri(node.$id, node.schema.$recursiveRef));
-            return nextNode;
+            return getRef(node, resolveUri(node.$id, node.schema.$recursiveRef));
         }
         if (/^https?:\/\//.test(history[i].node.schema.$id ?? "") && history[i].node.schema.$recursiveAnchor !== true) {
             startIndex = i;
@@ -168,7 +166,7 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
         if ($ref[0] === "#") {
             // @todo there is a bug joining multiple fragments to e.g. #/base#/examples/0
             // from "$id": "/base" +  $ref "#/examples/0" (in refOfUnknownKeyword spec)
-            const ref = $ref.match(/#[^#]*$/)?.pop(); // sanitize pointer
+            const ref = $ref.match(/#[^#]*$/)?.pop() as string; // sanitize pointer
             // support refOfUnknownKeyword
             const rootSchema = node.context.rootNode.schema;
             const targetSchema = get(rootSchema, ref);
@@ -203,8 +201,8 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
             const path = split(fragments[1]);
             // @todo add utility to resolve schema-pointer to schema
             let currentNode = parentNode;
-            for (let i = 0; i < path.length; i += 1) {
-                const property = path[i] === "definitions" ? "$defs" : path[i];
+            for (const item of path) {
+                const property = item === "definitions" ? "$defs" : item;
                 // @ts-expect-error random path
                 currentNode = currentNode[property];
                 if (currentNode == null) {

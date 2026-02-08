@@ -4,15 +4,10 @@ type ValidationPath = {
   node: SchemaNode;
 }[];
 type JsonSchemaReducerParams = {
-  /** data of current node */
-  data: unknown;
-  /** optional key to used to resolve by property without having data */
-  key?: string | number;
-  /** node to reduce */
-  node: SchemaNode;
-  /** JSON pointer to data */
-  pointer: string;
-  /** passed through path for schema resolution, will be changed by reference */
+  /** data of current node */data: unknown; /** optional key to used to resolve by property without having data */
+  key?: string | number; /** node to reduce */
+  node: SchemaNode; /** JSON pointer to data */
+  pointer: string; /** passed through path for schema resolution, will be changed by reference */
   path: ValidationPath;
 };
 interface JsonSchemaReducer {
@@ -30,12 +25,12 @@ interface JsonSchemaResolver {
   order?: number;
   (options: JsonSchemaResolverParams): SchemaNode | JsonError | undefined;
 }
-type ValidationResult = JsonError | Promise<JsonError>;
+type ValidationResult = JsonError | Promise<JsonError | undefined>;
 type JsonSchemaValidatorParams = {
-  pointer?: string;
+  pointer: string;
   data: unknown;
   node: SchemaNode;
-  path?: ValidationPath;
+  path: ValidationPath;
 };
 interface JsonSchemaValidator {
   toJSON?: () => string;
@@ -43,21 +38,15 @@ interface JsonSchemaValidator {
   (options: JsonSchemaValidatorParams): undefined | Promise<undefined> | ValidationResult | ValidationResult[];
 }
 type Keyword = {
-  id: string;
-  /** unique keyword corresponding to JSON Schema keywords (or custom) */
-  keyword: string;
-  /** sort order of keyword. Lower numbers will be processed last. Default is 0 */
-  order?: number;
-  /** called with compileSchema */
+  id: string; /** unique keyword corresponding to JSON Schema keywords (or custom) */
+  keyword: string; /** sort order of keyword. Lower numbers will be processed last. Default is 0 */
+  order?: number; /** called with compileSchema */
   parse?: (node: SchemaNode) => void;
-  addResolve?: (node: SchemaNode) => boolean;
-  /** return node corresponding to passed in key or do nothing */
+  addResolve?: (node: SchemaNode) => boolean; /** return node corresponding to passed in key or do nothing */
   resolve?: JsonSchemaResolver;
-  addValidate?: (node: SchemaNode) => boolean;
-  /** validate data using node */
+  addValidate?: (node: SchemaNode) => boolean; /** validate data using node */
   validate?: JsonSchemaValidator;
-  addReduce?: (node: SchemaNode) => boolean;
-  /** remove dynamic schema-keywords by merging valid sub-schemas */
+  addReduce?: (node: SchemaNode) => boolean; /** remove dynamic schema-keywords by merging valid sub-schemas */
   reduce?: JsonSchemaReducer;
 };
 //#endregion
@@ -86,9 +75,7 @@ declare function getChildSelection(node: SchemaNode, property: string | number):
 //#endregion
 //#region src/methods/getData.d.ts
 type TemplateOptions = {
-  /** Add all properties (required and optional) to the generated data */
-  addOptionalProps?: boolean;
-  /** Remove data that does not match input schema. Defaults to false */
+  /** Add all properties (required and optional) to the generated data */addOptionalProps?: boolean; /** Remove data that does not match input schema. Defaults to false */
   removeInvalidData?: boolean;
   /** Set to false to take default values as they are and not extend them.
    *  Defaults to true.
@@ -104,10 +91,8 @@ type TemplateOptions = {
    * Limits how often a $ref should be followed before aborting. Prevents infinite data-structure.
    * Defaults to 1
    */
-  recursionLimit?: number;
-  /** @internal disables recursion limit for next call */
-  disableRecursionLimit?: boolean;
-  /** @internal context to track recursion limit */
+  recursionLimit?: number; /** @internal disables recursion limit for next call */
+  disableRecursionLimit?: boolean; /** @internal context to track recursion limit */
   cache?: Record<string, Record<string, number>>;
 };
 declare function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions): any;
@@ -198,8 +183,7 @@ declare const errors: {
   "one-of-property-error": string;
   "pattern-error": string;
   "pattern-properties-error": string;
-  "required-property-error": string;
-  /** return schema-warning with createSchemaWarning:true when a valid, but undefined  property was found */
+  "required-property-error": string; /** return schema-warning with createSchemaWarning:true when a valid, but undefined  property was found */
   "schema-warning": string;
   "type-error": string;
   "undefined-value-error": string;
@@ -210,51 +194,21 @@ declare const errors: {
   "value-not-empty-error": string;
 };
 //#endregion
-//#region src/getNode.d.ts
-declare function getNode(pointer: string, data: unknown, options: {
-  withSchemaWarning: true;
-} & GetNodeOptions): NodeOrError;
-declare function getNode(pointer: string, data: unknown, options: {
-  createSchema: true;
-} & GetNodeOptions): NodeOrError;
-declare function getNode(pointer: string, data?: unknown, options?: GetNodeOptions): OptionalNodeOrError;
-//#endregion
-//#region src/getNodeChild.d.ts
-declare function getNodeChild(key: string | number, data: unknown, options: {
-  withSchemaWarning: true;
-} & GetNodeOptions): NodeOrError;
-declare function getNodeChild(key: string | number, data: unknown, options: {
-  createSchema: true;
-} & GetNodeOptions): NodeOrError;
-declare function getNodeChild(key: string | number, data?: unknown, options?: GetNodeOptions): OptionalNodeOrError;
-//#endregion
 //#region src/SchemaNode.d.ts
 declare function isSchemaNode(value: unknown): value is SchemaNode;
 declare function isReduceable(node: SchemaNode): boolean;
 type Context = {
-  /** root node of this JSON Schema */
-  rootNode: SchemaNode;
-  /** available draft configurations */
-  drafts: Draft[];
-  /** [SHARED ACROSS REMOTES] root nodes of registered remote JSON Schema, stored by id/url */
-  remotes: Record<string, SchemaNode>;
-  /** references stored by fully resolved schema-$id + local-pointer */
-  refs: Record<string, SchemaNode>;
-  /** anchors stored by fully resolved schema-$id + $anchor */
-  anchors: Record<string, SchemaNode>;
-  /** [SHARED ACROSS REMOTES] dynamicAnchors stored by fully resolved schema-$id + $anchor */
-  dynamicAnchors: Record<string, SchemaNode>;
-  /** JSON Schema parser, validator, reducer and resolver for this JSON Schema (root schema and its child nodes) */
-  keywords: Draft["keywords"];
-  /** JSON Schema draft dependend methods */
-  methods: Draft["methods"];
-  /** draft version */
-  version: Draft["version"];
-  /** draft errors & template-strings */
-  errors: Draft["errors"];
-  /** draft formats & validators */
-  formats: Draft["formats"];
-  /** [SHARED USING ADD REMOTE] getData default options */
+  /** root node of this JSON Schema */rootNode: SchemaNode; /** available draft configurations */
+  drafts: Draft[]; /** [SHARED ACROSS REMOTES] root nodes of registered remote JSON Schema, stored by id/url */
+  remotes: Record<string, SchemaNode>; /** references stored by fully resolved schema-$id + local-pointer */
+  refs: Record<string, SchemaNode>; /** anchors stored by fully resolved schema-$id + $anchor */
+  anchors: Record<string, SchemaNode>; /** [SHARED ACROSS REMOTES] dynamicAnchors stored by fully resolved schema-$id + $anchor */
+  dynamicAnchors: Record<string, SchemaNode>; /** JSON Schema parser, validator, reducer and resolver for this JSON Schema (root schema and its child nodes) */
+  keywords: Draft["keywords"]; /** JSON Schema draft dependend methods */
+  methods: Draft["methods"]; /** draft version */
+  version: Draft["version"]; /** draft errors & template-strings */
+  errors: Draft["errors"]; /** draft formats & validators */
+  formats: Draft["formats"]; /** [SHARED USING ADD REMOTE] getData default options */
   getDataDefaultOptions?: TemplateOptions;
 };
 interface SchemaNode extends SchemaNodeMethodsType {
@@ -292,10 +246,6 @@ interface SchemaNode extends SchemaNodeMethodsType {
   reducers: JsonSchemaReducer[];
   resolvers: JsonSchemaResolver[];
   validators: JsonSchemaValidator[];
-  resolveRef?: (args?: {
-    pointer?: string;
-    path?: ValidationPath;
-  }) => SchemaNode;
   $id?: string;
   $defs?: Record<string, SchemaNode>;
   $ref?: string;
@@ -355,7 +305,47 @@ interface SchemaNode extends SchemaNodeMethodsType {
   unevaluatedItems?: SchemaNode;
   unevaluatedProperties?: SchemaNode;
 }
-type SchemaNodeMethodsType = typeof SchemaNodeMethods;
+/**
+ * Fixed SchemaNode mixin methods
+ */
+interface SchemaNodeMethodsType {
+  compileSchema(schema: JsonSchema, evaluationPath?: string, schemaLocation?: string, dynamicId?: string): SchemaNode;
+  createError<T extends string = DefaultErrors>(code: T, data: ErrorData, message?: string): JsonError;
+  createSchema(data?: unknown): JsonSchema;
+  getNode(pointer: string, data: unknown, options: {
+    withSchemaWarning: true;
+  } & GetNodeOptions): NodeOrError;
+  getNode(pointer: string, data: unknown, options: {
+    createSchema: true;
+  } & GetNodeOptions): NodeOrError;
+  getNode(pointer: string, data?: unknown, options?: GetNodeOptions): OptionalNodeOrError;
+  getNodeChild(key: string | number, data: unknown, options: {
+    withSchemaWarning: true;
+  } & GetNodeOptions): NodeOrError;
+  getNodeChild(key: string | number, data: unknown, options: {
+    createSchema: true;
+  } & GetNodeOptions): NodeOrError;
+  getNodeChild(key: string | number, data?: unknown, options?: GetNodeOptions): OptionalNodeOrError;
+  getChildSelection(property: string | number): JsonError | SchemaNode[];
+  getNodeRef($ref: string): SchemaNode | undefined;
+  getNodeRoot(): SchemaNode;
+  getDraftVersion(): string;
+  getData(data?: unknown, options?: TemplateOptions): unknown;
+  reduceNode(data: unknown, options?: {
+    key?: string | number;
+    pointer?: string;
+    path?: ValidationPath;
+  }): OptionalNodeOrError;
+  resolveRef: (args?: {
+    pointer?: string;
+    path?: ValidationPath;
+  }) => SchemaNode;
+  validate(data: unknown, pointer?: string, path?: ValidationPath): ValidateReturnType;
+  addRemoteSchema(url: string, schema: JsonSchema): SchemaNode;
+  toSchemaNodes(): SchemaNode[];
+  toDataNodes(data: unknown, pointer?: string): DataNode[];
+  toJSON(): unknown;
+}
 type GetNodeOptions = {
   /**
    *  Per default `undefined` is returned for valid data, but undefined schema.
@@ -387,61 +377,10 @@ type ValidateReturnType = {
    */
   errorsAsync: Promise<JsonError | undefined>[];
 };
-declare const SchemaNodeMethods: {
-  /**
-   * Compiles a child-schema of this node to its context
-   * @returns SchemaNode representing the passed JSON Schema
-   */
-  readonly compileSchema: (schema: JsonSchema, evaluationPath?: string, schemaLocation?: string, dynamicId?: string) => SchemaNode;
-  readonly createError: <T extends string = "additional-items-error" | "additional-properties-error" | "all-of-error" | "any-of-error" | "const-error" | "contains-any-error" | "contains-array-error" | "contains-error" | "contains-min-error" | "contains-max-error" | "enum-error" | "exclusive-maximum-error" | "exclusive-minimum-error" | "forbidden-property-error" | "format-date-error" | "format-date-time-error" | "format-duration-error" | "format-email-error" | "format-hostname-error" | "format-ipv4-error" | "format-ipv4-leading-zero-error" | "format-ipv6-error" | "format-ipv6-leading-zero-error" | "format-json-pointer-error" | "format-regex-error" | "format-time-error" | "format-uri-error" | "format-uri-reference-error" | "format-uri-template-error" | "format-url-error" | "format-uuid-error" | "invalid-data-error" | "invalid-property-name-error" | "maximum-error" | "max-items-error" | "max-length-error" | "max-properties-error" | "minimum-error" | "min-items-error" | "min-items-one-error" | "min-length-error" | "min-length-one-error" | "missing-one-of-declarator-error" | "min-properties-error" | "missing-array-item-error" | "missing-dependency-error" | "missing-one-of-property-error" | "multiple-of-error" | "multiple-one-of-error" | "no-additional-properties-error" | "not-error" | "one-of-error" | "one-of-property-error" | "pattern-error" | "pattern-properties-error" | "required-property-error" | "schema-warning" | "type-error" | "undefined-value-error" | "unevaluated-property-error" | "unevaluated-items-error" | "unique-items-error" | "unknown-property-error" | "value-not-empty-error">(code: T, data: ErrorData, message?: string) => JsonError;
-  readonly createSchema: typeof createSchema;
-  readonly getChildSelection: (property: string | number) => JsonError | SchemaNode[];
-  readonly getNode: typeof getNode;
-  readonly getNodeChild: typeof getNodeChild;
-  /**
-   * @returns for $ref, the corresponding SchemaNode or undefined
-   */
-  readonly getNodeRef: ($ref: string) => SchemaNode | undefined;
-  readonly getNodeRoot: () => SchemaNode;
-  /**
-   * @returns draft version this JSON Schema is evaluated by
-   */
-  readonly getDraftVersion: () => DraftVersion;
-  /**
-   * @returns data that is valid to the schema of this node
-   */
-  readonly getData: (data?: unknown, options?: TemplateOptions) => any;
-  /**
-   * @returns SchemaNode with a reduced JSON Schema matching the given data
-   */
-  readonly reduceNode: (data: unknown, options?: {
-    key?: string | number;
-    pointer?: string;
-    path?: ValidationPath;
-  }) => OptionalNodeOrError;
-  /**
-   * @returns validation result of data validated by this node's JSON Schema
-   */
-  readonly validate: (data: unknown, pointer?: string, path?: ValidationPath) => ValidateReturnType;
-  /**
-   * Register a JSON Schema as a remote-schema to be resolved by $ref, $anchor, etc
-   * @returns the current node (not the remote schema-node)
-   */
-  readonly addRemoteSchema: (url: string, schema: JsonSchema) => SchemaNode;
-  /**
-   * @returns a list of all sub-schema as SchemaNode
-   */
-  readonly toSchemaNodes: () => SchemaNode[];
-  /**
-   * @returns a list of values (including objects and arrays) and their corresponding JSON Schema as SchemaNode
-   */
-  readonly toDataNodes: (data: unknown, pointer?: string) => DataNode[];
-  readonly toJSON: () => any;
-};
 //#endregion
 //#region src/types.d.ts
 interface JsonSchema {
-  [p: string]: any;
+  [keyword: string]: any;
 }
 type JsonPointer = string;
 type DefaultErrors = keyof typeof errors;
@@ -476,7 +415,7 @@ type JsonError<T extends ErrorData = ErrorData> = {
  * ts type guard for json error
  * @returns true if passed type is a JsonError
  */
-declare function isJsonError(error: any): error is JsonError;
+declare function isJsonError(error: unknown): error is JsonError;
 //#endregion
 //#region src/compileSchema.d.ts
 type CompileOptions = {
@@ -619,14 +558,14 @@ declare const oneOfKeyword: Keyword;
 declare const oneOfFuzzyKeyword: Keyword;
 //#endregion
 //#region src/errors/render.d.ts
-declare function render(template: string, data?: Record<string, any>): string;
+declare function render(template: string, data?: Record<string, unknown>): string;
 //#endregion
 //#region src/utils/getTypeOf.d.ts
 type JSType = "array" | "bigint" | "boolean" | "function" | "null" | "number" | "object" | "string" | "symbol" | "undefined";
 declare function getTypeOf(value: unknown): JSType;
 //#endregion
 //#region src/mergeNode.d.ts
-declare function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): SchemaNode | undefined;
+declare function mergeNode(a?: SchemaNode, b?: SchemaNode, ...omit: string[]): SchemaNode | undefined;
 //#endregion
 //#region src/utils/mergeSchema.d.ts
 declare function mergeSchema<T extends JsonSchema>(a: T, b: T, ...omit: string[]): T;

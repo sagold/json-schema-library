@@ -16,8 +16,8 @@ export function mergeSchema<T extends JsonSchema>(a: T, b: T, ...omit: string[])
     }
 
     const schema = mergeSchema2(a, b) as T;
-    for (let i = 0; i < omit.length; i += 1) {
-        delete schema[omit[i]];
+    for (const s of omit) {
+        delete schema[s]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
     }
 
     return schema;

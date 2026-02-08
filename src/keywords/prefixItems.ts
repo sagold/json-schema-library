@@ -13,7 +13,7 @@ export const prefixItemsKeyword: Keyword = {
 };
 
 function prefixItemsResolver({ node, key }: JsonSchemaResolverParams) {
-    if (node.prefixItems[key as number]) {
+    if (node.prefixItems && node.prefixItems[key as number]) {
         return node.prefixItems[key as number];
     }
 }

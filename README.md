@@ -1358,6 +1358,11 @@ settings.REGEX_FLAGS = "v";
 
 ## Breaking Changes
 
+### v10.6.0
+
+- introduced annotations
+- changed typing to strict
+
 ### v10.5.0
 
 - added support for ref resolution in getSchemaType

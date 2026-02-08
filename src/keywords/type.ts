@@ -25,7 +25,7 @@ function getJsonSchemaType(value: unknown, expectedType: string | string[]): JST
         jsType === "number" &&
         (expectedType === "integer" || (Array.isArray(expectedType) && expectedType.includes("integer")))
     ) {
-        return Number.isInteger(value) || isNaN(value as any) ? "integer" : "number";
+        return Number.isInteger(value) || isNaN(value as number) ? "integer" : "number";
     }
     return jsType;
 }

@@ -61,9 +61,10 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
             // when a single node is invalid
             if (validateNode(child, value, `${pointer}/${i}`, path).length > 0) {
                 // nothing should validate, so we validate unevaluated items only
-                if (node.unevaluatedItems) {
+                const unevaluatedItems = node.unevaluatedItems;
+                if (unevaluatedItems) {
                     return sanitizeErrors(
-                        data.map((value) => validateNode(node.unevaluatedItems, value, `${pointer}/${i}`, path))
+                        data.map((value) => validateNode(unevaluatedItems, value, `${pointer}/${i}`, path))
                     );
                 }
                 if (node.schema.unevaluatedItems === false) {
@@ -77,7 +78,8 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
         }
         // "unevaluatedItems false"
         if (child === undefined) {
-            if (validIf && node.if.prefixItems && node.if.prefixItems.length > i) {
+            // valid if ensures node.if is set
+            if (validIf && node.if!.prefixItems && node.if!.prefixItems.length > i) {
                 // evaluated by if -- skip
             } else if (node.unevaluatedItems) {
                 const result = validateNode(node.unevaluatedItems, value, `${pointer}/${i}`, path);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { isSchemaNode, SchemaNode } from "../types";
 
 function eachProperty(nodeList: SchemaNode[], o?: Record<string, SchemaNode | unknown>) {

@@ -1,4 +1,5 @@
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import { isNumber } from "../types";
 
 export const minimumKeyword: Keyword = {
     id: "minimum",
@@ -8,7 +9,7 @@ export const minimumKeyword: Keyword = {
 };
 
 function validateMinimum({ node, data, pointer }: JsonSchemaValidatorParams) {
-    if (isNaN(data as number)) {
+    if (!isNumber(data)) {
         return undefined;
     }
     const { schema } = node;

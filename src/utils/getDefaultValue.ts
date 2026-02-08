@@ -1,6 +1,6 @@
 import { JsonSchema } from "../types";
 
-export function getDefaultValue(schema: JsonSchema, inputData: any, initValue: any) {
+export function getDefaultValue(schema: JsonSchema, inputData: unknown, initValue: unknown) {
     if (inputData != null) {
         return inputData;
     } else if (schema.const) {

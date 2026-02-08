@@ -5,7 +5,7 @@ import { SchemaNode, isSchemaNode, GetNodeOptions } from "./SchemaNode";
 export type BooleanSchema = boolean;
 // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
 export interface JsonSchema {
-    [p: string]: any;
+    [keyword: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 export type JsonPointer = string;
 
@@ -38,6 +38,13 @@ export type JsonError<T extends ErrorData = ErrorData> = {
  * ts type guard for json error
  * @returns true if passed type is a JsonError
  */
-export function isJsonError(error: any): error is JsonError {
-    return error?.type === "error";
+export function isJsonError(error: unknown): error is JsonError {
+    if (error && typeof error == "object") {
+        return (error as Record<string, unknown>).type === "error";
+    }
+    return false;
+}
+
+export function isNumber(value: unknown): value is number {
+    return isNaN(value as number) === false;
 }

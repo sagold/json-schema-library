@@ -14,7 +14,7 @@ export const containsKeyword: Keyword = {
         return node.compileSchema(
             {
                 items: {
-                    anyOf: [node.contains.schema]
+                    anyOf: [node.contains!.schema] // we tested for contains in addReduce
                 }
             },
             node.evaluationPath,
@@ -54,8 +54,9 @@ function validateContains({ node, data, pointer, path }: JsonSchemaValidatorPara
     }
 
     let count = 0;
-    for (let i = 0; i < data.length; i += 1) {
-        if (validateNode(node.contains, data[i], pointer, path).length === 0) {
+    for (const d of data) {
+        // we tested for contains in addValidate
+        if (validateNode(node.contains!, d, pointer, path).length === 0) {
             count++;
         }
     }

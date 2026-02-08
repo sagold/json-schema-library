@@ -18,7 +18,8 @@ export function getChildSelection(node: SchemaNode, property: string | number): 
         if (isSchemaNode(childNode)) {
             return [childNode];
         }
-        return error;
+        // @todo improve return type guard?
+        return error as JsonError;
     }
     if (node.schema.items === true) {
         return [node.compileSchema({ type: "string" })];
@@ -37,5 +38,6 @@ export function getChildSelection(node: SchemaNode, property: string | number): 
     }
 
     const { node: childNode, error } = node.getNodeChild(property);
-    return error ?? [childNode];
+    // @todo improve return type?
+    return (error as JsonError) ?? [childNode];
 }

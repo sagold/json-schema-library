@@ -5,7 +5,15 @@ import type { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, Keywor
 import { createSchema } from "./methods/createSchema";
 import { Draft } from "./Draft";
 import { toSchemaNodes } from "./methods/toSchemaNodes";
-import { isJsonError, JsonSchema, JsonError, ErrorData, DefaultErrors, OptionalNodeOrError } from "./types";
+import {
+    isJsonError,
+    JsonSchema,
+    JsonError,
+    ErrorData,
+    DefaultErrors,
+    OptionalNodeOrError,
+    NodeOrError
+} from "./types";
 import { isObject } from "./utils/isObject";
 import { join } from "@sagold/json-pointer";
 import { resolveUri } from "./utils/resolveUri";
@@ -110,7 +118,6 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     resolvers: JsonSchemaResolver[];
     validators: JsonSchemaValidator[];
 
-    resolveRef?: (args?: { pointer?: string; path?: ValidationPath }) => SchemaNode;
     // parsed schema properties (registered by parsers)
     $id?: string;
     $defs?: Record<string, SchemaNode>;
@@ -168,7 +175,44 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     unevaluatedProperties?: SchemaNode;
 }
 
-type SchemaNodeMethodsType = typeof SchemaNodeMethods;
+/**
+ * Fixed SchemaNode mixin methods
+ */
+interface SchemaNodeMethodsType {
+    compileSchema(schema: JsonSchema, evaluationPath?: string, schemaLocation?: string, dynamicId?: string): SchemaNode;
+    createError<T extends string = DefaultErrors>(code: T, data: ErrorData, message?: string): JsonError;
+    createSchema(data?: unknown): JsonSchema;
+
+    // getNode overloads
+    getNode(pointer: string, data: unknown, options: { withSchemaWarning: true } & GetNodeOptions): NodeOrError;
+    getNode(pointer: string, data: unknown, options: { createSchema: true } & GetNodeOptions): NodeOrError;
+    getNode(pointer: string, data?: unknown, options?: GetNodeOptions): OptionalNodeOrError;
+
+    // getNodeChild overloads
+    getNodeChild(
+        key: string | number,
+        data: unknown,
+        options: { withSchemaWarning: true } & GetNodeOptions
+    ): NodeOrError;
+    getNodeChild(key: string | number, data: unknown, options: { createSchema: true } & GetNodeOptions): NodeOrError;
+    getNodeChild(key: string | number, data?: unknown, options?: GetNodeOptions): OptionalNodeOrError;
+
+    getChildSelection(property: string | number): JsonError | SchemaNode[];
+    getNodeRef($ref: string): SchemaNode | undefined;
+    getNodeRoot(): SchemaNode;
+    getDraftVersion(): string;
+    getData(data?: unknown, options?: TemplateOptions): unknown;
+    reduceNode(
+        data: unknown,
+        options?: { key?: string | number; pointer?: string; path?: ValidationPath }
+    ): OptionalNodeOrError;
+    resolveRef: (args?: { pointer?: string; path?: ValidationPath }) => SchemaNode;
+    validate(data: unknown, pointer?: string, path?: ValidationPath): ValidateReturnType;
+    addRemoteSchema(url: string, schema: JsonSchema): SchemaNode;
+    toSchemaNodes(): SchemaNode[];
+    toDataNodes(data: unknown, pointer?: string): DataNode[];
+    toJSON(): unknown;
+}
 
 export type GetNodeOptions = {
     /**
@@ -208,7 +252,7 @@ export function joinDynamicId(a?: string, b?: string) {
         return a ?? "";
     }
     if (a == null || b == null) {
-        return a || b;
+        return (a || b) ?? "";
     }
     if (a.startsWith(b)) {
         return a;
@@ -224,14 +268,10 @@ export const SchemaNodeMethods = {
      * Compiles a child-schema of this node to its context
      * @returns SchemaNode representing the passed JSON Schema
      */
-    compileSchema(
-        schema: JsonSchema,
-        evaluationPath: string = this.evaluationPath,
-        schemaLocation?: string,
-        dynamicId?: string
-    ): SchemaNode {
-        const nextFragment = evaluationPath.split("/$ref")[0];
+    compileSchema(schema: JsonSchema, evaluationPath: string, schemaLocation?: string, dynamicId?: string): SchemaNode {
         const parentNode = this as SchemaNode;
+        evaluationPath = evaluationPath ?? parentNode.evaluationPath;
+        const nextFragment = evaluationPath.split("/$ref")[0];
         const node: SchemaNode = {
             lastIdPointer: parentNode.lastIdPointer, // ref helper
             context: parentNode.context,
@@ -251,9 +291,10 @@ export const SchemaNodeMethods = {
     },
 
     createError<T extends string = DefaultErrors>(code: T, data: ErrorData, message?: string): JsonError {
+        const node = this as SchemaNode;
         let errorMessage = message;
         if (errorMessage === undefined) {
-            const error = this.schema?.errorMessages?.[code] ?? this.context.errors[code];
+            const error = node.schema?.errorMessages?.[code] ?? node.context.errors[code];
             if (typeof error === "function") {
                 return error(data);
             }
@@ -314,7 +355,7 @@ export const SchemaNodeMethods = {
         options: { key?: string | number; pointer?: string; path?: ValidationPath } = {}
     ): OptionalNodeOrError {
         const node = this as SchemaNode;
-        const { key, pointer, path } = options;
+        const { key = "missing-key", pointer = node.evaluationPath, path } = options;
 
         // @ts-expect-error bool schema
         if (node.schema === false) {
@@ -331,8 +372,8 @@ export const SchemaNodeMethods = {
         // @todo does mergeNode break immutability?
         let workingNode = node.compileSchema(node.schema, node.evaluationPath, node.schemaLocation);
         const reducers = node.reducers;
-        for (let i = 0; i < reducers.length; i += 1) {
-            const result = reducers[i]({ data, key, node, pointer, path });
+        for (const reducer of reducers) {
+            const result = reducer({ data, key, node, pointer, path: path ?? [] });
             if (isJsonError(result)) {
                 return { node: undefined, error: result };
             }
@@ -342,10 +383,9 @@ export const SchemaNodeMethods = {
                     schema = false;
                     break;
                 }
-
                 // compilation result for data of current schemain order to merge results, we rebuild
                 // node from schema alternatively we would need to merge by node-property
-                workingNode = mergeNode(workingNode, result);
+                workingNode = mergeNode(workingNode, result) as SchemaNode;
             }
         }
 
@@ -369,7 +409,8 @@ export const SchemaNodeMethods = {
      * @returns validation result of data validated by this node's JSON Schema
      */
     validate(data: unknown, pointer = "#", path: ValidationPath = []) {
-        const errors = validateNode(this, data, pointer, path) ?? [];
+        const node = this as SchemaNode;
+        const errors = validateNode(node, data, pointer, path) ?? [];
         const syncErrors: JsonError[] = [];
         const flatErrorList = sanitizeErrors(Array.isArray(errors) ? errors : [errors]).filter(isJsonError);
 
@@ -398,10 +439,11 @@ export const SchemaNodeMethods = {
     addRemoteSchema(url: string, schema: JsonSchema): SchemaNode {
         // @draft >= 6
         schema.$id = resolveUri(schema.$id || url);
-        const { context } = this as SchemaNode;
-        const draft = getDraft(context.drafts, schema?.$schema ?? this.context.rootNode.$schema);
+        const node = this as SchemaNode;
+        const { context } = node;
+        const draft = getDraft(context.drafts, schema?.$schema ?? context.rootNode.schema?.$schema);
 
-        const node: SchemaNode = {
+        const remoteNode: SchemaNode = {
             evaluationPath: "#",
             lastIdPointer: "#",
             schemaLocation: "#",
@@ -419,11 +461,17 @@ export const SchemaNodeMethods = {
             ...SchemaNodeMethods
         } as SchemaNode;
 
-        node.context.rootNode = node;
-        node.context.remotes[resolveUri(url)] = node;
-        addKeywords(node);
+        remoteNode.context.rootNode = remoteNode;
+        remoteNode.context.remotes[resolveUri(url)] = remoteNode;
+        addKeywords(remoteNode);
 
-        return this;
+        return node;
+    },
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    resolveRef(args?: { pointer?: string; path?: ValidationPath }) {
+        throw new Error("method 'resolveRef' is not implemented");
+        return this as SchemaNode;
     },
 
     /**
@@ -442,7 +490,8 @@ export const SchemaNodeMethods = {
     },
 
     toJSON() {
-        return { ...this, context: undefined, errors: undefined, parent: this.parent?.evaluationPath };
+        const node = this as SchemaNode;
+        return { ...node, context: undefined, errors: undefined, parent: node.parent?.evaluationPath };
     }
 } as const;
 
@@ -466,13 +515,13 @@ export function addKeywords(node: SchemaNode) {
 export function execKeyword(keyword: Keyword, node: SchemaNode) {
     // @todo consider first parsing all nodes
     keyword.parse?.(node);
-    if (keyword.addReduce?.(node)) {
+    if (keyword.reduce && keyword.addReduce?.(node)) {
         node.reducers.push(keyword.reduce);
     }
-    if (keyword.addResolve?.(node)) {
+    if (keyword.resolve && keyword.addResolve?.(node)) {
         node.resolvers.push(keyword.resolve);
     }
-    if (keyword.addValidate?.(node)) {
+    if (keyword.validate && keyword.addValidate?.(node)) {
         node.validators.push(keyword.validate);
     }
 }

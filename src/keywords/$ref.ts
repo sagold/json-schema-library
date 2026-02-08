@@ -27,7 +27,7 @@ function register(node: SchemaNode, path: string) {
 }
 
 export function parseRef(node: SchemaNode) {
-    // add ref resolution method to node
+    // @ts-expect-error add ref resolution method to node
     node.resolveRef = resolveRef;
 
     // get and store current $id of node - this may be the same as parent $id
@@ -87,27 +87,26 @@ export function reduceRef({ node, data, key, pointer, path }: JsonSchemaReducerP
     if (resolvedNode.schemaLocation === node.schemaLocation) {
         return resolvedNode;
     }
-    const merged = mergeNode(node, resolvedNode);
-    const { node: reducedNode, error } = merged.reduceNode(data, { key, pointer, path });
+    const merged = mergeNode(node, resolvedNode) as SchemaNode;
+    // @todo no-null-assertion
+    const { node: reducedNode, error } = merged.reduceNode(data, { key: key!, pointer, path });
     return reducedNode ?? error;
 }
 
-export function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
-    const node = this as SchemaNode;
-
-    if (node.schema.$dynamicRef) {
-        const nextNode = resolveRecursiveRef(node, path);
-        path?.push({ pointer, node: nextNode });
+export function resolveRef(this: SchemaNode, { pointer, path = [] }: { pointer?: string; path?: ValidationPath } = {}) {
+    if (this.schema.$dynamicRef) {
+        const nextNode = resolveRecursiveRef(this, path);
+        path.push({ pointer: pointer!, node: nextNode! });
         return nextNode;
     }
 
-    if (node.$ref == null) {
-        return node;
+    if (this.$ref == null) {
+        return this;
     }
 
-    const resolvedNode = getRef(node);
+    const resolvedNode = getRef(this);
     if (resolvedNode != null) {
-        path?.push({ pointer, node: resolvedNode });
+        path.push({ pointer: pointer!, node: resolvedNode });
     }
 
     return resolvedNode;
@@ -122,7 +121,7 @@ function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorPar
 }
 
 // 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
-function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode {
+function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode | undefined {
     const history = path;
     const refInCurrentScope = resolveUri(node.$id, node.schema.$dynamicRef);
 
@@ -134,15 +133,15 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
         }
     }
 
-    for (let i = 0; i < history.length; i += 1) {
+    for (const entry of history) {
         // A $dynamicRef that initially resolves to a schema with a matching $dynamicAnchor resolves to the first $dynamicAnchor in the dynamic scope
-        if (history[i].node.schema.$dynamicAnchor) {
-            return compileNext(history[i].node, node);
+        if (entry.node.schema.$dynamicAnchor) {
+            return compileNext(entry.node, node);
         }
 
         // A $dynamicRef only stops at a $dynamicAnchor if it is in the same dynamic scope.
         const refWithoutScope = node.schema.$dynamicRef.split("#").pop();
-        const ref = resolveUri(history[i].node.$id, `#${refWithoutScope}`);
+        const ref = resolveUri(entry.node.$id, `#${refWithoutScope}`);
         const anchorNode = node.context.dynamicAnchors[ref];
         if (anchorNode) {
             return compileNext(node.context.dynamicAnchors[ref], node);
@@ -150,9 +149,7 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     }
 
     // A $dynamicRef without a matching $dynamicAnchor in the same schema resource behaves like a normal $ref to $anchor
-
-    const nextNode = getRef(node, refInCurrentScope);
-    return nextNode;
+    return getRef(node, refInCurrentScope);
 }
 
 const PROPERTIES_TO_MERGE = ["title", "description", "options", "readOnly", "writeOnly"];
@@ -239,8 +236,8 @@ export function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefi
             const path = split(fragments[1]);
             // @todo add utility to resolve schema-pointer to schema
             let currentNode = parentNode;
-            for (let i = 0; i < path.length; i += 1) {
-                const property = path[i] === "definitions" ? "$defs" : path[i];
+            for (const item of path) {
+                const property = item === "definitions" ? "$defs" : item;
                 // @ts-expect-error random path
                 currentNode = currentNode[property];
                 if (currentNode == null) {

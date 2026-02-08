@@ -11,7 +11,7 @@ export const $refKeyword: Keyword = {
     keyword: "$ref",
     parse: parseRef,
     addValidate: ({ schema }) => schema.$ref != null,
-    validate: draft06Keyword.validate
+    validate: draft06Keyword.validate!
 };
 
 function register(node: SchemaNode, path: string) {
@@ -27,15 +27,15 @@ function parseRef(node: SchemaNode) {
         currentId = resolveUri(node.parent?.$id, node.schema.id);
         // console.log("create id", node.evaluationPath, ":", node.parent?.$id, node.schema?.id, "=>", currentId);
     }
-    node.$id = currentId;
+    node.$id = currentId as string;
     node.lastIdPointer = node.parent?.lastIdPointer ?? "#";
 
-    // add ref resolution method to node
+    // @ts-expect-error add ref resolution method to node
     node.resolveRef = resolveRef;
 
     // store this node for retrieval by id
-    if (node.context.refs[currentId] == null) {
-        node.context.refs[currentId] = node;
+    if (node.context.refs[currentId as string] == null) {
+        node.context.refs[currentId as string] = node;
     }
 
     const idChanged = currentId !== node.parent?.$id;
@@ -58,19 +58,17 @@ function parseRef(node: SchemaNode) {
     }
 }
 
-function resolveRef({ pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
-    // throw new Error("resolving ref");
-    const node = this as SchemaNode;
-    if (node.$ref == null) {
-        return node;
+function resolveRef(this: SchemaNode, { pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
+    if (this.$ref == null) {
+        return this;
     }
-    const resolvedNode = getRef(node);
+    const resolvedNode = getRef(this);
     // console.log("RESOLVE REF", node.schema, "resolved ref", node.$ref, "=>", resolvedNode.schema);
     if (resolvedNode != null) {
-        path?.push({ pointer, node: resolvedNode });
+        path?.push({ pointer: pointer!, node: resolvedNode });
         // console.log("resolve ref", node.$ref, "=>", resolvedNode.schema, Object.keys(node.context.refs));
     } else {
-        console.log("failed resolving", node.$ref, "from", Object.keys(node.context.refs));
+        console.log("failed resolving", this.$ref, "from", Object.keys(this.context.refs));
     }
 
     return resolvedNode;
@@ -139,7 +137,9 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefined {
         if (node.context.refs[$localRef]) {
             const nextNode = node.context.refs[$localRef];
             const property = fragments[1].split("$defs/").pop();
-            return getRef(nextNode?.$defs?.[property]);
+            if (property && nextNode?.$defs) {
+                return getRef(nextNode.$defs[property]);
+            }
         }
 
         // console.error("REF: UNFOUND 2", $ref);

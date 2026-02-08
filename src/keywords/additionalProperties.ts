@@ -67,11 +67,12 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
     const { schema } = node;
     const errors: ValidationResult[] = [];
     let receivedProperties = Object.keys(data).filter((prop) => settings.propertyBlacklist.includes(prop) === false);
-    if (Array.isArray(node.patternProperties)) {
+    const patternProperties = node.patternProperties;
+    if (Array.isArray(patternProperties)) {
         // filter received properties by matching patternProperties
         receivedProperties = receivedProperties.filter((prop) => {
-            for (let i = 0; i < node.patternProperties.length; i += 1) {
-                if (node.patternProperties[i].pattern.test(prop)) {
+            for (const property of patternProperties) {
+                if (property.pattern.test(prop)) {
                     return false; // remove
                 }
             }
@@ -92,8 +93,10 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
                     `${pointer}/${property}`,
                     path
                 );
-                // @note: we pass through specific errors here
-                validationErrors && errors.push(...validationErrors);
+                if (validationErrors) {
+                    // @note: we pass through specific errors here
+                    errors.push(...validationErrors);
+                }
             } else {
                 errors.push(
                     node.createError("no-additional-properties-error", {

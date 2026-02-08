@@ -7,7 +7,7 @@ export const ifKeyword: Keyword = {
     id: "if-then-else",
     keyword: "if",
     parse: parseIfThenElse,
-    addReduce: (node: SchemaNode) => node.if && (node.then != null || node.else != null),
+    addReduce: (node: SchemaNode) => node.if != null && (node.then != null || node.else != null),
     reduce: reduceIf,
     addValidate: (node) => node.if != null,
     validate: validateIfThenElse

@@ -32,7 +32,8 @@ function additionalItemsResolver({ node, key, data }: JsonSchemaResolverParams) 
     if (Array.isArray(data)) {
         // @attention: items, etc should already have been tried
         const value = getValue(data, key);
-        const { node: childNode, error } = node.items.reduceNode(value);
+        // items is ensures by addResolve
+        const { node: childNode, error } = node.items!.reduceNode(value);
         return childNode ?? error;
     }
 }
@@ -53,7 +54,9 @@ function validateAdditionalItems({ node, data, pointer, path }: JsonSchemaValida
         const item = data[i];
         if (node.items) {
             const validationResult = validateNode(node.items, item, `${pointer}/${i}`, path);
-            validationResult && errors.push(...validationResult);
+            if (validationResult) {
+                errors.push(...validationResult);
+            }
         } else if (schema.additionalItems === false) {
             errors.push(
                 node.createError("additional-items-error", {

@@ -18,15 +18,15 @@ function parseRef(node: SchemaNode) {
     if (node.schema?.$ref == null) {
         currentId = resolveUri(node.parent?.$id, node.schema?.$id);
     }
-    node.$id = currentId;
+    node.$id = currentId as string;
     node.lastIdPointer = node.parent?.lastIdPointer ?? "#";
 
-    // add ref resolution method to node
+    // @ts-expect-error add ref resolution method to node
     node.resolveRef = resolveRef;
 
     // store this node for retrieval by $id
-    if (node.context.refs[currentId] == null) {
-        node.context.refs[currentId] = node;
+    if (node.context.refs[currentId as string] == null) {
+        node.context.refs[currentId as string] = node;
     }
 
     const idChanged = currentId !== node.parent?.$id;

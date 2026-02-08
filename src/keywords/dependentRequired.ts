@@ -21,7 +21,7 @@ export function validateDependentRequired({
     node,
     data,
     pointer = "#"
-}: JsonSchemaValidatorParams): ValidationResult[] {
+}: JsonSchemaValidatorParams): undefined | ValidationResult[] {
     if (!isObject(data)) {
         return undefined;
     }

@@ -16,7 +16,7 @@ export const itemsKeyword: Keyword = {
 function itemsResolver({ node, key }: JsonSchemaResolverParams) {
     // prefixItems should handle this, abort
     // Note: This keeps features sort independent for arrays
-    if (node.prefixItems?.length > +key) {
+    if (node.prefixItems && node.prefixItems?.length > +key) {
         return;
     }
     return node.items;

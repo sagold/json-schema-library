@@ -7,8 +7,8 @@
   "types": "./dist/index.d.cts",
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
     },
     "./package.json": "./package.json"
   },
@@ -17,6 +17,7 @@
     "dist": "tsdown -f esm -f cjs --minify; yarn dist:iife",
     "dist:iife": "tsdown --config tsdown.iife.config.ts --no-clean --minify; mv dist/index.iife.js dist/jlib.js",
     "lint": "eslint src",
+    "lint:types": "tsc --noEmit",
     "prepublishOnly": "yarn dist",
     "tdd": "watch \"npm run test:unit\" src/",
     "test": "mocha 'src/**/*.{test,spec}.ts'",
@@ -71,8 +72,8 @@
     "json-schema-test-suite": "https://github.com/json-schema-org/JSON-Schema-Test-Suite#83e866b46c9f9e7082fd51e83a61c5f2145a1ab7",
     "mocha": "^11.7.5",
     "nyc": "^17.1.0",
-    "ts-node": "^10.9.2",
     "tsdown": "^0.20.3",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.54.0",
     "watch": "^1.0.1"

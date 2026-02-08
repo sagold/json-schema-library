@@ -5,13 +5,15 @@ type MaybeNestedErrors = ReturnType<JsonSchemaValidator>;
 
 export default function sanitizeErrors(
     list: MaybeNestedErrors | MaybeNestedErrors[],
-    result: (undefined | JsonError | Promise<JsonError> | ValidationResult)[] = []
+    result: (JsonError | Promise<JsonError | undefined> | ValidationResult)[] = []
 ): ValidationResult[] {
     if (!Array.isArray(list)) {
-        return [list];
+        if (list !== undefined) {
+            return [list];
+        }
+        return [];
     }
-    for (let i = 0; i < list.length; i += 1) {
-        const item = list[i];
+    for (const item of list) {
         if (Array.isArray(item)) {
             sanitizeErrors(item, result);
         } else if (isJsonError(item) || item instanceof Promise) {

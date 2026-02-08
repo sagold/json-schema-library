@@ -5,14 +5,14 @@ import { joinDynamicId } from "./SchemaNode";
 interface SchemaNodeCB {
     toJSON?: () => string;
     order?: number;
-    (...args: unknown[]): void;
+    (...args: any[]): any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 function sortCb(a: SchemaNodeCB, b: SchemaNodeCB) {
     return (b.order ?? 0) - (a.order ?? 0);
 }
 
-export function removeDuplicates(fun: SchemaNodeCB, funIndex: number, list: ((...args: unknown[]) => void)[]) {
+export function removeDuplicates(fun: SchemaNodeCB, funIndex: number, list: SchemaNodeCB[]) {
     if (fun == null || list.indexOf(fun) !== funIndex) {
         return false;
     }
@@ -55,7 +55,7 @@ function mergePatternProperties(a?: SchemaNode["patternProperties"], b?: SchemaN
     return result;
 }
 
-export function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): SchemaNode | undefined {
+export function mergeNode(a?: SchemaNode, b?: SchemaNode, ...omit: string[]): SchemaNode | undefined {
     if (a == null || b == null) {
         return a || b;
     }
@@ -66,18 +66,19 @@ export function mergeNode(a: SchemaNode, b?: SchemaNode, ...omit: string[]): Sch
         if (b.prefixItems) {
             arraySelection.prefixItems = b.prefixItems;
         } else {
-            arraySelection.items = b.items;
+            arraySelection.items = b.items!;
         }
     } else {
         // prefixItems?: SchemaNode[];
-        arraySelection.prefixItems = b.prefixItems ?? a.prefixItems;
-        arraySelection.items = mergeNode(a.items, b.items);
+        arraySelection.prefixItems = (b.prefixItems ?? a.prefixItems)!;
+        arraySelection.items = mergeNode(a.items, b.items)!;
     }
 
     // we have no node-type if (atype !== b.type) {return a; }
 
-    // note: {x: b.x ?? a.x} is already done by {...a, ...b}
+    // @ts-expect-error simplified merging of objects
     const mergedNode: SchemaNode = {
+        // note: {x: b.x ?? a.x} is already done by {...a, ...b}
         ...a,
         ...b,
         ...arraySelection,

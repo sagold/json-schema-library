@@ -16,10 +16,10 @@ export function getChildSelection(node: SchemaNode, property: string | number): 
     // array.items[] found
     if (node.prefixItems && node.prefixItems.length > +property) {
         const { node: childNode, error } = node.getNodeChild(property);
-        if (node) {
+        if (childNode) {
             return [childNode];
         }
-        return error;
+        return error as JsonError;
     }
 
     // array.items[] exceeded (or undefined), but additionalItems specified
@@ -28,7 +28,9 @@ export function getChildSelection(node: SchemaNode, property: string | number): 
         if (node.schema.additionalItems === true) {
             return [node.compileSchema({ type: "string" })];
         }
-        return [node.items.resolveRef()];
+        if (node.items) {
+            return [node.items.resolveRef()];
+        }
     }
 
     // array.items[] exceeded
@@ -37,9 +39,8 @@ export function getChildSelection(node: SchemaNode, property: string | number): 
     }
 
     const { node: childNode, error } = node.getNodeChild(property);
-    if (error) {
-        return error;
+    if (childNode) {
+        return [childNode as SchemaNode];
     }
-
-    return [childNode];
+    return error as JsonError;
 }

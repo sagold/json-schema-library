@@ -5,7 +5,7 @@ import { SchemaNode } from "../types";
 export type DataNode = { node: SchemaNode; value: unknown; pointer: string };
 
 export function toDataNodes(node: SchemaNode, data: unknown, pointer = "#", dataNodes: DataNode[] = []) {
-    const currentNode = node.resolveRef();
+    const currentNode = node.resolveRef() ?? node;
     dataNodes.push({
         node: currentNode,
         value: data,

@@ -53,15 +53,16 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
     let required = workingNode.schema.required ?? [];
 
     let dynamicId = "";
-    if (node.dependentRequired) {
-        Object.keys(node.dependentRequired).forEach((propertyName) => {
+    const dependentRequired = node.dependentRequired;
+    if (dependentRequired) {
+        Object.keys(dependentRequired).forEach((propertyName) => {
             if (!hasProperty(data, propertyName) && !required.includes(propertyName)) {
                 return;
             }
-            if (node.dependentRequired[propertyName] == null) {
+            if (dependentRequired[propertyName] == null) {
                 return;
             }
-            required.push(...node.dependentRequired[propertyName]);
+            required.push(...dependentRequired[propertyName]);
 
             // @dynamicId
             const localDynamicId = `dependencies/${propertyName}`;
@@ -69,12 +70,13 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
         });
     }
 
-    if (node.dependentSchemas) {
-        Object.keys(node.dependentSchemas).forEach((propertyName) => {
+    const dependentSchemas = node.dependentSchemas;
+    if (dependentSchemas) {
+        Object.keys(dependentSchemas).forEach((propertyName) => {
             if (!hasProperty(data, propertyName) && !required.includes(propertyName)) {
                 return true;
             }
-            const dependency = node.dependentSchemas[propertyName];
+            const dependency = dependentSchemas[propertyName];
             if (!isSchemaNode(dependency)) {
                 return true;
             }
@@ -86,12 +88,13 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
             // @note pass on updated required-list to resolve nested dependencies. This is currently supported,
             // but probably not how json-schema spec defines this behaviour (resolve only within sub-schema)
             const reducedDependency = { ...dependency, schema: { ...dependency.schema, required } }.reduceNode(data, {
-                key,
+                // @todo no-null-assertion
+                key: key!,
                 pointer: `${pointer}/dependencies/${propertyName}`,
                 path
-            }).node;
+            }).node as SchemaNode;
 
-            workingNode = mergeNode(workingNode, reducedDependency);
+            workingNode = mergeNode(workingNode, reducedDependency) as SchemaNode;
 
             // @dynamicId
             const nestedDynamicId = reducedDependency.dynamicId?.replace(node.dynamicId, "") ?? "";
@@ -110,7 +113,7 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
 
     required = workingNode.schema.required ? workingNode.schema.required.concat(...required) : required;
     required = required.filter((r: string, index: number, list: string[]) => list.indexOf(r) === index);
-    workingNode = mergeNode(workingNode, workingNode, "dependencies");
+    workingNode = mergeNode(workingNode, workingNode, "dependencies") as SchemaNode;
     return workingNode.compileSchema(
         { ...workingNode.schema, required },
         workingNode.evaluationPath,
@@ -123,14 +126,13 @@ function validateDependencies({ node, data, pointer, path }: JsonSchemaValidator
     if (!isObject(data)) {
         return undefined;
     }
-    let errors: ValidationResult[];
+    let errors: ValidationResult[] = [];
     if (node.dependentRequired) {
         errors = validateDependentRequired({ node, data, pointer, path }) ?? [];
     }
     if (node.dependentSchemas) {
         const schemaErrors = validateDependentSchemas({ node, data, pointer, path });
         if (schemaErrors) {
-            errors = errors ?? [];
             errors.push(...schemaErrors);
         }
     }

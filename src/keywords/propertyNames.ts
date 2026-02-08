@@ -50,7 +50,8 @@ function validatePropertyNames({ node, data, pointer, path }: JsonSchemaValidato
         return undefined;
     }
 
-    if (!isObject(node.propertyNames)) {
+    const propertyNames = node.propertyNames;
+    if (!isObject(propertyNames)) {
         // ignore invalid schema
         return undefined;
     }
@@ -58,7 +59,7 @@ function validatePropertyNames({ node, data, pointer, path }: JsonSchemaValidato
     const errors: JsonError[] = [];
     const properties = Object.keys(data);
     properties.forEach((prop) => {
-        const validationResult = validateNode(node.propertyNames, prop, `${pointer}/prop`, path);
+        const validationResult = validateNode(propertyNames, prop, `${pointer}/prop`, path);
         if (validationResult.length > 0) {
             errors.push(
                 node.createError("invalid-property-name-error", {

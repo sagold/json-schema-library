@@ -57,7 +57,7 @@ function reducePatternProperties({ node, data, key }: JsonSchemaReducerParams) {
         return;
     }
 
-    let mergedSchema: JsonSchema;
+    let mergedSchema: JsonSchema | undefined;
     const dataProperties = Object.keys(data ?? {});
     if (key) {
         dataProperties.push(`${key}`);
@@ -101,7 +101,8 @@ function validatePatternProperties({ node, data, pointer, path }: JsonSchemaVali
 
     keys.forEach((key) => {
         const value = getValue(data, key);
-        const matchingPatterns = patternProperties.filter((property) => property.pattern.test(key));
+        // patternProperties was tested in addValidate
+        const matchingPatterns = patternProperties!.filter((property) => property.pattern.test(key));
         matchingPatterns.forEach(({ node }) => errors.push(...validateNode(node, value, `${pointer}/${key}`, path)));
 
         if (properties[key]) {

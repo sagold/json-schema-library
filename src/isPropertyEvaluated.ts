@@ -42,24 +42,24 @@ export function isPropertyEvaluated({ node, data, key, pointer, path }: Options)
     }
 
     if (node.allOf) {
-        for (let i = 0; i < node.allOf.length; i += 1) {
-            if (isPropertyEvaluated({ node: node.allOf[i], data, key, pointer, path })) {
+        for (const allOf of node.allOf) {
+            if (isPropertyEvaluated({ node: allOf, data, key, pointer, path })) {
                 return true;
             }
         }
     }
 
     if (node.anyOf) {
-        for (let i = 0; i < node.anyOf.length; i += 1) {
-            if (isPropertyEvaluated({ node: node.anyOf[i], data, key, pointer, path })) {
+        for (const anyOf of node.anyOf) {
+            if (isPropertyEvaluated({ node: anyOf, data, key, pointer, path })) {
                 return true;
             }
         }
     }
 
     if (node.oneOf) {
-        for (let i = 0; i < node.oneOf.length; i += 1) {
-            if (isPropertyEvaluated({ node: node.oneOf[i], data, key, pointer, path })) {
+        for (const oneOf of node.oneOf) {
+            if (isPropertyEvaluated({ node: oneOf, data, key, pointer, path })) {
                 return true;
             }
         }

@@ -36,8 +36,8 @@ type PartialDraft = Partial<Omit<Draft, "errors" | "formats">> & {
 
 export function extendDraft(draft: Draft, extension: PartialDraft) {
     const { keywords } = addKeywords(draft, ...(extension.keywords ?? []));
-    const errors = { ...draft.errors, ...(extension.errors ?? {}) };
-    const formats = { ...draft.formats, ...(extension.formats ?? {}) };
+    const errors = { ...draft.errors, ...(extension.errors ?? {}) } as Draft["errors"];
+    const formats = { ...draft.formats, ...((extension.formats ?? {}) as Draft["formats"]) };
     return sanitizeKeywords({
         ...draft,
         ...extension,
@@ -66,7 +66,7 @@ function addKeyword(draft: Draft, keyword: Keyword) {
 }
 
 export function sanitizeKeywords(draft: Draft) {
-    draft.keywords.forEach((keyword) => {
+    draft.keywords?.forEach((keyword) => {
         const logKeyword = () => keyword.keyword;
         if (keyword.validate) {
             keyword.validate.toJSON = logKeyword;
@@ -81,6 +81,6 @@ export function sanitizeKeywords(draft: Draft) {
             keyword.resolve.order = keyword.order ?? 0;
         }
     });
-    draft.keywords.sort((a, b) => (b.order ?? 0) - (a.order ?? 0));
+    draft.keywords?.sort((a, b) => (b.order ?? 0) - (a.order ?? 0));
     return draft;
 }
