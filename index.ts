@@ -3,7 +3,7 @@ export type { CompileOptions } from "./src/compileSchema";
 export type { Context, SchemaNode, GetNodeOptions, ValidateReturnType } from "./src/SchemaNode";
 export type { DataNode } from "./src/methods/toDataNodes";
 export type { Draft, DraftVersion } from "./src/Draft";
-export type { JsonError, JsonPointer, JsonSchema, OptionalNodeOrError, NodeOrError } from "./src/types";
+export type { JsonError, JsonAnnotation, JsonPointer, JsonSchema, OptionalNodeOrError, NodeOrError } from "./src/types";
 export type {
     Keyword,
     ValidationPath,
@@ -29,7 +29,7 @@ export { oneOfFuzzyKeyword, oneOfKeyword } from "./src/keywords/oneOf";
 
 // errors
 export { render } from "./src/errors/render";
-export type { ErrorData, ErrorConfig } from "./src/types";
+export type { AnnotationData, ErrorConfig } from "./src/types";
 
 // utilities
 export { getTypeOf } from "./src/utils/getTypeOf";

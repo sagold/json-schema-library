@@ -9,7 +9,7 @@ import {
     isJsonError,
     JsonSchema,
     JsonError,
-    ErrorData,
+    AnnotationData,
     DefaultErrors,
     OptionalNodeOrError,
     NodeOrError
@@ -180,7 +180,7 @@ export interface SchemaNode extends SchemaNodeMethodsType {
  */
 interface SchemaNodeMethodsType {
     compileSchema(schema: JsonSchema, evaluationPath?: string, schemaLocation?: string, dynamicId?: string): SchemaNode;
-    createError<T extends string = DefaultErrors>(code: T, data: ErrorData, message?: string): JsonError;
+    createError<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonError;
     createSchema(data?: unknown): JsonSchema;
 
     // getNode overloads
@@ -290,7 +290,7 @@ export const SchemaNodeMethods = {
         return node;
     },
 
-    createError<T extends string = DefaultErrors>(code: T, data: ErrorData, message?: string): JsonError {
+    createError<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonError {
         const node = this as SchemaNode;
         let errorMessage = message;
         if (errorMessage === undefined) {
