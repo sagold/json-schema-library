@@ -37,7 +37,7 @@ export function getNodeChild(
     for (const resolver of node.resolvers) {
         const schemaNode = resolver({ data, key, node });
         if (isSchemaNode(schemaNode)) {
-            return { node: schemaNode, error: undefined };
+            return { node: schemaNode.resolveRef({ pointer, path }), error: undefined };
         }
         if (isJsonError(schemaNode)) {
             return { node: undefined, error: schemaNode };

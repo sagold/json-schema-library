@@ -163,9 +163,7 @@ describe("compileSchema `schemaLocation`", () => {
             $defs: { asset: { type: "string" } }
         }).getNodeChild("title");
 
-        // @todo should have returned already resolved node?
-        const result = node.resolveRef();
-        assert.deepEqual(result.schemaLocation, "#/$defs/asset");
+        assert.deepEqual(node?.schemaLocation, "#/$defs/asset");
     });
 
     it("should maintain schemaLocation when resolved by root-ref", () => {
@@ -173,9 +171,7 @@ describe("compileSchema `schemaLocation`", () => {
             properties: { title: { $ref: "#" } }
         }).getNodeChild("title");
 
-        // @todo should have returned already resolved node?
-        const result = node.resolveRef();
-        assert.deepEqual(result.schemaLocation, "#");
+        assert.deepEqual(node?.schemaLocation, "#");
     });
 });
 
