@@ -4,6 +4,37 @@ import { Draft, JsonError, SchemaNode } from "./types";
 import { draft2020 } from "./draft2020";
 
 describe("compileSchema.validate", () => {
+    describe("boolean schema", () => {
+        // note: all this is tested in spec already
+        it("should fail if root schema is false", () => {
+            // @ts-expect-error boolean typ unsupported
+            const { errors } = compileSchema(false).validate("anything");
+            assert.deepEqual(errors.length, 1);
+        });
+        it("should fail if property schema is false", () => {
+            const { errors } = compileSchema({
+                type: "object",
+                required: ["all"],
+                properties: { all: false }
+            }).validate({
+                all: "anything"
+            });
+            assert.deepEqual(errors.length, 1);
+        });
+        it("should succeed if root schema is true", () => {
+            // @ts-expect-error boolean typ unsupported
+            const { errors } = compileSchema(true).validate("anything");
+            assert.deepEqual(errors.length, 0);
+        });
+        it("should fail if property schema is true", () => {
+            const { errors } = compileSchema({ type: "object", required: ["any"], properties: { any: true } }).validate(
+                {
+                    any: "anything"
+                }
+            );
+            assert.deepEqual(errors.length, 0);
+        });
+    });
     describe("integer", () => {
         describe("exclusiveMaximum", () => {
             it("should fail if value is equal to 0", () => {
