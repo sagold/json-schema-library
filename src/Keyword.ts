@@ -9,7 +9,7 @@ export type JsonSchemaReducerParams = {
     /** data of current node */
     data: unknown;
     /** optional key to used to resolve by property without having data */
-    key?: string | number;
+    key: string | number;
     /** node to reduce */
     node: SchemaNode;
     /** JSON pointer to data */

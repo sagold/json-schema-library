@@ -5,7 +5,7 @@ type ValidationPath = {
 }[];
 type JsonSchemaReducerParams = {
   /** data of current node */data: unknown; /** optional key to used to resolve by property without having data */
-  key?: string | number; /** node to reduce */
+  key: string | number; /** node to reduce */
   node: SchemaNode; /** JSON pointer to data */
   pointer: string; /** passed through path for schema resolution, will be changed by reference */
   path: ValidationPath;
@@ -421,7 +421,7 @@ declare function isJsonError(error: unknown): error is JsonError;
 type CompileOptions = {
   drafts?: Draft[];
   remote?: SchemaNode;
-  formatAssertion?: boolean | "meta-schema";
+  formatAssertion?: boolean | "meta-schema" | undefined;
   getDataDefaultOptions?: TemplateOptions;
 };
 /**

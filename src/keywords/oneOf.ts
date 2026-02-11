@@ -44,7 +44,7 @@ export function parseOneOf(node: SchemaNode) {
     }
 }
 
-function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
+function reduceOneOf({ node, data, pointer, path }: Omit<JsonSchemaReducerParams, "key">) {
     if (node.oneOf == null) {
         return;
     }
@@ -101,7 +101,7 @@ function reduceOneOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     });
 }
 
-export function reduceOneOfDeclarator({ node, data, pointer, path }: JsonSchemaReducerParams) {
+export function reduceOneOfDeclarator({ node, data, pointer, path }: Omit<JsonSchemaReducerParams, "key">) {
     if (node.oneOf == null) {
         return;
     }
@@ -188,7 +188,7 @@ function fuzzyObjectValue(node: SchemaNode, data: Record<string, unknown>, point
  * @param [pointer] - json pointer to data
  * @return oneOf schema or an error
  */
-export function reduceOneOfFuzzy({ node, data, pointer, path }: JsonSchemaReducerParams) {
+export function reduceOneOfFuzzy({ node, data, pointer, path }: Omit<JsonSchemaReducerParams, "key">) {
     // @todo: usingMergeNode may add reducers that are no longer available
     if (node.oneOf == null) {
         return node;

@@ -88,8 +88,7 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
             // @note pass on updated required-list to resolve nested dependencies. This is currently supported,
             // but probably not how json-schema spec defines this behaviour (resolve only within sub-schema)
             const reducedDependency = { ...dependency, schema: { ...dependency.schema, required } }.reduceNode(data, {
-                // @todo no-null-assertion
-                key: key!,
+                key,
                 pointer: `${pointer}/dependencies/${propertyName}`,
                 path
             }).node as SchemaNode;

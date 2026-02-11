@@ -37,7 +37,7 @@ export function mergeSchema2(a: unknown, b: unknown, property?: string): unknown
             return a.concat(b).filter((item, index, array) => array.indexOf(item) === index);
         }
         if (property === "items" || property === "prefixItems") {
-            const result = [];
+            const result: unknown[] = [];
             for (let i = 0; i < b.length; i += 1) {
                 if (isObject(a[i]) && isObject(b[i]) && a[i].type === b[i].type) {
                     result[i] = mergeSchema2(a[i], b[i]);
@@ -47,8 +47,8 @@ export function mergeSchema2(a: unknown, b: unknown, property?: string): unknown
             }
             return result;
         }
-        const result = [];
-        const append = [];
+        const result: unknown[] = [];
+        const append: unknown[] = [];
         for (let i = 0; i < Math.max(a.length, b.length); i += 1) {
             if (isObject(a[i]) && isObject(b[i])) {
                 result[i] = mergeSchema2(a[i], b[i]);
