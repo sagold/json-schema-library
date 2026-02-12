@@ -2,6 +2,7 @@
 import { Draft } from "./Draft";
 import { errors } from "./errors/errors";
 import { SchemaNode, isSchemaNode, GetNodeOptions } from "./SchemaNode";
+import { isObject } from "./utils/isObject";
 
 export type BooleanSchema = boolean;
 // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
@@ -20,7 +21,7 @@ export type AnnotationData<D extends Record<string, unknown> = Record<string, un
     value: unknown;
 };
 
-type Annotation<T = string, D extends AnnotationData = AnnotationData, S = string> = {
+export type Annotation<T = string, D extends AnnotationData = AnnotationData, S = string> = {
     type: T;
     code: S;
     message: string;
@@ -37,8 +38,6 @@ export type JsonAnnotation<D extends AnnotationData = AnnotationData> = Annotati
 
 export type { SchemaNode, GetNodeOptions, Draft };
 export { isSchemaNode };
-
-const isObject = (value: unknown): value is Record<string, unknown> => value != null && typeof value == "object";
 
 export function isAnnotation(value: any): value is Annotation {
     return isObject(value) && (value?.type && value?.code && value?.data) != null;

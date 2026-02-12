@@ -29,7 +29,7 @@ import myData from "./myData.json";
 
 const schema: SchemaNode = compileSchema(myJsonSchema);
 // validate data and collect errors if invalid
-const { valid, errors } = schema.validate(myData);
+const { valid, errors, annotations } = schema.validate(myData);
 // create data which validates to the compiled JSON Schema
 const defaultData = schema.getData();
 // access a subschema at a specific JSON Pointer location
@@ -108,6 +108,8 @@ const titleData = titleNode?.getData();
 
 <details><summary>Each node has an identity</summary>
 
+---
+
 ```ts
 const titleNode = compileSchema(mySchema).getNode("#/image/title");
 console.log(titleNode.evaluationPath); // #/properties/image/properties/title
@@ -117,9 +119,13 @@ console.log(titleNode.schemaLocation); // #/properties/image/properties/title
 - `evaluationPath` refers to the path in schema and is extended by `$ref`, e.g. if image is defined on `$defs`: `#/properties/image/$ref/properties/title`
 - `schemaLocation` refers to the absolute path within the schema and will not change, e.g. `#/$defs/properties/title`
 
+---
+
 </details>
 
 <details><summary>Each node has a reference to its parent node</summary>
+
+---
 
 The parent-node can be a sub-schema or intermediary node:
 
@@ -128,6 +134,8 @@ const root = compileSchema(mySchema);
 const { node: childNode } = root.getNode("#/image");
 assert(root === childNode.parent);
 ```
+
+---
 
 </details>
 
@@ -153,6 +161,8 @@ assert(root === childNode.context.rootNode);
 
 Note that rootNodes will change when working across remote schema (using $ref).
 
+---
+
 </details>
 
 ### Draft Support
@@ -161,6 +171,8 @@ _json-schema-library_ fully supports all core features of draft versions draft-0
 
 <details><summary>Overview draft support</summary>
 
+---
+
 Draft support is defined by running a validator against the official [json-schema-test-suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite).
 
 - Test results for _json-schema-library_ can be inspected in [github actions](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml)
@@ -168,12 +180,18 @@ Draft support is defined by running a validator against the official [json-schem
 
 Please note that these benchmarks refer to validation only. _json-schema-library_ offers tooling outside of validation and strives to be as spec-compliant as possible.
 
+---
+
 </details>
 
 <details><summary>Overview format validation support</summary>
 
+---
+
 - **`❌ unsupported formats`** iri, iri-reference, idn-hostname
 - **`✅ supported formats`**: date, date-time, date, duration, ecmascript-regex, email, hostname, idn-email, ipv4, ipv6, json-pointer, regex, relative-json-pointer, time, unknown, uri-reference, uri-template, uri, uuid
+
+---
 
 </details>
 
@@ -192,8 +210,6 @@ Please note that these benchmarks refer to validation only. _json-schema-library
 [toDataNodes](#todatanodes) ·
 [toSchemaNodes](#toschemanodes) ·
 [validate](#validate)
-
-</details>
 
 ### addRemoteSchema
 
@@ -243,6 +259,8 @@ const { node, error } = schemaNode.getNodeRef("https://sagold.com/remote");
 
 <details><summary>Adding remote schema to compileSchema</summary>
 
+---
+
 It is possible to pass remoteSchema on compileSchema by passing a SchemaNode (with all its remote schemas) in `remote`:
 
 ```ts
@@ -261,9 +279,13 @@ const remote = compileSchema({
 const schemaNode = compileSchema({ $ref: "https://sagold.com/remote#/defs/character" }, { remote });
 ```
 
+---
+
 </details>
 
 <details><summary>Access local subschemas in remote schemas</summary>
+
+---
 
 You can add a local uri reference to the remote schema by using the `#` separator. The following example resolves hte local path `/$defs/character` in the remote schema `https://sagold.com/remote` throught the combined url:
 `https://sagold.com/remote#/$defs/character`
@@ -316,6 +338,8 @@ schemaNode.getData("A"); // "A" - default value resolved
 // returns remote schema (from compiled local schema):
 schemaNode.getNodeRef("https://sagold.com/remote#/properties/character");
 ```
+
+---
 
 </details>
 
@@ -463,6 +487,8 @@ expect(myData).to.deep.equal({
 
 <details><summary>Option: extendDefaults (default: false)</summary>
 
+---
+
 Per default, `getData` does try to create data that is valid to the json-schema. Example: array-schemas with `minItems: 1` will add one item to fullfil the validation criteria. You can use the option and pass `{ extendDefaults: false }` to override this behaviour with a default value:
 
 ```ts
@@ -483,9 +509,13 @@ const myData = compileSchema(myJsonSchema).getData(undefined, { extendDefaults: 
 expect(myData).to.deep.equal([]);
 ```
 
+---
+
 </details>
 
 <details><summary>Option: addOptionalProps (default: false)</summary>
+
+---
 
 `getData` will only add required properties per default:
 
@@ -513,9 +543,13 @@ const data = compileSchema({
 console.log(data); // { title: "", subTitle: "sub-title" }
 ```
 
+---
+
 </details>
 
 <details><summary>Option: removeInvalidData (default: false)</summary>
+
+---
 
 With `removeInvalidData:true`, `getData` will remove data that is invalid to the given schema;
 
@@ -537,9 +571,13 @@ const data = compileSchema({
 console.log(data); // { valid: "stays", invalid: "removed" }
 ```
 
+---
+
 </details>
 
 <details><summary>Option: useTypeDefaults (default: true)</summary>
+
+---
 
 With `useTypeDefaults:true`, `getData` will return initial values for all primitives (non-objects/arrays) that do not have a default-property set:
 
@@ -580,6 +618,8 @@ const data = compileSchema({
 }).getData(null, { useTypeDefaults: false });
 console.log(data); // { valid: [undefined] }
 ```
+
+---
 
 </details>
 
@@ -673,6 +713,8 @@ expect(node.schema).to.deep.equal({
 
 <details><summary>Evaluating errors</summary>
 
+---
+
 All returned json-errors have a data property with the following properties
 
 - `pointer` JSON Pointer to the location where the error occured. In case of omitted data, this is the last JSON Schema location that could be resolved
@@ -686,11 +728,17 @@ if (error) {
 }
 ```
 
+---
+
 </details>
 
 <details><summary>About JsonPointer</summary>
 
+---
+
 **[JSON Pointer](https://tools.ietf.org/html/rfc6901)** defines a string syntax for identifying a specific value within a Json document and is [supported by Json-Schema](https://json-schema.org/understanding-json-schema/structuring.html). Given a Json document, it behaves similar to a [lodash path](https://lodash.com/docs/4.17.5#get) (`a[0].b.c`), which follows JS-syntax, but instead uses `/` separators (e.g., `a/0/b/c`). In the end, you describe a path into the Json data to a specific point.
+
+---
 
 </details>
 
@@ -757,7 +805,7 @@ if (node) {
 }
 ```
 
-</details>
+---
 
 ### reduceNode
 
@@ -873,11 +921,13 @@ expect(calls).to.deep.equal([
 `validate` is a complete _JSON Schema validator_ for your input data. Calling _validate_ will return a list of validation errors for the passed data.
 
 ```ts
-const { valid, errors } = compileSchema(myJsonSchema).validate(myData);
+const { valid, errors, annotations } = compileSchema(myJsonSchema).validate(myData);
 // { valid: boolean, errors: JsonError[] }
 ```
 
 <details><summary>About type JsonError</summary>
+
+---
 
 In _json-schema-library_ all errors are in the format of a `JsonError`:
 
@@ -892,9 +942,11 @@ type JsonError = {
 
 In almost all cases, a JSON Pointer is given on _error.data.pointer_, which points to the source within data where the error occured. For more details on how to work with errors, refer to section [custom errors](#extending-a-draft).
 
+---
+
 </details>
 
-<details><summary>Example</summary>
+<details><summary>JsonError Example</summary>
 
 ```ts
 const myJsonSchema: JsonSchema = { type: "object", additionalProperties: false };
@@ -910,6 +962,56 @@ expect(errors).to.deep.equal([
   }
 ]);
 ```
+
+</details>
+
+<details><summary>About type JsonAnnotation</summary>
+
+---
+
+In _json-schema-library_ all annotations are in the format of a `JsonAnnotation`. _Annotations_ are meta-data associated with a json-schema that are not actual errors. They can be a deprecated warning or additional resolved meta-data based on the given value. _Annotations_ do not have an affect on the `valid` property exposed by `validate()`.
+
+```ts
+type JsonAnnotation = {
+  type: "annotation";
+  code: string;
+  message: string;
+  data?: { [p: string]: any };
+};
+```
+
+In all cases, a JSON Pointer is given on _annotation.data.pointer_, which points to the source within data where the error occured.
+
+An included annotation is exposed for the keyword: `deprecated: true`:
+
+```ts
+const myJsonSchema: JsonSchema = { type: "object", properties: { name: { deprecated: true } } };
+
+const { annotations } = compileSchema(myJsonSchema).validate({ name: "my-data" });
+
+expect(annotations).to.deep.equal([
+  {
+    type: "annotation",
+    code: "deprecated-warning",
+    message: "Value at `#/name` is deprecated",
+    data: { pointer: "#", value: "my-data", schema: { deprecated: true } }
+  }
+]);
+```
+
+To create a custom annotation you can use the `createAnnotation` helper exposed by _SchemaNode_:
+
+```ts
+const validation: JsonSchemaValidator = ({ node, pointer, data }) => {
+  return node.createAnnotation("my-annotation", {
+    schema: node.schema
+    pointer,
+    value: data
+  });
+};
+```
+
+---
 
 </details>
 
@@ -930,7 +1032,7 @@ Per default _json-schema-library_ does not contain async validators, so `errorsA
 <details><summary>Example Async Validation</summary>
 
 ```ts
-import { JsonSchemaValidator, draft2020 } from "json-schema-library";
+import { JsonSchemaValidator, draft2020, sanitizeErrors } from "json-schema-library";
 // return Promise<JsonError>
 const customValidator: JsonSchemaValidator = async ({ node, pointer, data }) => {
   return node.createError("type-error", {
@@ -951,7 +1053,7 @@ const draftList = [
 const { isValid, errorsAsync } = compileSchema({ custom: true }).validate("data");
 console.log(isValid, errors.length); // true, 0
 
-const errors = await Promise.all(errorsAsync);
+const errors = await Promise.all(errorsAsync).then(sanitizeErrors);
 console.log(errors); /// [{ code: "type-error", value: "data", pointer: "#", ... }]
 ```
 
@@ -1103,8 +1205,7 @@ const myDraft = extendDraft(draft2020, {
 
 The built-in format validators may not always align with your specific requirements. For instance, you might need to validate the output of an `<input type="time" />`, which produces values in formats like `HH:MM` or `HH:MM:SS`. In such cases, you can customize or overwrite the format validators to suit your needs using `extendDraft`
 
-<details>
-<summary>Example of overwriting a format validator</summary>
+<details><summary>Example of overwriting a format validator</summary>
 
 ```ts
 import { extendDraft, draft2020 } from "json-schema-library";
@@ -1358,10 +1459,17 @@ settings.REGEX_FLAGS = "v";
 
 ## Breaking Changes
 
-### v10.6.0
+### next
 
 - introduced annotations
+- added node.createAnnotation helper
 - changed typing to strict
+- added annotations-list to `validate()` result
+- added keyword support for `deprecated: true` which returns a `deprecated-warning` annotation
+
+**breaking changes**:
+
+- Return type of validators is now ValidationReturnType
 
 ### v10.5.0
 

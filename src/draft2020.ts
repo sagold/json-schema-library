@@ -1,17 +1,21 @@
+import { $defsKeyword } from "./keywords/$defs";
+import { $refKeyword } from "./keywords/$ref";
 import { additionalPropertiesKeyword } from "./keywords/additionalProperties";
 import { allOfKeyword } from "./keywords/allOf";
 import { anyOfKeyword } from "./keywords/anyOf";
 import { constKeyword } from "./keywords/const";
 import { containsKeyword } from "./keywords/contains";
-import { $defsKeyword } from "./keywords/$defs";
+import { createSchema } from "./methods/createSchema";
 import { dependenciesKeyword } from "./keywords/dependencies";
 import { dependentRequiredKeyword } from "./keywords/dependentRequired";
 import { dependentSchemasKeyword } from "./keywords/dependentSchemas";
-import { toDataNodes } from "./methods/toDataNodes";
+import { deprecatedKeyword } from "./keywords/deprecated";
 import { enumKeyword } from "./keywords/enum";
+import { errors } from "./errors/errors";
 import { exclusiveMaximumKeyword } from "./keywords/exclusiveMaximum";
 import { exclusiveMinimumKeyword } from "./keywords/exclusiveMinimum";
 import { formatKeyword } from "./keywords/format";
+import { formats } from "./formats/formats";
 import { getChildSelection } from "./methods/getChildSelection";
 import { getData } from "./methods/getData";
 import { ifKeyword } from "./keywords/ifthenelse";
@@ -32,16 +36,13 @@ import { patternPropertiesKeyword } from "./keywords/patternProperties";
 import { prefixItemsKeyword } from "./keywords/prefixItems";
 import { propertiesKeyword } from "./keywords/properties";
 import { propertyNamesKeyword } from "./keywords/propertyNames";
-import { $refKeyword } from "./keywords/$ref";
 import { requiredKeyword } from "./keywords/required";
 import { sanitizeKeywords } from "./Draft";
+import { toDataNodes } from "./methods/toDataNodes";
 import { typeKeyword } from "./keywords/type";
 import { unevaluatedItemsKeyword } from "./keywords/unevaluatedItems";
 import { unevaluatedPropertiesKeyword } from "./keywords/unevaluatedProperties";
 import { uniqueItemsKeyword } from "./keywords/uniqueItems";
-import { createSchema } from "./methods/createSchema";
-import { errors } from "./errors/errors";
-import { formats } from "./formats/formats";
 
 /**
  * @draft-2020-12 https://json-schema.org/draft/2020-12/release-notes
@@ -90,6 +91,7 @@ export const draft2020 = sanitizeKeywords({
         dependenciesKeyword,
         dependentRequiredKeyword,
         dependentSchemasKeyword,
+        deprecatedKeyword,
         enumKeyword,
         exclusiveMaximumKeyword,
         exclusiveMinimumKeyword,

@@ -6,13 +6,16 @@ export type { Draft, DraftVersion } from "./src/Draft";
 export type { JsonError, JsonAnnotation, JsonPointer, JsonSchema, OptionalNodeOrError, NodeOrError } from "./src/types";
 export type {
     Keyword,
+    Maybe,
     ValidationPath,
     JsonSchemaReducerParams,
     JsonSchemaReducer,
     JsonSchemaResolverParams,
     JsonSchemaResolver,
     JsonSchemaValidatorParams,
-    JsonSchemaValidator
+    JsonSchemaValidator,
+    ValidationAnnotation,
+    ValidationReturnType
 } from "./src/Keyword";
 export { default as settings } from "./src/settings";
 
@@ -29,16 +32,17 @@ export { oneOfFuzzyKeyword, oneOfKeyword } from "./src/keywords/oneOf";
 
 // errors
 export { render } from "./src/errors/render";
-export type { AnnotationData, ErrorConfig } from "./src/types";
+export type { Annotation, AnnotationData, ErrorConfig } from "./src/types";
 
 // utilities
 export { getTypeOf } from "./src/utils/getTypeOf";
 export { isReduceable } from "./src/SchemaNode";
-export { isJsonError, isSchemaNode } from "./src/types";
+export { isJsonError, isJsonAnnotation, isAnnotation, isSchemaNode } from "./src/types";
 export { extendDraft, addKeywords } from "./src/Draft";
 export { mergeNode } from "./src/mergeNode";
 export { mergeSchema } from "./src/utils/mergeSchema";
 export { getSchemaType } from "./src/utils/getSchemaType";
+export { default as sanitizeErrors } from "./src/utils/sanitizeErrors";
 
 // remotes
 export { remotes } from "./remotes";

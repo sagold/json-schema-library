@@ -1,15 +1,22 @@
+import { $defsKeyword } from "./keywords/$defs";
+import { $refKeyword } from "./draft06/keywords/$ref";
 import { additionalItemsKeyword } from "./draft2019-09/keywords/additionalItems";
 import { additionalPropertiesKeyword } from "./keywords/additionalProperties";
 import { allOfKeyword } from "./keywords/allOf";
 import { anyOfKeyword } from "./keywords/anyOf";
 import { constKeyword } from "./keywords/const";
 import { containsKeyword } from "./keywords/contains";
-import { $defsKeyword } from "./keywords/$defs";
+import { createSchema } from "./methods/createSchema";
 import { dependenciesKeyword } from "./keywords/dependencies";
+import { deprecatedKeyword } from "./keywords/deprecated";
 import { enumKeyword } from "./keywords/enum";
+import { errors } from "./errors/errors";
 import { exclusiveMaximumKeyword } from "./keywords/exclusiveMaximum";
 import { exclusiveMinimumKeyword } from "./keywords/exclusiveMinimum";
 import { formatKeyword } from "./keywords/format";
+import { formats } from "./formats/formats";
+import { getChildSelection } from "./draft2019-09/methods/getChildSelection";
+import { getData } from "./draft2019-09/methods/getData";
 import { itemsKeyword } from "./draft2019-09/keywords/items";
 import { maximumKeyword } from "./keywords/maximum";
 import { maxItemsKeyword } from "./keywords/maxItems";
@@ -26,17 +33,11 @@ import { patternKeyword } from "./keywords/pattern";
 import { patternPropertiesKeyword } from "./keywords/patternProperties";
 import { propertiesKeyword } from "./keywords/properties";
 import { propertyNamesKeyword } from "./keywords/propertyNames";
-import { $refKeyword } from "./draft06/keywords/$ref";
 import { requiredKeyword } from "./keywords/required";
 import { sanitizeKeywords } from "./Draft";
+import { toDataNodes } from "./methods/toDataNodes";
 import { typeKeyword } from "./keywords/type";
 import { uniqueItemsKeyword } from "./keywords/uniqueItems";
-import { getChildSelection } from "./draft2019-09/methods/getChildSelection";
-import { getData } from "./draft2019-09/methods/getData";
-import { toDataNodes } from "./methods/toDataNodes";
-import { createSchema } from "./methods/createSchema";
-import { errors } from "./errors/errors";
-import { formats } from "./formats/formats";
 
 /**
  * @draft-06 https://json-schema.org/draft-06/json-schema-release-notes
@@ -79,6 +80,7 @@ export const draft06 = sanitizeKeywords({
         containsKeyword,
         $defsKeyword,
         dependenciesKeyword, // optional support for old draft-version
+        deprecatedKeyword,
         enumKeyword,
         exclusiveMaximumKeyword,
         exclusiveMinimumKeyword,

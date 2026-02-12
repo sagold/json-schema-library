@@ -71,5 +71,7 @@ export const errors = {
     "unique-items-error":
         "Items in array must be unique. Value `{{value}}` in `{{pointer}}` is a duplicate of {{duplicatePointer}}.",
     "unknown-property-error": "Could not find a valid schema for property `{{pointer}}` within object",
-    "value-not-empty-error": "A value for `{{property}}` is required at `{{pointer}}`"
+    "value-not-empty-error": "A value for `{{property}}` is required at `{{pointer}}`",
+    // annotations
+    "deprecated-warning": "Value at `{{pointer}}` is deprecated"
 };

@@ -1,8 +1,11 @@
 import { isAnnotation } from "../types";
 import { ValidationAnnotation, ValidationReturnType } from "../Keyword";
 
+/**
+ * Flattens nested validation array results and filters items to only include errors, annotations and promises
+ */
 export default function sanitizeErrors(
-    list: ValidationReturnType | ValidationAnnotation[],
+    list: ValidationReturnType | ValidationReturnType[] | ValidationAnnotation[],
     result: ValidationAnnotation[] = []
 ) {
     if (!Array.isArray(list)) {

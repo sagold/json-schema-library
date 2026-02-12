@@ -20,7 +20,9 @@ import {
     AnnotationData,
     DefaultErrors,
     OptionalNodeOrError,
-    NodeOrError
+    NodeOrError,
+    JsonAnnotation,
+    isJsonAnnotation
 } from "./types";
 import { isObject } from "./utils/isObject";
 import { join } from "@sagold/json-pointer";
@@ -189,6 +191,7 @@ export interface SchemaNode extends SchemaNodeMethodsType {
 interface SchemaNodeMethodsType {
     compileSchema(schema: JsonSchema, evaluationPath?: string, schemaLocation?: string, dynamicId?: string): SchemaNode;
     createError<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonError;
+    createAnnotation<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonAnnotation;
     createSchema(data?: unknown): JsonSchema;
 
     // getNode overloads
@@ -250,6 +253,10 @@ export type ValidateReturnType = {
      */
     errors: JsonError[];
     /**
+     * List of annotations from validators
+     */
+    annotations: JsonAnnotation[];
+    /**
      * List of Promises resolving to `JsonError|undefined` or empty.
      */
     errorsAsync: Promise<Maybe<ValidationAnnotation>[]>[];
@@ -309,6 +316,23 @@ export const SchemaNodeMethods = {
             errorMessage = render(error ?? name, data);
         }
         return { type: "error", code, message: errorMessage, data };
+    },
+
+    createAnnotation<T extends string = DefaultErrors>(
+        code: T,
+        data: AnnotationData,
+        message?: string
+    ): JsonAnnotation {
+        const node = this as SchemaNode;
+        let annotationMessage = message;
+        if (annotationMessage === undefined) {
+            const error = node.schema?.errorMessages?.[code] ?? node.context.errors[code];
+            if (typeof error === "function") {
+                return error(data);
+            }
+            annotationMessage = render(error ?? name, data);
+        }
+        return { type: "annotation", code, message: annotationMessage, data };
     },
 
     createSchema,
@@ -420,6 +444,7 @@ export const SchemaNodeMethods = {
         const node = this as SchemaNode;
         const errors = validateNode(node, data, pointer, path) ?? [];
         const syncErrors: JsonError[] = [];
+        const annotations: JsonAnnotation[] = [];
         const flatErrorList = sanitizeErrors(Array.isArray(errors) ? errors : [errors]).filter(isJsonError);
 
         const errorsAsync: Promise<Maybe<ValidationAnnotation>[]>[] = [];
@@ -427,13 +452,16 @@ export const SchemaNodeMethods = {
             if (isJsonError(error)) {
                 syncErrors.push(error);
             } else if (error instanceof Promise) {
-                errorsAsync.push(error);
+                errorsAsync.push(error.then(sanitizeErrors));
+            } else if (isJsonAnnotation(error)) {
+                annotations.push(error);
             }
         });
 
         const result: ValidateReturnType = {
             valid: flatErrorList.length === 0,
             errors: syncErrors,
+            annotations,
             errorsAsync
         };
 
@@ -486,7 +514,7 @@ export const SchemaNodeMethods = {
      * @returns a list of all sub-schema as SchemaNode
      */
     toSchemaNodes() {
-        return toSchemaNodes(this as SchemaNode);
+        return toSchemaNodes(this);
     },
 
     /**
