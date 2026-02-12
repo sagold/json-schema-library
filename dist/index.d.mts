@@ -25,7 +25,10 @@ interface JsonSchemaResolver {
   order?: number;
   (options: JsonSchemaResolverParams): SchemaNode | JsonError | undefined;
 }
-type ValidationResult = JsonError | Promise<JsonError | undefined>;
+type Maybe<T> = T | undefined;
+type ValidationAnnotation = JsonError | JsonAnnotation | Promise<Maybe<ValidationAnnotation>[]>;
+type ValidationResult = Maybe<ValidationAnnotation>;
+type ValidationReturnType = ValidationResult | ValidationResult[];
 type JsonSchemaValidatorParams = {
   pointer: string;
   data: unknown;
@@ -35,7 +38,7 @@ type JsonSchemaValidatorParams = {
 interface JsonSchemaValidator {
   toJSON?: () => string;
   order?: number;
-  (options: JsonSchemaValidatorParams): undefined | Promise<undefined> | ValidationResult | ValidationResult[];
+  (options: JsonSchemaValidatorParams): ValidationReturnType;
 }
 type Keyword = {
   id: string; /** unique keyword corresponding to JSON Schema keywords (or custom) */
@@ -192,6 +195,7 @@ declare const errors: {
   "unique-items-error": string;
   "unknown-property-error": string;
   "value-not-empty-error": string;
+  "deprecated-warning": string;
 };
 //#endregion
 //#region src/SchemaNode.d.ts
@@ -310,7 +314,8 @@ interface SchemaNode extends SchemaNodeMethodsType {
  */
 interface SchemaNodeMethodsType {
   compileSchema(schema: JsonSchema, evaluationPath?: string, schemaLocation?: string, dynamicId?: string): SchemaNode;
-  createError<T extends string = DefaultErrors>(code: T, data: ErrorData, message?: string): JsonError;
+  createError<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonError;
+  createAnnotation<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonAnnotation;
   createSchema(data?: unknown): JsonSchema;
   getNode(pointer: string, data: unknown, options: {
     withSchemaWarning: true;
@@ -373,9 +378,13 @@ type ValidateReturnType = {
    */
   errors: JsonError[];
   /**
+   * List of annotations from validators
+   */
+  annotations: JsonAnnotation[];
+  /**
    * List of Promises resolving to `JsonError|undefined` or empty.
    */
-  errorsAsync: Promise<JsonError | undefined>[];
+  errorsAsync: Promise<Maybe<ValidationAnnotation>[]>[];
 };
 //#endregion
 //#region src/types.d.ts
@@ -383,8 +392,20 @@ interface JsonSchema {
   [keyword: string]: any;
 }
 type JsonPointer = string;
+type AnnotationData<D extends Record<string, unknown> = Record<string, unknown>> = D & {
+  pointer: string;
+  schema: JsonSchema;
+  value: unknown;
+};
+type Annotation<T = string, D extends AnnotationData = AnnotationData, S = string> = {
+  type: T;
+  code: S;
+  message: string;
+  data: D;
+  [p: string]: unknown;
+};
 type DefaultErrors = keyof typeof errors;
-type ErrorConfig = Record<DefaultErrors | string, string | ((error: ErrorData) => void)>;
+type ErrorConfig = Record<DefaultErrors | string, string | ((error: AnnotationData) => void)>;
 type OptionalNodeOrError = {
   node?: SchemaNode;
   error: undefined;
@@ -399,18 +420,14 @@ type NodeOrError = {
   node: undefined;
   error: JsonError;
 };
-type ErrorData<T extends Record<string, unknown> = Record<string, unknown>> = T & {
-  pointer: string;
-  schema: JsonSchema;
-  value: unknown;
-};
-type JsonError<T extends ErrorData = ErrorData> = {
-  type: "error";
-  code: ErrorConfig | string;
-  message: string;
-  data: T;
-  [p: string]: unknown;
-};
+type JsonError<D extends AnnotationData = AnnotationData> = Annotation<"error", D, ErrorConfig | string>;
+type JsonAnnotation<D extends AnnotationData = AnnotationData> = Annotation<"annotation", D>;
+declare function isAnnotation(value: any): value is Annotation;
+/**
+ * ts type guard for json error
+ * @returns true if passed type is a JsonError
+ */
+declare function isJsonAnnotation(error: unknown): error is JsonAnnotation;
 /**
  * ts type guard for json error
  * @returns true if passed type is a JsonError
@@ -580,8 +597,14 @@ type SchemaType = (typeof SCHEMA_TYPES)[number];
  */
 declare function getSchemaType(node: SchemaNode, data: unknown): SchemaType | undefined;
 //#endregion
+//#region src/utils/sanitizeErrors.d.ts
+/**
+ * Flattens nested validation array results and filters items to only include errors, annotations and promises
+ */
+declare function sanitizeErrors(list: ValidationReturnType | ValidationReturnType[] | ValidationAnnotation[], result?: ValidationAnnotation[]): ValidationAnnotation[];
+//#endregion
 //#region remotes/index.d.ts
 /** remote meta-schema stored by schema $id */
 declare const remotes: Record<string, any>;
 //#endregion
-export { type CompileOptions, type Context, type DataNode, type Draft, type DraftVersion, type ErrorConfig, type ErrorData, type GetNodeOptions, type JsonError, type JsonPointer, type JsonSchema, type JsonSchemaReducer, type JsonSchemaReducerParams, type JsonSchemaResolver, type JsonSchemaResolverParams, type JsonSchemaValidator, type JsonSchemaValidatorParams, type Keyword, type NodeOrError, type OptionalNodeOrError, type SchemaNode, type ValidateReturnType, type ValidationPath, addKeywords, compileSchema, draft04, draft06, draft07, draft2019, draft2020, draftEditor, extendDraft, getSchemaType, getTypeOf, isJsonError, isReduceable, isSchemaNode, mergeNode, mergeSchema, oneOfFuzzyKeyword, oneOfKeyword, remotes, render, _default as settings };
+export { type Annotation, type AnnotationData, type CompileOptions, type Context, type DataNode, type Draft, type DraftVersion, type ErrorConfig, type GetNodeOptions, type JsonAnnotation, type JsonError, type JsonPointer, type JsonSchema, type JsonSchemaReducer, type JsonSchemaReducerParams, type JsonSchemaResolver, type JsonSchemaResolverParams, type JsonSchemaValidator, type JsonSchemaValidatorParams, type Keyword, type Maybe, type NodeOrError, type OptionalNodeOrError, type SchemaNode, type ValidateReturnType, type ValidationAnnotation, type ValidationPath, type ValidationReturnType, addKeywords, compileSchema, draft04, draft06, draft07, draft2019, draft2020, draftEditor, extendDraft, getSchemaType, getTypeOf, isAnnotation, isJsonAnnotation, isJsonError, isReduceable, isSchemaNode, mergeNode, mergeSchema, oneOfFuzzyKeyword, oneOfKeyword, remotes, render, sanitizeErrors, _default as settings };
