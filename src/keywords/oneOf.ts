@@ -3,7 +3,7 @@ import {
     JsonSchemaReducerParams,
     JsonSchemaValidatorParams,
     ValidationPath,
-    ValidationResult
+    ValidationReturnType
 } from "../Keyword";
 import { isSchemaNode, SchemaNode } from "../types";
 import settings from "../settings";
@@ -57,7 +57,7 @@ function reduceOneOf({ node, data, pointer, path }: Omit<JsonSchemaReducerParams
     }
 
     const matches: { index: number; node: SchemaNode }[] = [];
-    const errors: ValidationResult[] = [];
+    const errors: ValidationReturnType[] = [];
     for (let i = 0; i < node.oneOf.length; i += 1) {
         const validationErrors = validateNode(node.oneOf[i], data, pointer, path);
         if (validationErrors.length === 0) {
@@ -106,7 +106,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: Omit<JsonSc
         return;
     }
 
-    const errors: ValidationResult[] = [];
+    const errors: ValidationReturnType = [];
     const oneOfProperty = node.schema[DECLARATOR_ONEOF];
     const oneOfValue = getValue(data, oneOfProperty);
 
@@ -242,7 +242,7 @@ function oneOfValidator({ node, data, pointer = "#", path }: JsonSchemaValidator
         return;
     }
     const matches: { index: number; node: SchemaNode }[] = [];
-    const errors: ValidationResult[] = [];
+    const errors: ValidationReturnType = [];
     for (let i = 0; i < oneOf.length; i += 1) {
         const validationResult = validateNode(oneOf[i], data, pointer, path);
         if (validationResult.length > 0) {

@@ -1,6 +1,6 @@
 import { getValue } from "../utils/getValue";
 import { SchemaNode } from "../types";
-import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
+import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
 import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
 
@@ -39,7 +39,7 @@ function validateProperties({ node, data, pointer, path }: JsonSchemaValidatorPa
         return;
     }
     // move validation through properties
-    const errors: ValidationResult[] = [];
+    const errors: ValidationReturnType = [];
     const properties = node.properties ?? {};
     Object.keys(data).forEach((propertyName) => {
         const value = getValue(data, propertyName);

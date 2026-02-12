@@ -1,5 +1,5 @@
 import { mergeSchema } from "../utils/mergeSchema";
-import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
+import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
 import { SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
 
@@ -55,7 +55,7 @@ function validateAllOf({ node, data, pointer, path }: JsonSchemaValidatorParams)
     if (!Array.isArray(node.allOf) || node.allOf.length === 0) {
         return;
     }
-    const errors: ValidationResult[] = [];
+    const errors: ValidationReturnType = [];
     node.allOf.forEach((allOfNode) => {
         errors.push(...validateNode(allOfNode, data, pointer, path));
     });

@@ -1,7 +1,6 @@
 import { isObject } from "../../utils/isObject";
 import { SchemaNode } from "../../types";
-import { Keyword, JsonSchemaValidatorParams, ValidationResult } from "../../Keyword";
-import sanitizeErrors from "../../utils/sanitizeErrors";
+import { Keyword, JsonSchemaValidatorParams, ValidationReturnType } from "../../Keyword";
 import { validateNode } from "../../validateNode";
 
 /**
@@ -50,7 +49,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
     // console.log("EVAL", reducedNode.schema);
 
     const validIf = node.if != null && validateNode(node.if, data, pointer, path).length === 0;
-    const errors: ValidationResult[] = [];
+    const errors: ValidationReturnType = [];
     // "unevaluatedItems with nested items"
     for (let i = 0; i < data.length; i += 1) {
         const value = data[i];
@@ -63,9 +62,16 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
                 // nothing should validate, so we validate unevaluated items only
                 const unevaluatedItems = node.unevaluatedItems;
                 if (unevaluatedItems) {
-                    return sanitizeErrors(
-                        data.map((value) => validateNode(unevaluatedItems, value, `${pointer}/${i}`, path))
-                    );
+                    data.forEach((value) => {
+                        const result = validateNode(unevaluatedItems, value, `${pointer}/${i}`, path);
+                        if (result == null) {
+                            return;
+                        }
+                        if (Array.isArray(result)) {
+                            return errors.push(...result);
+                        }
+                        errors.push(result);
+                    });
                 }
                 if (node.schema.unevaluatedItems === false) {
                     return node.createError("unevaluated-items-error", {

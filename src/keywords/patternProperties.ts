@@ -6,7 +6,7 @@ import {
     JsonSchemaReducerParams,
     JsonSchemaResolverParams,
     JsonSchemaValidatorParams,
-    ValidationResult
+    ValidationReturnType
 } from "../Keyword";
 import { getValue } from "../utils/getValue";
 import { validateNode } from "../validateNode";
@@ -96,7 +96,7 @@ function validatePatternProperties({ node, data, pointer, path }: JsonSchemaVali
     const { schema, patternProperties } = node;
     const properties = schema.properties || {};
     const patterns = Object.keys(schema.patternProperties).join(",");
-    const errors: ValidationResult[] = [];
+    const errors: ValidationReturnType = [];
     const keys = Object.keys(data);
 
     keys.forEach((key) => {

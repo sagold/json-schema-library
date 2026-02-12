@@ -1,5 +1,5 @@
 import { isObject } from "../../utils/isObject";
-import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../../Keyword";
+import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationReturnType } from "../../Keyword";
 import { SchemaNode } from "../../types";
 import { getValue } from "../../utils/getValue";
 import { validateNode } from "../../validateNode";
@@ -49,7 +49,7 @@ function validateAdditionalItems({ node, data, pointer, path }: JsonSchemaValida
         return;
     }
     const startIndex = Array.isArray(schema.items) ? schema.items.length : 0;
-    const errors: ValidationResult[] = [];
+    const errors: ValidationReturnType = [];
     for (let i = startIndex; i < data.length; i += 1) {
         const item = data[i];
         if (node.items) {

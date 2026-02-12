@@ -1,9 +1,8 @@
 /* eslint-disable no-control-regex */
 import { getTypeOf } from "../utils/getTypeOf";
 import validUrl from "valid-url";
-import { JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
+import { JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
 import { parse as parseIdnEmail } from "smtp-address-parser";
-import { JsonError } from "../types";
 import settings from "../settings";
 
 const { REGEX_FLAGS } = settings;
@@ -27,10 +26,7 @@ const isValidURITemplate =
 const isValidDurationString = /^P(?!$)(\d+Y)?(\d+M)?(\d+W)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+S)?)?$/;
 
 // Default Json-Schema formats: date-time, email, hostname, ipv4, ipv6, uri, uriref
-export const formats: Record<
-    string,
-    (options: JsonSchemaValidatorParams) => undefined | JsonError | ValidationResult[]
-> = {
+export const formats: Record<string, (options: JsonSchemaValidatorParams) => ValidationReturnType> = {
     date: ({ node, pointer, data }) => {
         const { schema } = node;
         if (typeof data !== "string" || data === "") {

@@ -1,10 +1,11 @@
 import { isSchemaNode, SchemaNode } from "../types";
-import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
+import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
 import { isObject } from "../utils/isObject";
 import { mergeNode } from "../mergeNode";
 import { hasProperty } from "../utils/hasProperty";
 import { validateDependentRequired } from "./dependentRequired";
 import { validateDependentSchemas } from "./dependentSchemas";
+import sanitizeErrors from "../utils/sanitizeErrors";
 
 export const dependenciesKeyword: Keyword = {
     id: "dependencies",
@@ -125,15 +126,13 @@ function validateDependencies({ node, data, pointer, path }: JsonSchemaValidator
     if (!isObject(data)) {
         return undefined;
     }
-    let errors: ValidationResult[] = [];
+    const errors: ValidationAnnotation[] = [];
     if (node.dependentRequired) {
-        errors = validateDependentRequired({ node, data, pointer, path }) ?? [];
+        sanitizeErrors(validateDependentRequired({ node, data, pointer, path }), errors);
     }
     if (node.dependentSchemas) {
         const schemaErrors = validateDependentSchemas({ node, data, pointer, path });
-        if (schemaErrors) {
-            errors.push(...schemaErrors);
-        }
+        sanitizeErrors(schemaErrors, errors);
     }
     return errors;
 }

@@ -1,4 +1,4 @@
-import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
+import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
 import { SchemaNode } from "../types";
 import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
@@ -52,7 +52,7 @@ function validateItems({ node, data, pointer = "#", path }: JsonSchemaValidatorP
         return node.createError("invalid-data-error", { pointer, value: data, schema });
     }
 
-    const errors: ValidationResult[] = [];
+    const errors: ValidationReturnType = [];
     if (node.items) {
         for (let i = schema.prefixItems?.length ?? 0; i < data.length; i += 1) {
             const itemData = data[i];

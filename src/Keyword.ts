@@ -1,4 +1,4 @@
-import type { SchemaNode, JsonError } from "./types";
+import type { SchemaNode, JsonError, JsonAnnotation } from "./types";
 
 export type ValidationPath = {
     pointer: string;
@@ -30,13 +30,18 @@ export interface JsonSchemaResolver {
     (options: JsonSchemaResolverParams): SchemaNode | JsonError | undefined;
 }
 
-export type ValidationResult = JsonError | Promise<JsonError | undefined>;
+// type MaybeAsync<T> = T | Promise<T>;
+// type MaybeArray<T> = T | T[];
+export type Maybe<T> = T | undefined;
+export type ValidationAnnotation = JsonError | JsonAnnotation | Promise<Maybe<ValidationAnnotation>[]>;
+type ValidationResult = Maybe<ValidationAnnotation>;
+export type ValidationReturnType = ValidationResult | ValidationResult[];
 
 export type JsonSchemaValidatorParams = { pointer: string; data: unknown; node: SchemaNode; path: ValidationPath };
 export interface JsonSchemaValidator {
     toJSON?: () => string;
     order?: number;
-    (options: JsonSchemaValidatorParams): undefined | Promise<undefined> | ValidationResult | ValidationResult[];
+    (options: JsonSchemaValidatorParams): ValidationReturnType;
 }
 
 export type Keyword = {

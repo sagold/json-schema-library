@@ -1,4 +1,4 @@
-import { Keyword, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
+import { Keyword, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
 import { JsonError, SchemaNode } from "../types";
 import { isObject } from "../utils/isObject";
 
@@ -21,7 +21,7 @@ export function validateDependentRequired({
     node,
     data,
     pointer = "#"
-}: JsonSchemaValidatorParams): undefined | ValidationResult[] {
+}: JsonSchemaValidatorParams): ValidationReturnType {
     if (!isObject(data)) {
         return undefined;
     }

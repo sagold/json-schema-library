@@ -1,7 +1,15 @@
 import { copy } from "fast-copy";
 import sanitizeErrors from "./utils/sanitizeErrors";
 import settings from "./settings";
-import type { JsonSchemaReducer, JsonSchemaResolver, JsonSchemaValidator, Keyword, ValidationPath } from "./Keyword";
+import type {
+    JsonSchemaReducer,
+    JsonSchemaResolver,
+    JsonSchemaValidator,
+    Keyword,
+    Maybe,
+    ValidationAnnotation,
+    ValidationPath
+} from "./Keyword";
 import { createSchema } from "./methods/createSchema";
 import { Draft } from "./Draft";
 import { toSchemaNodes } from "./methods/toSchemaNodes";
@@ -244,7 +252,7 @@ export type ValidateReturnType = {
     /**
      * List of Promises resolving to `JsonError|undefined` or empty.
      */
-    errorsAsync: Promise<JsonError | undefined>[];
+    errorsAsync: Promise<Maybe<ValidationAnnotation>[]>[];
 };
 
 export function joinDynamicId(a?: string, b?: string) {
@@ -414,7 +422,7 @@ export const SchemaNodeMethods = {
         const syncErrors: JsonError[] = [];
         const flatErrorList = sanitizeErrors(Array.isArray(errors) ? errors : [errors]).filter(isJsonError);
 
-        const errorsAsync: Promise<JsonError | undefined>[] = [];
+        const errorsAsync: Promise<Maybe<ValidationAnnotation>[]>[] = [];
         sanitizeErrors(Array.isArray(errors) ? errors : [errors]).forEach((error) => {
             if (isJsonError(error)) {
                 syncErrors.push(error);

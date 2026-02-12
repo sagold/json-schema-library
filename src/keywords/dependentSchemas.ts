@@ -1,8 +1,9 @@
 import { mergeSchema } from "../utils/mergeSchema";
 import { isObject } from "../utils/isObject";
 import { isSchemaNode, SchemaNode, JsonSchema } from "../types";
-import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
+import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
 import { validateNode } from "../validateNode";
+import sanitizeErrors from "../utils/sanitizeErrors";
 
 export const dependentSchemasKeyword: Keyword = {
     id: "dependentSchemas",
@@ -78,7 +79,7 @@ export function validateDependentSchemas({ node, data, pointer, path }: JsonSche
     if (!isObject(data) || dependentSchemas == null) {
         return undefined;
     }
-    const errors: ValidationResult[] = [];
+    const errors: ValidationAnnotation[] = [];
     Object.keys(data).forEach((property) => {
         const dependencies = dependentSchemas[property];
         // @draft >= 6 boolean schema
@@ -90,7 +91,7 @@ export function validateDependentSchemas({ node, data, pointer, path }: JsonSche
             return;
         }
         if (isSchemaNode(dependencies)) {
-            errors.push(...validateNode(dependencies, data, pointer, path));
+            sanitizeErrors(validateNode(dependencies, data, pointer, path), errors);
             return;
         }
     });

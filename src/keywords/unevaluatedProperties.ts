@@ -1,6 +1,6 @@
 import { isObject } from "../utils/isObject";
 import { SchemaNode } from "../types";
-import { Keyword, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
+import { Keyword, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
 import { validateNode } from "../validateNode";
 import { isPropertyEvaluated } from "../isPropertyEvaluated";
 
@@ -37,7 +37,7 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
         return undefined;
     }
 
-    const errors: ValidationResult[] = [];
+    const errors: ValidationReturnType = [];
     for (const propertyName of unevaluated) {
         if (isPropertyEvaluated({ node, data, key: propertyName, pointer, path })) {
             continue;

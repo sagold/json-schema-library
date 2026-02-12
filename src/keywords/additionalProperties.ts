@@ -1,6 +1,6 @@
 import settings from "../settings";
 import { isObject } from "../utils/isObject";
-import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationResult } from "../Keyword";
+import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationReturnType} from "../Keyword";
 import { SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 import { validateNode } from "../validateNode";
@@ -65,7 +65,7 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
     }
 
     const { schema } = node;
-    const errors: ValidationResult[] = [];
+    const errors: ValidationReturnType = [];
     let receivedProperties = Object.keys(data).filter((prop) => settings.propertyBlacklist.includes(prop) === false);
     const patternProperties = node.patternProperties;
     if (Array.isArray(patternProperties)) {

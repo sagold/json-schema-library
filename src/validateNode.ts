@@ -1,5 +1,5 @@
 import { BooleanSchema, JsonSchema, SchemaNode } from "./types";
-import { ValidationPath, ValidationResult } from "./Keyword";
+import { ValidationPath, ValidationReturnType } from "./Keyword";
 import sanitizeErrors from "./utils/sanitizeErrors";
 
 export function validateNode(node: SchemaNode, data: unknown, pointer: string, path: ValidationPath) {
@@ -17,7 +17,7 @@ export function validateNode(node: SchemaNode, data: unknown, pointer: string, p
             })
         ];
     }
-    const errors: (undefined | ValidationResult | ValidationResult | Promise<undefined>)[] = [];
+    const errors: ValidationReturnType = [];
     for (const validate of node.validators) {
         const result = validate({ node, data, pointer, path });
         if (Array.isArray(result)) {
