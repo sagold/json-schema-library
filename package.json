@@ -67,17 +67,17 @@
     "@eslint/js": "^10.0.1",
     "@types/glob": "^9.0.0",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^25.2.2",
+    "@types/node": "^25.2.3",
     "@types/valid-url": "^1.0.7",
     "eslint": "^9.39.2",
-    "glob": "^13.0.1",
-    "json-schema-test-suite": "https://github.com/json-schema-org/JSON-Schema-Test-Suite#83e866b46c9f9e7082fd51e83a61c5f2145a1ab7",
+    "glob": "^13.0.3",
+    "json-schema-test-suite": "https://github.com/json-schema-org/JSON-Schema-Test-Suite#Test-JSON-Schema-Acceptance-1.029",
     "mocha": "^11.7.5",
     "nyc": "^17.1.0",
     "tsdown": "^0.20.3",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.54.0",
+    "typescript-eslint": "^8.55.0",
     "watch": "^1.0.1"
   },
   "dependencies": {
@@ -99,7 +99,7 @@
     "lodash": ">=4",
     "merge": ">=2",
     "micromatch": ">=4.0.8",
-    "string-width": "^4.2.3"
+    "string-width": ">=4.2.3"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
