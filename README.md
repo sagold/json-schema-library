@@ -141,7 +141,7 @@ assert(root === childNode.parent);
 
 <details><summary>All nodes share a context</summary>
 
-> It is not advised to work on context directly, but it might be useful in some situations
+---
 
 A context is shared across all nodes of a schema
 
@@ -164,6 +164,9 @@ Note that rootNodes will change when working across remote schema (using $ref).
 ---
 
 </details>
+
+> [!CAUTION]
+> It is not advised to work on context directly, but it might be useful in some situations
 
 ### Draft Support
 
@@ -837,7 +840,8 @@ expect(reducedNode.schema).to.deep.eq({
 });
 ```
 
-> ⚠️ Please be aware that certain schema-definitions are lost when resolving or merging sub-schemas.
+> [!CAUTION]
+> Please be aware that certain schema-definitions are lost when resolving or merging sub-schemas.
 > This mainly refers to validation-properties, but also some ambigiuous schema might get overriden.
 
 ### toDataNodes
@@ -1027,7 +1031,8 @@ if (errorsAsync.length > 0) {
 
 Per default _json-schema-library_ does not contain async validators, so `errorsAsync` is always empty. If you add async validators, a list of `Promise<JsonError|undefined>` is return and you need to resolve and filter non-errors (undefined) yourself.
 
-> **Note** `isValid` only refers to errors. `errorsAsync` has to be evaluated separately
+> [!NOTE]
+> `isValid` only refers to errors. `errorsAsync` has to be evaluated separately
 
 <details><summary>Example Async Validation</summary>
 

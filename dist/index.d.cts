@@ -335,7 +335,7 @@ interface SchemaNodeMethodsType {
   getNodeRef($ref: string): SchemaNode | undefined;
   getNodeRoot(): SchemaNode;
   getDraftVersion(): string;
-  getData(data?: unknown, options?: TemplateOptions): unknown;
+  getData(data?: unknown, options?: TemplateOptions): any;
   reduceNode(data: unknown, options?: {
     key?: string | number;
     pointer?: string;
