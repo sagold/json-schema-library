@@ -108,4 +108,15 @@ describe("keyword : properties : validate", () => {
 
         assert.deepEqual(errors.length, 1);
     });
+
+    it("should validate undefined properties with boolean schema `false`", () => {
+        const { valid } = compileSchema({
+            type: "object",
+            properties: {
+                header: false
+            }
+        }).validate({ header: undefined });
+
+        assert.equal(valid, true);
+    });
 });
