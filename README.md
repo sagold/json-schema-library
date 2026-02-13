@@ -1464,7 +1464,7 @@ settings.REGEX_FLAGS = "v";
 
 ## Breaking Changes
 
-### next
+### v11.0.0
 
 - introduced annotations
 - added node.createAnnotation helper
@@ -1474,7 +1474,8 @@ settings.REGEX_FLAGS = "v";
 
 **breaking changes**:
 
-- Return type of validators is now ValidationReturnType
+- Return type of validators is now `ValidationReturnType` instead of `ValidationResult`
+- type `AnnotationData` replaces `ErroData`
 
 ### v10.5.0
 
