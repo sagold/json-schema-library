@@ -42,11 +42,14 @@ function validateProperties({ node, data, pointer, path }: JsonSchemaValidatorPa
     const errors: ValidationResult[] = [];
     const properties = node.properties ?? {};
     Object.keys(data).forEach((propertyName) => {
-        if (properties[propertyName] == null) {
+        const value = getValue(data, propertyName);
+        const propertyNode = properties[propertyName];
+
+        if (propertyNode == null || value === void 0) {
             return;
         }
-        const propertyNode = properties[propertyName];
-        const result = validateNode(propertyNode, getValue(data, propertyName), `${pointer}/${propertyName}`, path);
+
+        const result = validateNode(propertyNode, value, `${pointer}/${propertyName}`, path);
         errors.push(...result);
     });
     return errors;
