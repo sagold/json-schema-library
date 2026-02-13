@@ -66,6 +66,11 @@ describe("keyword : additionalProperties : validate", () => {
         assert.deepEqual(errors.length, 1);
     });
 
+    it("should NOT return error if no schema is given for an undefined additional property", () => {
+        const { errors } = compileSchema({ type: "object", additionalProperties: false }).validate({ a: undefined });
+        assert.deepEqual(errors.length, 0);
+    });
+
     it("should return error for property not in properties schema", () => {
         const { errors } = compileSchema({
             $schema: "https://json-schema.org/draft/2019-09/schema",
@@ -125,6 +130,15 @@ describe("keyword : additionalProperties : validate", () => {
         assert.deepEqual(errors[0].type, "error");
     });
 
+    it("should NOT return error if 'undefined' value does not match 'additionalProperties' schema ", () => {
+        const { errors } = compileSchema({
+            type: "object",
+            properties: { b: { type: "string" } },
+            additionalProperties: { type: "string" }
+        }).validate({ a: undefined });
+        assert.deepEqual(errors.length, 0);
+    });
+
     it("should be valid if value matches 'additionalProperties' oneOf schema", () => {
         const { errors } = compileSchema({
             type: "object",
@@ -170,6 +184,5 @@ describe("keyword : additionalProperties : validate", () => {
             }
         }).validate({ a: "a string" });
         assert.deepEqual(errors.length, 1);
-        // assert.deepEqual(errors[0].code, "additional-properties-error");
     });
 });

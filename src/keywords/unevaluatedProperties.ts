@@ -29,7 +29,10 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
         return undefined;
     }
 
-    const unevaluated = Object.keys(data);
+    const unevaluated = Object.keys(data)
+        // do not validate undefined properties
+        .filter((property) => data[property] !== undefined);
+
     if (unevaluated.length === 0) {
         return undefined;
     }

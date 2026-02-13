@@ -86,6 +86,10 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
         .filter((property) => expectedProperties.indexOf(property) === -1)
         .forEach((property) => {
             const propertyValue = getValue(data, property);
+            if (propertyValue === undefined) {
+                return; // do not validate undefined properties
+            }
+
             if (isObject(node.additionalProperties)) {
                 const validationErrors = validateNode(
                     node.additionalProperties,

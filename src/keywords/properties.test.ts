@@ -42,7 +42,7 @@ describe("keyword : properties : get", () => {
         });
 
         const { node: next } = node.getNodeChild("header", { header: { title: "huhu" } });
-        const schema = next.getNodeChild("title")?.node?.schema;
+        const schema = next?.getNodeChild("title")?.node?.schema;
 
         assert.deepEqual(schema, { type: "string", minLength: 1 });
     });

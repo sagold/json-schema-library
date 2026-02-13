@@ -36,6 +36,15 @@ describe("keyword : patternProperties : validate", () => {
         assert.equal(errors[0].code, "type-error");
     });
 
+    it("should NOT return error for matching pattern and undefined value", () => {
+        const { errors } = compileSchema({
+            type: "object",
+            patternProperties: { test: { type: "number" } }
+        }).validate({ test: undefined });
+
+        assert.equal(errors.length, 0);
+    });
+
     it("should validate a correct matching pattern", () => {
         const { errors } = compileSchema({
             type: "object",
