@@ -236,11 +236,71 @@ export function reduceOneOfFuzzy({ node, data, pointer, path }: Omit<JsonSchemaR
     return oneOfResult;
 }
 
+function validateFromDeclarator({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
+    const { oneOf, schema } = node;
+    if (!oneOf) {
+        return;
+    }
+
+    // with a declarator we only validate by a declarator to retrieve matches.
+    // - if a single match was found, we return validation errors if any
+    // - if no match was found we return a one-of-error
+    // - if multiples matches were found we return a multiple-one-of-error
+    const oneOfProperty = schema[DECLARATOR_ONEOF];
+    const oneOfValue = getValue(data, oneOfProperty);
+    const matches: { index: number; node: SchemaNode }[] = [];
+    const errors: ValidationReturnType = [];
+    for (const oneOfNode of oneOf) {
+        const { node: oneOfPropertyNode, error } = oneOfNode.getNodeChild(oneOfProperty, oneOfValue);
+        if (oneOfPropertyNode) {
+            const validationResult = validateNode(oneOfPropertyNode, oneOfValue, `${pointer}/${oneOfProperty}`, path);
+            if (validationResult.length > 0) {
+                errors.push(...validationResult);
+            } else {
+                matches.push({ index: oneOf.indexOf(oneOfNode), node: oneOfNode });
+            }
+        } else {
+            console.log(
+                `jlib oneOf error: failed getting schema for '${oneOfProperty}' to resolve ${DECLARATOR_ONEOF} in ${pointer}/oneOf/${oneOf.indexOf(oneOfNode)}`,
+                error
+            );
+        }
+    }
+
+    if (matches.length === 1) {
+        const match = matches[0];
+        match.node.oneOfIndex = match.index; // @evaluation-info
+        return validateNode(match.node, data, pointer, path);
+    }
+
+    if (matches.length > 1) {
+        return node.createError("multiple-one-of-error", {
+            value: data,
+            pointer,
+            schema,
+            matches
+        });
+    }
+
+    return node.createError("one-of-error", {
+        value: JSON.stringify(data),
+        pointer,
+        schema,
+        oneOf: schema.oneOf,
+        errors
+    });
+}
+
 function oneOfValidator({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
     const { oneOf, schema } = node;
     if (!oneOf) {
         return;
     }
+
+    if (schema[DECLARATOR_ONEOF]) {
+        return validateFromDeclarator({ node, data, pointer, path });
+    }
+
     const matches: { index: number; node: SchemaNode }[] = [];
     const errors: ValidationReturnType = [];
     for (let i = 0; i < oneOf.length; i += 1) {

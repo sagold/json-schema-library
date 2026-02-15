@@ -4,7 +4,7 @@ import { Draft, isJsonError, SchemaNode } from "./types";
 import { draft2020 } from "./draft2020";
 import sanitizeErrors from "./utils/sanitizeErrors";
 
-describe("compileSchema.validate", () => {
+describe("compileSchema : validate", () => {
     // note: boolean schema is already thoroughly tested by spec
     describe("boolean schema", () => {
         it("should fail if root schema is false", () => {

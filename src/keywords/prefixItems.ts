@@ -32,18 +32,9 @@ export function parseItems(node: SchemaNode) {
 }
 
 function validatePrefixItems({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
-    // const { schema } = node;
     if (!Array.isArray(data) || data.length === 0) {
         return;
     }
-
-    // @draft >= 7 bool schema
-    // if (schema.items === false) {
-    //     if (Array.isArray(data) && data.length === 0) {
-    //         return undefined;
-    //     }
-    //     return node.createError("InvalidDataError", { pointer, value: data, schema });
-    // }
 
     const errors: ValidationReturnType = [];
     if (node.prefixItems) {
