@@ -520,7 +520,7 @@ describe("compileSchema : getNode", () => {
                 assert.deepEqual(node.schema, { type: "array", minItems: 2 });
             });
 
-            it("should mrege title from local schema", () => {
+            it("should merge title from local schema", () => {
                 const { node } = compileSchema({
                     type: "array",
                     prefixItems: [{ title: "from ref", $ref: "/$defs/target" }],

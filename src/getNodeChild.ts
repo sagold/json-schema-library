@@ -2,67 +2,73 @@ import { GetNodeOptions, isSchemaNode, SchemaNode } from "./SchemaNode";
 import { isJsonError, NodeOrError, OptionalNodeOrError } from "./types";
 import { getValue } from "./utils/getValue";
 
-// prettier-ignore
-export function getNodeChild(key: string | number, data: unknown, options: { withSchemaWarning: true } & GetNodeOptions): NodeOrError;
-// prettier-ignore
-export function getNodeChild(key: string | number, data: unknown, options: { createSchema: true } & GetNodeOptions): NodeOrError;
+export function getNodeChild(key: string | number, data: unknown, options: { withSchemaWarning: true } & GetNodeOptions): NodeOrError; // prettier-ignore
+export function getNodeChild(key: string | number, data: unknown, options: { createSchema: true } & GetNodeOptions): NodeOrError; // prettier-ignore
 export function getNodeChild(key: string | number, data?: unknown, options?: GetNodeOptions): OptionalNodeOrError;
 
 /**
- * @returns child node identified by property as SchemaNode
+ * Returns the child for the given property-name or array-index
+ *
+ * - the returned child node is **not reduced**
+ * - a child node $ref is resolved
+ *
+ * @returns { node } or { error } where node can also be undefined (valid but undefined)
  */
 export function getNodeChild(
     key: string | number,
     data?: unknown,
     options: GetNodeOptions = {}
-): OptionalNodeOrError | NodeOrError | object {
+): OptionalNodeOrError | NodeOrError {
     options.path = options.path ?? [];
-
     options.withSchemaWarning = options.withSchemaWarning ?? false;
     options.pointer = options.pointer ?? "#";
     const { path, pointer } = options;
 
+    // reduce parent
     // @ts-expect-error implicitely any
-    let node = this as SchemaNode;
-    if (node.reducers.length) {
-        const result = node.reduceNode(data, { key, path, pointer });
+    let parentNode = this as SchemaNode;
+    if (parentNode.reducers.length) {
+        const result = parentNode.reduceNode(data, { key, path, pointer });
         if (result.error) {
             return result;
         }
         if (isSchemaNode(result.node)) {
-            node = result.node;
+            parentNode = result.node;
         }
     }
 
-    for (const resolver of node.resolvers) {
-        const schemaNode = resolver({ data, key, node });
-        if (isSchemaNode(schemaNode)) {
-            return { node: schemaNode.resolveRef({ pointer, path }), error: undefined };
-        }
+    // find child node
+    for (const resolver of parentNode.resolvers) {
+        const schemaNode = resolver({ data, key, node: parentNode });
+        // a matching resolver found an error, return
         if (isJsonError(schemaNode)) {
             return { node: undefined, error: schemaNode };
         }
+        // a matching resolver found a child node, return
+        if (isSchemaNode(schemaNode)) {
+            return { node: schemaNode.resolveRef({ pointer, path }), error: undefined };
+        }
     }
 
-    const referencedNode = node.resolveRef({ path });
-    if (referencedNode !== node) {
-        return referencedNode.getNodeChild(key, data, options);
-    }
-
+    // no child node was found, but the child node is valid
     if (options.createSchema === true) {
-        const newNode = node.compileSchema(
-            node.createSchema(getValue(data, key)),
-            `${node.evaluationPath}/additional`,
-            `${node.schemaLocation}/additional`
+        const newNode = parentNode.compileSchema(
+            parentNode.createSchema(getValue(data, key)),
+            `${parentNode.evaluationPath}/additional`,
+            `${parentNode.schemaLocation}/additional`
         );
         return { node: newNode, error: undefined };
     }
 
     if (options.withSchemaWarning === true) {
-        const error = node.createError("schema-warning", { pointer, value: data, schema: node.schema, key });
+        const error = parentNode.createError("schema-warning", {
+            pointer,
+            value: data,
+            schema: parentNode.schema,
+            key
+        });
         return { node: undefined, error };
     }
 
-    // throw new Error("getNodeChild failed retrieving node or error");
-    return {};
+    return { node: undefined };
 }

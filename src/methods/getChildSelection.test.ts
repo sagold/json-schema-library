@@ -34,6 +34,24 @@ describe("getChildSelection", () => {
         );
     });
 
+    it("should return resolved $ref", () => {
+        const result = compileSchema({
+            type: "array",
+            prefixItems: [{ $ref: "#/$defs/first" }, { $ref: "#/$defs/second" }],
+            $defs: {
+                first: { type: "string" },
+                second: { type: "number" }
+            }
+        }).getChildSelection(1);
+
+        assert(!isJsonError(result));
+        assert.deepEqual(result.length, 1);
+        assert.deepEqual(
+            result.map((n) => n.schema),
+            [{ type: "number" }]
+        );
+    });
+
     it("should return an empty array if items schema is undefined", () => {
         const result = compileSchema({
             type: "array",

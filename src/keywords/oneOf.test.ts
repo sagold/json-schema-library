@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../compileSchema";
-import { isJsonError } from "../types";
+import { isJsonError, isSchemaNode } from "../types";
 import { reduceOneOfDeclarator, reduceOneOfFuzzy } from "./oneOf";
 import settings from "../settings";
 import { draftEditor } from "../draftEditor";
@@ -350,32 +350,55 @@ describe("keyword : oneof-property : reduce", () => {
             assert(isJsonError(res), "expected result to be an error");
             assert.deepEqual(res.code, "missing-one-of-property-error");
         });
-    });
 
-    describe("array", () => {
-        it("should return an error if no oneOfProperty could be matched", () => {
+        it("should return correct reference", () => {
             const node = compileSchema({
-                oneOf: [
-                    {
-                        type: "object",
-                        required: ["title"],
-                        properties: {
-                            title: {
-                                type: "string"
-                            }
-                        }
+                [DECLARATOR_ONEOF]: "name",
+                oneOf: [{ $ref: "#/$defs/first" }, { $ref: "#/$defs/second" }],
+                $defs: {
+                    first: {
+                        properties: { name: { type: "string", const: "first" }, title: { type: "number" } }
+                    },
+                    second: {
+                        properties: { name: { type: "string", const: "second" }, title: { type: "number" } }
                     }
-                ]
+                }
+            });
+            const res = reduceOneOfDeclarator({ node, data: { name: "second" }, pointer: "#", path: [] });
+            assert(isSchemaNode(res), "expected result to be a node");
+            assert.deepEqual(res.schema, {
+                properties: { name: { type: "string", const: "second" }, title: { type: "number" } }
+            });
+        });
+
+        it("should return correct reference even if data is not fully valid", () => {
+            const node = compileSchema({
+                [DECLARATOR_ONEOF]: "name",
+                oneOf: [{ $ref: "#/$defs/first" }, { $ref: "#/$defs/second" }],
+                $defs: {
+                    first: {
+                        properties: { name: { type: "string", const: "first" }, title: { type: "number" } }
+                    },
+                    second: {
+                        properties: { name: { type: "string", const: "second" }, title: { type: "number" } }
+                    }
+                }
             });
             const res = reduceOneOfDeclarator({
                 node,
-                data: { name: "2", title: "not a number" },
+                data: { name: "first", title: "not a number" },
                 pointer: "#",
                 path: []
             });
-            assert(isJsonError(res), "expected result to be an error");
-            assert.deepEqual(res.code, "missing-one-of-property-error");
+            assert(isSchemaNode(res), "expected result to be a node");
+            assert.deepEqual(res.schema, {
+                properties: { name: { type: "string", const: "first" }, title: { type: "number" } }
+            });
         });
+    });
+
+    describe("array", () => {
+        // TODO test access on array-item as oneOfProperty id (oneOfProperty: "0")
     });
 });
 

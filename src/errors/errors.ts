@@ -45,12 +45,13 @@ export const errors = {
     "min-items-one-error": "At least one item is required in `{{pointer}}`",
     "min-length-error": "Value `{{pointer}}` should have a minimum length of `{{minLength}}`, but got `{{length}}`.",
     "min-length-one-error": "A value is required in `{{pointer}}`",
-    "missing-one-of-declarator-error": "Missing oneOf declarator `{{declarator}}` in `{{pointer}}`",
+    "missing-one-of-declarator-error": "Missing oneOf declarator `{{declarator}}` in schema `{{schemaLocation}}`",
     "min-properties-error":
         "Too few properties in `{{pointer}}`, should be at least `{{minProperties}}`, but got `{{length}}`",
     "missing-array-item-error": "Array at '{{pointer}}' has a missing item at '{{key}}'",
     "missing-dependency-error": "The required propery '{{missingProperty}}' in `{{pointer}}` is missing",
-    "missing-one-of-property-error": "Value at `{{pointer}}` property: `{{property}}`",
+    "missing-one-of-property-error":
+        "Value at `{{pointer}}` must be object or array and have a property ${oneOfProperty}: ${value}",
     "multiple-of-error": "Expected `{{value}}` in `{{pointer}}` to be multiple of `{{multipleOf}}`",
     "multiple-one-of-error": "Value `{{value}}` should not match multiple schemas in oneOf `{{matches}}`",
     "no-additional-properties-error": "Additional property `{{property}}` in `{{pointer}}` is not allowed",

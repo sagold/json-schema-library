@@ -1,14 +1,14 @@
 import { extendDraft } from "./Draft";
-import { draft2019 } from "./draft2019";
+import { draft2020 } from "./draft2020";
 import { oneOfFuzzyKeyword } from "./keywords/oneOf";
 import { render } from "./errors/render";
 
 /**
- * @draft-editor https://json-schema.org/draft/2019-09/release-notes
+ * @draft-editor https://json-schema.org/draft/2020-12/release-notes
  *
- * Uses Draft 2019-09 and changes resolveOneOf to be fuzzy
+ * Uses Draft 2020-12 and changes resolveOneOf to be fuzzy
  */
-export const draftEditor = extendDraft(draft2019, {
+export const draftEditor = extendDraft(draft2020, {
     $schemaRegEx: ".",
     keywords: [oneOfFuzzyKeyword],
     errors: {

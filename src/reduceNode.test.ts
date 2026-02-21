@@ -302,7 +302,6 @@ describe("compileSchema : reduceNode", () => {
             }).reduceNode({ id: "second" });
             assert.deepEqual(node.schema, {
                 type: "object",
-                oneOfProperty: "id",
                 properties: { id: { const: "second" }, one: { type: "number" } }
             });
         });

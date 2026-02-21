@@ -1464,6 +1464,10 @@ settings.REGEX_FLAGS = "v";
 
 ## Breaking Changes
 
+### v11.0.1
+
+- improved error reporting when using oneOfProperty-declarator
+
 ### v11.0.0
 
 - introduced annotations

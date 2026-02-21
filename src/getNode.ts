@@ -1,4 +1,4 @@
-import { GetNodeOptions, SchemaNode } from "./SchemaNode";
+import { GetNodeOptions, isSchemaNode, SchemaNode } from "./SchemaNode";
 import { isJsonError, NodeOrError, OptionalNodeOrError } from "./types";
 import { split } from "@sagold/json-pointer";
 import { getValue } from "./utils/getValue";
@@ -7,8 +7,12 @@ import { getValue } from "./utils/getValue";
 export function getNode(pointer: string, data: unknown, options: { withSchemaWarning: true } & GetNodeOptions): NodeOrError;
 export function getNode(pointer: string, data: unknown, options: { createSchema: true } & GetNodeOptions): NodeOrError;
 export function getNode(pointer: string, data?: unknown, options?: GetNodeOptions): OptionalNodeOrError;
+
 /**
  * Returns a node containing JSON Schema of a data JSON Pointer.
+ *
+ * - the returned node will have a reduced schema based on given input data
+ * - the returned node $ref is resolved
  *
  * To resolve dynamic schema where the type of JSON Schema is evaluated by
  * its value, a data object has to be passed in options.
@@ -49,6 +53,15 @@ export function getNode(
         currentNode = result.node;
         data = getValue(data, keys[i]);
     }
-    const result = currentNode.resolveRef(options);
-    return isJsonError(result) ? { node: undefined, error: result } : { node: result, error: undefined };
+
+    const { node: reducedNode, error: reduceError } = currentNode.resolveRef(options).reduceNode(data);
+
+    if (isJsonError(reduceError)) {
+        return { node: undefined, error: reduceError };
+    }
+    if (isSchemaNode(reducedNode)) {
+        return { node: reducedNode, error: undefined };
+    }
+
+    return { error: undefined };
 }

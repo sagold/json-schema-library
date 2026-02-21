@@ -38,7 +38,7 @@ import { getNode } from "./getNode";
 import { getNodeChild } from "./getNodeChild";
 import { DataNode } from "./methods/toDataNodes";
 
-const { DYNAMIC_PROPERTIES, REGEX_FLAGS } = settings;
+const { DYNAMIC_PROPERTIES, REGEX_FLAGS, DECLARATOR_ONEOF } = settings;
 
 export function isSchemaNode(value: unknown): value is SchemaNode {
     return isObject(value) && Array.isArray(value?.reducers) && Array.isArray(value?.resolvers);
@@ -194,12 +194,34 @@ interface SchemaNodeMethodsType {
     createAnnotation<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonAnnotation;
     createSchema(data?: unknown): JsonSchema;
 
-    // getNode overloads
+    /**
+     * Returns a node matching the given location (pointer) in data
+     *
+     * - the returned node will have a **reduced schema** based on given input data
+     * - return returned node $ref is resolved
+     *
+     * To resolve dynamic schema where the type of JSON Schema is evaluated by
+     * its value, a data object has to be passed in options.
+     *
+     * Per default this function will return `undefined` schema for valid properties
+     * that do not have a defined schema. Use the option `withSchemaWarning: true` to
+     * receive an error with `code: schema-warning` containing the location of its
+     * last evaluated json-schema.
+     *
+     * @returns { node } or { error } where node can also be undefined (valid but undefined)
+     */
     getNode(pointer: string, data: unknown, options: { withSchemaWarning: true } & GetNodeOptions): NodeOrError;
     getNode(pointer: string, data: unknown, options: { createSchema: true } & GetNodeOptions): NodeOrError;
     getNode(pointer: string, data?: unknown, options?: GetNodeOptions): OptionalNodeOrError;
 
-    // getNodeChild overloads
+    /**
+     * Returns the child for the given property-name or array-index
+     *
+     * - the returned child node is **not reduced**
+     * - a child node $ref is resolved
+     *
+     * @returns { node } or { error } where node can also be undefined (valid but undefined)
+     */
     getNodeChild(
         key: string | number,
         data: unknown,
@@ -431,7 +453,7 @@ export const SchemaNodeMethods = {
         }
 
         // remove dynamic properties of node
-        workingNode.schema = omit(workingNode.schema, ...DYNAMIC_PROPERTIES);
+        workingNode.schema = omit(workingNode.schema, DECLARATOR_ONEOF, ...DYNAMIC_PROPERTIES);
         // @ts-expect-error string accessing schema props
         DYNAMIC_PROPERTIES.forEach((prop) => (workingNode[prop] = undefined));
         return { node: workingNode, error: undefined };

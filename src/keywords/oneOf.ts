@@ -101,42 +101,57 @@ function reduceOneOf({ node, data, pointer, path }: Omit<JsonSchemaReducerParams
     });
 }
 
+/**
+ * Returns matching oneOf schema identified by matching schema for oneOfProperty
+ */
 export function reduceOneOfDeclarator({ node, data, pointer, path }: Omit<JsonSchemaReducerParams, "key">) {
     if (node.oneOf == null) {
         return;
     }
 
-    const errors: ValidationReturnType = [];
     const oneOfProperty = node.schema[DECLARATOR_ONEOF];
-    const oneOfValue = getValue(data, oneOfProperty);
+    const oneOfPropertyValue = getValue(data, oneOfProperty);
 
-    if (oneOfValue === undefined) {
+    // in this case, we also fail when data undefined as this always is valid,
+    // but not in context on an expected oneOfProperty
+    if (data === undefined || oneOfPropertyValue === undefined) {
         return node.createError("missing-one-of-property-error", {
-            property: oneOfProperty,
+            oneOfProperty,
             pointer,
             schema: node.schema,
             value: data
         });
     }
 
+    // find oneOf schema that has a matching oneOfProperty to the current input data
+    // TODO throw an error if multiple matches were found
+    const errors: ValidationReturnType = [];
     for (let i = 0; i < node.oneOf.length; i += 1) {
         const { node: resultNode } = node.oneOf[i].getNodeChild(oneOfProperty, data);
         if (!isSchemaNode(resultNode)) {
+            // one of the oneOf schemas has a missing oneOfTypeProperty
+            // TODO this still might succeed
+            // TODO there is a possibility this throws an invalid error as we use input data
             return node.createError("missing-one-of-declarator-error", {
                 declarator: DECLARATOR_ONEOF,
                 oneOfProperty,
-                schemaPointer: node.oneOf[i].schemaLocation,
+                schemaLocation: node.oneOf[i].schemaLocation,
                 pointer: `${pointer}/oneOf/${i}`,
                 schema: node.schema,
                 value: data
             });
         }
 
-        const result = sanitizeErrors(validateNode(resultNode, oneOfValue, pointer, path));
-        // result = result.filter(errorOrPromise);
+        // collect errors in case we fail finding a matching schema
+        const result = sanitizeErrors(
+            validateNode(resultNode, oneOfPropertyValue, `${pointer}/${oneOfProperty}`, path)
+        );
+
         if (result.length > 0) {
             errors.push(...result);
         } else {
+            // return at once when we found a schema
+            // TODO should check all oneOf-schema
             const { node: reducedNode } = node.oneOf[i].reduceNode(data, { pointer, path });
             if (reducedNode) {
                 reducedNode.oneOfIndex = i; // @evaluation-info
@@ -147,7 +162,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: Omit<JsonSc
 
     return node.createError("one-of-property-error", {
         property: oneOfProperty,
-        value: oneOfValue,
+        value: data,
         pointer,
         schema: node.schema,
         errors
