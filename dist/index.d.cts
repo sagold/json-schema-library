@@ -74,7 +74,7 @@ declare function toDataNodes(node: SchemaNode, data: unknown, pointer?: string, 
  * could be added at the given property (e.g. item-index), thus an array of options is returned. In all other cases
  * a list with a single item will be returned
  */
-declare function getChildSelection(node: SchemaNode, property: string | number): SchemaNode[] | JsonError;
+declare function getChildSelection(node: SchemaNode, property: string | number): JsonError | SchemaNode[];
 //#endregion
 //#region src/methods/getData.d.ts
 type TemplateOptions = {
@@ -317,6 +317,22 @@ interface SchemaNodeMethodsType {
   createError<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonError;
   createAnnotation<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonAnnotation;
   createSchema(data?: unknown): JsonSchema;
+  /**
+   * Returns a node matching the given location (pointer) in data
+   *
+   * - the returned node will have a **reduced schema** based on given input data
+   * - return returned node $ref is resolved
+   *
+   * To resolve dynamic schema where the type of JSON Schema is evaluated by
+   * its value, a data object has to be passed in options.
+   *
+   * Per default this function will return `undefined` schema for valid properties
+   * that do not have a defined schema. Use the option `withSchemaWarning: true` to
+   * receive an error with `code: schema-warning` containing the location of its
+   * last evaluated json-schema.
+   *
+   * @returns { node } or { error } where node can also be undefined (valid but undefined)
+   */
   getNode(pointer: string, data: unknown, options: {
     withSchemaWarning: true;
   } & GetNodeOptions): NodeOrError;
@@ -324,6 +340,14 @@ interface SchemaNodeMethodsType {
     createSchema: true;
   } & GetNodeOptions): NodeOrError;
   getNode(pointer: string, data?: unknown, options?: GetNodeOptions): OptionalNodeOrError;
+  /**
+   * Returns the child for the given property-name or array-index
+   *
+   * - the returned child node is **not reduced**
+   * - a child node $ref is resolved
+   *
+   * @returns { node } or { error } where node can also be undefined (valid but undefined)
+   */
   getNodeChild(key: string | number, data: unknown, options: {
     withSchemaWarning: true;
   } & GetNodeOptions): NodeOrError;
@@ -564,9 +588,9 @@ declare const draft2020: Draft;
 //#endregion
 //#region src/draftEditor.d.ts
 /**
- * @draft-editor https://json-schema.org/draft/2019-09/release-notes
+ * @draft-editor https://json-schema.org/draft/2020-12/release-notes
  *
- * Uses Draft 2019-09 and changes resolveOneOf to be fuzzy
+ * Uses Draft 2020-12 and changes resolveOneOf to be fuzzy
  */
 declare const draftEditor: Draft;
 //#endregion
