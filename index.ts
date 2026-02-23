@@ -3,7 +3,7 @@ export type { CompileOptions } from "./src/compileSchema";
 export type { Context, SchemaNode, GetNodeOptions, ValidateReturnType } from "./src/SchemaNode";
 export type { DataNode } from "./src/methods/toDataNodes";
 export type { Draft, DraftVersion } from "./src/Draft";
-export type { JsonError, JsonAnnotation, JsonPointer, JsonSchema, OptionalNodeOrError, NodeOrError } from "./src/types";
+export type { JsonError, JsonAnnotation, JsonPointer, JsonSchema, BooleanSchema, OptionalNodeOrError, NodeOrError } from "./src/types";
 export type {
     Keyword,
     Maybe,
@@ -37,7 +37,7 @@ export type { Annotation, AnnotationData, ErrorConfig } from "./src/types";
 // utilities
 export { getTypeOf } from "./src/utils/getTypeOf";
 export { isReduceable } from "./src/SchemaNode";
-export { isJsonError, isJsonAnnotation, isAnnotation, isSchemaNode } from "./src/types";
+export { isJsonError, isJsonAnnotation, isAnnotation, isSchemaNode, isJsonSchema, isBooleanSchema } from "./src/types";
 export { extendDraft, addKeywords } from "./src/Draft";
 export { mergeNode } from "./src/mergeNode";
 export { mergeSchema } from "./src/utils/mergeSchema";
