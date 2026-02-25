@@ -221,7 +221,7 @@ interface SchemaNodeMethodsType {
     ): OptionalNodeOrError;
     resolveRef: (args?: { pointer?: string; path?: ValidationPath }) => SchemaNode;
     validate(data: unknown, pointer?: string, path?: ValidationPath): ValidateReturnType;
-    addRemoteSchema(url: string, schema: JsonSchema): SchemaNode;
+    addRemoteSchema(url: string, schema: JsonSchema | BooleanSchema): SchemaNode;
     toSchemaNodes(): SchemaNode[];
     toDataNodes(data: unknown, pointer?: string): DataNode[];
     toJSON(): unknown;

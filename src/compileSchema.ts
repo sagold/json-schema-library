@@ -6,7 +6,7 @@ import { draft07 } from "./draft07";
 import { draft2019 } from "./draft2019";
 import { draft2020 } from "./draft2020";
 import { pick } from "./utils/pick";
-import { JsonSchema, Draft } from "./types";
+import { JsonSchema, BooleanSchema, Draft, isJsonSchema } from "./types";
 import { TemplateOptions } from "./methods/getData";
 import { SchemaNode, SchemaNodeMethods, addKeywords, isSchemaNode } from "./SchemaNode";
 import settings from "./settings";
@@ -31,10 +31,10 @@ function getDraft(drafts: Draft[], $schema: string) {
  * wrapping each schema with utilities and as much preevaluation as possible. Each
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
-export function compileSchema(schema: JsonSchema, options: CompileOptions = {}) {
+export function compileSchema(schema: JsonSchema | BooleanSchema, options: CompileOptions = {}) {
     let formatAssertion = options.formatAssertion ?? true;
     const drafts = options.drafts ?? defaultDrafts;
-    const draft = getDraft(drafts, schema?.$schema);
+    const draft = getDraft(drafts, isJsonSchema(schema) ? schema.$schema : undefined);
 
     const node: SchemaNode = {
         evaluationPath: "#",
@@ -44,7 +44,7 @@ export function compileSchema(schema: JsonSchema, options: CompileOptions = {}) 
         reducers: [],
         resolvers: [],
         validators: [],
-        schema,
+        schema: schema as JsonSchema,
         // @ts-expect-error self-reference added later
         context: {
             remotes: {},
@@ -60,7 +60,7 @@ export function compileSchema(schema: JsonSchema, options: CompileOptions = {}) 
     };
 
     node.context.rootNode = node;
-    node.context.remotes[schema?.$id ?? "#"] = node;
+    node.context.remotes[(isJsonSchema(schema) ? schema.$id : undefined) ?? "#"] = node;
 
     if (options.remote) {
         const metaSchema = getRef(node, node.schema.$schema);
