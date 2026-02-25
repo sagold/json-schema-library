@@ -15,7 +15,9 @@ import { Draft } from "./Draft";
 import { toSchemaNodes } from "./methods/toSchemaNodes";
 import {
     isJsonError,
+    isJsonSchema,
     JsonSchema,
+    BooleanSchema,
     JsonError,
     AnnotationData,
     DefaultErrors,
@@ -189,7 +191,7 @@ export interface SchemaNode extends SchemaNodeMethodsType {
  * Fixed SchemaNode mixin methods
  */
 interface SchemaNodeMethodsType {
-    compileSchema(schema: JsonSchema, evaluationPath?: string, schemaLocation?: string, dynamicId?: string): SchemaNode;
+    compileSchema(schema: JsonSchema | BooleanSchema, evaluationPath?: string, schemaLocation?: string, dynamicId?: string): SchemaNode;
     createError<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonError;
     createAnnotation<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonAnnotation;
     createSchema(data?: unknown): JsonSchema;
@@ -241,7 +243,7 @@ interface SchemaNodeMethodsType {
     ): OptionalNodeOrError;
     resolveRef: (args?: { pointer?: string; path?: ValidationPath }) => SchemaNode;
     validate(data: unknown, pointer?: string, path?: ValidationPath): ValidateReturnType;
-    addRemoteSchema(url: string, schema: JsonSchema): SchemaNode;
+    addRemoteSchema(url: string, schema: JsonSchema | BooleanSchema): SchemaNode;
     toSchemaNodes(): SchemaNode[];
     toDataNodes(data: unknown, pointer?: string): DataNode[];
     toJSON(): unknown;
@@ -494,12 +496,16 @@ export const SchemaNodeMethods = {
      * Register a JSON Schema as a remote-schema to be resolved by $ref, $anchor, etc
      * @returns the current node (not the remote schema-node)
      */
-    addRemoteSchema(url: string, schema: JsonSchema): SchemaNode {
-        // @draft >= 6
+    addRemoteSchema(url: string, schema: JsonSchema | BooleanSchema): SchemaNode {
+    // @draft >= 6
+    if (isJsonSchema(schema)) {
         schema.$id = resolveUri(schema.$id || url);
+    }
+        
         const node = this as SchemaNode;
         const { context } = node;
-        const draft = getDraft(context.drafts, schema?.$schema ?? context.rootNode.schema?.$schema);
+        const schemaId = isJsonSchema(schema) ? schema.$schema : undefined;
+const draft = getDraft(context.drafts, schemaId ?? context.rootNode.schema?.$schema);
 
         const remoteNode: SchemaNode = {
             evaluationPath: "#",
