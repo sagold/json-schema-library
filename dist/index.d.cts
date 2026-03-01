@@ -313,7 +313,7 @@ interface SchemaNode extends SchemaNodeMethodsType {
  * Fixed SchemaNode mixin methods
  */
 interface SchemaNodeMethodsType {
-  compileSchema(schema: JsonSchema, evaluationPath?: string, schemaLocation?: string, dynamicId?: string): SchemaNode;
+  compileSchema(schema: JsonSchema | BooleanSchema, evaluationPath?: string, schemaLocation?: string, dynamicId?: string): SchemaNode;
   createError<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonError;
   createAnnotation<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonAnnotation;
   createSchema(data?: unknown): JsonSchema;
@@ -370,7 +370,7 @@ interface SchemaNodeMethodsType {
     path?: ValidationPath;
   }) => SchemaNode;
   validate(data: unknown, pointer?: string, path?: ValidationPath): ValidateReturnType;
-  addRemoteSchema(url: string, schema: JsonSchema): SchemaNode;
+  addRemoteSchema(url: string, schema: JsonSchema | BooleanSchema): SchemaNode;
   toSchemaNodes(): SchemaNode[];
   toDataNodes(data: unknown, pointer?: string): DataNode[];
   toJSON(): unknown;
@@ -412,9 +412,12 @@ type ValidateReturnType = {
 };
 //#endregion
 //#region src/types.d.ts
+type BooleanSchema = boolean;
 interface JsonSchema {
   [keyword: string]: any;
 }
+declare function isJsonSchema(value: unknown): value is JsonSchema;
+declare function isBooleanSchema(value: unknown): value is BooleanSchema;
 type JsonPointer = string;
 type AnnotationData<D extends Record<string, unknown> = Record<string, unknown>> = D & {
   pointer: string;
@@ -470,7 +473,7 @@ type CompileOptions = {
  * wrapping each schema with utilities and as much preevaluation as possible. Each
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
-declare function compileSchema(schema: JsonSchema, options?: CompileOptions): SchemaNode;
+declare function compileSchema(schema: JsonSchema | BooleanSchema, options?: CompileOptions): SchemaNode;
 //#endregion
 //#region src/settings.d.ts
 declare const _default: {
@@ -631,4 +634,4 @@ declare function sanitizeErrors(list: ValidationReturnType | ValidationReturnTyp
 /** remote meta-schema stored by schema $id */
 declare const remotes: Record<string, any>;
 //#endregion
-export { type Annotation, type AnnotationData, type CompileOptions, type Context, type DataNode, type Draft, type DraftVersion, type ErrorConfig, type GetNodeOptions, type JsonAnnotation, type JsonError, type JsonPointer, type JsonSchema, type JsonSchemaReducer, type JsonSchemaReducerParams, type JsonSchemaResolver, type JsonSchemaResolverParams, type JsonSchemaValidator, type JsonSchemaValidatorParams, type Keyword, type Maybe, type NodeOrError, type OptionalNodeOrError, type SchemaNode, type ValidateReturnType, type ValidationAnnotation, type ValidationPath, type ValidationReturnType, addKeywords, compileSchema, draft04, draft06, draft07, draft2019, draft2020, draftEditor, extendDraft, getSchemaType, getTypeOf, isAnnotation, isJsonAnnotation, isJsonError, isReduceable, isSchemaNode, mergeNode, mergeSchema, oneOfFuzzyKeyword, oneOfKeyword, remotes, render, sanitizeErrors, _default as settings };
+export { type Annotation, type AnnotationData, type BooleanSchema, type CompileOptions, type Context, type DataNode, type Draft, type DraftVersion, type ErrorConfig, type GetNodeOptions, type JsonAnnotation, type JsonError, type JsonPointer, type JsonSchema, type JsonSchemaReducer, type JsonSchemaReducerParams, type JsonSchemaResolver, type JsonSchemaResolverParams, type JsonSchemaValidator, type JsonSchemaValidatorParams, type Keyword, type Maybe, type NodeOrError, type OptionalNodeOrError, type SchemaNode, type ValidateReturnType, type ValidationAnnotation, type ValidationPath, type ValidationReturnType, addKeywords, compileSchema, draft04, draft06, draft07, draft2019, draft2020, draftEditor, extendDraft, getSchemaType, getTypeOf, isAnnotation, isBooleanSchema, isJsonAnnotation, isJsonError, isJsonSchema, isReduceable, isSchemaNode, mergeNode, mergeSchema, oneOfFuzzyKeyword, oneOfKeyword, remotes, render, sanitizeErrors, _default as settings };

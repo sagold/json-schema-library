@@ -658,6 +658,9 @@ const { node, error } = schemaNode.getNode("/name", { name: 123 }, { createSchem
 console.log(node?.schema, error); // { type: "number" }, undefined
 ```
 
+> [!NOTE]
+> `getChild` will return the reduced node (using `reduceNode` internally) for the given input-data. This means, the resulting json-schema is a merge of all defined JSON schema. For more control use `getChildNode`, which will not further compile JSON schema
+
 <details><summary>Example</summary>
 
 ```ts
@@ -747,7 +750,7 @@ if (error) {
 
 ### getNodeChild
 
-`getNodeChild` retrieves the SchemaNode of a child property or index. Using `get` it is possible to incrementally go through the data, retrieving the schema for each next item.
+`getNodeChild` retrieves the SchemaNode of a child property or index. Using `getNodeChild` it is possible to incrementally go through the data, retrieving the schema for each next item.
 
 ```ts
 const mySchema = { type: "object", properties: { title: { type: "string" } } };
@@ -1464,10 +1467,6 @@ settings.REGEX_FLAGS = "v";
 
 ## Breaking Changes
 
-### v11.0.1
-
-- improved error reporting when using oneOfProperty-declarator
-
 ### v11.0.0
 
 - introduced annotations
@@ -1480,6 +1479,19 @@ settings.REGEX_FLAGS = "v";
 
 - Return type of validators is now `ValidationReturnType` instead of `ValidationResult`
 - type `AnnotationData` replaces `ErroData`
+
+#### v11.0.1
+
+- improved error reporting when using oneOfProperty-declarator
+
+#### v11.0.2
+
+- fixed `getNode` to always return a reduced JSON schema
+- fixed issues using reduce with `oneOfProperty`
+
+#### v11.0.3
+
+- fixed type of main input-schema to support boolean
 
 ### v10.5.0
 

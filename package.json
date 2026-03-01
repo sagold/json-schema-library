@@ -1,6 +1,6 @@
 {
   "name": "json-schema-library",
-  "version": "11.0.2",
+  "version": "11.0.3",
   "description": "Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -12,8 +12,12 @@
     },
     "./package.json": "./package.json"
   },
-  "packageManager": "yarn@^3.6.0",
+  "engines": {
+    "yarn": ">=1.22.0",
+    "npm": "use yarn instead"
+  },
   "scripts": {
+    "preinstall": "npx only-allow yarn",
     "coverage": "nyc npm run test --reporter=lcov",
     "dist": "tsdown -f esm -f cjs --minify; yarn dist:iife",
     "dist:iife": "tsdown --config tsdown.iife.config.ts --no-clean --minify; mv dist/index.iife.js dist/jlib.js",
