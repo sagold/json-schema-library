@@ -12,6 +12,7 @@
     },
     "./package.json": "./package.json"
   },
+  "packageManager": "yarn@^3.6.0",
   "scripts": {
     "coverage": "nyc npm run test --reporter=lcov",
     "dist": "tsdown -f esm -f cjs --minify; yarn dist:iife",
