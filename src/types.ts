@@ -9,6 +9,13 @@ export type BooleanSchema = boolean;
 export interface JsonSchema {
     [keyword: string]: any;
 }
+export function isJsonSchema(value: unknown): value is JsonSchema {
+    return isObject(value);
+}
+
+export function isBooleanSchema(value: unknown): value is BooleanSchema {
+    return typeof value === "boolean";
+}
 
 export type JsonPointer = string;
 
