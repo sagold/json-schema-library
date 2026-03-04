@@ -12,10 +12,6 @@
     },
     "./package.json": "./package.json"
   },
-  "engines": {
-    "yarn": ">=1.22.0",
-    "npm": "use yarn instead"
-  },
   "scripts": {
     "preinstall": "npx only-allow yarn",
     "coverage": "nyc npm run test --reporter=lcov",
