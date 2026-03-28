@@ -9,10 +9,14 @@ export const deprecatedKeyword: Keyword = {
 
 function validateDeprecated({ node, data, pointer }: JsonSchemaValidatorParams) {
     return [
-        node.createAnnotation("deprecated-warning", {
-            pointer,
-            schema: node.schema,
-            value: data
-        })
+        node.createAnnotation(
+            "deprecated-warning",
+            {
+                pointer,
+                schema: node.schema,
+                value: data
+            },
+            node.schema.deprecatedMessage
+        )
     ];
 }
