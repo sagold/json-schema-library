@@ -29,7 +29,10 @@ export type CompileOptions = {
     remote?: SchemaNode;
     formatAssertion?: boolean | "meta-schema" | undefined;
     getDataDefaultOptions?: TemplateOptions;
+    /** set to true to throw an Errors on errors in input schema. Defaults to false */
     throwOnInvalidSchema?: boolean;
+    /** set to true to collect unknown keywords of input schema in `node.schemaAnnotations`. Defaults to false */
+    withSchemaAnnotations?: boolean;
 };
 
 const defaultDrafts: Draft[] = [draft04, draft06, draft07, draft2019, draft2020];
@@ -65,6 +68,7 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
             refs: {},
             ...copy(pick(draft, "methods", "keywords", "version", "formats", "errors")),
             getDataDefaultOptions: options.getDataDefaultOptions,
+            withSchemaAnnotations: options.withSchemaAnnotations ?? false,
             drafts
         },
         ...SchemaNodeMethods

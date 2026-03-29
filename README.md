@@ -96,14 +96,14 @@ Details on `getDataDefaultOptions` are documented in [getData](#getData).
 
 ### validate input schema
 
-The JSON Schema passed to `compileSchema` is validated automatically. To retrieve any schema errors you can access the property `schemaErrors` of the main node:
+All JSON Schema passed to `compileSchema` are validated automatically. To retrieve any schema errors you can access the property `schemaErrors` of the main node:
 
 ```ts
 const root = compileSchema(mySchema);
 const { schemaErrors } = root; // JsonError[]
 ```
 
-In cases you want `compileSchema` throw an error for an invalid schema-input use the option `throwOnInvalidSchema:true`
+Use the option `throwOnInvalidSchema:true` of `compileSchema` to throw an Error for a input schema containing errors:
 
 ```ts
 const root = compileSchema({ properties: 123 }, { throwOnInvalidSchema: true });
@@ -128,6 +128,39 @@ console.log(schemaErrors[0]);
     message: '$defs must be an object - received: number'
   }
 }
+```
+
+---
+
+</details>
+
+To collect JSON Schema annotations for unused keywords you can opt in with option `withSchemaAnnotations`:
+
+```ts
+const root = compileSchema(mySchema, { withSchemaAnnotations: true });
+const { schemaAnnotations } = root; // JsonAnnotation[]
+```
+
+This collects all JSON Schema keywords not part of the used draft and any custom keywords. Custom keywords starting with `x-` are allowed and thus will not create an annotation.
+
+<details><summary>Example for validation annotations</summary>
+
+---
+
+```ts
+const { schemaErrors } = compileSchema({ options: {} }, { withSchemaAnnotations: true });
+console.log(schemaErrors[0]);
+{
+   type: 'annotation',
+   code: 'unknown-keyword-warning',
+   message: "Keyword 'options' is not a valid keyword to draft 'draft-2020-12'",
+   data: {
+     pointer: '#/options',
+     schema: { options: {} },
+     value: 'options',
+     draft: 'draft-2020-12'
+   }
+ }
 ```
 
 ---

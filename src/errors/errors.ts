@@ -76,5 +76,6 @@ export const errors = {
     // annotations
     "deprecated-warning": "Value at `{{pointer}}` is deprecated",
     // schema validation
-    "schema-error": "Invalid schema found at {{pointer}}: {{message}}"
+    "schema-error": "Invalid schema found at {{pointer}}: {{message}}",
+    "unknown-keyword-warning": "Keyword '{{value}}' is not a valid keyword to draft '{{draft}}'"
 };

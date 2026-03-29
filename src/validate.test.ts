@@ -8,7 +8,6 @@ describe("compileSchema : validate", () => {
     // note: boolean schema is already thoroughly tested by spec
     describe("boolean schema", () => {
         it("should fail if root schema is false", () => {
-            // @ts-expect-error boolean typ unsupported
             const { errors } = compileSchema(false).validate("anything");
             assert.deepEqual(errors.length, 1);
         });
@@ -23,7 +22,6 @@ describe("compileSchema : validate", () => {
             assert.deepEqual(errors.length, 1);
         });
         it("should succeed if root schema is true", () => {
-            // @ts-expect-error boolean typ unsupported
             const { errors } = compileSchema(true).validate("anything");
             assert.deepEqual(errors.length, 0);
         });

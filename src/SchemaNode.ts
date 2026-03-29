@@ -92,6 +92,8 @@ export type Context = {
     formats: Draft["formats"];
     /** [SHARED USING ADD REMOTE] getData default options */
     getDataDefaultOptions?: TemplateOptions;
+    /** [SHARED USING ADD REMOTE] collect unknown keywords in schemaAnnotations */
+    withSchemaAnnotations?: boolean;
 };
 
 export interface SchemaNode extends SchemaNodeMethodsType {
@@ -606,9 +608,30 @@ export function addKeywords(node: SchemaNode) {
             .map((keyword) => execKeyword(keyword, node));
     }
     const keys = Object.keys(node.schema);
-    return node.context.keywords
-        .filter(({ keyword }) => keys.includes(keyword) || whitelist.includes(keyword))
+    const errors = node.context.keywords
+        .filter(({ keyword }) => whitelist.includes(keyword) || keys.includes(keyword))
         .map((keyword) => execKeyword(keyword, node));
+
+    // find unused keywords
+    if (node.context.withSchemaAnnotations) {
+        Object.keys(node.schema)
+            .filter(
+                (key) =>
+                    !key.startsWith("x-") && node.context.keywords.find((keyword) => keyword.keyword === key) == null
+            )
+            .forEach((keyword) => {
+                errors.push(
+                    node.createAnnotation("unknown-keyword-warning", {
+                        pointer: `${node.schemaLocation}/${keyword}`,
+                        schema: node.schema,
+                        value: keyword,
+                        draft: node.getDraftVersion()
+                    })
+                );
+            });
+    }
+
+    return errors;
 }
 
 export function execKeyword(keyword: Keyword, node: SchemaNode) {

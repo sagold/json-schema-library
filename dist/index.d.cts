@@ -29,27 +29,51 @@ type Maybe<T> = T | undefined;
 type ValidationAnnotation = JsonError | JsonAnnotation | Promise<Maybe<ValidationAnnotation>[]>;
 type ValidationResult = Maybe<ValidationAnnotation>;
 type ValidationReturnType = ValidationResult | ValidationResult[];
-type JsonSchemaValidatorParams = {
+type SchemaNodeWithRequired<K extends keyof SchemaNode> = SchemaNode & Required<Pick<SchemaNode, K>>;
+type JsonSchemaValidatorParams<Key extends keyof SchemaNode = keyof SchemaNode> = {
   pointer: string;
   data: unknown;
-  node: SchemaNode;
+  node: SchemaNodeWithRequired<Key>;
   path: ValidationPath;
 };
-interface JsonSchemaValidator {
+interface JsonSchemaValidator<Key extends keyof SchemaNode = keyof SchemaNode> {
   toJSON?: () => string;
   order?: number;
-  (options: JsonSchemaValidatorParams): ValidationReturnType;
+  (options: JsonSchemaValidatorParams<Key>): ValidationReturnType;
 }
-type Keyword = {
+type Keyword<Key extends keyof SchemaNode = keyof SchemaNode> = {
   id: string; /** unique keyword corresponding to JSON Schema keywords (or custom) */
   keyword: string; /** sort order of keyword. Lower numbers will be processed last. Default is 0 */
-  order?: number; /** called with compileSchema */
-  parse?: (node: SchemaNode) => void;
-  addResolve?: (node: SchemaNode) => boolean; /** return node corresponding to passed in key or do nothing */
-  resolve?: JsonSchemaResolver;
-  addValidate?: (node: SchemaNode) => boolean; /** validate data using node */
-  validate?: JsonSchemaValidator;
-  addReduce?: (node: SchemaNode) => boolean; /** remove dynamic schema-keywords by merging valid sub-schemas */
+  order?: number;
+  /**
+   * Called once for each JSON Schema dduring compileSchema to evaluate keyword.
+   * Use this to skip or preprocess the Keyword for the given JSON Schema and
+   * to create any schema annotations, like input errors.
+   *
+   * - most keywords cache their evaluation directly on node, e.g. node.required
+   * - most keywords skip any other actions if their evaluation is missing on node
+   * - return any errors found in JSON schema related to this keyword
+   *      (this includes errors from created nodes)
+   */
+  parse?: (node: SchemaNode) => void | ValidationAnnotation | ValidationAnnotation[];
+  addResolve?: (node: SchemaNode) => boolean;
+  /**
+   * If this contains child-data, resolve must return schema associated for the passed in key
+   *
+   * @example
+   * a keyword properties has has child-properties. So when a properties[key] exists,
+   * it will return the node of properties[key] or nothing at all
+   */
+  resolve?: JsonSchemaResolver; /** return true if the given node should run the validate-function on this keyword */
+  addValidate?: (node: SchemaNode) => boolean;
+  /**
+   * Perform validation for this keyword and the passed in data
+   */
+  validate?: JsonSchemaValidator<Key>;
+  addReduce?: (node: SchemaNode) => boolean;
+  /**
+   * Remove dynamic schema-keywords by merging valid sub-schemas
+   */
   reduce?: JsonSchemaReducer;
 };
 //#endregion
@@ -196,6 +220,8 @@ declare const errors: {
   "unknown-property-error": string;
   "value-not-empty-error": string;
   "deprecated-warning": string;
+  "schema-error": string;
+  "unknown-keyword-warning": string;
 };
 //#endregion
 //#region src/SchemaNode.d.ts
@@ -213,7 +239,8 @@ type Context = {
   version: Draft["version"]; /** draft errors & template-strings */
   errors: Draft["errors"]; /** draft formats & validators */
   formats: Draft["formats"]; /** [SHARED USING ADD REMOTE] getData default options */
-  getDataDefaultOptions?: TemplateOptions;
+  getDataDefaultOptions?: TemplateOptions; /** [SHARED USING ADD REMOTE] collect unknown keywords in schemaAnnotations */
+  withSchemaAnnotations?: boolean;
 };
 interface SchemaNode extends SchemaNodeMethodsType {
   /** shared context across nodes of JSON schema and shared properties across all remotes */
@@ -250,6 +277,7 @@ interface SchemaNode extends SchemaNodeMethodsType {
   reducers: JsonSchemaReducer[];
   resolvers: JsonSchemaResolver[];
   validators: JsonSchemaValidator[];
+  schemaValidation?: ValidationAnnotation[];
   $id?: string;
   $defs?: Record<string, SchemaNode>;
   $ref?: string;
@@ -259,7 +287,9 @@ interface SchemaNode extends SchemaNodeMethodsType {
   contains?: SchemaNode;
   dependentRequired?: Record<string, string[]>;
   dependentSchemas?: Record<string, SchemaNode | boolean>;
+  deprecated?: boolean;
   else?: SchemaNode;
+  enum?: unknown[];
   if?: SchemaNode;
   /**
    * # Items-array schema - for all drafts
@@ -296,18 +326,32 @@ interface SchemaNode extends SchemaNodeMethodsType {
    * | [AdditionalItems Specification](https://json-schema.org/draft/2019-09/draft-handrews-json-schema-02#additionalItems)
    */
   items?: SchemaNode;
+  maximum?: number;
+  minimum?: number;
+  maxItems?: number;
+  maxLength?: number;
+  maxProperties?: number;
+  minItems?: number;
+  minLength?: number;
+  minProperties?: number;
   not?: SchemaNode;
   oneOf?: SchemaNode[];
+  multipleOf?: number;
+  pattern?: RegExp;
   patternProperties?: {
     name: string;
     pattern: RegExp;
     node: SchemaNode;
   }[];
+  propertyDependencies?: Record<string, Record<string, SchemaNode>>;
   properties?: Record<string, SchemaNode>;
   propertyNames?: SchemaNode;
+  required?: string[];
   then?: SchemaNode;
+  type?: string | string[];
   unevaluatedItems?: SchemaNode;
   unevaluatedProperties?: SchemaNode;
+  uniqueItems?: true;
 }
 /**
  * Fixed SchemaNode mixin methods
@@ -466,14 +510,19 @@ type CompileOptions = {
   drafts?: Draft[];
   remote?: SchemaNode;
   formatAssertion?: boolean | "meta-schema" | undefined;
-  getDataDefaultOptions?: TemplateOptions;
+  getDataDefaultOptions?: TemplateOptions; /** set to true to throw an Errors on errors in input schema. Defaults to false */
+  throwOnInvalidSchema?: boolean; /** set to true to collect unknown keywords of input schema in `node.schemaAnnotations`. Defaults to false */
+  withSchemaAnnotations?: boolean;
 };
 /**
  * With compileSchema we replace the schema and all sub-schemas with a schemaNode,
  * wrapping each schema with utilities and as much preevaluation as possible. Each
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
-declare function compileSchema(schema: JsonSchema | BooleanSchema, options?: CompileOptions): SchemaNode;
+declare function compileSchema(schema: JsonSchema | BooleanSchema, options?: CompileOptions): SchemaNode & {
+  schemaErrors?: JsonError[];
+  schemaAnnotations: JsonAnnotation[];
+};
 //#endregion
 //#region src/settings.d.ts
 declare const _default: {
@@ -601,6 +650,34 @@ declare const draftEditor: Draft;
 declare const oneOfKeyword: Keyword;
 declare const oneOfFuzzyKeyword: Keyword;
 //#endregion
+//#region src/keywords/propertyDependencies.d.ts
+/**
+ * @experimental `propertyDependencies` to resolve schema by nested name and value
+ * @reference https://docs.google.com/presentation/d/1ajXlCQcsjjiMLsluFIILR7sN5aDRBnfqQ9DLbcFbqjI/mobilepresent?slide=id.p
+ *
+ * - matching schemas are resolved and validiated
+ * - multiple matching schemas are resolved and validiated
+ * - ignores keyword if no schema is matched
+ *
+ * @example
+ * {
+ *   type: "object",
+ *   propertyDependencies: {
+ *      propertyName: {
+ *          propertyValue: { $ref: "#/$defs/schema" }
+ *      }
+ *   }
+ * }
+ *
+ * matches
+ *
+ * {
+ *   "propertyName": "propertyValue",
+ *   "otherData": 123
+ * } with "#/$defs/schema"
+ */
+declare const propertyDependenciesKeyword: Keyword;
+//#endregion
 //#region src/errors/render.d.ts
 declare function render(template: string, data?: Record<string, unknown>): string;
 //#endregion
@@ -634,4 +711,4 @@ declare function sanitizeErrors(list: ValidationReturnType | ValidationReturnTyp
 /** remote meta-schema stored by schema $id */
 declare const remotes: Record<string, any>;
 //#endregion
-export { type Annotation, type AnnotationData, type BooleanSchema, type CompileOptions, type Context, type DataNode, type Draft, type DraftVersion, type ErrorConfig, type GetNodeOptions, type JsonAnnotation, type JsonError, type JsonPointer, type JsonSchema, type JsonSchemaReducer, type JsonSchemaReducerParams, type JsonSchemaResolver, type JsonSchemaResolverParams, type JsonSchemaValidator, type JsonSchemaValidatorParams, type Keyword, type Maybe, type NodeOrError, type OptionalNodeOrError, type SchemaNode, type ValidateReturnType, type ValidationAnnotation, type ValidationPath, type ValidationReturnType, addKeywords, compileSchema, draft04, draft06, draft07, draft2019, draft2020, draftEditor, extendDraft, getSchemaType, getTypeOf, isAnnotation, isBooleanSchema, isJsonAnnotation, isJsonError, isJsonSchema, isReduceable, isSchemaNode, mergeNode, mergeSchema, oneOfFuzzyKeyword, oneOfKeyword, remotes, render, sanitizeErrors, _default as settings };
+export { type Annotation, type AnnotationData, type BooleanSchema, type CompileOptions, type Context, type DataNode, type Draft, type DraftVersion, type ErrorConfig, type GetNodeOptions, type JsonAnnotation, type JsonError, type JsonPointer, type JsonSchema, type JsonSchemaReducer, type JsonSchemaReducerParams, type JsonSchemaResolver, type JsonSchemaResolverParams, type JsonSchemaValidator, type JsonSchemaValidatorParams, type Keyword, type Maybe, type NodeOrError, type OptionalNodeOrError, type SchemaNode, type ValidateReturnType, type ValidationAnnotation, type ValidationPath, type ValidationReturnType, addKeywords, compileSchema, draft04, draft06, draft07, draft2019, draft2020, draftEditor, extendDraft, getSchemaType, getTypeOf, isAnnotation, isBooleanSchema, isJsonAnnotation, isJsonError, isJsonSchema, isReduceable, isSchemaNode, mergeNode, mergeSchema, oneOfFuzzyKeyword, oneOfKeyword, propertyDependenciesKeyword, remotes, render, sanitizeErrors, _default as settings };

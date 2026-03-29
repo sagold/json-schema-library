@@ -3,6 +3,7 @@ import { strict as assert } from "assert";
 import { extendDraft } from "./Draft";
 import { draft2020 } from "./draft2020";
 import { propertyDependenciesKeyword } from "./keywords/propertyDependencies";
+import { draft07 } from "./draft07";
 
 const withAdditionalKeywords = {
     drafts: [
@@ -248,5 +249,65 @@ describe("validateSchema", () => {
         const { schemaErrors } = compileSchema({ uniqueItems: {} });
         assert.equal(schemaErrors?.length, 1);
         assert.equal(schemaErrors[0].data.pointer, "#/uniqueItems");
+    });
+
+    describe("annotations", () => {
+        it("should return unknown keywords as annotation", () => {
+            const { schemaAnnotations } = compileSchema(
+                {
+                    properties: {
+                        headline: {
+                            options: {},
+                            type: "string"
+                        }
+                    }
+                },
+                { withSchemaAnnotations: true }
+            );
+            assert.equal(schemaAnnotations.length, 1);
+            assert.equal(schemaAnnotations[0].data.pointer, "#/properties/headline/options");
+        });
+        it("should return not unknown keywords starting with 'x-'", () => {
+            const { schemaAnnotations } = compileSchema(
+                {
+                    properties: {
+                        headline: {
+                            "x-options": {},
+                            type: "string"
+                        }
+                    }
+                },
+                { withSchemaAnnotations: true }
+            );
+            assert.equal(schemaAnnotations.length, 0);
+        });
+        it("should return removed keywords from old drafts as annotation", () => {
+            const { schemaAnnotations } = compileSchema(
+                {
+                    properties: {
+                        headline: {
+                            additionalItems: true
+                        }
+                    }
+                },
+                { withSchemaAnnotations: true }
+            );
+            assert.equal(schemaAnnotations.length, 1);
+            assert.equal(schemaAnnotations[0].data.pointer, "#/properties/headline/additionalItems");
+        });
+        it("should return new keywords in old drafts as annotation", () => {
+            const { schemaAnnotations } = compileSchema(
+                {
+                    properties: {
+                        headline: {
+                            prefixItems: []
+                        }
+                    }
+                },
+                { drafts: [draft07], withSchemaAnnotations: true }
+            );
+            assert.equal(schemaAnnotations.length, 1);
+            assert.equal(schemaAnnotations[0].data.pointer, "#/properties/headline/prefixItems");
+        });
     });
 });
