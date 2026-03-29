@@ -17,7 +17,6 @@ describe("validateSchema", () => {
     it("should error if `$defs` is not an object", () => {
         const { schemaErrors } = compileSchema({ $defs: true });
         assert.equal(schemaErrors?.length, 1);
-        console.log(schemaErrors[0]);
     });
     it("should throw an error if schema is invalid and option 'throwOnInvalidSchema = true'", () => {
         assert.throws(() => {
