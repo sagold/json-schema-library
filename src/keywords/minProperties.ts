@@ -1,14 +1,35 @@
 import { isObject } from "../utils/isObject";
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import { SchemaNode } from "../SchemaNode";
+import { isNumber } from "../types";
 
-export const minPropertiesKeyword: Keyword = {
-    id: "minProperties",
-    keyword: "minProperties",
-    addValidate: ({ schema }) => !isNaN(schema.minProperties),
+const KEYWORD = "minProperties";
+
+export const minPropertiesKeyword: Keyword<"minProperties"> = {
+    id: KEYWORD,
+    keyword: KEYWORD,
+    parse: parseMinItems,
+    addValidate: (node) => node[KEYWORD] != null,
     validate: validateMinProperties
 };
 
-function validateMinProperties({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
+function parseMinItems(node: SchemaNode) {
+    const min = node.schema[KEYWORD];
+    if (min == null) {
+        return;
+    }
+    if (!isNumber(min)) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: min,
+            message: `Keyword '${KEYWORD}' must be a number - received '${typeof min}'`
+        });
+    }
+    node[KEYWORD] = min;
+}
+
+function validateMinProperties({ node, data, pointer = "#" }: JsonSchemaValidatorParams<"minProperties">) {
     if (!isObject(data)) {
         return;
     }

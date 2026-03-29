@@ -1,29 +1,41 @@
-import { JsonError } from "../types";
+import { isBooleanSchema, isJsonSchema, JsonError } from "../types";
 import { isObject } from "../utils/isObject";
 import { SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
 import { validateNode } from "../validateNode";
 
+const KEYWORD = "propertyNames";
+
 export const propertyNamesKeyword: Keyword = {
-    id: "propertyNames",
-    keyword: "propertyNames",
+    id: KEYWORD,
+    keyword: KEYWORD,
     parse: parsePropertyNames,
-    addValidate: ({ schema }) => schema.propertyNames != null,
+    addValidate: (node) => node.schema[KEYWORD] != null,
     validate: validatePropertyNames
 };
 
 export function parsePropertyNames(node: SchemaNode) {
-    const { propertyNames } = node.schema;
+    const propertyNames = node.schema[KEYWORD];
     if (propertyNames == null) {
         return;
     }
-    if (isObject(propertyNames)) {
-        node.propertyNames = node.compileSchema(
-            propertyNames,
-            `${node.evaluationPath}/propertyNames`,
-            `${node.schemaLocation}/propertyNames`
-        );
+    if (!(isJsonSchema(propertyNames) || isBooleanSchema(propertyNames))) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: propertyNames,
+            message: `Keyword '${KEYWORD}' must be a valid JSON Schema - received '${typeof propertyNames}'`
+        });
     }
+    if (isBooleanSchema(propertyNames)) {
+        return;
+    }
+    node.propertyNames = node.compileSchema(
+        propertyNames,
+        `${node.evaluationPath}/propertyNames`,
+        `${node.schemaLocation}/propertyNames`
+    );
+    return node.schemaValidation;
 }
 
 function validatePropertyNames({ node, data, pointer, path }: JsonSchemaValidatorParams) {
@@ -46,11 +58,11 @@ function validatePropertyNames({ node, data, pointer, path }: JsonSchemaValidato
         });
     }
 
-    if (schema.propertyNames === true) {
+    if (schema[KEYWORD] === true) {
         return undefined;
     }
 
-    const propertyNames = node.propertyNames;
+    const propertyNames = node[KEYWORD];
     if (!isObject(propertyNames)) {
         // ignore invalid schema
         return undefined;

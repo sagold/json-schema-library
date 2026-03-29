@@ -1,13 +1,32 @@
-import { JsonError } from "../types";
+import { JsonError, SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
 import deepEqual from "fast-deep-equal";
 
+const KEYWORD = "uniqueItems";
+
 export const uniqueItemsKeyword: Keyword = {
-    id: "uniqueItems",
-    keyword: "uniqueItems",
-    addValidate: ({ schema }) => schema.uniqueItems === true,
+    id: KEYWORD,
+    keyword: KEYWORD,
+    parse: parseUniqueItems,
+    addValidate: ({ schema }) => schema[KEYWORD] === true,
     validate: validateUniqueItems
 };
+
+function parseUniqueItems(node: SchemaNode) {
+    const uniqueItems = node.schema[KEYWORD];
+    if (uniqueItems == null || uniqueItems === false) {
+        return;
+    }
+    if (typeof uniqueItems !== "boolean") {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: uniqueItems,
+            message: `Keyword '${KEYWORD}' must be a boolean - received ${typeof uniqueItems}`
+        });
+    }
+    node.uniqueItems = true;
+}
 
 function validateUniqueItems({ node, data, pointer }: JsonSchemaValidatorParams) {
     if (!Array.isArray(data)) {

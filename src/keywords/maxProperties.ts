@@ -1,25 +1,46 @@
 import { isObject } from "../utils/isObject";
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import { SchemaNode } from "../SchemaNode";
+import { isNumber } from "../types";
 
-export const maxPropertiesKeyword: Keyword = {
-    id: "maxProperties",
-    keyword: "maxProperties",
-    addValidate: ({ schema }) => !isNaN(schema.maxProperties),
+const KEYWORD = "maxProperties";
+
+export const maxPropertiesKeyword: Keyword<typeof KEYWORD> = {
+    id: KEYWORD,
+    keyword: KEYWORD,
+    parse: parseMaxProperties,
+    addValidate: (node) => node[KEYWORD] != null,
     validate: validateMaxProperties
 };
 
-function validateMaxProperties({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
+function parseMaxProperties(node: SchemaNode) {
+    const max = node.schema[KEYWORD];
+    if (max == null) {
+        return;
+    }
+    if (!isNumber(max)) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: max,
+            message: `Keyword '${KEYWORD}' must be a number - received '${typeof max}'`
+        });
+    }
+    node[KEYWORD] = max;
+}
+
+function validateMaxProperties({ node, data, pointer = "#" }: JsonSchemaValidatorParams<typeof KEYWORD>) {
     if (!isObject(data)) {
         return;
     }
-    const { schema } = node;
+    const maxProperties = node[KEYWORD];
     const propertyCount = Object.keys(data).length;
-    if (isNaN(schema.maxProperties) === false && schema.maxProperties < propertyCount) {
+    if (maxProperties < propertyCount) {
         return node.createError("max-properties-error", {
-            maxProperties: schema.maxProperties,
+            maxProperties: maxProperties,
             length: propertyCount,
             pointer,
-            schema,
+            schema: node.schema,
             value: data
         });
     }

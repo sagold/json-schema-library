@@ -3,7 +3,8 @@ import {
     JsonSchemaReducerParams,
     JsonSchemaValidatorParams,
     ValidationPath,
-    ValidationReturnType
+    ValidationReturnType,
+    ValidationAnnotation
 } from "../Keyword";
 import { isSchemaNode, SchemaNode } from "../types";
 import settings from "../settings";
@@ -13,15 +14,16 @@ import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
 import { joinDynamicId } from "../SchemaNode";
 
+const KEYWORD = "oneOf";
 const { DECLARATOR_ONEOF } = settings;
 
 export const oneOfKeyword: Keyword = {
-    id: "oneOf",
-    keyword: "oneOf",
+    id: KEYWORD,
+    keyword: KEYWORD,
     parse: parseOneOf,
-    addReduce: (node) => node.oneOf != null,
+    addReduce: (node) => node[KEYWORD] != null,
     reduce: reduceOneOf,
-    addValidate: (node) => node.oneOf != null,
+    addValidate: (node) => node[KEYWORD] != null,
     validate: oneOfValidator
 };
 
@@ -37,11 +39,29 @@ export const oneOfFuzzyKeyword: Keyword = {
 
 export function parseOneOf(node: SchemaNode) {
     const { schema, evaluationPath, schemaLocation } = node;
-    if (Array.isArray(schema.oneOf) && schema.oneOf.length) {
-        node.oneOf = schema.oneOf.map((s, index) =>
-            node.compileSchema(s, `${evaluationPath}/oneOf/${index}`, `${schemaLocation}/oneOf/${index}`)
-        );
+    if (schema[KEYWORD] == null) {
+        return;
     }
+    if (!Array.isArray(schema[KEYWORD])) {
+        return node.createError("schema-error", {
+            pointer: schemaLocation,
+            schema,
+            value: schema[KEYWORD],
+            message: `Keyword '${KEYWORD}' must be an array - received '${typeof schema[KEYWORD]}'`
+        });
+    }
+    if (schema[KEYWORD].length === 0) {
+        return;
+    }
+
+    node[KEYWORD] = schema[KEYWORD].map((s, index) =>
+        node.compileSchema(s, `${evaluationPath}/${KEYWORD}/${index}`, `${schemaLocation}/${KEYWORD}/${index}`)
+    );
+
+    return node[KEYWORD].reduce((errors, node) => {
+        if (node.schemaValidation) errors.push(...node.schemaValidation);
+        return errors;
+    }, [] as ValidationAnnotation[]);
 }
 
 function reduceOneOf({ node, data, pointer, path }: Omit<JsonSchemaReducerParams, "key">) {

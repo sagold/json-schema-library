@@ -1,27 +1,48 @@
 import ucs2decode from "../utils/punycode.ucs2decode";
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import { SchemaNode } from "../SchemaNode";
+import { isNumber } from "../types";
 
-export const minLengthKeyword: Keyword = {
-    id: "minLength",
-    keyword: "minLength",
-    addValidate: ({ schema }) => !isNaN(schema.minLength),
+const KEYWORD = "minLength";
+
+export const minLengthKeyword: Keyword<"minLength"> = {
+    id: KEYWORD,
+    keyword: KEYWORD,
+    parse: parseMinLength,
+    addValidate: (node) => node[KEYWORD] != null,
     validate: validateMinLength
 };
 
-function validateMinLength({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
+function parseMinLength(node: SchemaNode) {
+    const min = node.schema[KEYWORD];
+    if (min == null) {
+        return;
+    }
+    if (!isNumber(min)) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: min,
+            message: `Keyword '${KEYWORD}' must be a number - received '${typeof min}'`
+        });
+    }
+    node[KEYWORD] = min;
+}
+
+function validateMinLength({ node, data, pointer = "#" }: JsonSchemaValidatorParams<"minLength">) {
     if (typeof data !== "string") {
         return;
     }
-    const { schema } = node;
     const length = ucs2decode(data).length;
-    if (schema.minLength <= length) {
+    const minLength = node[KEYWORD];
+    if (minLength <= length) {
         return;
     }
     return node.createError("min-length-error", {
-        minLength: schema.minLength,
+        minLength,
         length,
         pointer,
-        schema,
+        schema: node.schema,
         value: data
     });
 }

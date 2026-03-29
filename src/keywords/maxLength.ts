@@ -1,25 +1,46 @@
 import ucs2decode from "../utils/punycode.ucs2decode";
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import { SchemaNode } from "../SchemaNode";
+import { isNumber } from "../types";
 
-export const maxLengthKeyword: Keyword = {
-    id: "maxLength",
-    keyword: "maxLength",
-    addValidate: ({ schema }) => !isNaN(schema.maxLength),
+const KEYWORD = "maxLength";
+
+export const maxLengthKeyword: Keyword<"maxLength"> = {
+    id: KEYWORD,
+    keyword: KEYWORD,
+    parse: parseMaxLength,
+    addValidate: (node) => node[KEYWORD] != null,
     validate: validateMaxLength
 };
 
-function validateMaxLength({ node, data, pointer = "#" }: JsonSchemaValidatorParams) {
+function parseMaxLength(node: SchemaNode) {
+    const max = node.schema[KEYWORD];
+    if (max == null) {
+        return;
+    }
+    if (!isNumber(max)) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: max,
+            message: `Keyword '${KEYWORD}' must be a number - received '${typeof max}'`
+        });
+    }
+    node[KEYWORD] = max;
+}
+
+function validateMaxLength({ node, data, pointer = "#" }: JsonSchemaValidatorParams<"maxLength">) {
     if (typeof data !== "string") {
         return;
     }
-    const { schema } = node;
+    const maxLength = node[KEYWORD];
     const length = ucs2decode(data).length;
-    if (schema.maxLength < length) {
+    if (maxLength < length) {
         return node.createError("max-length-error", {
-            maxLength: schema.maxLength,
+            maxLength: maxLength,
             length,
             pointer,
-            schema,
+            schema: node.schema,
             value: data
         });
     }

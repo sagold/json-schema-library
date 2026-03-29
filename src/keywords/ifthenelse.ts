@@ -1,6 +1,6 @@
 import { mergeSchema } from "../utils/mergeSchema";
-import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams } from "../Keyword";
-import { SchemaNode } from "../types";
+import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
+import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
 
 export const ifKeyword: Keyword = {
@@ -15,15 +15,59 @@ export const ifKeyword: Keyword = {
 
 export function parseIfThenElse(node: SchemaNode) {
     const { schema, evaluationPath } = node;
+    const errors: ValidationAnnotation[] = [];
     if (schema.if != null) {
-        node.if = node.compileSchema(schema.if, `${evaluationPath}/if`);
+        if (isJsonSchema(schema.if) || isBooleanSchema(schema.if)) {
+            node.if = node.compileSchema(schema.if, `${evaluationPath}/if`);
+            if (node.if.schemaValidation) {
+                errors.push(...node.if.schemaValidation);
+            }
+        } else {
+            errors.push(
+                node.createError("schema-error", {
+                    pointer: `${node.schemaLocation}/if`,
+                    schema: node.schema,
+                    value: schema.if,
+                    message: `Keyword 'if' must be valid JSON Schema - received '${typeof schema.if}'`
+                })
+            );
+        }
     }
     if (schema.then != null) {
-        node.then = node.compileSchema(schema.then, `${evaluationPath}/then`);
+        if (isJsonSchema(schema.then) || isBooleanSchema(schema.then)) {
+            node.then = node.compileSchema(schema.then, `${evaluationPath}/then`);
+            if (node.then.schemaValidation) {
+                errors.push(...node.then.schemaValidation);
+            }
+        } else {
+            errors.push(
+                node.createError("schema-error", {
+                    pointer: `${node.schemaLocation}/then`,
+                    schema: node.schema,
+                    value: schema.then,
+                    message: `Keyword 'then' must be valid JSON Schema - received '${typeof schema.then}'`
+                })
+            );
+        }
     }
     if (schema.else != null) {
-        node.else = node.compileSchema(schema.else, `${evaluationPath}/else`);
+        if (isJsonSchema(schema.else) || isBooleanSchema(schema.else)) {
+            node.else = node.compileSchema(schema.else, `${evaluationPath}/else`);
+            if (node.else.schemaValidation) {
+                errors.push(...node.else.schemaValidation);
+            }
+        } else {
+            errors.push(
+                node.createError("schema-error", {
+                    pointer: `${node.schemaLocation}/else`,
+                    schema: node.schema,
+                    value: schema.else,
+                    message: `Keyword 'else' must be valid JSON Schema - received '${typeof schema.else}'`
+                })
+            );
+        }
     }
+    return errors;
 }
 
 function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {

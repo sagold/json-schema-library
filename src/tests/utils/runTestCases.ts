@@ -23,7 +23,11 @@ function runTestCase(setup: Setup, tc: FeatureTest, remotes: SchemaNode) {
             const $schema = setup.metaSchema.$id ?? setup.metaSchema.id;
             // get schema and add $schema to identify draft version
             const schema = isObject(testCase.schema) ? { $schema, ...testCase.schema } : testCase.schema;
-            const node = compileSchema(schema, { remote: remotes, formatAssertion: tc.optional });
+            const node = compileSchema(schema, {
+                remote: remotes,
+                formatAssertion: tc.optional,
+                throwOnInvalidSchema: true
+            });
 
             // register tests
             describe(testCase.description, () => {

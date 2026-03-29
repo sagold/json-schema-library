@@ -1,13 +1,15 @@
 import { mergeSchema } from "../utils/mergeSchema";
 import { isObject } from "../utils/isObject";
-import { isSchemaNode, SchemaNode, JsonSchema } from "../types";
+import { isSchemaNode, SchemaNode, JsonSchema, isBooleanSchema } from "../types";
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
 import { validateNode } from "../validateNode";
 import sanitizeErrors from "../utils/sanitizeErrors";
 
+const KEYWORD = "dependentSchemas";
+
 export const dependentSchemasKeyword: Keyword = {
-    id: "dependentSchemas",
-    keyword: "dependentSchemas",
+    id: KEYWORD,
+    keyword: KEYWORD,
     parse: parseDependentSchemas,
     addReduce: (node) => node.dependentSchemas != null,
     reduce: reduceDependentSchemas,
@@ -17,29 +19,51 @@ export const dependentSchemasKeyword: Keyword = {
 
 export function parseDependentSchemas(node: SchemaNode) {
     const { dependentSchemas } = node.schema;
+    if (dependentSchemas == null) {
+        return;
+    }
     if (!isObject(dependentSchemas)) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: dependentSchemas,
+            message: `Keyword '${KEYWORD}' must be an object - received '${typeof dependentSchemas}'`
+        });
+    }
+
+    const dependentProperties = Object.keys(dependentSchemas);
+    if (dependentProperties.length === 0) {
         return;
     }
 
-    const schemas = Object.keys(dependentSchemas);
-    if (schemas.length === 0) {
-        return;
-    }
-
+    const errors: ValidationAnnotation[] = [];
     const parsedSchemas: Record<string, boolean | SchemaNode> = {};
-    schemas.forEach((property) => {
+    for (const property of Object.keys(dependentSchemas)) {
         const schema = dependentSchemas[property];
         if (isObject(schema)) {
             parsedSchemas[property] = node.compileSchema(
                 schema,
-                `${node.evaluationPath}/dependentSchemas/${property}`,
-                `${node.schemaLocation}/dependentSchemas/${property}`
+                `${node.evaluationPath}/${KEYWORD}/${property}`,
+                `${node.schemaLocation}/${KEYWORD}/${property}`
             );
-        } else if (typeof schema === "boolean") {
+            if (parsedSchemas[property].schemaValidation) {
+                errors.push(...parsedSchemas[property].schemaValidation);
+            }
+        } else if (isBooleanSchema(schema)) {
             parsedSchemas[property] = schema;
+        } else {
+            errors.push(
+                node.createError("schema-error", {
+                    pointer: `${node.schemaLocation}/${KEYWORD}/${property}`,
+                    schema: node.schema,
+                    value: schema,
+                    message: `Keyword '${KEYWORD}[string]' must be a valid JSON Schema'`
+                })
+            );
         }
-    });
+    }
     node.dependentSchemas = parsedSchemas;
+    return errors;
 }
 
 export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) {
@@ -62,7 +86,7 @@ export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) 
         } else {
             mergedSchema.properties[propertyName] = dependentSchemas[propertyName];
         }
-        dynamicId += `${added ? "," : ""}dependentSchemas/${propertyName}`;
+        dynamicId += `${added ? "," : ""}${KEYWORD}/${propertyName}`;
         added++;
     });
 
@@ -70,7 +94,7 @@ export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) 
         return node;
     }
 
-    mergedSchema = mergeSchema(node.schema, mergedSchema, "dependentSchemas");
+    mergedSchema = mergeSchema(node.schema, mergedSchema, KEYWORD);
     return node.compileSchema(mergedSchema, node.evaluationPath, node.schemaLocation, `${dynamicId})`);
 }
 

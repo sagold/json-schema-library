@@ -24,7 +24,8 @@ import {
     OptionalNodeOrError,
     NodeOrError,
     JsonAnnotation,
-    isJsonAnnotation
+    isJsonAnnotation,
+    isBooleanSchema
 } from "./types";
 import { isObject } from "./utils/isObject";
 import { join } from "@sagold/json-pointer";
@@ -129,6 +130,7 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     reducers: JsonSchemaReducer[];
     resolvers: JsonSchemaResolver[];
     validators: JsonSchemaValidator[];
+    schemaValidation?: ValidationAnnotation[];
 
     // parsed schema properties (registered by parsers)
     $id?: string;
@@ -140,7 +142,9 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     contains?: SchemaNode;
     dependentRequired?: Record<string, string[]>;
     dependentSchemas?: Record<string, SchemaNode | boolean>;
+    deprecated?: boolean;
     else?: SchemaNode;
+    enum?: unknown[];
     if?: SchemaNode;
     /**
      * # Items-array schema - for all drafts
@@ -177,15 +181,28 @@ export interface SchemaNode extends SchemaNodeMethodsType {
      * | [AdditionalItems Specification](https://json-schema.org/draft/2019-09/draft-handrews-json-schema-02#additionalItems)
      */
     items?: SchemaNode;
+    maximum?: number;
+    minimum?: number;
+    maxItems?: number;
+    maxLength?: number;
+    maxProperties?: number;
+    minItems?: number;
+    minLength?: number;
+    minProperties?: number;
     not?: SchemaNode;
     oneOf?: SchemaNode[];
+    multipleOf?: number;
+    pattern?: RegExp;
     patternProperties?: { name: string; pattern: RegExp; node: SchemaNode }[];
     propertyDependencies?: Record<string, Record<string, SchemaNode>>;
     properties?: Record<string, SchemaNode>;
     propertyNames?: SchemaNode;
+    required?: string[];
     then?: SchemaNode;
+    type?: string | string[];
     unevaluatedItems?: SchemaNode;
     unevaluatedProperties?: SchemaNode;
+    uniqueItems?: true;
 }
 
 /**
@@ -331,7 +348,20 @@ export const SchemaNodeMethods = {
             ...SchemaNodeMethods
         };
 
-        addKeywords(node);
+        if (!isJsonSchema(schema) && !isBooleanSchema(schema)) {
+            node.schemaValidation = [
+                node.createError("schema-error", {
+                    pointer: schemaLocation ?? evaluationPath,
+                    schema,
+                    value: undefined,
+                    message: `JSON schema must be object or boolean - reveived: '${schema}'`
+                })
+            ];
+            return node;
+        }
+        const schemaValidation = addKeywords(node).filter((err) => err != null);
+        node.schemaValidation = sanitizeErrors(schemaValidation);
+
         return node;
     },
 
@@ -571,20 +601,19 @@ const noRefMergeDrafts = ["draft-04", "draft-06", "draft-07"];
 export function addKeywords(node: SchemaNode) {
     if (node.schema.$ref && noRefMergeDrafts.includes(node.context.version)) {
         // for these draft versions only ref is validated
-        node.context.keywords
+        return node.context.keywords
             .filter(({ keyword }) => whitelist.includes(keyword))
-            .forEach((keyword) => execKeyword(keyword, node));
-        return;
+            .map((keyword) => execKeyword(keyword, node));
     }
     const keys = Object.keys(node.schema);
-    node.context.keywords
+    return node.context.keywords
         .filter(({ keyword }) => keys.includes(keyword) || whitelist.includes(keyword))
-        .forEach((keyword) => execKeyword(keyword, node));
+        .map((keyword) => execKeyword(keyword, node));
 }
 
 export function execKeyword(keyword: Keyword, node: SchemaNode) {
     // @todo consider first parsing all nodes
-    keyword.parse?.(node);
+    const errors = keyword.parse?.(node);
     if (keyword.reduce && keyword.addReduce?.(node)) {
         node.reducers.push(keyword.reduce);
     }
@@ -594,4 +623,5 @@ export function execKeyword(keyword: Keyword, node: SchemaNode) {
     if (keyword.validate && keyword.addValidate?.(node)) {
         node.validators.push(keyword.validate);
     }
+    return errors;
 }

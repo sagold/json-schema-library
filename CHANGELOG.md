@@ -1,8 +1,19 @@
 ## Changelog
 
+### v11.1.0
+
+- introduced upcoming keyword `propertyDependenciesKeyword` to package export
+- added support for keyword `deprecatedMessage`
+- introduced schema validation
+
+### v11.0.4, v11.0.5
+
+- removed enforcing packageManager as this failed build-jobs
+
 ### v11.0.3
 
 - fixed type of main input-schema to support boolean
+- enforced yarn as a package manager
 
 ### v11.0.2
 

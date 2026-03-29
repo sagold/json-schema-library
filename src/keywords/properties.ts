@@ -1,6 +1,12 @@
 import { getValue } from "../utils/getValue";
-import { SchemaNode } from "../types";
-import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
+import { JsonError, SchemaNode } from "../types";
+import {
+    Keyword,
+    JsonSchemaResolverParams,
+    JsonSchemaValidatorParams,
+    ValidationReturnType,
+    ValidationAnnotation
+} from "../Keyword";
 import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
 
@@ -20,18 +26,35 @@ function propertyResolver({ node, key }: JsonSchemaResolverParams) {
 
 export function parseProperties(node: SchemaNode) {
     const { schema, evaluationPath, schemaLocation } = node;
-    if (schema.properties) {
-        const parsedProperties: Record<string, SchemaNode> = {};
-        Object.keys(schema.properties).forEach((propertyName) => {
-            const propertyNode = node.compileSchema(
-                schema.properties[propertyName],
-                `${evaluationPath}/properties/${propertyName}`,
-                `${schemaLocation}/properties/${propertyName}`
-            );
-            parsedProperties[propertyName] = propertyNode;
-        });
-        node.properties = parsedProperties;
+    if (schema.properties == null) {
+        return;
     }
+
+    if (schema.properties && !isObject(schema.properties)) {
+        return node.createError("schema-error", {
+            pointer: schemaLocation,
+            schema,
+            value: undefined,
+            message: "keyword `properties` must be of type `object`"
+        });
+    }
+
+    const errors: ValidationAnnotation[] = [];
+    const parsedProperties: Record<string, SchemaNode> = {};
+    Object.keys(schema.properties).forEach((propertyName) => {
+        const propertyNode = node.compileSchema(
+            schema.properties[propertyName],
+            `${evaluationPath}/properties/${propertyName}`,
+            `${schemaLocation}/properties/${propertyName}`
+        );
+        parsedProperties[propertyName] = propertyNode;
+        if (parsedProperties[propertyName].schemaValidation) {
+            errors.push(...parsedProperties[propertyName].schemaValidation);
+        }
+    });
+    node.properties = parsedProperties;
+
+    return errors;
 }
 
 function validateProperties({ node, data, pointer, path }: JsonSchemaValidatorParams) {

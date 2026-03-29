@@ -74,5 +74,7 @@ export const errors = {
     "unknown-property-error": "Could not find a valid schema for property `{{pointer}}` within object",
     "value-not-empty-error": "A value for `{{property}}` is required at `{{pointer}}`",
     // annotations
-    "deprecated-warning": "Value at `{{pointer}}` is deprecated"
+    "deprecated-warning": "Value at `{{pointer}}` is deprecated",
+    // schema validation
+    "schema-error": "Invalid schema found at {{pointer}}: {{message}}"
 };

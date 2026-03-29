@@ -37,9 +37,12 @@ function mergeObjects(a?: Record<string, SchemaNode>, b?: Record<string, SchemaN
     return object;
 }
 
-// function mergeArray<T = unknown[]>(a?: T[], b?: T[]) {
-//     return a || b ? [...(a ?? []), ...(b ?? [])] : undefined;
-// }
+function combineArrays<T>(a?: T[], b?: T[]): T[] | undefined {
+    if (a == null || b == null) {
+        return b || a;
+    }
+    return a.concat(b).filter((value, index, list) => list.indexOf(value) === index);
+}
 
 function mergePatternProperties(a?: SchemaNode["patternProperties"], b?: SchemaNode["patternProperties"]) {
     if (a == null || b == null) {
@@ -92,6 +95,7 @@ export function mergeNode(a?: SchemaNode, b?: SchemaNode, ...omit: string[]): Sc
 
         additionalProperties: mergeNode(a.additionalProperties, b.additionalProperties),
         contains: mergeNode(a.contains, b.contains),
+        enum: combineArrays(a.enum, b.enum),
         if: mergeNode(a.if, b.if),
         then: mergeNode(a.then, b.then),
         else: mergeNode(a.else, b.else),
@@ -101,7 +105,8 @@ export function mergeNode(a?: SchemaNode, b?: SchemaNode, ...omit: string[]): Sc
         unevaluatedItems: mergeNode(a.unevaluatedItems, b.unevaluatedItems),
         $defs: mergeObjects(a.$defs, b.$defs),
         patternProperties: mergePatternProperties(a.patternProperties, b.patternProperties),
-        properties: mergeObjects(a.properties, b.properties)
+        properties: mergeObjects(a.properties, b.properties),
+        required: combineArrays(a.required, b.required)
     };
 
     // this removes any function that has no keyword associated on schema

@@ -1,15 +1,16 @@
 import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
-import { SchemaNode } from "../types";
-import { isObject } from "../utils/isObject";
+import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
 
+const KEYWORD = "items";
+
 export const itemsKeyword: Keyword = {
-    id: "items",
-    keyword: "items",
+    id: KEYWORD,
+    keyword: KEYWORD,
     parse: parseItems,
-    addResolve: (node) => node.items != null,
+    addResolve: (node) => node[KEYWORD] != null,
     resolve: itemsResolver,
-    addValidate: ({ schema }) => schema.items != null,
+    addValidate: (node) => node[KEYWORD] != null,
     validate: validateItems
 };
 
@@ -23,14 +24,27 @@ function itemsResolver({ node, key }: JsonSchemaResolverParams) {
 }
 
 export function parseItems(node: SchemaNode) {
-    const { schema, evaluationPath } = node;
-    if (isObject(schema.items)) {
-        const propertyNode = node.compileSchema(
-            schema.items,
-            `${evaluationPath}/items`,
-            `${node.schemaLocation}/items`
+    const items = node.schema[KEYWORD];
+    if (items == null) {
+        return;
+    }
+    if (!(isJsonSchema(items) || isBooleanSchema(items))) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: items,
+            message: `Keyword '${KEYWORD}' must be a valid JSON Schema - received '${typeof items}'`
+        });
+    }
+
+    if (items !== true) {
+        // @todo remove skipping boolean schema
+        node[KEYWORD] = node.compileSchema(
+            items,
+            `${node.evaluationPath}/${KEYWORD}`,
+            `${node.schemaLocation}/${KEYWORD}`
         );
-        node.items = propertyNode;
+        return node[KEYWORD].schemaValidation;
     }
 }
 

@@ -1,20 +1,22 @@
 import { isObject } from "../utils/isObject";
-import { SchemaNode } from "../types";
+import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
 import { validateNode } from "../validateNode";
 
+const KEYWORD = "contains";
+
 export const containsKeyword: Keyword = {
-    id: "contains",
-    keyword: "contains",
+    id: KEYWORD,
+    keyword: KEYWORD,
     parse: parseContains,
-    addValidate: (node) => node.contains != null,
+    addValidate: (node) => node[KEYWORD] != null,
     validate: validateContains,
-    addReduce: (node) => node.contains != null,
+    addReduce: (node) => node[KEYWORD] != null,
     reduce: ({ node }) => {
         return node.compileSchema(
             {
                 items: {
-                    anyOf: [node.contains!.schema] // we tested for contains in addReduce
+                    anyOf: [node[KEYWORD]!.schema] // we tested for contains in addReduce
                 }
             },
             node.evaluationPath,
@@ -24,11 +26,21 @@ export const containsKeyword: Keyword = {
 };
 
 export function parseContains(node: SchemaNode) {
-    const { schema, evaluationPath } = node;
-    if (schema.contains == null) {
+    const contains = node.schema[KEYWORD];
+    if (contains == null) {
         return;
     }
-    node.contains = node.compileSchema(schema.contains, `${evaluationPath}/contains`);
+    if (!(isJsonSchema(contains) || isBooleanSchema(contains))) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: contains,
+            message: `Keyword '${KEYWORD}' must be a valid JSON Schema - received '${typeof contains}'`
+        });
+    }
+
+    node[KEYWORD] = node.compileSchema(contains, `${node.evaluationPath}/${KEYWORD}`);
+    return node[KEYWORD].schemaValidation;
 }
 
 function validateContains({ node, data, pointer, path }: JsonSchemaValidatorParams) {

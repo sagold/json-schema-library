@@ -1,26 +1,43 @@
 import { isObject } from "../utils/isObject";
-import { SchemaNode } from "../types";
+import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
 import { validateNode } from "../validateNode";
 import { isPropertyEvaluated } from "../isPropertyEvaluated";
 
+const KEYWORD = "unevaluatedProperties";
+
 export const unevaluatedPropertiesKeyword: Keyword = {
-    id: "unevaluatedProperties",
-    keyword: "unevaluatedProperties",
+    id: KEYWORD,
+    keyword: KEYWORD,
     parse: parseUnevaluatedProperties,
-    addValidate: ({ schema }) => schema.unevaluatedProperties != null,
+    addValidate: ({ schema }) => schema[KEYWORD] != null, // currently we do not store boolean schema
     validate: validateUnevaluatedProperties
 };
 
 export function parseUnevaluatedProperties(node: SchemaNode) {
-    if (!isObject(node.schema.unevaluatedProperties)) {
+    const unevaluatedProperties = node.schema[KEYWORD];
+    if (unevaluatedProperties == null) {
         return;
     }
+    if (!(isJsonSchema(unevaluatedProperties) || isBooleanSchema(unevaluatedProperties))) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: unevaluatedProperties,
+            message: `Keyword '${KEYWORD}' must be a valid JSON Schema - received '${typeof unevaluatedProperties}'`
+        });
+    }
+
+    if (isBooleanSchema(unevaluatedProperties)) {
+        return;
+    }
+
     node.unevaluatedProperties = node.compileSchema(
         node.schema.unevaluatedProperties,
-        `${node.evaluationPath}/unevaluatedProperties`,
-        `${node.schemaLocation}/unevaluatedProperties`
+        `${node.evaluationPath}/${KEYWORD}`,
+        `${node.schemaLocation}/${KEYWORD}`
     );
+    return node.unevaluatedProperties.schemaValidation;
 }
 
 // @todo we should use collected annotation to evaluated unevaluate properties

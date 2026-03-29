@@ -1,26 +1,39 @@
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
-import { SchemaNode } from "../types";
+import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
 
-export const notKeyword: Keyword = {
-    id: "not",
-    keyword: "not",
+const KEYWORD = "not";
+
+export const notKeyword: Keyword<"not"> = {
+    id: KEYWORD,
+    keyword: KEYWORD,
     parse: parseNot,
-    addValidate: (node) => node.not != null,
+    addValidate: (node) => node[KEYWORD] != null,
     validate: validateNot
 };
 
 export function parseNot(node: SchemaNode) {
     const { schema, evaluationPath, schemaLocation } = node;
-    if (schema.not != null) {
-        node.not = node.compileSchema(schema.not, `${evaluationPath}/not`, `${schemaLocation}/not`);
+    const not = schema[KEYWORD];
+    if (not == null) {
+        return;
     }
+    if (!isJsonSchema(not) && !isBooleanSchema(not)) {
+        return node.createError("schema-error", {
+            pointer: `${schemaLocation}/${KEYWORD}`,
+            schema,
+            value: not,
+            message: `Keyword '${KEYWORD}' must be a valid JSON Schema - received '${typeof not}'`
+        });
+    }
+    node[KEYWORD] = node.compileSchema(schema[KEYWORD], `${evaluationPath}/not`, `${schemaLocation}/not`);
+    return node[KEYWORD].schemaValidation;
 }
 
-function validateNot({ node, data, pointer, path }: JsonSchemaValidatorParams) {
+function validateNot({ node, data, pointer, path }: JsonSchemaValidatorParams<"not">) {
     const { schema } = node;
     // not has been tested in addValidate
-    if (validateNode(node.not!, data, pointer, path).length === 0) {
-        return node.createError("not-error", { value: data, not: schema.not, pointer, schema });
+    if (validateNode(node[KEYWORD]!, data, pointer, path).length === 0) {
+        return node.createError("not-error", { value: data, not: schema[KEYWORD], pointer, schema });
     }
 }

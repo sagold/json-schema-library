@@ -1,13 +1,18 @@
-import { Keyword, JsonSchemaValidatorParams, JsonSchemaReducerParams, ValidationReturnType } from "../Keyword";
-import { JsonSchema, SchemaNode } from "../types";
+import {
+    Keyword,
+    JsonSchemaValidatorParams,
+    JsonSchemaReducerParams,
+    ValidationReturnType,
+    ValidationAnnotation
+} from "../Keyword";
+import { isBooleanSchema, isJsonSchema, JsonSchema, SchemaNode } from "../types";
+import { hasProperty } from "../utils/hasProperty";
 import { isObject } from "../utils/isObject";
 import { mergeSchema } from "../utils/mergeSchema";
 import sanitizeErrors from "../utils/sanitizeErrors";
 import { validateNode } from "../validateNode";
 
-export const KEYWORD = "propertyDependencies";
-export const hasPropertyDependencies = (schema: JsonSchema) =>
-    isObject(schema[KEYWORD]) && Object.keys(schema[KEYWORD]).length > 0;
+const KEYWORD = "propertyDependencies";
 
 function findMatchingSchemata(node: SchemaNode, data: Record<string, unknown>) {
     const dependentProperties = node[KEYWORD];
@@ -17,7 +22,7 @@ function findMatchingSchemata(node: SchemaNode, data: Record<string, unknown>) {
     const dependentPropertyNames = Object.keys(dependentProperties);
     const matchingSchemata: { property: string; value: string; node: SchemaNode }[] = [];
     for (const propertyName of dependentPropertyNames) {
-        if (data.hasOwnProperty(propertyName)) {
+        if (hasProperty(data, propertyName)) {
             const value = data[propertyName];
             if (dependentProperties[propertyName][value as string]) {
                 matchingSchemata.push({
@@ -67,23 +72,56 @@ export const propertyDependenciesKeyword: Keyword = {
 };
 
 function parsePropertyDependencies(node: SchemaNode) {
-    if (!hasPropertyDependencies(node.schema)) {
-        return;
+    const propertyDependencies = node.schema[KEYWORD];
+    if (!isObject(propertyDependencies)) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: propertyDependencies,
+            message: `Keyword '${KEYWORD}' must be an object - received '${typeof propertyDependencies}'`
+        });
     }
-    const propertyDependencies = node.schema[KEYWORD] as Record<string, Record<string, JsonSchema>>;
     const parsed: Record<string, Record<string, SchemaNode>> = {};
+    const errors: ValidationAnnotation[] = [];
     Object.keys(propertyDependencies).map((propertyName) => {
         const values = propertyDependencies[propertyName];
+        if (!isObject(values)) {
+            errors.push(
+                node.createError("schema-error", {
+                    pointer: `${node.schemaLocation}/${KEYWORD}/${propertyName}`,
+                    schema: node.schema,
+                    value: propertyDependencies,
+                    message: `Keyword '${KEYWORD}[string]' must be an object - received '${typeof propertyDependencies}'`
+                })
+            );
+            return;
+        }
         Object.keys(values).forEach((value) => {
+            const schema = values[value];
+            if (!(isJsonSchema(schema) || isBooleanSchema(schema))) {
+                errors.push(
+                    node.createError("schema-error", {
+                        pointer: `${node.schemaLocation}/${KEYWORD}/${propertyName}/${value}`,
+                        schema: node.schema,
+                        value: schema,
+                        message: `Keyword '${KEYWORD}[string][string]' must be a valid JSON Schema - received '${typeof schema}'`
+                    })
+                );
+                return;
+            }
             parsed[propertyName] = parsed[propertyName] ?? {};
             parsed[propertyName][value] = node.compileSchema(
-                propertyDependencies[propertyName][value],
+                schema,
                 `${node.evaluationPath}/${KEYWORD}/${propertyName}/${value}`,
                 `${node.schemaLocation}/${KEYWORD}/${propertyName}/${value}`
             );
+            if (parsed[propertyName][value].schemaValidation) {
+                errors.push(...parsed[propertyName][value].schemaValidation);
+            }
         });
     });
     node[KEYWORD] = parsed;
+    return errors;
 }
 
 function validatePropertyDependencies({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {

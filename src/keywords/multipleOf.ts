@@ -1,39 +1,60 @@
 import { getPrecision } from "../utils/getPrecision";
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import { SchemaNode } from "../SchemaNode";
+import { isNumber } from "../types";
 
-export const multipleOfKeyword: Keyword = {
-    id: "multipleOf",
-    keyword: "multipleOf",
-    addValidate: ({ schema }) => !isNaN(schema.multipleOf),
+const KEYWORD = "multipleOf";
+
+export const multipleOfKeyword: Keyword<"multipleOf"> = {
+    id: KEYWORD,
+    keyword: KEYWORD,
+    parse: parseMultipleOf,
+    addValidate: (node) => node[KEYWORD] != null,
     validate: validateMultipleOf
 };
 
-function validateMultipleOf({ node, data, pointer }: JsonSchemaValidatorParams) {
+function parseMultipleOf(node: SchemaNode) {
+    const multipleOf = node.schema[KEYWORD];
+    if (multipleOf == null) {
+        return;
+    }
+    if (!isNumber(multipleOf)) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: multipleOf,
+            message: `Keyword '${KEYWORD}' must be a number - received '${typeof multipleOf}'`
+        });
+    }
+    node[KEYWORD] = multipleOf;
+}
+
+function validateMultipleOf({ node, data, pointer }: JsonSchemaValidatorParams<"multipleOf">) {
     if (typeof data !== "number") {
         return undefined;
     }
-    const { schema } = node;
+    const multipleOf = node[KEYWORD];
     const valuePrecision = getPrecision(data);
-    const multiplePrecision = getPrecision(schema.multipleOf);
+    const multiplePrecision = getPrecision(multipleOf);
     if (valuePrecision > multiplePrecision) {
         // value with higher precision then multipleOf-precision can never be multiple
         return node.createError("multiple-of-error", {
-            multipleOf: schema.multipleOf,
+            multipleOf,
             value: data,
             pointer,
-            schema
+            schema: node.schema
         });
     }
 
     const precision = Math.pow(10, multiplePrecision);
     const val = Math.round(data * precision);
-    const multiple = Math.round(schema.multipleOf * precision);
+    const multiple = Math.round(multipleOf * precision);
     if ((val % multiple) / precision !== 0) {
         return node.createError("multiple-of-error", {
-            multipleOf: schema.multipleOf,
+            multipleOf: multipleOf,
             value: data,
             pointer,
-            schema
+            schema: node.schema
         });
     }
 

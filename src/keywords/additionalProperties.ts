@@ -1,7 +1,7 @@
 import settings from "../settings";
 import { isObject } from "../utils/isObject";
-import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationReturnType} from "../Keyword";
-import { SchemaNode } from "../types";
+import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
+import { isBooleanSchema, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 import { validateNode } from "../validateNode";
 
@@ -24,13 +24,24 @@ export const additionalPropertiesKeyword: Keyword = {
 // must come as last resolver
 export function parseAdditionalProperties(node: SchemaNode) {
     const { schema, evaluationPath, schemaLocation } = node;
-    if (isObject(schema.additionalProperties)) {
-        node.additionalProperties = node.compileSchema(
-            schema.additionalProperties,
-            `${evaluationPath}/additionalProperties`,
-            `${schemaLocation}/additionalProperties`
-        );
+    if (schema.additionalProperties == null || isBooleanSchema(schema.additionalProperties)) {
+        return;
     }
+
+    if (!isObject(schema.additionalProperties)) {
+        return node.createError("schema-error", {
+            pointer: node.schemaLocation,
+            schema,
+            value: schema.additionalProperties,
+            message: `keyword 'additionalProperties' must be a valid JSON Schema - receoved: ${typeof schema.additionalProperties}`
+        });
+    }
+
+    node.additionalProperties = node.compileSchema(
+        schema.additionalProperties,
+        `${evaluationPath}/additionalProperties`,
+        `${schemaLocation}/additionalProperties`
+    );
 }
 
 function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParams) {

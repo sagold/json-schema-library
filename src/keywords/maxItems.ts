@@ -1,11 +1,31 @@
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import { isNumber, SchemaNode } from "../types";
+
+const KEYWORD = "maxItems";
 
 export const maxItemsKeyword: Keyword = {
-    id: "maxItems",
-    keyword: "maxItems",
+    id: KEYWORD,
+    keyword: KEYWORD,
+    parse: parseMaxItems,
     addValidate: ({ schema }) => !isNaN(schema.maxItems),
     validate: validateMaxItems
 };
+
+function parseMaxItems(node: SchemaNode) {
+    const max = node.schema[KEYWORD];
+    if (max == null) {
+        return;
+    }
+    if (!isNumber(max)) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: max,
+            message: `Keyword '${KEYWORD}' must be a number - received '${typeof max}'`
+        });
+    }
+    node[KEYWORD] = max;
+}
 
 function validateMaxItems({ node, data, pointer }: JsonSchemaValidatorParams) {
     const { schema } = node;

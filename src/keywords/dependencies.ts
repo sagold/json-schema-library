@@ -1,4 +1,4 @@
-import { isSchemaNode, SchemaNode } from "../types";
+import { isBooleanSchema, isJsonSchema, isSchemaNode, SchemaNode } from "../types";
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
 import { isObject } from "../utils/isObject";
 import { mergeNode } from "../mergeNode";
@@ -6,38 +6,58 @@ import { hasProperty } from "../utils/hasProperty";
 import { validateDependentRequired } from "./dependentRequired";
 import { validateDependentSchemas } from "./dependentSchemas";
 import sanitizeErrors from "../utils/sanitizeErrors";
+import { isListOfStrings } from "../utils/isListOfStrings";
+
+const KEYWORD = "dependencies";
 
 export const dependenciesKeyword: Keyword = {
-    id: "dependencies",
-    keyword: "dependencies",
+    id: KEYWORD,
+    keyword: KEYWORD,
     parse: parseDependencies,
     order: -9,
-    addReduce: (node) => node.schema.dependencies != null,
+    addReduce: (node) => node.schema[KEYWORD] != null, // because we remap this has to be tested on schema
     reduce: reduceDependencies,
-    addValidate: (node) => node.schema.dependencies != null,
+    addValidate: (node) => node.schema[KEYWORD] != null, // because we remap this has to be tested on schema
     validate: validateDependencies
 };
 
 export function parseDependencies(node: SchemaNode) {
     const { dependencies } = node.schema;
     if (!isObject(dependencies)) {
-        return;
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: dependencies,
+            message: `Keyword '${KEYWORD}' must be an object - received ${typeof dependencies}`
+        });
     }
-    const schemas = Object.keys(dependencies);
-    schemas.forEach((property) => {
+
+    const errors: ValidationAnnotation[] = [];
+    for (const property of Object.keys(dependencies)) {
         const schema = dependencies[property] as string[];
-        if (isObject(schema) || typeof schema === "boolean") {
+        if (isJsonSchema(schema) || isBooleanSchema(schema)) {
             node.dependentSchemas = node.dependentSchemas ?? {};
             node.dependentSchemas[property] = node.compileSchema(
                 schema,
-                `${node.evaluationPath}/dependencies/${property}`,
-                `${node.schemaLocation}/dependencies/${property}`
+                `${node.evaluationPath}/${KEYWORD}/${property}`,
+                `${node.schemaLocation}/${KEYWORD}/${property}`
             );
-        } else {
+        } else if (isListOfStrings(schema)) {
             node.dependentRequired = node.dependentRequired ?? {};
             node.dependentRequired[property] = schema;
+        } else {
+            errors.push(
+                node.createError("schema-error", {
+                    pointer: `${node.schemaLocation}/${KEYWORD}`,
+                    schema: node.schema,
+                    value: dependencies,
+                    message: `Keyword '${KEYWORD}[string]' must be JSON Schema or string[]`
+                })
+            );
         }
-    });
+    }
+
+    return errors;
 }
 
 export function reduceDependencies({ node, data, key, pointer, path }: JsonSchemaReducerParams) {
@@ -66,7 +86,7 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
             required.push(...dependentRequired[propertyName]);
 
             // @dynamicId
-            const localDynamicId = `dependencies/${propertyName}`;
+            const localDynamicId = `${KEYWORD}/${propertyName}`;
             dynamicId += `${dynamicId === "" ? "" : ","}${localDynamicId}`;
         });
     }
@@ -90,7 +110,7 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
             // but probably not how json-schema spec defines this behaviour (resolve only within sub-schema)
             const reducedDependency = { ...dependency, schema: { ...dependency.schema, required } }.reduceNode(data, {
                 key,
-                pointer: `${pointer}/dependencies/${propertyName}`,
+                pointer: `${pointer}/${KEYWORD}/${propertyName}`,
                 path
             }).node as SchemaNode;
 
@@ -98,7 +118,7 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
 
             // @dynamicId
             const nestedDynamicId = reducedDependency.dynamicId?.replace(node.dynamicId, "") ?? "";
-            const localDynamicId = nestedDynamicId === "" ? `dependencies/${propertyName}` : nestedDynamicId;
+            const localDynamicId = nestedDynamicId === "" ? `${KEYWORD}/${propertyName}` : nestedDynamicId;
             dynamicId += `${dynamicId === "" ? "" : ","}${localDynamicId}`;
         });
     }
@@ -113,7 +133,7 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
 
     required = workingNode.schema.required ? workingNode.schema.required.concat(...required) : required;
     required = required.filter((r: string, index: number, list: string[]) => list.indexOf(r) === index);
-    workingNode = mergeNode(workingNode, workingNode, "dependencies") as SchemaNode;
+    workingNode = mergeNode(workingNode, workingNode, KEYWORD) as SchemaNode;
     return workingNode.compileSchema(
         { ...workingNode.schema, required },
         workingNode.evaluationPath,

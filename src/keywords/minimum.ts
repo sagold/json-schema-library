@@ -1,33 +1,52 @@
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
-import { isNumber } from "../types";
+import { isNumber, SchemaNode } from "../types";
 
-export const minimumKeyword: Keyword = {
-    id: "minimum",
-    keyword: "minimum",
-    addValidate: ({ schema }) => !isNaN(schema.minimum),
+const KEYWORD = "minimum";
+
+export const minimumKeyword: Keyword<"minimum"> = {
+    id: KEYWORD,
+    keyword: KEYWORD,
+    parse: parseMinimum,
+    addValidate: (node) => node[KEYWORD] != null,
     validate: validateMinimum
 };
 
-function validateMinimum({ node, data, pointer }: JsonSchemaValidatorParams) {
+function parseMinimum(node: SchemaNode) {
+    const min = node.schema[KEYWORD];
+    if (min == null) {
+        return;
+    }
+    if (!isNumber(min)) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: min,
+            message: `Keyword '${KEYWORD}' must be a number - received '${typeof min}'`
+        });
+    }
+    node[KEYWORD] = min;
+}
+
+function validateMinimum({ node, data, pointer }: JsonSchemaValidatorParams<"minimum">) {
     if (!isNumber(data)) {
         return undefined;
     }
-    const { schema } = node;
-    if (schema.minimum > data) {
+    const min = node[KEYWORD];
+    if (min > data) {
         return node.createError("minimum-error", {
-            minimum: schema.minimum,
+            minimum: min,
             length: data,
             pointer,
-            schema,
+            schema: node.schema,
             value: data
         });
     }
-    if (schema.exclusiveMinimum === true && schema.minimum === data) {
+    if (node.schema.exclusiveMinimum === true && node.schema.minimum === data) {
         return node.createError("minimum-error", {
-            minimum: schema.minimum,
+            minimum: min,
             length: data,
             pointer,
-            schema,
+            schema: node.schema,
             value: data
         });
     }

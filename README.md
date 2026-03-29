@@ -94,6 +94,46 @@ compileSchema(mySchema, { getDataDefaultOptions: { addOptionalProps: true } });
 Details on _drafts_ are documented in [draft customization](#draft-customization).
 Details on `getDataDefaultOptions` are documented in [getData](#getData).
 
+### validate input schema
+
+The JSON Schema passed to `compileSchema` is validated automatically. To retrieve any schema errors you can access the property `schemaErrors` of the main node:
+
+```ts
+const root = compileSchema(mySchema);
+const { schemaErrors } = root; // JsonError[]
+```
+
+In cases you want `compileSchema` throw an error for an invalid schema-input use the option `throwOnInvalidSchema:true`
+
+```ts
+const root = compileSchema({ properties: 123 }, { throwOnInvalidSchema: true });
+// throws Error
+```
+
+<details><summary>Example for validation errors</summary>
+
+---
+
+```ts
+const { schemaErrors } = compileSchema({ $defs: 999 });
+console.log(schemaErrors[0]);
+{
+  type: 'error',
+  code: 'schema-error',
+  message: 'Invalid schema found at #: $defs must be an object - received: number',
+  data: {
+    pointer: '#',
+    schema: { '$defs': 999 },
+    value: 999,
+    message: '$defs must be an object - received: number'
+  }
+}
+```
+
+---
+
+</details>
+
 ### SchemaNode
 
 `compileSchema` builds a tree where each sub-schema becomes its own SchemaNode. Every node in the tree offers the same set of methods.

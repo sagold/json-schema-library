@@ -1,31 +1,51 @@
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
-import { isNumber } from "../types";
+import { isNumber, SchemaNode } from "../types";
+
+const KEYWORD = "maximum";
 
 export const maximumKeyword: Keyword = {
-    id: "maximum",
-    keyword: "maximum",
-    addValidate: ({ schema }) => !isNaN(schema.maximum),
+    id: KEYWORD,
+    keyword: KEYWORD,
+    parse: parseMaximum,
+    addValidate: (node) => node.maximum != null,
     validate: validateMaximum
 };
+
+function parseMaximum(node: SchemaNode) {
+    const max = node.schema[KEYWORD];
+    if (max == null) {
+        return;
+    }
+    if (!isNumber(max)) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: max,
+            message: `Keyword '${KEYWORD}' must be a number - received '${typeof max}'`
+        });
+    }
+    node[KEYWORD] = max;
+}
 
 function validateMaximum({ node, data, pointer }: JsonSchemaValidatorParams) {
     if (!isNumber(data)) {
         return undefined;
     }
 
+    const max = node[KEYWORD];
     const { schema } = node;
-    if (schema.maximum && schema.maximum < data) {
+    if (max && max < data) {
         return node.createError("maximum-error", {
-            maximum: schema.maximum,
+            maximum: max,
             length: data,
             value: data,
             pointer,
             schema
         });
     }
-    if (schema.maximum && schema.exclusiveMaximum === true && schema.maximum === data) {
+    if (max && schema.exclusiveMaximum === true && max === data) {
         return node.createError("maximum-error", {
-            maximum: schema.maximum,
+            maximum: max,
             length: data,
             pointer,
             schema,

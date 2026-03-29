@@ -67,5 +67,5 @@ export function isJsonError(error: unknown): error is JsonError {
 }
 
 export function isNumber(value: unknown): value is number {
-    return isNaN(value as number) === false;
+    return typeof value === "number";
 }

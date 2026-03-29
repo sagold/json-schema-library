@@ -1,8 +1,9 @@
-import { isObject } from "../utils/isObject";
-import { SchemaNode } from "../types";
+import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
 import { validateNode } from "../validateNode";
 import { isItemEvaluated } from "../isItemEvaluated";
+
+const KEYWORD = "unevaluatedItems";
 
 /**
  * @draft >= 2019-09
@@ -10,22 +11,37 @@ import { isItemEvaluated } from "../isItemEvaluated";
  * https://json-schema.org/draft/2019-09/json-schema-core#rfc.section.9.3.1.3
  */
 export const unevaluatedItemsKeyword: Keyword = {
-    id: "unevaluatedItems",
-    keyword: "unevaluatedItems",
+    id: KEYWORD,
+    keyword: KEYWORD,
     parse: parseUnevaluatedItems,
-    addValidate: ({ schema }) => schema.unevaluatedItems != null,
+    addValidate: ({ schema }) => schema.unevaluatedItems != null, // currently we do not store boolean schema
     validate: validateUnevaluatedItems
 };
 
 export function parseUnevaluatedItems(node: SchemaNode) {
-    if (!isObject(node.schema.unevaluatedItems)) {
+    const unevaluatedItems = node.schema[KEYWORD];
+    if (unevaluatedItems == null) {
         return;
     }
+    if (!(isJsonSchema(unevaluatedItems) || isBooleanSchema(unevaluatedItems))) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: unevaluatedItems,
+            message: `Keyword '${KEYWORD}' must be a valid JSON Schema - received '${typeof unevaluatedItems}'`
+        });
+    }
+
+    if (isBooleanSchema(unevaluatedItems)) {
+        return;
+    }
+
     node.unevaluatedItems = node.compileSchema(
         node.schema.unevaluatedItems,
-        `${node.evaluationPath}/unevaluatedItems`,
-        `${node.schemaLocation}/unevaluatedItems`
+        `${node.evaluationPath}/${KEYWORD}`,
+        `${node.schemaLocation}/${KEYWORD}`
     );
+    return node.unevaluatedItems.schemaValidation;
 }
 
 function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValidatorParams) {

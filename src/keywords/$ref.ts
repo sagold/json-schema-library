@@ -72,6 +72,18 @@ export function parseRef(node: SchemaNode) {
             node.$ref = `#${node.$ref}`;
         }
     }
+
+    // validate simple ref to definitions
+    if (node.$ref?.startsWith("#/$defs/")) {
+        if (get(node.getNodeRoot().schema, node.$ref) == null) {
+            return node.createError("schema-error", {
+                pointer: `${node.schemaLocation}/$ref`,
+                schema: node.schema,
+                value: node.schema.$ref,
+                message: `Invalid $ref to missing target '${node.schema.ref}'`
+            });
+        }
+    }
 }
 
 export function reduceRef({ node, data, key, pointer, path }: JsonSchemaReducerParams) {

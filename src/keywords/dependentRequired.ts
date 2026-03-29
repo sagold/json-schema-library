@@ -1,20 +1,51 @@
-import { Keyword, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
+import { Keyword, JsonSchemaValidatorParams, ValidationReturnType, ValidationAnnotation } from "../Keyword";
 import { JsonError, SchemaNode } from "../types";
+import { isListOfStrings } from "../utils/isListOfStrings";
 import { isObject } from "../utils/isObject";
 
+const KEYWORD = "dependentRequired";
+
 export const dependentRequiredKeyword: Keyword = {
-    id: "dependentRequired",
-    keyword: "dependentRequired",
+    id: KEYWORD,
+    keyword: KEYWORD,
     parse: parseDependentRequired,
-    addValidate: (node) => isObject(node.schema.dependentRequired),
+    addValidate: (node) => node[KEYWORD] != null,
     validate: validateDependentRequired
 };
 
 export function parseDependentRequired(node: SchemaNode) {
-    if (!isObject(node.schema.dependentRequired)) {
+    const { schema } = node;
+    if (schema[KEYWORD] == null) {
         return;
     }
-    node.dependentRequired = (node.schema.dependentRequired as Record<string, string[]>) ?? {};
+    if (!isObject(schema[KEYWORD])) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema,
+            value: schema[KEYWORD],
+            message: `Keyword '${KEYWORD}' must be an object - received '${typeof schema[KEYWORD]}'`
+        });
+    }
+
+    const errors: ValidationAnnotation[] = [];
+    node.dependentRequired = {};
+    for (const propertyName of Object.keys(schema[KEYWORD])) {
+        const list = schema[KEYWORD][propertyName];
+        if (isListOfStrings(list)) {
+            node.dependentRequired[propertyName] = list;
+        } else {
+            errors.push(
+                node.createError("schema-error", {
+                    pointer: `${node.schemaLocation}/${KEYWORD}/${propertyName}`,
+                    schema,
+                    value: list,
+                    message: `Keyword '${KEYWORD}[string]' must be a string[] - received '${typeof list}'`
+                })
+            );
+        }
+    }
+
+    return errors;
 }
 
 export function validateDependentRequired({
@@ -22,41 +53,28 @@ export function validateDependentRequired({
     data,
     pointer = "#"
 }: JsonSchemaValidatorParams): ValidationReturnType {
-    if (!isObject(data)) {
+    const { dependentRequired } = node;
+    if (dependentRequired == null || !isObject(data)) {
         return undefined;
     }
-    const { dependentRequired } = node;
     const errors: JsonError[] = [];
-    if (dependentRequired) {
-        Object.keys(data).forEach((property) => {
-            const dependencies = dependentRequired[property];
-            // @draft >= 6 boolean schema
-            // @ts-expect-error boolean schema
-            if (dependencies === true) {
-                return;
+    Object.keys(data).forEach((property) => {
+        const dependencies = dependentRequired[property];
+        if (!Array.isArray(dependencies)) {
+            return;
+        }
+        for (let i = 0, l = dependencies.length; i < l; i += 1) {
+            if (data[dependencies[i]] === undefined) {
+                errors.push(
+                    node.createError("missing-dependency-error", {
+                        missingProperty: dependencies[i],
+                        pointer,
+                        schema: node.schema,
+                        value: data
+                    })
+                );
             }
-            // @ts-expect-error boolean schema
-            if (dependencies === false) {
-                // @ts-expect-error boolean schema
-                errors.push(node.createError("missing-dependency-error", { pointer, schema, value: data }));
-                return;
-            }
-            if (!Array.isArray(dependencies)) {
-                return;
-            }
-            for (let i = 0, l = dependencies.length; i < l; i += 1) {
-                if (data[dependencies[i]] === undefined) {
-                    errors.push(
-                        node.createError("missing-dependency-error", {
-                            missingProperty: dependencies[i],
-                            pointer,
-                            schema: node.schema,
-                            value: data
-                        })
-                    );
-                }
-            }
-        });
-    }
+        }
+    });
     return errors;
 }

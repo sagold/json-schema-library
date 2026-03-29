@@ -6,10 +6,21 @@ import { draft07 } from "./draft07";
 import { draft2019 } from "./draft2019";
 import { draft2020 } from "./draft2020";
 import { pick } from "./utils/pick";
-import { JsonSchema, BooleanSchema, Draft, isJsonSchema } from "./types";
+import {
+    JsonSchema,
+    BooleanSchema,
+    Draft,
+    isJsonSchema,
+    JsonAnnotation,
+    JsonError,
+    isJsonError,
+    isJsonAnnotation,
+    isBooleanSchema
+} from "./types";
 import { TemplateOptions } from "./methods/getData";
 import { SchemaNode, SchemaNodeMethods, addKeywords, isSchemaNode } from "./SchemaNode";
 import settings from "./settings";
+import sanitizeErrors from "./utils/sanitizeErrors";
 
 const { REGEX_FLAGS } = settings;
 
@@ -18,6 +29,7 @@ export type CompileOptions = {
     remote?: SchemaNode;
     formatAssertion?: boolean | "meta-schema" | undefined;
     getDataDefaultOptions?: TemplateOptions;
+    throwOnInvalidSchema?: boolean;
 };
 
 const defaultDrafts: Draft[] = [draft04, draft06, draft07, draft2019, draft2020];
@@ -35,8 +47,7 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
     let formatAssertion = options.formatAssertion ?? true;
     const drafts = options.drafts ?? defaultDrafts;
     const draft = getDraft(drafts, isJsonSchema(schema) ? schema.$schema : undefined);
-
-    const node: SchemaNode = {
+    const node: SchemaNode & { schemaErrors?: JsonError[]; schemaAnnotations: JsonAnnotation[] } = {
         evaluationPath: "#",
         lastIdPointer: "#",
         schemaLocation: "#",
@@ -82,6 +93,40 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
         node.context.keywords = node.context.keywords.filter((f) => f.keyword !== "format");
     }
 
-    addKeywords(node);
+    if (!isJsonSchema(schema) && !isBooleanSchema(schema)) {
+        node.schemaErrors = [
+            node.createError("schema-error", {
+                pointer: "#",
+                schema,
+                value: undefined,
+                message: `JSON schema must be object or boolean - reveived: '${schema}'`
+            })
+        ];
+        return node;
+    }
+
+    // parse and validate schema
+    let schemaValidation = addKeywords(node).filter((err) => err != null);
+    schemaValidation = sanitizeErrors(schemaValidation);
+    const schemaErrors: JsonError[] = [];
+    const schemaAnnotations: JsonAnnotation[] = [];
+    schemaValidation.forEach((error) => {
+        if (isJsonError(error)) {
+            schemaErrors.push(error);
+        } else if (isJsonAnnotation(error)) {
+            schemaAnnotations.push(error);
+        }
+    });
+
+    if (options.throwOnInvalidSchema && schemaErrors.length > 0) {
+        const error = new Error("Invalid schema passed to compileSchema");
+        // @ts-expect-error unknown error-property
+        error.data = schemaErrors;
+        throw error;
+    }
+
+    node.schemaErrors = schemaErrors;
+    node.schemaAnnotations = schemaAnnotations;
+
     return node;
 }

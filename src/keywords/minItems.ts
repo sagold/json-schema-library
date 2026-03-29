@@ -1,23 +1,44 @@
 import { JsonSchemaValidatorParams, Keyword } from "../Keyword";
+import { SchemaNode } from "../SchemaNode";
+import { isNumber } from "../types";
 
-export const minItemsKeyword: Keyword = {
-    id: "minItems",
-    keyword: "minItems",
-    addValidate: ({ schema }) => !isNaN(schema.minItems),
+const KEYWORD = "minItems";
+
+export const minItemsKeyword: Keyword<"minItems"> = {
+    id: KEYWORD,
+    keyword: KEYWORD,
+    parse: parseMinItems,
+    addValidate: (node) => node[KEYWORD] != null,
     validate: validateMinItems
 };
 
-function validateMinItems({ node, data, pointer }: JsonSchemaValidatorParams) {
+function parseMinItems(node: SchemaNode) {
+    const min = node.schema[KEYWORD];
+    if (min == null) {
+        return;
+    }
+    if (!isNumber(min)) {
+        return node.createError("schema-error", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: min,
+            message: `Keyword '${KEYWORD}' must be a number - received '${typeof min}'`
+        });
+    }
+    node[KEYWORD] = min;
+}
+
+function validateMinItems({ node, data, pointer }: JsonSchemaValidatorParams<"minItems">) {
     if (!Array.isArray(data)) {
         return;
     }
-    const { schema } = node;
-    if (schema.minItems > data.length) {
+    const minItems = node[KEYWORD];
+    if (minItems > data.length) {
         return node.createError("min-items-error", {
-            minItems: schema.minItems,
+            minItems: minItems,
             length: data.length,
             pointer,
-            schema,
+            schema: node.schema,
             value: data
         });
     }

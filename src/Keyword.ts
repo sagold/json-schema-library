@@ -1,3 +1,4 @@
+import { KEYWORD } from "./keywords/propertyDependencies";
 import type { SchemaNode, JsonError, JsonAnnotation } from "./types";
 
 export type ValidationPath = {
@@ -37,21 +38,27 @@ export type ValidationAnnotation = JsonError | JsonAnnotation | Promise<Maybe<Va
 type ValidationResult = Maybe<ValidationAnnotation>;
 export type ValidationReturnType = ValidationResult | ValidationResult[];
 
-export type JsonSchemaValidatorParams = { pointer: string; data: unknown; node: SchemaNode; path: ValidationPath };
-export interface JsonSchemaValidator {
+type SchemaNodeWithRequired<K extends keyof SchemaNode> = SchemaNode & Required<Pick<SchemaNode, K>>;
+export type JsonSchemaValidatorParams<Key extends keyof SchemaNode = never> = {
+    pointer: string;
+    data: unknown;
+    node: SchemaNodeWithRequired<Key>;
+    path: ValidationPath;
+};
+export interface JsonSchemaValidator<Key extends keyof SchemaNode = never> {
     toJSON?: () => string;
     order?: number;
-    (options: JsonSchemaValidatorParams): ValidationReturnType;
+    (options: JsonSchemaValidatorParams<Key>): ValidationReturnType;
 }
 
-export type Keyword = {
+export type Keyword<Key extends keyof SchemaNode = never> = {
     id: string;
     /** unique keyword corresponding to JSON Schema keywords (or custom) */
     keyword: string;
     /** sort order of keyword. Lower numbers will be processed last. Default is 0 */
     order?: number;
     /** called with compileSchema */
-    parse?: (node: SchemaNode) => void;
+    parse?: (node: SchemaNode) => void | ValidationAnnotation | ValidationAnnotation[];
     addResolve?: (node: SchemaNode) => boolean;
     /** return node corresponding to passed in key or do nothing */
     resolve?: JsonSchemaResolver;
@@ -59,7 +66,7 @@ export type Keyword = {
     /** return true if the given node should run the validate-function on this keyword */
     addValidate?: (node: SchemaNode) => boolean;
     /** validate data using node */
-    validate?: JsonSchemaValidator;
+    validate?: JsonSchemaValidator<Key>;
 
     addReduce?: (node: SchemaNode) => boolean;
     /** remove dynamic schema-keywords by merging valid sub-schemas */
