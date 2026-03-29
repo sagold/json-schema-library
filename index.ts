@@ -3,7 +3,15 @@ export type { CompileOptions } from "./src/compileSchema";
 export type { Context, SchemaNode, GetNodeOptions, ValidateReturnType } from "./src/SchemaNode";
 export type { DataNode } from "./src/methods/toDataNodes";
 export type { Draft, DraftVersion } from "./src/Draft";
-export type { JsonError, JsonAnnotation, JsonPointer, JsonSchema, BooleanSchema, OptionalNodeOrError, NodeOrError } from "./src/types";
+export type {
+    JsonError,
+    JsonAnnotation,
+    JsonPointer,
+    JsonSchema,
+    BooleanSchema,
+    OptionalNodeOrError,
+    NodeOrError
+} from "./src/types";
 export type {
     Keyword,
     Maybe,
@@ -29,6 +37,7 @@ export { draftEditor } from "./src/draftEditor";
 
 // keywords
 export { oneOfFuzzyKeyword, oneOfKeyword } from "./src/keywords/oneOf";
+export { propertyDependenciesKeyword } from "./src/keywords/propertyDependencies";
 
 // errors
 export { render } from "./src/errors/render";

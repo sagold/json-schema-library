@@ -14,7 +14,8 @@ export default {
         "dependentRequired",
         "definitions",
         "dependencies",
-        "patternProperties"
+        "patternProperties",
+        "propertyDependencies"
     ],
     REGEX_FLAGS: "u"
 };

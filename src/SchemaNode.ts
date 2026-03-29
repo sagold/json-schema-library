@@ -180,6 +180,7 @@ export interface SchemaNode extends SchemaNodeMethodsType {
     not?: SchemaNode;
     oneOf?: SchemaNode[];
     patternProperties?: { name: string; pattern: RegExp; node: SchemaNode }[];
+    propertyDependencies?: Record<string, Record<string, SchemaNode>>;
     properties?: Record<string, SchemaNode>;
     propertyNames?: SchemaNode;
     then?: SchemaNode;
@@ -191,7 +192,12 @@ export interface SchemaNode extends SchemaNodeMethodsType {
  * Fixed SchemaNode mixin methods
  */
 interface SchemaNodeMethodsType {
-    compileSchema(schema: JsonSchema | BooleanSchema, evaluationPath?: string, schemaLocation?: string, dynamicId?: string): SchemaNode;
+    compileSchema(
+        schema: JsonSchema | BooleanSchema,
+        evaluationPath?: string,
+        schemaLocation?: string,
+        dynamicId?: string
+    ): SchemaNode;
     createError<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonError;
     createAnnotation<T extends string = DefaultErrors>(code: T, data: AnnotationData, message?: string): JsonAnnotation;
     createSchema(data?: unknown): JsonSchema;
@@ -497,15 +503,15 @@ export const SchemaNodeMethods = {
      * @returns the current node (not the remote schema-node)
      */
     addRemoteSchema(url: string, schema: JsonSchema | BooleanSchema): SchemaNode {
-    // @draft >= 6
-    if (isJsonSchema(schema)) {
-        schema.$id = resolveUri(schema.$id || url);
-    }
-        
+        // @draft >= 6
+        if (isJsonSchema(schema)) {
+            schema.$id = resolveUri(schema.$id || url);
+        }
+
         const node = this as SchemaNode;
         const { context } = node;
         const schemaId = isJsonSchema(schema) ? schema.$schema : undefined;
-const draft = getDraft(context.drafts, schemaId ?? context.rootNode.schema?.$schema);
+        const draft = getDraft(context.drafts, schemaId ?? context.rootNode.schema?.$schema);
 
         const remoteNode: SchemaNode = {
             evaluationPath: "#",

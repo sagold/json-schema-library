@@ -56,6 +56,7 @@ export type Keyword = {
     /** return node corresponding to passed in key or do nothing */
     resolve?: JsonSchemaResolver;
 
+    /** return true if the given node should run the validate-function on this keyword */
     addValidate?: (node: SchemaNode) => boolean;
     /** validate data using node */
     validate?: JsonSchemaValidator;

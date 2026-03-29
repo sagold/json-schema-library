@@ -1379,6 +1379,45 @@ const dependentSchemasKeyword = draft2020.keywords.find((f) => f.keyword === "de
 
 ## Keyword extensions
 
+### propertyDependencies
+
+Resolves an object-schema by `propertyName:propertyValue`
+
+```ts
+{
+  type: "object",
+  propertyDependencies: {
+     propertyName: {
+         propertyValue: {
+          properties: {
+            id: { type: "string" }
+          }
+         }
+     }
+}
+
+// matches and returns error for id
+{
+  "propertyName": "propertyValue",
+  "id": 123
+}
+```
+
+Note that this keyword is not added by default as it is not part yet of the JSONSchema spec. Add this keyword with:
+
+```ts
+import { compileSchema, draft2020, extendDraft, propertyDependenciesKeyword } from "json-schema-library";
+
+const draft = extendDraft(draft2020, {
+  keywords: [propertyDependenciesKeyword]
+});
+
+const node = compileSchema({ propertyDependencies: {} }, { drafts: [draft] });
+```
+
+- Note: this keyword may replace `OneOfProperty`
+- Reference: https://docs.google.com/presentation/d/1ajXlCQcsjjiMLsluFIILR7sN5aDRBnfqQ9DLbcFbqjI/mobilepresent?slide=id.g3ae4fb2e16d_0_15
+
 ### oneOfProperty
 
 For `oneOf` resolution, JSON Schema states that data is valid if it validates against exactly one of those sub-schemas. In some scenarios this is unwanted behaviour, as the actual `oneOf` schema is known and only validation errors of this exact sub-schema should be returned.
