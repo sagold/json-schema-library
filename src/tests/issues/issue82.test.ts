@@ -68,4 +68,30 @@ describe("issue#82", () => {
 
         assert.equal(valid, false);
     });
+    it("should return an error when $ref cannot be resolved and strictRefs is true", () => {
+        const schema = compileSchema({
+            $schema: "https://json-schema.org/draft/2020-12/schema",
+            type: "object",
+            properties: {
+                value: { $ref: "#/$defs/nonexistent" }
+            }
+        }, { strictRefs: true });
+
+        const { valid, errors } = schema.validate({ value: 123 });
+        assert.equal(valid, false);
+        assert.equal(errors[0].code, "unknown-ref-target-error");
+    });
+
+    it("should silently pass when $ref cannot be resolved and strictRefs is false (default)", () => {
+        const schema = compileSchema({
+            type: "object",
+            properties: {
+                value: { $ref: "#/$defs/nonexistent" }
+            }
+        });
+
+        const { valid } = schema.validate({ value: 123 });
+        assert.equal(valid, true);
+    });
+
 });

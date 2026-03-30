@@ -90,9 +90,18 @@ export function reduceRef({ node, data, key, pointer, path }: JsonSchemaReducerP
     if (node == null) {
         return;
     }
+    
 
     const resolvedNode = node.resolveRef({ pointer, path });
     if (resolvedNode == null) {
+        if (node.context.strictRefs) {
+            return node.createError("unknown-ref-target-error", {
+                ref: node.schema.$ref ?? node.schema.$dynamicRef,
+                pointer,
+                schema: node.schema,
+                value: data
+            });
+        }
         return;
     }
 
@@ -128,6 +137,14 @@ function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorPar
     if (nextNode != null) {
         // recursively resolveRef and validate
         return validateNode(nextNode, data, pointer, path);
+    }
+        if (node.context.strictRefs) {
+        return node.createError("unknown-ref-target-error", {
+            ref: node.schema.$ref ?? node.schema.$dynamicRef,
+            pointer,
+            schema: node.schema,
+            value: data
+        });
     }
 }
 

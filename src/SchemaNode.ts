@@ -94,6 +94,7 @@ export type Context = {
     getDataDefaultOptions?: TemplateOptions;
     /** [SHARED USING ADD REMOTE] collect unknown keywords in schemaAnnotations */
     withSchemaAnnotations?: boolean;
+    strictRefs?: boolean;
 };
 
 export interface SchemaNode extends SchemaNodeMethodsType {

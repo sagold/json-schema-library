@@ -77,5 +77,6 @@ export const errors = {
     "deprecated-warning": "Value at `{{pointer}}` is deprecated",
     // schema validation
     "schema-error": "Invalid schema found at {{pointer}}: {{message}}",
-    "unknown-keyword-warning": "Keyword '{{value}}' is not a valid keyword to draft '{{draft}}'"
+    "unknown-keyword-warning": "Keyword '{{value}}' is not a valid keyword to draft '{{draft}}'",
+    "unknown-ref-target-error": "Could not resolve $ref '{{ref}}' from '{{pointer}}'",
 };
