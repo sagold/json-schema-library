@@ -52,6 +52,14 @@ function parseRef(node: SchemaNode) {
 function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
     const nextNode = resolveAllRefs(node, pointer, path);
     if (nextNode == null) {
+        if (node.context.strictRefs) {
+            return node.createError("unknown-ref-target-error", {
+                ref: node.schema.$ref,
+                pointer,
+                schema: node.schema,
+                value: data
+            });
+        }
         return undefined;
     }
     return validateNode(nextNode, data, pointer, path);
