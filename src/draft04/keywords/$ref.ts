@@ -5,32 +5,14 @@ import { omit } from "../../utils/omit";
 import splitRef from "../../utils/splitRef";
 import { $refKeyword as draft06Keyword } from "../../draft06/keywords/$ref";
 import { SchemaNode } from "../../types";
-import { JsonSchemaValidatorParams } from "../../Keyword";
-import { validateNode } from "../../validateNode";
 
 export const $refKeyword: Keyword = {
     id: "$ref",
     keyword: "$ref",
     parse: parseRef,
     addValidate: ({ schema }) => schema.$ref != null,
-    validate: validateRef
+    validate: draft06Keyword.validate!
 };
-
-function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
-    const nextNode = node.resolveRef({ pointer, path });
-    if (nextNode == null) {
-        if (node.context.strictRefs) {
-            return node.createError("unknown-ref-target-error", {
-                ref: node.schema.$ref,
-                pointer,
-                schema: node.schema,
-                value: data
-            });
-        }
-        return undefined;
-    }
-    return validateNode(nextNode, data, pointer, path);
-}
 
 function register(node: SchemaNode, path: string) {
     if (node.context.refs[path] == null) {
