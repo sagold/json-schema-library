@@ -4,7 +4,7 @@ import splitRef from "../../utils/splitRef";
 import { omit } from "../../utils/omit";
 import { isObject } from "../../utils/isObject";
 import { validateNode } from "../../validateNode";
-import { SchemaNode } from "../../types";
+import { isSchemaNode, JsonError, SchemaNode } from "../../types";
 import { get, split } from "@sagold/json-pointer";
 import { reduceRef } from "../../keywords/$ref";
 
@@ -73,7 +73,9 @@ export function parseRef(node: SchemaNode) {
 export function resolveRef(this: SchemaNode, { pointer, path }: { pointer?: string; path?: ValidationPath } = {}) {
     if (this.schema.$recursiveRef) {
         const nextNode = resolveRecursiveRef(this, path ?? []);
-        path?.push({ pointer: pointer!, node: nextNode! });
+        if (isSchemaNode(nextNode)) {
+            path?.push({ pointer: pointer!, node: nextNode! });
+        }
         return nextNode;
     }
 
@@ -82,10 +84,8 @@ export function resolveRef(this: SchemaNode, { pointer, path }: { pointer?: stri
     }
 
     const resolvedNode = getRef(this);
-    if (resolvedNode != null) {
+    if (isSchemaNode(resolvedNode)) {
         path?.push({ pointer: pointer!, node: resolvedNode });
-    } else {
-        // console.log("failed resolving", node.$ref, "from", Object.keys(node.context.refs));
     }
     return resolvedNode;
 }
@@ -95,18 +95,16 @@ function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorPar
     if (nextNode != null) {
         return validateNode(nextNode, data, pointer, path);
     }
-    if (node.context.strictRefs) {
-        return node.createError("unknown-ref-target-error", {
-            ref: node.schema.$ref ?? node.schema.$recursiveRef,
-            pointer,
-            schema: node.schema,
-            value: data
-        });
-    }
+    return node.createError("ref-error", {
+        ref: node.schema.$ref ?? node.schema.$recursiveRef,
+        pointer,
+        schema: node.schema,
+        value: data
+    });
 }
 
 // 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
-function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode | undefined {
+function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode | JsonError {
     const history = path;
 
     // RESTRICT BY CHANGE IN BASE-URL
@@ -142,7 +140,7 @@ function compileNext(referencedNode: SchemaNode, evaluationPath = referencedNode
     return referencedNode.compileSchema(referencedSchema, `${evaluationPath}/$ref`, referencedNode.schemaLocation);
 }
 
-export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefined {
+export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError {
     if ($ref == null) {
         return node;
     }
@@ -160,7 +158,12 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
     const fragments = splitRef($ref);
     if (fragments.length === 0) {
         // console.error("REF: INVALID", $ref);
-        return undefined;
+        return node.createError("ref-error", {
+            ref: $ref,
+            pointer: node.evaluationPath,
+            schema: node.schema,
+            value: undefined
+        });
     }
 
     // resolve $ref as remote-host
@@ -182,7 +185,12 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
             }
         }
         // console.error("REF: UNFOUND 1", $ref);
-        return undefined;
+        return node.createError("ref-error", {
+            ref: $ref,
+            pointer: node.evaluationPath,
+            schema: node.schema,
+            value: undefined
+        });
     }
 
     if (fragments.length === 2) {
@@ -213,16 +221,25 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
                 // @ts-expect-error random path
                 currentNode = currentNode[property];
                 if (currentNode == null) {
-                    console.error("REF: FAILED RESOLVING ref json-pointer", fragments[1]);
-                    return undefined;
+                    // console.error("REF: FAILED RESOLVING ref json-pointer", fragments[1]);
+                    return node.createError("ref-error", {
+                        ref: $ref,
+                        pointer: node.evaluationPath,
+                        schema: node.schema,
+                        value: undefined,
+                        host: fragments[0],
+                        local: fragments[1]
+                    });
                 }
             }
             return currentNode;
         }
-
-        // console.error("REF: UNFOUND 2", $ref);
-        return undefined;
     }
 
-    console.error("REF: UNHANDLED", $ref);
+    return node.createError("ref-error", {
+        ref: $ref,
+        pointer: node.evaluationPath,
+        schema: node.schema,
+        value: undefined
+    });
 }

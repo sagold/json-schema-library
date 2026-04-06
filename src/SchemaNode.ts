@@ -94,7 +94,8 @@ export type Context = {
     getDataDefaultOptions?: TemplateOptions;
     /** [SHARED USING ADD REMOTE] collect unknown keywords in schemaAnnotations */
     withSchemaAnnotations?: boolean;
-    strictRefs?: boolean;
+    /** [SHARED USING ADD REMOTE] throw error on validation when ref cannot be resolved */
+    throwOnInvalidRef?: boolean;
 };
 
 export interface SchemaNode extends SchemaNodeMethodsType {
@@ -513,6 +514,13 @@ export const SchemaNodeMethods = {
         const errorsAsync: Promise<Maybe<ValidationAnnotation>[]>[] = [];
         sanitizeErrors(Array.isArray(errors) ? errors : [errors]).forEach((error) => {
             if (isJsonError(error)) {
+                if (node.context.throwOnInvalidRef && error.code === "ref-error") {
+                    const refError = new Error("Invalid $ref: " + error.message);
+                    // @ts-expect-error unknown error-property
+                    refError.data = syncErrors;
+                    throw refError;
+                }
+
                 syncErrors.push(error);
             } else if (error instanceof Promise) {
                 errorsAsync.push(error.then(sanitizeErrors));

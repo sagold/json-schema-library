@@ -160,7 +160,7 @@ export function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions
         return defaultData;
     }
 
-    if (resolvedNode && resolvedNode !== currentNode) {
+    if (isSchemaNode(resolvedNode)) {
         defaultData = resolvedNode.getData(defaultData, opts) ?? defaultData;
         currentNode = resolvedNode;
     }

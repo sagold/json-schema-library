@@ -26,7 +26,8 @@ function runTestCase(setup: Setup, tc: FeatureTest, remotes: SchemaNode) {
             const node = compileSchema(schema, {
                 remote: remotes,
                 formatAssertion: tc.optional,
-                throwOnInvalidSchema: true
+                throwOnInvalidSchema: true,
+                throwOnInvalidRef: true
             });
 
             // register tests

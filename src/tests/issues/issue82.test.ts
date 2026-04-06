@@ -68,30 +68,31 @@ describe("issue#82", () => {
 
         assert.equal(valid, false);
     });
-    it("should return an error when $ref cannot be resolved and strictRefs is true", () => {
-        const schema = compileSchema({
-            $schema: "https://json-schema.org/draft/2020-12/schema",
-            type: "object",
-            properties: {
-                value: { $ref: "#/$defs/nonexistent" }
-            }
-        }, { strictRefs: true });
+    it("should throw an error when $ref cannot be resolved and 'throwOnInvalidRef' is true", () => {
+        const schema = compileSchema(
+            {
+                $schema: "https://json-schema.org/draft/2020-12/schema",
+                type: "object",
+                properties: {
+                    value: { $ref: "https://remote.schema#/$defs/nonexistent" }
+                }
+            },
+            { throwOnInvalidRef: true }
+        );
 
-        const { valid, errors } = schema.validate({ value: 123 });
-        assert.equal(valid, false);
-        assert.equal(errors[0].code, "unknown-ref-target-error");
+        assert.throws(() => schema.validate({ value: 123 }));
     });
 
-    it("should silently pass when $ref cannot be resolved and strictRefs is false (default)", () => {
+    it("should return an error when $ref cannot be resolved (default)", () => {
         const schema = compileSchema({
             type: "object",
             properties: {
-                value: { $ref: "#/$defs/nonexistent" }
+                value: { $ref: "https://remote.schema#/$defs/nonexistent" }
             }
         });
 
-        const { valid } = schema.validate({ value: 123 });
-        assert.equal(valid, true);
+        const { valid, errors } = schema.validate({ value: 123 });
+        assert.equal(valid, false);
+        assert.equal(errors[0].code, "ref-error");
     });
-
 });

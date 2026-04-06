@@ -4,7 +4,7 @@ import { isObject } from "../../utils/isObject";
 import { omit } from "../../utils/omit";
 import splitRef from "../../utils/splitRef";
 import { $refKeyword as draft06Keyword } from "../../draft06/keywords/$ref";
-import { SchemaNode } from "../../types";
+import { isSchemaNode, JsonError, SchemaNode } from "../../types";
 
 export const $refKeyword: Keyword = {
     id: "$ref",
@@ -63,14 +63,9 @@ function resolveRef(this: SchemaNode, { pointer, path }: { pointer?: string; pat
         return this;
     }
     const resolvedNode = getRef(this);
-    // console.log("RESOLVE REF", node.schema, "resolved ref", node.$ref, "=>", resolvedNode.schema);
-    if (resolvedNode != null) {
+    if (isSchemaNode(resolvedNode)) {
         path?.push({ pointer: pointer!, node: resolvedNode });
-        // console.log("resolve ref", node.$ref, "=>", resolvedNode.schema, Object.keys(node.context.refs));
-    } else {
-        console.log("failed resolving", this.$ref, "from", Object.keys(this.context.refs));
     }
-
     return resolvedNode;
 }
 
@@ -81,7 +76,7 @@ function compileNext(referencedNode: SchemaNode, evaluationPath = referencedNode
     return referencedNode.compileSchema(referencedSchema, `${evaluationPath}/$ref`, referencedSchema.schemaLocation);
 }
 
-function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefined {
+function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError | undefined {
     if ($ref == null) {
         return node;
     }
@@ -100,8 +95,12 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefined {
     // check for remote-host + pointer pair to switch rootSchema
     const fragments = splitRef($ref);
     if (fragments.length === 0) {
-        // console.error("REF: INVALID", $ref);
-        return undefined;
+        return node.createError("ref-error", {
+            ref: $ref,
+            pointer: node.evaluationPath,
+            schema: node.schema,
+            value: undefined
+        });
     }
 
     // resolve $ref as remote-host
@@ -111,8 +110,12 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefined {
         if (node.context.remotes[$ref]) {
             return compileNext(node.context.remotes[$ref], node.evaluationPath);
         }
-        // console.error("REF: UNFOUND 1", $ref, Object.keys(node.context.remotes));
-        return undefined;
+        return node.createError("ref-error", {
+            ref: $ref,
+            pointer: node.evaluationPath,
+            schema: node.schema,
+            value: undefined
+        });
     }
 
     if (fragments.length === 2) {
@@ -142,9 +145,14 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefined {
             }
         }
 
-        // console.error("REF: UNFOUND 2", $ref);
+        // @todo returning error here breaks specs
         return undefined;
     }
 
-    console.error("REF: INVALID", $ref);
+    return node.createError("ref-error", {
+        ref: $ref,
+        pointer: node.evaluationPath,
+        schema: node.schema,
+        value: undefined
+    });
 }

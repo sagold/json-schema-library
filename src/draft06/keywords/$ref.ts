@@ -1,6 +1,6 @@
 import { Keyword, JsonSchemaValidatorParams, ValidationPath } from "../../Keyword";
 import { resolveRef } from "../../keywords/$ref";
-import { SchemaNode } from "../../types";
+import { isSchemaNode, SchemaNode } from "../../types";
 import { resolveUri } from "../../utils/resolveUri";
 import { validateNode } from "../../validateNode";
 
@@ -51,24 +51,26 @@ function parseRef(node: SchemaNode) {
 
 function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {
     const nextNode = resolveAllRefs(node, pointer, path);
-    if (nextNode == null) {
-        if (node.context.strictRefs) {
-            return node.createError("unknown-ref-target-error", {
-                ref: node.schema.$ref,
-                pointer,
-                schema: node.schema,
-                value: data
-            });
-        }
-        return undefined;
+    if (!isSchemaNode(nextNode)) {
+        return node.createError("ref-error", {
+            ref: node.schema.$ref,
+            pointer,
+            schema: node.schema,
+            value: data
+        });
     }
     return validateNode(nextNode, data, pointer, path);
 }
 
 function resolveAllRefs(node: SchemaNode, pointer: string, path: ValidationPath) {
     const nextNode = node.resolveRef({ pointer, path });
-    if (nextNode == null) {
-        return undefined;
+    if (!isSchemaNode(nextNode)) {
+        return node.createError("ref-error", {
+            ref: node.schema.$ref,
+            pointer,
+            schema: node.schema,
+            value: undefined
+        });
     }
     if (nextNode !== node && nextNode) {
         return resolveAllRefs(nextNode, pointer, path);

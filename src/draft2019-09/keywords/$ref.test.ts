@@ -1,5 +1,6 @@
 import { strict as assert } from "assert";
 import { compileSchema } from "../../compileSchema";
+import { isJsonError } from "../../types";
 
 describe("keyword : $ref : resolve", () => {
     it("should return undefined for missing reference", () => {
@@ -8,7 +9,8 @@ describe("keyword : $ref : resolve", () => {
             minLength: 1
         }).resolveRef();
 
-        assert.deepEqual(node, undefined);
+        assert(isJsonError(node));
+        assert.deepEqual(node.code, "ref-error");
     });
 
     it("should resolve $ref from definitions", () => {

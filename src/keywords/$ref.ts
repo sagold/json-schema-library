@@ -1,4 +1,4 @@
-import { SchemaNode } from "../types";
+import { isJsonError, isSchemaNode, JsonError, SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationPath, JsonSchemaReducerParams } from "../Keyword";
 import { resolveUri } from "../utils/resolveUri";
 import splitRef from "../utils/splitRef";
@@ -90,19 +90,15 @@ export function reduceRef({ node, data, key, pointer, path }: JsonSchemaReducerP
     if (node == null) {
         return;
     }
-    
 
     const resolvedNode = node.resolveRef({ pointer, path });
     if (resolvedNode == null) {
-        if (node.context.strictRefs) {
-            return node.createError("unknown-ref-target-error", {
-                ref: node.schema.$ref ?? node.schema.$dynamicRef,
-                pointer,
-                schema: node.schema,
-                value: data
-            });
-        }
-        return;
+        return node.createError("ref-error", {
+            ref: node.schema.$ref ?? node.schema.$dynamicRef,
+            pointer,
+            schema: node.schema,
+            value: data
+        });
     }
 
     if (resolvedNode.schemaLocation === node.schemaLocation) {
@@ -116,6 +112,9 @@ export function reduceRef({ node, data, key, pointer, path }: JsonSchemaReducerP
 export function resolveRef(this: SchemaNode, { pointer, path = [] }: { pointer?: string; path?: ValidationPath } = {}) {
     if (this.schema.$dynamicRef) {
         const nextNode = resolveRecursiveRef(this, path);
+        if (isJsonError(nextNode)) {
+            return nextNode;
+        }
         path.push({ pointer: pointer!, node: nextNode! });
         return nextNode;
     }
@@ -125,7 +124,7 @@ export function resolveRef(this: SchemaNode, { pointer, path = [] }: { pointer?:
     }
 
     const resolvedNode = getRef(this);
-    if (resolvedNode != null) {
+    if (isSchemaNode(resolvedNode)) {
         path.push({ pointer: pointer!, node: resolvedNode });
     }
 
@@ -138,18 +137,16 @@ function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorPar
         // recursively resolveRef and validate
         return validateNode(nextNode, data, pointer, path);
     }
-        if (node.context.strictRefs) {
-        return node.createError("unknown-ref-target-error", {
-            ref: node.schema.$ref ?? node.schema.$dynamicRef,
-            pointer,
-            schema: node.schema,
-            value: data
-        });
-    }
+    return node.createError("ref-error", {
+        ref: node.schema.$ref ?? node.schema.$dynamicRef,
+        pointer,
+        schema: node.schema,
+        value: data
+    });
 }
 
 // 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
-function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode | undefined {
+function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode | JsonError {
     const history = path;
     const refInCurrentScope = resolveUri(node.$id, node.schema.$dynamicRef);
 
@@ -197,7 +194,7 @@ function compileNext(referencedNode: SchemaNode, sourceNode: SchemaNode) {
     );
 }
 
-export function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefined {
+export function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError {
     if ($ref == null) {
         return node;
     }
@@ -219,7 +216,12 @@ export function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefi
     // check for remote-host + pointer pair to switch rootSchema
     const fragments = splitRef($ref);
     if (fragments.length === 0) {
-        return undefined;
+        return node.createError("ref-error", {
+            ref: $ref,
+            pointer: node.evaluationPath,
+            schema: node.schema,
+            value: undefined
+        });
     }
 
     // resolve $ref as remote-host
@@ -229,6 +231,7 @@ export function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefi
         if (node.context.remotes[$ref]) {
             return compileNext(node.context.remotes[$ref], node);
         }
+
         if ($ref[0] === "#") {
             // support refOfUnknownKeyword
             const rootSchema = node.context.rootNode.schema;
@@ -238,7 +241,12 @@ export function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefi
             }
         }
         // console.error("REF: UNFOUND 1", $ref);
-        return undefined;
+        return node.createError("ref-error", {
+            ref: $ref,
+            pointer: node.evaluationPath,
+            schema: node.schema,
+            value: undefined
+        });
     }
 
     if (fragments.length === 2) {
@@ -269,16 +277,25 @@ export function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | undefi
                 // @ts-expect-error random path
                 currentNode = currentNode[property];
                 if (currentNode == null) {
-                    console.error("REF: FAILED RESOLVING ref json-pointer", fragments[1]);
-                    return undefined;
+                    // console.error("REF: FAILED RESOLVING ref json-pointer", fragments[1]);
+                    return node.createError("ref-error", {
+                        ref: $ref,
+                        pointer: node.evaluationPath,
+                        schema: node.schema,
+                        value: undefined,
+                        host: fragments[0],
+                        local: fragments[1]
+                    });
                 }
             }
             return currentNode;
         }
-
-        console.error("REF: UNFOUND 2", $ref);
-        return undefined;
     }
 
-    console.error("REF: UNHANDLED", $ref);
+    return node.createError("ref-error", {
+        ref: $ref,
+        pointer: node.evaluationPath,
+        schema: node.schema,
+        value: undefined
+    });
 }
