@@ -1,16 +1,14 @@
 /* eslint-disable no-control-regex */
-import { getTypeOf } from "../utils/getTypeOf";
+import { isAsciiIdn, isUri, isIdnEmail, isIri, isIriReference, isIdn } from "@hyperjump/json-schema-formats";
 import validUrl from "valid-url";
+import { getTypeOf } from "../utils/getTypeOf";
 import { JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
-import { parse as parseIdnEmail } from "smtp-address-parser";
 import settings from "../settings";
 
 const { REGEX_FLAGS } = settings;
 const isValidIPV4 = /^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$/;
 const isValidIPV6 =
     /^((([0-9a-f]{1,4}:){7}([0-9a-f]{1,4}|:))|(([0-9a-f]{1,4}:){6}(:[0-9a-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9a-f]{1,4}:){5}(((:[0-9a-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9a-f]{1,4}:){4}(((:[0-9a-f]{1,4}){1,3})|((:[0-9a-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){3}(((:[0-9a-f]{1,4}){1,4})|((:[0-9a-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){2}(((:[0-9a-f]{1,4}){1,5})|((:[0-9a-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){1}(((:[0-9a-f]{1,4}){1,6})|((:[0-9a-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9a-f]{1,4}){1,7})|((:[0-9a-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))$/i;
-const isValidHostname =
-    /^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\.?$/;
 const matchDate = /^(\d\d\d\d)-(\d\d)-(\d\d)$/;
 const matchTime =
     /^(?<time>(?:([0-1]\d|2[0-3]):[0-5]\d:(?<second>[0-5]\d|60)))(?:\.\d+)?(?<offset>(?:z|[+-]([0-1]\d|2[0-3])(?::?[0-5]\d)?))$/i;
@@ -129,33 +127,30 @@ export const formats: Record<string, (options: JsonSchemaValidatorParams) => Val
         return undefined;
     },
 
+    hostname: ({ node, pointer, data }) => {
+        const { schema } = node;
+        if (typeof data !== "string" || isAsciiIdn(data)) {
+            return undefined;
+        }
+        return node.createError("format-hostname-error", { value: data, pointer, schema });
+    },
+
+    "idn-hostname": ({ node, pointer, data }) => {
+        if (typeof data !== "string" || isIdn(data)) {
+            return undefined;
+        }
+        return node.createError("format-idn-hostname-error", { value: data, pointer, schema: node.schema });
+    },
+
     /**
      * @draft 7
      * [RFC6531] https://json-schema.org/draft-07/json-schema-validation.html#RFC6531
      */
     "idn-email": ({ node, pointer, data }) => {
-        const { schema } = node;
-        if (typeof data !== "string" || data === "") {
+        if (typeof data !== "string" || data === "" || isIdnEmail(data)) {
             return undefined;
         }
-        try {
-            parseIdnEmail(data);
-            return undefined;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (e) {
-            return node.createError("format-email-error", { value: data, pointer, schema });
-        }
-    },
-
-    hostname: ({ node, pointer, data }) => {
-        const { schema } = node;
-        if (typeof data !== "string") {
-            return undefined;
-        }
-        if (isValidHostname.test(data)) {
-            return undefined;
-        }
-        return node.createError("format-hostname-error", { value: data, pointer, schema });
+        return node.createError("format-email-error", { value: data, pointer, schema: node.schema });
     },
 
     ipv4: ({ node, pointer, data }) => {
@@ -186,6 +181,22 @@ export const formats: Record<string, (options: JsonSchemaValidatorParams) => Val
             return undefined;
         }
         return node.createError("format-ipv6-error", { value: data, pointer, schema });
+    },
+
+    iri: ({ node, pointer, data }) => {
+        const { schema } = node;
+        if (typeof data !== "string" || data === "" || isIri(data)) {
+            return undefined;
+        }
+        return node.createError("format-iri-error", { value: data, pointer, schema });
+    },
+
+    "iri-reference": ({ node, pointer, data }) => {
+        const { schema } = node;
+        if (typeof data !== "string" || data === "" || isIriReference(data)) {
+            return undefined;
+        }
+        return node.createError("format-iri-reference-error", { value: data, pointer, schema });
     },
 
     "json-pointer": ({ node, pointer, data }) => {
@@ -281,14 +292,10 @@ export const formats: Record<string, (options: JsonSchemaValidatorParams) => Val
     },
 
     uri: ({ node, pointer, data }) => {
-        const { schema } = node;
-        if (typeof data !== "string" || data === "") {
+        if (typeof data !== "string" || data === "" || isUri(data)) {
             return undefined;
         }
-        if (validUrl.isUri(data)) {
-            return undefined;
-        }
-        return node.createError("format-uri-error", { value: data, pointer, schema });
+        return node.createError("format-uri-error", { value: data, pointer, schema: node.schema });
     },
 
     "uri-reference": ({ node, pointer, data }) => {

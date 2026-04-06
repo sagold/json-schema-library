@@ -16,10 +16,7 @@ runAllTestCases({
     skipTestCase: (t) =>
         ![
             // optionals
-            "float-overflow",
-            "format-idn-hostname",
-            "format-iri",
-            "format-iri-reference"
+            "float-overflow"
         ].includes(t.name),
     /*
         ✓ vocabulary

@@ -42,10 +42,7 @@ runAllTestCases({
     skipTestCase: (t) =>
         ![
             // optional:
-            "float-overflow",
-            "format-idn-hostname",
-            "format-iri",
-            "format-iri-reference"
+            "float-overflow"
         ].includes(t.name),
 
     metaSchema: draft2020Meta,

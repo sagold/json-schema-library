@@ -19,12 +19,15 @@ export const errors = {
     "format-duration-error": "Value `{{value}}` at `{{pointer}}` is not a valid duration",
     "format-email-error": "Value `{{value}}` at `{{pointer}}` is not a valid email",
     "format-hostname-error": "Value `{{value}}` at `{{pointer}}` is not a valid hostname",
+    "format-idn-hostname-error": "Value `{{value}}` at `{{pointer}}` is not a valid idn hostname",
     "format-ipv4-error": "Value `{{value}}` at `{{pointer}}` is not a valid IPv4 address",
     "format-ipv4-leading-zero-error":
         "IPv4 addresses starting with zero are invalid, since they are interpreted as octals",
     "format-ipv6-error": "Value `{{value}}` at `{{pointer}}` is not a valid IPv6 address",
     "format-ipv6-leading-zero-error":
         "IPv6 addresses starting with zero are invalid, since they are interpreted as octals",
+    "format-iri-error": "Value `{{value}}` at `{{pointer}}` is not a valid iri",
+    "format-iri-reference-error": "Value `{{value}}` at `{{pointer}}` is not a valid iri-reference",
     "format-json-pointer-error": "Value `{{value}}` at `{{pointer}}` is not a valid json-pointer",
     "format-regex-error": "Value `{{value}}` at `{{pointer}}` is not a valid regular expression",
     "format-time-error": "Value `{{value}}` at `{{pointer}}` is not a valid time",
