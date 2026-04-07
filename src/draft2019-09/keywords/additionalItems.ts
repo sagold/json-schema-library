@@ -4,28 +4,51 @@ import { SchemaNode } from "../../types";
 import { getValue } from "../../utils/getValue";
 import { validateNode } from "../../validateNode";
 
+const KEYWORD = "additionalItems";
+
 export const additionalItemsKeyword: Keyword = {
-    id: "additionalItems",
-    keyword: "additionalItems",
+    id: KEYWORD,
+    keyword: KEYWORD,
     order: -10,
     parse: parseAdditionalItems,
     addResolve: (node: SchemaNode) => node.items != null,
     resolve: additionalItemsResolver,
-    addValidate: ({ schema }) =>
-        schema.additionalItems != null && schema.additionalItems !== true && Array.isArray(schema.items),
+    addValidate: ({ schema }) => schema[KEYWORD] != null && schema[KEYWORD] !== true && Array.isArray(schema.items),
     validate: validateAdditionalItems
 };
 
 // must come as last resolver
 export function parseAdditionalItems(node: SchemaNode) {
     const { schema, evaluationPath, schemaLocation } = node;
-    if ((isObject(schema.additionalItems) || schema.additionalItems === true) && Array.isArray(schema.items)) {
-        node.items = node.compileSchema(
-            schema.additionalItems,
-            `${evaluationPath}/additionalItems`,
-            `${schemaLocation}/additionalItems`
-        );
+    if (schema.additionalItems == null || schema.additionalItems === false) {
+        return;
     }
+
+    const additionalItems = schema[KEYWORD];
+
+    if (!(isObject(additionalItems) || additionalItems === true)) {
+        return node.createError("schema-error", {
+            pointer: evaluationPath,
+            schema,
+            value: undefined,
+            message: `Keyword '${KEYWORD}' must be an object or a boolean - received '${typeof additionalItems}'`
+        });
+    }
+
+    if (!Array.isArray(schema.items)) {
+        return node.createAnnotation("schema-error", {
+            pointer: evaluationPath,
+            schema,
+            value: undefined,
+            message: `Keyword '${KEYWORD}' is only evaluated with a given items-array`
+        });
+    }
+
+    node.items = node.compileSchema(
+        schema.additionalItems,
+        `${evaluationPath}/additionalItems`,
+        `${schemaLocation}/additionalItems`
+    );
 }
 
 function additionalItemsResolver({ node, key, data }: JsonSchemaResolverParams) {

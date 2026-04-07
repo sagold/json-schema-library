@@ -3,11 +3,13 @@ import { SchemaNode } from "../../types";
 import { isObject } from "../../utils/isObject";
 import { validateNode } from "../../validateNode";
 
+const KEYWORD = "items";
+
 export const itemsKeyword: Keyword = {
-    id: "items",
-    keyword: "items",
+    id: KEYWORD,
+    keyword: KEYWORD,
     parse: parseItems,
-    addResolve: (node) => (node.prefixItems || node.items) != null,
+    addResolve: (node) => (node.prefixItems || node[KEYWORD]) != null,
     resolve: itemsResolver,
     addValidate: ({ schema }) => schema.items != null,
     validate: validateItems
@@ -24,18 +26,38 @@ function itemsResolver({ node, key }: JsonSchemaResolverParams) {
 
 export function parseItems(node: SchemaNode) {
     const { schema, evaluationPath } = node;
-    if (isObject(schema.items)) {
+    const items = schema[KEYWORD];
+    if (items == null || typeof items === "boolean") {
+        return;
+    }
+
+    if (isObject(items)) {
         const propertyNode = node.compileSchema(
-            schema.items,
-            `${evaluationPath}/items`,
-            `${node.schemaLocation}/items`
+            items,
+            `${evaluationPath}/${KEYWORD}`,
+            `${node.schemaLocation}/${KEYWORD}`
         );
         node.items = propertyNode;
-    } else if (Array.isArray(schema.items)) {
-        node.prefixItems = schema.items.map((itemSchema, index) =>
-            node.compileSchema(itemSchema, `${evaluationPath}/items/${index}`, `${node.schemaLocation}/items/${index}`)
-        );
+        return;
     }
+
+    if (Array.isArray(items)) {
+        node.prefixItems = items.map((itemSchema, index) =>
+            node.compileSchema(
+                itemSchema,
+                `${evaluationPath}/${KEYWORD}/${index}`,
+                `${node.schemaLocation}/${KEYWORD}/${index}`
+            )
+        );
+        return;
+    }
+
+    return node.createError("schema-error", {
+        pointer: evaluationPath,
+        schema,
+        value: undefined,
+        message: `Keyword '${KEYWORD}' must be an object or array - received '${typeof items}'`
+    });
 }
 
 function validateItems({ node, data, pointer = "#", path }: JsonSchemaValidatorParams) {

@@ -3,27 +3,40 @@ import { SchemaNode } from "../../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationReturnType } from "../../Keyword";
 import { validateNode } from "../../validateNode";
 
+const KEYWORD = "unevaluatedItems";
+
 /**
  * @draft >= 2019-09
  * Similar to additionalItems, but can "see" into subschemas and across references
  * https://json-schema.org/draft/2019-09/json-schema-core#rfc.section.9.3.1.3
  */
 export const unevaluatedItemsKeyword: Keyword = {
-    id: "unevaluatedItems",
-    keyword: "unevaluatedItems",
+    id: KEYWORD,
+    keyword: KEYWORD,
     parse: parseUnevaluatedItems,
-    addValidate: ({ schema }) => schema.unevaluatedItems != null,
+    addValidate: ({ schema }) => schema[KEYWORD] != null,
     validate: validateUnevaluatedItems
 };
 
 export function parseUnevaluatedItems(node: SchemaNode) {
-    if (!isObject(node.schema.unevaluatedItems)) {
+    const { unevaluatedItems } = node.schema;
+    if (unevaluatedItems == null || typeof unevaluatedItems === "boolean") {
         return;
     }
+
+    if (!isObject(unevaluatedItems)) {
+        return node.createError("schema-error", {
+            pointer: node.evaluationPath,
+            schema: node.schema,
+            value: undefined,
+            message: `Keyword '${KEYWORD}' must be an object - received '${typeof unevaluatedItems}'`
+        });
+    }
+
     node.unevaluatedItems = node.compileSchema(
         node.schema.unevaluatedItems,
-        `${node.evaluationPath}/unevaluatedItems`,
-        `${node.schemaLocation}/unevaluatedItems`
+        `${node.evaluationPath}/${KEYWORD}`,
+        `${node.schemaLocation}/${KEYWORD}`
     );
 }
 
