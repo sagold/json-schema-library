@@ -52,6 +52,3 @@ export { mergeNode } from "./src/mergeNode";
 export { mergeSchema } from "./src/utils/mergeSchema";
 export { getSchemaType } from "./src/utils/getSchemaType";
 export { default as sanitizeErrors } from "./src/utils/sanitizeErrors";
-
-// remotes
-export { remotes } from "./remotes";

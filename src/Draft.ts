@@ -2,7 +2,7 @@ import type { JsonSchemaValidator, Keyword } from "./Keyword";
 import { copyDraft } from "./utils/copyDraft";
 import { createSchema } from "./methods/createSchema";
 import { toDataNodes } from "./methods/toDataNodes";
-import { ErrorConfig, SchemaNode } from "./types";
+import { ErrorConfig } from "./types";
 import { getChildSelection } from "./methods/getChildSelection";
 import { getData } from "./methods/getData";
 

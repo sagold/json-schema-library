@@ -5,7 +5,7 @@ import {
     ValidationReturnType,
     ValidationAnnotation
 } from "../Keyword";
-import { isBooleanSchema, isJsonSchema, JsonSchema, SchemaNode } from "../types";
+import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
 import { hasProperty } from "../utils/hasProperty";
 import { isObject } from "../utils/isObject";
 import { mergeSchema } from "../utils/mergeSchema";

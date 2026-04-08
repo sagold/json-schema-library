@@ -1,5 +1,5 @@
 import { getValue } from "../utils/getValue";
-import { JsonError, SchemaNode } from "../types";
+import { SchemaNode } from "../types";
 import {
     Keyword,
     JsonSchemaResolverParams,

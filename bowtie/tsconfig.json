@@ -1,0 +1,12 @@
+{
+    "extends": "../tsconfig.test.json",
+    "compilerOptions": {
+        "baseUrl": "..",
+        "rootDir": "..",
+        "paths": {
+            "json-schema-library": ["./index.ts"],
+            "json-schema-library/remotes": ["./remotes/index.ts"],
+            "json-schema-library/package.json": ["./package.json"]
+        }
+    }
+}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-invalid-void-type */
 import type { SchemaNode, JsonError, JsonAnnotation } from "./types";
 
 export type ValidationPath = {
@@ -30,8 +31,6 @@ export interface JsonSchemaResolver {
     (options: JsonSchemaResolverParams): SchemaNode | JsonError | undefined;
 }
 
-// type MaybeAsync<T> = T | Promise<T>;
-// type MaybeArray<T> = T | T[];
 export type Maybe<T> = T | undefined;
 export type ValidationAnnotation = JsonError | JsonAnnotation | Promise<Maybe<ValidationAnnotation>[]>;
 type ValidationResult = Maybe<ValidationAnnotation>;
@@ -66,7 +65,7 @@ export type Keyword<Key extends keyof SchemaNode = keyof SchemaNode> = {
      * - return any errors found in JSON schema related to this keyword
      *      (this includes errors from created nodes)
      */
-    parse?: (node: SchemaNode) => void | ValidationAnnotation | ValidationAnnotation[];
+    parse?: (node: SchemaNode) => ValidationAnnotation | ValidationAnnotation[] | void;
     addResolve?: (node: SchemaNode) => boolean;
     /**
      * If this contains child-data, resolve must return schema associated for the passed in key

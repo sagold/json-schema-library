@@ -16,6 +16,7 @@
 .sass-cache
 /src/tests
 build
+/remotes
 coverage
 docs
 node_modules

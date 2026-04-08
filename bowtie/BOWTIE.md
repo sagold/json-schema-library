@@ -3,13 +3,17 @@
 brew install bowtie-json-schema/tap/bowtie
 https://docs.bowtie.report/en/stable/implementers/
 
+> docker build -t localhost/jlib .
+> bowtie suite -i localhost/jlib https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/main/tests/draft2020-12 | bowtie summary --show failures
+> bowtie suite -i localhost/jlib https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft7 --fail-fast
+
 # build
 
 docker build -t localhost/jlib .
-docker run --rm localhost/jlib
 
 # test without bowtie
 
+docker run --rm localhost/jlib
 echo '{"cmd":"start","version":1}' | docker run -i jlib
 echo '{"cmd":"run","seq":1,"case":{"schema":{"type": "string"},"tests":["valid",999]}}' | docker run -i jlib
 echo '{"cmd":"dialect","dialect":"http://json-schema.org/draft-07/schema#"}' | docker run -i jlib

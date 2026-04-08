@@ -7,10 +7,17 @@
         "module": "ESNext",
         "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "lib": ["DOM", "ES2018"],
-        "exactOptionalPropertyTypes": true
+        "exactOptionalPropertyTypes": true,
+        "baseUrl": ".",
+        "paths": {
+            "json-schema-library": ["./index.ts"],
+            "json-schema-library/remotes": ["./remotes/index.ts"],
+            "json-schema-library/package.json": ["./package.json"]
+        },
+        "types": ["node", "mocha"]
     },
-    "exclude": ["src/**/*.test.ts"],
-    "include": ["index.ts", "src/**/*"]
+    "exclude": ["src/**/*.test.ts", "src/**/*.spec.ts", "bowtie/**/*.test.ts"],
+    "include": ["index.ts", "src/**/*", "remotes/**/*", "bowtie/**/*"]
 }

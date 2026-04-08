@@ -1,0 +1,11 @@
+{
+  "name": "bowtie-jlib",
+  "version": "1.0.0",
+  "scripts": {
+    "format": "prettier -w ."
+  },
+  "dependencies": {
+    "json-schema-library": "*",
+    "prettier": "^3.8.1"
+  }
+}

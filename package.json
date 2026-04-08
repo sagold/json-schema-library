@@ -10,6 +10,10 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
+    "./remotes": {
+      "import": "./dist/remotes/index.mjs",
+      "require": "./dist/remotes/index.cjs"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -35,7 +39,7 @@
     "test:7:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft07.spec.ts' > test-result-spec7.json; exit 0",
     "test:inspect": "NODE_OPTIONS='--inspect-brk' mocha 'src/**/*.test.ts'",
     "test:spec": "mocha 'src/tests/spec/*.spec.ts'",
-    "test:unit": "mocha 'src/**/*.test.ts'",
+    "test:unit": "mocha 'src/**/*.test.ts' 'bowtie/**/*.test.ts'",
     "test:unit:ci": "DISABLE_LOG=true mocha -R json 'src/**/*.test.ts' -R json > test-result-unit.json; exit 0"
   },
   "repository": {
@@ -69,7 +73,7 @@
     "@types/mocha": "^10.0.6",
     "@types/node": "^25.3.3",
     "@types/valid-url": "^1.0.7",
-    "eslint": "^9.39.2",
+    "eslint": "^10.2.0",
     "glob": "^13.0.6",
     "json-schema-test-suite": "https://github.com/json-schema-org/JSON-Schema-Test-Suite#Test-JSON-Schema-Acceptance-1.037",
     "mocha": "^11.7.5",
@@ -83,16 +87,18 @@
   "dependencies": {
     "@hyperjump/json-schema-formats": "^1.0.1",
     "@sagold/json-pointer": "^7.2.1",
-    "@sagold/json-query": "^6.2.0",
     "deepmerge": "^4.3.1",
+    "diff": ">=8.0.3",
     "fast-copy": "^4.0.2",
     "fast-deep-equal": "^3.1.3",
-    "lodash": "^4.17.23",
+    "lodash": ">=4",
+    "minimatch": ">=9.0.7",
+    "serialize-javascript": ">=7.0.3",
+    "string-width": ">=4.2.3",
     "uri-js": "^4.4.1",
     "valid-url": "^1.0.9"
   },
   "resolutions": {
-    "ajv": ">=6.14.0",
     "braces": ">=3.0.3",
     "cross-spawn": ">=7.0.6",
     "diff": ">=8.0.3",
