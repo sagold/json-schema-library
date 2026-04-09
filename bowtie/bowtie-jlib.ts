@@ -67,9 +67,10 @@ const cmds: CommandMap = {
     run: async (args) => {
         console.assert(state === "dialect" || state === "testing");
         state = "testing";
-        const { schema, tests, registry } = args.case;
+        const { tests, registry } = args.case;
+        let { schema } = args.case;
         if (schema != null && typeof schema === "object") {
-            schema.$schema = dialect; // set draft version to non-boolean schema
+            schema = { $schema: dialect, ...schema }; // set default draft version for non-boolean schema
         }
         // compile schema
         const node = compileSchema(schema, { remote, formatAssertion: false });

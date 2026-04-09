@@ -39,7 +39,7 @@
     "test:7:ci": "DISABLE_LOG=true mocha -R json 'src/tests/spec/draft07.spec.ts' > test-result-spec7.json; exit 0",
     "test:inspect": "NODE_OPTIONS='--inspect-brk' mocha 'src/**/*.test.ts'",
     "test:spec": "mocha 'src/tests/spec/*.spec.ts'",
-    "test:unit": "mocha 'src/**/*.test.ts' 'bowtie/**/*.test.ts'",
+    "test:unit": "mocha 'src/**/*.test.ts' 'bowtie/*.test.ts'",
     "test:unit:ci": "DISABLE_LOG=true mocha -R json 'src/**/*.test.ts' -R json > test-result-unit.json; exit 0"
   },
   "repository": {
