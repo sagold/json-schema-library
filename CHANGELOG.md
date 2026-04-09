@@ -1,5 +1,11 @@
 ## Changelog
 
+### v11.2.0
+
+- introduced `throwOnInvalidRef` to abort validation when a $ref cannot be resolved
+- added export of meta-schema for all drafts using `import "json-schema-library/remotes"`
+- added support for format validations: `idn-hostname`, `iri`, `iri-reference`
+
 ### v11.1.0
 
 - introduced upcoming keyword `propertyDependenciesKeyword` to package export
