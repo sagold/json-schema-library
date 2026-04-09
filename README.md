@@ -58,6 +58,12 @@ type CompileOptions = {
   remote: SchemaNode;
   // if format-validations should create errors. Defaults to true
   formatAssertion: boolean | "meta-schema";
+  /** set to true to throw an Error on errors in input schema. Defaults to false */
+  throwOnInvalidSchema?: boolean;
+  /** set to true to collect unknown keywords of input schema in `node.schemaAnnotations`. Defaults to false */
+  withSchemaAnnotations?: boolean;
+  /** set to true to throw an Error when encountering an unresolvable ref  */
+  throwOnInvalidRef?: boolean;
   // default options for all calls to node.getData()
   getDataDefaultOptions?: {
     // Add all properties (required and optional) to the generated data
@@ -110,7 +116,7 @@ const root = compileSchema({ properties: 123 }, { throwOnInvalidSchema: true });
 // throws Error
 ```
 
-<details><summary>Example for validation errors</summary>
+<details><summary>Example for schema validation errors</summary>
 
 ---
 
@@ -148,19 +154,21 @@ This collects all JSON Schema keywords not part of the used draft and any custom
 ---
 
 ```ts
-const { schemaErrors } = compileSchema({ options: {} }, { withSchemaAnnotations: true });
-console.log(schemaErrors[0]);
+const { schemaAnnotations } = compileSchema({ unknown: true }, { withSchemaAnnotations: true });
+console.log(schemaAnnotations[0]);
 {
-   type: 'annotation',
-   code: 'unknown-keyword-warning',
-   message: "Keyword 'options' is not a valid keyword to draft 'draft-2020-12'",
-   data: {
-     pointer: '#/options',
-     schema: { options: {} },
-     value: 'options',
-     draft: 'draft-2020-12'
-   }
- }
+  type: "annotation",
+  code: "unknown-keyword-warning",
+  message: "Keyword 'unknown' is not a valid keyword to draft 'draft-2020-12'",
+  data: {
+    pointer: "#/unknown",
+    schema: {
+      unknown: true
+    },
+    value: "unknown",
+    draft: "draft-2020-12"
+  }
+}
 ```
 
 ---

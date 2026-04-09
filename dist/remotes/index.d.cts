@@ -1,7 +1,7 @@
-import { c as JsonSchema } from "../types-CBGZ554I.cjs";
+import { c as JsonSchema } from "../types-B2wwNWyo.cjs";
 
 //#region remotes/index.d.ts
-/** remote meta-schema stored by schema $id */
-declare const remotes: Record<string, JsonSchema>;
+/** JSON Schema meta-schemata */
+declare const remotes: JsonSchema[];
 //#endregion
 export { remotes };
