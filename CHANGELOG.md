@@ -1,5 +1,10 @@
 ## Changelog
 
+### v11.3.0
+
+- added option 'draft' as fallback for a missing `$schema` id
+- added properties to merge when resolvinf a $ref to `settings.PROPERTIES_TO_MERGE`
+
 ### v11.2.0
 
 - introduced `throwOnInvalidRef` to abort validation when a $ref cannot be resolved
