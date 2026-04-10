@@ -14,6 +14,86 @@ const isErrorResponse = (value: unknown): value is ErrorResponse =>
 const remote = compileSchema({ $id: "draft2020-12" });
 remotes.map((schema: JsonSchema) => remote.addRemoteSchema(schema.$id ?? schema.id, schema));
 
+describe("bowtie (draft4)", async () => {
+    before(async () => {
+        await runCommand({ cmd: "start", version: 1 });
+        await runCommand({ cmd: "dialect", dialect: "http://json-schema.org/draft-04/schema#" });
+    });
+    after(async () => runCommand({ cmd: "stop" }));
+
+    const registry = {
+        "http://localhost:1234/draft4/name.json": {
+            definitions: { orNull: { anyOf: [{ type: "null" }, { $ref: "#" }] } },
+            type: "string"
+        },
+        "http://localhost:1234/v1/nested-absolute-ref-to-string.json": {
+            $defs: { bar: { $id: "http://localhost:1234/v1/the-nested-id.json", type: "string" } },
+            $ref: "http://localhost:1234/v1/the-nested-id.json"
+        },
+        "http://localhost:1234/nested/string.json": { type: "string" },
+        "http://localhost:1234/baseUriChange/folderInteger.json": { type: "integer" },
+        "http://localhost:1234/draft4/subSchemas.json": {
+            definitions: { integer: { type: "integer" }, refToInteger: { $ref: "#/definitions/integer" } }
+        },
+        "http://localhost:1234/v1/different-id-ref-string.json": {
+            $id: "http://localhost:1234/v1/real-id-ref-string.json",
+            $defs: { bar: { type: "string" } },
+            $ref: "#/$defs/bar"
+        },
+        "http://localhost:1234/v1/urn-ref-string.json": {
+            $id: "urn:uuid:feebdaed-ffff-0000-ff01-0000deadbeef",
+            $defs: { bar: { type: "string" } },
+            $ref: "#/$defs/bar"
+        },
+        "http://localhost:1234/integer.json": { type: "integer" },
+        "http://localhost:1234/nested/foo-ref-string.json": {
+            type: "object",
+            properties: { foo: { $ref: "string.json" } }
+        },
+        "http://localhost:1234/baseUriChangeFolder/folderInteger.json": { type: "integer" },
+        "http://localhost:1234/draft4/locationIndependentIdentifier.json": {
+            definitions: { refToInteger: { $ref: "#foo" }, A: { id: "#foo", type: "integer" } }
+        },
+        "http://localhost:1234/baseUriChangeFolderInSubschema/folderInteger.json": { type: "integer" }
+    };
+
+    it("Location-independent identifier in remote ref - additional items match schema", async () => {
+        const response = await runCommand({
+            cmd: "run",
+            seq: 1,
+            case: {
+                description: "Location-independent identifier in remote ref",
+                schema: {
+                    $ref: "http://localhost:1234/draft4/locationIndependentIdentifier.json#/definitions/refToInteger"
+                },
+                registry,
+                tests: [{ description: "integer is valid", instance: 1, valid: true }]
+            }
+        });
+        assert(isRunCmdResponse(response));
+        assert(!isErrorResponse(response.results[0]));
+        assert.equal(response.results[0].valid, true);
+    });
+
+    it("Location-independent identifier in remote ref - additional items do not match schema", async () => {
+        const response = await runCommand({
+            cmd: "run",
+            seq: 1,
+            case: {
+                description: "Location-independent identifier in remote ref",
+                schema: {
+                    $ref: "http://localhost:1234/draft4/locationIndependentIdentifier.json#/definitions/refToInteger"
+                },
+                registry,
+                tests: [{ description: "string is invalid", instance: "foo", valid: false }]
+            }
+        });
+        assert(isRunCmdResponse(response));
+        assert(!isErrorResponse(response.results[0]));
+        assert.equal(response.results[0].valid, false);
+    });
+});
+
 describe("bowtie (draft7)", async () => {
     before(async () => {
         await runCommand({ cmd: "start", version: 1 });

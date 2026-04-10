@@ -70,6 +70,8 @@ function getDraft(drafts: Draft[], $schema: string) {
 export type Context = {
     /** root node of this JSON Schema */
     rootNode: SchemaNode;
+    /** Fallback _draft_ version in case no _draft_ is specified by `schema.$schema` */
+    draft?: string;
     /** available draft configurations */
     drafts: Draft[];
     /** [SHARED ACROSS REMOTES] root nodes of registered remote JSON Schema, stored by id/url */
@@ -551,7 +553,7 @@ export const SchemaNodeMethods = {
 
         const node = this as SchemaNode;
         const { context } = node;
-        const schemaId = isJsonSchema(schema) ? schema.$schema : undefined;
+        const schemaId = isJsonSchema(schema) ? (node.context.draft ?? schema.$schema) : undefined;
         const draft = getDraft(context.drafts, schemaId ?? context.rootNode.schema?.$schema);
 
         const remoteNode: SchemaNode = {

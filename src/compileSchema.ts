@@ -116,6 +116,7 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
             anchors: {},
             refs: {},
             ...copy(pick(draft, "methods", "keywords", "version", "formats", "errors")),
+            draft: options.draft,
             getDataDefaultOptions: options.getDataDefaultOptions,
             withSchemaAnnotations: options.withSchemaAnnotations ?? false,
             throwOnInvalidRef: options.throwOnInvalidRef ?? false,
