@@ -452,7 +452,7 @@
                             title: "Stil der Headerleiste (Süddeutsche Zeitung)",
                             type: "string",
                             enum: ["light", "dark"],
-                            options: { enum_titles: ["Heller Headerbalken", "Dunkler Headerbalken"] }
+                            "x-options": { enum_titles: ["Heller Headerbalken", "Dunkler Headerbalken"] }
                         },
                         datePublished: {
                             title: "Veröffentlichungsdatum",
@@ -493,18 +493,18 @@
                             type: "string",
                             enum: ["top", "middle", "bottom"],
                             default: "bottom",
-                            options: { enum_titles: ["oben", "mittig", "unten"] }
+                            "x-options": { enum_titles: ["oben", "mittig", "unten"] }
                         },
                         image: {
                             type: "object",
                             additionalProperties: false,
                             required: ["desktop", "mobile"],
-                            options: { hide_title: true },
+                            "x-options": { hide_title: true },
                             properties: {
                                 desktop: {
                                     type: "object",
                                     required: ["url", "quality"],
-                                    options: {
+                                    "x-options": {
                                         hide_title: true,
                                         "max-height": "250px",
                                         maxWidth: 1920,
@@ -534,7 +534,12 @@
                                 mobile: {
                                     type: "object",
                                     required: ["url", "quality"],
-                                    options: { hide_title: true, "max-height": "120px", maxWidth: 750, maxHeight: 750 },
+                                    "x-options": {
+                                        hide_title: true,
+                                        "max-height": "120px",
+                                        maxWidth: 750,
+                                        maxHeight: 750
+                                    },
                                     format: "mediaImage",
                                     devicePixelRatio: 2,
                                     minWidth: 320,
@@ -560,7 +565,7 @@
                             title: "Optionales Introvideo",
                             type: "object",
                             required: ["url", "loop", "type"],
-                            options: { hide_title: true },
+                            "x-options": { hide_title: true },
                             properties: {
                                 url: {
                                     title: "Comyan-ID des Videos",
@@ -573,7 +578,7 @@
                                     title: "Medientyp",
                                     type: "string",
                                     default: "video",
-                                    options: { hidden: true }
+                                    "x-options": { hidden: true }
                                 }
                             }
                         },
@@ -582,7 +587,7 @@
                             type: "string",
                             enum: ["parallax", "inline"],
                             default: "parallax",
-                            options: {
+                            "x-options": {
                                 enum_titles: [
                                     "Bild und Video im Hintergrund als Parallaxe einblenden",
                                     "Intro-Bild im Dokumentfluss anzeigen"
@@ -597,7 +602,7 @@
                     format: "table",
                     items: {
                         title: "Modul",
-                        options: { disable_collapse: true, keep_oneof_values: false },
+                        "x-options": { disable_collapse: true, keep_oneof_values: false },
                         oneOf: [
                             {
                                 id: "textModule",
@@ -608,7 +613,7 @@
                                 properties: {
                                     partial: {
                                         type: "string",
-                                        options: { hidden: true },
+                                        "x-options": { hidden: true },
                                         default: "app/src/modules/text/text",
                                         pattern: "^app/src/modules/text/text"
                                     },
@@ -616,7 +621,7 @@
                                         type: "object",
                                         required: ["withInitial", "content"],
                                         additionalProperties: false,
-                                        options: { hide_title: true },
+                                        "x-options": { hide_title: true },
                                         properties: {
                                             withInitial: {
                                                 title: "Text beginnt mit einer Initiale",
@@ -628,7 +633,7 @@
                                                 title: "Text",
                                                 type: "string",
                                                 format: "html",
-                                                options: {
+                                                "x-options": {
                                                     mediumEditor: {
                                                         buttons: [
                                                             "h2",
@@ -651,11 +656,11 @@
                                 title: "Bild",
                                 additionalProperties: false,
                                 required: ["partial", "image"],
-                                options: { disable_collapse: true },
+                                "x-options": { disable_collapse: true },
                                 properties: {
                                     partial: {
                                         type: "string",
-                                        options: { hidden: true },
+                                        "x-options": { hidden: true },
                                         default: "app/src/modules/image/image",
                                         pattern: "^app/src/modules/image/image"
                                     },
@@ -663,7 +668,7 @@
                                         type: "object",
                                         additionalProperties: false,
                                         required: ["desktop", "mobile", "caption", "source", "displayMode", "animated"],
-                                        options: { hide_title: true },
+                                        "x-options": { hide_title: true },
                                         properties: {
                                             desktop: {
                                                 type: "object",
@@ -671,7 +676,7 @@
                                                 devicePixelRatio: 2,
                                                 minWidth: 456,
                                                 minHeight: 304,
-                                                options: { hide_title: true, maxWidth: 1320, maxHeight: 1320 },
+                                                "x-options": { hide_title: true, maxWidth: 1320, maxHeight: 1320 },
                                                 required: ["url", "quality"],
                                                 properties: {
                                                     url: { title: "Comyan-ID *", type: "string", minLength: 1 },
@@ -693,7 +698,7 @@
                                                 devicePixelRatio: 2,
                                                 minWidth: 456,
                                                 minHeight: 304,
-                                                options: { hide_title: true, maxWidth: 750, maxHeight: 750 },
+                                                "x-options": { hide_title: true, maxWidth: 750, maxHeight: 750 },
                                                 required: ["url", "quality"],
                                                 properties: {
                                                     url: {
@@ -731,7 +736,7 @@
                                                     "expanded",
                                                     "fullwidth"
                                                 ],
-                                                options: {
+                                                "x-options": {
                                                     enum_titles: [
                                                         "Bild links",
                                                         "Bild rechts",
@@ -741,7 +746,7 @@
                                                     ]
                                                 }
                                             },
-                                            animated: { options: { hidden: true }, type: "object" }
+                                            animated: { "x-options": { hidden: true }, type: "object" }
                                         }
                                     }
                                 }
@@ -754,7 +759,7 @@
                                 properties: {
                                     partial: {
                                         type: "string",
-                                        options: { hidden: true },
+                                        "x-options": { hidden: true },
                                         default: "app/src/modules/blender/imageBlender",
                                         pattern: "^app/src/modules/blender/imageBlender"
                                     },
@@ -763,12 +768,12 @@
                                         type: "string",
                                         enum: ["light", "dark"],
                                         default: "light",
-                                        options: { hidden: true, enum_titles: ["hell", "dunkel"] }
+                                        "x-options": { hidden: true, enum_titles: ["hell", "dunkel"] }
                                     },
                                     slides: {
                                         type: "object",
                                         title: "",
-                                        options: { hide_title: true },
+                                        "x-options": { hide_title: true },
                                         required: ["displayMode", "default", "fallback"],
                                         properties: {
                                             displayMode: {
@@ -776,7 +781,7 @@
                                                 type: "string",
                                                 enum: ["contain", "cover"],
                                                 default: "contain",
-                                                options: {
+                                                "x-options": {
                                                     enum_titles: [
                                                         "Bilder so einbinden, dass sie komplett sichtbar sind",
                                                         "Bilder so einbinden, dass sie den kompletten Bildschirm abdecken"
@@ -786,7 +791,7 @@
                                             default: {
                                                 type: "array",
                                                 title: "Bildergalerie",
-                                                options: { hide_title: true },
+                                                "x-options": { hide_title: true },
                                                 minItems: 1,
                                                 items: {
                                                     type: "object",
@@ -800,7 +805,7 @@
                                                             devicePixelRatio: 2,
                                                             minWidth: 320,
                                                             minHeight: 320,
-                                                            options: {
+                                                            "x-options": {
                                                                 "max-height": "250px",
                                                                 maxWidth: 1320,
                                                                 maxHeight: 1320
@@ -828,7 +833,7 @@
                                                             devicePixelRatio: 2,
                                                             minWidth: 320,
                                                             minHeight: 320,
-                                                            options: {
+                                                            "x-options": {
                                                                 "max-height": "250px",
                                                                 maxWidth: 750,
                                                                 maxHeight: 750
@@ -868,7 +873,7 @@
                                                             devicePixelRatio: 2,
                                                             minWidth: 320,
                                                             minHeight: 480,
-                                                            options: { maxWidth: 750, maxHeight: 750 },
+                                                            "x-options": { maxWidth: 750, maxHeight: 750 },
                                                             properties: {
                                                                 url: {
                                                                     title: "Schmales Bild. Comyan-ID *",
@@ -901,7 +906,7 @@
                                 properties: {
                                     partial: {
                                         type: "string",
-                                        options: { hidden: true },
+                                        "x-options": { hidden: true },
                                         default: "app/src/modules/parallax/parallax",
                                         pattern: "^app/src/modules/parallax/parallax"
                                     },
@@ -919,7 +924,7 @@
                                                 type: "object",
                                                 additionalProperties: false,
                                                 required: ["desktop", "mobile"],
-                                                options: { hide_title: true },
+                                                "x-options": { hide_title: true },
                                                 properties: {
                                                     desktop: {
                                                         type: "object",
@@ -928,7 +933,11 @@
                                                         devicePixelRatio: 2,
                                                         minWidth: 300,
                                                         minHeight: 400,
-                                                        options: { hide_title: true, maxWidth: 1320, maxHeight: 1320 },
+                                                        "x-options": {
+                                                            hide_title: true,
+                                                            maxWidth: 1320,
+                                                            maxHeight: 1320
+                                                        },
                                                         required: ["url", "quality"],
                                                         properties: {
                                                             url: {
@@ -953,7 +962,7 @@
                                                         devicePixelRatio: 2,
                                                         minWidth: 300,
                                                         minHeight: 400,
-                                                        options: {
+                                                        "x-options": {
                                                             "max-height": "120px",
                                                             hide_title: true,
                                                             maxWidth: 750,
@@ -980,7 +989,7 @@
                                             video: {
                                                 type: "object",
                                                 required: ["url", "type", "loop"],
-                                                options: { hide_title: true },
+                                                "x-options": { hide_title: true },
                                                 properties: {
                                                     url: {
                                                         title: "Hintergrundvideo. Comyan-ID",
@@ -999,7 +1008,7 @@
                                                         title: "Medientyp",
                                                         type: "string",
                                                         default: "video",
-                                                        options: { hidden: true }
+                                                        "x-options": { hidden: true }
                                                     }
                                                 }
                                             }
@@ -1016,7 +1025,7 @@
                                 properties: {
                                     partial: {
                                         type: "string",
-                                        options: { hidden: true },
+                                        "x-options": { hidden: true },
                                         default: "app/src/modules/typing/typing",
                                         pattern: "^app/src/modules/typing/typing"
                                     },
@@ -1024,7 +1033,7 @@
                                         type: "object",
                                         required: ["headline", "content", "position"],
                                         additionalProperties: false,
-                                        options: { hide_title: true },
+                                        "x-options": { hide_title: true },
                                         properties: {
                                             headline: { title: "Dachzeile", type: "string" },
                                             content: { title: "Text", type: "string" },
@@ -1032,7 +1041,7 @@
                                                 title: "Positionierung",
                                                 type: "string",
                                                 enum: ["center", "left", "right"],
-                                                options: {
+                                                "x-options": {
                                                     enum_titles: [
                                                         "Zentriert",
                                                         "Nach links versetzt",
@@ -1050,11 +1059,11 @@
                                 title: "Aufklappbild",
                                 additionalProperties: false,
                                 required: ["partial", "popin"],
-                                options: { disable_collapse: true },
+                                "x-options": { disable_collapse: true },
                                 properties: {
                                     partial: {
                                         type: "string",
-                                        options: { hidden: true },
+                                        "x-options": { hidden: true },
                                         default: "app/src/modules/popin/popin",
                                         pattern: "^app/src/modules/popin/popin"
                                     },
@@ -1062,7 +1071,7 @@
                                         type: "object",
                                         require: ["content", "image", "caption", "source"],
                                         additionalProperties: false,
-                                        options: { hide_title: true },
+                                        "x-options": { hide_title: true },
                                         properties: {
                                             withInitial: {
                                                 title: "Text beginnt mit einer Initiale",
@@ -1074,7 +1083,7 @@
                                                 title: "Text",
                                                 type: "string",
                                                 format: "html",
-                                                options: {
+                                                "x-options": {
                                                     mediumEditor: {
                                                         buttons: [
                                                             {
@@ -1098,7 +1107,7 @@
                                                     desktop: {
                                                         type: "object",
                                                         required: ["url", "quality"],
-                                                        options: {
+                                                        "x-options": {
                                                             "max-height": "250px",
                                                             maxWidth: 1320,
                                                             maxHeight: 1320
@@ -1126,7 +1135,7 @@
                                                     mobile: {
                                                         type: "object",
                                                         required: ["url", "quality"],
-                                                        options: {
+                                                        "x-options": {
                                                             "max-height": "120px",
                                                             maxWidth: 750,
                                                             maxHeight: 750
@@ -1173,14 +1182,14 @@
                                 properties: {
                                     partial: {
                                         type: "string",
-                                        options: { hidden: true },
+                                        "x-options": { hidden: true },
                                         default: "app/src/modules/video/video",
                                         pattern: "^app/src/modules/video/video"
                                     },
                                     video: {
                                         type: "object",
                                         required: ["url", "source", "type", "previewImage", "autoplay", "displayMode"],
-                                        options: { hide_title: true },
+                                        "x-options": { hide_title: true },
                                         properties: {
                                             url: {
                                                 title: "Video-URL als Comyan-ID",
@@ -1191,7 +1200,7 @@
                                                 title: "Vorschaubild",
                                                 type: "object",
                                                 required: ["url", "quality"],
-                                                options: {
+                                                "x-options": {
                                                     hide_title: true,
                                                     "max-height": "120px",
                                                     maxWidth: 750,
@@ -1246,7 +1255,7 @@
                                                     "expanded",
                                                     "fullwidth"
                                                 ],
-                                                options: {
+                                                "x-options": {
                                                     enum_titles: [
                                                         "Video links",
                                                         "Video rechts",
@@ -1260,7 +1269,7 @@
                                                 title: "Medientyp",
                                                 type: "string",
                                                 default: "video",
-                                                options: { hidden: true }
+                                                "x-options": { hidden: true }
                                             }
                                         }
                                     }
@@ -1271,11 +1280,11 @@
                                 title: "Sprungmarke",
                                 additionalProperties: false,
                                 required: ["partial", "target"],
-                                options: { disable_collapse: true },
+                                "x-options": { disable_collapse: true },
                                 properties: {
                                     partial: {
                                         type: "string",
-                                        options: { hidden: true },
+                                        "x-options": { hidden: true },
                                         default: "app/src/modules/target/target",
                                         pattern: "^app/src/modules/target/target"
                                     },
@@ -1294,11 +1303,11 @@
                                 title: "SZ Embed-Script",
                                 additionalProperties: false,
                                 required: ["partial", "embed"],
-                                options: { disable_collapse: true },
+                                "x-options": { disable_collapse: true },
                                 properties: {
                                     partial: {
                                         type: "string",
-                                        options: { hidden: true },
+                                        "x-options": { hidden: true },
                                         default: "app/src/modules/embed/embed",
                                         pattern: "^app/src/modules/embed/embed"
                                     },
@@ -1323,7 +1332,7 @@
                                                 title: "Channel",
                                                 type: "string",
                                                 enum: ["www", "mobile", "tablet"],
-                                                options: { hidden: true },
+                                                "x-options": { hidden: true },
                                                 default: "www"
                                             }
                                         }
@@ -1336,11 +1345,11 @@
                                 title: "Kontinuierlicher Hochzähler",
                                 additionalProperties: false,
                                 required: ["partial", "counter"],
-                                options: { disable_collapse: true },
+                                "x-options": { disable_collapse: true },
                                 properties: {
                                     partial: {
                                         type: "string",
-                                        options: { hidden: true },
+                                        "x-options": { hidden: true },
                                         default: "app/src/modules/counter/counter",
                                         pattern: "^app/src/modules/counter/counter"
                                     },
@@ -1390,7 +1399,7 @@
                                 type: "object",
                                 required: ["url", "quality"],
                                 format: "mediaImage",
-                                options: { hide_title: true, maxWidth: 1320, maxHeight: 1320 },
+                                "x-options": { hide_title: true, maxWidth: 1320, maxHeight: 1320 },
                                 devicePixelRatio: 2,
                                 minWidth: 320,
                                 minHeight: 200,
@@ -1413,7 +1422,7 @@
                 credits: {
                     type: "array",
                     title: "Credits",
-                    options: { collapsed: true },
+                    "x-options": { collapsed: true },
                     items: {
                         type: "object",
                         required: ["what", "who"],
@@ -1428,7 +1437,7 @@
                     title: "SEO",
                     type: "object",
                     required: ["title", "teaser", "keywords", "schemaOrg"],
-                    options: { collapsed: true },
+                    "x-options": { collapsed: true },
                     properties: {
                         title: {
                             title: "Seitentitel",
@@ -1462,7 +1471,12 @@
                                 image: {
                                     type: "object",
                                     required: ["url", "quality"],
-                                    options: { hide_title: true, "max-height": "150px", maxWidth: 600, maxHeight: 600 },
+                                    "x-options": {
+                                        hide_title: true,
+                                        "max-height": "150px",
+                                        maxWidth: 600,
+                                        maxHeight: 600
+                                    },
                                     format: "mediaImage",
                                     devicePixelRatio: 2,
                                     minWidth: 600,
@@ -1486,7 +1500,7 @@
                                 logo: {
                                     type: "string",
                                     default: "szig-style/lib/assets/sz-small-black.png",
-                                    options: { hidden: true }
+                                    "x-options": { hidden: true }
                                 }
                             }
                         }
@@ -1496,13 +1510,13 @@
                     title: "Social Media",
                     type: "object",
                     required: ["email", "facebook", "twitter", "whatsapp"],
-                    options: { collapsed: true },
+                    "x-options": { collapsed: true },
                     properties: {
                         email: {
                             title: "E-mail",
                             type: "object",
                             required: ["sharingSubject", "sharingBody"],
-                            options: { disable_collapse: true },
+                            "x-options": { disable_collapse: true },
                             properties: {
                                 sharingSubject: { title: "Betreff", type: "string" },
                                 sharingBody: {
@@ -1518,14 +1532,19 @@
                             type: "object",
                             description: "Diese Informationen werden in einer Box unter dem Post angezeigt.",
                             required: ["title", "description", "image"],
-                            options: { disable_collapse: true },
+                            "x-options": { disable_collapse: true },
                             properties: {
                                 title: { title: "Überschrift", type: "string" },
                                 description: { title: "Kurzfassung", type: "string", format: "textarea" },
                                 image: {
                                     type: "object",
                                     required: ["url", "quality"],
-                                    options: { hide_title: true, "max-height": "150px", maxWidth: 600, maxHeight: 600 },
+                                    "x-options": {
+                                        hide_title: true,
+                                        "max-height": "150px",
+                                        maxWidth: 600,
+                                        maxHeight: 600
+                                    },
                                     format: "mediaImage",
                                     devicePixelRatio: 2,
                                     minWidth: 600,
@@ -1553,14 +1572,19 @@
                             type: "object",
                             description: "Diese Informationen werden als kleines Kärtchen unter dem Tweet angezeigt.",
                             required: ["title", "description", "image", "sharingText"],
-                            options: { disable_collapse: true },
+                            "x-options": { disable_collapse: true },
                             properties: {
                                 title: { title: "Überschrift", type: "string" },
                                 description: { title: "Kurzfassung", type: "string", format: "textarea" },
                                 image: {
                                     type: "object",
                                     required: ["url", "quality"],
-                                    options: { hide_title: true, "max-height": "150px", maxWidth: 600, maxHeight: 600 },
+                                    "x-options": {
+                                        hide_title: true,
+                                        "max-height": "150px",
+                                        maxWidth: 600,
+                                        maxHeight: 600
+                                    },
                                     format: "mediaImage",
                                     devicePixelRatio: 2,
                                     minWidth: 600,
@@ -1595,7 +1619,7 @@
                             title: "Whatsapp",
                             type: "object",
                             required: ["sharingText"],
-                            options: { disable_collapse: true },
+                            "x-options": { disable_collapse: true },
                             properties: {
                                 sharingText: {
                                     title: "Nachricht",

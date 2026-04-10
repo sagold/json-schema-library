@@ -8,6 +8,7 @@ import { validateNode } from "../validateNode";
 import { get, split } from "@sagold/json-pointer";
 import { mergeNode } from "../mergeNode";
 import { pick } from "../utils/pick";
+import settings from "src/settings";
 
 export const $refKeyword: Keyword = {
     id: "$ref",
@@ -177,14 +178,12 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     return getRef(node, refInCurrentScope);
 }
 
-const PROPERTIES_TO_MERGE = ["title", "description", "options", "readOnly", "writeOnly"];
-
-function compileNext(referencedNode: SchemaNode, sourceNode: SchemaNode) {
+export function compileNext(referencedNode: SchemaNode, sourceNode: SchemaNode) {
     let referencedSchema = referencedNode.schema;
     if (isObject(referencedNode.schema)) {
         referencedSchema = {
             ...omit(referencedNode.schema, "$id"),
-            ...pick(sourceNode.schema, ...PROPERTIES_TO_MERGE)
+            ...pick(sourceNode.schema, ...settings.PROPERTIES_TO_MERGE)
         };
     }
     return referencedNode.compileSchema(

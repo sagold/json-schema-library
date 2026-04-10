@@ -14,7 +14,7 @@ describe("issue#22 - resolve nested oneOfs and refs", () => {
                     pageContents: {
                         title: "Page",
                         type: "array",
-                        options: {
+                        "x-options": {
                             classNames: ["scm-page-contents"],
                             sortable: {
                                 enabled: true
@@ -36,23 +36,23 @@ describe("issue#22 - resolve nested oneOfs and refs", () => {
                         required: ["type", "children"],
                         properties: {
                             type: {
-                                options: { hidden: true },
+                                "x-options": { hidden: true },
                                 type: "string",
                                 const: "layout:column-two"
                             },
                             children: {
                                 type: "array",
-                                options: { classNames: [".scm-two-columns"] },
+                                "x-options": { classNames: [".scm-two-columns"] },
                                 prefixItems: [
                                     {
                                         $ref: "#/$defs/layout-column-one",
-                                        options: {
+                                        "x-options": {
                                             classNames: [".scm-column"]
                                         }
                                     },
                                     {
                                         $ref: "#/$defs/layout-column-one",
-                                        options: {
+                                        "x-options": {
                                             classNames: [".scm-column"]
                                         }
                                     }
@@ -66,14 +66,14 @@ describe("issue#22 - resolve nested oneOfs and refs", () => {
                         required: ["type", "children"],
                         properties: {
                             type: {
-                                options: { hidden: true },
+                                "x-options": { hidden: true },
                                 type: "string",
                                 const: "layout:column-one"
                             },
                             children: {
                                 type: "array",
                                 uniqueItems: true,
-                                options: {
+                                "x-options": {
                                     sortable: {
                                         enabled: true
                                     }
@@ -95,7 +95,7 @@ describe("issue#22 - resolve nested oneOfs and refs", () => {
                         required: ["type"],
                         properties: {
                             type: {
-                                options: { hidden: true },
+                                "x-options": { hidden: true },
                                 type: "string",
                                 const: "module:cta"
                             }
@@ -107,7 +107,7 @@ describe("issue#22 - resolve nested oneOfs and refs", () => {
                         required: ["type"],
                         properties: {
                             type: {
-                                options: { hidden: true },
+                                "x-options": { hidden: true },
                                 type: "string",
                                 const: "module:product-list"
                             }
@@ -119,7 +119,7 @@ describe("issue#22 - resolve nested oneOfs and refs", () => {
                         required: ["type"],
                         properties: {
                             type: {
-                                options: { hidden: true },
+                                "x-options": { hidden: true },
                                 type: "string",
                                 const: "module:address"
                             }
@@ -131,7 +131,7 @@ describe("issue#22 - resolve nested oneOfs and refs", () => {
                         required: ["type", "withLogo"],
                         properties: {
                             type: {
-                                options: { hidden: true },
+                                "x-options": { hidden: true },
                                 type: "string",
                                 const: "module:footer"
                             },
@@ -186,7 +186,7 @@ describe("issue#22 - resolve nested oneOfs and refs", () => {
             firstColumn?.schema,
             {
                 // options on ref-node should have been merged
-                options: { classNames: [".scm-column"] },
+                "x-options": { classNames: [".scm-column"] },
                 ...root.schema.$defs["layout-column-one"]
             },
             "should match $defs['layout-column-one']"

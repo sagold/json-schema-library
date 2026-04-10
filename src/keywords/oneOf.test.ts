@@ -483,7 +483,7 @@ describe("keyword : oneof-fuzzy : validate", () => {
                         required: ["type", "children"],
                         properties: {
                             type: {
-                                options: { hidden: true },
+                                "x-options": { hidden: true },
                                 type: "string",
                                 const: "parent"
                             },
@@ -500,7 +500,7 @@ describe("keyword : oneof-fuzzy : validate", () => {
                                             required: ["type"],
                                             properties: {
                                                 type: {
-                                                    options: { hidden: true },
+                                                    "x-options": { hidden: true },
                                                     type: "string",
                                                     const: "one"
                                                 }
@@ -512,7 +512,7 @@ describe("keyword : oneof-fuzzy : validate", () => {
                                             required: ["type"],
                                             properties: {
                                                 type: {
-                                                    options: { hidden: true },
+                                                    "x-options": { hidden: true },
                                                     type: "string",
                                                     const: "two"
                                                 }

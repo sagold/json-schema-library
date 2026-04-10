@@ -1,12 +1,10 @@
 import { Keyword, JsonSchemaValidatorParams, ValidationPath } from "../../Keyword";
 import { resolveUri } from "../../utils/resolveUri";
 import splitRef from "../../utils/splitRef";
-import { omit } from "../../utils/omit";
-import { isObject } from "../../utils/isObject";
 import { validateNode } from "../../validateNode";
 import { isSchemaNode, JsonError, SchemaNode } from "../../types";
 import { get, split } from "@sagold/json-pointer";
-import { reduceRef } from "../../keywords/$ref";
+import { reduceRef, compileNext } from "../../keywords/$ref";
 
 export const $refKeyword: Keyword = {
     id: "$ref",
@@ -132,14 +130,6 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     return nextNode;
 }
 
-function compileNext(referencedNode: SchemaNode, evaluationPath = referencedNode.evaluationPath) {
-    const referencedSchema = isObject(referencedNode.schema)
-        ? omit(referencedNode.schema, "$id")
-        : referencedNode.schema;
-
-    return referencedNode.compileSchema(referencedSchema, `${evaluationPath}/$ref`, referencedNode.schemaLocation);
-}
-
 export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError {
     if ($ref == null) {
         return node;
@@ -147,11 +137,11 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
 
     // resolve $ref by json-evaluationPath
     if (node.context.refs[$ref]) {
-        return compileNext(node.context.refs[$ref], node.evaluationPath);
+        return compileNext(node.context.refs[$ref], node);
     }
     // resolve $ref from $anchor
     if (node.context.anchors[$ref]) {
-        return compileNext(node.context.anchors[$ref], node.evaluationPath);
+        return compileNext(node.context.anchors[$ref], node);
     }
 
     // check for remote-host + pointer pair to switch rootSchema
@@ -171,7 +161,7 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
         const $ref = fragments[0];
         // this is a reference to remote-host root node
         if (node.context.remotes[$ref]) {
-            return compileNext(node.context.remotes[$ref], node.evaluationPath);
+            return compileNext(node.context.remotes[$ref], node);
         }
         if ($ref[0] === "#") {
             // @todo there is a bug joining multiple fragments to e.g. #/base#/examples/0
