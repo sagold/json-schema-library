@@ -232,7 +232,8 @@ declare const errors: {
 declare function isSchemaNode(value: unknown): value is SchemaNode;
 declare function isReduceable(node: SchemaNode): boolean;
 type Context = {
-  /** root node of this JSON Schema */rootNode: SchemaNode; /** available draft configurations */
+  /** root node of this JSON Schema */rootNode: SchemaNode; /** Fallback _draft_ version in case no _draft_ is specified by `schema.$schema` */
+  draft?: string; /** available draft configurations */
   drafts: Draft[]; /** [SHARED ACROSS REMOTES] root nodes of registered remote JSON Schema, stored by id/url */
   remotes: Record<string, SchemaNode>; /** references stored by fully resolved schema-$id + local-pointer */
   refs: Record<string, SchemaNode>; /** anchors stored by fully resolved schema-$id + $anchor */
