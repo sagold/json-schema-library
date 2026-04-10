@@ -19,6 +19,7 @@ import {
 let state: "started" | "dialect" | "testing" | "stopped" = "stopped";
 /** current JSON Schema draft version to test */
 let dialect: Dialect;
+/** all meta-schemata added as remtoes */
 let remote: SchemaNode;
 
 const cmds: CommandMap = {
@@ -26,6 +27,7 @@ const cmds: CommandMap = {
         console.assert(args.version === 1, { args });
         console.assert(state === "stopped");
         state = "started";
+
         return {
             version: 1,
             implementation: {
@@ -53,33 +55,23 @@ const cmds: CommandMap = {
     dialect: async (args) => {
         console.assert(state === "started");
         state = "dialect";
+
         dialect = args.dialect;
-
-        const node = compileSchema({ $schema: dialect });
-        remotes.forEach((schema) => {
-            node.addRemoteSchema(schema.$id ?? schema.id, schema);
-        });
-        remote = node;
-
+        remote = compileSchema({ $schema: dialect });
+        remotes.forEach((schema) => remote.addRemoteSchema(schema.$id ?? schema.id, schema));
         return { ok: true };
     },
 
     run: async (args) => {
         console.assert(state === "dialect" || state === "testing");
         state = "testing";
-        const { tests, registry } = args.case;
-        let { schema } = args.case;
-        if (schema != null && typeof schema === "object") {
-            schema = { $schema: dialect, ...schema }; // set default draft version for non-boolean schema
-        }
-        // compile schema
-        const node = compileSchema(schema, { remote, formatAssertion: false });
-        // add remote schemata
-        for (const id in registry) {
-            node.addRemoteSchema(id, registry[id]);
+
+        const node = compileSchema(args.case.schema, { remote, draft: dialect, formatAssertion: false });
+        for (const id in args.case.registry) {
+            node.addRemoteSchema(id, args.case.registry[id]);
         }
         // run test cases and collect results to be sent back to bowtie
-        const results: RunCmdResponse["results"] = tests.map((test) => {
+        const results: RunCmdResponse["results"] = args.case.tests.map((test) => {
             try {
                 return { valid: node.validate(test.instance).valid };
             } catch (e) {
@@ -93,6 +85,7 @@ const cmds: CommandMap = {
     stop: async (_, stdio) => {
         console.assert(state === "testing");
         state = "stopped";
+
         if (process.env.JLIB_TEST_RUN !== "true") {
             stdio?.close();
             process.exit(0);

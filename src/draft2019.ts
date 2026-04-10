@@ -60,7 +60,7 @@ import { uniqueItemsKeyword } from "./keywords/uniqueItems";
  */
 export const draft2019 = sanitizeKeywords({
     version: "draft-2019-09",
-    $schemaRegEx: "draft[/-]2019-09",
+    $schemaRegEx: "draft[/-]2019-?(09)?",
     $schema: "https://json-schema.org/draft/2019-09/schema",
     errors,
     formats,

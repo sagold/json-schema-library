@@ -27,13 +27,13 @@ echo '{"cmd":"stop"}' | docker run -i jlib
 bowtie smoke -i localhost/jlib
 bowtie suite -i localhost/jlib https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft7/type.json | bowtie summary --show failures
 
-bowtie suite -i localhost/jlib https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/main/tests/draft7 > draft7.json
-bowtie suite -i localhost/jlib https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/main/tests/draft2019-09 > draft2019-09.json
-bowtie suite -i localhost/jlib https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/main/tests/draft2020-12 > draft2020-12.json
-
+bowtie suite -i localhost/jlib https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/main/tests/draft4 | bowtie summary --show failures
+bowtie suite -i localhost/jlib https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/main/tests/draft6 | bowtie summary --show failures
 bowtie suite -i localhost/jlib https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/main/tests/draft7 | bowtie summary --show failures
 bowtie suite -i localhost/jlib https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/main/tests/draft2019-09 | bowtie summary --show failures
 bowtie suite -i localhost/jlib https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/main/tests/draft2020-12 | bowtie summary --show failures
+
+bowtie suite -i localhost/jlib https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/main/tests/draft7 > draft7.json
 
 **Fails**
 bowtie suite $(bowtie filter-implementations | sed 's/^/-i /') https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/main/tests/draft2020-12 >draft2020-12.json

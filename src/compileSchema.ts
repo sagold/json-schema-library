@@ -25,15 +25,62 @@ import sanitizeErrors from "./utils/sanitizeErrors";
 const { REGEX_FLAGS } = settings;
 
 export type CompileOptions = {
+    /**
+     * List of drafts to support.
+     *
+     * Drafts are selected by testing the passed `schema.$schema` for a matching id, which
+     * is tested by each draft's `Draft.$schemaRegEx`. In case no draft matches `schema.$schema`
+     * the last draft in the list will be used.
+     *
+     * @default [draft04, draft06, draft07, draft2019, draft2020]
+     *
+     * @example
+     * import { draft04, draft07, draft2020 } from "json-schema-library"
+     * compileSchema({ $schema: "draft-04" }, { drafts: [draft04, draft07, draft2020] })
+     */
     drafts?: Draft[];
+    /**
+     * Fallback _draft_ version in case no _draft_ is specified by `schema.$schema`.
+     *
+     * Drafts are selected by given `schema.$schema` or the last draft from `drafts` as a fallback.
+     * Specifying `draft` will workthe same as a specifying `schema.$schema` in case no $schema is
+     * defined. When no match can be found, the last _draft_ from `drafts` will be used.
+     *
+     * @example
+     * // uses draft-04
+     * compileSchema({ $schema: "draft-04" }, { drafts: [draft04, draft07, draft2020] })
+     *
+     * // uses draft-2020-12
+     * compileSchema({}, { drafts: [draft04, draft07, draft2020] })
+     *
+     * // uses draft-07
+     * compileSchema({}, { draft: "draft-07", drafts: [draft04, draft07, draft2020] })
+
+     * // uses draft-04
+     * compileSchema({ $schema: "draft-04" }, { draft: "draft-07", drafts: [draft04, draft07, draft2020] })
+     *
+     * // uses draft-2020
+     * compileSchema({ $schema: "draft-04" }, { draft: "draft-07", drafts: [draft2020] })
+     */
+    draft?: string;
+    /**
+     * Set node and its remote schemata as remote schemata for this node and schema to resolve $ref
+     */
     remote?: SchemaNode;
+    /**
+     * Enables `format`-keyword assertions when this is set tor `true` or sets assertion as defined by
+     * the given meta-schema. Set to `false` to deactivate format validation.
+     *
+     * @default true
+     */
     formatAssertion?: boolean | "meta-schema" | undefined;
+    /** Set default options for all `node.getData` requests */
     getDataDefaultOptions?: TemplateOptions;
-    /** set to true to throw an Error on errors in input schema. Defaults to false */
+    /** Set to true to throw an Error on errors in input schema. Defaults to false */
     throwOnInvalidSchema?: boolean;
-    /** set to true to collect unknown keywords of input schema in `node.schemaAnnotations`. Defaults to false */
+    /** Set to true to collect unknown keywords of input schema in `node.schemaAnnotations`. Defaults to false */
     withSchemaAnnotations?: boolean;
-    /** set to true to throw an Error when encountering an unresolvable ref  */
+    /** Set to true to throw an Error when encountering an unresolvable ref  */
     throwOnInvalidRef?: boolean;
 };
 
@@ -51,7 +98,7 @@ function getDraft(drafts: Draft[], $schema: string) {
 export function compileSchema(schema: JsonSchema | BooleanSchema, options: CompileOptions = {}) {
     let formatAssertion = options.formatAssertion ?? true;
     const drafts = options.drafts ?? defaultDrafts;
-    const draft = getDraft(drafts, isJsonSchema(schema) ? schema.$schema : undefined);
+    const draft = getDraft(drafts, isJsonSchema(schema) ? (options.draft ?? schema.$schema) : undefined);
     const node: SchemaNode & { schemaErrors?: JsonError[]; schemaAnnotations: JsonAnnotation[] } = {
         evaluationPath: "#",
         lastIdPointer: "#",

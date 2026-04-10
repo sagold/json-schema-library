@@ -62,8 +62,8 @@ import { uniqueItemsKeyword } from "./keywords/uniqueItems";
  */
 export const draft06 = sanitizeKeywords({
     version: "draft-06",
-    $schemaRegEx: "draft-06",
-    $schema: "http://json-schema.org/draft-06/schema",
+    $schemaRegEx: "draft-?0?6",
+    $schema: "http://json-schema.org/draft-06/schema#",
     errors,
     formats,
     methods: {

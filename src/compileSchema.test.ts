@@ -2,6 +2,9 @@ import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
 import { draftEditor } from "./draftEditor";
 import { SchemaNode } from "./SchemaNode";
+import { draft04 } from "./draft04";
+import { draft07 } from "./draft07";
+import { draft2020 } from "./draft2020";
 
 describe("compileSchema vocabulary", () => {
     let root: SchemaNode;
@@ -30,6 +33,54 @@ describe("compileSchema vocabulary", () => {
         const { node } = root.getNode("/image/title");
         assert(node);
         assert(node.getNodeRoot() === root);
+    });
+});
+
+describe("compileSchema draft-version", () => {
+    it("should select last draft", () => {
+        const node = compileSchema({}, { drafts: [draft04, draft07, draft2020] });
+        assert(node.getDraftVersion(), "draft-2020");
+    });
+
+    it("should select draft specified by $schema", () => {
+        const node = compileSchema(
+            { $schema: "http://json-schema.org/draft-07/schema#" },
+            { drafts: [draft04, draft07, draft2020] }
+        );
+        assert(node.getDraftVersion(), "draft-07");
+    });
+
+    it("should select fallback draft specified by `draft`", () => {
+        const node = compileSchema(
+            {},
+            {
+                draft: "http://json-schema.org/draft-07/schema#",
+                drafts: [draft04, draft07, draft2020]
+            }
+        );
+        assert(node.getDraftVersion(), "draft-07");
+    });
+
+    it("should prefer `$schema` over `draft` options", () => {
+        const node = compileSchema(
+            { $schema: "http://json-schema.org/draft-04/schema#" },
+            {
+                draft: "http://json-schema.org/draft-07/schema#",
+                drafts: [draft04, draft07, draft2020]
+            }
+        );
+        assert(node.getDraftVersion(), "draft-04");
+    });
+
+    it("should always fallback to last draft if nothing matches", () => {
+        const node = compileSchema(
+            { $schema: "http://json-schema.org/draft-A/schema#" },
+            {
+                draft: "http://json-schema.org/draft-B/schema#",
+                drafts: [draft04, draft07, draft2020]
+            }
+        );
+        assert(node.getDraftVersion(), "draft-2020");
     });
 });
 
@@ -150,6 +201,7 @@ describe("compileSchema `schemaLocation`", () => {
             $defs: { asset: { type: "string" } }
         });
 
+        assert(node.if && node.then && node.properties && node.$defs);
         assert.deepEqual(node.schemaLocation, "#");
         assert.deepEqual(node.if.schemaLocation, "#/if");
         assert.deepEqual(node.then.schemaLocation, "#/then");
