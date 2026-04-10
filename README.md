@@ -54,6 +54,8 @@ Use `compileSchema` once to turn a JSON Schema into a tree of SchemaNodes. After
 type CompileOptions = {
   // set of drafts to use
   drafts: Draft[];
+  /** fallback draft version in case no draft_is specified by `schema.$schema` */
+  draft?: string;
   // a context to share
   remote: SchemaNode;
   // if format-validations should create errors. Defaults to true
@@ -66,13 +68,13 @@ type CompileOptions = {
   throwOnInvalidRef?: boolean;
   // default options for all calls to node.getData()
   getDataDefaultOptions?: {
-    // Add all properties (required and optional) to the generated data
+    // add all properties (required and optional) to the generated data
     addOptionalProps?: boolean;
-    // Remove data that does not match input schema. Defaults to false
+    // remove data that does not match input schema. Defaults to false
     removeInvalidData?: boolean;
-    // Set to false to take default values as they are and not extend them. Defaults to true
+    // set to false to take default values as they are and not extend them. Defaults to true
     extendDefaults?: boolean;
-    // Limits how often a $ref should be followed before aborting. Prevents infinite data-structure. Defaults to 1
+    // limits how often a $ref should be followed before aborting. Prevents infinite data-structure. Defaults to 1
     recursionLimit?: number;
   };
 };
@@ -433,6 +435,22 @@ schemaNode.getNodeRef("https://sagold.com/remote#/properties/character");
 
 ```ts
 const someNode = node.compileSchema({ prefixItems: [{ type: "string" }, { $ref: "#/$defs/string" }] });
+```
+
+#### custom error messages
+
+You can set custom errors messages locally by using the errors-keyword:
+
+```ts
+const { errors } = compileSchema({
+  type: "array",
+  minItems: 2,
+  errorMessages: {
+    "min-items-error": "Custom error {{minItems}}"
+  }
+}).validate([1]);
+
+assert.deepEqual(errors[0].message, "Custom error 2");
 ```
 
 ### createSchema
@@ -1150,7 +1168,7 @@ console.log(errors); /// [{ code: "type-error", value: "data", pointer: "#", ...
 
 ## Draft Customization
 
-[**Extending a Draft**](#extending-a-draft) · [**Keyword**](#keyword)
+[Extending a Draft](#extending-a-draft) · [Overwrite format validator](#overwrite-a-format-validator) · [Keyword](#keyword)
 
 _json-schema-library_ uses the concept of **drafts** to support different versions of the JSON Schema specification — such as Draft 04, Draft 07, or 2020-12 — and to allow customization of schema behavior.
 
@@ -1549,21 +1567,7 @@ const myDraft = extendDraft(draft2020, {
 });
 ```
 
-### errorMessages
-
-You can set custom errors messages locally by using the errors-keyword:
-
-```ts
-const { errors } = compileSchema({
-  type: "array",
-  minItems: 2,
-  errorMessages: {
-    "min-items-error": "Custom error {{minItems}}"
-  }
-}).validate([1]);
-
-assert.deepEqual(errors[0].message, "Custom error 2");
-```
+## Settings
 
 ### regexFlags
 

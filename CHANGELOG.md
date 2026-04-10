@@ -2,8 +2,8 @@
 
 ### v11.3.0
 
-- added option 'draft' as fallback for a missing `$schema` id
-- added properties to merge when resolvinf a $ref to `settings.PROPERTIES_TO_MERGE`
+- added option `draft` as fallback for a missing `$schema` id
+- added setting for properties to merge when resolving a `$ref` to `settings.PROPERTIES_TO_MERGE`
 
 ### v11.2.0
 
