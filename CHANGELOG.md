@@ -1,4 +1,22 @@
+`hostname`, `idn-hostname`, `idn-email`, `ipv4`, `ipv6`, `iri`, `iri-reference`, `uri`, `uri-reference`, `uri-template`
+
 ## Changelog
+
+###
+
+**Breaking change**: Moved some large format-validators to separate entry point:
+
+- the following format-validators have been moved to a separate entry point "json-schema-library/formats": `hostname`, `idn-email`, `ipv4`, `ipv6`, `uri`, `uri-reference`, `uri-template`
+- the following additional format-validators are available through "json-schema-library/formats": `iri`, `iri-reference`, `idn-hostname`
+
+_Use the following to add the additional format validators to drafts per default:_
+
+```ts
+import { addFormats } from "json-schema-library/formats";
+import { draft04, draft06, draft07, draft2019, draft2020 } from "json-schema-library";
+// add additional formats to the following drafts
+addFormats([draft04, draft06, draft07, draft2019, draft2020]);
+```
 
 ### v11.3.0
 

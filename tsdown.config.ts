@@ -2,7 +2,8 @@ import { defineConfig } from "tsdown";
 
 export default defineConfig({
     dts: true,
-    entry: ["./index.ts", "./remotes/index.ts"],
+    entry: { index: "./index.ts", remotes: "./remotes/index.ts", formats: "./src/formats/additionalFormats.ts" },
     exports: true,
-    globalName: "jlib"
+    globalName: "jlib",
+    sourcemap: true
 });

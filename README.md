@@ -46,6 +46,11 @@ console.log(schemaNode.getDraftVersion()); // draft-07
 
 ## Overview
 
+[compileSchema](#compileschema) ·
+[validate input schema](#validate-input-schema) ·
+[SchemaNode](#schemanode) ·
+[Draft Support](#draft-support)
+
 ### compileSchema
 
 Use `compileSchema` once to turn a JSON Schema into a tree of SchemaNodes. After that, you'll work with individual nodes in the tree. You can also pass an options object to `compileSchema` to customize how the nodes are created.
@@ -253,7 +258,19 @@ Note that rootNodes will change when working across remote schema (using $ref).
 
 ### Draft Support
 
-_json-schema-library_ fully supports all core features of draft versions draft-04, draft-06, draft-07, draft-2019-09 and draft-2020-12. Additionally, most format-validations are supported per default besides the listed format below. You can always override or extend format validation as is documented in [draft customization](#draft-customization).
+_json-schema-library_ fully supports all core features of draft versions draft-04, draft-06, draft-07, draft-2019-09 and draft-2020-12. Additionally, all JSON Schema format validators are supported:
+
+- The following formats are **available per default**: `date`, `date-time`, `duration`, `email`, `json-pointer`, `relative-json-pointer`, `regex`, `time`, `url`, `uuid`
+- **Add remaining format** validators `hostname`, `idn-email`, `ipv4`, `ipv6`, `uri`, `uri-reference`, `uri-template` to drafts with:
+
+```ts
+import { addFormats } from "json-schema-library/formats";
+import { draft04, draft06, draft07, draft2019, draft2020 } from "json-schema-library";
+// add additional formats to the following drafts
+addFormats([draft04, draft06, draft07, draft2019, draft2020]);
+```
+
+You can always override or extend format validation as is documented in [draft customization](#draft-customization).
 
 <details><summary>Overview draft support</summary>
 
@@ -265,17 +282,6 @@ Draft support is defined by running a validator against the official [json-schem
 - A comparison to other validators is listed on [json-schema-benchmark](https://github.com/sagold/json-schema-benchmark)
 
 Please note that these benchmarks refer to validation only. _json-schema-library_ offers tooling outside of validation and strives to be as spec-compliant as possible.
-
----
-
-</details>
-
-<details><summary>Overview format validation support</summary>
-
----
-
-- **`❌ unsupported formats`** iri, iri-reference, idn-hostname
-- **`✅ supported formats`**: date, date-time, date, duration, ecmascript-regex, email, hostname, idn-email, ipv4, ipv6, json-pointer, regex, relative-json-pointer, time, unknown, uri-reference, uri-template, uri, uuid
 
 ---
 
@@ -910,7 +916,8 @@ if (node) {
 }
 ```
 
----
+> [!CAUTION]
+> `getNode` returns the root of the current schema. If a remote schema was resolved, the returned node will be the remote-schema root - not the initial schema-root you passed in to compileSchema
 
 ### reduceNode
 

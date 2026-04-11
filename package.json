@@ -2,24 +2,26 @@
   "name": "json-schema-library",
   "version": "11.3.1",
   "description": "Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
+    "./formats": {
+      "import": "./dist/formats.mjs",
+      "require": "./dist/formats.cjs"
+    },
     "./remotes": {
-      "import": "./dist/remotes/index.mjs",
-      "require": "./dist/remotes/index.cjs"
+      "import": "./dist/remotes.mjs",
+      "require": "./dist/remotes.cjs"
     },
     "./package.json": "./package.json"
   },
   "scripts": {
     "coverage": "nyc npm run test --reporter=lcov",
-    "dist": "tsdown -f esm -f cjs --minify; yarn dist:iife",
-    "dist:iife": "tsdown --config tsdown.iife.config.ts --no-clean --minify; mv dist/index.iife.js dist/jlib.js",
+    "dist": "tsdown -f esm -f cjs --minify --report --attw --unused; yarn dist:iife;",
+    "dist:iife": "tsdown --config tsdown.iife.config.ts --no-clean --minify --report; mv ./dist/jlib.iife.js ./dist/jlib.js",
     "lint": "yarn lint:src && yarn lint:types",
     "lint:src": "eslint src",
     "lint:types": "tsc --noEmit",
@@ -68,6 +70,7 @@
   },
   "homepage": "https://github.com/sagold/json-schema-library",
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
     "@eslint/js": "^10.0.1",
     "@types/glob": "^ 8.1.0",
     "@types/mocha": "^10.0.6",
@@ -82,19 +85,14 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.0",
+    "unplugin-unused": "^0.5.7",
     "watch": "^1.0.1"
   },
   "dependencies": {
     "@hyperjump/json-schema-formats": "^1.0.1",
     "@sagold/json-pointer": "^7.2.1",
-    "deepmerge": "^4.3.1",
-    "diff": ">=8.0.3",
     "fast-copy": "^4.0.2",
     "fast-deep-equal": "^3.1.3",
-    "lodash": ">=4",
-    "minimatch": ">=9.0.7",
-    "serialize-javascript": ">=7.0.3",
-    "string-width": ">=4.2.3",
     "uri-js": "^4.4.1",
     "valid-url": "^1.0.9"
   },
@@ -113,5 +111,7 @@
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
-  }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs"
 }
