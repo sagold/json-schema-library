@@ -2,6 +2,7 @@ import { mergeSchema } from "../utils/mergeSchema";
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
 import { SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
+import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
 const KEYWORD = "anyOf";
 
@@ -35,10 +36,7 @@ export function parseAnyOf(node: SchemaNode) {
         node.compileSchema(s, `${evaluationPath}/${KEYWORD}/${index}`, `${schemaLocation}/${KEYWORD}/${index}`)
     );
 
-    return node[KEYWORD].reduce((errors, node) => {
-        if (node.schemaValidation) errors.push(...node.schemaValidation);
-        return errors;
-    }, [] as ValidationAnnotation[]);
+    return collectValidationErrors([], ...node[KEYWORD]);
 }
 
 function reduceAnyOf({ node, data, pointer, path }: JsonSchemaReducerParams) {

@@ -1,3 +1,4 @@
+import { collectValidationErrors } from "src/utils/collectValidationErrors";
 import { Keyword, ValidationAnnotation } from "../Keyword";
 import { SchemaNode } from "../types";
 import { isObject } from "../utils/isObject";
@@ -29,6 +30,7 @@ export function parseDefs(node: SchemaNode) {
                     `${node.evaluationPath}/$defs/${urlEncodeJsonPointerProperty(property)}`,
                     `${node.schemaLocation}/$defs/${property}`
                 );
+                collectValidationErrors(errors, node.$defs![property]);
             });
         }
     }
@@ -50,6 +52,7 @@ export function parseDefs(node: SchemaNode) {
                 `${node.evaluationPath}/definitions/${urlEncodeJsonPointerProperty(property)}`,
                 `${node.schemaLocation}/definitions/${urlEncodeJsonPointerProperty(property)}`
             );
+            collectValidationErrors(errors, node.$defs![property]);
         });
     }
 

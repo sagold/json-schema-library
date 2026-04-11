@@ -2,6 +2,7 @@ import { mergeSchema } from "../utils/mergeSchema";
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
 import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
+import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
 export const ifKeyword: Keyword = {
     id: "if-then-else",
@@ -19,9 +20,7 @@ export function parseIfThenElse(node: SchemaNode) {
     if (schema.if != null) {
         if (isJsonSchema(schema.if) || isBooleanSchema(schema.if)) {
             node.if = node.compileSchema(schema.if, `${evaluationPath}/if`);
-            if (node.if.schemaValidation) {
-                errors.push(...node.if.schemaValidation);
-            }
+            collectValidationErrors(errors, node.if);
         } else {
             errors.push(
                 node.createError("schema-error", {
@@ -36,9 +35,7 @@ export function parseIfThenElse(node: SchemaNode) {
     if (schema.then != null) {
         if (isJsonSchema(schema.then) || isBooleanSchema(schema.then)) {
             node.then = node.compileSchema(schema.then, `${evaluationPath}/then`);
-            if (node.then.schemaValidation) {
-                errors.push(...node.then.schemaValidation);
-            }
+            collectValidationErrors(errors, node.then);
         } else {
             errors.push(
                 node.createError("schema-error", {
@@ -53,9 +50,7 @@ export function parseIfThenElse(node: SchemaNode) {
     if (schema.else != null) {
         if (isJsonSchema(schema.else) || isBooleanSchema(schema.else)) {
             node.else = node.compileSchema(schema.else, `${evaluationPath}/else`);
-            if (node.else.schemaValidation) {
-                errors.push(...node.else.schemaValidation);
-            }
+            collectValidationErrors(errors, node.else);
         } else {
             errors.push(
                 node.createError("schema-error", {

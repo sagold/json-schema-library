@@ -308,5 +308,13 @@ describe("validateSchema", () => {
             assert.equal(schemaAnnotations.length, 1);
             assert.equal(schemaAnnotations[0].data.pointer, "#/properties/headline/prefixItems");
         });
+        it("should return unsupported formats as annotation", () => {
+            const { schemaAnnotations } = compileSchema({
+                type: "array",
+                prefixItems: [{ format: "email" }, { format: "textarea" }]
+            });
+            assert.equal(schemaAnnotations.length, 1);
+            assert.equal(schemaAnnotations[0].data.pointer, "#/prefixItems/1/format");
+        });
     });
 });

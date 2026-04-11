@@ -1,14 +1,17 @@
 import { SchemaNode } from "../types";
 import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
 import { validateNode } from "../validateNode";
+import { collectValidationErrors } from "src/utils/collectValidationErrors";
+
+const KEYWORD = "prefixItems";
 
 export const prefixItemsKeyword: Keyword = {
-    id: "prefixItems",
-    keyword: "prefixItems",
+    id: KEYWORD,
+    keyword: KEYWORD,
     parse: parseItems,
-    addResolve: (node) => node.prefixItems != null,
+    addResolve: (node) => node[KEYWORD] != null,
     resolve: prefixItemsResolver,
-    addValidate: ({ schema }) => schema.prefixItems != null,
+    addValidate: (node) => node[KEYWORD] != null,
     validate: validatePrefixItems
 };
 
@@ -24,10 +27,11 @@ export function parseItems(node: SchemaNode) {
         node.prefixItems = schema.prefixItems.map((itemSchema, index) =>
             node.compileSchema(
                 itemSchema,
-                `${evaluationPath}/prefixItems/${index}`,
-                `${node.schemaLocation}/prefixItems/${index}`
+                `${evaluationPath}/${KEYWORD}/${index}`,
+                `${node.schemaLocation}/${KEYWORD}/${index}`
             )
         );
+        return collectValidationErrors([], ...node.prefixItems);
     }
 }
 
@@ -37,12 +41,13 @@ function validatePrefixItems({ node, data, pointer = "#", path }: JsonSchemaVali
     }
 
     const errors: ValidationReturnType = [];
-    if (node.prefixItems) {
+    const prefixItems = node[KEYWORD];
+    if (prefixItems) {
         // note: schema is valid when data does not have enough elements as defined by array-list
-        for (let i = 0; i < Math.min(node.prefixItems.length, data.length); i += 1) {
+        for (let i = 0; i < Math.min(prefixItems.length, data.length); i += 1) {
             const itemData = data[i];
             // @todo v1 reevaluate: incomplete schema is created here?
-            const itemNode = node.prefixItems[i];
+            const itemNode = prefixItems[i];
             const result = validateNode(itemNode, itemData, `${pointer}/${i}`, path);
             errors.push(...result);
         }

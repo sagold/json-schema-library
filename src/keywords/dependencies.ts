@@ -7,6 +7,7 @@ import { validateDependentRequired } from "./dependentRequired";
 import { validateDependentSchemas } from "./dependentSchemas";
 import sanitizeErrors from "../utils/sanitizeErrors";
 import { isListOfStrings } from "../utils/isListOfStrings";
+import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
 const KEYWORD = "dependencies";
 
@@ -42,6 +43,7 @@ export function parseDependencies(node: SchemaNode) {
                 `${node.evaluationPath}/${KEYWORD}/${property}`,
                 `${node.schemaLocation}/${KEYWORD}/${property}`
             );
+            collectValidationErrors(errors, node.dependentSchemas[property]);
         } else if (isListOfStrings(schema)) {
             node.dependentRequired = node.dependentRequired ?? {};
             node.dependentRequired[property] = schema;

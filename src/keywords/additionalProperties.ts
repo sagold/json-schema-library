@@ -42,6 +42,7 @@ export function parseAdditionalProperties(node: SchemaNode) {
         `${evaluationPath}/additionalProperties`,
         `${schemaLocation}/additionalProperties`
     );
+    return node.additionalProperties.schemaValidation;
 }
 
 function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParams) {

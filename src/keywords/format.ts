@@ -24,6 +24,14 @@ function parseFormat(node: SchemaNode) {
             message: `Keyword '${KEYWORD}' must be a string - received '${typeof format}'`
         });
     }
+    if (node.context.formats[format] == null) {
+        return node.createAnnotation("unknown-format-warning", {
+            pointer: `${node.schemaLocation}/${KEYWORD}`,
+            schema: node.schema,
+            value: format,
+            message: `Keyword '${KEYWORD}' must be a string - received '${typeof format}'`
+        });
+    }
 }
 
 function validateFormat(options: JsonSchemaValidatorParams) {

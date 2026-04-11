@@ -1,3 +1,4 @@
+import { collectValidationErrors } from "src/utils/collectValidationErrors";
 import {
     Keyword,
     JsonSchemaValidatorParams,
@@ -115,9 +116,7 @@ function parsePropertyDependencies(node: SchemaNode) {
                 `${node.evaluationPath}/${KEYWORD}/${propertyName}/${value}`,
                 `${node.schemaLocation}/${KEYWORD}/${propertyName}/${value}`
             );
-            if (parsed[propertyName][value].schemaValidation) {
-                errors.push(...parsed[propertyName][value].schemaValidation);
-            }
+            collectValidationErrors(errors, parsed[propertyName][value]);
         });
     });
     node[KEYWORD] = parsed;

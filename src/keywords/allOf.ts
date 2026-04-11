@@ -8,6 +8,7 @@ import {
 } from "../Keyword";
 import { SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
+import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
 const KEYWORD = "allOf";
 
@@ -41,11 +42,7 @@ export function parseAllOf(node: SchemaNode) {
     node[KEYWORD] = schema[KEYWORD].map((s, index) =>
         node.compileSchema(s, `${evaluationPath}/${KEYWORD}/${index}`, `${schemaLocation}/${KEYWORD}/${index}`)
     );
-
-    return node[KEYWORD].reduce((errors, node) => {
-        if (node.schemaValidation) errors.push(...node.schemaValidation);
-        return errors;
-    }, [] as ValidationAnnotation[]);
+    return collectValidationErrors([], ...node[KEYWORD]);
 }
 
 function reduceAllOf({ node, data, key, pointer, path }: JsonSchemaReducerParams) {

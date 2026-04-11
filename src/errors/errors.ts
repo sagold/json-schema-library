@@ -67,7 +67,7 @@ export const errors = {
         "Property `{{key}}` does not match any patterns in `{{pointer}}`. Valid patterns are: {{patterns}}",
     "ref-error": "Could not resolve $ref '{{ref}}' from '{{pointer}}'",
     "required-property-error": "The required property `{{key}}` is missing at `{{pointer}}`",
-    /** return schema-warning with createSchemaWarning:true when a valid, but undefined  property was found */
+    /** return schema-warning with createSchemaWarning:true when a valid, but undefined property was found */
     "schema-warning": "Failed retrieving a schema from '{{pointer}}' to key '{{key}}'",
     "type-error": "Expected `{{value}}` ({{received}}) in `{{pointer}}` to be of type `{{expected}}`",
     "undefined-value-error": "Value must not be undefined in `{{pointer}}`",
@@ -81,5 +81,6 @@ export const errors = {
     "deprecated-warning": "Value at `{{pointer}}` is deprecated",
     // schema validation
     "schema-error": "Invalid schema found at {{pointer}}: {{message}}",
-    "unknown-keyword-warning": "Keyword '{{value}}' is not a valid keyword to draft '{{draft}}'"
+    "unknown-keyword-warning": "Keyword '{{value}}' is not a valid keyword to draft '{{draft}}'",
+    "unknown-format-warning": "Format {{value}} is not a valid format"
 };

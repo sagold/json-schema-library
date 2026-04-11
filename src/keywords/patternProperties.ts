@@ -6,11 +6,13 @@ import {
     JsonSchemaReducerParams,
     JsonSchemaResolverParams,
     JsonSchemaValidatorParams,
-    ValidationReturnType
+    ValidationReturnType,
+    ValidationAnnotation
 } from "../Keyword";
 import { getValue } from "../utils/getValue";
 import { validateNode } from "../validateNode";
 import settings from "../settings";
+import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
 const { REGEX_FLAGS } = settings;
 
@@ -45,6 +47,8 @@ export function parsePatternProperties(node: SchemaNode) {
             `${node.schemaLocation}/patternProperties/${pattern}`
         )
     }));
+
+    return collectValidationErrors([], ...node.patternProperties.map(({ node }) => node));
 }
 
 function patternPropertyResolver({ node, key }: JsonSchemaResolverParams) {

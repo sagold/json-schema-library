@@ -35,7 +35,7 @@ export function parsePropertyNames(node: SchemaNode) {
         `${node.evaluationPath}/propertyNames`,
         `${node.schemaLocation}/propertyNames`
     );
-    return node.schemaValidation;
+    return node.propertyNames.schemaValidation;
 }
 
 function validatePropertyNames({ node, data, pointer, path }: JsonSchemaValidatorParams) {

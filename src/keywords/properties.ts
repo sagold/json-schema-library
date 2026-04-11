@@ -9,6 +9,7 @@ import {
 } from "../Keyword";
 import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
+import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
 export const propertiesKeyword: Keyword = {
     id: "property",
@@ -48,9 +49,7 @@ export function parseProperties(node: SchemaNode) {
             `${schemaLocation}/properties/${propertyName}`
         );
         parsedProperties[propertyName] = propertyNode;
-        if (parsedProperties[propertyName].schemaValidation) {
-            errors.push(...parsedProperties[propertyName].schemaValidation);
-        }
+        collectValidationErrors(errors, parsedProperties[propertyName]);
     });
     node.properties = parsedProperties;
 

@@ -13,6 +13,7 @@ import sanitizeErrors from "../utils/sanitizeErrors";
 import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
 import { joinDynamicId } from "../SchemaNode";
+import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
 const KEYWORD = "oneOf";
 const { DECLARATOR_ONEOF } = settings;
@@ -57,11 +58,7 @@ export function parseOneOf(node: SchemaNode) {
     node[KEYWORD] = schema[KEYWORD].map((s, index) =>
         node.compileSchema(s, `${evaluationPath}/${KEYWORD}/${index}`, `${schemaLocation}/${KEYWORD}/${index}`)
     );
-
-    return node[KEYWORD].reduce((errors, node) => {
-        if (node.schemaValidation) errors.push(...node.schemaValidation);
-        return errors;
-    }, [] as ValidationAnnotation[]);
+    return collectValidationErrors([], ...node[KEYWORD]);
 }
 
 function reduceOneOf({ node, data, pointer, path }: Omit<JsonSchemaReducerParams, "key">) {

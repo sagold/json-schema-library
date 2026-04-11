@@ -4,6 +4,8 @@
 
 ###
 
+- added schema annotation on `compileSchema` for unknown format
+
 **Breaking change**: Moved some large format-validators to separate entry point:
 
 - the following format-validators have been moved to a separate entry point "json-schema-library/formats": `hostname`, `idn-email`, `ipv4`, `ipv6`, `uri`, `uri-reference`, `uri-template`

@@ -4,6 +4,7 @@ import { isSchemaNode, SchemaNode, JsonSchema, isBooleanSchema } from "../types"
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
 import { validateNode } from "../validateNode";
 import sanitizeErrors from "../utils/sanitizeErrors";
+import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
 const KEYWORD = "dependentSchemas";
 
@@ -46,9 +47,7 @@ export function parseDependentSchemas(node: SchemaNode) {
                 `${node.evaluationPath}/${KEYWORD}/${property}`,
                 `${node.schemaLocation}/${KEYWORD}/${property}`
             );
-            if (parsedSchemas[property].schemaValidation) {
-                errors.push(...parsedSchemas[property].schemaValidation);
-            }
+            collectValidationErrors(errors, parsedSchemas[property]);
         } else if (isBooleanSchema(schema)) {
             parsedSchemas[property] = schema;
         } else {
