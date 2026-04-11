@@ -5,6 +5,7 @@
 ###
 
 - added schema annotation on `compileSchema` for unknown format
+- replaced option `withSchemaAnnotations` in favor of always creating all annotations
 
 **Breaking change**: Moved some large format-validators to separate entry point:
 

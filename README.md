@@ -67,8 +67,6 @@ type CompileOptions = {
   formatAssertion: boolean | "meta-schema";
   /** set to true to throw an Error on errors in input schema. Defaults to false */
   throwOnInvalidSchema?: boolean;
-  /** set to true to collect unknown keywords of input schema in `node.schemaAnnotations`. Defaults to false */
-  withSchemaAnnotations?: boolean;
   /** set to true to throw an Error when encountering an unresolvable ref  */
   throwOnInvalidRef?: boolean;
   // default options for all calls to node.getData()

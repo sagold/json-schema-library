@@ -252,45 +252,36 @@ describe("validateSchema", () => {
 
     describe("annotations", () => {
         it("should return unknown keywords as annotation", () => {
-            const { schemaAnnotations } = compileSchema(
-                {
-                    properties: {
-                        headline: {
-                            options: {},
-                            type: "string"
-                        }
+            const { schemaAnnotations } = compileSchema({
+                properties: {
+                    headline: {
+                        options: {},
+                        type: "string"
                     }
-                },
-                { withSchemaAnnotations: true }
-            );
+                }
+            });
             assert.equal(schemaAnnotations.length, 1);
             assert.equal(schemaAnnotations[0].data.pointer, "#/properties/headline/options");
         });
         it("should return not unknown keywords starting with 'x-'", () => {
-            const { schemaAnnotations } = compileSchema(
-                {
-                    properties: {
-                        headline: {
-                            "x-options": {},
-                            type: "string"
-                        }
+            const { schemaAnnotations } = compileSchema({
+                properties: {
+                    headline: {
+                        "x-options": {},
+                        type: "string"
                     }
-                },
-                { withSchemaAnnotations: true }
-            );
+                }
+            });
             assert.equal(schemaAnnotations.length, 0);
         });
         it("should return removed keywords from old drafts as annotation", () => {
-            const { schemaAnnotations } = compileSchema(
-                {
-                    properties: {
-                        headline: {
-                            additionalItems: true
-                        }
+            const { schemaAnnotations } = compileSchema({
+                properties: {
+                    headline: {
+                        additionalItems: true
                     }
-                },
-                { withSchemaAnnotations: true }
-            );
+                }
+            });
             assert.equal(schemaAnnotations.length, 1);
             assert.equal(schemaAnnotations[0].data.pointer, "#/properties/headline/additionalItems");
         });
@@ -303,7 +294,7 @@ describe("validateSchema", () => {
                         }
                     }
                 },
-                { drafts: [draft07], withSchemaAnnotations: true }
+                { drafts: [draft07] }
             );
             assert.equal(schemaAnnotations.length, 1);
             assert.equal(schemaAnnotations[0].data.pointer, "#/properties/headline/prefixItems");

@@ -623,24 +623,18 @@ export function addKeywords(node: SchemaNode) {
         .filter(({ keyword }) => whitelist.includes(keyword) || keys.includes(keyword))
         .map((keyword) => execKeyword(keyword, node));
 
-    // find unused keywords
-    if (node.context.withSchemaAnnotations) {
-        Object.keys(node.schema)
-            .filter(
-                (key) =>
-                    !key.startsWith("x-") && node.context.keywords.find((keyword) => keyword.keyword === key) == null
-            )
-            .forEach((keyword) => {
-                errors.push(
-                    node.createAnnotation("unknown-keyword-warning", {
-                        pointer: `${node.schemaLocation}/${keyword}`,
-                        schema: node.schema,
-                        value: keyword,
-                        draft: node.getDraftVersion()
-                    })
-                );
-            });
-    }
+    keys.filter(
+        (key) => !key.startsWith("x-") && node.context.keywords.find((keyword) => keyword.keyword === key) == null
+    ).forEach((keyword) => {
+        errors.push(
+            node.createAnnotation("unknown-keyword-warning", {
+                pointer: `${node.schemaLocation}/${keyword}`,
+                schema: node.schema,
+                value: keyword,
+                draft: node.getDraftVersion()
+            })
+        );
+    });
 
     return errors;
 }

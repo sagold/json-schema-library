@@ -78,8 +78,6 @@ export type CompileOptions = {
     getDataDefaultOptions?: TemplateOptions;
     /** Set to true to throw an Error on errors in input schema. Defaults to false */
     throwOnInvalidSchema?: boolean;
-    /** Set to true to collect unknown keywords of input schema in `node.schemaAnnotations`. Defaults to false */
-    withSchemaAnnotations?: boolean;
     /** Set to true to throw an Error when encountering an unresolvable ref  */
     throwOnInvalidRef?: boolean;
 };
@@ -118,7 +116,6 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
             ...copy(pick(draft, "methods", "keywords", "version", "formats", "errors")),
             draft: options.draft,
             getDataDefaultOptions: options.getDataDefaultOptions,
-            withSchemaAnnotations: options.withSchemaAnnotations ?? false,
             throwOnInvalidRef: options.throwOnInvalidRef ?? false,
             drafts
         },
