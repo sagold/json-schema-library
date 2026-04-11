@@ -7,28 +7,22 @@ on:
         branches: [main, next]
 
 jobs:
-    install:
+    run-unit-tests:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
-            - name: Install yarn (required locally)
-              run: npm install --global yarn
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10
             - uses: actions/setup-node@v3
               with:
                   node-version: "22"
-                  cache: "yarn"
+                  cache: "pnpm"
             - name: Install dependencies
-              run: yarn install --frozen-lockfile
-
-    run-unit-tests:
-        runs-on: ubuntu-latest
-        needs: install
-        steps:
-            - uses: actions/checkout@v3
-            - name: Install dependencies
-              run: yarn install --frozen-lockfile
+              run: pnpm install --frozen-lockfile
             - name: Run unit tests
-              run: yarn test:unit:ci
+              run: pnpm run test:unit:ci
             - uses: actions/upload-artifact@v4
               with:
                   name: test-results-unit-tests
@@ -42,13 +36,20 @@ jobs:
 
     run-spec-v4-tests:
         runs-on: ubuntu-latest
-        needs: install
         steps:
             - uses: actions/checkout@v3
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: "22"
+                  cache: "pnpm"
             - name: Install dependencies
-              run: yarn install --frozen-lockfile
+              run: pnpm install --frozen-lockfile
             - name: Test spec v4
-              run: yarn test:4:ci
+              run: pnpm run test:4:ci
             - uses: actions/upload-artifact@v4
               with:
                   name: test-results-spec-4
@@ -62,13 +63,20 @@ jobs:
 
     run-spec-v6-tests:
         runs-on: ubuntu-latest
-        needs: install
         steps:
             - uses: actions/checkout@v3
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: "22"
+                  cache: "pnpm"
             - name: Install dependencies
-              run: yarn install --frozen-lockfile
+              run: pnpm install --frozen-lockfile
             - name: Test spec v6
-              run: yarn test:6:ci
+              run: pnpm run test:6:ci
             - uses: actions/upload-artifact@v4
               with:
                   name: test-results-spec-6
@@ -82,13 +90,20 @@ jobs:
 
     run-spec-v7-tests:
         runs-on: ubuntu-latest
-        needs: install
         steps:
             - uses: actions/checkout@v3
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: "22"
+                  cache: "pnpm"
             - name: Install dependencies
-              run: yarn install --frozen-lockfile
+              run: pnpm install --frozen-lockfile
             - name: Test spec v7
-              run: yarn test:7:ci
+              run: pnpm run test:7:ci
             - uses: actions/upload-artifact@v4
               with:
                   name: test-results-spec-7
@@ -102,13 +117,20 @@ jobs:
 
     run-spec-2019-09-tests:
         runs-on: ubuntu-latest
-        needs: install
         steps:
             - uses: actions/checkout@v3
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: "22"
+                  cache: "pnpm"
             - name: Install dependencies
-              run: yarn install --frozen-lockfile
+              run: pnpm install --frozen-lockfile
             - name: Test spec 2019-09
-              run: yarn test:2019:ci
+              run: pnpm run test:2019:ci
             - uses: actions/upload-artifact@v4
               with:
                   name: test-results-spec-2019-09
@@ -122,13 +144,20 @@ jobs:
 
     run-spec-2020-12-tests:
         runs-on: ubuntu-latest
-        needs: install
         steps:
             - uses: actions/checkout@v3
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: "22"
+                  cache: "pnpm"
             - name: Install dependencies
-              run: yarn install --frozen-lockfile
+              run: pnpm install --frozen-lockfile
             - name: Test spec 2020-12
-              run: yarn test:2020:ci
+              run: pnpm run test:2020:ci
             - uses: actions/upload-artifact@v4
               with:
                   name: test-results-spec-2020-12

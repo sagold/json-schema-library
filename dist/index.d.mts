@@ -1,4 +1,4 @@
-import { A as JsonSchemaResolver, C as DraftVersion, D as DataNode, E as TemplateOptions, F as Maybe, I as ValidationAnnotation, L as ValidationPath, M as JsonSchemaValidator, N as JsonSchemaValidatorParams, O as JsonSchemaReducer, P as Keyword, R as ValidationReturnType, S as Draft, T as extendDraft, _ as GetNodeOptions, a as JsonAnnotation, b as isReduceable, c as JsonSchema, d as isAnnotation, f as isBooleanSchema, g as Context, h as isJsonSchema, i as ErrorConfig, j as JsonSchemaResolverParams, k as JsonSchemaReducerParams, l as NodeOrError, m as isJsonError, n as AnnotationData, o as JsonError, p as isJsonAnnotation, r as BooleanSchema, s as JsonPointer, t as Annotation, u as OptionalNodeOrError, v as SchemaNode, w as addKeywords, x as isSchemaNode, y as ValidateReturnType } from "./types-DVyFDxCv.mjs";
+import { A as JsonSchemaResolver, C as DraftVersion, D as DataNode, E as TemplateOptions, F as Maybe, I as ValidationAnnotation, L as ValidationPath, M as JsonSchemaValidator, N as JsonSchemaValidatorParams, O as JsonSchemaReducer, P as Keyword, R as ValidationReturnType, S as Draft, T as extendDraft, _ as GetNodeOptions, a as JsonAnnotation, b as isReduceable, c as JsonSchema, d as isAnnotation, f as isBooleanSchema, g as Context, h as isJsonSchema, i as ErrorConfig, j as JsonSchemaResolverParams, k as JsonSchemaReducerParams, l as NodeOrError, m as isJsonError, n as AnnotationData, o as JsonError, p as isJsonAnnotation, r as BooleanSchema, s as JsonPointer, t as Annotation, u as OptionalNodeOrError, v as SchemaNode, w as addKeywords, x as isSchemaNode, y as ValidateReturnType } from "./types-CqkCJmt8.mjs";
 
 //#region src/compileSchema.d.ts
 type CompileOptions = {
@@ -51,8 +51,7 @@ type CompileOptions = {
    */
   formatAssertion?: boolean | "meta-schema" | undefined; /** Set default options for all `node.getData` requests */
   getDataDefaultOptions?: TemplateOptions; /** Set to true to throw an Error on errors in input schema. Defaults to false */
-  throwOnInvalidSchema?: boolean; /** Set to true to collect unknown keywords of input schema in `node.schemaAnnotations`. Defaults to false */
-  withSchemaAnnotations?: boolean; /** Set to true to throw an Error when encountering an unresolvable ref  */
+  throwOnInvalidSchema?: boolean; /** Set to true to throw an Error when encountering an unresolvable ref  */
   throwOnInvalidRef?: boolean;
 };
 /**

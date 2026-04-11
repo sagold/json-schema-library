@@ -1,4 +1,4 @@
-import { c as JsonSchema } from "./types-DVyFDxCv.mjs";
+import { c as JsonSchema } from "./types-CqkCJmt8.mjs";
 
 //#region remotes/index.d.ts
 /** JSON Schema meta-schemata */

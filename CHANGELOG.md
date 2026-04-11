@@ -1,5 +1,3 @@
-`hostname`, `idn-hostname`, `idn-email`, `ipv4`, `ipv6`, `iri`, `iri-reference`, `uri`, `uri-reference`, `uri-template`
-
 ## Changelog
 
 ###
