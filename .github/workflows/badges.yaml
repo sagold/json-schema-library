@@ -1,0 +1,104 @@
+name: JSON Schema Test Suite Badges
+
+on:
+  push:
+    branches:
+      - main
+  workflow_run:
+    workflows: [CI]
+    types:
+      - completed
+
+jobs:
+  badges:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # Run each draft's test suite and capture JSON output
+      - name: Run draft-04 tests
+        run: yarn test:4:ci
+        continue-on-error: true
+
+      - name: Run draft-06 tests
+        run: yarn test:6:ci
+        continue-on-error: true
+
+      - name: Run draft-07 tests
+        run: yarn test:7:ci
+        continue-on-error: true
+
+      - name: Run draft-2019-09 tests
+        run: yarn test:2019:ci
+        continue-on-error: true
+
+      - name: Run draft-2020-12 tests
+        run: yarn test:2020:ci
+        continue-on-error: true
+
+      # Parse results and set env variables for each draft
+      - name: Parse test results
+        id: parse
+        run: node .github/scripts/parse-test-results.js
+
+      # One badge per draft
+      - name: Badge - draft-04
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ secrets.BADGE_GIST_ID }}
+          filename: jsl-draft04.json
+          label: draft-04
+          message: ${{ env.BADGE_DRAFT04 }}
+          color: ${{ env.COLOR_DRAFT04 }}
+
+      - name: Badge - draft-06
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ secrets.BADGE_GIST_ID }}
+          filename: jsl-draft06.json
+          label: draft-06
+          message: ${{ env.BADGE_DRAFT06 }}
+          color: ${{ env.COLOR_DRAFT06 }}
+
+      - name: Badge - draft-07
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ secrets.BADGE_GIST_ID }}
+          filename: jsl-draft07.json
+          label: draft-07
+          message: ${{ env.BADGE_DRAFT07 }}
+          color: ${{ env.COLOR_DRAFT07 }}
+
+      - name: Badge - draft-2019-09
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ secrets.BADGE_GIST_ID }}
+          filename: jsl-draft2019-09.json
+          label: draft-2019-09
+          message: ${{ env.BADGE_DRAFT2019 }}
+          color: ${{ env.COLOR_DRAFT2019 }}
+
+      - name: Badge - draft-2020-12
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ secrets.BADGE_GIST_ID }}
+          filename: jsl-draft2020-12.json
+          label: draft-2020-12
+          message: ${{ env.BADGE_DRAFT2020 }}
+          color: ${{ env.COLOR_DRAFT2020 }}
