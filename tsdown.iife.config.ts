@@ -6,7 +6,7 @@ export default defineConfig([
         format: "iife",
         globalName: "jlib",
         platform: "browser",
-        sourcemap: true,
+        sourcemap: false,
         // Bundle anything that's not a relative/absolute path (=> node_modules)
         noExternal: (id) => !id.startsWith(".") && !id.startsWith("/")
     },
@@ -15,7 +15,7 @@ export default defineConfig([
         format: "iife",
         globalName: "jlibRemotes",
         platform: "browser",
-        sourcemap: true,
+        sourcemap: false,
         // Bundle anything that's not a relative/absolute path (=> node_modules)
         noExternal: (id) => !id.startsWith(".") && !id.startsWith("/")
     },
@@ -24,7 +24,7 @@ export default defineConfig([
         format: "iife",
         globalName: "jlibFormats",
         platform: "browser",
-        sourcemap: true,
+        sourcemap: false,
         // Bundle anything that's not a relative/absolute path (=> node_modules)
         noExternal: (id) => !id.startsWith(".") && !id.startsWith("/")
     }
