@@ -1,6 +1,6 @@
 {
   "name": "json-schema-library",
-  "version": "11.3.1",
+  "version": "11.4.0",
   "description": "Customizable and hackable json-validator and json-schema utilities for traversal, data generation and validation",
   "types": "./dist/index.d.cts",
   "exports": {

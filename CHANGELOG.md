@@ -1,6 +1,6 @@
 ## Changelog
 
-###
+### v11.4.0
 
 - added schema annotation on `compileSchema` for unknown format
 - replaced option `withSchemaAnnotations` in favor of always creating all annotations
