@@ -1,0 +1,108 @@
+name: JSON Schema Test Suite Badges
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types:
+      - completed
+
+jobs:
+  badges:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download spec-4 results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results-spec-4
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Download spec-6 results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results-spec-6
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Download spec-7 results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results-spec-7
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Download spec-2019-09 results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results-spec-2019-09
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Download spec-2020-12 results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results-spec-2020-12
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Parse test results
+        run: node .github/scripts/parse-test-results.js
+
+      - name: Badge - draft-04
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ secrets.BADGE_GIST_ID }}
+          filename: jsl-draft04.json
+          label: draft-04
+          message: ${{ env.BADGE_DRAFT04 }}
+          color: ${{ env.COLOR_DRAFT04 }}
+
+      - name: Badge - draft-06
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ secrets.BADGE_GIST_ID }}
+          filename: jsl-draft06.json
+          label: draft-06
+          message: ${{ env.BADGE_DRAFT06 }}
+          color: ${{ env.COLOR_DRAFT06 }}
+
+      - name: Badge - draft-07
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ secrets.BADGE_GIST_ID }}
+          filename: jsl-draft07.json
+          label: draft-07
+          message: ${{ env.BADGE_DRAFT07 }}
+          color: ${{ env.COLOR_DRAFT07 }}
+
+      - name: Badge - draft-2019-09
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ secrets.BADGE_GIST_ID }}
+          filename: jsl-draft2019-09.json
+          label: draft-2019-09
+          message: ${{ env.BADGE_DRAFT2019 }}
+          color: ${{ env.COLOR_DRAFT2019 }}
+
+      - name: Badge - draft-2020-12
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ secrets.BADGE_GIST_ID }}
+          filename: jsl-draft2020-12.json
+          label: draft-2020-12
+          message: ${{ env.BADGE_DRAFT2020 }}
+          color: ${{ env.COLOR_DRAFT2020 }}
