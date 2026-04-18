@@ -1,9 +1,9 @@
 [![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://www.npmjs.com/package/json-schema-library) [![CI](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) ![Types](https://badgen.net/npm/types/json-schema-library)
-![draft-04](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Adityakumar37/8e62d5f2312c1821398caf27f389f117/raw/jsl-draft04.json)
-![draft-06](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Adityakumar37/8e62d5f2312c1821398caf27f389f117/raw/jsl-draft06.json)
-![draft-07](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Adityakumar37/8e62d5f2312c1821398caf27f389f117/raw/jsl-draft07.json)
-![draft-2019-09](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Adityakumar37/8e62d5f2312c1821398caf27f389f117/raw/jsl-draft2019-09.json)
-![draft-2020-12](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Adityakumar37/8e62d5f2312c1821398caf27f389f117/raw/jsl-draft2020-12.json)
+![draft-04](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft04.json)
+![draft-06](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft06.json)
+![draft-07](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft07.json)
+![draft-2019-09](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft2019-09.json)
+![draft-2020-12](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft2020-12.json)
 
 <h1 align="center">
     <img src="./docs/json-schema-library-10.png" width="192" alt="json-schema-library">
