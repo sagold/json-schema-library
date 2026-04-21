@@ -112,18 +112,11 @@ Details on `getDataDefaultOptions` are documented in [getData](#getData).
 
 ### validate input schema
 
-All JSON Schema passed to `compileSchema` are validated automatically. To retrieve any schema errors you can access the property `schemaErrors` of the main node:
+All JSON Schema passed to `compileSchema` are validated automatically. To retrieve any schema errors you can access the property `schemaErrors` of the main node. `schemaAnnotations` contains all JSON Schema keywords that are not part of the used draft and any custom keyword that does not start with `x-`.
 
 ```ts
 const root = compileSchema(mySchema);
-const { schemaErrors } = root; // JsonError[]
-```
-
-Use the option `throwOnInvalidSchema:true` of `compileSchema` to throw an Error for a input schema containing errors:
-
-```ts
-const root = compileSchema({ properties: 123 }, { throwOnInvalidSchema: true });
-// throws Error
+const { schemaErrors, schemaAnnotations } = root; // JsonError[]
 ```
 
 <details><summary>Example for schema validation errors</summary>
@@ -150,15 +143,6 @@ console.log(schemaErrors[0]);
 
 </details>
 
-To collect JSON Schema annotations for unused keywords you can opt in with option `withSchemaAnnotations`:
-
-```ts
-const root = compileSchema(mySchema, { withSchemaAnnotations: true });
-const { schemaAnnotations } = root; // JsonAnnotation[]
-```
-
-This collects all JSON Schema keywords not part of the used draft and any custom keywords. Custom keywords starting with `x-` are allowed and thus will not create an annotation.
-
 <details><summary>Example for validation annotations</summary>
 
 ---
@@ -184,6 +168,13 @@ console.log(schemaAnnotations[0]);
 ---
 
 </details>
+
+Use the option `throwOnInvalidSchema:true` of `compileSchema` to throw an Error for a input schema containing errors:
+
+```ts
+const root = compileSchema({ properties: 123 }, { throwOnInvalidSchema: true });
+// throws Error
+```
 
 ### SchemaNode
 
