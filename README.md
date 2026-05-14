@@ -224,35 +224,6 @@ assert(root === childNode.parent);
 
 </details>
 
-<details><summary>All nodes share a context</summary>
-
----
-
-A context is shared across all nodes of a schema
-
-```ts
-const root = compileSchema(mySchema);
-const { node: childNode } = root.getNode("#/image");
-assert(root.context === childNode.context);
-```
-
-And some context properties are shared across all schema added as remotes. The property `rootNode` refers to the root-schema for the current node
-
-```ts
-const root = compileSchema(mySchema);
-const { node: childNode } = root.getNode("#/image");
-assert(root === childNode.context.rootNode);
-```
-
-Note that rootNodes will change when working across remote schema (using $ref).
-
----
-
-</details>
-
-> [!CAUTION]
-> It is not advised to work on context directly, but it might be useful in some situations
-
 ### Draft Support
 
 _json-schema-library_ fully supports all draft versions _draft-04, draft-06, draft-07, draft-2019-09 and draft-2020-12_.
