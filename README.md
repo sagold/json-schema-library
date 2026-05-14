@@ -1,15 +1,18 @@
 [![Npm package version](https://badgen.net/npm/v/json-schema-library)](https://www.npmjs.com/package/json-schema-library) [![CI](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml) ![Types](https://badgen.net/npm/types/json-schema-library)
-![draft-04](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft04.json)
-![draft-06](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft06.json)
-![draft-07](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft07.json)
-![draft-2019-09](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft2019-09.json)
-![draft-2020-12](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft2020-12.json)
 
 <h1 align="center">
     <img src="./docs/json-schema-library-10.png" width="192" alt="json-schema-library">
     <br/>
     json-schema-library
 </h1>
+
+_json-schema-library_ is the [most compliant JSON Schema validator](https://bowtie.report/#/?language=typescript&language=javascript) for the web, fully supporting all major JSON Schema draft versions. Read [Draft Support](#draft-support) for more details.
+
+![draft-04](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft04.json)
+![draft-06](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft06.json)
+![draft-07](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft07.json)
+![draft-2019-09](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft2019-09.json)
+![draft-2020-12](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sagold/60138b5d728d1f8f92ba29546dee7c00/raw/jsl-draft2020-12.json)
 
 > **json-schema-library** provides tools and utilities for working with JSON Schema - enabling creation, validation, and schema exploration. Unlike most validators and editors, which hide the inner workings, this library is designed for developers building custom tools around JSON Schema. It runs in both Node and browser environments, prioritizing flexibility and extensibility over minimal memory footprint or raw performance.
 
@@ -252,10 +255,28 @@ Note that rootNodes will change when working across remote schema (using $ref).
 
 ### Draft Support
 
-_json-schema-library_ fully supports all core features of draft versions draft-04, draft-06, draft-07, draft-2019-09 and draft-2020-12. Additionally, all JSON Schema format validators are supported:
+_json-schema-library_ fully supports all draft versions _draft-04, draft-06, draft-07, draft-2019-09 and draft-2020-12_.
 
-- The following formats are **available per default**: `date`, `date-time`, `duration`, `email`, `json-pointer`, `relative-json-pointer`, `regex`, `time`, `url`, `uuid`
-- **Add remaining format** validators `hostname`, `idn-email`, `ipv4`, `ipv6`, `uri`, `uri-reference`, `uri-template` to drafts with:
+<details><summary>References</summary>
+
+---
+
+- Draft support is defined by running a validator against the official [json-schema-test-suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite).
+- _json-schema-library_ passes all tests from [json-schema-test-suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite) which can be inspected in [github actions](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml)
+- To compare _json-schema-library_ to other validators refer to the official [Bowtie Report](https://bowtie.report/#/?language=typescript&language=javascript), which runs a subset of _json-schema-test-suite_ on all registered validators
+
+---
+
+</details>
+
+> Please note that these reports refer to validation only. _json-schema-library_ offers tooling outside of validation and strives to be as spec-compliant as possible.
+
+**format validators**
+
+All JSON Schema format validators are supported:
+
+- **per default** the following formats available: `date`, `date-time`, `duration`, `email`, `json-pointer`, `relative-json-pointer`, `regex`, `time`, `url`, `uuid`
+- **add remaining format** validators `hostname`, `idn-email`, `ipv4`, `ipv6`, `uri`, `uri-reference`, `uri-template` to drafts with:
 
 ```ts
 import { addFormats } from "json-schema-library/formats";
@@ -265,21 +286,6 @@ addFormats([draft04, draft06, draft07, draft2019, draft2020]);
 ```
 
 You can always override or extend format validation as is documented in [draft customization](#draft-customization).
-
-<details><summary>Overview draft support</summary>
-
----
-
-Draft support is defined by running a validator against the official [json-schema-test-suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite).
-
-- Test results for _json-schema-library_ can be inspected in [github actions](https://github.com/sagold/json-schema-library/actions/workflows/ci.yaml)
-- A comparison to other validators is listed on [json-schema-benchmark](https://github.com/sagold/json-schema-benchmark)
-
-Please note that these benchmarks refer to validation only. _json-schema-library_ offers tooling outside of validation and strives to be as spec-compliant as possible.
-
----
-
-</details>
 
 ## SchemaNode methods
 
