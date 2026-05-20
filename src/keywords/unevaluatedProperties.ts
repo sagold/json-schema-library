@@ -56,6 +56,13 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
 
     const errors: ValidationReturnType = [];
     for (const propertyName of unevaluated) {
+        // properties defined directly on this schema object are always
+        // evaluated by the "properties" keyword, regardless of whether the
+        // value passes validation (per JSON Schema spec, annotations from
+        // adjacent keywords are always collected)
+        if (node.properties?.[propertyName]) {
+            continue;
+        }
         if (isPropertyEvaluated({ node, data, key: propertyName, pointer, path })) {
             continue;
         }
