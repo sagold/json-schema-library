@@ -78,4 +78,41 @@ describe("mergeSchema", () => {
         );
         assert.deepEqual(schema.items.anyOf, [{ type: "string" }, { type: "number" }]);
     });
+
+    describe("type", () => {
+        it("should return last type if they conflict", () => {
+            const schema = mergeSchema({ type: "array" }, { type: "integer" });
+            assert.deepEqual(schema.type, "integer");
+        });
+
+        it("should not merge mixed data types with string first", () => {
+            const schema = mergeSchema({ type: "array" }, { type: ["array", "object"] });
+            assert.deepEqual(schema.type, "array");
+        });
+
+        it("should not merge mixed data types with string second", () => {
+            const schema = mergeSchema({ type: ["array", "object"] }, { type: "array" });
+            assert.deepEqual(schema.type, "array");
+        });
+
+        it("should  merge mixed data types if they have no type in common", () => {
+            const schema = mergeSchema({ type: ["array", "object"] }, { type: "integer" });
+            assert.deepEqual(schema.type, ["array", "object", "integer"]);
+        });
+
+        it("should merge return last type if they do not match", () => {
+            const schema = mergeSchema({ type: "object" }, { type: "array" });
+            assert.deepEqual(schema.type, "array");
+        });
+
+        it("should merge array types", () => {
+            const schema = mergeSchema({ type: ["object"] }, { type: ["array"] });
+            assert.deepEqual(schema.type, ["object", "array"]);
+        });
+
+        it("should merge array types without duplicated", () => {
+            const schema = mergeSchema({ type: ["integer", "object"] }, { type: ["object", "array"] });
+            assert.deepEqual(schema.type, ["integer", "object", "array"]);
+        });
+    });
 });

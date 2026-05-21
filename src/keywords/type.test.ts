@@ -20,3 +20,16 @@ describe("keyword : type : validation", () => {
         });
     });
 });
+
+describe("keyword : type : reduce", () => {
+    it("should reduce array-type to the last matching data-type", () => {
+        const { node } = compileSchema({ type: ["null", "integer"] }).reduceNode(123);
+        assert.equal(node?.type, "integer");
+        assert.equal(node?.schema.type, "integer");
+    });
+    it("should reduce array-type to the first matching data-type", () => {
+        const { node } = compileSchema({ type: ["null", "integer"] }).reduceNode(null);
+        assert.equal(node?.type, "null");
+        assert.equal(node?.schema.type, "null");
+    });
+});

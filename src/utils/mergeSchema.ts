@@ -32,7 +32,10 @@ export function mergeSchema2(a: unknown, b: unknown, property?: string): unknown
         return newObject;
     }
 
-    if (Array.isArray(a) && Array.isArray(b)) {
+    const aIsArray = Array.isArray(a);
+    const bIsArray = Array.isArray(b);
+
+    if (aIsArray && bIsArray) {
         if (property === "required" || property === "anyOf") {
             return a.concat(b).filter((item, index, array) => array.indexOf(item) === index);
         }
@@ -66,11 +69,29 @@ export function mergeSchema2(a: unknown, b: unknown, property?: string): unknown
         return [...result, ...append].filter((item, index, array) => array.indexOf(item) === index);
     }
 
-    if (Array.isArray(b)) {
+    // mixed data-type for type keyword
+    if (property === "type" && (aIsArray || bIsArray)) {
+        // we merge to the specific type
+        if (aIsArray && a.includes(b)) {
+            return b;
+        }
+        if (bIsArray && b.includes(a)) {
+            return a;
+        }
+        // extend the types if they do not match
+        if (aIsArray) {
+            return [...a, b];
+        }
+        if (bIsArray) {
+            return [...b, a];
+        }
+    }
+
+    if (bIsArray) {
         return b;
     }
 
-    if (Array.isArray(a)) {
+    if (aIsArray) {
         return a;
     }
 
