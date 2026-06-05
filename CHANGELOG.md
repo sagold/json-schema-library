@@ -1,5 +1,11 @@
 ## Changelog
 
+### 11.5.0
+
+- added: option `remotes: JsonSchema[]` for `compileSchema` to simplify adding remotes
+- fixed: annotation warnings should not be reported for title, description or default
+- deprecated: DraftEditor Draft
+
 ### v11.4.0
 
 - added schema annotation on `compileSchema` for unknown format
