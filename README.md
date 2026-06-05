@@ -71,6 +71,8 @@ type CompileOptions = {
   draft?: string;
   // a context to share
   remote: SchemaNode;
+  /** a list of remotes to add, requires a unique $id for each schema. Will be ignored if remote is set */
+  remotes: JsonSchema[];
   // if format-validations should create errors. Defaults to true
   formatAssertion: boolean | "meta-schema";
   /** set to true to throw an Error on errors in input schema. Defaults to false */
