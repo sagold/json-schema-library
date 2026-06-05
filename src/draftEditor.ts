@@ -4,6 +4,7 @@ import { oneOfFuzzyKeyword } from "./keywords/oneOf";
 import { render } from "./errors/render";
 
 /**
+ * @deprecated
  * @draft-editor https://json-schema.org/draft/2020-12/release-notes
  *
  * Uses Draft 2020-12 and changes resolveOneOf to be fuzzy
