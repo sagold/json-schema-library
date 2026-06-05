@@ -84,6 +84,30 @@ describe("compileSchema draft-version", () => {
     });
 });
 
+describe("compileSchema remotes", () => {
+    it("should add list of remotes to returned SchemaNode node", () => {
+        const node = compileSchema(
+            {
+                type: "object",
+                required: ["string", "number"],
+                properties: {
+                    string: { $ref: "https://remote-a.com/schema" },
+                    number: { $ref: "https://remote-b.com/schema" }
+                }
+            },
+            {
+                drafts: [draft2020],
+                remotes: [
+                    { $id: "https://remote-a.com/schema", type: "string", default: "a" },
+                    { $id: "https://remote-b.com/schema", type: "number", default: 9 }
+                ]
+            }
+        );
+        const data = node.getData();
+        assert.deepEqual(data, { string: "a", number: 9 });
+    });
+});
+
 describe("compileSchema vocabulary", () => {
     it("should add remote schema on compile", () => {
         const remote = compileSchema({

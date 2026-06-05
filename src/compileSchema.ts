@@ -67,6 +67,7 @@ export type CompileOptions = {
      * Set node and its remote schemata as remote schemata for this node and schema to resolve $ref
      */
     remote?: SchemaNode;
+    remotes?: JsonSchema[];
     /**
      * Enables `format`-keyword assertions when this is set tor `true` or sets assertion as defined by
      * the given meta-schema. Set to `false` to deactivate format validation.
@@ -94,6 +95,18 @@ function getDraft(drafts: Draft[], $schema: string) {
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
 export function compileSchema(schema: JsonSchema | BooleanSchema, options: CompileOptions = {}) {
+    let remote = options.remote;
+    if (Array.isArray(options.remotes) && options.remotes.length > 0 && !options.remote) {
+        const remotes = [...options.remotes];
+        remotes.forEach((remote, index) => {
+            if (remote.$id == null) {
+                throw new Error(`required $id on remotes[${index}] is missing`);
+            }
+        });
+        remote = compileSchema(remotes.shift()!);
+        remotes.forEach((r) => remote?.addRemoteSchema(r.$id, r));
+    }
+
     let formatAssertion = options.formatAssertion ?? true;
     const drafts = options.drafts ?? defaultDrafts;
     const draft = getDraft(drafts, isJsonSchema(schema) ? (options.draft ?? schema.$schema) : undefined);
@@ -110,7 +123,7 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
         context: {
             remotes: {},
             dynamicAnchors: {},
-            ...(options.remote?.context ?? {}),
+            ...(remote?.context ?? {}),
             anchors: {},
             refs: {},
             ...copy(pick(draft, "methods", "keywords", "version", "formats", "errors")),
@@ -125,7 +138,7 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
     node.context.rootNode = node;
     node.context.remotes[(isJsonSchema(schema) ? schema.$id : undefined) ?? "#"] = node;
 
-    if (options.remote) {
+    if (remote) {
         const metaSchema = getRef(node, node.schema.$schema);
         if (isSchemaNode(metaSchema) && metaSchema.schema.$vocabulary) {
             const vocabs = Object.keys(metaSchema.schema.$vocabulary);
