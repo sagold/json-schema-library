@@ -263,7 +263,7 @@ describe("validateSchema", () => {
             assert.equal(schemaAnnotations.length, 1);
             assert.equal(schemaAnnotations[0].data.pointer, "#/properties/headline/options");
         });
-        it("should return not unknown keywords starting with 'x-'", () => {
+        it("should not return unknown keywords starting with 'x-'", () => {
             const { schemaAnnotations } = compileSchema({
                 properties: {
                     headline: {
@@ -271,6 +271,15 @@ describe("validateSchema", () => {
                         type: "string"
                     }
                 }
+            });
+            assert.equal(schemaAnnotations.length, 0);
+        });
+        it("should not return valid annotation keywords", () => {
+            const { schemaAnnotations } = compileSchema({
+                type: "string",
+                title: "input",
+                description: "any string",
+                default: "hey"
             });
             assert.equal(schemaAnnotations.length, 0);
         });

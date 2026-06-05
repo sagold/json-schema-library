@@ -41,7 +41,7 @@ import { getNode } from "./getNode";
 import { getNodeChild } from "./getNodeChild";
 import { DataNode } from "./methods/toDataNodes";
 
-const { DYNAMIC_PROPERTIES, REGEX_FLAGS, DECLARATOR_ONEOF } = settings;
+const { DYNAMIC_PROPERTIES, REGEX_FLAGS, DECLARATOR_ONEOF, VALID_ANNOTATION_KEYWORDS } = settings;
 
 export function isSchemaNode(value: unknown): value is SchemaNode {
     return isObject(value) && Array.isArray(value?.reducers) && Array.isArray(value?.resolvers);
@@ -624,7 +624,10 @@ export function addKeywords(node: SchemaNode) {
         .map((keyword) => execKeyword(keyword, node));
 
     keys.filter(
-        (key) => !key.startsWith("x-") && node.context.keywords.find((keyword) => keyword.keyword === key) == null
+        (key) =>
+            !key.startsWith("x-") &&
+            !VALID_ANNOTATION_KEYWORDS.includes(key) &&
+            node.context.keywords.find((keyword) => keyword.keyword === key) == null
     ).forEach((keyword) => {
         errors.push(
             node.createAnnotation("unknown-keyword-warning", {

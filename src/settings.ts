@@ -18,6 +18,8 @@ export default {
         "propertyDependencies"
     ],
     REGEX_FLAGS: "u",
+    /** additional keywords that should not produce an unknown-keyword-warning */
+    VALID_ANNOTATION_KEYWORDS: ["title", "description", "default"],
     /**
      * properties to keep from a $ref-schema when resolving a $ref (recursively)
      * this allows to overwrite specified properties locally on a $ref-definition
