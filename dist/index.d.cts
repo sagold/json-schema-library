@@ -43,6 +43,7 @@ type CompileOptions = {
    * Set node and its remote schemata as remote schemata for this node and schema to resolve $ref
    */
   remote?: SchemaNode;
+  remotes?: JsonSchema[];
   /**
    * Enables `format`-keyword assertions when this is set tor `true` or sets assertion as defined by
    * the given meta-schema. Set to `false` to deactivate format validation.
@@ -69,7 +70,8 @@ declare const _default: {
   DECLARATOR_ONEOF: string;
   propertyBlacklist: string[];
   DYNAMIC_PROPERTIES: string[];
-  REGEX_FLAGS: string;
+  REGEX_FLAGS: string; /** additional keywords that should not produce an unknown-keyword-warning */
+  VALID_ANNOTATION_KEYWORDS: string[];
   /**
    * properties to keep from a $ref-schema when resolving a $ref (recursively)
    * this allows to overwrite specified properties locally on a $ref-definition
@@ -206,6 +208,7 @@ declare const draft2020: Draft;
 //#endregion
 //#region src/draftEditor.d.ts
 /**
+ * @deprecated
  * @draft-editor https://json-schema.org/draft/2020-12/release-notes
  *
  * Uses Draft 2020-12 and changes resolveOneOf to be fuzzy
