@@ -19,7 +19,7 @@ export default {
     ],
     REGEX_FLAGS: "u",
     /** additional keywords that should not produce an unknown-keyword-warning */
-    VALID_ANNOTATION_KEYWORDS: ["title", "description", "default"],
+    VALID_ANNOTATION_KEYWORDS: ["$id", "$schema", "title", "description", "default", "oneOfProperty"],
     /**
      * properties to keep from a $ref-schema when resolving a $ref (recursively)
      * this allows to overwrite specified properties locally on a $ref-definition
@@ -45,5 +45,5 @@ export default {
      *   type: "object"
      * }
      */
-    PROPERTIES_TO_MERGE: ["title", "description", "options", "x-options", "readOnly", "writeOnly"]
+    PROPERTIES_TO_MERGE: ["title", "description", "default", "options", "x-options", "readOnly", "writeOnly"]
 };
