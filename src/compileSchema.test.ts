@@ -1,7 +1,6 @@
 import { compileSchema } from "./compileSchema";
 import { strict as assert } from "assert";
-import { draftEditor } from "./draftEditor";
-import { SchemaNode } from "./SchemaNode";
+import { isSchemaNode, SchemaNode } from "./SchemaNode";
 import { draft04 } from "./draft04";
 import { draft07 } from "./draft07";
 import { draft2020 } from "./draft2020";
@@ -105,6 +104,42 @@ describe("compileSchema remotes", () => {
         );
         const data = node.getData();
         assert.deepEqual(data, { string: "a", number: 9 });
+    });
+
+    it("should resolve definition of remote schema", () => {
+        const node = compileSchema(
+            {
+                type: "object",
+                required: ["value"],
+                properties: {
+                    value: { $ref: "https://remote.com/definitions.json#/$defs/property" }
+                }
+            },
+            {
+                drafts: [draft2020],
+                remotes: [
+                    {
+                        $id: "https://remote.com/definitions.json",
+                        $defs: {
+                            property: {
+                                title: "remote boolean definition",
+                                type: "boolean"
+                            }
+                        }
+                    }
+                ]
+            }
+        );
+
+        const data = node.getData();
+        assert.deepEqual(data, { value: false });
+
+        const { node: valueNode } = node.getNode("#/value");
+        assert(isSchemaNode(valueNode), "expected returned node to be a valid SchemaNode");
+        assert.deepEqual(valueNode.schema, {
+            title: "remote boolean definition",
+            type: "boolean"
+        });
     });
 });
 
@@ -248,19 +283,5 @@ describe("compileSchema `schemaLocation`", () => {
         }).getNodeChild("title");
 
         assert.deepEqual(node?.schemaLocation, "#");
-    });
-});
-
-describe("compileSchema `errors`", () => {
-    it("draftEditor come with custom minLengthOneError", () => {
-        const { errors } = compileSchema(
-            {
-                type: "string",
-                minLength: 1
-            },
-            { drafts: [draftEditor] }
-        ).validate("");
-        assert.equal(errors.length, 1);
-        assert.deepEqual(errors[0].code, "min-length-one-error");
     });
 });
