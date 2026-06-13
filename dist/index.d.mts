@@ -42,7 +42,10 @@ type CompileOptions = {
   /**
    * Set node and its remote schemata as remote schemata for this node and schema to resolve $ref
    */
-  remote?: SchemaNode;
+  remote?: SchemaNode & {
+    schemaErrors?: JsonError[];
+    schemaAnnotations: JsonAnnotation[];
+  };
   /**
    * a list of remotes to add, requires a unique $id for each schema. Will be ignored if `remote` is set
    */

@@ -1,5 +1,12 @@
 ## Changelog
 
+### 11.6.0
+
+- added: array support for reduceOneOfFuzzy
+- added: additionally expose remote schema validation results. A `schemaId` is passed to error-data to id remote schema
+- fixed: childSelection suporting items.$ref
+- fixed: prototype pollution
+
 ### 11.5.0
 
 - added: option `remotes: JsonSchema[]` for `compileSchema` to simplify adding remotes
