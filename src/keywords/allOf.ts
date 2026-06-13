@@ -1,11 +1,5 @@
 import { mergeSchema } from "../utils/mergeSchema";
-import {
-    Keyword,
-    JsonSchemaReducerParams,
-    JsonSchemaValidatorParams,
-    ValidationReturnType,
-    ValidationAnnotation
-} from "../Keyword";
+import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
 import { SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
 import { collectValidationErrors } from "src/utils/collectValidationErrors";

@@ -66,7 +66,7 @@ export type CompileOptions = {
     /**
      * Set node and its remote schemata as remote schemata for this node and schema to resolve $ref
      */
-    remote?: SchemaNode;
+    remote?: SchemaNode & { schemaErrors?: JsonError[]; schemaAnnotations: JsonAnnotation[] };
     /**
      * a list of remotes to add, requires a unique $id for each schema. Will be ignored if `remote` is set
      */
@@ -180,11 +180,19 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
     const schemaAnnotations: JsonAnnotation[] = [];
     schemaValidation.forEach((error) => {
         if (isJsonError(error)) {
+            error.data.schemaId = node.context.rootNode.$id ?? "#";
             schemaErrors.push(error);
         } else if (isJsonAnnotation(error)) {
+            error.data.schemaId = node.context.rootNode.$id ?? "#";
             schemaAnnotations.push(error);
         }
     });
+    if (Array.isArray(remote?.schemaErrors)) {
+        schemaErrors.push(...remote.schemaErrors);
+    }
+    if (Array.isArray(remote?.schemaAnnotations)) {
+        schemaAnnotations.push(...remote.schemaAnnotations);
+    }
 
     if (options.throwOnInvalidSchema && schemaErrors.length > 0) {
         const error = new Error("Invalid schema passed to compileSchema");

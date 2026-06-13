@@ -250,6 +250,18 @@ describe("validateSchema", () => {
         assert.equal(schemaErrors[0].data.pointer, "#/uniqueItems");
     });
 
+    describe("remotes", () => {
+        it("should return errors of remotes", () => {
+            const { schemaErrors } = compileSchema(
+                {},
+                { remotes: [{ $id: "https://remote.com/error.json", anyOf: [999] }] }
+            );
+            assert.equal(schemaErrors?.length, 1);
+            assert.equal(schemaErrors[0].data.pointer, "#/anyOf/0");
+            assert.equal(schemaErrors[0].data.schemaId, "https://remote.com/error.json");
+        });
+    });
+
     describe("annotations", () => {
         it("should return unknown keywords as annotation", () => {
             const { schemaAnnotations } = compileSchema({

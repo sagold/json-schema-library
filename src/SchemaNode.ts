@@ -551,7 +551,7 @@ export const SchemaNodeMethods = {
             schema.$id = resolveUri(schema.$id || url);
         }
 
-        const node = this as SchemaNode;
+        const node = this as SchemaNode & { schemaErrors?: JsonError[]; schemaAnnotations: JsonAnnotation[] };
         const { context } = node;
         const schemaId = isJsonSchema(schema) ? (node.context.draft ?? schema.$schema) : undefined;
         const draft = getDraft(context.drafts, schemaId ?? context.rootNode.schema?.$schema);
@@ -576,7 +576,22 @@ export const SchemaNodeMethods = {
 
         remoteNode.context.rootNode = remoteNode;
         remoteNode.context.remotes[resolveUri(url)] = remoteNode;
-        addKeywords(remoteNode);
+
+        // parse and validate schema
+        // @todo this is a duplicated to compileSchema
+        let schemaValidation = addKeywords(remoteNode).filter((err) => err != null);
+        schemaValidation = sanitizeErrors(schemaValidation);
+        const schemaErrors: JsonError[] = [];
+        const schemaAnnotations: JsonAnnotation[] = [];
+        schemaValidation.forEach((error) => {
+            if (isJsonError(error)) {
+                schemaErrors.push(error);
+            } else if (isJsonAnnotation(error)) {
+                schemaAnnotations.push(error);
+            }
+        });
+        node.schemaErrors = schemaErrors;
+        node.schemaAnnotations = schemaAnnotations;
 
         return node;
     },
@@ -631,6 +646,7 @@ export function addKeywords(node: SchemaNode) {
     ).forEach((keyword) => {
         errors.push(
             node.createAnnotation("unknown-keyword-warning", {
+                $id: node.$id,
                 pointer: `${node.schemaLocation}/${keyword}`,
                 schema: node.schema,
                 value: keyword,
