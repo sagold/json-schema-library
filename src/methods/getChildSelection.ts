@@ -6,12 +6,17 @@ import { isSchemaNode, JsonError, SchemaNode } from "../types";
  * a list with a single item will be returned
  */
 export function getChildSelection(node: SchemaNode, property: string | number) {
+    if (node.items) {
+        const items = node.items.resolveRef();
+        if (items?.oneOf) {
+            return items.oneOf.map((childNode: SchemaNode) => childNode.resolveRef());
+        }
+    }
+
     if (node.oneOf) {
         return node.oneOf.map((childNode: SchemaNode) => childNode.resolveRef());
     }
-    if (node.items?.oneOf) {
-        return node.items.oneOf.map((childNode: SchemaNode) => childNode.resolveRef());
-    }
+
     // array.items[] found
     if (node.prefixItems && node.prefixItems.length > +property) {
         const { node: childNode, error } = node.getNodeChild(property);

@@ -88,7 +88,30 @@ describe("getChildSelection", () => {
                 number: { type: "number" },
                 string: { type: "string" }
             }
-        }).getChildSelection("b");
+        }).getChildSelection(1);
+
+        assert(!isJsonError(result));
+        assert.deepEqual(result.length, 2);
+        assert.deepEqual(
+            result.map((n) => n.schema),
+            [{ type: "string" }, { type: "number" }]
+        );
+    });
+
+    it("should resolve items $ref", () => {
+        const result = compileSchema({
+            type: "array",
+            items: {
+                $ref: "#/$defs/oneOfRef"
+            },
+            $defs: {
+                oneOfRef: {
+                    oneOf: [{ $ref: "#/$defs/string" }, { $ref: "#/$defs/number" }]
+                },
+                number: { type: "number" },
+                string: { type: "string" }
+            }
+        }).getChildSelection(1);
 
         assert(!isJsonError(result));
         assert.deepEqual(result.length, 2);
