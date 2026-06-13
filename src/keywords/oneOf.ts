@@ -263,6 +263,38 @@ export function reduceOneOfFuzzy({ node, data, pointer, path }: Omit<JsonSchemaR
             return reducedNode;
         }
         return error;
+    } else if (Array.isArray(data)) {
+        let nodeOfItem: SchemaNode | undefined;
+        let schemaOfIndex = -1;
+        let errorCount = Infinity;
+
+        for (let i = 0; i < node.oneOf.length; i += 1) {
+            const oneNode = node.oneOf[i];
+            const { errors } = oneNode.validate(data);
+            const nextErrorCount = errors.length;
+
+            if (nextErrorCount < errorCount) {
+                errorCount = nextErrorCount;
+                nodeOfItem = oneNode;
+                schemaOfIndex = i;
+            }
+        }
+
+        if (nodeOfItem === undefined) {
+            return node.createError("one-of-error", {
+                value: JSON.stringify(data),
+                pointer,
+                schema: node.schema,
+                oneOf: node.schema.oneOf
+            });
+        }
+
+        const { node: reducedNode, error } = nodeOfItem.reduceNode(data, { pointer, path });
+        if (reducedNode) {
+            reducedNode.oneOfIndex = schemaOfIndex; // @evaluation-info
+            return reducedNode;
+        }
+        return error;
     }
 
     return oneOfResult;

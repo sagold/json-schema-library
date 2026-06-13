@@ -160,6 +160,17 @@ describe("keyword : oneof-fuzzy : reduce", () => {
         assert.equal(res.oneOfIndex, 1, "should have exposed correct resolved oneOfIndex");
     });
 
+    it("should resolve to best matching oneOf", () => {
+        const node = compileSchema({
+            oneOf: [
+                { type: "array", items: { oneOf: [{ type: "string" }] } },
+                { type: "array", items: { oneOf: [{ type: "number" }] } }
+            ]
+        });
+        const res = reduceOneOfFuzzy({ node, data: [1, 2, "3"], pointer: "#", path: [] });
+        assert.deepEqual(res?.schema, { type: "array", items: { oneOf: [{ type: "number" }] } });
+    });
+
     describe("object", () => {
         it("should return schema with matching properties", () => {
             const node = compileSchema({
