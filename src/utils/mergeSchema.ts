@@ -25,7 +25,7 @@ export function mergeSchema<T extends JsonSchema>(a: T, b: T, ...omit: string[])
 
 export function mergeSchema2(a: unknown, b: unknown, property?: string): unknown {
     if (isObject(a) && isObject(b)) {
-        const newObject: Record<string, unknown> = {};
+        const newObject: Record<string, unknown> = Object.create(null);
         [...Object.keys(a), ...Object.keys(b)]
             .filter((item, index, array) => array.indexOf(item) === index)
             .forEach((key) => (newObject[key] = mergeSchema2(a[key], b[key], key)));

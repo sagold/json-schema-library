@@ -24,12 +24,13 @@ function findMatchingSchemata(node: SchemaNode, data: Record<string, unknown>) {
     const matchingSchemata: { property: string; value: string; node: SchemaNode }[] = [];
     for (const propertyName of dependentPropertyNames) {
         if (hasProperty(data, propertyName)) {
-            const value = data[propertyName];
-            if (dependentProperties[propertyName][value as string]) {
+            const dependentValues = dependentProperties[propertyName];
+            const value = `${data[propertyName]}`;
+            if (hasProperty(dependentValues, value)) {
                 matchingSchemata.push({
                     property: propertyName,
-                    value: `${value}`,
-                    node: dependentProperties[propertyName][value as string]
+                    value,
+                    node: dependentValues[value]
                 });
             }
         }
@@ -82,7 +83,7 @@ function parsePropertyDependencies(node: SchemaNode) {
             message: `Keyword '${KEYWORD}' must be an object - received '${typeof propertyDependencies}'`
         });
     }
-    const parsed: Record<string, Record<string, SchemaNode>> = {};
+    const parsed: Record<string, Record<string, SchemaNode>> = Object.create(null);
     const errors: ValidationAnnotation[] = [];
     Object.keys(propertyDependencies).map((propertyName) => {
         const values = propertyDependencies[propertyName];
@@ -110,7 +111,7 @@ function parsePropertyDependencies(node: SchemaNode) {
                 );
                 return;
             }
-            parsed[propertyName] = parsed[propertyName] ?? {};
+            parsed[propertyName] = parsed[propertyName] ?? Object.create(null);
             parsed[propertyName][value] = node.compileSchema(
                 schema,
                 `${node.evaluationPath}/${KEYWORD}/${propertyName}/${value}`,

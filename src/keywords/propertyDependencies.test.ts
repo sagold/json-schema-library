@@ -139,6 +139,27 @@ describe("keyword : propertyDependencies : validate", () => {
         const { errors } = node.validate([{ propertyName: "propertyValue", type: "headline", test: 123 }]);
         assert.equal(errors.length, 0);
     });
+
+    it("should safely support __proto__ as property dependency key", () => {
+        const schema = JSON.parse(`{
+            "type": "array",
+            "items": {
+                "propertyDependencies": {
+                    "__proto__": {
+                        "polluted": {
+                            "type": "object",
+                            "required": ["safe"]
+                        }
+                    }
+                }
+            }
+        }`);
+        const node = compileSchema(schema, { drafts });
+        const data = JSON.parse(`[{ "__proto__": "polluted" }]`);
+
+        const { errors } = node.validate(data);
+        assert.equal(errors.length, 1);
+    });
 });
 
 describe("keyword : propertyDependencies : validate", () => {
