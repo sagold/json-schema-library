@@ -1450,6 +1450,79 @@ describe("getData", () => {
             assert.deepEqual(res, {});
         });
 
+        it("should not remove 'null' values if specified in enum", () => {
+            const node = compileSchema({
+                type: "object",
+                additionalProperties: false,
+                properties: {
+                    keepA: {
+                        type: ["string", "null"],
+                        enum: ["Chicago", "Rome", null]
+                    },
+                    keepB: {
+                        type: ["null", "string"],
+                        enum: ["Chicago", null, "Rome"]
+                    },
+                    removeA: {
+                        type: ["string"],
+                        enum: ["Chicago", "Rome", null]
+                    },
+                    removeB: {
+                        type: ["string", "null"],
+                        enum: ["Chicago", "Rome"]
+                    }
+                }
+            });
+
+            const res = node.getData(
+                { keepA: null, keepB: null, removeA: null, removeB: null },
+                { removeInvalidData: true }
+            );
+
+            assert.deepEqual(res, { keepA: null, keepB: null });
+        });
+
+        it("should not remove full object when a nested value fails validation", () => {
+            const node = compileSchema({
+                type: "object",
+                additionalProperties: false,
+                properties: {
+                    keep: {
+                        type: "object",
+                        additionalProperties: false,
+                        properties: {
+                            keep: { type: "number" },
+                            remove: { type: "number" }
+                        }
+                    }
+                }
+            });
+
+            const res = node.getData({ keep: { keep: 9, remove: "a" } }, { removeInvalidData: true });
+
+            assert.deepEqual(res, { keep: { keep: 9 } });
+        });
+
+        it("should remove nested properties that fail validation", () => {
+            const node = compileSchema({
+                type: "object",
+                additionalProperties: false,
+                properties: {
+                    keep: {
+                        type: "object",
+                        properties: {
+                            keep: { type: "number" },
+                            remove: { type: "number" }
+                        }
+                    }
+                }
+            });
+
+            const res = node.getData({ keep: { keep: 9, remove: "a" } }, { removeInvalidData: true });
+
+            assert.deepEqual(res, { keep: { keep: 9 } });
+        });
+
         it("should not add optional properties", () => {
             const schema = {
                 type: "object",

@@ -191,8 +191,19 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
                 const input = getValue(data, propertyName);
                 const value = data === undefined || input === undefined ? getValue(template, propertyName) : input;
                 // Omit adding a property if it is not required or optional props should be added
-                if (value != null || isRequired || opts.addOptionalProps) {
+                if (value !== undefined || isRequired || opts.addOptionalProps) {
                     const propertyValue = propertyNode.getData(value, opts);
+                    const dataType = getTypeOf(propertyValue);
+                    if (
+                        opts.removeInvalidData &&
+                        // @attention we do not remove values that might have valid nested values
+                        dataType !== "object" &&
+                        dataType !== "array" &&
+                        !propertyNode.validate(propertyValue).valid
+                    ) {
+                        return;
+                    }
+
                     if (propertyValue !== undefined || opts.useTypeDefaults !== false) {
                         d[propertyName] = propertyValue;
                     }
@@ -250,7 +261,28 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
                 }
             } else {
                 // merge any missing data (additionals) to resulting object
-                Object.keys(data).forEach((key) => d[key] == null && (d[key] = getValue(data, key)));
+                Object.keys(data).forEach((key) => {
+                    // if we allow additionalProperties, but the current value has a schema that invalidates
+                    // do not add this value
+                    const dataType = getTypeOf(key);
+                    if (
+                        opts.removeInvalidData &&
+                        node.properties &&
+                        node.properties[key] &&
+                        dataType !== "object" &&
+                        dataType !== "array"
+                    ) {
+                        const propertyNode = node.properties[key];
+                        const propertyValue = propertyNode.getData(getValue(data, key), opts);
+                        if (!propertyNode.validate(propertyValue).valid) {
+                            return;
+                        }
+                    }
+
+                    if (d[key] == null) {
+                        d[key] = getValue(data, key);
+                    }
+                });
             }
         }
 
