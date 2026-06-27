@@ -48,8 +48,8 @@ export const formats: Record<string, (options: JsonSchemaValidatorParams) => Val
         if (typeof data !== "string" || data === "") {
             return undefined;
         }
-        if (data && data[0] === "0") {
-            // leading zeroes should be rejected, as they are treated as octals
+        if (data && data.split(".").some((octet) => octet.length > 1 && octet[0] === "0")) {
+            // leading zeroes in an octet should be rejected, as they are treated as octals
             return node.createError("format-ipv4-leading-zero-error", { value: data, pointer, schema });
         }
         if (data.length <= 15 && isValidIPV4.test(data)) {
