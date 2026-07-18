@@ -70,4 +70,58 @@ describe("keyword : unevaluatedProperties : validation", () => {
         const unevaluatedErrors = errors.filter((e) => e.code === "unevaluated-property-error");
         assert.equal(unevaluatedErrors.length, 1, "should flag unknown as unevaluated");
     });
+
+    it("should not treat a failed anyOf branch's additionalProperties as evaluating a property", () => {
+        const node = compileSchema(
+            {
+                anyOf: [
+                    // annotating but failing branch: additionalProperties:true would mark `x`
+                    // as evaluated, but maxProperties:0 makes this branch invalid
+                    { additionalProperties: true, maxProperties: 0 },
+                    // succeeding but non-annotating branch
+                    { type: "object" }
+                ],
+                unevaluatedProperties: false
+            },
+            { drafts: [draft2020] }
+        );
+
+        const { errors } = node.validate({ x: 1 });
+
+        const unevaluatedErrors = errors.filter((e) => e.code === "unevaluated-property-error");
+        assert.equal(unevaluatedErrors.length, 1, "failed anyOf branch must not suppress unevaluatedProperties");
+    });
+
+    it("should not treat a failed oneOf branch's additionalProperties as evaluating a property", () => {
+        const node = compileSchema(
+            {
+                oneOf: [
+                    { additionalProperties: true, maxProperties: 0 },
+                    { type: "object" }
+                ],
+                unevaluatedProperties: false
+            },
+            { drafts: [draft2020] }
+        );
+
+        const { errors } = node.validate({ x: 1 });
+
+        const unevaluatedErrors = errors.filter((e) => e.code === "unevaluated-property-error");
+        assert.equal(unevaluatedErrors.length, 1, "failed oneOf branch must not suppress unevaluatedProperties");
+    });
+
+    it("should still evaluate a property through a successful anyOf branch", () => {
+        const node = compileSchema(
+            {
+                anyOf: [{ additionalProperties: true }],
+                unevaluatedProperties: false
+            },
+            { drafts: [draft2020] }
+        );
+
+        const { errors } = node.validate({ x: 1 });
+
+        const unevaluatedErrors = errors.filter((e) => e.code === "unevaluated-property-error");
+        assert.equal(unevaluatedErrors.length, 0, "successful anyOf branch must still evaluate the property");
+    });
 });
