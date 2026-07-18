@@ -1,5 +1,4 @@
-import { A as JsonSchemaResolver, C as DraftVersion, D as DataNode, E as TemplateOptions, F as Maybe, I as ValidationAnnotation, L as ValidationPath, M as JsonSchemaValidator, N as JsonSchemaValidatorParams, O as JsonSchemaReducer, P as Keyword, R as ValidationReturnType, S as Draft, T as extendDraft, _ as GetNodeOptions, a as JsonAnnotation, b as isReduceable, c as JsonSchema, d as isAnnotation, f as isBooleanSchema, g as Context, h as isJsonSchema, i as ErrorConfig, j as JsonSchemaResolverParams, k as JsonSchemaReducerParams, l as NodeOrError, m as isJsonError, n as AnnotationData, o as JsonError, p as isJsonAnnotation, r as BooleanSchema, s as JsonPointer, t as Annotation, u as OptionalNodeOrError, v as SchemaNode, w as addKeywords, x as isSchemaNode, y as ValidateReturnType } from "./types-BDjKcTVR.cjs";
-
+import { A as JsonSchemaResolver, C as DraftVersion, D as DataNode, E as TemplateOptions, F as Maybe, I as ValidationAnnotation, L as ValidationPath, M as JsonSchemaValidator, N as JsonSchemaValidatorParams, O as JsonSchemaReducer, P as Keyword, R as ValidationReturnType, S as Draft, T as extendDraft, _ as GetNodeOptions, a as JsonAnnotation, b as isReduceable, c as JsonSchema, d as isAnnotation, f as isBooleanSchema, g as Context, h as isJsonSchema, i as ErrorConfig, j as JsonSchemaResolverParams, k as JsonSchemaReducerParams, l as NodeOrError, m as isJsonError, n as AnnotationData, o as JsonError, p as isJsonAnnotation, r as BooleanSchema, s as JsonPointer, t as Annotation, u as OptionalNodeOrError, v as SchemaNode, w as addKeywords, x as isSchemaNode, y as ValidateReturnType } from "./types-0Orw2kYf.cjs";
 //#region src/compileSchema.d.ts
 type CompileOptions = {
   /**
@@ -32,7 +31,7 @@ type CompileOptions = {
    *
    * // uses draft-07
    * compileSchema({}, { draft: "draft-07", drafts: [draft04, draft07, draft2020] })
-    * // uses draft-04
+   * // uses draft-04
    * compileSchema({ $schema: "draft-04" }, { draft: "draft-07", drafts: [draft04, draft07, draft2020] })
    *
    * // uses draft-2020
@@ -56,9 +55,12 @@ type CompileOptions = {
    *
    * @default true
    */
-  formatAssertion?: boolean | "meta-schema" | undefined; /** Set default options for all `node.getData` requests */
-  getDataDefaultOptions?: TemplateOptions; /** Set to true to throw an Error on errors in input schema. Defaults to false */
-  throwOnInvalidSchema?: boolean; /** Set to true to throw an Error when encountering an unresolvable ref  */
+  formatAssertion?: boolean | "meta-schema" | undefined;
+  /** Set default options for all `node.getData` requests */
+  getDataDefaultOptions?: TemplateOptions;
+  /** Set to true to throw an Error on errors in input schema. Defaults to false */
+  throwOnInvalidSchema?: boolean;
+  /** Set to true to throw an Error when encountering an unresolvable ref  */
   throwOnInvalidRef?: boolean;
 };
 /**
@@ -76,7 +78,8 @@ declare const _default: {
   DECLARATOR_ONEOF: string;
   propertyBlacklist: string[];
   DYNAMIC_PROPERTIES: string[];
-  REGEX_FLAGS: string; /** additional keywords that should not produce an unknown-keyword-warning */
+  REGEX_FLAGS: string;
+  /** additional keywords that should not produce an unknown-keyword-warning */
   VALID_ANNOTATION_KEYWORDS: string[];
   /**
    * properties to keep from a $ref-schema when resolving a $ref (recursively)

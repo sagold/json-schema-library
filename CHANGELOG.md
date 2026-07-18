@@ -1,5 +1,13 @@
 ## Changelog
 
+### 11.6.2
+
+- fixed: ipv4 reject leading-zero octets, not addresses starting with 0 (#113)
+
+### 11.6.1
+
+- fixed: getData should not remove valid enum options (#110)
+
 ### 11.6.0
 
 - added: array support for reduceOneOfFuzzy

@@ -4,10 +4,15 @@ type ValidationPath = {
   node: SchemaNode;
 }[];
 type JsonSchemaReducerParams = {
-  /** data of current node */data: unknown; /** optional key to used to resolve by property without having data */
-  key: string | number; /** node to reduce */
-  node: SchemaNode; /** JSON pointer to data */
-  pointer: string; /** passed through path for schema resolution, will be changed by reference */
+  /** data of current node */
+  data: unknown;
+  /** optional key to used to resolve by property without having data */
+  key: string | number;
+  /** node to reduce */
+  node: SchemaNode;
+  /** JSON pointer to data */
+  pointer: string;
+  /** passed through path for schema resolution, will be changed by reference */
   path: ValidationPath;
 };
 interface JsonSchemaReducer {
@@ -42,8 +47,10 @@ interface JsonSchemaValidator<Key extends keyof SchemaNode = keyof SchemaNode> {
   (options: JsonSchemaValidatorParams<Key>): ValidationReturnType;
 }
 type Keyword<Key extends keyof SchemaNode = keyof SchemaNode> = {
-  id: string; /** unique keyword corresponding to JSON Schema keywords (or custom) */
-  keyword: string; /** sort order of keyword. Lower numbers will be processed last. Default is 0 */
+  id: string;
+  /** unique keyword corresponding to JSON Schema keywords (or custom) */
+  keyword: string;
+  /** sort order of keyword. Lower numbers will be processed last. Default is 0 */
   order?: number;
   /**
    * Called once for each JSON Schema dduring compileSchema to evaluate keyword.
@@ -64,7 +71,8 @@ type Keyword<Key extends keyof SchemaNode = keyof SchemaNode> = {
    * a keyword properties has has child-properties. So when a properties[key] exists,
    * it will return the node of properties[key] or nothing at all
    */
-  resolve?: JsonSchemaResolver; /** return true if the given node should run the validate-function on this keyword */
+  resolve?: JsonSchemaResolver;
+  /** return true if the given node should run the validate-function on this keyword */
   addValidate?: (node: SchemaNode) => boolean;
   /**
    * Perform validation for this keyword and the passed in data
@@ -102,7 +110,9 @@ declare function getChildSelection(node: SchemaNode, property: string | number):
 //#endregion
 //#region src/methods/getData.d.ts
 type TemplateOptions = {
-  /** Add all properties (required and optional) to the generated data */addOptionalProps?: boolean; /** Remove data that does not match input schema. Defaults to false */
+  /** Add all properties (required and optional) to the generated data */
+  addOptionalProps?: boolean;
+  /** Remove data that does not match input schema. Defaults to false */
   removeInvalidData?: boolean;
   /** Set to false to take default values as they are and not extend them.
    *  Defaults to true.
@@ -118,8 +128,10 @@ type TemplateOptions = {
    * Limits how often a $ref should be followed before aborting. Prevents infinite data-structure.
    * Defaults to 1
    */
-  recursionLimit?: number; /** @internal disables recursion limit for next call */
-  disableRecursionLimit?: boolean; /** @internal context to track recursion limit */
+  recursionLimit?: number;
+  /** @internal disables recursion limit for next call */
+  disableRecursionLimit?: boolean;
+  /** @internal context to track recursion limit */
   cache?: Record<string, Record<string, number>>;
 };
 declare function getData(node: SchemaNode, data?: unknown, opts?: TemplateOptions): any;
@@ -214,7 +226,8 @@ declare const errors: {
   "pattern-error": string;
   "pattern-properties-error": string;
   "ref-error": string;
-  "required-property-error": string; /** return schema-warning with createSchemaWarning:true when a valid, but undefined property was found */
+  "required-property-error": string;
+  /** return schema-warning with createSchemaWarning:true when a valid, but undefined property was found */
   "schema-warning": string;
   "type-error": string;
   "undefined-value-error": string;
@@ -233,20 +246,35 @@ declare const errors: {
 declare function isSchemaNode(value: unknown): value is SchemaNode;
 declare function isReduceable(node: SchemaNode): boolean;
 type Context = {
-  /** root node of this JSON Schema */rootNode: SchemaNode; /** Fallback _draft_ version in case no _draft_ is specified by `schema.$schema` */
-  draft?: string; /** available draft configurations */
-  drafts: Draft[]; /** [SHARED ACROSS REMOTES] root nodes of registered remote JSON Schema, stored by id/url */
-  remotes: Record<string, SchemaNode>; /** references stored by fully resolved schema-$id + local-pointer */
-  refs: Record<string, SchemaNode>; /** anchors stored by fully resolved schema-$id + $anchor */
-  anchors: Record<string, SchemaNode>; /** [SHARED ACROSS REMOTES] dynamicAnchors stored by fully resolved schema-$id + $anchor */
-  dynamicAnchors: Record<string, SchemaNode>; /** JSON Schema parser, validator, reducer and resolver for this JSON Schema (root schema and its child nodes) */
-  keywords: Draft["keywords"]; /** JSON Schema draft dependend methods */
-  methods: Draft["methods"]; /** draft version */
-  version: Draft["version"]; /** draft errors & template-strings */
-  errors: Draft["errors"]; /** draft formats & validators */
-  formats: Draft["formats"]; /** [SHARED USING ADD REMOTE] getData default options */
-  getDataDefaultOptions?: TemplateOptions; /** [SHARED USING ADD REMOTE] collect unknown keywords in schemaAnnotations */
-  withSchemaAnnotations?: boolean; /** [SHARED USING ADD REMOTE] throw error on validation when ref cannot be resolved */
+  /** root node of this JSON Schema */
+  rootNode: SchemaNode;
+  /** Fallback _draft_ version in case no _draft_ is specified by `schema.$schema` */
+  draft?: string;
+  /** available draft configurations */
+  drafts: Draft[];
+  /** [SHARED ACROSS REMOTES] root nodes of registered remote JSON Schema, stored by id/url */
+  remotes: Record<string, SchemaNode>;
+  /** references stored by fully resolved schema-$id + local-pointer */
+  refs: Record<string, SchemaNode>;
+  /** anchors stored by fully resolved schema-$id + $anchor */
+  anchors: Record<string, SchemaNode>;
+  /** [SHARED ACROSS REMOTES] dynamicAnchors stored by fully resolved schema-$id + $anchor */
+  dynamicAnchors: Record<string, SchemaNode>;
+  /** JSON Schema parser, validator, reducer and resolver for this JSON Schema (root schema and its child nodes) */
+  keywords: Draft["keywords"];
+  /** JSON Schema draft dependend methods */
+  methods: Draft["methods"];
+  /** draft version */
+  version: Draft["version"];
+  /** draft errors & template-strings */
+  errors: Draft["errors"];
+  /** draft formats & validators */
+  formats: Draft["formats"];
+  /** [SHARED USING ADD REMOTE] getData default options */
+  getDataDefaultOptions?: TemplateOptions;
+  /** [SHARED USING ADD REMOTE] collect unknown keywords in schemaAnnotations */
+  withSchemaAnnotations?: boolean;
+  /** [SHARED USING ADD REMOTE] throw error on validation when ref cannot be resolved */
   throwOnInvalidRef?: boolean;
 };
 interface SchemaNode extends SchemaNodeMethodsType {
@@ -513,4 +541,4 @@ declare function isJsonAnnotation(error: unknown): error is JsonAnnotation;
 declare function isJsonError(error: unknown): error is JsonError;
 //#endregion
 export { JsonSchemaResolver as A, DraftVersion as C, DataNode as D, TemplateOptions as E, Maybe as F, ValidationAnnotation as I, ValidationPath as L, JsonSchemaValidator as M, JsonSchemaValidatorParams as N, JsonSchemaReducer as O, Keyword as P, ValidationReturnType as R, Draft as S, extendDraft as T, GetNodeOptions as _, JsonAnnotation as a, isReduceable as b, JsonSchema as c, isAnnotation as d, isBooleanSchema as f, Context as g, isJsonSchema as h, ErrorConfig as i, JsonSchemaResolverParams as j, JsonSchemaReducerParams as k, NodeOrError as l, isJsonError as m, AnnotationData as n, JsonError as o, isJsonAnnotation as p, BooleanSchema as r, JsonPointer as s, Annotation as t, OptionalNodeOrError as u, SchemaNode as v, addKeywords as w, isSchemaNode as x, ValidateReturnType as y };
-//# sourceMappingURL=types-CqkCJmt8.d.mts.map
+//# sourceMappingURL=types-0Orw2kYf.d.cts.map
