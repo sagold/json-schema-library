@@ -583,15 +583,20 @@ export const SchemaNodeMethods = {
         schemaValidation = sanitizeErrors(schemaValidation);
         const schemaErrors: JsonError[] = [];
         const schemaAnnotations: JsonAnnotation[] = [];
+        const remoteSchemaId = remoteNode.context.rootNode.$id ?? resolveUri(url);
         schemaValidation.forEach((error) => {
             if (isJsonError(error)) {
+                error.data.schemaId = remoteSchemaId;
                 schemaErrors.push(error);
             } else if (isJsonAnnotation(error)) {
+                error.data.schemaId = remoteSchemaId;
                 schemaAnnotations.push(error);
             }
         });
-        node.schemaErrors = schemaErrors;
-        node.schemaAnnotations = schemaAnnotations;
+        // accumulate diagnostics instead of overwriting so that registering
+        // multiple remotes retains all of their errors/annotations, see #116
+        node.schemaErrors = (node.schemaErrors ?? []).concat(schemaErrors);
+        node.schemaAnnotations = (node.schemaAnnotations ?? []).concat(schemaAnnotations);
 
         return node;
     },
