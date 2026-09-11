@@ -10,7 +10,6 @@ import type {
     ValidationAnnotation,
     ValidationPath
 } from "./Keyword";
-import { createSchema } from "./methods/createSchema";
 import { Draft } from "./Draft";
 import { toSchemaNodes } from "./methods/toSchemaNodes";
 import {
@@ -401,7 +400,10 @@ export const SchemaNodeMethods = {
         return { type: "annotation", code, message: annotationMessage, data };
     },
 
-    createSchema,
+    createSchema(data?: unknown): JsonSchema {
+        const node = this as SchemaNode;
+        return node.context.methods.createSchema(data);
+    },
 
     getChildSelection(property: string | number): JsonError | SchemaNode[] {
         const node = this as SchemaNode;
@@ -460,7 +462,7 @@ export const SchemaNodeMethods = {
             return { node, error: undefined };
             // @ts-expect-error bool schema
         } else if (node.schema === true) {
-            const nextNode = node.compileSchema(createSchema(data), node.evaluationPath, node.schemaLocation);
+            const nextNode = node.compileSchema(node.createSchema(data), node.evaluationPath, node.schemaLocation);
             path?.push({ pointer, node });
             return { node: nextNode, error: undefined };
         }
