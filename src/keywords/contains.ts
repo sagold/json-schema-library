@@ -4,6 +4,8 @@ import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
 import { validateNode } from "../validateNode";
 
 const KEYWORD = "contains";
+/** minContains/maxContains are draft >= 2019-09; earlier drafts only require one match. */
+const draftsWithoutMinMaxContains = ["draft-04", "draft-06", "draft-07"];
 
 export const containsKeyword: Keyword = {
     id: KEYWORD,
@@ -73,9 +75,10 @@ function validateContains({ node, data, pointer, path }: JsonSchemaValidatorPara
         }
     }
 
-    // @draft >= 2019-09
-    const max = schema.maxContains ?? Infinity;
-    const min = schema.minContains ?? 1;
+    // @draft >= 2019-09 — ignore minContains/maxContains on older drafts that do not define them
+    const applyMinMaxContains = !draftsWithoutMinMaxContains.includes(node.context.version);
+    const max = applyMinMaxContains ? (schema.maxContains ?? Infinity) : Infinity;
+    const min = applyMinMaxContains ? (schema.minContains ?? 1) : 1;
     if (max >= count && min <= count) {
         return undefined;
     }
