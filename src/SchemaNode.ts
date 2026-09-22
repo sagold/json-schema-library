@@ -92,6 +92,8 @@ export type Context = {
     errors: Draft["errors"];
     /** draft formats & validators */
     formats: Draft["formats"];
+    /** [SHARED USING ADD REMOTE] effective format assertion policy */
+    formatAssertion?: boolean | "meta-schema";
     /** [SHARED USING ADD REMOTE] getData default options */
     getDataDefaultOptions?: TemplateOptions;
     /** [SHARED USING ADD REMOTE] collect unknown keywords in schemaAnnotations */
@@ -573,6 +575,12 @@ export const SchemaNodeMethods = {
             },
             ...SchemaNodeMethods
         } as SchemaNode;
+
+        if (context.formatAssertion === false) {
+            remoteNode.context.keywords = remoteNode.context.keywords.map((keyword) =>
+                keyword.keyword === "format" ? { ...keyword, addValidate: () => false } : keyword
+            );
+        }
 
         remoteNode.context.rootNode = remoteNode;
         remoteNode.context.remotes[resolveUri(url)] = remoteNode;

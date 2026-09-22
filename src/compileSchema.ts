@@ -157,6 +157,7 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
         }
     }
 
+    node.context.formatAssertion = formatAssertion;
     if (formatAssertion === false) {
         node.context.keywords = node.context.keywords.filter((f) => f.keyword !== "format");
     }
