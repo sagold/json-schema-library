@@ -51,7 +51,7 @@ export function parseRef(node: SchemaNode) {
     if (node.schema.$ref) {
         node.$ref = resolveUri(currentId, node.schema.$ref);
         if (node.$ref.startsWith("/")) {
-            node.$ref = `#${node.$ref}`;
+            node.$ref = resolveUri(`#${node.$ref}`);
         }
     }
 }
@@ -207,9 +207,8 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
             // @todo add utility to resolve schema-pointer to schema
             let currentNode = parentNode;
             for (const item of path) {
-                const property = item === "definitions" ? "$defs" : item;
                 // @ts-expect-error random path
-                currentNode = currentNode[property];
+                currentNode = currentNode[item];
                 if (currentNode == null) {
                     // console.error("REF: FAILED RESOLVING ref json-pointer", fragments[1]);
                     return node.createError("ref-error", {

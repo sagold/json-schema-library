@@ -1,3 +1,4 @@
+import { join } from "@sagold/json-pointer";
 import { collectValidationErrors } from "src/utils/collectValidationErrors";
 import {
     Keyword,
@@ -86,11 +87,12 @@ function parsePropertyDependencies(node: SchemaNode) {
     const parsed: Record<string, Record<string, SchemaNode>> = Object.create(null);
     const errors: ValidationAnnotation[] = [];
     Object.keys(propertyDependencies).map((propertyName) => {
+        const propertyPointer = join([propertyName], true).slice(1);
         const values = propertyDependencies[propertyName];
         if (!isObject(values)) {
             errors.push(
                 node.createError("schema-error", {
-                    pointer: `${node.schemaLocation}/${KEYWORD}/${propertyName}`,
+                    pointer: `${node.schemaLocation}/${KEYWORD}${propertyPointer}`,
                     schema: node.schema,
                     value: propertyDependencies,
                     message: `Keyword '${KEYWORD}[string]' must be an object - received '${typeof propertyDependencies}'`
@@ -99,11 +101,12 @@ function parsePropertyDependencies(node: SchemaNode) {
             return;
         }
         Object.keys(values).forEach((value) => {
+            const schemaPointer = `${propertyPointer}${join([value], true).slice(1)}`;
             const schema = values[value];
             if (!(isJsonSchema(schema) || isBooleanSchema(schema))) {
                 errors.push(
                     node.createError("schema-error", {
-                        pointer: `${node.schemaLocation}/${KEYWORD}/${propertyName}/${value}`,
+                        pointer: `${node.schemaLocation}/${KEYWORD}${schemaPointer}`,
                         schema: node.schema,
                         value: schema,
                         message: `Keyword '${KEYWORD}[string][string]' must be a valid JSON Schema - received '${typeof schema}'`
@@ -114,8 +117,8 @@ function parsePropertyDependencies(node: SchemaNode) {
             parsed[propertyName] = parsed[propertyName] ?? Object.create(null);
             parsed[propertyName][value] = node.compileSchema(
                 schema,
-                `${node.evaluationPath}/${KEYWORD}/${propertyName}/${value}`,
-                `${node.schemaLocation}/${KEYWORD}/${propertyName}/${value}`
+                `${node.evaluationPath}/${KEYWORD}${schemaPointer}`,
+                `${node.schemaLocation}/${KEYWORD}${schemaPointer}`
             );
             collectValidationErrors(errors, parsed[propertyName][value]);
         });

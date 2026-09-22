@@ -34,9 +34,7 @@ function parseRef(node: SchemaNode) {
     node.resolveRef = resolveRef;
 
     // store this node for retrieval by id
-    if (node.context.refs[currentId as string] == null) {
-        node.context.refs[currentId as string] = node;
-    }
+    register(node, currentId ?? "#");
 
     const idChanged = currentId !== node.parent?.$id;
     if (idChanged) {
@@ -82,9 +80,9 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError | u
     }
 
     // resolve $ref by json-evaluationPath
-    if (node.context.refs[$ref]) {
-        // console.log(`ref resolve ${$ref} from refs`, node.context.refs[$ref].ref);
-        return compileNext(node.context.refs[$ref], node.evaluationPath);
+    const referencedNode = node.context.refs[$ref];
+    if (referencedNode) {
+        return compileNext(referencedNode, node.evaluationPath);
     }
 
     if (node.context.anchors[$ref]) {

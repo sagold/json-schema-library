@@ -1,21 +1,36 @@
-import { resolve } from "uri-js";
+import { join, split } from "@sagold/json-pointer";
+import { normalize, resolve } from "uri-js";
 
 const suffixes = /(#)+$/;
 const trailingHash = /#$/;
 const isDomain = /^[^:]+:\/\/[^/]+\//;
 const idAndPointer = /#.*$/;
 
+function normalizeFragment(ref: string) {
+    const index = ref.indexOf("#");
+    if (index < 0) return ref;
+    const fragment = ref.slice(index);
+    // Decode separators before the pointer parser decodes each token, preserving literal percent names.
+    const pointer = fragment.replace(/%2f/gi, "/");
+    return ref.slice(0, index) + (pointer.startsWith("#/") ? join(split(pointer), true) : normalize(fragment));
+}
+
 /**
  * Resolves a reference URI against a base URI.
- * Uses fast-uri (RFC 3986 compliant) for most cases, with special handling for JSON Schema specifics.
- *
- * This replaces the custom joinId logic while leveraging the standards-compliant fast-uri library.
+ * Uses uri-js with special handling for JSON Schema scopes and equivalent pointer fragments.
  *
  * @param base - The base URI (e.g., current scope $id)
  * @param ref - The reference to resolve (e.g., $id, $ref, or json-pointer)
  * @returns The resolved absolute URI
  */
 export function resolveUri(base?: string, ref?: string): string {
+    if (base != null) {
+        base = normalizeFragment(base);
+    }
+    if (ref != null) {
+        ref = normalizeFragment(ref);
+    }
+
     if (ref == null) {
         return base?.replace(trailingHash, "") ?? "#";
     }

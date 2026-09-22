@@ -1,6 +1,7 @@
 export default {
     DECLARATOR_ONEOF: "oneOfProperty",
-    propertyBlacklist: ["_id"],
+    /** Property names explicitly exempted from additionalProperties validation. */
+    propertyBlacklist: [] as string[],
     DYNAMIC_PROPERTIES: [
         "$ref",
         "$defs",

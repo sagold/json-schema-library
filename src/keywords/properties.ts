@@ -1,3 +1,4 @@
+import { join } from "@sagold/json-pointer";
 import { getValue } from "../utils/getValue";
 import { SchemaNode } from "../types";
 import {
@@ -41,12 +42,13 @@ export function parseProperties(node: SchemaNode) {
     }
 
     const errors: ValidationAnnotation[] = [];
-    const parsedProperties: Record<string, SchemaNode> = {};
+    const parsedProperties: Record<string, SchemaNode> = Object.create(null);
     Object.keys(schema.properties).forEach((propertyName) => {
+        const propertyPointer = join([propertyName], true).slice(1);
         const propertyNode = node.compileSchema(
             schema.properties[propertyName],
-            `${evaluationPath}/properties/${propertyName}`,
-            `${schemaLocation}/properties/${propertyName}`
+            `${evaluationPath}/properties${propertyPointer}`,
+            `${schemaLocation}/properties${propertyPointer}`
         );
         parsedProperties[propertyName] = propertyNode;
         collectValidationErrors(errors, parsedProperties[propertyName]);

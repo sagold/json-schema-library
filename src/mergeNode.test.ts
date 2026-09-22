@@ -46,6 +46,36 @@ describe("mergeNode", () => {
         assert.deepEqual(errors.length, 1);
     });
 
+    it("keeps modern and legacy definitions separate when merging nodes", () => {
+        const node = mergeNode(
+            compileSchema({ definitions: { item: { type: "string", maxLength: 2 } } }),
+            compileSchema({ $defs: { item: { type: "string", minLength: 3 } } })
+        );
+        assert.ok(node);
+        assert.equal(node.$defs?.item.validate("text").valid, true);
+        assert.equal(node.$defs?.item.validate(2).valid, false);
+        assert.equal(node.$defs?.item.validate("ab").valid, false);
+        assert.equal(node.definitions?.item.validate("ab").valid, true);
+        assert.equal(node.definitions?.item.validate("text").valid, false);
+        assert.equal(node.definitions?.item.validate(2).valid, false);
+        assert.deepEqual(node.toSchemaNodes(), [node, node.$defs?.item, node.definitions?.item]);
+    });
+
+    it("merges legacy dictionaries without duplicating their compatibility alias", () => {
+        const node = mergeNode(
+            compileSchema({ definitions: { first: { type: "string" } } }),
+            compileSchema({ definitions: { second: { type: "number" } } })
+        );
+        assert.ok(node);
+        assert.deepEqual(Object.keys(node.definitions ?? {}), ["first", "second"]);
+        assert.equal(node.$defs, node.definitions);
+        assert.deepEqual(node.toSchemaNodes(), [node, node.definitions?.first, node.definitions?.second]);
+        assert.equal(node.definitions?.first.validate("text").valid, true);
+        assert.equal(node.definitions?.first.validate(7).valid, false);
+        assert.equal(node.definitions?.second.validate(7).valid, true);
+        assert.equal(node.definitions?.second.validate("text").valid, false);
+    });
+
     describe("omit", () => {
         it("should omit oneOf node- and schema-property", () => {
             const a = compileSchema({

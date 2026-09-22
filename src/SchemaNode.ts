@@ -140,7 +140,9 @@ export interface SchemaNode extends SchemaNodeMethodsType {
 
     // parsed schema properties (registered by parsers)
     $id?: string;
+    /** Modern definitions, or an alias of definitions when only the legacy keyword is present. */
     $defs?: Record<string, SchemaNode>;
+    definitions?: Record<string, SchemaNode>;
     $ref?: string;
     additionalProperties?: SchemaNode;
     allOf?: SchemaNode[];

@@ -1,3 +1,4 @@
+import { join } from "@sagold/json-pointer";
 import { Keyword, JsonSchemaValidatorParams, ValidationReturnType, ValidationAnnotation } from "../Keyword";
 import { JsonError, SchemaNode } from "../types";
 import { isListOfStrings } from "../utils/isListOfStrings";
@@ -28,7 +29,7 @@ export function parseDependentRequired(node: SchemaNode) {
     }
 
     const errors: ValidationAnnotation[] = [];
-    node.dependentRequired = {};
+    node.dependentRequired = Object.create(null) as Record<string, string[]>;
     for (const propertyName of Object.keys(schema[KEYWORD])) {
         const list = schema[KEYWORD][propertyName];
         if (isListOfStrings(list)) {
@@ -36,7 +37,7 @@ export function parseDependentRequired(node: SchemaNode) {
         } else {
             errors.push(
                 node.createError("schema-error", {
-                    pointer: `${node.schemaLocation}/${KEYWORD}/${propertyName}`,
+                    pointer: `${node.schemaLocation}/${KEYWORD}${join([propertyName], true).slice(1)}`,
                     schema,
                     value: list,
                     message: `Keyword '${KEYWORD}[string]' must be a string[] - received '${typeof list}'`

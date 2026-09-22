@@ -1,3 +1,4 @@
+import { join } from "@sagold/json-pointer";
 import { isBooleanSchema, isJsonSchema, isSchemaNode, SchemaNode } from "../types";
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
 import { isObject } from "../utils/isObject";
@@ -37,15 +38,17 @@ export function parseDependencies(node: SchemaNode) {
     for (const property of Object.keys(dependencies)) {
         const schema = dependencies[property] as string[];
         if (isJsonSchema(schema) || isBooleanSchema(schema)) {
-            node.dependentSchemas = node.dependentSchemas ?? {};
+            const propertyPointer = join([property], true).slice(1);
+            node.dependentSchemas =
+                node.dependentSchemas ?? (Object.create(null) as Record<string, SchemaNode | boolean>);
             node.dependentSchemas[property] = node.compileSchema(
                 schema,
-                `${node.evaluationPath}/${KEYWORD}/${property}`,
-                `${node.schemaLocation}/${KEYWORD}/${property}`
+                `${node.evaluationPath}/${KEYWORD}${propertyPointer}`,
+                `${node.schemaLocation}/${KEYWORD}${propertyPointer}`
             );
             collectValidationErrors(errors, node.dependentSchemas[property]);
         } else if (isListOfStrings(schema)) {
-            node.dependentRequired = node.dependentRequired ?? {};
+            node.dependentRequired = node.dependentRequired ?? (Object.create(null) as Record<string, string[]>);
             node.dependentRequired[property] = schema;
         } else {
             errors.push(

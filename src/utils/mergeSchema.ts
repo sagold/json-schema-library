@@ -1,6 +1,7 @@
 import { JsonSchema } from "../types";
 import { getTypeOf } from "./getTypeOf";
 import { isObject } from "./isObject";
+import { getValue } from "./getValue";
 
 export function mergeSchema<T extends JsonSchema>(a: T, b: T, ...omit: string[]): T {
     if (b?.type === "error") {
@@ -25,11 +26,11 @@ export function mergeSchema<T extends JsonSchema>(a: T, b: T, ...omit: string[])
 
 export function mergeSchema2(a: unknown, b: unknown, property?: string): unknown {
     if (isObject(a) && isObject(b)) {
-        const newObject: Record<string, unknown> = {};
-        [...Object.keys(a), ...Object.keys(b)]
-            .filter((item, index, array) => array.indexOf(item) === index)
-            .forEach((key) => (newObject[key] = mergeSchema2(a[key], b[key], key)));
-        return newObject;
+        return Object.fromEntries(
+            [...Object.keys(a), ...Object.keys(b)]
+                .filter((item, index, array) => array.indexOf(item) === index)
+                .map((key) => [key, mergeSchema2(getValue(a, key), getValue(b, key), key)])
+        );
     }
 
     const aIsArray = Array.isArray(a);
