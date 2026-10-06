@@ -45,10 +45,10 @@ export function parseAdditionalProperties(node: SchemaNode) {
     return node.additionalProperties.schemaValidation;
 }
 
-function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParams) {
+function additionalPropertyResolver({ node, data, key, pointer = "#", path = [] }: JsonSchemaResolverParams) {
     const value = getValue(data, key);
     if (node.additionalProperties) {
-        const { node: reduced, error } = node.additionalProperties.reduceNode(value);
+        const { node: reduced, error } = node.additionalProperties.reduceNode(value, { pointer, path });
         return reduced ?? error;
     }
     if (node.schema.additionalProperties === false) {

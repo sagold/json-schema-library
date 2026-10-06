@@ -1,6 +1,7 @@
 import { mergeSchema } from "../utils/mergeSchema";
+import { mergeNode, mergeReducedNode } from "../mergeNode";
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
-import { SchemaNode } from "../types";
+import { isBooleanSchema, SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
 import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
@@ -39,33 +40,36 @@ export function parseAnyOf(node: SchemaNode) {
     return collectValidationErrors([], ...node[KEYWORD]);
 }
 
-function reduceAnyOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
+function reduceAnyOf({ node, data, key, pointer, path }: JsonSchemaReducerParams) {
     if (node[KEYWORD] == null) {
         return;
     }
 
     let mergedSchema = {};
+    let mergedNode: SchemaNode | undefined;
     let dynamicId = "";
     for (let i = 0; i < node[KEYWORD].length; i += 1) {
         if (validateNode(node[KEYWORD][i], data, pointer, path).length === 0) {
-            const { node: schemaNode } = node[KEYWORD][i].reduceNode(data);
+            const { node: schemaNode } = node[KEYWORD][i].reduceNode(data, { key, pointer, path: [...path] });
 
             if (schemaNode) {
                 const nestedDynamicId = schemaNode.dynamicId?.replace(node.dynamicId, "") ?? "";
                 const localDynamicId = nestedDynamicId === "" ? `${KEYWORD}/${i}` : nestedDynamicId;
                 dynamicId += `${dynamicId === "" ? "" : ","}${localDynamicId}`;
 
-                const schema = mergeSchema(node[KEYWORD][i].schema, schemaNode.schema);
-                mergedSchema = mergeSchema(mergedSchema, schema, KEYWORD);
+                const reduced = isBooleanSchema(node[KEYWORD][i].schema) ? node[KEYWORD][i] : schemaNode;
+                mergedSchema = mergeSchema(mergedSchema, reduced.schema, KEYWORD);
+                mergedNode = mergeNode(mergedNode, reduced, KEYWORD);
             }
         }
     }
-    return node.compileSchema(
+    const result = node.compileSchema(
         mergedSchema,
         `${node.evaluationPath}${dynamicId}`,
         node.schemaLocation,
         `${node.schemaLocation}(${dynamicId})`
     );
+    return mergeReducedNode(result, mergedNode, KEYWORD);
 }
 
 function validateAnyOf({ node, data, pointer, path }: JsonSchemaValidatorParams) {

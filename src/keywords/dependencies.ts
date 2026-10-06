@@ -113,7 +113,7 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
             const reducedDependency = { ...dependency, schema: { ...dependency.schema, required } }.reduceNode(data, {
                 key,
                 pointer: `${pointer}/${KEYWORD}/${propertyName}`,
-                path
+                path: [...path]
             }).node as SchemaNode;
 
             workingNode = mergeNode(workingNode, reducedDependency) as SchemaNode;

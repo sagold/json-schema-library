@@ -3,6 +3,8 @@ export default {
     propertyBlacklist: ["_id"],
     DYNAMIC_PROPERTIES: [
         "$ref",
+        "$dynamicRef",
+        "$recursiveRef",
         "$defs",
         "if",
         "then",

@@ -10,6 +10,7 @@ import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
 import { hasProperty } from "../utils/hasProperty";
 import { isObject } from "../utils/isObject";
 import { mergeSchema } from "../utils/mergeSchema";
+import { mergeNode, mergeReducedNode } from "../mergeNode";
 import sanitizeErrors from "../utils/sanitizeErrors";
 import { validateNode } from "../validateNode";
 
@@ -150,24 +151,27 @@ function reducePropertyDependencies({ node, data, key, pointer, path }: JsonSche
     }
 
     let mergedSchema = {};
+    let mergedNode: SchemaNode | undefined;
     let dynamicId = "";
     for (const match of matchingSchemata) {
-        const { node: schemaNode } = match.node.reduceNode(data, { key, pointer, path });
+        const { node: schemaNode } = match.node.reduceNode(data, { key, pointer, path: [...path] });
         if (schemaNode) {
             const nestedDynamicId = schemaNode.dynamicId?.replace(node.dynamicId, "") ?? "";
             const localDynamicId =
                 nestedDynamicId === "" ? `propertyDependencies/${match.property}/${match.value}` : nestedDynamicId;
             dynamicId += `${dynamicId === "" ? "" : ","}${localDynamicId}`;
 
-            const schema = mergeSchema(match.node.schema, schemaNode.schema);
-            mergedSchema = mergeSchema(mergedSchema, schema, "propertyDependencies");
+            const reduced = isBooleanSchema(match.node.schema) ? match.node : schemaNode;
+            mergedSchema = mergeSchema(mergedSchema, reduced.schema, "propertyDependencies");
+            mergedNode = mergeNode(mergedNode, reduced, "propertyDependencies");
         }
     }
 
-    return node.compileSchema(
+    const result = node.compileSchema(
         mergedSchema,
         `${node.evaluationPath}/${dynamicId}`,
         node.schemaLocation,
         `${node.schemaLocation}(${dynamicId})`
     );
+    return mergeReducedNode(result, mergedNode, "propertyDependencies");
 }

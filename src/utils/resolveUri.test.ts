@@ -2,6 +2,37 @@ import { strict as assert } from "assert";
 import { resolveUri } from "./resolveUri";
 
 describe("resolveUri", () => {
+    it("should use one identity for the anonymous document root", () => {
+        // RFC 6901 section 6: the empty fragment identifies the whole document.
+        for (const base of [undefined, "", "#"]) {
+            for (const ref of [undefined, "", "#"]) {
+                assert.equal(resolveUri(base, ref), "#", `base=${base}, ref=${ref}`);
+            }
+        }
+        assert.equal(resolveUri(resolveUri(), undefined), "#");
+        assert.equal(resolveUri("#name", "#"), "#");
+        assert.equal(resolveUri("#/definitions/value", ""), "#");
+    });
+
+    it("should preserve nonempty references against an anonymous base", () => {
+        for (const base of [undefined, "", "#"]) {
+            for (const ref of ["#name", "#/definitions/value", "child.json", "https://example.com/schema"]) {
+                assert.equal(resolveUri(base, ref), ref);
+            }
+        }
+        assert.equal(resolveUri("", "folder/../child.json"), "/child.json");
+    });
+
+    it("should preserve named document identities when resolving empty fragments", () => {
+        for (const base of ["https://example.com/schema", "child.json", "urn:example:schema"]) {
+            assert.equal(resolveUri(`${base}#`), base);
+            assert.equal(resolveUri(base, "#"), base);
+            assert.equal(resolveUri(base, ""), base);
+            assert.equal(resolveUri(`${base}#name`, "#"), base);
+            assert.equal(resolveUri(`${base}#name`, "#other"), `${base}#other`);
+        }
+    });
+
     it("should return initial base", () => {
         const url = resolveUri("https://localhost.com/");
 

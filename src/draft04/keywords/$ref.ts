@@ -15,16 +15,16 @@ export const $refKeyword: Keyword = {
 };
 
 function register(node: SchemaNode, path: string) {
-    if (node.context.refs[path] == null) {
+    if (!node.dynamicId && node.context.refs[path] == null) {
         node.context.refs[path] = node;
     }
 }
 
 function parseRef(node: SchemaNode) {
     // get and store current id of node - this may be the same as parent id
-    let currentId = node.parent?.$id;
+    let currentId = node.parent?.$id ?? node.$id;
     if (node.schema?.$ref == null && node.schema?.id) {
-        currentId = resolveUri(node.parent?.$id, node.schema.id);
+        currentId = resolveUri(currentId, node.schema.id);
         // console.log("create id", node.evaluationPath, ":", node.parent?.$id, node.schema?.id, "=>", currentId);
     }
     node.$id = currentId as string;
@@ -34,9 +34,7 @@ function parseRef(node: SchemaNode) {
     node.resolveRef = resolveRef;
 
     // store this node for retrieval by id
-    if (node.context.refs[currentId as string] == null) {
-        node.context.refs[currentId as string] = node;
-    }
+    register(node, currentId as string);
 
     const idChanged = currentId !== node.parent?.$id;
     if (idChanged) {
@@ -53,7 +51,7 @@ function parseRef(node: SchemaNode) {
     register(node, resolveUri(node.context.rootNode.$id, node.evaluationPath));
 
     // precompile reference
-    if (node.schema.$ref) {
+    if (node.schema.$ref != null) {
         node.$ref = resolveUri(currentId, node.schema.$ref);
     }
 }
@@ -69,11 +67,16 @@ function resolveRef(this: SchemaNode, { pointer, path }: { pointer?: string; pat
     return resolvedNode;
 }
 
-function compileNext(referencedNode: SchemaNode, evaluationPath = referencedNode.evaluationPath) {
+function compileNext(referencedNode: SchemaNode, sourceNode: SchemaNode) {
     const referencedSchema = isObject(referencedNode.schema)
         ? omit(referencedNode.schema, "id")
         : referencedNode.schema;
-    return referencedNode.compileSchema(referencedSchema, `${evaluationPath}/$ref`, referencedSchema.schemaLocation);
+    return referencedNode.compileSchema(
+        referencedSchema,
+        `${sourceNode.evaluationPath}/$ref`,
+        referencedNode.schemaLocation,
+        sourceNode.dynamicId || `${sourceNode.schemaLocation}($ref)`
+    );
 }
 
 function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError | undefined {
@@ -84,12 +87,12 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError | u
     // resolve $ref by json-evaluationPath
     if (node.context.refs[$ref]) {
         // console.log(`ref resolve ${$ref} from refs`, node.context.refs[$ref].ref);
-        return compileNext(node.context.refs[$ref], node.evaluationPath);
+        return compileNext(node.context.refs[$ref], node);
     }
 
     if (node.context.anchors[$ref]) {
         // console.log(`ref resolve ${$ref} from anchors`, node.context.anchors[$ref].ref);
-        return compileNext(node.context.anchors[$ref], node.evaluationPath);
+        return compileNext(node.context.anchors[$ref], node);
     }
 
     // check for remote-host + pointer pair to switch rootSchema
@@ -108,7 +111,7 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError | u
         const $ref = fragments[0];
         // this is a reference to remote-host root node
         if (node.context.remotes[$ref]) {
-            return compileNext(node.context.remotes[$ref], node.evaluationPath);
+            return compileNext(node.context.remotes[$ref], node);
         }
         return node.createError("ref-error", {
             ref: $ref,
@@ -124,13 +127,13 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError | u
         if (node.context.remotes[$remoteHostRef] && node !== node.context.remotes[$remoteHostRef]) {
             const referencedNode = node.context.remotes[$remoteHostRef];
             // resolve full ref on remote schema - we store currently only store ref with domain
-            let nextNode = getRef(referencedNode, $ref);
-            if (nextNode) {
+            let nextNode = getRef(referencedNode, resolveUri(referencedNode.$id, fragments[1]));
+            if (isSchemaNode(nextNode)) {
                 return nextNode;
             }
             // @note required for test spec 04
             nextNode = getRef(referencedNode, fragments[1]);
-            if (nextNode) {
+            if (isSchemaNode(nextNode)) {
                 return nextNode;
             }
         }

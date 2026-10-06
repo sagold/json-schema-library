@@ -2,9 +2,9 @@ import { Keyword, JsonSchemaValidatorParams, ValidationPath } from "../../Keywor
 import { resolveUri } from "../../utils/resolveUri";
 import splitRef from "../../utils/splitRef";
 import { validateNode } from "../../validateNode";
-import { isSchemaNode, JsonError, SchemaNode } from "../../types";
+import { isBooleanSchema, isJsonSchema, isSchemaNode, JsonError, SchemaNode } from "../../types";
 import { get, split } from "@sagold/json-pointer";
-import { reduceRef, compileNext } from "../../keywords/$ref";
+import { reduceRef, compileNext, resolveAdjacentRefs } from "../../keywords/$ref";
 
 export const $refKeyword: Keyword = {
     id: "$ref",
@@ -17,17 +17,17 @@ export const $refKeyword: Keyword = {
 };
 
 function register(node: SchemaNode, path: string) {
-    if (node.context.refs[path] == null) {
+    if (!node.dynamicId && node.context.refs[path] == null) {
         node.context.refs[path] = node;
     }
 }
 
 export function parseRef(node: SchemaNode) {
     // @ts-expect-error add ref resolution method to node
-    node.resolveRef = resolveRef;
+    node.resolveRef = node.schema.$ref != null && node.schema.$recursiveRef != null ? resolveAdjacentRefs : resolveRef;
 
     // get and store current $id of node - this may be the same as parent $id
-    const currentId = resolveUri(node.parent?.$id, node.schema?.$id);
+    const currentId = resolveUri(node.parent?.$id ?? node.$id, node.schema?.$id);
     node.$id = currentId;
     node.lastIdPointer = node.parent?.lastIdPointer ?? "#";
     if (currentId !== node.parent?.$id && node.evaluationPath !== "#") {
@@ -43,12 +43,12 @@ export function parseRef(node: SchemaNode) {
     register(node, resolveUri(node.context.rootNode.$id, node.evaluationPath));
 
     // store this node for retrieval by $id + anchor
-    if (node.schema.$anchor) {
+    if (node.schema.$anchor && !node.dynamicId) {
         node.context.anchors[`${currentId.replace(/#$/, "")}#${node.schema.$anchor}`] = node;
     }
 
     // precompile reference
-    if (node.schema.$ref) {
+    if (node.schema.$ref != null) {
         node.$ref = resolveUri(currentId, node.schema.$ref);
         if (node.$ref.startsWith("/")) {
             node.$ref = `#${node.$ref}`;
@@ -103,31 +103,27 @@ function validateRef({ node, data, pointer = "#", path }: JsonSchemaValidatorPar
 
 // 1. https://json-schema.org/draft/2019-09/json-schema-core#scopes
 function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode | JsonError {
-    const history = path;
-
-    // RESTRICT BY CHANGE IN BASE-URL
-    // go back in history until we have a domain definition and use this as start node to search for an anchor
-    let startIndex = 0;
-    for (let i = history.length - 1; i >= 0; i--) {
-        if (history[i].node.schema.$recursiveAnchor === false) {
-            // $recursiveRef with $recursiveAnchor: false works like $ref
-            return getRef(node, resolveUri(node.$id, node.schema.$recursiveRef));
+    const initialTarget = getRef(node, resolveUri(node.$id, node.schema.$recursiveRef));
+    // Only an initial target that enables recursion can rebind through the dynamic scope.
+    if (!isSchemaNode(initialTarget) || initialTarget.schema.$recursiveAnchor !== true) {
+        return initialTarget;
+    }
+    let target = initialTarget;
+    let resourceId = node.$id;
+    for (let i = path.length - 1; i >= 0; i--) {
+        const entry = path[i].node;
+        if (entry.$id === resourceId) {
+            continue;
         }
-        if (/^https?:\/\//.test(history[i].node.schema.$id ?? "") && history[i].node.schema.$recursiveAnchor !== true) {
-            startIndex = i;
+        resourceId = entry.$id;
+        // Reference expansions omit schema.$id; the effective ID still identifies the authored resource.
+        const resource = entry.context.refs[resourceId ?? "#"];
+        if (resource?.schema.$recursiveAnchor !== true) {
             break;
         }
+        target = compileNext(resource, node);
     }
-
-    // FROM THERE FIND FIRST OCCURENCE OF AN ANCHOR
-    const firstAnchor = history.find((s, index) => index >= startIndex && s.node.schema.$recursiveAnchor === true);
-    if (firstAnchor) {
-        return firstAnchor.node;
-    }
-
-    // $recursiveRef with no $recursiveAnchor works like $ref?
-    const nextNode = getRef(node, resolveUri(node.$id, node.schema.$recursiveRef));
-    return nextNode;
+    return target;
 }
 
 export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError {
@@ -170,8 +166,10 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
             // support refOfUnknownKeyword
             const rootSchema = node.context.rootNode.schema;
             const targetSchema = get(rootSchema, ref);
-            if (targetSchema) {
-                return node.compileSchema(targetSchema, `${node.evaluationPath}/$ref`, ref);
+            if (isJsonSchema(targetSchema) || isBooleanSchema(targetSchema)) {
+                // Register the authored location before deriving its evaluation-path expansion.
+                const target = node.context.rootNode.compileSchema(targetSchema, ref, ref);
+                return compileNext(target, node);
             }
         }
         // console.error("REF: UNFOUND 1", $ref);
@@ -189,13 +187,13 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
         if (node.context.remotes[$remoteHostRef] && node !== node.context.remotes[$remoteHostRef]) {
             const referencedNode = node.context.remotes[$remoteHostRef];
             // resolve full ref on remote schema - we store currently only store ref with domain
-            let nextNode = getRef(referencedNode, $ref);
-            if (nextNode) {
+            let nextNode = getRef(referencedNode, resolveUri(referencedNode.$id, fragments[1]));
+            if (isSchemaNode(nextNode)) {
                 return nextNode;
             }
             // @note required for test spec 04
             nextNode = getRef(referencedNode, fragments[1]);
-            if (nextNode) {
+            if (isSchemaNode(nextNode)) {
                 return nextNode;
             }
         }

@@ -89,7 +89,7 @@ describe("compileSchema : reduceNode", () => {
                 required: ["one", "two", "three"],
                 properties: { one: { type: "string" }, two: { type: "string" }, three: { type: "number" } }
             });
-            assert.deepEqual(reduced.dynamicId, "#/$defs/schema(dependencies/one,dependencies/two)");
+            assert.deepEqual(reduced.dynamicId, "#($ref)+#/$defs/schema(dependencies/one,dependencies/two)");
         });
 
         it("should add required-property from dependency", () => {
@@ -133,7 +133,8 @@ describe("compileSchema : reduceNode", () => {
                 required: [],
                 properties: { one: { type: "string" }, two: { type: "string" } }
             });
-            assert.deepEqual(node.dynamicId, "");
+            // Resolving the reference derives a node, but no dependency was added.
+            assert.deepEqual(node.dynamicId, "#($ref)");
         });
 
         it("should resolve nested dependencies schema", () => {
@@ -166,7 +167,7 @@ describe("compileSchema : reduceNode", () => {
             });
             assert.deepEqual(
                 node.dynamicId,
-                "#/$defs/two(dependencies/two)+#/$defs/schema(dependencies/one,#/$defs/two(dependencies/two))"
+                "#($ref)+#/$defs/two(dependencies/two)+#/$defs/schema(dependencies/one,+#/$defs/two(dependencies/two))"
             );
         });
     });

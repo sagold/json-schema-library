@@ -6,7 +6,6 @@ export function validateNode(node: SchemaNode, data: unknown, pointer: string, p
     if (isJsonError(node)) {
         return [node];
     }
-    path.push({ pointer, node });
     const schema = node.schema as BooleanSchema | JsonSchema;
     if (schema === true) {
         return [];
@@ -22,7 +21,13 @@ export function validateNode(node: SchemaNode, data: unknown, pointer: string, p
     }
     const errors: ValidationReturnType = [];
     for (const validate of node.validators) {
-        const result = validate({ node: node as SchemaNodeWithRequired<keyof SchemaNode>, data, pointer, path });
+        // Each keyword owns its branch, including entries appended by reference resolution.
+        const result = validate({
+            node: node as SchemaNodeWithRequired<keyof SchemaNode>,
+            data,
+            pointer,
+            path: [...path, { pointer, node }]
+        });
         if (Array.isArray(result)) {
             errors.push(...result);
         } else if (result) {

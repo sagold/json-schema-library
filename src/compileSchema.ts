@@ -1,5 +1,6 @@
 import { copy } from "fast-copy";
 import { getRef } from "./keywords/$ref";
+import { resolveUri } from "./utils/resolveUri";
 import { draft04 } from "./draft04";
 import { draft06 } from "./draft06";
 import { draft07 } from "./draft07";
@@ -25,6 +26,8 @@ import sanitizeErrors from "./utils/sanitizeErrors";
 const { REGEX_FLAGS } = settings;
 
 export type CompileOptions = {
+    /** Retrieval URI of the root document, before resolving its id/$id keyword. */
+    baseUri?: string | undefined;
     /**
      * List of drafts to support.
      *
@@ -106,7 +109,8 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
                 throw new Error(`required $id on remotes[${index}] is missing`);
             }
         });
-        remote = compileSchema(remotes.shift()!);
+        const first = remotes.shift()!;
+        remote = compileSchema(first, { baseUri: first.$id });
         remotes.forEach((r) => remote?.addRemoteSchema(r.$id, r));
     }
 
@@ -122,6 +126,7 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
         resolvers: [],
         validators: [],
         schema: schema as JsonSchema,
+        ...(options.baseUri === undefined ? {} : { $id: resolveUri(options.baseUri) }),
         // @ts-expect-error self-reference added later
         context: {
             remotes: {},
@@ -139,7 +144,7 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
     };
 
     node.context.rootNode = node;
-    node.context.remotes[(isJsonSchema(schema) ? schema.$id : undefined) ?? "#"] = node;
+    node.context.remotes[node.$id ?? (isJsonSchema(schema) ? schema.$id : undefined) ?? "#"] = node;
 
     if (remote) {
         const metaSchema = getRef(node, node.schema.$schema);
@@ -175,6 +180,9 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
 
     // parse and validate schema
     let schemaValidation = addKeywords(node).filter((err) => err != null);
+    if (node.$id != null) {
+        node.context.remotes[node.$id] = node;
+    }
     schemaValidation = sanitizeErrors(schemaValidation);
     const schemaErrors: JsonError[] = [];
     const schemaAnnotations: JsonAnnotation[] = [];

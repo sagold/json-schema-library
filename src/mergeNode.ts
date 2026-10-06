@@ -1,6 +1,7 @@
 import { isSchemaNode, SchemaNode } from "./types";
 import { mergeSchema } from "./utils/mergeSchema";
 import { joinDynamicId } from "./SchemaNode";
+import { pick } from "./utils/pick";
 
 interface SchemaNodeCB {
     toJSON?: () => string;
@@ -58,6 +59,18 @@ function mergePatternProperties(a?: SchemaNode["patternProperties"], b?: SchemaN
     return result;
 }
 
+export function mergeReducedNode(result: SchemaNode, reduced?: SchemaNode, ...omit: string[]): SchemaNode {
+    if (!reduced?.toSchemaNodes().some((child) => child.context !== result.context || child.$id !== result.$id)) {
+        return result;
+    }
+    // Keep foreign resource contexts while retaining the reduction's same-resource locations.
+    return {
+        ...result,
+        ...mergeNode(result, reduced, ...omit),
+        ...pick(result, "schema", "context", "$id", "schemaLocation", "evaluationPath", "dynamicId")
+    };
+}
+
 export function mergeNode(a?: SchemaNode, b?: SchemaNode, ...omit: string[]): SchemaNode | undefined {
     if (a == null || b == null) {
         return a || b;
@@ -112,7 +125,10 @@ export function mergeNode(a?: SchemaNode, b?: SchemaNode, ...omit: string[]): Sc
     // this removes any function that has no keyword associated on schema
     function filterKeywordsBySchema(fun: SchemaNodeCB) {
         const funName = fun.toJSON?.() ?? fun.name;
-        if (mergedNode.schema?.[funName] === undefined) {
+        // In supported drafts the $ref callbacks also own dynamic/recursive references.
+        const reference =
+            funName === "$ref" ? mergedNode.context.keywords.find((keyword) => keyword.keyword === "$ref") : undefined;
+        if (mergedNode.schema?.[funName] === undefined && !reference?.addValidate?.(mergedNode)) {
             // @ts-expect-error forced key
             mergedNode[funName] = undefined;
             return false;

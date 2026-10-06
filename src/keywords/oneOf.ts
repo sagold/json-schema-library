@@ -6,7 +6,7 @@ import {
     ValidationReturnType,
     ValidationAnnotation
 } from "../Keyword";
-import { isSchemaNode, SchemaNode } from "../types";
+import { isBooleanSchema, isSchemaNode, SchemaNode } from "../types";
 import settings from "../settings";
 import { getValue } from "../utils/getValue";
 import sanitizeErrors from "../utils/sanitizeErrors";
@@ -61,6 +61,12 @@ export function parseOneOf(node: SchemaNode) {
     return collectValidationErrors([], ...node[KEYWORD]);
 }
 
+function reduceOneOfNode(node: SchemaNode, data: unknown, pointer: string, path: ValidationPath) {
+    return isBooleanSchema(node.schema)
+        ? { node: { ...node }, error: undefined }
+        : node.reduceNode(data, { pointer, path });
+}
+
 function reduceOneOf({ node, data, pointer, path }: Omit<JsonSchemaReducerParams, "key">) {
     if (node.oneOf == null) {
         return;
@@ -86,7 +92,7 @@ function reduceOneOf({ node, data, pointer, path }: Omit<JsonSchemaReducerParams
 
     if (matches.length === 1) {
         const { node, index } = matches[0];
-        const { node: reducedNode, error } = node.reduceNode(data, { pointer, path });
+        const { node: reducedNode, error } = reduceOneOfNode(node, data, pointer, path);
 
         if (reducedNode) {
             const nestedDynamicId = reducedNode.dynamicId?.replace(node.dynamicId, "") ?? "";
@@ -169,7 +175,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: Omit<JsonSc
         } else {
             // return at once when we found a schema
             // TODO should check all oneOf-schema
-            const { node: reducedNode } = node.oneOf[i].reduceNode(data, { pointer, path });
+            const { node: reducedNode } = reduceOneOfNode(node.oneOf[i], data, pointer, path);
             if (reducedNode) {
                 reducedNode.oneOfIndex = i; // @evaluation-info
                 return reducedNode;
@@ -257,7 +263,7 @@ export function reduceOneOfFuzzy({ node, data, pointer, path }: Omit<JsonSchemaR
             });
         }
 
-        const { node: reducedNode, error } = nodeOfItem.reduceNode(data, { pointer, path });
+        const { node: reducedNode, error } = reduceOneOfNode(nodeOfItem, data, pointer, path);
         if (reducedNode) {
             reducedNode.oneOfIndex = schemaOfIndex; // @evaluation-info
             return reducedNode;
@@ -289,7 +295,7 @@ export function reduceOneOfFuzzy({ node, data, pointer, path }: Omit<JsonSchemaR
             });
         }
 
-        const { node: reducedNode, error } = nodeOfItem.reduceNode(data, { pointer, path });
+        const { node: reducedNode, error } = reduceOneOfNode(nodeOfItem, data, pointer, path);
         if (reducedNode) {
             reducedNode.oneOfIndex = schemaOfIndex; // @evaluation-info
             return reducedNode;

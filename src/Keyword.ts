@@ -24,7 +24,13 @@ export interface JsonSchemaReducer {
     (options: JsonSchemaReducerParams): SchemaNode | JsonError | undefined;
 }
 
-export type JsonSchemaResolverParams = { key: string | number; data: unknown; node: SchemaNode };
+export type JsonSchemaResolverParams = {
+    key: string | number;
+    data: unknown;
+    node: SchemaNode;
+    pointer?: string;
+    path?: ValidationPath;
+};
 export interface JsonSchemaResolver {
     toJSON?: () => string;
     order?: number;

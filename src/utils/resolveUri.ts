@@ -7,9 +7,8 @@ const idAndPointer = /#.*$/;
 
 /**
  * Resolves a reference URI against a base URI.
- * Uses fast-uri (RFC 3986 compliant) for most cases, with special handling for JSON Schema specifics.
- *
- * This replaces the custom joinId logic while leveraging the standards-compliant fast-uri library.
+ * Uses uri-js (RFC 3986) with JSON Schema fragment handling.
+ * The anonymous document root is always represented by "#" (RFC 6901 section 6).
  *
  * @param base - The base URI (e.g., current scope $id)
  * @param ref - The reference to resolve (e.g., $id, $ref, or json-pointer)
@@ -17,11 +16,11 @@ const idAndPointer = /#.*$/;
  */
 export function resolveUri(base?: string, ref?: string): string {
     if (ref == null) {
-        return base?.replace(trailingHash, "") ?? "#";
+        return base?.replace(trailingHash, "") || "#";
     }
 
     if (base == null || base === "#") {
-        return ref?.replace(trailingHash, "");
+        return ref.replace(trailingHash, "") || "#";
     }
 
     // If ref starts with #, it's a fragment - for JSON Schema, append to base without its fragment
@@ -29,7 +28,7 @@ export function resolveUri(base?: string, ref?: string): string {
         if (base[0] === "/") {
             return ref;
         }
-        return `${base.replace(idAndPointer, "")}${ref.replace(suffixes, "")}`;
+        return `${base.replace(idAndPointer, "")}${ref.replace(suffixes, "")}` || "#";
     }
 
     // If ref is a full domain, it's absolute
@@ -37,5 +36,5 @@ export function resolveUri(base?: string, ref?: string): string {
         return ref.replace(trailingHash, "");
     }
 
-    return resolve(base, ref ?? "") ?? "#";
+    return resolve(base, ref) || "#";
 }

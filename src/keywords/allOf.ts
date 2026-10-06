@@ -1,6 +1,7 @@
 import { mergeSchema } from "../utils/mergeSchema";
+import { mergeNode, mergeReducedNode } from "../mergeNode";
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
-import { SchemaNode } from "../types";
+import { isBooleanSchema, SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
 import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
@@ -47,25 +48,28 @@ function reduceAllOf({ node, data, key, pointer, path }: JsonSchemaReducerParams
     // note: parts of schemas could be merged, e.g. if they do not include
     // dynamic schema parts
     let mergedSchema = {};
+    let mergedNode: SchemaNode | undefined;
     let dynamicId = "";
     for (let i = 0; i < node[KEYWORD].length; i += 1) {
-        const { node: schemaNode } = node[KEYWORD][i].reduceNode(data, { key, pointer, path });
+        const { node: schemaNode } = node[KEYWORD][i].reduceNode(data, { key, pointer, path: [...path] });
         if (schemaNode) {
             const nestedDynamicId = schemaNode.dynamicId?.replace(node.dynamicId, "") ?? "";
             const localDynamicId = nestedDynamicId === "" ? `${KEYWORD}/${i}` : nestedDynamicId;
             dynamicId += `${dynamicId === "" ? "" : ","}${localDynamicId}`;
 
-            const schema = mergeSchema(node[KEYWORD][i].schema, schemaNode.schema);
-            mergedSchema = mergeSchema(mergedSchema, schema, KEYWORD, "contains");
+            const reduced = isBooleanSchema(node[KEYWORD][i].schema) ? node[KEYWORD][i] : schemaNode;
+            mergedSchema = mergeSchema(mergedSchema, reduced.schema, KEYWORD, "contains");
+            mergedNode = mergeNode(mergedNode, reduced, KEYWORD, "contains");
         }
     }
 
-    return node.compileSchema(
+    const result = node.compileSchema(
         mergedSchema,
         `${node.evaluationPath}/${dynamicId}`,
         node.schemaLocation,
         `${node.schemaLocation}(${dynamicId})`
     );
+    return mergeReducedNode(result, mergedNode, KEYWORD, "contains");
 }
 
 function validateAllOf({ node, data, pointer, path }: JsonSchemaValidatorParams) {

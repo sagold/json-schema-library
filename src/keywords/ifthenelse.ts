@@ -1,4 +1,4 @@
-import { mergeSchema } from "../utils/mergeSchema";
+import { mergeReducedNode } from "../mergeNode";
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
 import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
@@ -65,7 +65,7 @@ export function parseIfThenElse(node: SchemaNode) {
     return errors;
 }
 
-function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
+function reduceIf({ node, data, key, pointer, path }: JsonSchemaReducerParams) {
     // @todo issue with mergeNode (node.if == null)
     if (data === undefined || node.if == null) {
         return undefined;
@@ -74,33 +74,35 @@ function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     if (validateNode(node.if, data, pointer, [...(path ?? [])]).length === 0) {
         if (node.then) {
             // reduce creates a new node
-            const { node: schemaNode } = node.then.reduceNode(data);
+            const { node: schemaNode } = node.then.reduceNode(data, { key, pointer, path: [...path] });
             if (schemaNode) {
                 const nestedDynamicId = schemaNode.dynamicId?.replace(node.dynamicId, "").replace(/^#/, "") ?? "";
                 const dynamicId = nestedDynamicId === "" ? `(then)` : nestedDynamicId;
 
-                const schema = mergeSchema(node.then.schema, schemaNode.schema, "if", "then", "else");
-                return node.compileSchema(
-                    schema,
+                const reduced = isBooleanSchema(node.then.schema) ? node.then : schemaNode;
+                const result = node.compileSchema(
+                    reduced.schema,
                     node.then.evaluationPath,
                     node.schemaLocation,
                     `${node.schemaLocation}${dynamicId}`
                 );
+                return mergeReducedNode(result, reduced, "if", "then", "else");
             }
         }
     } else if (node.else) {
-        const { node: schemaNode } = node.else.reduceNode(data);
+        const { node: schemaNode } = node.else.reduceNode(data, { key, pointer, path: [...path] });
         if (schemaNode) {
             const nestedDynamicId = schemaNode.dynamicId?.replace(node.dynamicId, "") ?? "";
             const dynamicId = nestedDynamicId === "" ? `(else)` : nestedDynamicId;
 
-            const schema = mergeSchema(node.else.schema, schemaNode.schema, "if", "then", "else");
-            return node.compileSchema(
-                schema,
+            const reduced = isBooleanSchema(node.else.schema) ? node.else : schemaNode;
+            const result = node.compileSchema(
+                reduced.schema,
                 node.else.evaluationPath,
                 node.schemaLocation,
                 `${node.schemaLocation}${dynamicId}`
             );
+            return mergeReducedNode(result, reduced, "if", "then", "else");
         }
     }
     return undefined;

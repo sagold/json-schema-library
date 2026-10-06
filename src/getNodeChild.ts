@@ -27,6 +27,7 @@ export function getNodeChild(
     // reduce parent
     // @ts-expect-error implicitely any
     let parentNode = this as SchemaNode;
+    path.push({ pointer, node: parentNode });
     if (parentNode.reducers.length) {
         const result = parentNode.reduceNode(data, { key, path, pointer });
         if (result.error) {
@@ -39,7 +40,7 @@ export function getNodeChild(
 
     // find child node
     for (const resolver of parentNode.resolvers) {
-        const schemaNode = resolver({ data, key, node: parentNode });
+        const schemaNode = resolver({ data, key, node: parentNode, pointer, path });
         // a matching resolver found an error, return
         if (isJsonError(schemaNode)) {
             return { node: undefined, error: schemaNode };
@@ -55,7 +56,8 @@ export function getNodeChild(
         const newNode = parentNode.compileSchema(
             parentNode.createSchema(getValue(data, key)),
             `${parentNode.evaluationPath}/additional`,
-            `${parentNode.schemaLocation}/additional`
+            `${parentNode.schemaLocation}/additional`,
+            `${parentNode.schemaLocation}(createSchema)`
         );
         return { node: newNode, error: undefined };
     }

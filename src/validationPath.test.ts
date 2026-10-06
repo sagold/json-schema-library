@@ -3,7 +3,7 @@ import { strict as assert } from "assert";
 import { ValidationPath } from "./Keyword";
 
 describe("validate - path", () => {
-    it("should should resolve both if-then-else and allOf schema", () => {
+    it("should preserve the caller's scope across conditional and allOf validation", () => {
         const node = compileSchema({
             type: "object",
             properties: { withHeader: { type: "boolean" } },
@@ -15,8 +15,9 @@ describe("validate - path", () => {
             allOf: [{ required: ["date"], properties: { date: { type: "string" } } }]
         });
 
-        const path: ValidationPath = [];
-        node.validate(
+        const path: ValidationPath = [{ pointer: "#", node: compileSchema({}) }];
+        const incomingScope = [...path];
+        const result = node.validate(
             {
                 withHeader: true,
                 date: "2013-13-13"
@@ -24,7 +25,9 @@ describe("validate - path", () => {
             "#",
             path
         );
-        // console.log(path.map((v) => ({ ptr: v.pointer, sptr: v.node.evaluationPath })));
-        assert(path.length > 0);
+        assert.equal(result.valid, false);
+        assert.deepEqual(result.errors.map(({ code }) => code), ["required-property-error"]);
+        assert.equal(path.length, incomingScope.length);
+        assert.equal(path[0], incomingScope[0]);
     });
 });

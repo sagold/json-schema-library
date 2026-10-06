@@ -54,7 +54,7 @@ export function getNode(
         data = getValue(data, keys[i]);
     }
 
-    const { node: reducedNode, error: reduceError } = currentNode.resolveRef(options).reduceNode(data);
+    const { node: reducedNode, error: reduceError } = currentNode.resolveRef(options).reduceNode(data, options);
 
     if (isJsonError(reduceError)) {
         return { node: undefined, error: reduceError };

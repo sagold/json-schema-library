@@ -31,7 +31,6 @@ import { isObject } from "./utils/isObject";
 import { join } from "@sagold/json-pointer";
 import { resolveUri } from "./utils/resolveUri";
 import { mergeNode } from "./mergeNode";
-import { omit } from "./utils/omit";
 import { pick } from "./utils/pick";
 import { render } from "./errors/render";
 import { TemplateOptions } from "./methods/getData";
@@ -124,7 +123,7 @@ export interface SchemaNode extends SchemaNodeMethodsType {
      * - may not have any association to the principal schema
      */
     schemaLocation: string;
-    /** id created when combining subschemas */
+    /** id created when combining or deriving subschemas */
     dynamicId: string;
     /** reference to parent node (node used to compile this node) */
     parent?: SchemaNode | undefined;
@@ -339,7 +338,13 @@ export const SchemaNodeMethods = {
     compileSchema(schema: JsonSchema, evaluationPath: string, schemaLocation?: string, dynamicId?: string): SchemaNode {
         const parentNode = this as SchemaNode;
         evaluationPath = evaluationPath ?? parentNode.evaluationPath;
-        const nextFragment = evaluationPath.split("/$ref")[0];
+        // Child locations follow the authored parent, even across reference expansions.
+        const nextFragment =
+            evaluationPath === parentNode.evaluationPath
+                ? "#"
+                : evaluationPath.startsWith(`${parentNode.evaluationPath}/`)
+                  ? `#${evaluationPath.slice(parentNode.evaluationPath.length)}`
+                  : evaluationPath;
         const node: SchemaNode = {
             lastIdPointer: parentNode.lastIdPointer, // ref helper
             context: parentNode.context,
@@ -460,18 +465,22 @@ export const SchemaNodeMethods = {
             return { node, error: undefined };
             // @ts-expect-error bool schema
         } else if (node.schema === true) {
-            const nextNode = node.compileSchema(createSchema(data), node.evaluationPath, node.schemaLocation);
+            const nextNode = node.compileSchema(
+                createSchema(data),
+                node.evaluationPath,
+                node.schemaLocation,
+                `${node.schemaLocation}(createSchema)`
+            );
             path?.push({ pointer, node });
             return { node: nextNode, error: undefined };
         }
 
         let schema;
-        // we need to copy node to prevent modification of source
-        // @todo does mergeNode break immutability?
-        let workingNode = node.compileSchema(node.schema, node.evaluationPath, node.schemaLocation);
+        // Keep compiled children in their own resource contexts while deriving this node.
+        let workingNode = { ...node };
         const reducers = node.reducers;
         for (const reducer of reducers) {
-            const result = reducer({ data, key, node, pointer, path: path ?? [] });
+            const result = reducer({ data, key, node, pointer, path: [...(path ?? []), { pointer, node }] });
             if (isJsonError(result)) {
                 return { node: undefined, error: result };
             }
@@ -496,10 +505,8 @@ export const SchemaNodeMethods = {
             path?.push({ pointer, node });
         }
 
-        // remove dynamic properties of node
-        workingNode.schema = omit(workingNode.schema, DECLARATOR_ONEOF, ...DYNAMIC_PROPERTIES);
-        // @ts-expect-error string accessing schema props
-        DYNAMIC_PROPERTIES.forEach((prop) => (workingNode[prop] = undefined));
+        // Retire reduced keywords and their callbacks together.
+        workingNode = mergeNode(workingNode, workingNode, DECLARATOR_ONEOF, ...DYNAMIC_PROPERTIES) as SchemaNode;
         return { node: workingNode, error: undefined };
     },
 
@@ -546,17 +553,13 @@ export const SchemaNodeMethods = {
      * @returns the current node (not the remote schema-node)
      */
     addRemoteSchema(url: string, schema: JsonSchema | BooleanSchema): SchemaNode {
-        // @draft >= 6
-        if (isJsonSchema(schema)) {
-            schema.$id = resolveUri(schema.$id || url);
-        }
-
         const node = this as SchemaNode & { schemaErrors?: JsonError[]; schemaAnnotations: JsonAnnotation[] };
         const { context } = node;
         const schemaId = isJsonSchema(schema) ? (node.context.draft ?? schema.$schema) : undefined;
         const draft = getDraft(context.drafts, schemaId ?? context.rootNode.schema?.$schema);
 
         const remoteNode: SchemaNode = {
+            $id: resolveUri(url),
             evaluationPath: "#",
             lastIdPointer: "#",
             schemaLocation: "#",
@@ -580,6 +583,9 @@ export const SchemaNodeMethods = {
         // parse and validate schema
         // @todo this is a duplicated to compileSchema
         let schemaValidation = addKeywords(remoteNode).filter((err) => err != null);
+        if (remoteNode.$id != null) {
+            remoteNode.context.remotes[remoteNode.$id] = remoteNode;
+        }
         schemaValidation = sanitizeErrors(schemaValidation);
         const schemaErrors: JsonError[] = [];
         const schemaAnnotations: JsonAnnotation[] = [];
@@ -632,10 +638,10 @@ const whitelist = ["$ref", "if", "$defs"];
 const noRefMergeDrafts = ["draft-04", "draft-06", "draft-07"];
 
 export function addKeywords(node: SchemaNode) {
-    if (node.schema.$ref && noRefMergeDrafts.includes(node.context.version)) {
-        // for these draft versions only ref is validated
+    if (node.schema.$ref != null && noRefMergeDrafts.includes(node.context.version)) {
+        // Reference siblings are ignored; definitions remain available as targets.
         return node.context.keywords
-            .filter(({ keyword }) => whitelist.includes(keyword))
+            .filter(({ keyword }) => keyword === "$ref" || keyword === "$defs")
             .map((keyword) => execKeyword(keyword, node));
     }
     const keys = Object.keys(node.schema);

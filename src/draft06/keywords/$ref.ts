@@ -1,5 +1,5 @@
 import { Keyword, JsonSchemaValidatorParams, ValidationPath } from "../../Keyword";
-import { resolveRef } from "../../keywords/$ref";
+import { resolveStaticRef as resolveRef } from "../../keywords/$ref";
 import { isSchemaNode, SchemaNode } from "../../types";
 import { resolveUri } from "../../utils/resolveUri";
 import { validateNode } from "../../validateNode";
@@ -14,9 +14,9 @@ export const $refKeyword: Keyword = {
 
 function parseRef(node: SchemaNode) {
     // get and store current $id of node - this may be the same as parent $id
-    let currentId = node.parent?.$id;
+    let currentId = node.parent?.$id ?? node.$id;
     if (node.schema?.$ref == null) {
-        currentId = resolveUri(node.parent?.$id, node.schema?.$id);
+        currentId = resolveUri(currentId, node.schema?.$id);
     }
     node.$id = currentId as string;
     node.lastIdPointer = node.parent?.lastIdPointer ?? "#";
@@ -25,7 +25,7 @@ function parseRef(node: SchemaNode) {
     node.resolveRef = resolveRef;
 
     // store this node for retrieval by $id
-    if (node.context.refs[currentId as string] == null) {
+    if (!node.dynamicId && node.context.refs[currentId as string] == null) {
         node.context.refs[currentId as string] = node;
     }
 
@@ -34,17 +34,20 @@ function parseRef(node: SchemaNode) {
         node.lastIdPointer = node.evaluationPath;
     }
 
-    // store this node for retrieval by $id + json-pointer from $id
-    if (node.lastIdPointer !== "#" && node.evaluationPath.startsWith(node.lastIdPointer)) {
-        const localPointer = `#${node.evaluationPath.replace(node.lastIdPointer, "")}`;
-        node.context.refs[resolveUri(currentId, localPointer)] = node;
-    } else {
-        node.context.refs[resolveUri(currentId, node.evaluationPath)] = node;
+    // Data-dependent reductions must not replace authored reference targets.
+    if (!node.dynamicId) {
+        // store this node for retrieval by $id + json-pointer from $id
+        if (node.lastIdPointer !== "#" && node.evaluationPath.startsWith(node.lastIdPointer)) {
+            const localPointer = `#${node.evaluationPath.replace(node.lastIdPointer, "")}`;
+            node.context.refs[resolveUri(currentId, localPointer)] = node;
+        } else {
+            node.context.refs[resolveUri(currentId, node.evaluationPath)] = node;
+        }
+        node.context.refs[resolveUri(node.context.rootNode.$id, node.evaluationPath)] = node;
     }
-    node.context.refs[resolveUri(node.context.rootNode.$id, node.evaluationPath)] = node;
 
     // precompile reference
-    if (node.schema.$ref) {
+    if (node.schema.$ref != null) {
         node.$ref = resolveUri(currentId, node.schema.$ref);
     }
 }

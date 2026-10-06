@@ -1,5 +1,5 @@
 import { ValidationPath } from "./Keyword";
-import { SchemaNode } from "./types";
+import { isSchemaNode, SchemaNode } from "./types";
 import { hasProperty } from "./utils/hasProperty";
 // import { getValue } from "./utils/getValue";
 import { validateNode } from "./validateNode";
@@ -25,6 +25,8 @@ type Options = {
  * - We could introduce this method as a new keyword-layer
  */
 export function isPropertyEvaluated({ node, data, key, pointer, path }: Options) {
+    // Reference traversal belongs to this branch, not the next property or applicator.
+    path = [...path, { pointer, node }];
     if (Array.isArray(node.schema.required) && !node.schema.required.find((prop) => hasProperty(data, prop))) {
         return false;
     }
@@ -83,7 +85,7 @@ export function isPropertyEvaluated({ node, data, key, pointer, path }: Options)
     }
 
     const resolved = node.resolveRef({ pointer, path });
-    if (resolved !== node) {
+    if (isSchemaNode(resolved) && resolved !== node) {
         if (isPropertyEvaluated({ node: resolved, data, key, pointer, path })) {
             return true;
         }
