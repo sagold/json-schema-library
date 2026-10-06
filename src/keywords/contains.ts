@@ -1,9 +1,10 @@
-import { isObject } from "../utils/isObject";
 import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
 import { validateNode } from "../validateNode";
 
 const KEYWORD = "contains";
+/** minContains/maxContains are draft >= 2019-09; earlier drafts only require one match. */
+const draftsWithoutMinMaxContains = ["draft-04", "draft-06", "draft-07"];
 
 export const containsKeyword: Keyword = {
     id: KEYWORD,
@@ -48,22 +49,6 @@ function validateContains({ node, data, pointer, path }: JsonSchemaValidatorPara
     if (!Array.isArray(data)) {
         return;
     }
-    if (schema.contains === false) {
-        return node.createError("contains-array-error", { pointer, value: data, schema });
-    }
-
-    if (schema.contains === true) {
-        if (Array.isArray(data) && data.length === 0) {
-            return node.createError("contains-any-error", { pointer, value: data, schema });
-        }
-        return undefined;
-    }
-
-    if (!isObject(schema.contains) || !Array.isArray(data)) {
-        // - ignore invalid schema
-        // - ignore invalid dara
-        return undefined;
-    }
 
     let count = 0;
     for (const d of data) {
@@ -73,9 +58,10 @@ function validateContains({ node, data, pointer, path }: JsonSchemaValidatorPara
         }
     }
 
-    // @draft >= 2019-09
-    const max = schema.maxContains ?? Infinity;
-    const min = schema.minContains ?? 1;
+    // @draft >= 2019-09 — ignore minContains/maxContains on older drafts that do not define them
+    const applyMinMaxContains = !draftsWithoutMinMaxContains.includes(node.context.version);
+    const max = applyMinMaxContains ? (schema.maxContains ?? Infinity) : Infinity;
+    const min = applyMinMaxContains ? (schema.minContains ?? 1) : 1;
     if (max >= count && min <= count) {
         return undefined;
     }
