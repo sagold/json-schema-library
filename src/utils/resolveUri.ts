@@ -1,4 +1,4 @@
-import { resolve } from "uri-js";
+import { resolve } from "fast-uri";
 
 const suffixes = /(#)+$/;
 const trailingHash = /#$/;
