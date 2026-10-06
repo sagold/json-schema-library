@@ -1,6 +1,6 @@
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
 import { SchemaNode } from "../SchemaNode";
-import { getTypeOf } from "../utils/getTypeOf";
+import { equalJson } from "../utils/equalJson";
 
 const KEYWORD = "enum";
 
@@ -32,15 +32,7 @@ function validateEnum({ node, data, pointer = "#" }: JsonSchemaValidatorParams) 
     if (node.enum == null) {
         return;
     }
-    const type = getTypeOf(data);
-    if (type === "object" || type === "array") {
-        const valueStr = JSON.stringify(data);
-        for (const e of node.enum) {
-            if (JSON.stringify(e) === valueStr) {
-                return undefined;
-            }
-        }
-    } else if (node.enum.includes(data)) {
+    if (node.enum.some((value) => equalJson(data, value))) {
         return undefined;
     }
     return node.createError("enum-error", {
