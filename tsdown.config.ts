@@ -6,6 +6,8 @@ export default defineConfig({
     exports: true,
     globalName: "jlib",
     sourcemap: true,
-    // Only bundle @hyperjump/json-schema-formats (used only in formats entry)
-    noExternal: ["@hyperjump/json-schema-formats"]
+    deps: {
+        // Keep these deps inlined to avoid ESM->CJS interop edge cases in Node consumers.
+        alwaysBundle: ["@hyperjump/json-schema-formats", "fast-uri"]
+    }
 });
