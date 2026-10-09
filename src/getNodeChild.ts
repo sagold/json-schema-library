@@ -37,17 +37,9 @@ export function getNodeChild(
         }
     }
 
-    // find child node
-    for (const resolver of parentNode.resolvers) {
-        const schemaNode = resolver({ data, key, node: parentNode });
-        // a matching resolver found an error, return
-        if (isJsonError(schemaNode)) {
-            return { node: undefined, error: schemaNode };
-        }
-        // a matching resolver found a child node, return
-        if (isSchemaNode(schemaNode)) {
-            return { node: schemaNode.resolveRef({ pointer, path }), error: undefined };
-        }
+    const child = resolveNodeChild(parentNode, key, data, options);
+    if (child) {
+        return child;
     }
 
     // no child node was found, but the child node is valid
@@ -71,4 +63,22 @@ export function getNodeChild(
     }
 
     return { node: undefined };
+}
+
+/** Resolve this node's own child keywords without reducing its applicators. */
+export function resolveNodeChild(
+    node: SchemaNode,
+    key: string | number,
+    data: unknown,
+    options: GetNodeOptions
+): OptionalNodeOrError | undefined {
+    for (const resolver of node.resolvers) {
+        const schemaNode = resolver({ data, key, node });
+        if (isJsonError(schemaNode)) {
+            return { node: undefined, error: schemaNode };
+        }
+        if (isSchemaNode(schemaNode)) {
+            return { node: schemaNode.resolveRef(options), error: undefined };
+        }
+    }
 }

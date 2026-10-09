@@ -1,6 +1,6 @@
 import { mergeSchema } from "../utils/mergeSchema";
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
-import { SchemaNode } from "../types";
+import { isJsonError, SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
 import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
@@ -47,7 +47,7 @@ function reduceAnyOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     let mergedSchema = {};
     let dynamicId = "";
     for (let i = 0; i < node[KEYWORD].length; i += 1) {
-        if (validateNode(node[KEYWORD][i], data, pointer, path).length === 0) {
+        if (!validateNode(node[KEYWORD][i], data, pointer, path).some(isJsonError)) {
             const { node: schemaNode } = node[KEYWORD][i].reduceNode(data);
 
             if (schemaNode) {
@@ -72,10 +72,17 @@ function validateAnyOf({ node, data, pointer, path }: JsonSchemaValidatorParams)
     if (node[KEYWORD] == null) {
         return;
     }
+    const annotations: ValidationAnnotation[] = [];
+    let valid = false;
     for (const anyOf of node[KEYWORD]) {
-        if (validateNode(anyOf, data, pointer, path).length === 0) {
-            return undefined;
+        const result = validateNode(anyOf, data, pointer, path);
+        if (!result.some(isJsonError)) {
+            valid = true;
+            annotations.push(...result);
         }
+    }
+    if (valid) {
+        return annotations;
     }
     return node.createError("any-of-error", { pointer, schema: node.schema, value: data, anyOf: node.schema[KEYWORD] });
 }

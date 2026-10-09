@@ -1,4 +1,4 @@
-import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
+import { isBooleanSchema, isJsonError, isJsonSchema, SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
 import { validateNode } from "../validateNode";
 import { isItemEvaluated } from "../isItemEvaluated";
@@ -59,7 +59,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
     const errors: ValidationReturnType = [];
     // "unevaluatedItems with nested items"
     for (let i = 0; i < data.length; i += 1) {
-        if (isItemEvaluated({ node, data, pointer, key: i, path })) {
+        if (isItemEvaluated({ node, data, pointer, key: i, path, skipUnevaluated: true })) {
             continue;
         }
 
@@ -83,7 +83,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
             }
         }
 
-        if (child && validateNode(child, value, `${pointer}/${i}`, path).length > 0) {
+        if (child && validateNode(child, value, `${pointer}/${i}`, path).some(isJsonError)) {
             // when a single node is invalid
             if (
                 node.unevaluatedItems &&

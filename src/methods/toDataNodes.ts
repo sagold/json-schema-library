@@ -1,3 +1,4 @@
+import { appendDataPointer } from "../utils/appendDataPointer";
 import { getValue } from "../utils/getValue";
 import { isObject } from "../utils/isObject";
 import { SchemaNode } from "../types";
@@ -16,14 +17,14 @@ export function toDataNodes(node: SchemaNode, data: unknown, pointer = "#", data
         Object.keys(data).forEach((key) => {
             const { node: nextNode } = currentNode.getNodeChild(key, data);
             if (nextNode) {
-                toDataNodes(nextNode, getValue(data, key), `${pointer}/${key}`, dataNodes);
+                toDataNodes(nextNode, getValue(data, key), appendDataPointer(pointer, key), dataNodes);
             }
         });
     } else if (Array.isArray(data)) {
         data.forEach((next: unknown, key: number) => {
             const { node: nextNode } = currentNode.getNodeChild(key, data);
             if (nextNode) {
-                toDataNodes(nextNode, getValue(data, key), `${pointer}/${key}`, dataNodes);
+                toDataNodes(nextNode, getValue(data, key), appendDataPointer(pointer, key), dataNodes);
             }
         });
     }

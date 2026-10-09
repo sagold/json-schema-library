@@ -1,3 +1,4 @@
+import { appendDataPointer } from "../utils/appendDataPointer";
 import {
     Keyword,
     JsonSchemaReducerParams,
@@ -6,7 +7,7 @@ import {
     ValidationReturnType,
     ValidationAnnotation
 } from "../Keyword";
-import { isSchemaNode, SchemaNode } from "../types";
+import { isJsonError, isSchemaNode, SchemaNode } from "../types";
 import settings from "../settings";
 import { getValue } from "../utils/getValue";
 import sanitizeErrors from "../utils/sanitizeErrors";
@@ -77,7 +78,7 @@ function reduceOneOf({ node, data, pointer, path }: Omit<JsonSchemaReducerParams
     const errors: ValidationReturnType[] = [];
     for (let i = 0; i < node.oneOf.length; i += 1) {
         const validationErrors = validateNode(node.oneOf[i], data, pointer, path);
-        if (validationErrors.length === 0) {
+        if (!validationErrors.some(isJsonError)) {
             matches.push({ index: i, node: node.oneOf[i] });
         } else {
             errors.push(...validationErrors);
@@ -161,10 +162,10 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: Omit<JsonSc
 
         // collect errors in case we fail finding a matching schema
         const result = sanitizeErrors(
-            validateNode(resultNode, oneOfPropertyValue, `${pointer}/${oneOfProperty}`, path)
+            validateNode(resultNode, oneOfPropertyValue, appendDataPointer(pointer, oneOfProperty), path)
         );
 
-        if (result.length > 0) {
+        if (result.some(isJsonError)) {
             errors.push(...result);
         } else {
             // return at once when we found a schema
@@ -203,7 +204,7 @@ function fuzzyObjectValue(node: SchemaNode, data: Record<string, unknown>, point
     const keys = Object.keys(node.properties ?? {});
     for (const key of keys) {
         if (data[key]) {
-            if (validateNode(node.properties[key], data[key], pointer, path).length === 0) {
+            if (!validateNode(node.properties[key], data[key], pointer, path).some(isJsonError)) {
                 value += 1;
             }
         }
@@ -315,10 +316,15 @@ function validateFromDeclarator({ node, data, pointer = "#", path }: JsonSchemaV
     const matches: { index: number; node: SchemaNode }[] = [];
     const errors: ValidationReturnType = [];
     for (const oneOfNode of oneOf) {
-        const { node: oneOfPropertyNode, error } = oneOfNode.getNodeChild(oneOfProperty, oneOfValue);
+        const { node: oneOfPropertyNode, error } = oneOfNode.getNodeChild(oneOfProperty, data);
         if (oneOfPropertyNode) {
-            const validationResult = validateNode(oneOfPropertyNode, oneOfValue, `${pointer}/${oneOfProperty}`, path);
-            if (validationResult.length > 0) {
+            const validationResult = validateNode(
+                oneOfPropertyNode,
+                oneOfValue,
+                appendDataPointer(pointer, oneOfProperty),
+                path
+            );
+            if (validationResult.some(isJsonError)) {
                 errors.push(...validationResult);
             } else {
                 matches.push({ index: oneOf.indexOf(oneOfNode), node: oneOfNode });
@@ -367,19 +373,21 @@ function oneOfValidator({ node, data, pointer = "#", path }: JsonSchemaValidator
 
     const matches: { index: number; node: SchemaNode }[] = [];
     const errors: ValidationReturnType = [];
+    const annotations: ValidationAnnotation[] = [];
     for (let i = 0; i < oneOf.length; i += 1) {
         const validationResult = validateNode(oneOf[i], data, pointer, path);
-        if (validationResult.length > 0) {
+        if (validationResult.some(isJsonError)) {
             errors.push(...validationResult);
         } else {
             matches.push({ index: i, node: oneOf[i] });
+            annotations.push(...validationResult);
         }
     }
 
     if (matches.length === 1) {
         const { node, index } = matches[0];
         node.oneOfIndex = index; // @evaluation-info
-        return undefined;
+        return annotations;
     }
 
     if (matches.length > 1) {

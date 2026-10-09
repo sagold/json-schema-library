@@ -15,7 +15,10 @@ export const itemsKeyword: Keyword = {
     validate: validateItems
 };
 
-function itemsResolver({ node, key }: JsonSchemaResolverParams) {
+function itemsResolver({ node, key, data }: JsonSchemaResolverParams) {
+    if (data !== undefined && !Array.isArray(data)) {
+        return;
+    }
     if (node.prefixItems?.[key as number]) {
         return node.prefixItems[key as number];
     }

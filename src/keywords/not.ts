@@ -1,5 +1,5 @@
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
-import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
+import { isBooleanSchema, isJsonError, isJsonSchema, SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
 
 const KEYWORD = "not";
@@ -33,7 +33,7 @@ export function parseNot(node: SchemaNode) {
 function validateNot({ node, data, pointer, path }: JsonSchemaValidatorParams<"not">) {
     const { schema } = node;
     // not has been tested in addValidate
-    if (validateNode(node[KEYWORD]!, data, pointer, path).length === 0) {
+    if (!validateNode(node[KEYWORD]!, data, pointer, path).some(isJsonError)) {
         return node.createError("not-error", { value: data, not: schema[KEYWORD], pointer, schema });
     }
 }

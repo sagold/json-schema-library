@@ -1,3 +1,4 @@
+import { appendDataPointer } from "../utils/appendDataPointer";
 import { getValue } from "../utils/getValue";
 import { SchemaNode } from "../types";
 import {
@@ -21,7 +22,10 @@ export const propertiesKeyword: Keyword = {
     validate: validateProperties
 };
 
-function propertyResolver({ node, key }: JsonSchemaResolverParams) {
+function propertyResolver({ node, key, data }: JsonSchemaResolverParams) {
+    if (data !== undefined && !isObject(data)) {
+        return;
+    }
     return node.properties?.[key];
 }
 
@@ -71,7 +75,7 @@ function validateProperties({ node, data, pointer, path }: JsonSchemaValidatorPa
             return;
         }
 
-        const result = validateNode(propertyNode, value, `${pointer}/${propertyName}`, path);
+        const result = validateNode(propertyNode, value, appendDataPointer(pointer, propertyName), path);
         errors.push(...result);
     });
     return errors;

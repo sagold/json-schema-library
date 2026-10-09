@@ -15,7 +15,7 @@ import { validateNode } from "../validateNode";
 
 const KEYWORD = "propertyDependencies";
 
-function findMatchingSchemata(node: SchemaNode, data: Record<string, unknown>) {
+export function findMatchingSchemata(node: SchemaNode, data: Record<string, unknown>) {
     const dependentProperties = node[KEYWORD];
     if (dependentProperties == null) {
         return undefined;

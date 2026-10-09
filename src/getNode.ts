@@ -2,6 +2,7 @@ import { GetNodeOptions, isSchemaNode, SchemaNode } from "./SchemaNode";
 import { isJsonError, NodeOrError, OptionalNodeOrError } from "./types";
 import { split } from "@sagold/json-pointer";
 import { getValue } from "./utils/getValue";
+import { appendDataPointer } from "./utils/appendDataPointer";
 
 // prettier-ignore
 export function getNode(pointer: string, data: unknown, options: { withSchemaWarning: true } & GetNodeOptions): NodeOrError;
@@ -42,7 +43,7 @@ export function getNode(
     let currentPointer = "#";
     let currentNode = node;
     for (let i = 0, l = keys.length; i < l; i += 1) {
-        currentPointer = `${currentPointer}/${keys[i]}`;
+        currentPointer = appendDataPointer(currentPointer, keys[i]);
         const result = currentNode.getNodeChild(keys[i], data, { ...options, pointer: currentPointer });
         if (result.error) {
             return result;

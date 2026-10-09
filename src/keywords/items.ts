@@ -14,7 +14,10 @@ export const itemsKeyword: Keyword = {
     validate: validateItems
 };
 
-function itemsResolver({ node, key }: JsonSchemaResolverParams) {
+function itemsResolver({ node, key, data }: JsonSchemaResolverParams) {
+    if (data !== undefined && !Array.isArray(data)) {
+        return;
+    }
     // prefixItems should handle this, abort
     // Note: This keeps features sort independent for arrays
     if (node.prefixItems && node.prefixItems?.length > +key) {

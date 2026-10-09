@@ -1,6 +1,6 @@
 import { mergeSchema } from "../utils/mergeSchema";
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
-import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
+import { isBooleanSchema, isJsonError, isJsonSchema, SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
 import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
@@ -71,7 +71,7 @@ function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
         return undefined;
     }
 
-    if (validateNode(node.if, data, pointer, [...(path ?? [])]).length === 0) {
+    if (!validateNode(node.if, data, pointer, [...(path ?? [])]).some(isJsonError)) {
         if (node.then) {
             // reduce creates a new node
             const { node: schemaNode } = node.then.reduceNode(data);
@@ -111,10 +111,12 @@ function validateIfThenElse({ node, data, pointer, path }: JsonSchemaValidatorPa
     if (node.if == null) {
         return;
     }
-    if (validateNode(node.if, data, pointer, [...(path ?? [])]).length === 0) {
+    const result = validateNode(node.if, data, pointer, [...(path ?? [])]);
+    if (!result.some(isJsonError)) {
         if (node.then) {
-            return validateNode(node.then, data, pointer, path);
+            result.push(...validateNode(node.then, data, pointer, path));
         }
+        return result;
     } else if (node.else) {
         return validateNode(node.else, data, pointer, path);
     }

@@ -1,6 +1,6 @@
 import { isObject } from "../utils/isObject";
-import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
-import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
+import { isBooleanSchema, isJsonError, isJsonSchema, SchemaNode } from "../types";
+import { Keyword, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
 import { validateNode } from "../validateNode";
 
 const KEYWORD = "contains";
@@ -66,10 +66,13 @@ function validateContains({ node, data, pointer, path }: JsonSchemaValidatorPara
     }
 
     let count = 0;
-    for (const d of data) {
+    const annotations: ValidationAnnotation[] = [];
+    for (let i = 0; i < data.length; i += 1) {
         // we tested for contains in addValidate
-        if (validateNode(node.contains!, d, pointer, path).length === 0) {
+        const result = validateNode(node.contains!, data[i], `${pointer}/${i}`, path);
+        if (!result.some(isJsonError)) {
             count++;
+            annotations.push(...result);
         }
     }
 
@@ -77,7 +80,7 @@ function validateContains({ node, data, pointer, path }: JsonSchemaValidatorPara
     const max = schema.maxContains ?? Infinity;
     const min = schema.minContains ?? 1;
     if (max >= count && min <= count) {
-        return undefined;
+        return annotations;
     }
     if (max < count) {
         return node.createError("contains-max-error", { pointer, schema, delta: count - max, value: data });
