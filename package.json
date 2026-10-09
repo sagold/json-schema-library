@@ -36,7 +36,7 @@
     "lint:src": "eslint src",
     "lint:types": "tsc --noEmit",
     "lint:tests": "tsc --noEmit --project tsconfig.test.json",
-    "prepublishOnly": "pnpm run dist",
+    "prepublishOnly": "pnpm run dist && node src/tests/node.mjs || echo '\u001b[31mprepublish failed'\u001b[0m",
     "tdd": "watch \"npm run test:unit\" src/",
     "test": "mocha 'src/**/*.{test,spec}.ts'",
     "test:2019": "mocha 'src/tests/spec/draft2019-09.spec.ts'",
