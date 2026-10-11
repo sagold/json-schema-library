@@ -10,12 +10,12 @@ jobs:
     run-unit-tests:
         runs-on: ubuntu-24.04
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - name: Install pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v6
               with:
                   version: 10
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version: "24"
                   cache: "pnpm"
@@ -23,11 +23,11 @@ jobs:
               run: pnpm install --frozen-lockfile
             - name: Run unit tests
               run: pnpm run test:unit:ci
-            - uses: actions/upload-artifact@v4
+            - uses: actions/upload-artifact@v7
               with:
                   name: test-results-unit-tests
                   path: test-result-unit.json
-            - uses: dorny/test-reporter@v1.6.0
+            - uses: dorny/test-reporter@v3
               if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
               with:
                   name: test-results / unit-tests
@@ -37,12 +37,12 @@ jobs:
     run-spec-v4-tests:
         runs-on: ubuntu-24.04
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - name: Install pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v6
               with:
                   version: 10
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version: "24"
                   cache: "pnpm"
@@ -50,11 +50,11 @@ jobs:
               run: pnpm install --frozen-lockfile
             - name: Test spec v4
               run: pnpm run test:4:ci
-            - uses: actions/upload-artifact@v4
+            - uses: actions/upload-artifact@v7
               with:
                   name: test-results-spec-4
                   path: test-result-spec4.json
-            - uses: dorny/test-reporter@v1.6.0
+            - uses: dorny/test-reporter@v3
               if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
               with:
                   name: test-results / spec-4
@@ -64,12 +64,12 @@ jobs:
     run-spec-v6-tests:
         runs-on: ubuntu-24.04
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - name: Install pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v6
               with:
                   version: 10
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version: "24"
                   cache: "pnpm"
@@ -77,11 +77,11 @@ jobs:
               run: pnpm install --frozen-lockfile
             - name: Test spec v6
               run: pnpm run test:6:ci
-            - uses: actions/upload-artifact@v4
+            - uses: actions/upload-artifact@v7
               with:
                   name: test-results-spec-6
                   path: test-result-spec6.json
-            - uses: dorny/test-reporter@v1.6.0
+            - uses: dorny/test-reporter@v3
               if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
               with:
                   name: test-results / spec-6
@@ -91,12 +91,12 @@ jobs:
     run-spec-v7-tests:
         runs-on: ubuntu-24.04
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - name: Install pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v6
               with:
                   version: 10
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version: "24"
                   cache: "pnpm"
@@ -104,11 +104,11 @@ jobs:
               run: pnpm install --frozen-lockfile
             - name: Test spec v7
               run: pnpm run test:7:ci
-            - uses: actions/upload-artifact@v4
+            - uses: actions/upload-artifact@v7
               with:
                   name: test-results-spec-7
                   path: test-result-spec7.json
-            - uses: dorny/test-reporter@v1.6.0
+            - uses: dorny/test-reporter@v3
               if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
               with:
                   name: test-results / spec-7
@@ -118,12 +118,12 @@ jobs:
     run-spec-2019-09-tests:
         runs-on: ubuntu-24.04
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - name: Install pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v6
               with:
                   version: 10
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version: "24"
                   cache: "pnpm"
@@ -131,11 +131,11 @@ jobs:
               run: pnpm install --frozen-lockfile
             - name: Test spec 2019-09
               run: pnpm run test:2019:ci
-            - uses: actions/upload-artifact@v4
+            - uses: actions/upload-artifact@v7
               with:
                   name: test-results-spec-2019-09
                   path: test-result-spec2019-09.json
-            - uses: dorny/test-reporter@v1.6.0
+            - uses: dorny/test-reporter@v3
               if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
               with:
                   name: test-results / spec-2019-09
@@ -145,12 +145,12 @@ jobs:
     run-spec-2020-12-tests:
         runs-on: ubuntu-24.04
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - name: Install pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v6
               with:
                   version: 10
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version: "24"
                   cache: "pnpm"
@@ -158,11 +158,11 @@ jobs:
               run: pnpm install --frozen-lockfile
             - name: Test spec 2020-12
               run: pnpm run test:2020:ci
-            - uses: actions/upload-artifact@v4
+            - uses: actions/upload-artifact@v7
               with:
                   name: test-results-spec-2020-12
                   path: test-result-spec2020-12.json
-            - uses: dorny/test-reporter@v1.6.0
+            - uses: dorny/test-reporter@v3
               if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
               with:
                   name: test-results / spec-2020-12
