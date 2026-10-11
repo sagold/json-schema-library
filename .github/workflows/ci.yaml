@@ -8,7 +8,7 @@ on:
 
 jobs:
     run-unit-tests:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v4
             - name: Install pnpm
@@ -35,7 +35,7 @@ jobs:
                   reporter: mocha-json
 
     run-spec-v4-tests:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v4
             - name: Install pnpm
@@ -62,7 +62,7 @@ jobs:
                   reporter: mocha-json
 
     run-spec-v6-tests:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v4
             - name: Install pnpm
@@ -89,7 +89,7 @@ jobs:
                   reporter: mocha-json
 
     run-spec-v7-tests:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v4
             - name: Install pnpm
@@ -116,7 +116,7 @@ jobs:
                   reporter: mocha-json
 
     run-spec-2019-09-tests:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v4
             - name: Install pnpm
@@ -143,7 +143,7 @@ jobs:
                   reporter: mocha-json
 
     run-spec-2020-12-tests:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v4
             - name: Install pnpm
