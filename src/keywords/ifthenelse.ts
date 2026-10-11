@@ -7,6 +7,7 @@ import { collectValidationErrors } from "src/utils/collectValidationErrors";
 export const ifKeyword: Keyword = {
     id: "if-then-else",
     keyword: "if",
+    keywords: ["if", "then", "else"],
     parse: parseIfThenElse,
     addReduce: (node: SchemaNode) => node.if != null && (node.then != null || node.else != null),
     reduce: reduceIf,

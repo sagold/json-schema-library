@@ -53,6 +53,10 @@ export type Keyword<Key extends keyof SchemaNode = keyof SchemaNode> = {
     id: string;
     /** unique keyword corresponding to JSON Schema keywords (or custom) */
     keyword: string;
+    /**
+     * Optional set of keywords this keyword registers to. e.g. if -> if, then, else.
+     * Used in schema validation */
+    keywords?: string[];
     /** sort order of keyword. Lower numbers will be processed last. Default is 0 */
     order?: number;
     /**
