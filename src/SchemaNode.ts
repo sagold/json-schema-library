@@ -92,6 +92,12 @@ export type Context = {
     errors: Draft["errors"];
     /** draft formats & validators */
     formats: Draft["formats"];
+    /**
+     * Contexts are isolated from original node-tree when being reduced. This flag is set by entering
+     * reduceNode which creates a new node-tree version. Keywords like $ref must check this before modifying
+     * the context
+     */
+    isolated?: boolean;
     /** [SHARED USING ADD REMOTE] getData default options */
     getDataDefaultOptions?: TemplateOptions;
     /** [SHARED USING ADD REMOTE] collect unknown keywords in schemaAnnotations */
@@ -452,8 +458,23 @@ export const SchemaNodeMethods = {
         data: unknown,
         options: { key?: string | number; pointer?: string; path?: ValidationPath } = {}
     ): OptionalNodeOrError {
-        const node = this as SchemaNode;
-        const { key = "missing-key", pointer = node.evaluationPath, path } = options;
+        const sourceNode = this as SchemaNode;
+        const { key = "missing-key", pointer = sourceNode.evaluationPath, path } = options;
+
+        let node = sourceNode;
+        if (sourceNode.context.isolated !== true) {
+            // we are now creating a modified node tree and need to ensure the original context
+            // is not changed by modified schema node versions
+            const reducedContext = {
+                isolated: true,
+                ...sourceNode.context,
+                refs: { ...sourceNode.context.refs },
+                anchors: { ...sourceNode.context.anchors },
+                dynamicAnchors: { ...sourceNode.context.dynamicAnchors },
+                remotes: { ...sourceNode.context.remotes }
+            };
+            node = { ...(this as SchemaNode), context: reducedContext };
+        }
 
         // @ts-expect-error bool schema
         if (node.schema === false) {
@@ -647,7 +668,9 @@ export function addKeywords(node: SchemaNode) {
         (key) =>
             !key.startsWith("x-") &&
             !VALID_ANNOTATION_KEYWORDS.includes(key) &&
-            node.context.keywords.find((keyword) => keyword.keyword === key) == null
+            node.context.keywords.find((keyword) =>
+                keyword.keywords ? keyword.keywords.includes(key) : keyword.keyword === key
+            ) == null
     ).forEach((keyword) => {
         errors.push(
             node.createAnnotation("unknown-keyword-warning", {

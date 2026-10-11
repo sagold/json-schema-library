@@ -22,6 +22,9 @@ export const $refKeyword: Keyword = {
 };
 
 function register(node: SchemaNode, path: string) {
+    if (node.context.isolated === true) {
+        return;
+    }
     if (node.context.refs[path] == null) {
         node.context.refs[path] = node;
     }
