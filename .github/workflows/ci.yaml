@@ -10,14 +10,14 @@ jobs:
     run-unit-tests:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
             - name: Install pnpm
               uses: pnpm/action-setup@v4
               with:
                   version: 10
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v4
               with:
-                  node-version: "22"
+                  node-version: "24"
                   cache: "pnpm"
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
@@ -37,14 +37,14 @@ jobs:
     run-spec-v4-tests:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
             - name: Install pnpm
               uses: pnpm/action-setup@v4
               with:
                   version: 10
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v4
               with:
-                  node-version: "22"
+                  node-version: "24"
                   cache: "pnpm"
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
@@ -64,14 +64,14 @@ jobs:
     run-spec-v6-tests:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
             - name: Install pnpm
               uses: pnpm/action-setup@v4
               with:
                   version: 10
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v4
               with:
-                  node-version: "22"
+                  node-version: "24"
                   cache: "pnpm"
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
@@ -91,14 +91,14 @@ jobs:
     run-spec-v7-tests:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
             - name: Install pnpm
               uses: pnpm/action-setup@v4
               with:
                   version: 10
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v4
               with:
-                  node-version: "22"
+                  node-version: "24"
                   cache: "pnpm"
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
@@ -118,14 +118,14 @@ jobs:
     run-spec-2019-09-tests:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
             - name: Install pnpm
               uses: pnpm/action-setup@v4
               with:
                   version: 10
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v4
               with:
-                  node-version: "22"
+                  node-version: "24"
                   cache: "pnpm"
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
@@ -145,14 +145,14 @@ jobs:
     run-spec-2020-12-tests:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
             - name: Install pnpm
               uses: pnpm/action-setup@v4
               with:
                   version: 10
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v4
               with:
-                  node-version: "22"
+                  node-version: "24"
                   cache: "pnpm"
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
