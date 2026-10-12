@@ -214,7 +214,10 @@ export const formats: Record<string, (options: JsonSchemaValidatorParams) => Val
 
     url: ({ node, data, pointer }) => {
         const { schema } = node;
-        if (data === "" || isWebUri(`${data}`)) {
+        if (typeof data !== "string" || data === "") {
+            return undefined;
+        }
+        if (isWebUri(data)) {
             return undefined;
         }
         return node.createError("format-url-error", { value: data, pointer, schema });
