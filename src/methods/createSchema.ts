@@ -19,7 +19,7 @@ export function createSchema(data: unknown): JsonSchema {
               };
 
     if (schema.type === "object" && isObject(data)) {
-        schema.properties = {};
+        schema.properties = Object.create(null);
         Object.keys(data).forEach((key) => (schema.properties[key] = createSchema(data[key])));
     }
 

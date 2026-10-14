@@ -3,6 +3,7 @@ import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
 import { validateNode } from "../validateNode";
 import { isPropertyEvaluated } from "../isPropertyEvaluated";
+import { appendDataPointer } from "../utils/iterateProperties";
 
 const KEYWORD = "unevaluatedProperties";
 
@@ -74,14 +75,14 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
                 const validationResult = validateNode(
                     node.unevaluatedProperties,
                     data[propertyName],
-                    `${pointer}/${propertyName}`,
+                    appendDataPointer(pointer, propertyName),
                     path
                 );
                 errors.push(...validationResult);
             } else if (node.schema.unevaluatedProperties === false) {
                 errors.push(
                     node.createError("unevaluated-property-error", {
-                        pointer: `${pointer}/${propertyName}`,
+                        pointer: appendDataPointer(pointer, propertyName),
                         value: JSON.stringify(data[propertyName]),
                         schema: node.schema
                     })
@@ -89,19 +90,22 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
             }
         }
 
-        if (child && validateNode(child, data[propertyName], `${pointer}/${propertyName}`, path).length > 0) {
+        if (
+            child &&
+            validateNode(child, data[propertyName], appendDataPointer(pointer, propertyName), path).length > 0
+        ) {
             if (node.unevaluatedProperties) {
                 const validationResult = validateNode(
                     node.unevaluatedProperties,
                     data[propertyName],
-                    `${pointer}/${propertyName}`,
+                    appendDataPointer(pointer, propertyName),
                     path
                 );
                 errors.push(...validationResult);
             } else if (node.schema.unevaluatedProperties === false) {
                 errors.push(
                     node.createError("unevaluated-property-error", {
-                        pointer: `${pointer}/${propertyName}`,
+                        pointer: appendDataPointer(pointer, propertyName),
                         value: JSON.stringify(data[propertyName]),
                         schema: node.schema
                     })

@@ -1,6 +1,7 @@
 import { GetNodeOptions, isSchemaNode, SchemaNode } from "./SchemaNode";
 import { isJsonError, NodeOrError, OptionalNodeOrError } from "./types";
 import { getValue } from "./utils/getValue";
+import { appendDataPointer } from "./utils/iterateProperties";
 
 export function getNodeChild(key: string | number, data: unknown, options: { withSchemaWarning: true } & GetNodeOptions): NodeOrError; // prettier-ignore
 export function getNodeChild(key: string | number, data: unknown, options: { createSchema: true } & GetNodeOptions): NodeOrError; // prettier-ignore
@@ -19,10 +20,9 @@ export function getNodeChild(
     data?: unknown,
     options: GetNodeOptions = {}
 ): OptionalNodeOrError | NodeOrError {
-    options.path = options.path ?? [];
-    options.withSchemaWarning = options.withSchemaWarning ?? false;
-    options.pointer = options.pointer ?? "#";
-    const { path, pointer } = options;
+    const resolverPointer = options.pointer ?? appendDataPointer("#", key);
+    const path = options.path ?? [];
+    const pointer = options.pointer ?? "#";
 
     // reduce parent
     // @ts-expect-error implicitely any
@@ -39,7 +39,7 @@ export function getNodeChild(
 
     // find child node
     for (const resolver of parentNode.resolvers) {
-        const schemaNode = resolver({ data, key, node: parentNode });
+        const schemaNode = resolver({ data, key, node: parentNode, pointer: resolverPointer });
         // a matching resolver found an error, return
         if (isJsonError(schemaNode)) {
             return { node: undefined, error: schemaNode };

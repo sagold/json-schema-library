@@ -2,6 +2,8 @@ import { Keyword, JsonSchemaValidatorParams, ValidationReturnType, ValidationAnn
 import { JsonError, SchemaNode } from "../types";
 import { isListOfStrings } from "../utils/isListOfStrings";
 import { isObject } from "../utils/isObject";
+import { hasProperty } from "../utils/hasProperty";
+import { iterateProperties } from "../utils/iterateProperties";
 
 const KEYWORD = "dependentRequired";
 
@@ -28,15 +30,15 @@ export function parseDependentRequired(node: SchemaNode) {
     }
 
     const errors: ValidationAnnotation[] = [];
-    node.dependentRequired = {};
-    for (const propertyName of Object.keys(schema[KEYWORD])) {
+    node.dependentRequired = Object.create(null) as Record<string, string[]>;
+    for (const [propertyName, propertyPointer] of iterateProperties(schema[KEYWORD])) {
         const list = schema[KEYWORD][propertyName];
         if (isListOfStrings(list)) {
             node.dependentRequired[propertyName] = list;
         } else {
             errors.push(
                 node.createError("schema-error", {
-                    pointer: `${node.schemaLocation}/${KEYWORD}/${propertyName}`,
+                    pointer: `${node.schemaLocation}/${KEYWORD}/${propertyPointer}`,
                     schema,
                     value: list,
                     message: `Keyword '${KEYWORD}[string]' must be a string[] - received '${typeof list}'`
@@ -64,7 +66,7 @@ export function validateDependentRequired({
             return;
         }
         for (let i = 0, l = dependencies.length; i < l; i += 1) {
-            if (data[dependencies[i]] === undefined) {
+            if (!hasProperty(data, dependencies[i])) {
                 errors.push(
                     node.createError("missing-dependency-error", {
                         missingProperty: dependencies[i],
