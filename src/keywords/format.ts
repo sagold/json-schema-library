@@ -1,5 +1,5 @@
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
-import { SchemaNode } from "../SchemaNode";
+import type { Context, SchemaNode } from "../SchemaNode";
 
 const KEYWORD = "format";
 
@@ -10,6 +10,14 @@ export const formatKeyword: Keyword = {
     addValidate: ({ schema }) => schema?.format != null,
     validate: validateFormat
 };
+
+export function applyFormatAssertion(context: Context) {
+    if (context.formatAssertion === false) {
+        context.keywords = context.keywords.map((keyword) =>
+            keyword.keyword === KEYWORD ? { ...keyword, addValidate: () => false } : keyword
+        );
+    }
+}
 
 function parseFormat(node: SchemaNode) {
     const format = node.schema[KEYWORD];

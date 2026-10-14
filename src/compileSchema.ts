@@ -21,6 +21,7 @@ import { TemplateOptions } from "./methods/getData";
 import { SchemaNode, SchemaNodeMethods, addKeywords, isSchemaNode } from "./SchemaNode";
 import settings from "./settings";
 import sanitizeErrors from "./utils/sanitizeErrors";
+import { applyFormatAssertion } from "./keywords/format";
 
 const { REGEX_FLAGS } = settings;
 
@@ -106,7 +107,7 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
                 throw new Error(`required $id on remotes[${index}] is missing`);
             }
         });
-        remote = compileSchema(remotes.shift()!);
+        remote = compileSchema(remotes.shift()!, { formatAssertion: options.formatAssertion });
         remotes.forEach((r) => remote?.addRemoteSchema(r.$id, r));
     }
 
@@ -157,9 +158,8 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
         }
     }
 
-    if (formatAssertion === false) {
-        node.context.keywords = node.context.keywords.filter((f) => f.keyword !== "format");
-    }
+    node.context.formatAssertion = formatAssertion;
+    applyFormatAssertion(node.context);
 
     if (!isJsonSchema(schema) && !isBooleanSchema(schema)) {
         node.schemaErrors = [
