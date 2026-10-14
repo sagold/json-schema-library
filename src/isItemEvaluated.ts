@@ -1,5 +1,5 @@
 import { ValidationPath } from "./Keyword";
-import { SchemaNode } from "./types";
+import { isJsonAnnotation, SchemaNode } from "./types";
 import { getValue } from "./utils/getValue";
 import { validateNode } from "./validateNode";
 
@@ -30,7 +30,7 @@ export function isItemEvaluated({ node, data, key, pointer, path }: Options) {
         return true;
     }
 
-    if (node.contains && validateNode(node.contains, value, `${pointer}/${key}`, path).length === 0) {
+    if (node.contains && validateNode(node.contains, value, `${pointer}/${key}`, path).every(isJsonAnnotation)) {
         return true;
     }
 
@@ -61,7 +61,7 @@ export function isItemEvaluated({ node, data, key, pointer, path }: Options) {
         if (isItemEvaluated({ node: node.if, data, key, pointer, path })) {
             return true;
         }
-        const validIf = validateNode(node.if, data, pointer, path).length === 0;
+        const validIf = validateNode(node.if, data, pointer, path).every(isJsonAnnotation);
 
         if (validIf && node.if.prefixItems && node.if.prefixItems.length > key) {
             // evaluated by if

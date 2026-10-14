@@ -1,5 +1,5 @@
 import { isObject } from "../utils/isObject";
-import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
+import { isBooleanSchema, isJsonAnnotation, isJsonSchema, SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
 import { validateNode } from "../validateNode";
 import { isPropertyEvaluated } from "../isPropertyEvaluated";
@@ -89,7 +89,10 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
             }
         }
 
-        if (child && validateNode(child, data[propertyName], `${pointer}/${propertyName}`, path).length > 0) {
+        if (
+            child &&
+            !validateNode(child, data[propertyName], `${pointer}/${propertyName}`, path).every(isJsonAnnotation)
+        ) {
             if (node.unevaluatedProperties) {
                 const validationResult = validateNode(
                     node.unevaluatedProperties,
