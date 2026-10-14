@@ -4,7 +4,7 @@ import { additionalItemsKeyword } from "./draft2019-09/keywords/additionalItems"
 import { additionalPropertiesKeyword } from "./keywords/additionalProperties";
 import { allOfKeyword } from "./keywords/allOf";
 import { anyOfKeyword } from "./keywords/anyOf";
-import { containsKeyword } from "./keywords/contains";
+import { containsKeyword } from "./draft06/keywords/contains";
 import { createSchema } from "./methods/createSchema";
 import { dependenciesKeyword } from "./keywords/dependencies";
 import { deprecatedKeyword } from "./keywords/deprecated";

@@ -5,7 +5,7 @@ import { additionalPropertiesKeyword } from "./keywords/additionalProperties";
 import { allOfKeyword } from "./keywords/allOf";
 import { anyOfKeyword } from "./keywords/anyOf";
 import { constKeyword } from "./keywords/const";
-import { containsKeyword } from "./keywords/contains";
+import { containsKeyword } from "./draft06/keywords/contains";
 import { createSchema } from "./methods/createSchema";
 import { dependenciesKeyword } from "./keywords/dependencies";
 import { deprecatedKeyword } from "./keywords/deprecated";
