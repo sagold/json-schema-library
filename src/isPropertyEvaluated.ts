@@ -1,5 +1,5 @@
 import { ValidationPath } from "./Keyword";
-import { SchemaNode } from "./types";
+import { isJsonAnnotation, SchemaNode } from "./types";
 import { hasProperty } from "./utils/hasProperty";
 // import { getValue } from "./utils/getValue";
 import { validateNode } from "./validateNode";
@@ -70,7 +70,7 @@ export function isPropertyEvaluated({ node, data, key, pointer, path }: Options)
             return true;
         }
 
-        const validIf = validateNode(node.if, data, pointer, path).length === 0;
+        const validIf = validateNode(node.if, data, pointer, path).every(isJsonAnnotation);
         if (validIf && node.then) {
             if (isPropertyEvaluated({ node: node.then, data, key, pointer, path })) {
                 return true;

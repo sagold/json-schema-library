@@ -6,7 +6,7 @@ import {
     ValidationReturnType,
     ValidationAnnotation
 } from "../Keyword";
-import { isSchemaNode, SchemaNode } from "../types";
+import { isJsonAnnotation, isSchemaNode, SchemaNode } from "../types";
 import settings from "../settings";
 import { getValue } from "../utils/getValue";
 import sanitizeErrors from "../utils/sanitizeErrors";
@@ -77,7 +77,7 @@ function reduceOneOf({ node, data, pointer, path }: Omit<JsonSchemaReducerParams
     const errors: ValidationReturnType[] = [];
     for (let i = 0; i < node.oneOf.length; i += 1) {
         const validationErrors = validateNode(node.oneOf[i], data, pointer, path);
-        if (validationErrors.length === 0) {
+        if (validationErrors.every(isJsonAnnotation)) {
             matches.push({ index: i, node: node.oneOf[i] });
         } else {
             errors.push(...validationErrors);
@@ -164,7 +164,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: Omit<JsonSc
             validateNode(resultNode, oneOfPropertyValue, `${pointer}/${oneOfProperty}`, path)
         );
 
-        if (result.length > 0) {
+        if (!result.every(isJsonAnnotation)) {
             errors.push(...result);
         } else {
             // return at once when we found a schema
@@ -203,7 +203,7 @@ function fuzzyObjectValue(node: SchemaNode, data: Record<string, unknown>, point
     const keys = Object.keys(node.properties ?? {});
     for (const key of keys) {
         if (data[key]) {
-            if (validateNode(node.properties[key], data[key], pointer, path).length === 0) {
+            if (validateNode(node.properties[key], data[key], pointer, path).every(isJsonAnnotation)) {
                 value += 1;
             }
         }
@@ -318,7 +318,7 @@ function validateFromDeclarator({ node, data, pointer = "#", path }: JsonSchemaV
         const { node: oneOfPropertyNode, error } = oneOfNode.getNodeChild(oneOfProperty, oneOfValue);
         if (oneOfPropertyNode) {
             const validationResult = validateNode(oneOfPropertyNode, oneOfValue, `${pointer}/${oneOfProperty}`, path);
-            if (validationResult.length > 0) {
+            if (!validationResult.every(isJsonAnnotation)) {
                 errors.push(...validationResult);
             } else {
                 matches.push({ index: oneOf.indexOf(oneOfNode), node: oneOfNode });
@@ -369,7 +369,7 @@ function oneOfValidator({ node, data, pointer = "#", path }: JsonSchemaValidator
     const errors: ValidationReturnType = [];
     for (let i = 0; i < oneOf.length; i += 1) {
         const validationResult = validateNode(oneOf[i], data, pointer, path);
-        if (validationResult.length > 0) {
+        if (!validationResult.every(isJsonAnnotation)) {
             errors.push(...validationResult);
         } else {
             matches.push({ index: i, node: oneOf[i] });
