@@ -1,6 +1,6 @@
 import { JsonError, SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
-import deepEqual from "fast-deep-equal";
+import { equalJson } from "../utils/equalJson";
 
 const KEYWORD = "uniqueItems";
 
@@ -37,7 +37,7 @@ function validateUniqueItems({ node, data, pointer }: JsonSchemaValidatorParams)
     const errors: JsonError[] = [];
     data.forEach((item, index) => {
         for (let i = index + 1; i < data.length; i += 1) {
-            if (deepEqual(item, data[i]) && !duplicates.includes(i)) {
+            if (equalJson(item, data[i]) && !duplicates.includes(i)) {
                 errors.push(
                     node.createError("unique-items-error", {
                         pointer: `${pointer}/${i}`,

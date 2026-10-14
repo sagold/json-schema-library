@@ -1,5 +1,5 @@
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
-import equal from "fast-deep-equal";
+import { equalJson } from "../utils/equalJson";
 
 export const constKeyword: Keyword = {
     id: "const",
@@ -9,7 +9,7 @@ export const constKeyword: Keyword = {
 };
 
 function validateConst({ node, data, pointer }: JsonSchemaValidatorParams) {
-    if (!equal(data, node.schema.const)) {
+    if (!equalJson(data, node.schema.const)) {
         return [
             node.createError("const-error", { pointer, schema: node.schema, value: data, expected: node.schema.const })
         ];
