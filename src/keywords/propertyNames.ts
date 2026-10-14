@@ -3,6 +3,7 @@ import { isObject } from "../utils/isObject";
 import { SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
 import { validateNode } from "../validateNode";
+import { appendDataPointer } from "../utils/iterateProperties";
 
 const KEYWORD = "propertyNames";
 
@@ -71,10 +72,8 @@ function validatePropertyNames({ node, data, pointer, path }: JsonSchemaValidato
     const errors: JsonError[] = [];
     const properties = Object.keys(data);
     properties.forEach((prop) => {
-        const validationResult = validateNode(propertyNames, prop, `${pointer}/${prop}`, path).filter(
-            (result) => !isJsonAnnotation(result)
-        );
-        if (validationResult.length > 0) {
+        const validationResult = validateNode(propertyNames, prop, appendDataPointer(pointer, prop), path);
+        if (!validationResult.every(isJsonAnnotation)) {
             errors.push(
                 node.createError("invalid-property-name-error", {
                     property: prop,

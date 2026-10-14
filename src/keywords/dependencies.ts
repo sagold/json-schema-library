@@ -8,6 +8,7 @@ import { validateDependentSchemas } from "./dependentSchemas";
 import sanitizeErrors from "../utils/sanitizeErrors";
 import { isListOfStrings } from "../utils/isListOfStrings";
 import { collectValidationErrors } from "src/utils/collectValidationErrors";
+import { appendDataPointer, iterateProperties } from "../utils/iterateProperties";
 
 const KEYWORD = "dependencies";
 
@@ -34,18 +35,19 @@ export function parseDependencies(node: SchemaNode) {
     }
 
     const errors: ValidationAnnotation[] = [];
-    for (const property of Object.keys(dependencies)) {
+    for (const [property, propertyPointer] of iterateProperties(dependencies)) {
         const schema = dependencies[property] as string[];
         if (isJsonSchema(schema) || isBooleanSchema(schema)) {
-            node.dependentSchemas = node.dependentSchemas ?? {};
+            node.dependentSchemas =
+                node.dependentSchemas ?? (Object.create(null) as Record<string, SchemaNode | boolean>);
             node.dependentSchemas[property] = node.compileSchema(
                 schema,
-                `${node.evaluationPath}/${KEYWORD}/${property}`,
-                `${node.schemaLocation}/${KEYWORD}/${property}`
+                `${node.evaluationPath}/${KEYWORD}/${propertyPointer}`,
+                `${node.schemaLocation}/${KEYWORD}/${propertyPointer}`
             );
             collectValidationErrors(errors, node.dependentSchemas[property]);
         } else if (isListOfStrings(schema)) {
-            node.dependentRequired = node.dependentRequired ?? {};
+            node.dependentRequired = node.dependentRequired ?? (Object.create(null) as Record<string, string[]>);
             node.dependentRequired[property] = schema;
         } else {
             errors.push(
@@ -115,7 +117,7 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
                 schema: { ...dependency.schema, required }
             }.reduceNode(data, {
                 key,
-                pointer: `${pointer}/${KEYWORD}/${propertyName}`,
+                pointer: appendDataPointer(`${pointer}/${KEYWORD}`, propertyName),
                 path
             });
 

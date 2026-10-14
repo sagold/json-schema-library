@@ -1,6 +1,7 @@
 import { isSchemaNode, SchemaNode } from "./types";
 import { mergeSchema } from "./utils/mergeSchema";
 import { joinDynamicId } from "./SchemaNode";
+import { getValue } from "./utils/getValue";
 
 interface SchemaNodeCB {
     toJSON?: () => string;
@@ -24,11 +25,11 @@ function mergeObjects(a?: Record<string, SchemaNode>, b?: Record<string, SchemaN
     if (a == null || b == null) {
         return b || a;
     }
-    const object: Record<string, SchemaNode> = {};
+    const object: Record<string, SchemaNode> = Object.create(null);
     [...Object.keys(a), ...Object.keys(b)]
         .filter((p, i, l) => l.indexOf(p) === i)
         .forEach((key) => {
-            const result = mergeNode(a[key], b[key]);
+            const result = mergeNode(getValue(a, key), getValue(b, key));
             if (isSchemaNode(result)) {
                 object[key] = result;
             }
