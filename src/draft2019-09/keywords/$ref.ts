@@ -5,6 +5,7 @@ import { validateNode } from "../../validateNode";
 import { isSchemaNode, JsonError, SchemaNode } from "../../types";
 import { get, split } from "@sagold/json-pointer";
 import { reduceRef, compileNext } from "../../keywords/$ref";
+import { isolateNode } from "../../SchemaNode";
 
 export const $refKeyword: Keyword = {
     id: "$ref",
@@ -187,7 +188,9 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
         const $remoteHostRef = fragments[0];
         // this is a reference to remote-host root node (and not a self reference)
         if (node.context.remotes[$remoteHostRef] && node !== node.context.remotes[$remoteHostRef]) {
-            const referencedNode = node.context.remotes[$remoteHostRef];
+            const { isolated, remotes } = node.context;
+            const remoteNode = remotes[$remoteHostRef];
+            const referencedNode = isolated === true ? isolateNode(remoteNode, remotes) : remoteNode;
             // resolve full ref on remote schema - we store currently only store ref with domain
             let nextNode = getRef(referencedNode, $ref);
             if (nextNode) {
@@ -222,7 +225,7 @@ export default function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode 
                     });
                 }
             }
-            return currentNode;
+            return node.context.isolated === true ? compileNext(currentNode, node) : currentNode;
         }
     }
 

@@ -9,6 +9,7 @@ import { get, split } from "@sagold/json-pointer";
 import { mergeNode } from "../mergeNode";
 import { pick } from "../utils/pick";
 import settings from "src/settings";
+import { isolateNode } from "../SchemaNode";
 
 export const $refKeyword: Keyword = {
     id: "$ref",
@@ -189,7 +190,9 @@ export function compileNext(referencedNode: SchemaNode, sourceNode: SchemaNode) 
             ...pick(sourceNode.schema, ...settings.PROPERTIES_TO_MERGE)
         };
     }
-    return referencedNode.compileSchema(
+    const { isolated, remotes } = sourceNode.context;
+    const targetNode = isolated === true ? isolateNode(referencedNode, remotes) : referencedNode;
+    return targetNode.compileSchema(
         referencedSchema,
         `${sourceNode.evaluationPath}/$ref`,
         referencedNode.schemaLocation
@@ -255,7 +258,9 @@ export function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonEr
         const $remoteHostRef = fragments[0];
         // this is a reference to remote-host root node (and not a self reference)
         if (node.context.remotes[$remoteHostRef] && node !== node.context.remotes[$remoteHostRef]) {
-            const referencedNode = node.context.remotes[$remoteHostRef];
+            const { isolated, remotes } = node.context;
+            const remoteNode = remotes[$remoteHostRef];
+            const referencedNode = isolated === true ? isolateNode(remoteNode, remotes) : remoteNode;
             // resolve full ref on remote schema - we store currently only store ref with domain
             let nextNode = getRef(referencedNode, $ref);
             if (nextNode) {
@@ -290,7 +295,7 @@ export function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonEr
                     });
                 }
             }
-            return currentNode;
+            return node.context.isolated === true ? compileNext(currentNode, node) : currentNode;
         }
     }
 

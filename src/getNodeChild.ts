@@ -1,4 +1,4 @@
-import { GetNodeOptions, isSchemaNode, SchemaNode } from "./SchemaNode";
+import { GetNodeOptions, isolateNode, isSchemaNode, SchemaNode } from "./SchemaNode";
 import { isJsonError, NodeOrError, OptionalNodeOrError } from "./types";
 import { getValue } from "./utils/getValue";
 
@@ -52,7 +52,7 @@ export function getNodeChild(
 
     // no child node was found, but the child node is valid
     if (options.createSchema === true) {
-        const newNode = parentNode.compileSchema(
+        const newNode = isolateNode(parentNode).compileSchema(
             parentNode.createSchema(getValue(data, key)),
             `${parentNode.evaluationPath}/additional`,
             `${parentNode.schemaLocation}/additional`
