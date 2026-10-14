@@ -12,6 +12,7 @@ import { isObject } from "../utils/isObject";
 import { mergeSchema } from "../utils/mergeSchema";
 import sanitizeErrors from "../utils/sanitizeErrors";
 import { validateNode } from "../validateNode";
+import { encodePointerProperty, iterateProperties } from "../utils/iterateProperties";
 
 const KEYWORD = "propertyDependencies";
 
@@ -85,12 +86,12 @@ function parsePropertyDependencies(node: SchemaNode) {
     }
     const parsed: Record<string, Record<string, SchemaNode>> = Object.create(null);
     const errors: ValidationAnnotation[] = [];
-    Object.keys(propertyDependencies).map((propertyName) => {
+    iterateProperties(propertyDependencies).forEach(([propertyName, propertyPointer]) => {
         const values = propertyDependencies[propertyName];
         if (!isObject(values)) {
             errors.push(
                 node.createError("schema-error", {
-                    pointer: `${node.schemaLocation}/${KEYWORD}/${propertyName}`,
+                    pointer: `${node.schemaLocation}/${KEYWORD}/${propertyPointer}`,
                     schema: node.schema,
                     value: propertyDependencies,
                     message: `Keyword '${KEYWORD}[string]' must be an object - received '${typeof propertyDependencies}'`
@@ -98,12 +99,12 @@ function parsePropertyDependencies(node: SchemaNode) {
             );
             return;
         }
-        Object.keys(values).forEach((value) => {
+        iterateProperties(values).forEach(([value, valuePointer]) => {
             const schema = values[value];
             if (!(isJsonSchema(schema) || isBooleanSchema(schema))) {
                 errors.push(
                     node.createError("schema-error", {
-                        pointer: `${node.schemaLocation}/${KEYWORD}/${propertyName}/${value}`,
+                        pointer: `${node.schemaLocation}/${KEYWORD}/${propertyPointer}/${valuePointer}`,
                         schema: node.schema,
                         value: schema,
                         message: `Keyword '${KEYWORD}[string][string]' must be a valid JSON Schema - received '${typeof schema}'`
@@ -114,8 +115,8 @@ function parsePropertyDependencies(node: SchemaNode) {
             parsed[propertyName] = parsed[propertyName] ?? Object.create(null);
             parsed[propertyName][value] = node.compileSchema(
                 schema,
-                `${node.evaluationPath}/${KEYWORD}/${propertyName}/${value}`,
-                `${node.schemaLocation}/${KEYWORD}/${propertyName}/${value}`
+                `${node.evaluationPath}/${KEYWORD}/${propertyPointer}/${valuePointer}`,
+                `${node.schemaLocation}/${KEYWORD}/${propertyPointer}/${valuePointer}`
             );
             collectValidationErrors(errors, parsed[propertyName][value]);
         });
@@ -156,7 +157,9 @@ function reducePropertyDependencies({ node, data, key, pointer, path }: JsonSche
         if (schemaNode) {
             const nestedDynamicId = schemaNode.dynamicId?.replace(node.dynamicId, "") ?? "";
             const localDynamicId =
-                nestedDynamicId === "" ? `propertyDependencies/${match.property}/${match.value}` : nestedDynamicId;
+                nestedDynamicId === ""
+                    ? `propertyDependencies/${encodePointerProperty(match.property)}/${encodePointerProperty(match.value)}`
+                    : nestedDynamicId;
             dynamicId += `${dynamicId === "" ? "" : ","}${localDynamicId}`;
 
             const schema = mergeSchema(match.node.schema, schemaNode.schema);

@@ -4,6 +4,7 @@ import { Keyword, JsonSchemaResolverParams, JsonSchemaValidatorParams, Validatio
 import { isBooleanSchema, SchemaNode } from "../types";
 import { getValue } from "../utils/getValue";
 import { validateNode } from "../validateNode";
+import { appendDataPointer } from "../utils/iterateProperties";
 
 export const additionalPropertiesKeyword: Keyword = {
     id: "additionalProperties",
@@ -45,20 +46,23 @@ export function parseAdditionalProperties(node: SchemaNode) {
     return node.additionalProperties.schemaValidation;
 }
 
-function additionalPropertyResolver({ node, data, key }: JsonSchemaResolverParams) {
+function additionalPropertyResolver({
+    node,
+    data,
+    key,
+    pointer = appendDataPointer("#", key)
+}: JsonSchemaResolverParams) {
     const value = getValue(data, key);
     if (node.additionalProperties) {
-        const { node: reduced, error } = node.additionalProperties.reduceNode(value);
+        const { node: reduced, error } = node.additionalProperties.reduceNode(value, { pointer });
         return reduced ?? error;
     }
     if (node.schema.additionalProperties === false) {
         return node.createError("no-additional-properties-error", {
-            pointer: `${key}`,
+            pointer,
             schema: node.schema,
             value: getValue(data, key),
             property: `${key}`
-            // @todo add pointer to resolver
-            // properties: expectedProperties
         });
     }
 }
@@ -106,7 +110,7 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
                 const validationErrors = validateNode(
                     node.additionalProperties,
                     propertyValue,
-                    `${pointer}/${property}`,
+                    appendDataPointer(pointer, property),
                     path
                 );
                 if (validationErrors) {
@@ -116,7 +120,7 @@ function validateAdditionalProperty({ node, data, pointer = "#", path }: JsonSch
             } else {
                 errors.push(
                     node.createError("no-additional-properties-error", {
-                        pointer: `${pointer}/${property}`,
+                        pointer: appendDataPointer(pointer, property),
                         schema,
                         value: data,
                         property,
