@@ -1,4 +1,4 @@
-import { c as JsonSchema } from "./types-CZDKSU_y.cjs";
+import { c as JsonSchema } from "./types-B27zrqR4.cjs";
 //#region remotes/index.d.ts
 /** JSON Schema meta-schemata */
 declare const remotes: JsonSchema[];
