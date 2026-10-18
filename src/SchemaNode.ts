@@ -40,6 +40,7 @@ import { hasProperty } from "./utils/hasProperty";
 import { getNode } from "./getNode";
 import { getNodeChild } from "./getNodeChild";
 import { DataNode } from "./methods/toDataNodes";
+import { applyFormatAssertion } from "./keywords/format";
 
 const { DYNAMIC_PROPERTIES, REGEX_FLAGS, DECLARATOR_ONEOF, VALID_ANNOTATION_KEYWORDS } = settings;
 
@@ -116,6 +117,8 @@ export type Context = {
     errors: Draft["errors"];
     /** draft formats & validators */
     formats: Draft["formats"];
+    /** [SHARED USING ADD REMOTE] effective format assertion policy */
+    formatAssertion?: boolean | "meta-schema";
     /**
      * Contexts are isolated from the original node-tree when reducing or navigating derived nodes.
      * Keywords like $ref must check this before modifying the context.
@@ -608,6 +611,7 @@ export const SchemaNodeMethods = {
 
         remoteNode.context.rootNode = remoteNode;
         remoteNode.context.remotes[resolveUri(url)] = remoteNode;
+        applyFormatAssertion(remoteNode.context);
 
         // parse and validate schema
         // @todo this is a duplicated to compileSchema

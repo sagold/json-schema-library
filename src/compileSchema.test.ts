@@ -194,6 +194,77 @@ describe("compileSchema vocabulary", () => {
     });
 });
 
+describe("compileSchema formatAssertion", () => {
+    it("should skip remote format assertions when disabled", () => {
+        const node = compileSchema({ $ref: "https://remote/email" }, { formatAssertion: false }).addRemoteSchema(
+            "https://remote/email",
+            { type: "string", format: "email" }
+        );
+
+        assert.equal(node.validate("not-an-email").valid, true);
+        assert.deepEqual(
+            node.validate(42).errors.map((error) => error.code),
+            ["type-error"]
+        );
+    });
+
+    it("should assert remote formats by default", () => {
+        const node = compileSchema({ $ref: "https://remote/email" }).addRemoteSchema("https://remote/email", {
+            type: "string",
+            format: "email"
+        });
+
+        assert.deepEqual(
+            node.validate("not-an-email").errors.map((error) => error.code),
+            ["format-email-error"]
+        );
+    });
+
+    it("should skip format assertions for the first and later remotes option entries", () => {
+        const node = compileSchema(
+            {
+                type: "array",
+                prefixItems: [{ $ref: "https://remote/first" }, { $ref: "https://remote/later" }]
+            },
+            {
+                formatAssertion: false,
+                remotes: [
+                    { $id: "https://remote/first", type: "string", format: "email" },
+                    { $id: "https://remote/later", type: "string", format: "email" }
+                ]
+            }
+        );
+
+        assert.deepEqual(node.validate(["not-an-email", "not-an-email"]).errors, []);
+    });
+
+    it("should preserve disabled assertions through transitive remote registration", () => {
+        const node = compileSchema({ $ref: "https://remote/wrapper" }, { formatAssertion: false }).addRemoteSchema(
+            "https://remote/wrapper",
+            { $ref: "https://remote/email" }
+        );
+        const remote = node.getNodeRef("https://remote/wrapper");
+        assert(remote);
+        remote.addRemoteSchema("https://remote/email", { type: "string", format: "email" });
+
+        assert.equal(node.validate("not-an-email").valid, true);
+    });
+
+    it("should still report and throw for malformed formats when assertions are disabled", () => {
+        const { schemaErrors, schemaAnnotations } = compileSchema({ format: 0 }, { formatAssertion: false });
+
+        assert.deepEqual(
+            schemaErrors?.map((error) => error.code),
+            ["schema-error"]
+        );
+        assert.deepEqual(schemaAnnotations, []);
+        assert.throws(
+            () => compileSchema({ format: 0 }, { formatAssertion: false, throwOnInvalidSchema: true }),
+            /Invalid schema passed to compileSchema/
+        );
+    });
+});
+
 describe("compileSchema getDataDefaultOptions", () => {
     it("should apply `getDataDefaultOptions.addOptionalProps` to getData", () => {
         const schema = {
