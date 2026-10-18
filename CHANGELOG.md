@@ -1,5 +1,13 @@
 ## Changelog
 
+### 11.6.12
+
+- fixed: minContains/maxContains wrongly applied to draft < 2019 (#122)
+
+### 11.6.11
+
+- fixed: createSchema not called from draft methods (#123)
+
 ### 11.6.10
 
 - fixed: incomplete support for `formatAssertion: false` (#120)
