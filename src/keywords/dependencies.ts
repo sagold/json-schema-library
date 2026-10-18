@@ -95,13 +95,13 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
 
     const dependentSchemas = node.dependentSchemas;
     if (dependentSchemas) {
-        Object.keys(dependentSchemas).forEach((propertyName) => {
+        for (const propertyName of Object.keys(dependentSchemas)) {
             if (!hasProperty(data, propertyName) && !required.includes(propertyName)) {
-                return true;
+                continue;
             }
             const dependency = dependentSchemas[propertyName];
             if (!isSchemaNode(dependency)) {
-                return true;
+                continue;
             }
 
             if (Array.isArray(dependency.schema.required)) {
@@ -110,11 +110,18 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
 
             // @note pass on updated required-list to resolve nested dependencies. This is currently supported,
             // but probably not how json-schema spec defines this behaviour (resolve only within sub-schema)
-            const reducedDependency = { ...dependency, schema: { ...dependency.schema, required } }.reduceNode(data, {
+            const { node: reducedDependency, error } = {
+                ...dependency,
+                schema: { ...dependency.schema, required }
+            }.reduceNode(data, {
                 key,
                 pointer: `${pointer}/${KEYWORD}/${propertyName}`,
                 path
-            }).node as SchemaNode;
+            });
+
+            if (!reducedDependency) {
+                return error;
+            }
 
             workingNode = mergeNode(workingNode, reducedDependency) as SchemaNode;
 
@@ -122,7 +129,7 @@ export function reduceDependencies({ node, data, key, pointer, path }: JsonSchem
             const nestedDynamicId = reducedDependency.dynamicId?.replace(node.dynamicId, "") ?? "";
             const localDynamicId = nestedDynamicId === "" ? `${KEYWORD}/${propertyName}` : nestedDynamicId;
             dynamicId += `${dynamicId === "" ? "" : ","}${localDynamicId}`;
-        });
+        }
     }
 
     if (workingNode === node) {

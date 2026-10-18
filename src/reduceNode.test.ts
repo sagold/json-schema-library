@@ -92,6 +92,32 @@ describe("compileSchema : reduceNode", () => {
             assert.deepEqual(reduced.dynamicId, "#/$defs/schema(dependencies/one,dependencies/two)");
         });
 
+        it("should propagate errors from dependent oneOf reduction", () => {
+            const node = compileSchema(
+                {
+                    type: "object",
+                    properties: { flag: { type: "boolean" } },
+                    dependencies: {
+                        flag: {
+                            oneOf: [
+                                { properties: { flag: { const: false } } },
+                                {
+                                    properties: { flag: { const: true }, extra: { type: "string" } },
+                                    required: ["extra"]
+                                }
+                            ]
+                        }
+                    }
+                },
+                { draft: "draft-07" }
+            );
+
+            const { node: reduced, error } = node.reduceNode({ flag: true });
+
+            assert.equal(reduced, undefined);
+            assert.equal(error?.code, "one-of-error");
+        });
+
         it("should add required-property from dependency", () => {
             const node: any = compileSchema({
                 type: "object",
