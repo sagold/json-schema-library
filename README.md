@@ -153,7 +153,7 @@ console.log(schemaErrors[0]);
 ---
 
 ```ts
-const { schemaAnnotations } = compileSchema({ unknown: true }, { withSchemaAnnotations: true });
+const { schemaAnnotations } = compileSchema({ unknown: true });
 console.log(schemaAnnotations[0]);
 {
   type: "annotation",
@@ -1238,7 +1238,7 @@ You may want to extend a draft when the default JSON Schema behavior does not fi
 Examples:
 
 ```ts
-import { extendDraft, draft2020, oneOfFuzzyKeyword, createCustomError, render, ErrorData } from "json-schema-library";
+import { extendDraft, draft2020, oneOfFuzzyKeyword, render, AnnotationData } from "json-schema-library";
 
 const myDraft = extendDraft(draft2020, {
   // Match all $schema
@@ -1269,7 +1269,7 @@ const myDraft = extendDraft(draft2020, {
     "max-length-error": "Too many characters",
 
     // Add a dynamic MinLengthError with custom logic
-    "min-length-error": (data: ErrorData) => {
+    "min-length-error": (data: AnnotationData) => {
       if (data.minLength === 1) {
         return {
           type: "error",
