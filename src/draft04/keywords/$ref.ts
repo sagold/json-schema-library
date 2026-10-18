@@ -5,6 +5,7 @@ import { omit } from "../../utils/omit";
 import splitRef from "../../utils/splitRef";
 import { $refKeyword as draft06Keyword } from "../../draft06/keywords/$ref";
 import { isSchemaNode, JsonError, SchemaNode } from "../../types";
+import { isolateNode } from "../../SchemaNode";
 
 export const $refKeyword: Keyword = {
     id: "$ref",
@@ -69,11 +70,17 @@ function resolveRef(this: SchemaNode, { pointer, path }: { pointer?: string; pat
     return resolvedNode;
 }
 
-function compileNext(referencedNode: SchemaNode, evaluationPath = referencedNode.evaluationPath) {
+function compileNext(referencedNode: SchemaNode, sourceNode: SchemaNode) {
     const referencedSchema = isObject(referencedNode.schema)
         ? omit(referencedNode.schema, "id")
         : referencedNode.schema;
-    return referencedNode.compileSchema(referencedSchema, `${evaluationPath}/$ref`, referencedSchema.schemaLocation);
+    const { isolated, remotes } = sourceNode.context;
+    const targetNode = isolated === true ? isolateNode(referencedNode, remotes) : referencedNode;
+    return targetNode.compileSchema(
+        referencedSchema,
+        `${sourceNode.evaluationPath}/$ref`,
+        referencedSchema.schemaLocation
+    );
 }
 
 function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError | undefined {
@@ -84,12 +91,12 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError | u
     // resolve $ref by json-evaluationPath
     if (node.context.refs[$ref]) {
         // console.log(`ref resolve ${$ref} from refs`, node.context.refs[$ref].ref);
-        return compileNext(node.context.refs[$ref], node.evaluationPath);
+        return compileNext(node.context.refs[$ref], node);
     }
 
     if (node.context.anchors[$ref]) {
         // console.log(`ref resolve ${$ref} from anchors`, node.context.anchors[$ref].ref);
-        return compileNext(node.context.anchors[$ref], node.evaluationPath);
+        return compileNext(node.context.anchors[$ref], node);
     }
 
     // check for remote-host + pointer pair to switch rootSchema
@@ -108,7 +115,7 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError | u
         const $ref = fragments[0];
         // this is a reference to remote-host root node
         if (node.context.remotes[$ref]) {
-            return compileNext(node.context.remotes[$ref], node.evaluationPath);
+            return compileNext(node.context.remotes[$ref], node);
         }
         return node.createError("ref-error", {
             ref: $ref,
@@ -122,7 +129,9 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError | u
         const $remoteHostRef = fragments[0];
         // this is a reference to remote-host root node (and not a self reference)
         if (node.context.remotes[$remoteHostRef] && node !== node.context.remotes[$remoteHostRef]) {
-            const referencedNode = node.context.remotes[$remoteHostRef];
+            const { isolated, remotes } = node.context;
+            const remoteNode = remotes[$remoteHostRef];
+            const referencedNode = isolated === true ? isolateNode(remoteNode, remotes) : remoteNode;
             // resolve full ref on remote schema - we store currently only store ref with domain
             let nextNode = getRef(referencedNode, $ref);
             if (nextNode) {
@@ -141,7 +150,8 @@ function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError | u
             const nextNode = node.context.refs[$localRef];
             const property = fragments[1].split("$defs/").pop();
             if (property && nextNode?.$defs) {
-                return getRef(nextNode.$defs[property]);
+                const target = nextNode.$defs[property];
+                return getRef(target && node.context.isolated === true ? compileNext(target, node) : target);
             }
         }
 

@@ -47,6 +47,30 @@ export function isSchemaNode(value: unknown): value is SchemaNode {
     return isObject(value) && Array.isArray(value?.reducers) && Array.isArray(value?.resolvers);
 }
 
+export function isolateNode(node: SchemaNode, remotes = node.context.remotes): SchemaNode {
+    if (node.context.isolated === true && remotes === node.context.remotes) {
+        return node;
+    }
+    const isolatedNode = {
+        ...node,
+        context: {
+            ...node.context,
+            isolated: true,
+            refs: { ...node.context.refs },
+            anchors: { ...node.context.anchors },
+            dynamicAnchors: { ...node.context.dynamicAnchors },
+            remotes: { ...remotes }
+        }
+    };
+    // Preserve remote self-reference checks on the isolated node.
+    Object.entries(isolatedNode.context.remotes).forEach(([uri, remote]) => {
+        if (remote === node) {
+            isolatedNode.context.remotes[uri] = isolatedNode;
+        }
+    });
+    return isolatedNode;
+}
+
 export function isReduceable(node: SchemaNode) {
     for (let i = 0, l = DYNAMIC_PROPERTIES.length; i < l; i += 1) {
         // @ts-expect-error interface to object conversion
@@ -93,9 +117,8 @@ export type Context = {
     /** draft formats & validators */
     formats: Draft["formats"];
     /**
-     * Contexts are isolated from original node-tree when being reduced. This flag is set by entering
-     * reduceNode which creates a new node-tree version. Keywords like $ref must check this before modifying
-     * the context
+     * Contexts are isolated from the original node-tree when reducing or navigating derived nodes.
+     * Keywords like $ref must check this before modifying the context.
      */
     isolated?: boolean;
     /** [SHARED USING ADD REMOTE] getData default options */
@@ -461,20 +484,7 @@ export const SchemaNodeMethods = {
         const sourceNode = this as SchemaNode;
         const { key = "missing-key", pointer = sourceNode.evaluationPath, path } = options;
 
-        let node = sourceNode;
-        if (sourceNode.context.isolated !== true) {
-            // we are now creating a modified node tree and need to ensure the original context
-            // is not changed by modified schema node versions
-            const reducedContext = {
-                isolated: true,
-                ...sourceNode.context,
-                refs: { ...sourceNode.context.refs },
-                anchors: { ...sourceNode.context.anchors },
-                dynamicAnchors: { ...sourceNode.context.dynamicAnchors },
-                remotes: { ...sourceNode.context.remotes }
-            };
-            node = { ...(this as SchemaNode), context: reducedContext };
-        }
+        const node = isolateNode(sourceNode);
 
         // @ts-expect-error bool schema
         if (node.schema === false) {
@@ -588,6 +598,7 @@ export const SchemaNodeMethods = {
             schema,
             context: {
                 ...context,
+                isolated: false,
                 refs: {},
                 anchors: {},
                 ...copy(pick(draft, "methods", "keywords", "version", "formats", "errors"))
