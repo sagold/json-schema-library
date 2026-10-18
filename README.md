@@ -317,7 +317,7 @@ To access the remote schema, add a $ref within your local schema and the remote 
 schemaNode.validate({ character: "AB" }); // maxLength error
 schemaNode.getData({}); // { character: "A" } - default value resolved
 // returns remote schema (from compiled local schema):
-const { node, error } = schemaNode.getNodeRef("https://sagold.com/remote");
+const node = schemaNode.getNodeRef("https://sagold.com/remote");
 ```
 
 **Note** JSON Schema $ref-keyword can become tricky when combined with $ids in sub-schemas. For more details, see [json-schema.org: Structuring a complex schema](https://json-schema.org/understanding-json-schema/structuring.html#base-uri).
@@ -375,7 +375,7 @@ schemaNode.addRemoteSchema("https://sagold.com/remote", {
 schemaNode.validate("AB"); // maxLength error
 schemaNode.getData("A"); // "A" - default value resolved
 // returns remote schema (from compiled local schema):
-const { node, error } = schemaNode.getNodeRef("https://sagold.com/remote#/$defs/character");
+const node = schemaNode.getNodeRef("https://sagold.com/remote#/$defs/character");
 ```
 
 **Note** JSON Pointer are not restricted to `$defs` (definitions), but can reference any subschema. For example:
@@ -867,13 +867,14 @@ expect(schema).to.deep.eq({ type: "number" });
 ### getNodeRef
 
 `getNodeRef` retrieves the SchemaNode of a `$ref` string.
+Returns the found _SchemaNode_ oa a _JsonError_ if the $ref could not be resolved.
 
 ```ts
 const root = compileSchema(mySchema);
 root.addRemoteSchema("https://remote.com/schema", remoteSchema);
 
-root.getNodeRef("#/$defs/title"); // title-schema of mySchema
-root.getNodeRef("https://remote.com/schema"); // remoteSchema
+const mySchemaTitleNode = root.getNodeRef("#/$defs/title");
+const remoteSchemaNode = root.getNodeRef("https://remote.com/schema");
 ```
 
 ### getNodeRoot

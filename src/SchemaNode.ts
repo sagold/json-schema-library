@@ -268,7 +268,7 @@ interface SchemaNodeMethodsType {
     getNodeChild(key: string | number, data?: unknown, options?: GetNodeOptions): OptionalNodeOrError;
 
     getChildSelection(property: string | number): JsonError | SchemaNode[];
-    getNodeRef($ref: string): SchemaNode | undefined;
+    getNodeRef($ref: string): SchemaNode | JsonError;
     getNodeRoot(): SchemaNode;
     getDraftVersion(): string;
     getData(data?: unknown, options?: TemplateOptions): any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -418,9 +418,9 @@ export const SchemaNodeMethods = {
     getNodeChild,
 
     /**
-     * @returns for $ref, the corresponding SchemaNode or undefined
+     * @returns for $ref, the corresponding SchemaNode or a JsonError
      */
-    getNodeRef($ref: string): SchemaNode | undefined {
+    getNodeRef($ref: string): SchemaNode | JsonError {
         const node = this as SchemaNode;
         return node.compileSchema({ $ref }, "$dynamic").resolveRef();
     },
