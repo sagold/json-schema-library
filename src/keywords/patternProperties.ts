@@ -6,8 +6,7 @@ import {
     JsonSchemaReducerParams,
     JsonSchemaResolverParams,
     JsonSchemaValidatorParams,
-    ValidationReturnType,
-    ValidationAnnotation
+    ValidationReturnType
 } from "../Keyword";
 import { getValue } from "../utils/getValue";
 import { validateNode } from "../validateNode";
