@@ -126,8 +126,6 @@ export type Context = {
     isolated?: boolean;
     /** [SHARED USING ADD REMOTE] getData default options */
     getDataDefaultOptions?: TemplateOptions;
-    /** [SHARED USING ADD REMOTE] collect unknown keywords in schemaAnnotations */
-    withSchemaAnnotations?: boolean;
     /** [SHARED USING ADD REMOTE] throw error on validation when ref cannot be resolved */
     throwOnInvalidRef?: boolean;
 };
