@@ -275,9 +275,8 @@ type Context = {
   /** draft formats & validators */
   formats: Draft["formats"];
   /**
-   * Contexts are isolated from original node-tree when being reduced. This flag is set by entering
-   * reduceNode which creates a new node-tree version. Keywords like $ref must check this before modifying
-   * the context
+   * Contexts are isolated from the original node-tree when reducing or navigating derived nodes.
+   * Keywords like $ref must check this before modifying the context.
    */
   isolated?: boolean;
   /** [SHARED USING ADD REMOTE] getData default options */
@@ -551,4 +550,4 @@ declare function isJsonAnnotation(error: unknown): error is JsonAnnotation;
 declare function isJsonError(error: unknown): error is JsonError;
 //#endregion
 export { JsonSchemaResolver as A, DraftVersion as C, DataNode as D, TemplateOptions as E, Maybe as F, ValidationAnnotation as I, ValidationPath as L, JsonSchemaValidator as M, JsonSchemaValidatorParams as N, JsonSchemaReducer as O, Keyword as P, ValidationReturnType as R, Draft as S, extendDraft as T, GetNodeOptions as _, JsonAnnotation as a, isReduceable as b, JsonSchema as c, isAnnotation as d, isBooleanSchema as f, Context as g, isJsonSchema as h, ErrorConfig as i, JsonSchemaResolverParams as j, JsonSchemaReducerParams as k, NodeOrError as l, isJsonError as m, AnnotationData as n, JsonError as o, isJsonAnnotation as p, BooleanSchema as r, JsonPointer as s, Annotation as t, OptionalNodeOrError as u, SchemaNode as v, addKeywords as w, isSchemaNode as x, ValidateReturnType as y };
-//# sourceMappingURL=types-B27zrqR4.d.mts.map
+//# sourceMappingURL=types-BVDBGPTy.d.cts.map

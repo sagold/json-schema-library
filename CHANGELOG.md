@@ -1,5 +1,11 @@
 ## Changelog
 
+### 11.6.9
+
+- fixed: getNodeChild still pollutes node context (#138)
+- fixed: url format validator must only apply to strings - (#140)
+- fixed: missing dependent schema reduction errors (#120)
+
 ### 11.6.8
 
 - fixed: annotations were internally treated as validation errors (#128)
