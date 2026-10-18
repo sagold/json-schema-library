@@ -1,5 +1,5 @@
 import { isObject } from "../../utils/isObject";
-import { SchemaNode } from "../../types";
+import { isJsonAnnotation, SchemaNode } from "../../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationReturnType } from "../../Keyword";
 import { validateNode } from "../../validateNode";
 
@@ -61,7 +61,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
 
     // console.log("EVAL", reducedNode.schema);
 
-    const validIf = node.if != null && validateNode(node.if, data, pointer, path).length === 0;
+    const validIf = node.if != null && validateNode(node.if, data, pointer, path).every(isJsonAnnotation);
     const errors: ValidationReturnType = [];
     // "unevaluatedItems with nested items"
     for (let i = 0; i < data.length; i += 1) {
@@ -71,7 +71,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
 
         if (child) {
             // when a single node is invalid
-            if (validateNode(child, value, `${pointer}/${i}`, path).length > 0) {
+            if (!validateNode(child, value, `${pointer}/${i}`, path).every(isJsonAnnotation)) {
                 // nothing should validate, so we validate unevaluated items only
                 const unevaluatedItems = node.unevaluatedItems;
                 if (unevaluatedItems) {

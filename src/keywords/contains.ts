@@ -1,5 +1,5 @@
 import { isObject } from "../utils/isObject";
-import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
+import { isBooleanSchema, isJsonAnnotation, isJsonSchema, SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
 import { validateNode } from "../validateNode";
 
@@ -68,7 +68,7 @@ function validateContains({ node, data, pointer, path }: JsonSchemaValidatorPara
     let count = 0;
     for (const d of data) {
         // we tested for contains in addValidate
-        if (validateNode(node.contains!, d, pointer, path).length === 0) {
+        if (validateNode(node.contains!, d, pointer, path).every(isJsonAnnotation)) {
             count++;
         }
     }

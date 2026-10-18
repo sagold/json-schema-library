@@ -1,6 +1,6 @@
 import { mergeSchema } from "../utils/mergeSchema";
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
-import { SchemaNode } from "../types";
+import { isJsonAnnotation, SchemaNode } from "../types";
 import { validateNode } from "../validateNode";
 import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
@@ -47,7 +47,7 @@ function reduceAnyOf({ node, data, pointer, path }: JsonSchemaReducerParams) {
     let mergedSchema = {};
     let dynamicId = "";
     for (let i = 0; i < node[KEYWORD].length; i += 1) {
-        if (validateNode(node[KEYWORD][i], data, pointer, path).length === 0) {
+        if (validateNode(node[KEYWORD][i], data, pointer, path).every(isJsonAnnotation)) {
             const { node: schemaNode } = node[KEYWORD][i].reduceNode(data);
 
             if (schemaNode) {
@@ -73,7 +73,7 @@ function validateAnyOf({ node, data, pointer, path }: JsonSchemaValidatorParams)
         return;
     }
     for (const anyOf of node[KEYWORD]) {
-        if (validateNode(anyOf, data, pointer, path).length === 0) {
+        if (validateNode(anyOf, data, pointer, path).every(isJsonAnnotation)) {
             return undefined;
         }
     }
