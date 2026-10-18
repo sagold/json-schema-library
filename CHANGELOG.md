@@ -1,5 +1,10 @@
 ## Changelog
 
+### 11.6.10
+
+- fixed: incomplete support for `formatAssertion: false` (#120)
+- fixed: comparison by property order in enum-objects
+
 ### 11.6.9
 
 - fixed: getNodeChild still pollutes node context (#138)
