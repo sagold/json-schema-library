@@ -1,4 +1,4 @@
-import { N as JsonSchemaValidatorParams, R as ValidationReturnType, S as Draft } from "./types-BeLUXgsa.cjs";
+import { N as JsonSchemaValidatorParams, R as ValidationReturnType, S as Draft } from "./types-BsguffEH.cjs";
 //#region src/formats/additionalFormats.d.ts
 export declare function addFormats(drafts: Draft[]): void;
 export declare const formats: Record<string, (options: JsonSchemaValidatorParams) => ValidationReturnType>;
