@@ -31,6 +31,7 @@ type CompileOptions = {
    *
    * // uses draft-07
    * compileSchema({}, { draft: "draft-07", drafts: [draft04, draft07, draft2020] })
+
    * // uses draft-04
    * compileSchema({ $schema: "draft-04" }, { draft: "draft-07", drafts: [draft04, draft07, draft2020] })
    *
@@ -68,7 +69,7 @@ type CompileOptions = {
  * wrapping each schema with utilities and as much preevaluation as possible. Each
  * node will be reused for each task, but will create a compiledNode for bound data.
  */
-declare function compileSchema(schema: JsonSchema | BooleanSchema, options?: CompileOptions): SchemaNode & {
+export declare function compileSchema(schema: JsonSchema | BooleanSchema, options?: CompileOptions): SchemaNode & {
   schemaErrors?: JsonError[];
   schemaAnnotations: JsonAnnotation[];
 };
@@ -131,7 +132,7 @@ declare const _default: {
  * - required  allows an empty array
  * - dependencies allows an empty array for property dependencies
  */
-declare const draft04: Draft;
+export declare const draft04: Draft;
 //#endregion
 //#region src/draft06.d.ts
 /**
@@ -155,7 +156,7 @@ declare const draft04: Draft;
  * - required  allows an empty array
  * - dependencies allows an empty array for property dependencies
  */
-declare const draft06: Draft;
+export declare const draft06: Draft;
 //#endregion
 //#region src/draft07.d.ts
 /**
@@ -169,7 +170,7 @@ declare const draft06: Draft;
  * - "contentMediaType"
  * - "contentEncoding"
  */
-declare const draft07: Draft;
+export declare const draft07: Draft;
 //#endregion
 //#region src/draft2019.d.ts
 /**
@@ -186,7 +187,7 @@ declare const draft07: Draft;
  * - $ref
  * - dependencies has been split into dependentSchemas and dependentRequired
  */
-declare const draft2019: Draft;
+export declare const draft2019: Draft;
 //#endregion
 //#region src/draft2020.d.ts
 /**
@@ -213,7 +214,7 @@ declare const draft2019: Draft;
  *  is required.
  *
  */
-declare const draft2020: Draft;
+export declare const draft2020: Draft;
 //#endregion
 //#region src/draftEditor.d.ts
 /**
@@ -222,11 +223,11 @@ declare const draft2020: Draft;
  *
  * Uses Draft 2020-12 and changes resolveOneOf to be fuzzy
  */
-declare const draftEditor: Draft;
+export declare const draftEditor: Draft;
 //#endregion
 //#region src/keywords/oneOf.d.ts
-declare const oneOfKeyword: Keyword;
-declare const oneOfFuzzyKeyword: Keyword;
+export declare const oneOfKeyword: Keyword;
+export declare const oneOfFuzzyKeyword: Keyword;
 //#endregion
 //#region src/keywords/propertyDependencies.d.ts
 /**
@@ -254,20 +255,20 @@ declare const oneOfFuzzyKeyword: Keyword;
  *   "otherData": 123
  * } with "#/$defs/schema"
  */
-declare const propertyDependenciesKeyword: Keyword;
+export declare const propertyDependenciesKeyword: Keyword;
 //#endregion
 //#region src/errors/render.d.ts
-declare function render(template: string, data?: Record<string, unknown>): string;
+export declare function render(template: string, data?: Record<string, unknown>): string;
 //#endregion
 //#region src/utils/getTypeOf.d.ts
 type JSType = "array" | "bigint" | "boolean" | "function" | "null" | "number" | "object" | "string" | "symbol" | "undefined";
-declare function getTypeOf(value: unknown): JSType;
+export declare function getTypeOf(value: unknown): JSType;
 //#endregion
 //#region src/mergeNode.d.ts
-declare function mergeNode(a?: SchemaNode, b?: SchemaNode, ...omit: string[]): SchemaNode | undefined;
+export declare function mergeNode(a?: SchemaNode, b?: SchemaNode, ...omit: string[]): SchemaNode | undefined;
 //#endregion
 //#region src/utils/mergeSchema.d.ts
-declare function mergeSchema<T extends JsonSchema>(a: T, b: T, ...omit: string[]): T;
+export declare function mergeSchema<T extends JsonSchema>(a: T, b: T, ...omit: string[]): T;
 //#endregion
 //#region src/utils/getSchemaType.d.ts
 declare const SCHEMA_TYPES: readonly ["string", "number", "integer", "boolean", "null", "array", "object"];
@@ -277,7 +278,7 @@ type SchemaType = (typeof SCHEMA_TYPES)[number];
  * returns schema type, which might be an educated guess based on defined schema
  * properties if an exact type cannot be retried from type.
  */
-declare function getSchemaType(node: SchemaNode, data: unknown): SchemaType | undefined;
+export declare function getSchemaType(node: SchemaNode, data: unknown): SchemaType | undefined;
 //#endregion
 //#region src/utils/sanitizeErrors.d.ts
 /**
@@ -285,5 +286,5 @@ declare function getSchemaType(node: SchemaNode, data: unknown): SchemaType | un
  */
 declare function sanitizeErrors(list: ValidationReturnType | ValidationReturnType[] | ValidationAnnotation[], result?: ValidationAnnotation[]): ValidationAnnotation[];
 //#endregion
-export { type Annotation, type AnnotationData, type BooleanSchema, type CompileOptions, type Context, type DataNode, type Draft, type DraftVersion, type ErrorConfig, type GetNodeOptions, type JsonAnnotation, type JsonError, type JsonPointer, type JsonSchema, type JsonSchemaReducer, type JsonSchemaReducerParams, type JsonSchemaResolver, type JsonSchemaResolverParams, type JsonSchemaValidator, type JsonSchemaValidatorParams, type Keyword, type Maybe, type NodeOrError, type OptionalNodeOrError, type SchemaNode, type ValidateReturnType, type ValidationAnnotation, type ValidationPath, type ValidationReturnType, addKeywords, compileSchema, draft04, draft06, draft07, draft2019, draft2020, draftEditor, extendDraft, getSchemaType, getTypeOf, isAnnotation, isBooleanSchema, isJsonAnnotation, isJsonError, isJsonSchema, isReduceable, isSchemaNode, mergeNode, mergeSchema, oneOfFuzzyKeyword, oneOfKeyword, propertyDependenciesKeyword, render, sanitizeErrors, _default as settings };
+export { type Annotation, type AnnotationData, type BooleanSchema, type CompileOptions, type Context, type DataNode, type Draft, type DraftVersion, type ErrorConfig, type GetNodeOptions, type JsonAnnotation, type JsonError, type JsonPointer, type JsonSchema, type JsonSchemaReducer, type JsonSchemaReducerParams, type JsonSchemaResolver, type JsonSchemaResolverParams, type JsonSchemaValidator, type JsonSchemaValidatorParams, type Keyword, type Maybe, type NodeOrError, type OptionalNodeOrError, type SchemaNode, type ValidateReturnType, type ValidationAnnotation, type ValidationPath, type ValidationReturnType, addKeywords, extendDraft, isAnnotation, isBooleanSchema, isJsonAnnotation, isJsonError, isJsonSchema, isReduceable, isSchemaNode, sanitizeErrors, _default as settings };
 //# sourceMappingURL=index.d.mts.map
