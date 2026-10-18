@@ -1,5 +1,26 @@
 ## Changelog
 
+### 11.6.8
+
+- fixed: annotations were internally treated as validation errors (#128)
+
+### 11.6.7
+
+- fixed: wrong type and documentation of getNodeRef return type (#141)
+
+### 11.6.6
+
+- fixed: reduceNode pollutes node context (#138)
+- fixed: then, else were annotated as undefined keywords
+
+### 11.6.5
+
+- fixed: fast-uri not bundled for node (#137)
+
+### 11.6.4
+
+- fixed: accumulate remote schema diagnostics instead of overwriting (#116)
+
 ### 11.6.2
 
 - fixed: ipv4 reject leading-zero octets, not addresses starting with 0 (#113)
