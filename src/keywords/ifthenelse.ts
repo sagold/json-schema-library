@@ -1,7 +1,7 @@
 import { mergeSchema } from "../utils/mergeSchema";
 import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, ValidationAnnotation } from "../Keyword";
-import { isBooleanSchema, isJsonAnnotation, isJsonSchema, SchemaNode } from "../types";
-import { validateNode } from "../validateNode";
+import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
+import { isValid, validateNode } from "../validateNode";
 import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
 export const ifKeyword: Keyword = {
@@ -72,7 +72,7 @@ function reduceIf({ node, data, pointer, path }: JsonSchemaReducerParams) {
         return undefined;
     }
 
-    if (validateNode(node.if, data, pointer, [...(path ?? [])]).every(isJsonAnnotation)) {
+    if (isValid(node.if, data, pointer, [...(path ?? [])])) {
         if (node.then) {
             // reduce creates a new node
             const { node: schemaNode } = node.then.reduceNode(data);
@@ -112,7 +112,7 @@ function validateIfThenElse({ node, data, pointer, path }: JsonSchemaValidatorPa
     if (node.if == null) {
         return;
     }
-    if (validateNode(node.if, data, pointer, [...(path ?? [])]).every(isJsonAnnotation)) {
+    if (isValid(node.if, data, pointer, [...(path ?? [])])) {
         if (node.then) {
             return validateNode(node.then, data, pointer, path);
         }

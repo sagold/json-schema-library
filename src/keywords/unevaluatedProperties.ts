@@ -1,7 +1,7 @@
 import { isObject } from "../utils/isObject";
-import { isBooleanSchema, isJsonAnnotation, isJsonSchema, SchemaNode } from "../types";
+import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
-import { validateNode } from "../validateNode";
+import { isValid, validateNode } from "../validateNode";
 import { isPropertyEvaluated } from "../isPropertyEvaluated";
 
 const KEYWORD = "unevaluatedProperties";
@@ -89,10 +89,7 @@ function validateUnevaluatedProperties({ node, data, pointer, path }: JsonSchema
             }
         }
 
-        if (
-            child &&
-            !validateNode(child, data[propertyName], `${pointer}/${propertyName}`, path).every(isJsonAnnotation)
-        ) {
+        if (child && !isValid(child, data[propertyName], `${pointer}/${propertyName}`, path)) {
             if (node.unevaluatedProperties) {
                 const validationResult = validateNode(
                     node.unevaluatedProperties,

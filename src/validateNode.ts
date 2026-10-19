@@ -1,7 +1,21 @@
-import { BooleanSchema, isJsonError, JsonSchema, SchemaNode } from "./types";
+import { BooleanSchema, isJsonAnnotation, isJsonError, JsonSchema, SchemaNode } from "./types";
 import { SchemaNodeWithRequired, ValidationPath, ValidationReturnType } from "./Keyword";
 import sanitizeErrors from "./utils/sanitizeErrors";
 
+/**
+ * Test if the data is valid to the given node
+ *
+ * @returns true, if the validation does not contain errors
+ */
+export function isValid(node: SchemaNode, data: unknown, pointer: string, path: ValidationPath) {
+    return validateNode(node, data, pointer, path).every(isJsonAnnotation);
+}
+
+/**
+ * Validate data using the given node.
+ *
+ * @returns List of validation errors and annotations
+ */
 export function validateNode(node: SchemaNode, data: unknown, pointer: string, path: ValidationPath) {
     if (isJsonError(node)) {
         return [node];

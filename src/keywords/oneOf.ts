@@ -10,7 +10,7 @@ import settings from "../settings";
 import { getValue } from "../utils/getValue";
 import sanitizeErrors from "../utils/sanitizeErrors";
 import { isObject } from "../utils/isObject";
-import { validateNode } from "../validateNode";
+import { isValid, validateNode } from "../validateNode";
 import { joinDynamicId } from "../SchemaNode";
 import { collectValidationErrors } from "src/utils/collectValidationErrors";
 
@@ -202,7 +202,7 @@ function fuzzyObjectValue(node: SchemaNode, data: Record<string, unknown>, point
     const keys = Object.keys(node.properties ?? {});
     for (const key of keys) {
         if (data[key] !== undefined) {
-            if (validateNode(node.properties[key], data[key], pointer, path).every(isJsonAnnotation)) {
+            if (isValid(node.properties[key], data[key], pointer, path)) {
                 value += 1;
             }
         }

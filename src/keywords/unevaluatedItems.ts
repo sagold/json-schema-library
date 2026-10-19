@@ -1,6 +1,6 @@
-import { isBooleanSchema, isJsonAnnotation, isJsonSchema, SchemaNode } from "../types";
+import { isBooleanSchema, isJsonSchema, SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams, ValidationReturnType } from "../Keyword";
-import { validateNode } from "../validateNode";
+import { isValid, validateNode } from "../validateNode";
 import { isItemEvaluated } from "../isItemEvaluated";
 
 const KEYWORD = "unevaluatedItems";
@@ -83,7 +83,7 @@ function validateUnevaluatedItems({ node, data, pointer, path }: JsonSchemaValid
             }
         }
 
-        if (child && !validateNode(child, value, `${pointer}/${i}`, path).every(isJsonAnnotation)) {
+        if (child && !isValid(child, value, `${pointer}/${i}`, path)) {
             // when a single node is invalid
             if (
                 node.unevaluatedItems &&

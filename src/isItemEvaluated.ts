@@ -1,7 +1,7 @@
 import { ValidationPath } from "./Keyword";
-import { isJsonAnnotation, SchemaNode } from "./types";
+import { SchemaNode } from "./types";
 import { getValue } from "./utils/getValue";
-import { validateNode } from "./validateNode";
+import { isValid } from "./validateNode";
 
 type Options = {
     /** array node */
@@ -30,7 +30,7 @@ export function isItemEvaluated({ node, data, key, pointer, path }: Options) {
         return true;
     }
 
-    if (node.contains && validateNode(node.contains, value, `${pointer}/${key}`, path).every(isJsonAnnotation)) {
+    if (node.contains && isValid(node.contains, value, `${pointer}/${key}`, path)) {
         return true;
     }
 
@@ -44,10 +44,7 @@ export function isItemEvaluated({ node, data, key, pointer, path }: Options) {
     if (node.anyOf) {
         for (const anyOf of node.anyOf) {
             // only a branch that validates the data contributes evaluated-item state
-            if (
-                validateNode(anyOf, data, pointer, path).every(isJsonAnnotation) &&
-                isItemEvaluated({ node: anyOf, data, key, pointer, path })
-            ) {
+            if (isValid(anyOf, data, pointer, path) && isItemEvaluated({ node: anyOf, data, key, pointer, path })) {
                 return true;
             }
         }
@@ -56,17 +53,14 @@ export function isItemEvaluated({ node, data, key, pointer, path }: Options) {
     if (node.oneOf) {
         for (const oneOf of node.oneOf) {
             // only a branch that validates the data contributes evaluated-item state
-            if (
-                validateNode(oneOf, data, pointer, path).every(isJsonAnnotation) &&
-                isItemEvaluated({ node: oneOf, data, key, pointer, path })
-            ) {
+            if (isValid(oneOf, data, pointer, path) && isItemEvaluated({ node: oneOf, data, key, pointer, path })) {
                 return true;
             }
         }
     }
 
     if (node.if) {
-        const validIf = validateNode(node.if, data, pointer, path).every(isJsonAnnotation);
+        const validIf = isValid(node.if, data, pointer, path);
         if (validIf && isItemEvaluated({ node: node.if, data, key, pointer, path })) {
             return true;
         }
