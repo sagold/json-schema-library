@@ -533,4 +533,70 @@ describe("compileSchema : getNode", () => {
             });
         });
     });
+
+    describe("$ref sibling keywords", () => {
+        // @draft >= 2019-09: $ref is an applicator that combines with sibling
+        // keywords. getNode must keep those siblings (e.g. an `oneOf` of
+        // allowed values next to a $ref) instead of replacing them with the
+        // resolved target.
+        it("should keep an object property's oneOf sibling alongside a $ref", () => {
+            const root = compileSchema({
+                $schema: "https://json-schema.org/draft/2020-12/schema",
+                type: "object",
+                properties: {
+                    key: { $ref: "#/$defs/key", oneOf: [{ const: "a" }, { const: "b" }] }
+                },
+                $defs: { key: { type: "string" } }
+            });
+
+            const { error } = root.getNode("/key", { key: "" });
+            // data does not match the oneOf yet -> one-of-error carrying the schema
+            assert.equal(error?.code, "one-of-error");
+            assert.deepEqual(error?.data?.schema?.oneOf, [{ const: "a" }, { const: "b" }]);
+        });
+
+        it("should keep an array item's oneOf sibling alongside a $ref", () => {
+            const root = compileSchema({
+                $schema: "https://json-schema.org/draft/2020-12/schema",
+                type: "array",
+                items: { $ref: "#/$defs/key", oneOf: [{ const: "a" }, { const: "b" }] },
+                $defs: { key: { type: "string" } }
+            });
+
+            const { error } = root.getNode("/0", [""]);
+            assert.equal(error?.code, "one-of-error");
+            assert.deepEqual(error?.data?.schema?.oneOf, [{ const: "a" }, { const: "b" }]);
+        });
+
+        it("should reduce to the matching $ref-sibling branch for matching data", () => {
+            const root = compileSchema({
+                $schema: "https://json-schema.org/draft/2020-12/schema",
+                type: "array",
+                items: { $ref: "#/$defs/key", oneOf: [{ const: "a" }, { const: "b" }] },
+                $defs: { key: { type: "string", pattern: "^[a-z]$" } }
+            });
+
+            const { node, error } = root.getNode("/0", ["a"]);
+            assert.equal(error, undefined);
+            assert.equal(node?.schema?.const, "a");
+            assert.equal(node?.schema?.type, "string");
+        });
+
+        it("should ignore $ref siblings in draft-07", () => {
+            const root = compileSchema({
+                $schema: "http://json-schema.org/draft-07/schema",
+                type: "object",
+                properties: {
+                    key: { $ref: "#/definitions/key", oneOf: [{ const: "a" }, { const: "b" }] }
+                },
+                definitions: { key: { type: "string" } }
+            });
+
+            const { node, error } = root.getNode("/key", { key: "" });
+            // draft-07 ignores siblings of $ref: resolves to the bare target
+            assert.equal(error, undefined);
+            assert.equal(node?.schema?.oneOf, undefined);
+            assert.equal(node?.schema?.type, "string");
+        });
+    });
 });
