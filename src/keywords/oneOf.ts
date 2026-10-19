@@ -201,7 +201,7 @@ function fuzzyObjectValue(node: SchemaNode, data: Record<string, unknown>, point
     let value = 0;
     const keys = Object.keys(node.properties ?? {});
     for (const key of keys) {
-        if (data[key]) {
+        if (data[key] !== undefined) {
             if (validateNode(node.properties[key], data[key], pointer, path).every(isJsonAnnotation)) {
                 value += 1;
             }

@@ -1,5 +1,14 @@
 ## Changelog
 
+### 11.6.14
+
+- fixed: wrong falsy check for oneOf fuzzy scoring (#142)
+
+### 11.6.13
+
+- fixed: annotations treated as errors for unevaluatedItems & unevaluatedProperties
+- fixed: failed anyOf/oneOf branches when computing evaluated items/properties (#117)
+
 ### 11.6.12
 
 - fixed: minContains/maxContains wrongly applied to draft < 2019 (#122)
