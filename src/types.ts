@@ -51,8 +51,8 @@ export function isAnnotation(value: any): value is Annotation {
 }
 
 /**
- * ts type guard for json error
- * @returns true if passed type is a JsonError
+ * ts type guard for json annotation (not an error)
+ * @returns true if passed type is an Annotation
  */
 export function isJsonAnnotation(error: unknown): error is JsonAnnotation {
     return isObject(error) && error.type === "annotation";

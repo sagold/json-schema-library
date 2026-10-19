@@ -95,10 +95,7 @@ describe("keyword : unevaluatedProperties : validation", () => {
     it("should not treat a failed oneOf branch's additionalProperties as evaluating a property", () => {
         const node = compileSchema(
             {
-                oneOf: [
-                    { additionalProperties: true, maxProperties: 0 },
-                    { type: "object" }
-                ],
+                oneOf: [{ additionalProperties: true, maxProperties: 0 }, { type: "object" }],
                 unevaluatedProperties: false
             },
             { drafts: [draft2020] }
@@ -123,5 +120,25 @@ describe("keyword : unevaluatedProperties : validation", () => {
 
         const unevaluatedErrors = errors.filter((e) => e.code === "unevaluated-property-error");
         assert.equal(unevaluatedErrors.length, 0, "successful anyOf branch must still evaluate the property");
+    });
+
+    // https://github.com/sagold/json-schema-library/pull/118#issuecomment-5157756737
+    it("should not pass 'else' case when 'if' is invalid", () => {
+        const node = compileSchema(
+            {
+                $schema: "https://json-schema.org/draft/2020-12/schema",
+                if: {
+                    properties: { value: true },
+                    maxProperties: 0
+                },
+                else: { type: "object" },
+                unevaluatedProperties: false
+            },
+            { drafts: [draft2020] }
+        );
+
+        const { valid } = node.validate({ value: 1 });
+
+        assert.equal(valid, false);
     });
 });

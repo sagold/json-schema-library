@@ -45,7 +45,7 @@ export function isItemEvaluated({ node, data, key, pointer, path }: Options) {
         for (const anyOf of node.anyOf) {
             // only a branch that validates the data contributes evaluated-item state
             if (
-                validateNode(anyOf, data, pointer, path).length === 0 &&
+                validateNode(anyOf, data, pointer, path).every(isJsonAnnotation) &&
                 isItemEvaluated({ node: anyOf, data, key, pointer, path })
             ) {
                 return true;
@@ -57,7 +57,7 @@ export function isItemEvaluated({ node, data, key, pointer, path }: Options) {
         for (const oneOf of node.oneOf) {
             // only a branch that validates the data contributes evaluated-item state
             if (
-                validateNode(oneOf, data, pointer, path).length === 0 &&
+                validateNode(oneOf, data, pointer, path).every(isJsonAnnotation) &&
                 isItemEvaluated({ node: oneOf, data, key, pointer, path })
             ) {
                 return true;
@@ -66,10 +66,10 @@ export function isItemEvaluated({ node, data, key, pointer, path }: Options) {
     }
 
     if (node.if) {
-        if (isItemEvaluated({ node: node.if, data, key, pointer, path })) {
+        const validIf = validateNode(node.if, data, pointer, path).every(isJsonAnnotation);
+        if (validIf && isItemEvaluated({ node: node.if, data, key, pointer, path })) {
             return true;
         }
-        const validIf = validateNode(node.if, data, pointer, path).every(isJsonAnnotation);
 
         if (validIf && node.if.prefixItems && node.if.prefixItems.length > key) {
             // evaluated by if

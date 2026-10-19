@@ -53,7 +53,7 @@ export function isPropertyEvaluated({ node, data, key, pointer, path }: Options)
         for (const anyOf of node.anyOf) {
             // only a branch that validates the data contributes evaluated-property state
             if (
-                validateNode(anyOf, data, pointer, path).length === 0 &&
+                validateNode(anyOf, data, pointer, path).every(isJsonAnnotation) &&
                 isPropertyEvaluated({ node: anyOf, data, key, pointer, path })
             ) {
                 return true;
@@ -65,7 +65,7 @@ export function isPropertyEvaluated({ node, data, key, pointer, path }: Options)
         for (const oneOf of node.oneOf) {
             // only a branch that validates the data contributes evaluated-property state
             if (
-                validateNode(oneOf, data, pointer, path).length === 0 &&
+                validateNode(oneOf, data, pointer, path).every(isJsonAnnotation) &&
                 isPropertyEvaluated({ node: oneOf, data, key, pointer, path })
             ) {
                 return true;
@@ -74,11 +74,11 @@ export function isPropertyEvaluated({ node, data, key, pointer, path }: Options)
     }
 
     if (node.if) {
-        if (isPropertyEvaluated({ node: node.if, data, key, pointer, path })) {
+        const validIf = validateNode(node.if, data, pointer, path).every(isJsonAnnotation);
+        if (validIf && isPropertyEvaluated({ node: node.if, data, key, pointer, path })) {
             return true;
         }
 
-        const validIf = validateNode(node.if, data, pointer, path).every(isJsonAnnotation);
         if (validIf && node.then) {
             if (isPropertyEvaluated({ node: node.then, data, key, pointer, path })) {
                 return true;
