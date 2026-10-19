@@ -43,7 +43,11 @@ export function isItemEvaluated({ node, data, key, pointer, path }: Options) {
     }
     if (node.anyOf) {
         for (const anyOf of node.anyOf) {
-            if (isItemEvaluated({ node: anyOf, data, key, pointer, path })) {
+            // only a branch that validates the data contributes evaluated-item state
+            if (
+                validateNode(anyOf, data, pointer, path).length === 0 &&
+                isItemEvaluated({ node: anyOf, data, key, pointer, path })
+            ) {
                 return true;
             }
         }
@@ -51,7 +55,11 @@ export function isItemEvaluated({ node, data, key, pointer, path }: Options) {
 
     if (node.oneOf) {
         for (const oneOf of node.oneOf) {
-            if (isItemEvaluated({ node: oneOf, data, key, pointer, path })) {
+            // only a branch that validates the data contributes evaluated-item state
+            if (
+                validateNode(oneOf, data, pointer, path).length === 0 &&
+                isItemEvaluated({ node: oneOf, data, key, pointer, path })
+            ) {
                 return true;
             }
         }
