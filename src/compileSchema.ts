@@ -113,7 +113,7 @@ export function compileSchema(schema: JsonSchema | BooleanSchema, options: Compi
 
     let formatAssertion = options.formatAssertion ?? true;
     const drafts = options.drafts ?? defaultDrafts;
-    const draft = getDraft(drafts, isJsonSchema(schema) ? (options.draft ?? schema.$schema) : undefined);
+    const draft = getDraft(drafts, isJsonSchema(schema) ? (schema.$schema ?? options.draft) : undefined);
     const node: SchemaNode & { schemaErrors?: JsonError[]; schemaAnnotations: JsonAnnotation[] } = {
         evaluationPath: "#",
         lastIdPointer: "#",

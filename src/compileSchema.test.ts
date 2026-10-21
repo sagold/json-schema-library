@@ -68,7 +68,21 @@ describe("compileSchema draft-version", () => {
                 drafts: [draft04, draft07, draft2020]
             }
         );
-        assert(node.getDraftVersion(), "draft-04");
+        assert.equal(node.getDraftVersion(), "draft-04");
+    });
+
+    it("should prefer `$schema` of a remote schema over `draft` option", () => {
+        const draft = "http://json-schema.org/draft-07/schema#";
+        const root = compileSchema(
+            { $id: "https://example.com/root" },
+            { draft, drafts: [draft04, draft07, draft2020] }
+        );
+        root.addRemoteSchema("https://example.com/remote", {
+            $id: "https://example.com/remote",
+            $schema: "http://json-schema.org/draft-04/schema#"
+        });
+        const remote = root.getNodeRef("https://example.com/remote") as SchemaNode;
+        assert.equal(remote.getDraftVersion(), "draft-04");
     });
 
     it("should always fallback to last draft if nothing matches", () => {
