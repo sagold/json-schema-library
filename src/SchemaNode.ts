@@ -587,7 +587,7 @@ export const SchemaNodeMethods = {
 
         const node = this as SchemaNode & { schemaErrors?: JsonError[]; schemaAnnotations: JsonAnnotation[] };
         const { context } = node;
-        const schemaId = isJsonSchema(schema) ? (node.context.draft ?? schema.$schema) : undefined;
+        const schemaId = isJsonSchema(schema) ? (schema.$schema ?? node.context.draft) : undefined;
         const draft = getDraft(context.drafts, schemaId ?? context.rootNode.schema?.$schema);
 
         const remoteNode: SchemaNode = {
