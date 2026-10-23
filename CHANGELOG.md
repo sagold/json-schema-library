@@ -1,5 +1,9 @@
 ## Changelog
 
+### 11.6.15
+
+- fixed: should prefer $schema over draft option in compileSchema and addRemoteSchema (#115)
+
 ### 11.6.14
 
 - fixed: wrong falsy check for oneOf fuzzy scoring (#142)
