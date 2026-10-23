@@ -1,4 +1,4 @@
-import { isBooleanSchema, isJsonAnnotation, isJsonSchema, JsonError } from "../types";
+import { isBooleanSchema, isJsonAnnotation, isJsonError, isJsonSchema, JsonError } from "../types";
 import { isObject } from "../utils/isObject";
 import { SchemaNode } from "../types";
 import { Keyword, JsonSchemaValidatorParams } from "../Keyword";
@@ -78,7 +78,7 @@ function validatePropertyNames({ node, data, pointer, path }: JsonSchemaValidato
                 node.createError("invalid-property-name-error", {
                     property: prop,
                     pointer,
-                    validationError: validationResult[0],
+                    validationError: validationResult.find(isJsonError),
                     value: data[prop],
                     schema
                 })
