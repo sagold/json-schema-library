@@ -2,6 +2,7 @@ import { collectValidationErrors } from "src/utils/collectValidationErrors";
 import { Keyword, ValidationAnnotation } from "../Keyword";
 import { SchemaNode } from "../types";
 import { isObject } from "../utils/isObject";
+import { iterateProperties } from "../utils/iterateProperties";
 
 export const $defsKeyword: Keyword = {
     id: "$defs",
@@ -23,12 +24,12 @@ export function parseDefs(node: SchemaNode) {
                 })
             );
         } else {
-            node.$defs = node.$defs ?? {};
-            Object.keys(node.schema.$defs).forEach((property) => {
+            node.$defs = node.$defs ?? Object.create(null);
+            iterateProperties(node.schema.$defs).forEach(([property, propertyPointer]) => {
                 node.$defs![property] = node.compileSchema(
                     node.schema.$defs[property],
-                    `${node.evaluationPath}/$defs/${urlEncodeJsonPointerProperty(property)}`,
-                    `${node.schemaLocation}/$defs/${property}`
+                    `${node.evaluationPath}/$defs/${propertyPointer}`,
+                    `${node.schemaLocation}/$defs/${propertyPointer}`
                 );
                 collectValidationErrors(errors, node.$defs![property]);
             });
@@ -45,22 +46,16 @@ export function parseDefs(node: SchemaNode) {
                 })
             );
         }
-        node.$defs = node.$defs ?? {};
-        Object.keys(node.schema.definitions).forEach((property) => {
+        node.$defs = node.$defs ?? Object.create(null);
+        iterateProperties(node.schema.definitions).forEach(([property, propertyPointer]) => {
             node.$defs![property] = node.compileSchema(
                 node.schema.definitions[property],
-                `${node.evaluationPath}/definitions/${urlEncodeJsonPointerProperty(property)}`,
-                `${node.schemaLocation}/definitions/${urlEncodeJsonPointerProperty(property)}`
+                `${node.evaluationPath}/definitions/${propertyPointer}`,
+                `${node.schemaLocation}/definitions/${propertyPointer}`
             );
             collectValidationErrors(errors, node.$defs![property]);
         });
     }
 
     return errors;
-}
-
-function urlEncodeJsonPointerProperty(property: string) {
-    property = property.replace(/~/g, "~0");
-    property = property.replace(/\//g, "~1");
-    return encodeURIComponent(property);
 }

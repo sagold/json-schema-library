@@ -10,6 +10,7 @@ import {
 import { isObject } from "../utils/isObject";
 import { validateNode } from "../validateNode";
 import { collectValidationErrors } from "src/utils/collectValidationErrors";
+import { appendDataPointer, iterateProperties } from "../utils/iterateProperties";
 
 export const propertiesKeyword: Keyword = {
     id: "property",
@@ -22,7 +23,7 @@ export const propertiesKeyword: Keyword = {
 };
 
 function propertyResolver({ node, key }: JsonSchemaResolverParams) {
-    return node.properties?.[key];
+    return getValue(node.properties, key);
 }
 
 export function parseProperties(node: SchemaNode) {
@@ -41,12 +42,12 @@ export function parseProperties(node: SchemaNode) {
     }
 
     const errors: ValidationAnnotation[] = [];
-    const parsedProperties: Record<string, SchemaNode> = {};
-    Object.keys(schema.properties).forEach((propertyName) => {
+    const parsedProperties: Record<string, SchemaNode> = Object.create(null);
+    iterateProperties(schema.properties).forEach(([propertyName, propertyPointer]) => {
         const propertyNode = node.compileSchema(
             schema.properties[propertyName],
-            `${evaluationPath}/properties/${propertyName}`,
-            `${schemaLocation}/properties/${propertyName}`
+            `${evaluationPath}/properties/${propertyPointer}`,
+            `${schemaLocation}/properties/${propertyPointer}`
         );
         parsedProperties[propertyName] = propertyNode;
         collectValidationErrors(errors, parsedProperties[propertyName]);
@@ -65,13 +66,13 @@ function validateProperties({ node, data, pointer, path }: JsonSchemaValidatorPa
     const properties = node.properties ?? {};
     Object.keys(data).forEach((propertyName) => {
         const value = getValue(data, propertyName);
-        const propertyNode = properties[propertyName];
+        const propertyNode = getValue(properties, propertyName);
 
         if (propertyNode == null || value === void 0) {
             return;
         }
 
-        const result = validateNode(propertyNode, value, `${pointer}/${propertyName}`, path);
+        const result = validateNode(propertyNode, value, appendDataPointer(pointer, propertyName), path);
         errors.push(...result);
     });
     return errors;

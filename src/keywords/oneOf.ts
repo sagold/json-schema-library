@@ -13,6 +13,7 @@ import { isObject } from "../utils/isObject";
 import { isValid, validateNode } from "../validateNode";
 import { joinDynamicId } from "../SchemaNode";
 import { collectValidationErrors } from "src/utils/collectValidationErrors";
+import { appendDataPointer } from "../utils/iterateProperties";
 
 const KEYWORD = "oneOf";
 const { DECLARATOR_ONEOF } = settings;
@@ -160,7 +161,7 @@ export function reduceOneOfDeclarator({ node, data, pointer, path }: Omit<JsonSc
 
         // collect errors in case we fail finding a matching schema
         const result = sanitizeErrors(
-            validateNode(resultNode, oneOfPropertyValue, `${pointer}/${oneOfProperty}`, path)
+            validateNode(resultNode, oneOfPropertyValue, appendDataPointer(pointer, oneOfProperty), path)
         );
 
         if (!result.every(isJsonAnnotation)) {
@@ -316,7 +317,12 @@ function validateFromDeclarator({ node, data, pointer = "#", path }: JsonSchemaV
     for (const oneOfNode of oneOf) {
         const { node: oneOfPropertyNode, error } = oneOfNode.getNodeChild(oneOfProperty, oneOfValue);
         if (oneOfPropertyNode) {
-            const validationResult = validateNode(oneOfPropertyNode, oneOfValue, `${pointer}/${oneOfProperty}`, path);
+            const validationResult = validateNode(
+                oneOfPropertyNode,
+                oneOfValue,
+                appendDataPointer(pointer, oneOfProperty),
+                path
+            );
             if (!validationResult.every(isJsonAnnotation)) {
                 errors.push(...validationResult);
             } else {

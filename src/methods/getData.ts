@@ -179,7 +179,7 @@ const TYPE: Record<string, (node: SchemaNode, data: unknown, opts: TemplateOptio
     object: (node, data, opts) => {
         const schema = node.schema;
         const template = schema.default === undefined ? {} : schema.default;
-        const d: Record<string, unknown> = {}; // do not assign data here, to keep ordering from json-schema
+        const d: Record<string, unknown> = Object.create(null); // do not assign data here, to keep ordering from json-schema
         const required = opts.extendDefaults === false && schema.default !== undefined ? [] : (schema.required ?? []);
 
         const properties = node.properties;

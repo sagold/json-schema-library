@@ -12,6 +12,8 @@ import { getValue } from "../utils/getValue";
 import { validateNode } from "../validateNode";
 import settings from "../settings";
 import { collectValidationErrors } from "src/utils/collectValidationErrors";
+import { hasProperty } from "../utils/hasProperty";
+import { appendDataPointer, iterateProperties } from "../utils/iterateProperties";
 
 const { REGEX_FLAGS } = settings;
 
@@ -32,18 +34,18 @@ export function parsePatternProperties(node: SchemaNode) {
     if (!isObject(schema.patternProperties)) {
         return;
     }
-    const patterns = Object.keys(schema.patternProperties);
+    const patterns = iterateProperties(schema.patternProperties);
     if (patterns.length === 0) {
         return;
     }
 
-    node.patternProperties = patterns.map((pattern) => ({
+    node.patternProperties = patterns.map(([pattern, propertyPointer]) => ({
         name: pattern,
         pattern: new RegExp(pattern, schema.regexFlags ?? REGEX_FLAGS),
         node: node.compileSchema(
             schema.patternProperties[pattern],
-            `${node.evaluationPath}/patternProperties/${pattern}`,
-            `${node.schemaLocation}/patternProperties/${pattern}`
+            `${node.evaluationPath}/patternProperties/${propertyPointer}`,
+            `${node.schemaLocation}/patternProperties/${propertyPointer}`
         )
     }));
 
@@ -74,11 +76,11 @@ function reducePatternProperties({ node, data, key }: JsonSchemaReducerParams) {
             return;
         }
         // build schema of property
-        let propertySchema = node.schema.properties?.[propertyName] ?? {};
+        let propertySchema = getValue(node.schema.properties, propertyName) ?? {};
         const matchingPatterns = patternProperties.filter((property) => property.pattern.test(propertyName));
         matchingPatterns.forEach((pp) => (propertySchema = mergeSchema(propertySchema, pp.node.schema)));
         if (matchingPatterns.length > 0) {
-            mergedSchema = mergedSchema ?? { properties: {} };
+            mergedSchema = mergedSchema ?? { properties: Object.create(null) };
             mergedSchema.properties[propertyName] = propertySchema;
             dynamicId += `${matchingPatterns.map(({ name }) => `patternProperties/${name}`).join(",")}`;
         }
@@ -106,9 +108,11 @@ function validatePatternProperties({ node, data, pointer, path }: JsonSchemaVali
         const value = getValue(data, key);
         // patternProperties was tested in addValidate
         const matchingPatterns = patternProperties!.filter((property) => property.pattern.test(key));
-        matchingPatterns.forEach(({ node }) => errors.push(...validateNode(node, value, `${pointer}/${key}`, path)));
+        matchingPatterns.forEach(({ node }) =>
+            errors.push(...validateNode(node, value, appendDataPointer(pointer, key), path))
+        );
 
-        if (properties[key]) {
+        if (hasProperty(properties, key)) {
             return;
         }
 
@@ -117,7 +121,7 @@ function validatePatternProperties({ node, data, pointer, path }: JsonSchemaVali
             errors.push(
                 node.createError("no-additional-properties-error", {
                     key,
-                    pointer: `${pointer}/${key}`,
+                    pointer: appendDataPointer(pointer, key),
                     schema,
                     value,
                     patterns

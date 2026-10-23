@@ -5,6 +5,7 @@ import { Keyword, JsonSchemaReducerParams, JsonSchemaValidatorParams, Validation
 import { validateNode } from "../validateNode";
 import sanitizeErrors from "../utils/sanitizeErrors";
 import { collectValidationErrors } from "src/utils/collectValidationErrors";
+import { iterateProperties } from "../utils/iterateProperties";
 
 const KEYWORD = "dependentSchemas";
 
@@ -38,14 +39,14 @@ export function parseDependentSchemas(node: SchemaNode) {
     }
 
     const errors: ValidationAnnotation[] = [];
-    const parsedSchemas: Record<string, boolean | SchemaNode> = {};
-    for (const property of Object.keys(dependentSchemas)) {
+    const parsedSchemas: Record<string, boolean | SchemaNode> = Object.create(null);
+    for (const [property, propertyPointer] of iterateProperties(dependentSchemas)) {
         const schema = dependentSchemas[property];
         if (isObject(schema)) {
             parsedSchemas[property] = node.compileSchema(
                 schema,
-                `${node.evaluationPath}/${KEYWORD}/${property}`,
-                `${node.schemaLocation}/${KEYWORD}/${property}`
+                `${node.evaluationPath}/${KEYWORD}/${propertyPointer}`,
+                `${node.schemaLocation}/${KEYWORD}/${propertyPointer}`
             );
             collectValidationErrors(errors, parsedSchemas[property]);
         } else if (isBooleanSchema(schema)) {
@@ -53,7 +54,7 @@ export function parseDependentSchemas(node: SchemaNode) {
         } else {
             errors.push(
                 node.createError("schema-error", {
-                    pointer: `${node.schemaLocation}/${KEYWORD}/${property}`,
+                    pointer: `${node.schemaLocation}/${KEYWORD}/${propertyPointer}`,
                     schema: node.schema,
                     value: schema,
                     message: `Keyword '${KEYWORD}[string]' must be a valid JSON Schema'`
@@ -79,7 +80,7 @@ export function reduceDependentSchemas({ node, data }: JsonSchemaReducerParams) 
         if (dependentSchemas[propertyName] == null) {
             return;
         }
-        mergedSchema = mergedSchema ?? { properties: {} };
+        mergedSchema = mergedSchema ?? { properties: Object.create(null) };
         if (isSchemaNode(dependentSchemas[propertyName])) {
             mergedSchema = mergeSchema(mergedSchema, dependentSchemas[propertyName].schema);
         } else {
