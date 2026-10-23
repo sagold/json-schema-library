@@ -1,5 +1,9 @@
 ## Changelog
 
+### 11.6.16
+
+- fixed: support for RFC 6901 json-pointer property names
+
 ### 11.6.15
 
 - fixed: should prefer $schema over draft option in compileSchema and addRemoteSchema (#115)
