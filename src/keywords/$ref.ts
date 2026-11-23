@@ -182,7 +182,15 @@ function resolveRecursiveRef(node: SchemaNode, path: ValidationPath): SchemaNode
     return getRef(node, refInCurrentScope);
 }
 
+// compiled once per $ref site, isolated sites are skipped as their registry copies would go stale
+const compiledRefs = new WeakMap<SchemaNode, WeakMap<SchemaNode, SchemaNode>>();
+
 export function compileNext(referencedNode: SchemaNode, sourceNode: SchemaNode) {
+    const compiled = compiledRefs.get(sourceNode) ?? new WeakMap<SchemaNode, SchemaNode>();
+    const cached = compiled.get(referencedNode);
+    if (cached) {
+        return cached;
+    }
     let referencedSchema = referencedNode.schema;
     if (isObject(referencedNode.schema)) {
         referencedSchema = {
@@ -192,11 +200,15 @@ export function compileNext(referencedNode: SchemaNode, sourceNode: SchemaNode) 
     }
     const { isolated, remotes } = sourceNode.context;
     const targetNode = isolated === true ? isolateNode(referencedNode, remotes) : referencedNode;
-    return targetNode.compileSchema(
+    const node = targetNode.compileSchema(
         referencedSchema,
         `${sourceNode.evaluationPath}/$ref`,
         referencedNode.schemaLocation
     );
+    if (isolated !== true) {
+        compiledRefs.set(sourceNode, compiled.set(referencedNode, node));
+    }
+    return node;
 }
 
 export function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError {
