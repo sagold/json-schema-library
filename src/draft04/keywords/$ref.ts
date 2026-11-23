@@ -70,17 +70,28 @@ function resolveRef(this: SchemaNode, { pointer, path }: { pointer?: string; pat
     return resolvedNode;
 }
 
+const compiledRefs = new WeakMap<SchemaNode, WeakMap<SchemaNode, SchemaNode>>();
+
 function compileNext(referencedNode: SchemaNode, sourceNode: SchemaNode) {
+    const compiled = compiledRefs.get(sourceNode) ?? new WeakMap<SchemaNode, SchemaNode>();
+    const cached = compiled.get(referencedNode);
+    if (cached) {
+        return cached;
+    }
     const referencedSchema = isObject(referencedNode.schema)
         ? omit(referencedNode.schema, "id")
         : referencedNode.schema;
     const { isolated, remotes } = sourceNode.context;
     const targetNode = isolated === true ? isolateNode(referencedNode, remotes) : referencedNode;
-    return targetNode.compileSchema(
+    const node = targetNode.compileSchema(
         referencedSchema,
         `${sourceNode.evaluationPath}/$ref`,
         referencedSchema.schemaLocation
     );
+    if (isolated !== true) {
+        compiledRefs.set(sourceNode, compiled.set(referencedNode, node));
+    }
+    return node;
 }
 
 function getRef(node: SchemaNode, $ref = node?.$ref): SchemaNode | JsonError | undefined {
